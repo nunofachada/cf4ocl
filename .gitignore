@@ -1,0 +1,8 @@
+*~
+.~*#
+.nfs*
+*.[oa]
+*.tsv
+doc/
+bin/
+obj/

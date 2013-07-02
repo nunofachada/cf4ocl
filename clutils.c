@@ -1,0 +1,531 @@
+/*   
+ * This file is part of cf4ocl (C Framework for OpenCL).
+ * 
+ * cf4ocl is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version.
+ * 
+ * cf4ocl is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public 
+ * License along with cf4ocl. If not, see 
+ * <http://www.gnu.org/licenses/>.
+ * */
+ 
+/** 
+ * @file
+ * @brief OpenCL utilities function implementations.
+ * 
+ * @author Nuno Fachada
+ * @date 2013
+ * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
+ * */
+ 
+#include "clutils.h"
+
+/** 
+ * @brief Get kernel workgroup info. 
+ * 
+ * @param kernel OpenCL kernel to obtain info of.
+ * @param device OpenCL device where kernel will run.
+ * @param kwgi Kernel workgroup information structure, which will be populated by this function.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return CL_SUCCESS if no error ocurred, or any other value otherwise.
+ */
+cl_uint clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err) {
+
+	/* Aux. var. */
+	cl_uint status;
+
+	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &(kwgi->preferred_work_group_size_multiple), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE")
+	
+	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, 3 * sizeof(size_t), kwgi->compile_work_group_size, NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_COMPILE_WORK_GROUP_SIZE")
+
+	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &(kwgi->max_work_group_size), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_WORK_GROUP_SIZE")
+
+	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &(kwgi->local_mem_size), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_LOCAL_MEM_SIZE")
+
+	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(cl_ulong), &(kwgi->private_mem_size), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_PRIVATE_MEM_SIZE")
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+	/* Return. */
+	return status;
+}
+
+/** 
+ * @brief Print kernel workgroup info. 
+ * 
+ * @param kwgi Kernel workgroup information to print.
+ */
+void clu_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi) {
+	
+	printf("\n   =========================== Kernel Information ==========================\n\n");
+	printf("     Maximum workgroup size                  : %zu\n", kwgi->max_work_group_size);
+	printf("     Preferred multiple of workgroup size    : %zu\n", kwgi->preferred_work_group_size_multiple);
+	printf("     WG size in __attribute__ qualifier      : (%zu, %zu, %zu)\n", kwgi->compile_work_group_size[0], kwgi->compile_work_group_size[1], kwgi->compile_work_group_size[2]);
+	printf("     Local memory used by kernel             : %ld bytes\n", (long) kwgi->local_mem_size);
+	printf("     Min. private mem. used by each workitem : %ld bytes\n\n", (long) kwgi->private_mem_size);
+
+}
+
+/** 
+ * @brief Get a string identifying the type of device. 
+ * 
+ * @param cldt Device type (OpenCL bitfield)
+ * @param full Boolean true if full string is required, boolean false (0) if short string suffices.
+ * @param str Memory space where to put string identifying device type.
+ * @param strSize Size of memory space where to put string.
+ * @return String identifying device type (i.e. the str parameter).
+ */
+char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strSize) {
+
+	int occuSpace = 0;
+	char temp[30];
+	*str = 0;
+
+	if (cldt & CL_DEVICE_TYPE_DEFAULT) {
+		strcpy(temp, full ? CLU_DEVICE_TYPE_DEFAULT_STR_FULL : CLU_DEVICE_TYPE_DEFAULT_STR);
+		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
+		if ((int) strlen(temp) <= availSpace) {
+			strcat(str, " ");
+			strcat(str, temp);
+			availSpace -= strlen(temp);
+		}
+	}
+	if (cldt & CL_DEVICE_TYPE_CPU) {
+		strcpy(temp, full ? CLU_DEVICE_TYPE_CPU_STR_FULL : CLU_DEVICE_TYPE_CPU_STR);
+		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
+		if ((int) strlen(temp) <= availSpace) {
+			strcat(str, " ");
+			strcat(str, temp);
+			availSpace -= strlen(temp);
+		}
+	}
+	if (cldt & CL_DEVICE_TYPE_GPU) {
+		strcpy(temp, full ? CLU_DEVICE_TYPE_GPU_STR_FULL : CLU_DEVICE_TYPE_GPU_STR);
+		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
+		if ((int) strlen(temp) <= availSpace) {
+			strcat(str, " ");
+			strcat(str, temp);
+			availSpace -= strlen(temp);
+		}
+	}
+	if (cldt & CL_DEVICE_TYPE_ACCELERATOR) {
+		strcpy(temp, full ? CLU_DEVICE_TYPE_ACCELERATOR_STR_FULL : CLU_DEVICE_TYPE_ACCELERATOR_STR);
+		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
+		if ((int) strlen(temp) <= availSpace) {
+			strcat(str, " ");
+			strcat(str, temp);
+			availSpace -= strlen(temp);
+		}
+	}
+	if (cldt == CL_DEVICE_TYPE_ALL) {
+		strcpy(temp, full ? CLU_DEVICE_TYPE_ALL_STR_FULL : CLU_DEVICE_TYPE_ALL_STR);
+		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
+		if ((int) strlen(temp) <= availSpace) {
+			strcat(str, " ");
+			strcat(str, temp);
+			availSpace -= strlen(temp);
+		}
+	}
+	return str;
+}
+
+/** 
+ * @brief Create a new OpenCL zone, which will contain complete information for an OpenCL execution session on a specific device. 
+ * 
+ * @param deviceType Device type (OpenCL bitfield).
+ * @param numQueues Number of command queues.
+ * @param queueProperties Properties for the command queues.
+ * @param (*deviceSelector) Pointer to function which will select device, if more than one is available.
+ * @param dsExtraArg Extra argument for (*deviceSelector) function.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return OpenCL zone or NULL if device wasn't properly initialized.
+ */
+CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl_uint (*deviceSelector)(CLUDeviceInfo*, cl_uint, void*), void* dsExtraArg, GError **err) {
+	
+	/* Helper variables */
+	cl_int status;
+	
+	/* OpenCL zone to initialize and return */
+	CLUZone* zone;
+	
+	/* Information about devices */
+	CLUDeviceInfo devInfos[CLU_MAX_DEVICES_TOTAL];
+
+	/* Number of devices. */
+	cl_uint numDevices;
+
+	/* Index of device information */
+	cl_uint deviceInfoIndex;
+
+	/* Context properties, */
+	cl_context_properties cps[3] = {CL_CONTEXT_PLATFORM, 0, 0};
+
+	/* List of platform Ids. */
+	cl_platform_id platfIds[CLU_MAX_PLATFORMS];
+
+	/* Number of platforms. */
+	cl_uint numPlatforms;
+
+	/* Total number of devices. */
+	unsigned int totalNumDevices;
+
+	/* Device IDs for a given platform. */
+	cl_device_id devIds[CLU_MAX_DEVICES_PER_PLATFORM];
+	
+	/* Initialize zone */
+	zone = (CLUZone*) malloc(sizeof(CLUZone));
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == zone, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory OpenCL zone. ");
+	zone->platform = NULL;
+	zone->device = NULL;
+	zone->context = NULL;
+	zone->queues = NULL;
+	zone->program = NULL;
+	zone->device_name = NULL;
+	zone->platform_name = NULL;
+		
+	/* Get number of platforms */
+	status = clGetPlatformIDs(0, NULL, &numPlatforms);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get number of platforms");
+
+	/* Get existing platforms */
+	status = clGetPlatformIDs(numPlatforms, platfIds, NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get platform Ids");
+
+	/* Cycle through platforms, get specified devices in existing platforms */
+	totalNumDevices = 0;
+	for(unsigned int i = 0; i < numPlatforms; i++) 	{
+		/* Get specified devices for current platform */
+		status = clGetDeviceIDs( platfIds[i], deviceType, CLU_MAX_DEVICES_PER_PLATFORM, devIds, &numDevices );
+		if (status != CL_DEVICE_NOT_FOUND) {
+			/* At least one device found, lets take note */
+			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device Ids");
+			for (unsigned int j = 0; j < numDevices; j++) {
+				/* Keep device and platform IDs. */
+				devInfos[totalNumDevices].id = devIds[j];
+				devInfos[totalNumDevices].platformId = platfIds[i];
+				/* Get device name. */
+				status = clGetDeviceInfo(devIds[j], CL_DEVICE_NAME, sizeof(devInfos[totalNumDevices].name), devInfos[totalNumDevices].name, NULL);
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device info");
+				/* Get platform name. */
+				status = clGetPlatformInfo( platfIds[i], CL_PLATFORM_VENDOR, sizeof(devInfos[totalNumDevices].platformName), devInfos[totalNumDevices].platformName, NULL);
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get platform info");
+				/* Increment total number of found devices. */
+				totalNumDevices++;
+			}
+		}
+	}
+	
+	/* Check whether any devices of the specified type were found */
+	if (totalNumDevices == 0) {
+		/* No devices of the specified type where found, return with error. */
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CL_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: device not found");
+	} else {
+		/* Several compatible devices found, chose one with given selector function. */
+		deviceInfoIndex = (*deviceSelector)(devInfos, totalNumDevices, dsExtraArg);
+	}
+
+	/* Store info about the selected device and platform. */
+	zone->device_type = deviceType;
+	zone->device = devInfos[deviceInfoIndex].id;
+	zone->platform = devInfos[deviceInfoIndex].platformId;
+	zone->device_name = g_strdup(devInfos[deviceInfoIndex].name);
+	zone->platform_name = g_strdup(devInfos[deviceInfoIndex].platformName);
+
+	/* Determine number of compute units for that device */
+	status = clGetDeviceInfo(zone->device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &zone->cu, NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: get target device info");
+	
+	/* Create a context on that device. */
+	cps[1] = (cl_context_properties) devInfos[deviceInfoIndex].platformId;
+	zone->context = clCreateContext(cps, 1, &zone->device, NULL, NULL, &status);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: creating context");
+	
+	/* Create the specified command queues on that device */
+	zone->numQueues = numQueues;
+	zone->queues = (cl_command_queue*) malloc(numQueues * sizeof(cl_command_queue));
+	for (unsigned int i = 0; i < numQueues; i++) {
+		zone->queues[i] = clCreateCommandQueue(zone->context, zone->device, queueProperties, &status);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: creating command queue");
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	/* Free OpenCL zone. */
+	if (zone != NULL) {
+		clu_zone_free(zone);
+		zone = NULL;
+	}
+
+finish:	
+
+	/* Return. */
+	return zone;
+
+}
+
+/** 
+ * @brief Create an OpenCL program given a set of source kernel files. 
+ * 
+ * @param zone OpenCL zone where to create program.
+ * @param kernelFiles Array of strings identifying filenames containing kernels.
+ * @param numKernelFiles Number of strings identifying filenames containing kernels.
+ * @param compilerOpts OpenCL compiler options.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return CL_SUCCESS if no error ocurred, or any other value otherwise.
+ */
+cl_int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err) {
+
+	/* Helper variables */
+	cl_int status, bpStatus;
+	char * buildLog = NULL;
+	size_t logsize;
+	char** source = NULL;
+	
+	/* Import kernels */
+	source = (char**) malloc(numKernelFiles * sizeof(char*));
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == source, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for kernels source file. ");
+	for (unsigned int i = 0; i < numKernelFiles; i++) { source[i] = NULL; }
+	for (unsigned int i = 0; i < numKernelFiles; i++) {
+		source[i] = clu_source_load(kernelFiles[i], err);
+		gef_if_error_goto(*err, GEF_USE_GERROR, status, error_handler);
+	}
+	
+	/* Load kernels sources and create program */
+	cl_program program = clCreateProgramWithSource(zone->context, numKernelFiles, (const char**) source, NULL, &status);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Create program with source");
+	
+	/* Perform runtime source compilation of program */
+	bpStatus = clBuildProgram( program, 1, &zone->device, compilerOpts, NULL, NULL );
+	/* Check for errors. */
+	if (bpStatus != CL_SUCCESS) {
+		/* If where here it's because program failed to build. However, error will only be thrown after getting build information. */
+		/* Get build log size. */
+		status = clGetProgramBuildInfo(program, zone->device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logsize);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Error getting program build info (log size) after program failed to build with error %d", bpStatus);
+		/* Alocate memory for build log. */
+		buildLog = (char*) malloc(logsize);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == buildLog, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for build log after program failed to build with error %d", bpStatus);
+		/* Get build log. */
+		status = clGetProgramBuildInfo(program, zone->device, CL_PROGRAM_BUILD_LOG, logsize, buildLog, NULL);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Error getting program build info (build log) after program failed to build with error %d", bpStatus);
+		/* Throw error. */
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, bpStatus, error_handler, "Failed to build program. \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", buildLog);
+	}
+	zone->program = program;
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+
+	/* Free stuff. */
+	if (source != NULL) {
+		for (unsigned int i = 0; i < numKernelFiles; i++) {
+			if (source[i] != NULL) {
+				clu_source_free(source[i]);
+			}
+		}
+		free(source);
+	}
+	if (buildLog != NULL) {
+		free(buildLog);
+	}
+	
+	/* Return. */
+	return status;
+}
+
+/** 
+ * @brief Free a previously created OpenCL zone. 
+ * @todo clReleaseCommandQueue segfault's with AMDAPPSDK 2.8.
+ * 
+ * @param zone OpenCL zone to free.
+ */
+void clu_zone_free(CLUZone* zone) {
+	g_assert(zone != NULL);
+	if (zone->queues) {
+		for (unsigned int i = 0; i < zone->numQueues; i++)
+			if (zone->queues[i]) clReleaseCommandQueue(zone->queues[i]);
+		free(zone->queues);
+	}
+	if (zone->program) clReleaseProgram(zone->program);
+	if (zone->context) clReleaseContext(zone->context);
+	if (zone->device_name) g_free(zone->device_name);
+	if (zone->platform_name) g_free(zone->platform_name);
+	free(zone);
+
+}
+
+/** 
+ * @brief Load kernel source from given file. 
+ * 
+ * @param filename Filename from where to load kernel source.
+ * @param err GLib error object for error reporting.
+ * @return Kernel source code.
+ */
+char* clu_source_load(const char * filename, GError** err) {
+	
+	/* Function vars. */
+	FILE * fp = NULL;
+	char * sourcetmp = NULL;
+
+	/* Open file. */
+	fp = fopen(filename, "r");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, fp == NULL, CLU_ERROR_OPENFILE, error_handler, "Unable to open kernels file '%s'.", filename);
+	
+	/* Get file size. */
+	fseek(fp, 0L, SEEK_END);
+	int prog_size = (int) ftell(fp);
+	
+	/* Allocate memory for file contents. */
+	sourcetmp = (char*) malloc((prog_size + 1)*sizeof(char));
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, sourcetmp == NULL, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory to place contents of file '%s'.", filename);
+
+	/* Read file contents in string buffer. */
+	rewind(fp);
+	fread(sourcetmp, sizeof(char), prog_size, fp);
+	sourcetmp[prog_size] = '\0';
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+
+	/* Close file. */
+	if (fp) fclose(fp);
+
+	/* Return file contents in string form. */
+	return sourcetmp;
+}
+
+/** 
+ * @brief Free kernel source.
+ * 
+ * @param source Kernel source code to free
+ */
+void clu_source_free(char* source) {
+	g_assert(source != NULL);
+	free(source);
+}
+
+/** 
+ * @brief Private helper function, prints a list of available devices. 
+ * 
+ * @param devInfos List of device information.
+ * @param numDevices Number of devices on list.
+ * */
+static void clu_menu_device_selector_list(CLUDeviceInfo* devInfos, cl_uint numDevices, cl_uint selected) {
+	char* selectedStr;
+	printf("\n   =========================== Device Selection ============================\n\n");
+	for (cl_uint i = 0; i < numDevices; i++) {
+		selectedStr = "            ";
+		if (i == selected) {
+			selectedStr = "  [SELECTED]";
+		}
+		printf(" %s %d. %s\n                 %s\n", selectedStr, i, devInfos[i].name, devInfos[i].platformName);
+	}
+}
+
+/** 
+ * @brief Simple implementation of a device selector function.
+ * 
+ * If @verbatim extraArg @endverbatim points to an integer within the index 
+ * interval of available devices, then the respective device is selected.
+ * Otherwise (e.g. if @verbatim extraArg @endverbatim is NULL), the user 
+ * is queried to select a device from a list of available devices.
+ * 
+ * @param devInfos List of device information.
+ * @param numDevices Number of devices on list.
+ * @param extraArg Pointer to device index or NULL.
+ * @return The list index of the selected device.
+ */
+cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
+	
+	/* numDevices must be greater than 0. */
+	g_assert_cmpuint(numDevices, >, 0);
+	
+	/* Index of selected device. */
+	cl_int index = -1;
+	
+	/* If only one device exists, return index 0. */
+	if (numDevices == 1) {
+		clu_menu_device_selector_list(devInfos, 1, 0);
+		return 0;
+	}
+
+	/* If extraArg contains a valid device index, return that index. */
+	if (extraArg != NULL) {
+		index = *((cl_uint*) extraArg);
+		if ((index >= 0) && (index < (cl_int) numDevices)) {
+			clu_menu_device_selector_list(devInfos, numDevices, index);
+			return index;
+		}
+		/* If we get here, an invalid device index was given. */
+		printf("\n   (!) No device at index %d!\n", index);
+	}
+	
+	/* Otherwise ask the user for the correct index. */
+	int result;
+	/* Print available devices */
+	clu_menu_device_selector_list(devInfos, numDevices, -1);
+	/* Get user selection. */
+	do {
+		printf("   (?) Select device (0-%d) > ", numDevices - 1);
+		result = scanf("%u", &index);
+		/* Clean keyboard buffer */
+		int c;
+		do { c = getchar(); } while (c != '\n' && c != EOF);
+		/* Check if result is Ok and break the loop if so */
+		if (1 == result) {
+			if ((index >= 0) && (index < (cl_int) numDevices))
+				break;
+		}
+		/* Result not Ok, print error message */
+		printf("   (!) Invalid choice, please insert a value between 0 and %u.\n", numDevices - 1);
+	} while (1);
+	return index;
+}
+
+/** 
+ * @brief Resolves to error category identifying string, in this case an error in the OpenCL utilities library.
+ * 
+ * @return A GQuark structure defined by category identifying string, which identifies the error as a CL utilities generated error.
+ */
+GQuark clu_utils_error_quark() {
+	return g_quark_from_static_string("clu-utils-error-quark");
+}
+
