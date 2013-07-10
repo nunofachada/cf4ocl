@@ -6,8 +6,8 @@ About
 
 The C Framework for OpenCL (cf4ocl) is a pure C99 set of libraries and
 utilities for speeding-up the development and benchmarking of OpenCL 
-programs. It's main target platform is Linux, although previous
-versions were sucessfully compiled in Windows with [MinGW](http://www.mingw.org/). 
+programs. Its main target platform is Linux, although previous
+versions were successfully compiled in Windows with [MinGW](http://www.mingw.org/). 
 The only dependency is [GLib](https://developer.gnome.org/glib/) (v2.23
 or newer), the development files of which can be easily installed from
 your distro's package manager. Library code is licensed under [LGPLv3](http://www.gnu.org/licenses/lgpl.html),
@@ -15,7 +15,7 @@ while the remaining code is licensed under [GPLv3](http://www.gnu.org/licenses/g
 
 The code is fully commented (docs can be generated with Doxygen, 
 preferably with version 1.8.3 or newer), is compiled with `-Wall` and
-`-Wextra` flags, and is veryfied with [cppcheck](http://cppcheck.sourceforge.net/).
+`-Wextra` flags, and is verified with [cppcheck](http://cppcheck.sourceforge.net/).
 
 Organization
 ------------
@@ -39,12 +39,12 @@ Library
 
 ### CL Utils
 
-* Create/initialize OpenCL objects such as plaform, device, context, 
+* Create/initialize OpenCL objects such as platform, device, context, 
 command queues, devices, and so on with just one instruction (also one
 instruction for freeing/releasing these objects).
 * Build an OpenCL program with one instruction by passing an array of
 filenames containing the kernels.
-* Automatic or manual device selecion.
+* Automatic or manual device selection.
 * Doesn't hide OpenCL objects from you.
 
 ### CL Profiler
@@ -83,3 +83,4 @@ Other useful C frameworks/utilities for OpenCL
 * [Simple OpenCL](http://code.google.com/p/simple-opencl/)
 * [The OpenCL utility library](https://github.com/Oblomov/CLU)
 * [Computing Language Utility](https://github.com/Computing-Language-Utility/CLU)
+* [OCL-MLA](http://tuxfan.github.io/ocl-mla/)
