@@ -28,6 +28,63 @@
 #include "clutils.h"
 
 /** 
+ * @brief Private helper function, prints a list of available devices. 
+ * 
+ * @param devInfos List of device information.
+ * @param numDevices Number of devices on list.
+ * */
+static void clu_menu_device_selector_list(CLUDeviceInfo* devInfos, cl_uint numDevices, cl_uint selected) {
+	char* selectedStr;
+	printf("\n   =========================== Device Selection ============================\n\n");
+	for (cl_uint i = 0; i < numDevices; i++) {
+		selectedStr = "            ";
+		if (i == selected) {
+			selectedStr = "  [SELECTED]";
+		}
+		printf(" %s %d. %s\n                 %s\n", selectedStr, i, devInfos[i].device_name, devInfos[i].platform_name);
+	}
+}
+
+/** 
+ * @brief Private helper function, asks the user to select a device 
+ * from a list. 
+ * 
+ * @param devInfos List of device information.
+ * @param numDevices Number of devices on list.
+ * @return The list index of the selected device.
+ * */
+static cl_uint clu_menu_device_selector_query(CLUDeviceInfo* devInfos, cl_uint numDevices) {
+	
+	/* Index of selected device. */
+	cl_int index = -1;
+	/* Number of results read from user input. */
+	int result;
+	
+	/* Print available devices */
+	clu_menu_device_selector_list(devInfos, numDevices, -1);
+	
+	/* Get user selection. */
+	do {
+		printf("   (?) Select device (0-%d) > ", numDevices - 1);
+		result = scanf("%u", &index);
+		/* Clean keyboard buffer */
+		int c;
+		do { c = getchar(); } while (c != '\n' && c != EOF);
+		/* Check if result is Ok and break the loop if so */
+		if (1 == result) {
+			if ((index >= 0) && (index < (cl_int) numDevices))
+				break;
+		}
+		/* Result not Ok, print error message */
+		printf("   (!) Invalid choice, please insert a value between 0 and %u.\n", numDevices - 1);
+	} while (1);
+	
+	/* Return device index. */
+	return index;
+
+}
+
+/** 
  * @brief Get kernel workgroup info. 
  * 
  * @param kernel OpenCL kernel to obtain info of.
@@ -154,12 +211,12 @@ char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strS
  * @param deviceType Device type (OpenCL bitfield).
  * @param numQueues Number of command queues.
  * @param queueProperties Properties for the command queues.
- * @param (*deviceSelector) Pointer to function which will select device, if more than one is available.
+ * @param devSel Pointer to function which will select device, if more than one is available.
  * @param dsExtraArg Extra argument for (*deviceSelector) function.
  * @param err Error structure, to be populated if an error occurs.
  * @return OpenCL zone or NULL if device wasn't properly initialized.
  */
-CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl_uint (*deviceSelector)(CLUDeviceInfo*, cl_uint, void*), void* dsExtraArg, GError **err) {
+CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err) {
 	
 	/* Helper variables */
 	cl_int status;
@@ -223,10 +280,10 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 				devInfos[totalNumDevices].id = devIds[j];
 				devInfos[totalNumDevices].platformId = platfIds[i];
 				/* Get device name. */
-				status = clGetDeviceInfo(devIds[j], CL_DEVICE_NAME, sizeof(devInfos[totalNumDevices].name), devInfos[totalNumDevices].name, NULL);
+				status = clGetDeviceInfo(devIds[j], CL_DEVICE_NAME, sizeof(devInfos[totalNumDevices].device_name), devInfos[totalNumDevices].device_name, NULL);
 				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device info");
 				/* Get platform name. */
-				status = clGetPlatformInfo( platfIds[i], CL_PLATFORM_VENDOR, sizeof(devInfos[totalNumDevices].platformName), devInfos[totalNumDevices].platformName, NULL);
+				status = clGetPlatformInfo( platfIds[i], CL_PLATFORM_VENDOR, sizeof(devInfos[totalNumDevices].platform_name), devInfos[totalNumDevices].platform_name, NULL);
 				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get platform info");
 				/* Increment total number of found devices. */
 				totalNumDevices++;
@@ -238,17 +295,24 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 	if (totalNumDevices == 0) {
 		/* No devices of the specified type where found, return with error. */
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CL_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: device not found");
+	} else if (totalNumDevices == 1) {
+		/* Only one device found, use that one. */
+		deviceInfoIndex = 0;
 	} else {
-		/* Several compatible devices found, chose one with given selector function. */
-		deviceInfoIndex = (*deviceSelector)(devInfos, totalNumDevices, dsExtraArg);
+		/* Several compatible devices found, choose one with given selector function. */
+		deviceInfoIndex = devSel(devInfos, totalNumDevices, dsExtraArg);
+		/* Test return value of selector function (if it is out of range, 
+		 * there is a programming error). */
+		g_assert_cmpint(deviceInfoIndex, >=, 0);
+		g_assert_cmpint(deviceInfoIndex, <, totalNumDevices);
 	}
 
 	/* Store info about the selected device and platform. */
 	zone->device_type = deviceType;
 	zone->device = devInfos[deviceInfoIndex].id;
 	zone->platform = devInfos[deviceInfoIndex].platformId;
-	zone->device_name = g_strdup(devInfos[deviceInfoIndex].name);
-	zone->platform_name = g_strdup(devInfos[deviceInfoIndex].platformName);
+	zone->device_name = g_strdup(devInfos[deviceInfoIndex].device_name);
+	zone->platform_name = g_strdup(devInfos[deviceInfoIndex].platform_name);
 
 	/* Determine number of compute units for that device */
 	status = clGetDeviceInfo(zone->device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &zone->cu, NULL);
@@ -443,29 +507,12 @@ void clu_source_free(char* source) {
 }
 
 /** 
- * @brief Private helper function, prints a list of available devices. 
+ * @brief Implementation of ::clu_device_selector function which 
+ * queries the user in order to select a device.
  * 
- * @param devInfos List of device information.
- * @param numDevices Number of devices on list.
- * */
-static void clu_menu_device_selector_list(CLUDeviceInfo* devInfos, cl_uint numDevices, cl_uint selected) {
-	char* selectedStr;
-	printf("\n   =========================== Device Selection ============================\n\n");
-	for (cl_uint i = 0; i < numDevices; i++) {
-		selectedStr = "            ";
-		if (i == selected) {
-			selectedStr = "  [SELECTED]";
-		}
-		printf(" %s %d. %s\n                 %s\n", selectedStr, i, devInfos[i].name, devInfos[i].platformName);
-	}
-}
-
-/** 
- * @brief Simple implementation of a device selector function.
- * 
- * If @verbatim extraArg @endverbatim points to an integer within the index 
+ * If `extraArg` points to an integer within the index 
  * interval of available devices, then the respective device is selected.
- * Otherwise (e.g. if @verbatim extraArg @endverbatim is NULL), the user 
+ * Otherwise (e.g. if `extraArg` is NULL), the user 
  * is queried to select a device from a list of available devices.
  * 
  * @param devInfos List of device information.
@@ -475,50 +522,144 @@ static void clu_menu_device_selector_list(CLUDeviceInfo* devInfos, cl_uint numDe
  */
 cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
 	
-	/* numDevices must be greater than 0. */
-	g_assert_cmpuint(numDevices, >, 0);
+	/* numDevices must be greater than 1. */
+	g_assert_cmpuint(numDevices, >, 1);
 	
 	/* Index of selected device. */
 	cl_int index = -1;
 	
-	/* If only one device exists, return index 0. */
-	if (numDevices == 1) {
-		clu_menu_device_selector_list(devInfos, 1, 0);
-		return 0;
-	}
-
-	/* If extraArg contains a valid device index, return that index. */
 	if (extraArg != NULL) {
+		/* If extraArg contains a valid device index, set return value
+		 * to that index. */
 		index = *((cl_uint*) extraArg);
 		if ((index >= 0) && (index < (cl_int) numDevices)) {
+			/* Check if index is within bounds. */
 			clu_menu_device_selector_list(devInfos, numDevices, index);
-			return index;
+		} else {
+			/* If we get here, an invalid device index was given. */
+			printf("\n   (!) No device at index %d!\n", index);
+			index = -1;
 		}
-		/* If we get here, an invalid device index was given. */
-		printf("\n   (!) No device at index %d!\n", index);
 	}
 	
-	/* Otherwise ask the user for the correct index. */
-	int result;
-	/* Print available devices */
-	clu_menu_device_selector_list(devInfos, numDevices, -1);
-	/* Get user selection. */
-	do {
-		printf("   (?) Select device (0-%d) > ", numDevices - 1);
-		result = scanf("%u", &index);
-		/* Clean keyboard buffer */
-		int c;
-		do { c = getchar(); } while (c != '\n' && c != EOF);
-		/* Check if result is Ok and break the loop if so */
-		if (1 == result) {
-			if ((index >= 0) && (index < (cl_int) numDevices))
-				break;
-		}
-		/* Result not Ok, print error message */
-		printf("   (!) Invalid choice, please insert a value between 0 and %u.\n", numDevices - 1);
-	} while (1);
+	/* If no proper index was given ask the user for the correct index. */
+	if (index == -1) {
+		index = clu_menu_device_selector_query(devInfos, numDevices);
+	}
+	
+	/* Return device index. */
 	return index;
 }
+
+/** 
+ * @brief Implementation of ::clu_device_selector function which selects a 
+ * device based on user a supplied filter.
+ * 
+ * `extraArg` should point to a NULL-terminated array of strings
+ * containing key-value pairs used for filtering. The following keys,
+ * as well as the corresponding value descriptions, are supported:
+ * 
+ * * "device_name" - String representing partial or complete device name
+ * * "platform_name" - String representing partial or complete platform name
+ * 
+ * @param devInfos List of device information.
+ * @param numDevices Number of devices on list.
+ * @param extraArg NULL-terminated array of strings.
+ * @return The list index of the selected device.
+ */
+cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
+	
+	/* numDevices must be greater than 1. */
+	g_assert_cmpuint(numDevices, >, 1);
+	
+	/* Index of selected device. */
+	cl_int index = -1;
+	/* Filters: a NULL-terminated array of strings. */
+	gchar** filters;
+	/* Filter index. */
+	guint filter_idx = 0;
+	/* Number of devices found which pass the filter. */
+	int numValidDevs = 0;
+	/* If more than 1 device is found this aux. struct. will be passed 
+	 * to a user query function. */
+    CLUDeviceInfo validDevInfos[CLU_MAX_DEVICES_TOTAL];
+    /* Maps the aux. struct. dev. index to the main struct. dev. index. */
+	int map[CLU_MAX_DEVICES_TOTAL];
+	/* Flag to check if a device is accepted by the filters. */
+	gboolean validDev;
+	/* Partial name must be a substring of complete name. */
+	gchar *partialName, *completeName;
+
+	/* Check if extraArg contains a valid NULL-terminated array of strings. */
+	if (extraArg != NULL) {
+		filters = (gchar**) extraArg;
+		g_assert(filters[0] != NULL);
+		/* Cycle through available devices. */
+		for (unsigned int i = 0; i < numDevices; i++) {
+			/* Apply filters while KEY is not NULL. */
+			while (filters[filter_idx] != NULL) {
+				/* Check if VALUE is valid. */
+				if (filters[filter_idx + 1] == NULL) {
+					/* If VALUE is NULL, there is a programming error on the 
+					* calling function. */
+					g_assert_not_reached();
+				}
+				/* Not known if device will pass next filter. */
+				validDev = FALSE;
+				/* Check to what filter the KEY corresponds to. */
+				if (g_strcmp0(filters[filter_idx], "device_name")) {
+					/* Filter is device name, get device name. */
+					completeName = g_ascii_strdown(devInfos[i].device_name, -1);
+				} else if (g_strcmp0(filters[filter_idx], "platform_name")) {
+					/* Filter is platform name, get platform name. */
+					completeName = g_ascii_strdown(devInfos[i].platform_name, -1);
+				} else {
+					/* A well-behaved app should not get here. */
+					g_assert_not_reached();
+				}
+				/* Check if partial name is within in the complete name. */
+				partialName = g_ascii_strdown(filters[filter_idx + 1], -1);
+				if (g_strrstr(completeName, partialName)) {
+					/* Valid device so far. */
+					validDev = TRUE;
+				}
+				/* Free temporary strings. */
+				g_free(partialName);
+				g_free(completeName);
+				/* If device didn't pass filter, break filter cycle. */
+				if (!validDev) {
+					break;
+				}
+				/* Increment filter index. */
+				filter_idx += 2;
+			}
+			/* If device passed filters, add it to approved*/
+			if (validDev) {
+				validDevInfos[numValidDevs] = devInfos[i];
+				map[numValidDevs] = i;
+				numValidDevs++;
+			}
+		}
+	}
+	
+	/* If only one device left, set device index to 0. */
+	if (numValidDevs == 0) {
+		/* If no valid device found ask the user to chose any among the
+		 * existing devices. */
+		index = clu_menu_device_selector_query(devInfos, numDevices);
+		/* @todo Should log a message somewhere indicating this. */
+	} else if (numValidDevs == 1) {
+		/* Only one valid device found, return that one. */
+		index = map[0];
+	} else {
+		/* Several valid devices found, ask the user to chose one. */
+		index = map[clu_menu_device_selector_query(validDevInfos, numValidDevs)];
+	}
+	
+	/* Return device index. */
+	return index;
+}
+
 
 /** 
  * @brief Resolves to error category identifying string, in this case an error in the OpenCL utilities library.

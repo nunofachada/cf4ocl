@@ -102,58 +102,88 @@ enum clu_error_codes {
  * @brief Kernel work group information.
  */
 typedef struct clu_kernel_work_group_info {
-	size_t preferred_work_group_size_multiple;	/**< Preferred multiple of workgroup size for launch. */
-	size_t compile_work_group_size[3];			/**< Work-group size specified by the @code __attribute__((reqd_work_gr oup_size(X, Y, Z))) @endcode qualifier. If the work-group size is not specified using the above attribute qualifier (0, 0, 0) is returned. */
-	size_t max_work_group_size;					/**< Maximum work-group size that can be used to execute a kernel on a specific device. */
-	cl_ulong local_mem_size;					/**< Amount of local memory in bytes being used by a kernel. */
-	cl_ulong private_mem_size;					/**< Minimum amount of private memory, in bytes, used by each workitem in the kernel.  */
+	size_t preferred_work_group_size_multiple; /**< Preferred multiple of workgroup size for launch. */
+	size_t compile_work_group_size[3];         /**< Work-group size specified by the @code __attribute__((reqd_work_gr oup_size(X, Y, Z))) @endcode qualifier. If the work-group size is not specified using the above attribute qualifier (0, 0, 0) is returned. */
+	size_t max_work_group_size;                /**< Maximum work-group size that can be used to execute a kernel on a specific device. */
+	cl_ulong local_mem_size;                   /**< Amount of local memory in bytes being used by a kernel. */
+	cl_ulong private_mem_size;                 /**< Minimum amount of private memory, in bytes, used by each workitem in the kernel.  */
 } CLUKernelWorkgroupInfo;
 
 /** 
  * @brief Complete information for an OpenCL execution session on a specific device.
  */
 typedef struct clu_zone {
-	cl_platform_id platform;	/**< OpenCL platform ID. */
-	cl_device_id device;		/**< OpenCL device ID. */
-	cl_uint device_type;		/**< OpenCL device type. */
-	cl_uint cu;					/**< Compute units of device. */
-	cl_context context;			/**< OpenCL context. */
-	cl_command_queue* queues;	/**< Command queues. */
-	cl_program program;			/**< OpenCL program. */
-	cl_uint numQueues;			/**< Number of command queues. */
-	char* device_name;			/**< Device name string. */
-	char* platform_name;		/**< Platform name string. */
+	cl_platform_id platform;  /**< OpenCL platform ID. */
+	cl_device_id device;      /**< OpenCL device ID. */
+	cl_uint device_type;      /**< OpenCL device type. */
+	cl_uint cu;               /**< Compute units of device. */
+	cl_context context;       /**< OpenCL context. */
+	cl_command_queue* queues; /**< Command queues. */
+	cl_program program;       /**< OpenCL program. */
+	cl_uint numQueues;        /**< Number of command queues. */
+	char* device_name;        /**< Device name string. */
+	char* platform_name;      /**< Platform name string. */
 } CLUZone;
-
 
 /**
  * @brief Information about OpenCL device.
  */
 typedef struct clu_device_info {
-	cl_device_id id;						/**< Device ID. */
-	char name[CLU_MAX_AUX_BUFF];			/**< Device name string. */
-	cl_platform_id platformId;				/**< Platform ID. */
-	char platformName[CLU_MAX_AUX_BUFF];	/**< Platform name string. */
+	cl_device_id id;                      /**< Device ID. */
+	char device_name[CLU_MAX_AUX_BUFF];   /**< Device name string. */
+	cl_platform_id platformId;            /**< Platform ID. */
+	char platform_name[CLU_MAX_AUX_BUFF]; /**< Platform name string. */
 } CLUDeviceInfo;
+
+/**
+ * @brief Pointer to function which will select device, if more than one 
+ * is available.
+ * 
+ * Implementations of this function must always return a value between
+ * 0 and @a numDevices.
+ * 
+ * @param devInfos Array of device information.
+ * @param numDevices Number of devices on list.
+ * @param extraArg Extra arguments which may be required by function 
+ * implementations.
+ * @return The array index of the selected device.
+ */
+typedef cl_uint (*clu_device_selector)(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Get kernel workgroup info. */
 cl_uint clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err);
+
 /** @brief Print kernel workgroup info. */
 void clu_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi);
+
 /** @brief Get a string identifying the type of device. */
 char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strSize);
-/** @brief Create a new OpenCL zone, which will contain complete information for an OpenCL execution session on a specific device. */
+
+/** @brief Create a new OpenCL zone, which will contain complete 
+ * information for an OpenCL execution session on a specific device. */
 CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl_uint (*deviceSelector)(CLUDeviceInfo*, cl_uint, void*), void* dsExtraArg, GError **err);
+
 /** @brief Create an OpenCL program given a set of source kernel files. */
 cl_int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err);
+
 /** @brief Free a previously created OpenCL zone. */
 void clu_zone_free(CLUZone* zone);
+
 /** @brief Load kernel source from given file. */
 char* clu_source_load(const char* filename, GError** err);
+
 /** @brief Free kernel source. */
 void clu_source_free(char* source);
+
 /** @brief Queries the user to select a device from a list. */
 cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
-/** @brief Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */
+
+/** @brief Implementation of a device selector function which selects a 
+ * device based on user supplied filter. */
+cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+
+/** @brief Resolves to error category identifying string, in this case 
+ * an error in the OpenCL utilities library. */
 GQuark clu_utils_error_quark(void);
+
 #endif
