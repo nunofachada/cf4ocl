@@ -87,6 +87,20 @@
 /** @} */
 
 /**
+ * @defgroup CLU_DEVICE_SELECTION Labels for selecting devices
+ *
+ * @{
+ */
+ 
+/** Select device by device name. */
+#define CLU_DEVICE_SELECTION_DEVICE_NAME "device_name"
+/** Select device by platform name. */
+#define CLU_DEVICE_SELECTION_PLATFORM_NAME "platform_name"
+
+/** @} */
+
+
+/**
  * @brief Error codes.
  * */ 
 enum clu_error_codes {
@@ -146,7 +160,8 @@ typedef struct clu_device_info {
  * @param numDevices Number of devices on list.
  * @param extraArg Extra arguments which may be required by function 
  * implementations.
- * @return The array index of the selected device.
+ * @return The array index of the selected device or -1 if no device is
+ * selectable.
  */
 typedef cl_uint (*clu_device_selector)(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 

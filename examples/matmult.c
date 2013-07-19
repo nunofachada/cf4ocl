@@ -85,6 +85,8 @@ static size_t lws[] = {LWS_X, LWS_Y};
 static int matrix_range[] = {RANGE_MATRIX_FROM, RANGE_MATRIX_TO};
 static gchar* compiler_opts = NULL;
 static int dev_idx = -1;
+static gchar* dev_name = NULL;
+static gchar* platf_name = NULL;
 static int kernel_id = KERNEL_ID;
 static gboolean verbose = VERBOSE;
 static guint32 seed = SEED;
@@ -105,15 +107,17 @@ static gboolean mm_parse_rge(const gchar *option_name, const gchar *value, gpoin
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"kernel",    'k', 0, G_OPTION_ARG_INT,      &kernel_id,     "kernel selection: 0-2 (C=AB), 3-4 (C=AA^T) (default is " STR(KERNEL_ID) ")",                "ID"},
-	{"asize",     'a', 0, G_OPTION_ARG_CALLBACK, mm_parse_a,     "Size (cols,rows) of matrix A (default is " STR(A_COLS) "," STR(A_ROWS) ")",                 "SIZE,SIZE"},
-	{"bsize",     'b', 0, G_OPTION_ARG_CALLBACK, mm_parse_b,     "Size (cols,rows) of matrix B (default is " STR(B_COLS) "," STR(B_ROWS) ")",                 "SIZE,SIZE"},
-	{"localsize", 'l', 0, G_OPTION_ARG_CALLBACK, mm_parse_lws,   "Local work size (default is " STR(LWS_X) "," STR(LWS_Y) ")",                                "SIZE,SIZE"},
-	{"range",     'r', 0, G_OPTION_ARG_CALLBACK, mm_parse_rge,   "Matrix range of values (default is " STR(RANGE_MATRIX_FROM) "," STR(RANGE_MATRIX_TO)")",    "MIN,MAX"},
-	{"seed",      's', 0, G_OPTION_ARG_INT,      &seed,          "RNG seed (default is " STR(SEED)")",                                                        "SEED"},
-	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,       "Print input and output matrices to stderr",                                                 NULL},
-	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,       "Device index (if not given and more than one device is available, chose device from menu)", "INDEX"},
-	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts, "Extra OpenCL compiler options",                                                             "OPTS"},
+	{"kernel",    'k', 0, G_OPTION_ARG_INT,      &kernel_id,     "kernel selection: 0-2 (C=AB), 3-4 (C=AA^T) (default is " STR(KERNEL_ID) ")",             "ID"},
+	{"asize",     'a', 0, G_OPTION_ARG_CALLBACK, mm_parse_a,     "Size (cols,rows) of matrix A (default is " STR(A_COLS) "," STR(A_ROWS) ")",              "SIZE,SIZE"},
+	{"bsize",     'b', 0, G_OPTION_ARG_CALLBACK, mm_parse_b,     "Size (cols,rows) of matrix B (default is " STR(B_COLS) "," STR(B_ROWS) ")",              "SIZE,SIZE"},
+	{"localsize", 'l', 0, G_OPTION_ARG_CALLBACK, mm_parse_lws,   "Local work size (default is " STR(LWS_X) "," STR(LWS_Y) ")",                             "SIZE,SIZE"},
+	{"range",     'r', 0, G_OPTION_ARG_CALLBACK, mm_parse_rge,   "Matrix range of values (default is " STR(RANGE_MATRIX_FROM) "," STR(RANGE_MATRIX_TO)")", "MIN,MAX"},
+	{"seed",      's', 0, G_OPTION_ARG_INT,      &seed,          "RNG seed (default is " STR(SEED)")",                                                     "SEED"},
+	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,       "Print input and output matrices to stderr",                                              NULL},
+	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,       "Device index, auto-selects device from menu (takes priority on -n and -p options)",      "INDEX"},
+	{"dname",     'n', 0, G_OPTION_ARG_STRING,   &dev_name,      "Device name, selects device by name",                                                    "NAME"},
+	{"dplatf",    'p', 0, G_OPTION_ARG_STRING,   &platf_name,    "Platform name, selects device by platform name",                                         "NAME"},
+	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts, "Extra OpenCL compiler options",                                                          "OPTS"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -136,6 +140,7 @@ int main(int argc, char *argv[])
 	/* ************* */
 
 	int status;                                    /* Function and program return status. */
+	gchar* deviceFilter[5];                        /* Select device by name and platform name. */
 	GError *err = NULL;                            /* Error management */
 	GRand* rng = NULL;	                           /* Random number generator. */
 	ProfCLProfile *profile_dev = NULL,             /* Profiler for OpenCL device implementation */
@@ -180,7 +185,25 @@ int main(int argc, char *argv[])
 	gef_if_error_create_goto(err, CLEXP_ERROR, profile_cpu == NULL, CLEXP_FAIL, error_handler, "Unable to create CPU profiler object.");
 
 	/* Get the required CL zone. */
-	zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
+	if ((dev_idx != -1) || ((dev_name == NULL) && (platf_name ==NULL))) {
+		/* Select device by index or user choice. */
+		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
+	} else {
+		/* Select device by device name and/or platform name. */
+		unsigned int i = 0;
+		if (dev_name != NULL) {
+			deviceFilter[0] = CLU_DEVICE_SELECTION_DEVICE_NAME;
+			deviceFilter[1] = dev_name;
+			i = 2;
+		}
+		if (platf_name != NULL) {
+			deviceFilter[i] = CLU_DEVICE_SELECTION_PLATFORM_NAME;
+			deviceFilter[i + 1] = platf_name;
+			i = i + 2;
+		}
+		deviceFilter[i] = NULL;
+		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_filter_device_selector, deviceFilter, &err);
+	}
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Build program. */
@@ -473,7 +496,7 @@ int main(int argc, char *argv[])
 	printf("\n   ============================== Results ==================================\n\n");
 	printf("     Total CPU Time (OpenMP)     : %fs\n", profcl_time_elapsed(profile_cpu));
 	printf("     SpeedUp (OpenCL vs. OpenMP) : %fx\n", profcl_time_elapsed(profile_cpu) / profcl_time_elapsed(profile_dev));
-	printf("     Error (GPU-CPU)             : %d\n", error);
+	printf("     Error (Device-CPU)          : %d\n", error);
 	printf("\n");
 	
 
@@ -536,8 +559,10 @@ cleanup:
 	if (profile_dev) profcl_profile_free(profile_dev);
 	if (profile_cpu) profcl_profile_free(profile_cpu);
 	
-	/* Free compiler options string. */
+	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);
+	if (dev_name) g_free(dev_name);
+	if (platf_name) g_free(platf_name);
 		
 	/* Free miscelaneous objects. */
 	if (kernelName) g_free(kernelName);

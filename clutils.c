@@ -231,7 +231,7 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 	cl_uint numDevices;
 
 	/* Index of device information */
-	cl_uint deviceInfoIndex;
+	cl_int deviceInfoIndex;
 
 	/* Context properties, */
 	cl_context_properties cps[3] = {CL_CONTEXT_PLATFORM, 0, 0};
@@ -295,16 +295,17 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 	if (totalNumDevices == 0) {
 		/* No devices of the specified type where found, return with error. */
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CL_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: device not found");
-	} else if (totalNumDevices == 1) {
-		/* Only one device found, use that one. */
-		deviceInfoIndex = 0;
 	} else {
 		/* Several compatible devices found, choose one with given selector function. */
 		deviceInfoIndex = devSel(devInfos, totalNumDevices, dsExtraArg);
 		/* Test return value of selector function (if it is out of range, 
 		 * there is a programming error). */
-		g_assert_cmpint(deviceInfoIndex, >=, 0);
+		g_assert_cmpint(deviceInfoIndex, >=, -1);
 		g_assert_cmpint(deviceInfoIndex, <, totalNumDevices);
+		/* If selector function returned -1, then no device is selectable. */
+		if (deviceInfoIndex == -1) {
+			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CL_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: specified device not found");
+		}
 	}
 
 	/* Store info about the selected device and platform. */
@@ -518,12 +519,12 @@ void clu_source_free(char* source) {
  * @param devInfos List of device information.
  * @param numDevices Number of devices on list.
  * @param extraArg Pointer to device index or NULL.
- * @return The list index of the selected device.
+ * @return The index of the selected device.
  */
 cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
 	
-	/* numDevices must be greater than 1. */
-	g_assert_cmpuint(numDevices, >, 1);
+	/* numDevices must be greater than 0. */
+	g_assert_cmpuint(numDevices, >, 0);
 	
 	/* Index of selected device. */
 	cl_int index = -1;
@@ -565,19 +566,20 @@ cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, vo
  * @param devInfos List of device information.
  * @param numDevices Number of devices on list.
  * @param extraArg NULL-terminated array of strings.
- * @return The list index of the selected device.
+ * @return The index of the selected device of -1 if no device is
+ * selectable.
  */
 cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
 	
-	/* numDevices must be greater than 1. */
-	g_assert_cmpuint(numDevices, >, 1);
+	/* numDevices must be greater than 0. */
+	g_assert_cmpuint(numDevices, >, 0);
 	
 	/* Index of selected device. */
 	cl_int index = -1;
 	/* Filters: a NULL-terminated array of strings. */
 	gchar** filters;
 	/* Filter index. */
-	guint filter_idx = 0;
+	guint filter_idx;
 	/* Number of devices found which pass the filter. */
 	int numValidDevs = 0;
 	/* If more than 1 device is found this aux. struct. will be passed 
@@ -597,6 +599,7 @@ cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, 
 		/* Cycle through available devices. */
 		for (unsigned int i = 0; i < numDevices; i++) {
 			/* Apply filters while KEY is not NULL. */
+			filter_idx = 0;
 			while (filters[filter_idx] != NULL) {
 				/* Check if VALUE is valid. */
 				if (filters[filter_idx + 1] == NULL) {
@@ -604,13 +607,13 @@ cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, 
 					* calling function. */
 					g_assert_not_reached();
 				}
-				/* Not known if device will pass next filter. */
+				/* Not known if device will pass this filter. */
 				validDev = FALSE;
 				/* Check to what filter the KEY corresponds to. */
-				if (g_strcmp0(filters[filter_idx], "device_name")) {
+				if (g_strcmp0(filters[filter_idx], CLU_DEVICE_SELECTION_DEVICE_NAME) == 0) {
 					/* Filter is device name, get device name. */
 					completeName = g_ascii_strdown(devInfos[i].device_name, -1);
-				} else if (g_strcmp0(filters[filter_idx], "platform_name")) {
+				} else if (g_strcmp0(filters[filter_idx], CLU_DEVICE_SELECTION_PLATFORM_NAME) == 0) {
 					/* Filter is platform name, get platform name. */
 					completeName = g_ascii_strdown(devInfos[i].platform_name, -1);
 				} else {
@@ -633,7 +636,7 @@ cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, 
 				/* Increment filter index. */
 				filter_idx += 2;
 			}
-			/* If device passed filters, add it to approved*/
+			/* If device passed filters, add it to valid devices. */
 			if (validDev) {
 				validDevInfos[numValidDevs] = devInfos[i];
 				map[numValidDevs] = i;
@@ -642,16 +645,11 @@ cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, 
 		}
 	}
 	
-	/* If only one device left, set device index to 0. */
-	if (numValidDevs == 0) {
-		/* If no valid device found ask the user to chose any among the
-		 * existing devices. */
-		index = clu_menu_device_selector_query(devInfos, numDevices);
-		/* @todo Should log a message somewhere indicating this. */
-	} else if (numValidDevs == 1) {
+	/* Check result. */
+	if (numValidDevs == 1) {
 		/* Only one valid device found, return that one. */
 		index = map[0];
-	} else {
+	} else if (numValidDevs > 1) {
 		/* Several valid devices found, ask the user to chose one. */
 		index = map[clu_menu_device_selector_query(validDevInfos, numValidDevs)];
 	}
