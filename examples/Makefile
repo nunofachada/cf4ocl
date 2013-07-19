@@ -22,9 +22,16 @@ UTILOBJS = $(OBJDIR)/bitstuff.o $(OBJDIR)/clutils.o $(OBJDIR)/clprofiler.o
 CLINCLUDES =
 CLLIBDIR =
 
-# If you use AMD APPSDK you may want to uncomment the following lines
+# If you use AMD APPSDK and Linux you may want to uncomment the line bellow
+#CLMACROS += -DATI_OS_LINUX
+
+# The location of the OpenCL headers
+# In Ubuntu you can install the package opencl-headers, so that the line bellow remains commented
 #CLINCLUDES += -I$$AMDAPPSDKROOT/include
-#CLLIBDIR += -L$$AMDAPPSDKROOT/lib/x86_64
+
+# The location of libOpenCL.so
+# If you have it in your LD_LIBRARY_PATH you can leave the line bellow commented
+#CLLIBDIR = -L$$AMDAPPSDKROOT/lib/x86_64
 
 # Phony targets
 .PHONY: all clean mkdirs
