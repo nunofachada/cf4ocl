@@ -98,9 +98,15 @@ int main(int argc, char ** argv) {
 			/* Device name. */
 			status = clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(pbuff), pbuff, NULL);
 			gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get device name.", status);
-			
+
 			printf("\tDevice #%d: %s\n", j, pbuff);
 			
+			/* Device vendor. */
+			status = clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, sizeof(pbuff), pbuff, NULL);
+			gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get device vendor.", status);
+
+			printf("\t           Vendor: %s\n", pbuff);
+
 			/* Device type. */
 			status = clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(cl_device_type), &dtypeaux, NULL);
 			gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get device type.", status);
