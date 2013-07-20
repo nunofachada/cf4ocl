@@ -63,22 +63,26 @@ static cl_uint clu_menu_device_selector_query(CLUDeviceInfo* devInfos, cl_uint n
 	/* Print available devices */
 	clu_menu_device_selector_list(devInfos, numDevices, -1);
 	
-	/* Get user selection. */
-	do {
-		printf("   (?) Select device (0-%d) > ", numDevices - 1);
-		result = scanf("%u", &index);
-		/* Clean keyboard buffer */
-		int c;
-		do { c = getchar(); } while (c != '\n' && c != EOF);
-		/* Check if result is Ok and break the loop if so */
-		if (1 == result) {
-			if ((index >= 0) && (index < (cl_int) numDevices))
-				break;
-		}
-		/* Result not Ok, print error message */
-		printf("   (!) Invalid choice, please insert a value between 0 and %u.\n", numDevices - 1);
-	} while (1);
-	
+	/* If only one device exists, return that one. */
+	if (numDevices == 1) {
+		index = 0;
+	} else {
+		/* Otherwise, query the user. */
+		do {
+			printf("   (?) Select device (0-%d) > ", numDevices - 1);
+			result = scanf("%u", &index);
+			/* Clean keyboard buffer */
+			int c;
+			do { c = getchar(); } while (c != '\n' && c != EOF);
+			/* Check if result is Ok and break the loop if so */
+			if (1 == result) {
+				if ((index >= 0) && (index < (cl_int) numDevices))
+					break;
+			}
+			/* Result not Ok, print error message */
+			printf("   (!) Invalid choice, please insert a value between 0 and %u.\n", numDevices - 1);
+		} while (1);
+	}
 	/* Return device index. */
 	return index;
 
@@ -528,12 +532,14 @@ cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, vo
 	/* Index of selected device. */
 	cl_int index = -1;
 	
+	/* If extra argument is given, perform auto-selection. */
 	if (extraArg != NULL) {
 		/* If extraArg contains a valid device index, set return value
 		 * to that index. */
 		index = *((cl_uint*) extraArg);
+		/* Check if index is within bounds. */
 		if ((index >= 0) && (index < (cl_int) numDevices)) {
-			/* Check if index is within bounds. */
+			/* Device is within bounds, print list with selection. */
 			clu_menu_device_selector_list(devInfos, numDevices, index);
 		} else {
 			/* If we get here, an invalid device index was given. */
