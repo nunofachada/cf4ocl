@@ -86,6 +86,7 @@ static int matrix_range[] = {RANGE_MATRIX_FROM, RANGE_MATRIX_TO};
 static gchar* compiler_opts = NULL;
 static int dev_idx = -1;
 static gchar* dev_name = NULL;
+static gchar* dev_vendor = NULL;
 static gchar* platf_name = NULL;
 static int kernel_id = KERNEL_ID;
 static gboolean verbose = VERBOSE;
@@ -116,6 +117,7 @@ static GOptionEntry entries[] = {
 	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,       "Print input and output matrices to stderr",                                              NULL},
 	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,       "Device index, auto-selects device from menu (takes priority on -n and -p options)",      "INDEX"},
 	{"dname",     'n', 0, G_OPTION_ARG_STRING,   &dev_name,      "Device name, selects device by name",                                                    "NAME"},
+	{"dvendor",   'e', 0, G_OPTION_ARG_STRING,   &dev_vendor,    "Device vendor, selects device by vendor",                                                "VENDOR"},
 	{"dplatf",    'p', 0, G_OPTION_ARG_STRING,   &platf_name,    "Platform name, selects device by platform name",                                         "NAME"},
 	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts, "Extra OpenCL compiler options",                                                          "OPTS"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
@@ -140,7 +142,7 @@ int main(int argc, char *argv[])
 	/* ************* */
 
 	int status;                                    /* Function and program return status. */
-	gchar* deviceFilter[5];                        /* Select device by name and platform name. */
+	CLUDeviceInfo deviceInfo;                      /* Select device by returned information strings. */
 	GError *err = NULL;                            /* Error management */
 	GRand* rng = NULL;	                           /* Random number generator. */
 	ProfCLProfile *profile_dev = NULL,             /* Profiler for OpenCL device implementation */
@@ -190,21 +192,22 @@ int main(int argc, char *argv[])
 		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
 	} else {
 		/* Select device by device name and/or platform name. */
-		unsigned int i = 0;
-		if (dev_name != NULL) {
-			deviceFilter[0] = CLU_DEVICE_SELECTION_DEVICE_NAME;
-			deviceFilter[1] = dev_name;
-			i = 2;
-		}
-		if (platf_name != NULL) {
-			deviceFilter[i] = CLU_DEVICE_SELECTION_PLATFORM_NAME;
-			deviceFilter[i + 1] = platf_name;
-			i = i + 2;
-		}
-		deviceFilter[i] = NULL;
-		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_filter_device_selector, deviceFilter, &err);
+		if (dev_name != NULL) 
+			g_strlcpy(deviceInfo.device_name, dev_name, CLU_MAX_AUX_BUFF);
+		else 
+			deviceInfo.device_name[0] = '\0';
+		if (dev_vendor != NULL) 
+			g_strlcpy(deviceInfo.device_vendor, dev_vendor, CLU_MAX_AUX_BUFF);
+		else 
+			deviceInfo.device_vendor[0] = '\0';
+		if (platf_name != NULL) 
+			g_strlcpy(deviceInfo.platform_name, platf_name, CLU_MAX_AUX_BUFF);
+		else 
+			deviceInfo.platform_name[0] = '\0';
+		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_info_device_selector, &deviceInfo, &err);
 	}
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	printf("\n   == Using device '%s' from '%s' (platform is '%s')\n", zone->device_info.device_name, zone->device_info.device_vendor, zone->device_info.platform_name);
 	
 	/* Build program. */
 	status = clu_program_create(zone, kernelFiles, 1, compiler_opts, &err);
@@ -562,6 +565,7 @@ cleanup:
 	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);
 	if (dev_name) g_free(dev_name);
+	if (dev_vendor) g_free(dev_vendor);
 	if (platf_name) g_free(platf_name);
 		
 	/* Free miscelaneous objects. */
