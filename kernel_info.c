@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	/*  Get and print kernel info  */
 	/* *************************** */
 	
-	status = clu_workgroup_info_get(kernel, zone->device, &kwgi, &err);
+	status = clu_workgroup_info_get(kernel, zone->device_info.device_id, &kwgi, &err);
 	gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get kernel information.", status);
 	
 	clu_workgroup_info_print(&kwgi);	

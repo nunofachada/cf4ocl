@@ -87,20 +87,6 @@
 /** @} */
 
 /**
- * @defgroup CLU_DEVICE_SELECTION Labels for selecting devices
- *
- * @{
- */
- 
-/** Select device by device name. */
-#define CLU_DEVICE_SELECTION_DEVICE_NAME "device_name"
-/** Select device by platform name. */
-#define CLU_DEVICE_SELECTION_PLATFORM_NAME "platform_name"
-
-/** @} */
-
-
-/**
  * @brief Error codes.
  * */ 
 enum clu_error_codes {
@@ -123,31 +109,30 @@ typedef struct clu_kernel_work_group_info {
 	cl_ulong private_mem_size;                 /**< Minimum amount of private memory, in bytes, used by each workitem in the kernel.  */
 } CLUKernelWorkgroupInfo;
 
-/** 
- * @brief Complete information for an OpenCL execution session on a specific device.
- */
-typedef struct clu_zone {
-	cl_platform_id platform;  /**< OpenCL platform ID. */
-	cl_device_id device;      /**< OpenCL device ID. */
-	cl_uint device_type;      /**< OpenCL device type. */
-	cl_uint cu;               /**< Compute units of device. */
-	cl_context context;       /**< OpenCL context. */
-	cl_command_queue* queues; /**< Command queues. */
-	cl_program program;       /**< OpenCL program. */
-	cl_uint numQueues;        /**< Number of command queues. */
-	char* device_name;        /**< Device name string. */
-	char* platform_name;      /**< Platform name string. */
-} CLUZone;
-
 /**
  * @brief Information about OpenCL device.
  */
 typedef struct clu_device_info {
-	cl_device_id id;                      /**< Device ID. */
+	cl_device_id device_id;               /**< Device ID. */
+	cl_platform_id platform_id;           /**< Platform ID. */
 	char device_name[CLU_MAX_AUX_BUFF];   /**< Device name string. */
-	cl_platform_id platformId;            /**< Platform ID. */
+	char device_vendor[CLU_MAX_AUX_BUFF]; /**< Device vendor string. */
 	char platform_name[CLU_MAX_AUX_BUFF]; /**< Platform name string. */
 } CLUDeviceInfo;
+
+/** 
+ * @brief Complete information for an OpenCL execution session on a specific device.
+ */
+typedef struct clu_zone {
+	cl_uint device_type;       /**< OpenCL device type. */
+	cl_uint cu;                /**< Compute units of device. */
+	cl_context context;        /**< OpenCL context. */
+	cl_command_queue* queues;  /**< Command queues. */
+	cl_program program;        /**< OpenCL program. */
+	cl_uint numQueues;         /**< Number of command queues. */
+	CLUDeviceInfo device_info; /**< Device information. */
+} CLUZone;
+
 
 /**
  * @brief Pointer to function which will select device, if more than one 
@@ -195,7 +180,7 @@ cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, vo
 
 /** @brief Implementation of a device selector function which selects a 
  * device based on user supplied filter. */
-cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+cl_uint clu_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Resolves to error category identifying string, in this case 
  * an error in the OpenCL utilities library. */

@@ -251,13 +251,14 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 	/* Initialize zone */
 	zone = (CLUZone*) malloc(sizeof(CLUZone));
 	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == zone, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory OpenCL zone. ");
-	zone->platform = NULL;
-	zone->device = NULL;
 	zone->context = NULL;
 	zone->queues = NULL;
 	zone->program = NULL;
-	zone->device_name = NULL;
-	zone->platform_name = NULL;
+	zone->device_info.device_id = NULL;
+	zone->device_info.platform_id = NULL;
+	zone->device_info.device_name[0] = '\0';
+	zone->device_info.device_vendor[0] = '\0';
+	zone->device_info.platform_name[0] = '\0';
 		
 	/* Get number of platforms */
 	status = clGetPlatformIDs(0, NULL, &numPlatforms);
@@ -277,11 +278,14 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device Ids");
 			for (unsigned int j = 0; j < numDevices; j++) {
 				/* Keep device and platform IDs. */
-				devInfos[totalNumDevices].id = devIds[j];
-				devInfos[totalNumDevices].platformId = platfIds[i];
+				devInfos[totalNumDevices].device_id = devIds[j];
+				devInfos[totalNumDevices].platform_id = platfIds[i];
 				/* Get device name. */
 				status = clGetDeviceInfo(devIds[j], CL_DEVICE_NAME, sizeof(devInfos[totalNumDevices].device_name), devInfos[totalNumDevices].device_name, NULL);
-				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device info");
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device name info");
+				/* Get device vendor. */
+				status = clGetDeviceInfo(devIds[j], CL_DEVICE_VENDOR, sizeof(devInfos[totalNumDevices].device_vendor), devInfos[totalNumDevices].device_vendor, NULL);
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device vendor info");
 				/* Get platform name. */
 				status = clGetPlatformInfo( platfIds[i], CL_PLATFORM_VENDOR, sizeof(devInfos[totalNumDevices].platform_name), devInfos[totalNumDevices].platform_name, NULL);
 				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get platform info");
@@ -310,25 +314,22 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 
 	/* Store info about the selected device and platform. */
 	zone->device_type = deviceType;
-	zone->device = devInfos[deviceInfoIndex].id;
-	zone->platform = devInfos[deviceInfoIndex].platformId;
-	zone->device_name = g_strdup(devInfos[deviceInfoIndex].device_name);
-	zone->platform_name = g_strdup(devInfos[deviceInfoIndex].platform_name);
+	zone->device_info = devInfos[deviceInfoIndex];
 
 	/* Determine number of compute units for that device */
-	status = clGetDeviceInfo(zone->device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &zone->cu, NULL);
+	status = clGetDeviceInfo(zone->device_info.device_id, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &zone->cu, NULL);
 	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: get target device info");
 	
 	/* Create a context on that device. */
-	cps[1] = (cl_context_properties) devInfos[deviceInfoIndex].platformId;
-	zone->context = clCreateContext(cps, 1, &zone->device, NULL, NULL, &status);
+	cps[1] = (cl_context_properties) devInfos[deviceInfoIndex].platform_id;
+	zone->context = clCreateContext(cps, 1, &zone->device_info.device_id, NULL, NULL, &status);
 	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: creating context");
 	
 	/* Create the specified command queues on that device */
 	zone->numQueues = numQueues;
 	zone->queues = (cl_command_queue*) malloc(numQueues * sizeof(cl_command_queue));
 	for (unsigned int i = 0; i < numQueues; i++) {
-		zone->queues[i] = clCreateCommandQueue(zone->context, zone->device, queueProperties, &status);
+		zone->queues[i] = clCreateCommandQueue(zone->context, zone->device_info.device_id, queueProperties, &status);
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: creating command queue");
 	}
 
@@ -384,18 +385,18 @@ cl_int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKe
 	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Create program with source");
 	
 	/* Perform runtime source compilation of program */
-	bpStatus = clBuildProgram( program, 1, &zone->device, compilerOpts, NULL, NULL );
+	bpStatus = clBuildProgram( program, 1, &zone->device_info.device_id, compilerOpts, NULL, NULL );
 	/* Check for errors. */
 	if (bpStatus != CL_SUCCESS) {
 		/* If where here it's because program failed to build. However, error will only be thrown after getting build information. */
 		/* Get build log size. */
-		status = clGetProgramBuildInfo(program, zone->device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logsize);
+		status = clGetProgramBuildInfo(program, zone->device_info.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &logsize);
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Error getting program build info (log size) after program failed to build with error %d", bpStatus);
 		/* Alocate memory for build log. */
 		buildLog = (char*) malloc(logsize);
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == buildLog, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for build log after program failed to build with error %d", bpStatus);
 		/* Get build log. */
-		status = clGetProgramBuildInfo(program, zone->device, CL_PROGRAM_BUILD_LOG, logsize, buildLog, NULL);
+		status = clGetProgramBuildInfo(program, zone->device_info.device_id, CL_PROGRAM_BUILD_LOG, logsize, buildLog, NULL);
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Error getting program build info (build log) after program failed to build with error %d", bpStatus);
 		/* Throw error. */
 		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, bpStatus, error_handler, "Failed to build program. \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", buildLog);
@@ -444,8 +445,6 @@ void clu_zone_free(CLUZone* zone) {
 	}
 	if (zone->program) clReleaseProgram(zone->program);
 	if (zone->context) clReleaseContext(zone->context);
-	if (zone->device_name) g_free(zone->device_name);
-	if (zone->platform_name) g_free(zone->platform_name);
 	free(zone);
 
 }
@@ -554,74 +553,76 @@ cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, vo
 
 /** 
  * @brief Implementation of ::clu_device_selector function which selects a 
- * device based on user a supplied filter.
+ * device based on device information such as device name, device vendor
+ * and platform name.
  * 
- * `extraArg` should point to a NULL-terminated array of strings
- * containing key-value pairs used for filtering. The following keys,
- * as well as the corresponding value descriptions, are supported:
- * 
- * * "device_name" - String representing partial or complete device name
- * * "platform_name" - String representing partial or complete platform name
+ * `extraArg` must point to a ::CLUDeviceInfo structure, which should
+ * have at least one of the `char`-type fields containing partial 
+ * information about the respective device information. The non-used
+ * `char'-type fields must be set to NULL.
  * 
  * @param devInfos List of device information.
  * @param numDevices Number of devices on list.
- * @param extraArg NULL-terminated array of strings.
+ * @param extraArg Pointer to ::CLUDeviceInfo structure.
  * @return The index of the selected device of -1 if no device is
  * selectable.
  */
-cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
+cl_uint clu_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
 	
 	/* numDevices must be greater than 0. */
 	g_assert_cmpuint(numDevices, >, 0);
 	
 	/* Index of selected device. */
 	cl_int index = -1;
-	/* Filters: a NULL-terminated array of strings. */
-	gchar** filters;
-	/* Filter index. */
-	guint filter_idx;
-	/* Number of devices found which pass the filter. */
+	/* Pointer to CLUDeviceInfo structure. */
+	CLUDeviceInfo* info;
+	/* Number of devices found which conform to the information. */
 	int numValidDevs = 0;
 	/* If more than 1 device is found this aux. struct. will be passed 
 	 * to a user query function. */
     CLUDeviceInfo validDevInfos[CLU_MAX_DEVICES_TOTAL];
     /* Maps the aux. struct. dev. index to the main struct. dev. index. */
 	int map[CLU_MAX_DEVICES_TOTAL];
-	/* Flag to check if a device is accepted by the filters. */
+	/* Flag to check if a device is conformant with the information. */
 	gboolean validDev;
 	/* Partial name must be a substring of complete name. */
 	gchar *partialName, *completeName;
 
 	/* Check if extraArg contains a valid NULL-terminated array of strings. */
 	if (extraArg != NULL) {
-		filters = (gchar**) extraArg;
-		g_assert(filters[0] != NULL);
+		info = (CLUDeviceInfo*) extraArg;
+		g_assert(info != NULL);
 		/* Cycle through available devices. */
 		for (unsigned int i = 0; i < numDevices; i++) {
-			/* Apply filters while KEY is not NULL. */
-			filter_idx = 0;
-			while (filters[filter_idx] != NULL) {
-				/* Check if VALUE is valid. */
-				if (filters[filter_idx + 1] == NULL) {
-					/* If VALUE is NULL, there is a programming error on the 
-					* calling function. */
-					g_assert_not_reached();
-				}
+			/* Check for the three types of information: device name.
+			 * device vendor and platform name. */
+			for (unsigned int j = 0; j < 3; j++) {
 				/* Not known if device will pass this filter. */
 				validDev = FALSE;
-				/* Check to what filter the KEY corresponds to. */
-				if (g_strcmp0(filters[filter_idx], CLU_DEVICE_SELECTION_DEVICE_NAME) == 0) {
-					/* Filter is device name, get device name. */
-					completeName = g_ascii_strdown(devInfos[i].device_name, -1);
-				} else if (g_strcmp0(filters[filter_idx], CLU_DEVICE_SELECTION_PLATFORM_NAME) == 0) {
-					/* Filter is platform name, get platform name. */
-					completeName = g_ascii_strdown(devInfos[i].platform_name, -1);
-				} else {
-					/* A well-behaved app should not get here. */
+				/* Obtain complete and partial information for comparison. */
+				switch (j) {
+					case 0:
+					if (info->device_name != NULL) {
+						completeName = g_ascii_strdown(devInfos[i].device_name, -1);
+						partialName = g_ascii_strdown(info->device_name, -1);
+					}
+					break;
+					case 1:
+					if (info->device_vendor != NULL) {
+						completeName = g_ascii_strdown(devInfos[i].device_vendor, -1);
+						partialName = g_ascii_strdown(info->device_vendor, -1);
+					}
+					break;
+					case 2:
+					if (info->platform_name != NULL) {
+						completeName = g_ascii_strdown(devInfos[i].platform_name, -1);
+						partialName = g_ascii_strdown(info->platform_name, -1);
+					}
+					break;
+					default:
 					g_assert_not_reached();
 				}
 				/* Check if partial name is within in the complete name. */
-				partialName = g_ascii_strdown(filters[filter_idx + 1], -1);
 				if (g_strrstr(completeName, partialName)) {
 					/* Valid device so far. */
 					validDev = TRUE;
@@ -629,12 +630,10 @@ cl_uint clu_filter_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, 
 				/* Free temporary strings. */
 				g_free(partialName);
 				g_free(completeName);
-				/* If device didn't pass filter, break filter cycle. */
+				/* If device didn't conform to info, go to next device. */
 				if (!validDev) {
 					break;
 				}
-				/* Increment filter index. */
-				filter_idx += 2;
 			}
 			/* If device passed filters, add it to valid devices. */
 			if (validDev) {
