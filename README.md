@@ -74,8 +74,13 @@ Static analysis of OpenCL kernels.
 How to use the library
 ----------------------
 
-Take a look at the examples, utilities and tests to see how the 
-library can be used.
+A tutorial will be available soon. For now take a look at the examples, 
+utilities and tests to see how the library can be used. You can use
+just one part of the library, but both CL Profiler ([clprofiler.c](https://github.com/FakenMC/cf4ocl/blob/master/clprofiler.c) 
+and [clprofiler.h](https://github.com/FakenMC/cf4ocl/blob/master/clprofiler.h)) 
+and CL Utils ([clutils.c](https://github.com/FakenMC/cf4ocl/blob/master/clutils.c)
+and [clutils.h](https://github.com/FakenMC/cf4ocl/blob/master/clutils.h)) 
+require the GError framework ([gerrorf.h](https://github.com/FakenMC/cf4ocl/blob/master/gerrorf.h)).
 
 Other useful C frameworks/utilities for OpenCL
 ----------------------------------------------
