@@ -38,7 +38,7 @@ export UTILSINCLUDEDIR := ${CURDIR}
 .PHONY: all tests tests_common examples clean mkdirs
 
 # Make rules (examples and tests are not built by default)
-all: mkdirs device_query kernel_info bitstuff.o clutils.o clprofiler.o
+all: mkdirs device_query kernel_info clutils.o clprofiler.o
 
 device_query: device_query.o clutils.o
 	$(CC) $(CFLAGS) $(CLMACROS) $(patsubst %,$(OBJDIR)/%,$^) $(CLINCLUDES) $(CLLIB) $(CLLIBDIR) -o $(BUILDDIR)/$(UTILS_IN_BIN_DIR)/$@ $(LFLAGS)
@@ -57,9 +57,6 @@ clutils.o: clutils.c clutils.h
 
 clprofiler.o: clprofiler.c clprofiler.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(TESTMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@ 
-
-bitstuff.o: bitstuff.c bitstuff.h
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$@
 	
 tests: test_profiler test_gerrorf
 
