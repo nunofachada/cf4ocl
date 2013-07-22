@@ -24,41 +24,53 @@ CLLIBDIR =
 #CLMACROS += -DATI_OS_LINUX
 
 # The location of the OpenCL headers
-# In Ubuntu you can install the package opencl-headers, so that the line bellow remains commented
+# In Debian/Ubuntu you can install the package opencl-headers, so that the line bellow remains commented
 #CLINCLUDES += -I$$AMDAPPSDKROOT/include
 
 # The location of libOpenCL.so
 # If you have it in your LD_LIBRARY_PATH you can leave the line bellow commented
-#CLLIBDIR = -L$$AMDAPPSDKROOT/lib/x86_64
+# You can also install the ocl-icd-opencl-dev package in order to leave the line bellow commented
+#CLLIBDIR += -L$$AMDAPPSDKROOT/lib/x86_64
 
 # Export utils include directory
 export UTILSINCLUDEDIR := ${CURDIR}
 
 # Phony rules
-.PHONY: all tests tests_common examples clean mkdirs
+.PHONY: all tests tests_common examples clean mkdirs library utils
 
-# Make rules (examples and tests are not built by default)
-all: mkdirs device_query kernel_info clutils.o clprofiler.o
+# Make rules
+all: library utils examples tests
 
-device_query: device_query.o clutils.o
+library: mkdirs clutils.o clprofiler.o
+
+utils: mkdirs device_query kernel_info
+
+tests: test_profiler test_gerrorf
+
+examples: mkdirs clutils.o clprofiler.o
+	$(MAKE) -C $@
+
+# Make rules for library
+clutils.o: clutils.c clutils.h gerrorf.h
+	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@	
+
+clprofiler.o: clprofiler.c clprofiler.h gerrorf.h
+	$(CC) $(CFLAGS) $(CLMACROS) $(TESTMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@ 
+
+# Make rules for utils
+device_query: device_query.o clutils.o 
 	$(CC) $(CFLAGS) $(CLMACROS) $(patsubst %,$(OBJDIR)/%,$^) $(CLINCLUDES) $(CLLIB) $(CLLIBDIR) -o $(BUILDDIR)/$(UTILS_IN_BIN_DIR)/$@ $(LFLAGS)
 	
-device_query.o: device_query.c
+device_query.o: device_query.c gerrorf.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@
 	
 kernel_info: kernel_info.o clutils.o
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLLIBDIR) -o $(BUILDDIR)/$(UTILS_IN_BIN_DIR)/$@ $(patsubst %,$(OBJDIR)/%,$^) $(LFLAGS) $(CLLIB) 
 	
-kernel_info.o: kernel_info.c
+kernel_info.o: kernel_info.c gerrorf.h
 	$(CC) $(CFLAGS) $(CLMACROS) -c $< $(CLINCLUDES) -o $(OBJDIR)/$@
 	
-clutils.o: clutils.c clutils.h
-	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@	
-
-clprofiler.o: clprofiler.c clprofiler.h
-	$(CC) $(CFLAGS) $(CLMACROS) $(TESTMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@ 
-	
-tests: test_profiler test_gerrorf
+# Make rules for tests	
 
 test_profiler.o test_utils.o: mkdirs tests_common 
 
@@ -77,10 +89,9 @@ test_gerrorf: test_gerrorf.o
 	
 test_gerrorf.o: $(TESTSDIR)/test_gerrorf.c gerrorf.h
 	$(CC) $(CFLAGS) $(CFLAGS_GLIB) $(CLMACROS) -c $< $(CLINCLUDES) -o $(OBJDIR)/$@
-	
-examples: mkdirs bitstuff.o clutils.o clprofiler.o
-	$(MAKE) -C $@
 
+# Other make rules
+	
 mkdirs:
 	mkdir -p $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/$(UTILS_IN_BIN_DIR)

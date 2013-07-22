@@ -1,15 +1,15 @@
 # Check if required directories are defined
+ifndef CF4OCLDIR
+CF4OCLDIR := $(realpath ${CURDIR}/..)
+$(warning CF4OCLDIR is not defined, assuming default $(CF4OCLDIR))
+endif
 ifndef OBJDIR
-OBJDIR := ${CURDIR}/obj
+OBJDIR := $(CF4OCLDIR)/obj
 $(warning OBJDIR is not defined, assuming default $(OBJDIR))
 endif
 ifndef BUILDDIR
-BUILDDIR := ${CURDIR}/bin
+BUILDDIR := $(CF4OCLDIR)/bin
 $(warning BUILDDIR is not defined, assuming default $(BUILDDIR))
-endif
-ifndef UTILSINCLUDEDIR
-UTILSINCLUDEDIR := $(realpath ${CURDIR}/..)
-$(warning UTILSINCLUDEDIR is not defined, assuming default $(UTILSINCLUDEDIR))
 endif
 
 # Variables definitions
@@ -17,8 +17,8 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g -std=c99 `pkg-config --cflags glib-2.0` -fopenmp 
 CLMACROS = -DATI_OS_LINUX
 LFLAGS = -lOpenCL -lm `pkg-config --libs glib-2.0`
-UTILSINCLUDES = -I$(UTILSINCLUDEDIR)
-UTILOBJS = $(OBJDIR)/bitstuff.o $(OBJDIR)/clutils.o $(OBJDIR)/clprofiler.o
+UTILSINCLUDES = -I$(CF4OCLDIR)
+UTILOBJS = $(OBJDIR)/clutils.o $(OBJDIR)/clprofiler.o
 CLINCLUDES =
 CLLIBDIR =
 
