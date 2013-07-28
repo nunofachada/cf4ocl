@@ -146,6 +146,10 @@ the shared library location in the `CLLIBDIR` Makefile variable.
 Using the library in a new project
 ----------------------------------
 
+Any of the three elements of the library can be used in a workflow
+without the need to use the others. However, both CL Utils and CL 
+Profiler internally use the GError framework.
+
 ### Compiling and linking
 
 When building a program based on cf4ocl (or any OpenCL program) with 
@@ -155,29 +159,64 @@ with the `-I` flag, and the location of the shared library
 installed from the package manager (e.g. the `ocl-icd-opencl-dev` 
 package in Debian and Ubuntu), this is usually not required.
 
-In order to **compile** with GLib (required by cf4ocl), the following 
-line should be added to the GCC syntax:
+Additionally, in order to **compile** a program with GLib (required by 
+cf4ocl), the following line should be added to the GCC syntax:
 
     `pkg-config --cflags glib-2.0`
     
-In order to **link** with GLib (required by cf4ocl), it is necessary to 
-add the following line to the GCC syntax:
+In order to **link** a program with GLib, it is necessary to add the 
+following line to the GCC syntax:
 
     `pkg-config --libs glib-2.0`
 
 These two lines will expand correctly to the `-I` and `-l` flags 
 required for compiling and linking, respectively.
 
-### Tutorial
+### Using CL Utils
 
-A tutorial will be available soon. For now take a look at the examples, 
-utilities and tests to see how the library can be used. You can use
-just one part of the library, but both CL Profiler 
-([clprofiler.c](https://github.com/FakenMC/cf4ocl/blob/master/clprofiler.c) 
-and [clprofiler.h](https://github.com/FakenMC/cf4ocl/blob/master/clprofiler.h)) 
-and CL Utils ([clutils.c](https://github.com/FakenMC/cf4ocl/blob/master/clutils.c)
-and [clutils.h](https://github.com/FakenMC/cf4ocl/blob/master/clutils.h)) 
-require the GError framework ([gerrorf.h](https://github.com/FakenMC/cf4ocl/blob/master/gerrorf.h)).
+TO DO
+
+### Using CL Profiler
+
+_In progress_
+
+Gives you detailed information about OpenCL events (kernel execution, 
+data transfers, etc), including a table dedicated to overlapped 
+execution of said events.
+
+Basic example:
+
+```c
+ProfCLProfile* profile = profcl_profile_new();
+cl_event events[NUMBER_OF_CL_EVENTS];
+...
+
+/* Start basic timming / profiling. */
+profcl_profile_start(profile);
+
+/* OpenCL data transfers, kernel executions, etc. */
+...
+clFinish(queue0);
+clFinish(queue1);
+...
+
+/* Manage and show profiling info */
+profcl_profile_stop(profile); 
+profcl_profile_add(profile, "Transfer data to device", events[0], NULL);
+profcl_profile_add(profile, "Kernel 1 execution", events[1], NULL);
+profcl_profile_add(profile, "Kernel 2 execution", events[2], NULL);
+...
+profcl_profile_aggregate(profile, NULL);
+profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, NULL);
+
+/* Two nice detailed tables will be printed: one for individual */
+/* events (sorted by name or execution time), and another describing */
+/* overlap of events. */
+```
+
+### Using GErrorF
+
+TO DO
 
 Generating the API documentation
 --------------------------------
