@@ -36,10 +36,10 @@ CLLIBDIR =
 export UTILSINCLUDEDIR := ${CURDIR}
 
 # Phony rules
-.PHONY: all tests tests_common examples clean mkdirs library utils
+.PHONY: all tests tests_common examples clean mkdirs library utils docs
 
 # Make rules
-all: library utils examples tests
+all: library utils tests examples
 
 library: mkdirs clutils.o clprofiler.o
 
@@ -89,7 +89,14 @@ test_gerrorf: test_gerrorf.o
 	
 test_gerrorf.o: $(TESTSDIR)/test_gerrorf.c gerrorf.h
 	$(CC) $(CFLAGS) $(CFLAGS_GLIB) $(CLMACROS) -c $< $(CLINCLUDES) -o $(OBJDIR)/$@
+	
+# Documentation rules
 
+docs:
+	sed -e 's/```c/~~~~~~~~~~~~~~~{.c}/g' -e 's/```/~~~~~~~~~~~~~~~/g' README.md > README.doxy.md
+	doxygen 
+	rm README.doxy.md
+	
 # Other make rules
 	
 mkdirs:

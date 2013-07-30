@@ -221,12 +221,17 @@ TO DO
 Generating the API documentation
 --------------------------------
 
-The API documentation can be generated with [Doxygen][] (version 1.8 or
-newer). In the cf4ocl directory run:
+The API documentation can be generated with `make` if [Doxygen][] 
+(version 1.8 or newer) is installed. In the cf4ocl directory run:
 
-    $ doxygen
+    $ make docs
     
-The documentation will be generated in the `./doc` folder.
+The documentation will be generated in the `./doc` folder. The direct
+use of the `doxygen` command should be avoided because 
+[Doxygen's markdown][doxymd] is not 100% compatible with the 
+[GitHub Flavored Markdown][ghmd] used in this document. When building 
+the documentation with `make`, the required conversion is performed 
+first.
 
 Other useful C frameworks/utilities for OpenCL
 ==============================================
@@ -260,6 +265,9 @@ Appendices
 [IntelSDK]: http://software.intel.com/en-us/vcsource/tools/opencl-sdk "Intel"
 [NvidiaSDK]: https://developer.nvidia.com/category/zone/cuda-zone "Nvidia"
 [clheaders]: http://www.khronos.org/registry/cl/ "Khronos"
+[markdown]: http://daringfireball.net/projects/markdown/
+[doxymd]: http://www.stack.nl/~dimitri/doxygen/manual/markdown.html
+[ghmd]: https://help.github.com/articles/github-flavored-markdown
 
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
