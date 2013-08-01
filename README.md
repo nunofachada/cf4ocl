@@ -61,7 +61,7 @@ instruction for freeing/releasing these objects).
 * Build an OpenCL program with one instruction by passing an array of
 filenames containing the kernels.
 * Automatic or manual device selection.
-* Doesn't hide OpenCL objects from you.
+* Doesn't hide OpenCL objects from the client programmer.
 
 ### CL Profiler
 
@@ -174,7 +174,132 @@ required for compiling and linking, respectively.
 
 ### Using CL Utils
 
-TO DO
+The functions provided by CL Utils aim to facilitate the rapid 
+development and deployment of C programs which use OpenCL. These 
+functions are focused on two key tasks:
+
+1. Setup and tear down of the OpenCL environment, including device,
+context and command queues.
+
+2. Loading, compilation and tear down of OpenCL kernel programs.
+
+These two tasks require very verbose code, with significant repetition 
+between projects. CL Utils wraps these tasks into two functions,
+providing an additional third function for freeing up the allocated
+resources. The OpenCL objects created by CL Utils are available to
+the client programmer at all times through the `CLUZone` object. 
+CL Utils does not wrap any other OpenCL tasks, such as kernel execution 
+or data transfers, which can be performed directly with the respective 
+OpenCL functions.
+
+The first task is performed with the `clu_zone_new` function, which
+has the following prototype:
+
+```c
+CLUZone* clu_zone_new(
+    /* Type of device, e.g. CL_DEVICE_TYPE_CPU, CL_DEVICE_TYPE_GPU, etc. */
+    cl_uint deviceType,
+    /* Number of command queues. */
+    cl_uint numQueues,
+    /* Command queue properties, e.g. CL_QUEUE_PROFILING_ENABLE, etc. */
+    cl_int queueProperties,
+    /* Pointer to a device selector function. */
+    clu_device_selector devSel, 
+    /* Extra arguments for device selector function. */
+    void* dsExtraArg, 
+    /* GLib's error reporting object (may be ignored). */
+    GError **err
+);
+```
+
+The returned `CLUZone` object will contain the context, command queues,
+device information and an uninitialized kernel program. The program is
+initialized with the `clu_program_create` function as part of the second 
+task. This function has the following prototype:
+
+```c
+cl_int clu_program_create(
+    /* The CLUZone object return by the clu_zone_new function. */
+    CLUZone* zone, 
+    /* List of files containing the source code for the kernels. */
+    const char** kernelFiles, 
+    /* Number of kernel files given in the previous parameter. */
+    cl_uint numKernelFiles, 
+    /* Compiler options. */
+    const char* compilerOpts, 
+    /* GLib's error reporting object (may be ignored). */
+    GError **err
+);
+```
+
+A typical usage pattern of CL Utils in a C program:
+
+```c
+include "clutils.h"
+
+...
+
+int main(int argc, char* argv[]) 
+{
+    ...
+    CLUZone* zone = NULL;
+    const char* oclSources[] = {"src1.cl", "src2.cl", "moresrc.cl"};
+    ...
+
+    /* Get a complete OpenCL environment using a GPU device, one  */
+    /* command queue, no command queue options, if more than one  */ 
+    /* GPU is available show selection menu to user, and ignore   */
+    /* error reporting. */
+    zone = clu_zone_new(CL_DEVICE_TYPE_GPU, 1, 0, clu_menu_device_selector, NULL, NULL);
+    ...
+
+    /* Create (compile) an OpenCL kernel program using three OpenCL */
+    /* source files, no compiler options, and ignoring error        */
+    /* reporting.                                                   */
+    status = clu_program_create(zone, oclSources, 3, NULL, NULL);
+    ...
+
+    /* Perform OpenCL tasks such as data transfer and kernel execution */
+    /* using the OpenCL objects (queues, program, context, etc.)       */
+    /* available within the CLUZone object.                            */
+    ...
+
+    /* Free the CLUZone object and all of the contained OpenCL objects.*/
+    /* This object should only be released after all OpenCL objects    */
+    /* not controlled by CL Utils (kernels, events, memory objects)    */
+    /* are released.                                                   */
+    clu_zone_free(zone);
+
+    ...
+
+}
+```
+
+The fourth parameter of `clu_zone_new` is a pointer to a device 
+selector function, which has the following definition:
+
+```c
+typedef cl_uint (*clu_device_selector)(
+    /* Array of available devices and respective information. */
+    CLUDeviceInfo* devInfos,
+    /* Number of devices in array. */
+    cl_uint numDevices, 
+    /* Extra arguments to selector function. */
+    void* extraArg
+);
+```
+
+CL Utils provides two ready to use device selector functions:
+
+* `clu_menu_device_selector` - If more than one device exists, presents
+a selection menu to the user. If extra argument is given it should be 
+the array index of the preferred device.
+* `clu_info_device_selector` - Selects a device by device name, device
+vendor and/or platform name, any/all of which are given in the extra
+argument.
+
+For other device selection requirements, the client programmer can 
+develop a specific device selector function.
 
 ### Using CL Profiler
 
@@ -337,7 +462,8 @@ include "gerrorf.h";
 
 ...
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
 
     ...
 
@@ -420,7 +546,8 @@ cleanup:
 /* This function is GError-aware, and will initialize the GError */
 /* object if an error occurs. The GError object usually comes    */
 /* as the last parameter.                                        */
-void some_function(some params, GError** err) {
+void some_function(some params, GError** err) 
+{
 
     ...
 
@@ -497,7 +624,7 @@ program execution will jump to the error handling block.
 
 This pattern avoids many bugs and makes error catching and handling
 possible in C. However it is not to everyone's taste, and is thus
-a completely optional aspect of the cl4ocl framework.
+a completely optional aspect of cf4ocl.
 
 Generating the API documentation
 --------------------------------
