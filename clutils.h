@@ -161,7 +161,7 @@ char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strS
 
 /** @brief Create a new OpenCL zone, which will contain complete 
  * information for an OpenCL execution session on a specific device. */
-CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl_uint (*deviceSelector)(CLUDeviceInfo*, cl_uint, void*), void* dsExtraArg, GError **err);
+CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
 cl_int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err);
@@ -178,8 +178,9 @@ void clu_source_free(char* source);
 /** @brief Queries the user to select a device from a list. */
 cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
-/** @brief Implementation of a device selector function which selects a 
- * device based on user supplied filter. */
+/** @brief Implementation of ::clu_device_selector function which selects a 
+ * device based on device information such as device name, device vendor
+ * and platform name. */
 cl_uint clu_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Resolves to error category identifying string, in this case 
