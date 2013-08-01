@@ -185,6 +185,10 @@ take place when the programmer is trying to optimize its application
 by simultaneously transfer data to and from the OpenCL device and 
 execute kernels, using different command queues.
 
+CL Profiler consists of two files, `clprofiler.c` and `clprofiler.h`.
+In order to use CL Profiler in a project, it is necessary to include
+the `clprofiler.h` header file.
+
 For the purpose of this explanation, we will consider that two command 
 queues are being used:
 
@@ -305,9 +309,194 @@ operation, and the other to the _unmap_ operation. The function uses
 the start instant of the _map_ event, and the _end_ instant of the
 _unmap_ event, in order to build a composite semantic event.
 
-### Using GErrorF
+### Using GError Framework (GErrorF)
 
-TO DO
+The main purpose of GErrorF is to provide error handling constructs to 
+CL Utils and CL Profiler. No knowledge of GErrorF is required to use
+CL Utils and/or CL Profiler. However, because it is sufficiently generic 
+to be used in any C application, a specific description is warranted.
+
+GErrorF uses GLib's `GError` object for function error reporting. This
+explanation assumes minimal knowledge of 
+[GLib's error reporting][gliberror].
+
+GErrorF is defined by two macros in `gerrorf.h`:
+
+* `gef_if_error_create_goto` - Catches errors from non-GError aware
+functions.
+* `gef_if_error_goto` - Catches errors from GError aware functions.
+
+GErrorF establishes an error handling methodology for C programs not
+entirely dissimilar to the pattern used in Linux kernel development. 
+Any function producing recoverable runtime errors, from `main` to 
+functions located deeper in the call stack, can benefit from this 
+approach. The general usage of GErrorF is as follows:
+
+```c
+include "gerrorf.h";
+
+...
+
+int main(int argc, char* argv[]) {
+
+    ...
+
+    /* Must initialize every allocable pointers and objects */
+    /* to NULL.                                             */
+    int some_vector* = NULL;
+
+    /* GError object. */
+    GError *err = NULL;
+
+    /* Function return status. */
+    int status = SUCCESS_CODE;
+
+    ...
+
+    /* Call a GError aware function. */
+    some_function(params, &err);
+
+    /* Catch possible error in GError-aware function. In this    */
+    /* the GError object is initialized by the called function.  */
+    gef_if_error_goto(
+        err,              /* GError object. */
+        SOME_ERROR_CODE,  /* Error code to set in status. */
+        status,           /* Function return status. */
+        error_handler     /* Label to goto in case of error. */
+    );
+
+    /* In the previous function it is possible to replace an app */
+    /* specific error code with GErrorF special constants        */
+    /* GEF_USE_STATUS and GEF_USE_GERROR. The former leaves the  */
+    /* status variable untouched (useful for cases were the      */
+    /* function itself returns a usable int status), while the   */
+    /* later sets status to the error code set in the GError     */
+    /* object. */
+
+    ...
+
+    /* Call a non-GError aware function. */
+    some_vector = (int*) malloc(sizeof(int) * SOME_SIZE);
+
+    /* Catch possible error in non-GError aware function. */
+    gef_if_error_create_goto(
+        err,                    /* GError object.                  */
+        SOME_QUARK_ERROR,       /* GLib GQuark identifier.         */
+        some_vector == NULL,    /* Error condition.                */
+        SOME_ERROR_CODE,        /* Error code to set in err.       */
+        error_handler,          /* Label to goto in case of error. */
+        "Unable to alloc. mem." /* Error msg to set in err.        */
+    );
+
+    ...
+
+    /* If we get here, there was no error, goto cleanup. */
+    g_assert(err == NULL);  /* Make sure err is NULL. */
+    goto cleanup;           /* Goto the cleanup section. */
+	
+error_handler:
+    /* If we got here there was an error, verify that it is so. */
+    g_assert (err != NULL);
+    /* Print error message. */
+    fprintf(stderr, "Error message: %s\n", err->message);
+    /* Make sure function status contains an error code. */
+    if (status == SUCCESS_CODE) status = err->code; 
+    /* Free the GError object. */
+    g_error_free(err);
+
+cleanup:	
+    /* Free any allocated memory. */
+    if (some_vector) free(some_vector);
+
+    ...
+
+    /* Return program status. */
+    return status;
+}
+
+...
+
+/* This function is GError-aware, and will initialize the GError */
+/* object if an error occurs. The GError object usually comes    */
+/* as the last parameter.                                        */
+void some_function(some params, GError** err) {
+
+    ...
+
+    FILE* fp;
+    const char* filename = "somefile.txt";
+
+    ...
+
+    /* Try to open a file. This function is not GError aware. */
+    fp = fopen(filename, "r");
+
+    /* Catch possible error in non-GError aware function. */
+    gef_if_error_create_goto(
+        *err,                     /* GError object.                  */
+        SOME_QUARK_ERROR,         /* GLib GQuark identifier.         */
+        fp == NULL,               /* Error condition.                */
+        SOME_ERROR_CODE,          /* Error code to set in err.       */
+        error_handler,            /* Label to goto in case of error. */
+        "Unable to open file %s", /* Error msg to set in err.        */
+        filename                  /* Extra args for error msg.       */
+    );
+
+    ...
+
+    /* If we got here, everything is OK.                          */
+    /* It's good practice to check if err is NULL (caller doesn't */
+    /* care about error reporting OR if a non-null err is         */
+    /* pointing to NULL (i.e. no error was reported).             */
+    g_assert (err == NULL || *err == NULL);
+
+    /* Goto finish label, ignoring the error handling section.    */
+    goto finish;
+
+error_handler:
+    /* If we got here there was an error, verify that it is so,   */
+    /* i.e. either the caller doesn't care about error reporting, */
+    /* in which case err is NULL, OR a non-null err is in fact    */
+    /* pointing to an initialized GError object.                  */
+    g_assert (err == NULL || *err != NULL);
+
+    /* Run any other error handling code. */
+    ...
+
+finish:	
+
+    /* Close the file, if open. */
+    if (fp) fclose(fp);
+
+    /* Perform additional required cleanup (free's and so on). */
+    ...
+    
+    /* Bye. */
+    return;
+
+}
+
+```
+
+As can be observed, GErrorF enforces a strict programming pattern, 
+which requires that complying functions follow a set of rules:
+
+* Define all pointers and objects in the beginning of the function 
+and initialize them to NULL.
+* Define a pointer to a GError object and set it to NULL.
+* Always test for errors after calls to error throwing functions
+with `gef_if_error_create_goto` (non-GError aware functions) or
+`gef_if_error_goto` (GError aware functions). If an error occurs
+program execution will jump to the error handling block.
+* Use the following pattern at the end of the function:
+    * goto cleanup
+    * error handling block
+    * cleanup: perform clean up
+    * return (possibly with a status code)
+
+This pattern avoids many bugs and makes error catching and handling
+possible in C. However it is not to everyone's taste, and is thus
+a completely optional aspect of the cl4ocl framework.
 
 Generating the API documentation
 --------------------------------
@@ -356,9 +545,10 @@ Appendices
 [IntelSDK]: http://software.intel.com/en-us/vcsource/tools/opencl-sdk "Intel"
 [NvidiaSDK]: https://developer.nvidia.com/category/zone/cuda-zone "Nvidia"
 [clheaders]: http://www.khronos.org/registry/cl/ "Khronos"
-[markdown]: http://daringfireball.net/projects/markdown/
-[doxymd]: http://www.stack.nl/~dimitri/doxygen/manual/markdown.html
-[ghmd]: https://help.github.com/articles/github-flavored-markdown
+[markdown]: http://daringfireball.net/projects/markdown/ "Markdown"
+[doxymd]: http://www.stack.nl/~dimitri/doxygen/manual/markdown.html "Doxygen Markdown"
+[ghmd]: https://help.github.com/articles/github-flavored-markdown "Github Flavored Markdown"
+[gliberror]: https://developer.gnome.org/glib/2.32/glib-Error-Reporting.html "GLib Error Reporting"
 
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
