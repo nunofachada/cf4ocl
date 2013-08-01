@@ -40,7 +40,7 @@ enum gerrorf_flags {
 
 
 /** 
- * @brief If error is detected (<tt>error_code != no_error_code</tt>), 
+ * @brief If error is detected (`error_code != no_error_code`), 
  * create an error object (GError) and go to the specified label. 
  * 
  * @param err GError* object.
@@ -59,12 +59,12 @@ enum gerrorf_flags {
 	
 	
 /** 
- * @brief If error is detected in <tt>err</tt> object (<tt>err != NULL</tt>),
- * set <tt>status</tt> to specified <tt>error_code</tt> 
+ * @brief If error is detected in `err` object (`err != NULL`),
+ * set `status` to specified `error_code`
  * OR to error code set in the GError object if 
- * <tt>error_code = </tt> @link gerrorf_flags::GEF_USE_GERROR @endlink) 
+ * `error_code = ` @link gerrorf_flags::GEF_USE_GERROR @endlink) 
  * OR leave status untouched if
- * <tt>error_code = </tt> @link gerrorf_flags::GEF_USE_STATUS @endlink) 
+ * `error_code = ` @link gerrorf_flags::GEF_USE_STATUS @endlink) 
  * and go to the specified label.
  * 
  * @param err GError* object.
