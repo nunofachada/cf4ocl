@@ -178,41 +178,132 @@ TO DO
 
 ### Using CL Profiler
 
-_In progress_
+The goal of CL Profiler is to provide detailed benchmarking information 
+about OpenCL events such as kernel execution, data transfers, and so on.
+CL Profiler is prepared to handle overlapping events, which usually
+take place when the programmer is trying to optimize its application
+by simultaneously transfer data to and from the OpenCL device and 
+execute kernels, using different command queues.
 
-Gives you detailed information about OpenCL events (kernel execution, 
-data transfers, etc), including a table dedicated to overlapped 
-execution of said events.
-
-Basic example:
+For the purpose of this explanation, we will consider that two command 
+queues are being used:
 
 ```c
-ProfCLProfile* profile = profcl_profile_new();
-cl_event events[NUMBER_OF_CL_EVENTS];
-...
+cl_command_queue queue0; /* Used for host-device data transfer. */
+cl_command_queue queue1; /* Used for kernel execution. */
+```
 
+Additionally, we will consider the following OpenCL events:
+
+```c
+cl_event ev_transf_in;  /* Transfer data from host to device. */
+cl_event ev_kernel_A_1; /* Execute kernel A on device. */
+cl_event ev_kernel_B;   /* Execute kernel B on device. */
+cl_event ev_kernel_A_2; /* Execute kernel A on device again. */
+cl_event ev_transf_out; /* Transfer data from device to host. */
+```
+
+The `ProfCLProfile` structure forms the basis of CL Profiler. It can:
+1) measure the total elapsed time of the application (or the relevant 
+part of the application); and, 2) keep track of the device time required
+by the OpenCL events. The following instruction creates a new 
+`ProfCLProfile` structure:
+
+```c
+/* Create a new ProfCLProfile structure. */
+ProfCLProfile* profile = profcl_profile_new();
+```
+
+In order to start measuring the relevant part of the application, the
+following instruction should be issued:
+
+```c
 /* Start basic timming / profiling. */
 profcl_profile_start(profile);
+```
 
-/* OpenCL data transfers, kernel executions, etc. */
-...
+At this time, the typical OpenCL application workflow, such as 
+transferring data and executing kernels, should take place. The above 
+defined events must be associated with the respective `clEnqueue*` 
+OpenCL functions in order to be later analyzed. A typical workflow 
+may be finalized with the following instructions:
+
+```c
+/* Finish all pending OpenCL operations. */
 clFinish(queue0);
 clFinish(queue1);
-...
-
-/* Manage and show profiling info */
-profcl_profile_stop(profile); 
-profcl_profile_add(profile, "Transfer data to device", events[0], NULL);
-profcl_profile_add(profile, "Kernel 1 execution", events[1], NULL);
-profcl_profile_add(profile, "Kernel 2 execution", events[2], NULL);
-...
-profcl_profile_aggregate(profile, NULL);
-profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, NULL);
-
-/* Two nice detailed tables will be printed: one for individual */
-/* events (sorted by name or execution time), and another describing */
-/* overlap of events. */
 ```
+
+Profiling should be stopped at this point.
+
+```c
+profcl_profile_stop(profile); 
+```
+
+Now the events can be added to the profiler structure. The
+`profcl_profile_add` function uses the second parameter (a string)
+as a key to differentiate between events. Thus, if the same key
+is given for different OpenCL events, CL Profiler will consider 
+it to be the same _semantic_ event. This can be useful for aggregating
+execution times of events which occur innumerous times in a cyclic 
+fashion (in a _for_ loop, for example). 
+
+```c
+/* Add events to be profiled/analyzed. */
+profcl_profile_add(profile, "Transfer data to device", ev_transf_in, NULL);
+profcl_profile_add(profile, "Kernel A", ev_kernel_A_1, NULL);
+profcl_profile_add(profile, "Kernel B", ev_kernel_B, NULL);
+profcl_profile_add(profile, "Kernel A", ev_kernel_A_2, NULL);
+profcl_profile_add(profile, "Transfer data from device", ev_transf_out, NULL);
+```
+
+The above code will consider OpenCL events `ev_kernel_A_1` and `ev_kernel_A_2`
+to be the same semantic event because the same key, string _Kernel A_, is
+used. Thus, the total execution time for the semantic event _Kernel A_ will 
+be the sum of respective two OpenCL events. CL Profiler can even
+determine overlaps of a semantic event with itself (i.e., two overlapping
+OpenCL events which are added for analysis with the same key).
+
+After all the events are added, it is necessary to instruct CL 
+Profiler to perform the required calculations in order to determine
+the absolute and relative times of all events, and how these correlate
+with the total elapsed time of the relevant part of the application.
+
+```c
+profcl_profile_aggregate(profile, NULL);
+```
+
+Finally, the complete benchmarking info can be printed:
+
+```c
+profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, NULL);
+```
+
+Two detailed tables will be printed: one for individual events (sorted by 
+name or execution time), and another showing event overlaps, if any occurred.
+
+Only at this time should the OpenCL events be freed.
+
+```c
+clReleaseEvent(ev_transf_in);
+clReleaseEvent(ev_kernel_A_1);
+clReleaseEvent(ev_kernel_B);
+clReleaseEvent(ev_kernel_A_2);
+clReleaseEvent(ev_transf_out);
+```
+
+The last parameter of some of the `profcl_*` functions is used for error 
+handling and to obtain detailed error messages if an error occurs. By 
+passing `NULL`, the programmer choses to ignore that feature. Such approach 
+is not critical because all of the error-prone `profcl_*` functions also return
+their execution status code. No error handling is performed in this 
+explanation, though.
+
+For map events, CL Profiler provides the `profcl_profile_add_composite`
+function, which accepts two OpenCL events, one relative to the _map_
+operation, and the other to the _unmap_ operation. The function uses
+the start instant of the _map_ event, and the _end_ instant of the
+_unmap_ event, in order to build a composite semantic event.
 
 ### Using GErrorF
 
