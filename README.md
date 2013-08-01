@@ -317,7 +317,7 @@ CL Utils and/or CL Profiler. However, because it is sufficiently generic
 to be used in any C application, a specific description is warranted.
 
 GErrorF uses GLib's `GError` object for function error reporting. This
-explanation assumes minimal knowledge of 
+explanation assumes some familiarity with 
 [GLib's error reporting][gliberror].
 
 GErrorF is defined by two macros in `gerrorf.h`:
@@ -353,11 +353,12 @@ int main(int argc, char* argv[]) {
 
     ...
 
-    /* Call a GError aware function. */
+    /* Call a GError aware function (defined bellow). */
     some_function(params, &err);
 
-    /* Catch possible error in GError-aware function. In this    */
-    /* the GError object is initialized by the called function.  */
+    /* Catch possible error in GError-aware function. In this */
+    /* case the GError object is initialized by the called    */
+    /* function.                                              */
     gef_if_error_goto(
         err,              /* GError object. */
         SOME_ERROR_CODE,  /* Error code to set in status. */
@@ -368,7 +369,7 @@ int main(int argc, char* argv[]) {
     /* In the previous function it is possible to replace an app */
     /* specific error code with GErrorF special constants        */
     /* GEF_USE_STATUS and GEF_USE_GERROR. The former leaves the  */
-    /* status variable untouched (useful for cases were the      */
+    /* status variable untouched (useful for cases where the     */
     /* function itself returns a usable int status), while the   */
     /* later sets status to the error code set in the GError     */
     /* object. */
