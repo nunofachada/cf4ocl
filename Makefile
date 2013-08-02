@@ -93,7 +93,9 @@ test_gerrorf.o: $(TESTSDIR)/test_gerrorf.c gerrorf.h
 # Documentation rules
 
 docs:
-	sed -e 's/```c/~~~~~~~~~~~~~~~{.c}/g' -e 's/```/~~~~~~~~~~~~~~~/g' README.md > README.doxy.md
+	sed -e 's/```c/~~~~~~~~~~~~~~~{.c}/g' \
+	    -e 's/```/~~~~~~~~~~~~~~~/g'      \
+	    README.md > README.doxy.md
 	doxygen 
 	rm README.doxy.md
 	
