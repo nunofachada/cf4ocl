@@ -1,25 +1,29 @@
 Summary
 =======
 
-The C Framework for OpenCL (cf4ocl) is a pure C99 set of libraries and
-utilities with the goal of facilitating: 1) the rapid development of 
-OpenCL C programs; 2) the benchmark of OpenCL events, such as kernel 
-execution and data transfers; and, 3) analysis of the OpenCL 
-environment and kernel requirements.
+The C Framework for OpenCL (_cf4ocl_) is a pure C99 set of libraries 
+and utilities with the following goals:
 
-cf4ocl is composed of four parts: i) library; ii) command-line 
-utilities; iii) unit tests; and, iv) examples. The library offers 
-functions which aim to achieve goals 1) and 2). The command-line 
-utilities are focused on goal 3). The unit tests aim to verify that the 
-library functions are working properly. Finally, the examples show how 
-to integrate the library functions in fully working OpenCL programs.
+1. Promote the rapid development of OpenCL C programs.
+2. Assist in the benchmarking of OpenCL events, such as kernel execution 
+and data transfers.
+3. Simplify the analysis of the OpenCL environment and of kernel 
+requirements.
 
-The target platform of cf4ocl is Linux, although, being pure C99, it 
+_cf4ocl_ is divided into four parts: i) library; ii) command-line 
+utilities; iii) unit tests; and, iv) examples. Part i), the library, 
+offers functions which aim to achieve goals 1 and 2. The command-line 
+utilities, part ii), are focused on goal 3. The unit tests, part
+iii), aim to verify that the library functions are working properly. 
+Finally, the examples show how to integrate the library functions in 
+fully working OpenCL programs.
+
+The target platform of _cf4ocl_ is Linux, although, being pure C99, it 
 can be compiled to other platforms as long as the dependencies, 
 [GLib][] and [OpenCL][], are met. The reference compiler is GCC with 
 `-Wall` and `-Wextra` flags activated. The code is verified with 
 [cppcheck][] and is fully commented. API documentation can be generated 
-with [Doxygen][].
+with [Doxygen][] via `make`.
 
 Library code is licensed under [LGPLv3][], while the remaining code is 
 licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html).
@@ -28,15 +32,14 @@ Table of contents
 =================
 
 1\.  [Introduction](#introduction)  
-1.1\.  [Structure](#structure)  
-1.2\.  [Library](#library)  
-1.2.1\.  [CL Utils](#clutils)  
-1.2.2\.  [CL Profiler](#clprofiler)  
-1.2.3\.  [GError framework](#gerrorframework)  
-1.3\.  [Utilities](#utilities)  
-1.3.1\.  [Device query](#devicequery)  
-1.3.2\.  [Kernel info](#kernelinfo)  
-2\.  [How to use cf4ocl](#howtousecf4ocl)  
+1.1\.  [Library](#library)  
+1.1.1\.  [CL Utils](#clutils)  
+1.1.2\.  [CL Profiler](#clprofiler)  
+1.1.3\.  [GError framework](#gerrorframework)  
+1.2\.  [Utilities](#utilities)  
+1.2.1\.  [Device query](#devicequery)  
+1.2.2\.  [Kernel info](#kernelinfo)  
+2\.  [How to use _cf4ocl_](#howtouse_cf4ocl_)  
 2.1\.  [Dependencies](#dependencies)  
 2.1.1\.  [OpenCL](#opencl)  
 2.1.2\.  [GLib](#glib)  
@@ -54,80 +57,102 @@ Table of contents
 1\. Introduction
 ============
 
-<a name="structure"></a>
+_cf4ocl_ is divided into four parts, with the following structure:
 
-1.1\. Structure
----------
-
-* **Library**
+1. Library
     * CL Utils
     * CL Profiler
     * GError framework
-* **Library tests**
+2. Library tests
     * CL Profiler
     * GError framework
-* **Utilities**
+3. Utilities
     * Device query
     * Kernel info
-* **Examples**
+4. Examples
     * Bank conflicts test
     * Matrix multiplication
 
+The following sections describe each of the parts in additional detail.
+
 <a name="library"></a>
 
-1.2\. Library
+1.1\. Library
 -------
+
+The library offers functions which promote the rapid development of 
+OpenCL C programs (_CL Utils_), as well as their detailed benchmarking
+(_CL Profiler_). The library also exposes an error handling framework
+(_GError framework_) used internally by _CL Utils_ and _CL Profiler_.
 
 <a name="clutils"></a>
 
-### 1.2.1\. CL Utils
+### 1.1.1\. CL Utils
 
-* Create/initialize OpenCL objects such as platform, device, context, 
-command queues, devices, and so on with just one instruction (also one
-instruction for freeing/releasing these objects).
-* Build an OpenCL program with one instruction by passing an array of
-filenames containing the kernels.
-* Automatic or manual device selection.
-* Doesn't hide OpenCL objects from the client programmer.
+The _CL Utils_ section of the library allows the initialization of 
+OpenCL environment objects, such as platform, device, context, 
+command queues and devices, with a single function, `clu_zone_new`, thus
+avoiding the typical boilerplate code required for this setup. Device
+selection is decoupled from the OpenCL environment setup, being 
+performed with a function passed as a parameter to `clu_zone_new`. The
+library supplies functions to accomplish this task automatically or 
+through user interaction, although the client programmer can supply its
+own function with the required selection criteria. The destruction of 
+the OpenCL environment, i.e. the removal of the respective objects from 
+memory, is also achieved with one function, namely `clu_zone_free`.
+
+Kernel compilation is simplified by the `clu_program_create` function,
+which can be used to build OpenCL device programs by passing an array of 
+filenames containing kernel code.
+
+The data structures in _CL Utils_ are completely transparent to the
+client programmer, allowing access the underlying OpenCL objects at all 
+times.
 
 <a name="clprofiler"></a>
 
-### 1.2.2\. CL Profiler
+### 1.1.2\. CL Profiler
 
-* Get detailed profiling information about OpenCL events, including
-relative and absolute times.
-* Supports multiple command queues and overlapping events (e.g. such
-as simultaneous kernel execution and data transfer).
+The functions in _CL Profiler_ allow the client programmer to obtain
+detailed profiling information about OpenCL functions for kernel 
+execution and host-device memory transfers, including relative and 
+absolute execution times. Profiling information is obtained using
+OpenCL events, which can be associated with the relevant OpenCL 
+functions. _CL Profiler_ supports multiple command queues and 
+overlapping events, such as simultaneous kernel executions and data 
+transfers.
 
 <a name="gerrorframework"></a>
 
-### 1.2.3\. GError framework
+### 1.1.3\. GError framework
 
-* Generic C error handling framework based on GError object from GLib.
-* Just two macros.
-* Required by CL Utils and CL Profiler.
+The _GError framework_ is internally used by _CL Utils_ and 
+_CL Profiler_ for error handling purposes. However, the framework is not
+in any way tied to OpenCL, so it can be used generically in any C 
+program. It is composed of only two macros and it is based on the 
+`GError` object from GLib.
 
 <a name="utilities"></a>
 
-1.3\. Utilities
+1.2\. Utilities
 ---------
 
 <a name="devicequery"></a>
 
-### 1.3.1\. Device query
+### 1.2.1\. Device query
 
 Simple implementation of a program for querying available OpenCL
 platforms and devices with clean and useful output.
 
 <a name="kernelinfo"></a>
 
-### 1.3.2\. Kernel info
+### 1.2.2\. Kernel info
 
-Static analysis of OpenCL kernels.
+The `kernel_info` program performs static analysis of OpenCL kernels.
 
-<a name="howtousecf4ocl"></a>
+<a name="howtouse_cf4ocl_"></a>
 
-2\. How to use cf4ocl
+2\. How to use _cf4ocl_
 =================
 
 <a name="dependencies"></a>
@@ -135,7 +160,7 @@ Static analysis of OpenCL kernels.
 2.1\. Dependencies
 ------------
 
-In order to compile cf4ocl and use it in projects, two dependencies are
+In order to compile _cf4ocl_ and use it in projects, two dependencies are
 required: 1) [OpenCL][]; and, 2) [GLib][] (v2.32 or newer).
 
 <a name="opencl"></a>
@@ -176,7 +201,7 @@ package to allow debugging at the GLib level.
 
 Assuming a working development environment with OpenCL and GLib 
 properly setup, to build everything it is simply necessary to run `make`
-within the cf4ocl directory.
+within the _cf4ocl_ directory.
 
 It is possible to build only specific targets, for example:
 
@@ -203,7 +228,7 @@ Profiler internally use the GError framework.
 
 ### 2.3.1\. Compiling and linking
 
-When building a program based on cf4ocl (or any OpenCL program) with 
+When building a program based on _cf4ocl_ (or any OpenCL program) with 
 GCC, it may be necessary to specify the location of the OpenCL headers 
 with the `-I` flag, and the location of the shared library 
 (libOpenCL.so) with the `-L` flag. If the OpenCL development files were
@@ -211,7 +236,7 @@ installed from the package manager (e.g. the `ocl-icd-opencl-dev`
 package in Debian and Ubuntu), this is usually not required.
 
 Additionally, in order to **compile** a program with GLib (required by 
-cf4ocl), the following line should be added to the GCC syntax:
+_cf4ocl_), the following line should be added to the GCC syntax:
 
     `pkg-config --cflags glib-2.0`
     
@@ -681,7 +706,7 @@ program execution will jump to the error handling block.
 
 This pattern avoids many bugs and makes error catching and handling
 possible in C. However it is not to everyone's taste, and is thus
-a completely optional aspect of cf4ocl.
+a completely optional aspect of _cf4ocl_.
 
 <a name="generatingtheapidocumentation"></a>
 
@@ -689,7 +714,7 @@ a completely optional aspect of cf4ocl.
 --------------------------------
 
 The API documentation can be generated with `make` if [Doxygen][] 
-(version 1.8 or newer) is installed. In the cf4ocl directory run:
+(version 1.8 or newer) is installed. In the _cf4ocl_ directory run:
 
     $ make docs
     
@@ -705,7 +730,7 @@ first.
 3\. Other useful C frameworks/utilities for OpenCL
 ==============================================
 
-If cf4ocl does not meet your requirements, take a look at the following
+If _cf4ocl_ does not meet your requirements, take a look at the following
 projects:
 
 * [Simple OpenCL][]
