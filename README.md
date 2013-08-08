@@ -1,7 +1,7 @@
 Summary
 =======
 
-The C Framework for OpenCL (_cf4ocl_) is a pure C99 set of libraries 
+The C Framework for OpenCL, _cf4ocl_, is a pure C99 set of libraries 
 and utilities with the following goals:
 
 1. Promote the rapid development of OpenCL C programs.
@@ -81,9 +81,9 @@ The following sections describe each of the parts in additional detail.
 -------
 
 The library offers functions which promote the rapid development of 
-OpenCL C programs (_CL Utils_), as well as their detailed benchmarking
-(_CL Profiler_). The library also exposes an error handling framework
-(_GError framework_) used internally by _CL Utils_ and _CL Profiler_.
+OpenCL C programs, _CL Utils_, as well as their detailed benchmarking,
+_CL Profiler_. The library also exposes an error handling framework,
+_GError framework_, used internally by _CL Utils_ and _CL Profiler_.
 
 <a name="clutils"></a>
 
