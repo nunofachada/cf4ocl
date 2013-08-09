@@ -180,6 +180,11 @@ int main(int argc, char ** argv) {
 
 				printf(" Short=%d,", uintaux);
 
+				status = clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, sizeof(uintaux), &uintaux, NULL);
+				gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get preferred vector width for int.", status);
+
+				printf(" Int=%d,", uintaux);
+
 				status = clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, sizeof(uintaux), &uintaux, NULL);
 				gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get preferred vector width for long.", status);
 
