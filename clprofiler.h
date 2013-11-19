@@ -43,9 +43,10 @@
  * @brief Error codes.
  * */ 
 enum profcl_error_codes {
-	PROFCL_SUCCESS = 0,      /**< Successful operation. */
-	PROFCL_ALLOC_ERROR = -1, /**< Error code thrown when no memory allocation is possible. */
-	PROFCL_OCL_ERROR = -2    /**< An OpenCL error ocurred. */
+	PROFCL_SUCCESS = 0,        /**< Successful operation. */
+	PROFCL_ALLOC_ERROR = 1,    /**< Error code thrown when no memory allocation is possible. */
+	PROFCL_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
+	PROFCL_OCL_ERROR = 10      /**< An OpenCL error ocurred. */
 };
 
 /** Resolves to error category identifying string, in this case an error in the OpenCL profiler library. */

@@ -117,7 +117,9 @@ int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event 
 int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
 	
 	/* OpenCL return status. */
-	int status;
+	cl_int ocl_status;
+	/* Function return status. */
+	int ret_status; 
 	/* Unique event ID. */
 	guint* unique_event_id;
 	/* Specific event ID. */
@@ -142,37 +144,35 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	event_id = ++profile->num_event_instants;
 	
 	/* Get event start instant. */
-	status = clGetEventProfilingInfo(ev1, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &instant, NULL);
-	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != status, PROFCL_OCL_ERROR, error_handler, "Get event start instant: OpenCL error %d.", status);
+	ocl_status = clGetEventProfilingInfo(ev1, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &instant, NULL);
+	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get event start instant: OpenCL error %d.", ocl_status);
 		
 	/* Add event start instant to list of event instants. */
 	evinst_start = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_START);
-	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_start == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for start of event '%s' with ID %d.", event_name, event_id);
+	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_start == NULL, ret_status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for start of event '%s' with ID %d.", event_name, event_id);
 	profile->event_instants = g_list_prepend(profile->event_instants, (gpointer) evinst_start);
 
 	/* Get event end instant. */
-	status = clGetEventProfilingInfo(ev2, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &instant, NULL);
-	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != status, PROFCL_OCL_ERROR, error_handler, "Get event end instant: OpenCL error %d.", status)
+	ocl_status = clGetEventProfilingInfo(ev2, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &instant, NULL);
+	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get event end instant: OpenCL error %d.", ocl_status)
 
 	/* Add event end instant to list of event instants. */
 	evinst_end = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_END);
-	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_end == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for end of event '%s' with ID %d.", event_name, event_id);
+	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_end == NULL, ret_status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for end of event '%s' with ID %d.", event_name, event_id);
 	profile->event_instants = g_list_prepend(profile->event_instants, (gpointer) evinst_end);
 
 	/* If we got here, everything is OK. */
-	status = PROFCL_SUCCESS;
 	g_assert (err == NULL || *err == NULL);
+	ret_status = PROFCL_SUCCESS;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-	/* Set return status to error code. */
-	status = (*err)->code;
 
 finish:	
 	/* Return status. */
-	return status;
+	return ret_status;
 	
 }
 
@@ -252,7 +252,6 @@ gint profcl_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
  */ 
 int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	
-	/* Function variables. */
 	/* Return status. */
 	int status;
 	/* Total overlap time. */
@@ -278,17 +277,17 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	
 	/* Initialize overlap matrix. */
 	overlapMatrix = (cl_ulong*) malloc(numUniqEvts * numUniqEvts * sizeof(cl_ulong));
-	gef_if_error_create_goto(*err, PROFCL_ERROR, overlapMatrix == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for overlapMatrix.");
+	gef_if_error_create_goto(*err, PROFCL_ERROR, overlapMatrix == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for overlapMatrix.");
 	for (guint i = 0; i < numUniqEvts * numUniqEvts; i++)
 		overlapMatrix[i] = 0;
 		
 	/* Initialize helper table to account for all overlapping events. */
 	overlaps = g_hash_table_new(g_direct_hash, g_direct_equal);
-	gef_if_error_create_goto(*err, PROFCL_ERROR, overlaps == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for overlaps helper table: g_hash_table_new function returned NULL.");
+	gef_if_error_create_goto(*err, PROFCL_ERROR, overlaps == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for overlaps helper table: g_hash_table_new function returned NULL.");
 	
 	/* Setup ocurring events table (key: eventID, value: uniqueEventID) */
 	eventsOccurring = g_hash_table_new(g_int_hash, g_int_equal);
-	gef_if_error_create_goto(*err, PROFCL_ERROR, eventsOccurring == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for occurring events table: g_hash_table_new function returned NULL.");
+	gef_if_error_create_goto(*err, PROFCL_ERROR, eventsOccurring == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for occurring events table: g_hash_table_new function returned NULL.");
 		
 	/* Sort all event instants. */
 	sortType = PROFCL_EV_SORT_INSTANT;
@@ -329,7 +328,7 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 					 * with second key (larger id) as key and event start 
 					 * instant as value. */
 					innerTable = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, (GDestroyNotify) g_hash_table_destroy);
-					gef_if_error_create_goto(*err, PROFCL_ERROR, innerTable == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for events inner table: g_hash_table_new_full function returned NULL.");
+					gef_if_error_create_goto(*err, PROFCL_ERROR, innerTable == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for events inner table: g_hash_table_new_full function returned NULL.");
 					g_hash_table_insert(overlaps, GUINT_TO_POINTER(eid_key1), innerTable);
 				}
 				/* Add second key (larger id) to inner tabler, setting the 
@@ -391,8 +390,6 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-	/* Set return status to error code. */
-	status = (*err)->code;
 
 finish:	
 	
@@ -416,14 +413,21 @@ finish:
  * */
 int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	
-	/* Function variables. */
+	/* Return status. */
 	int status;
+	/* Hash table iterator. */
 	GHashTableIter iter;
+	/* A pointer for a event name. */
 	gpointer eventName;
+	/* Aggregate event info. */
 	ProfCLEvAggregate* evagg = NULL;
+	/* Type of sorting to perform on event list. */
 	ProfCLEvSort sortType;
+	/* Aux. pointer for event data structure kept in a GList. */
 	GList* currEvInstContainer = NULL;
+	/* A pointer to a ProfCLEvAggregate (agg. event info) variable. */
 	gpointer valueAgg;
+	/* Auxiliary aggregate event info variable.*/
 	ProfCLEvAggregate* currAgg = NULL;
 	
 	/* Make sure profile is not NULL. */
@@ -433,7 +437,7 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	g_hash_table_iter_init(&iter, profile->unique_events);
 	while (g_hash_table_iter_next(&iter, &eventName, NULL)) {
 		evagg = profcl_aggregate_new(eventName);
-		gef_if_error_create_goto(*err, PROFCL_ERROR, evagg == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvAggregate object.");
+		gef_if_error_create_goto(*err, PROFCL_ERROR, evagg == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvAggregate object.");
 		evagg->totalTime = 0;
 		g_hash_table_insert(profile->aggregate, eventName, (gpointer) evagg);
 	}
@@ -483,8 +487,6 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-	/* Set return status to error code. */
-	status = (*err)->code;
 
 finish:	
 	
@@ -594,15 +596,23 @@ gdouble profcl_time_elapsed(ProfCLProfile* profile) {
  * */ 
 int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType, GError** err) {
 	
-	/* Function variables. */
+	/* Function return status. */
 	int status;
+	/* Auxiliary hash table. */
 	GHashTable* tmp = NULL;
+	/* Auxiliary hash table iterator. */
 	GHashTableIter iter;
+	/* Auxiliary pointers for data within hash tables and lists. */
 	gpointer pEventName, pId;
+	/* List of aggregate events. */
 	GList* evAggList = NULL;
+	/* List of aggregate events (traversing pointer). */
 	GList* evAggContainer = NULL;
+	/* Aggregate event info. */
 	ProfCLEvAggregate* evAgg = NULL;
+	/* Number of unique event names. */
 	guint numUniqEvts;
+	/* String containing description of overlapping events. */
 	GString* overlapString = NULL;
 	
 	/* Make sure profile is not NULL. */
@@ -624,7 +634,7 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 	if (g_hash_table_size(profile->aggregate) > 0) {
 		printf("     Aggregate times by event  :\n");
 		evAggList = g_hash_table_get_values(profile->aggregate);
-		gef_if_error_create_goto(*err, PROFCL_ERROR, evAggList == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for GList object 'evAggList'.");
+		gef_if_error_create_goto(*err, PROFCL_ERROR, evAggList == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for GList object 'evAggList'.");
 		evAggList = g_list_sort_with_data(evAggList, profcl_evagg_comp, &evAggSortType);
 		evAggContainer = evAggList;
 		printf("       ------------------------------------------------------------------\n");
@@ -644,7 +654,7 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 		/* Create new temporary hash table which is the reverse in 
 		 * terms of key-values of profile->unique_events. */
 		tmp = g_hash_table_new(g_direct_hash, g_direct_equal);
-		gef_if_error_create_goto(*err, PROFCL_ERROR, tmp == NULL, PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for 'tmp' table: g_hash_table_new function returned NULL.");
+		gef_if_error_create_goto(*err, PROFCL_ERROR, tmp == NULL, status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for 'tmp' table: g_hash_table_new function returned NULL.");
 		/* Populate temporary hash table. */
 		g_hash_table_iter_init(&iter, profile->unique_events);
 		while (g_hash_table_iter_next(&iter, &pEventName, &pId)) {
@@ -690,8 +700,6 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-	/* Set return status to error code. */
-	status = (*err)->code;
 
 finish:	
 	

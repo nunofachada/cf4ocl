@@ -39,7 +39,7 @@ export UTILSINCLUDEDIR := ${CURDIR}
 .PHONY: all tests tests_common examples clean mkdirs library utils docs
 
 # Make rules
-all: library utils tests examples
+all: library utils examples
 
 library: mkdirs clutils.o clprofiler.o
 

@@ -155,20 +155,23 @@ Library, utilities, tests and examples
 --------------------------------------
 
 Assuming a working development environment with OpenCL and GLib 
-properly setup, to build everything it is simply necessary to run `make`
-within the _cf4ocl_ directory.
+properly setup, to build the library, utils and examples it is necessary
+to run `make` within the _cf4ocl_ directory.
 
 It is possible to build only specific targets, for example:
 
     $ make library
     $ make utils
-    $ make tests
     $ make examples
 
 If the build failed, confirm if OpenCL and GLib are properly installed,
 and if GCC can find the OpenCL headers and shared library. If not,
 set the headers location in the `CLINCLUDES` Makefile variable, and set
 the shared library location in the `CLLIBDIR` Makefile variable.
+
+The tests should be compiled separately with:
+
+    $ make tests
 
 Using the library in a new project
 ----------------------------------
