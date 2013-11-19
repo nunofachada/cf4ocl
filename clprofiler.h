@@ -98,6 +98,7 @@ typedef struct profcl_evinst {
 	guint id;				/**< Event instant ID. */
 	cl_ulong instant;		/**< Event instant in nanoseconds from current device time counter. */
 	ProfCLEvInstType type;	/**< Type of event instant (ProfCLEvInstType#PROFCL_EV_START or ProfCLEvInstType#PROFCL_EV_END). */
+	cl_command_queue queue; /**< The command queue where the event took place. */
 } ProfCLEvInst;
 
 /**
@@ -135,7 +136,7 @@ int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event 
 int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err);
 
 /** @brief Create new event instant. */
-ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instant, ProfCLEvInstType type);
+ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instant, ProfCLEvInstType type, cl_command_queue queue);
 
 /** @brief Free an event instant. */
 void profcl_evinst_free(gpointer event_instant);

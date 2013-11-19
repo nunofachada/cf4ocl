@@ -131,6 +131,8 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	/* Event instant objects. */
 	ProfCLEvInst* evinst_start;
 	ProfCLEvInst* evinst_end;
+	/* Command queues to which the events are associated to. */
+	cl_command_queue q1, q2;
 	
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
@@ -145,21 +147,29 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	/* Update number of event instants, and get an ID for the given event. */
 	event_id = ++profile->num_event_instants;
 	
+	/* Get command queue associated with start event. */
+	ocl_status = clGetEventInfo (ev1, CL_EVENT_COMMAND_QUEUE, sizeof(cl_command_queue), &q1, NULL);
+	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get start event command queue: OpenCL error %d.", ocl_status);
+	
 	/* Get event start instant. */
 	ocl_status = clGetEventProfilingInfo(ev1, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &instant, NULL);
 	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get event start instant: OpenCL error %d.", ocl_status);
 		
 	/* Add event start instant to list of event instants. */
-	evinst_start = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_START);
+	evinst_start = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_START, q1);
 	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_start == NULL, ret_status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for start of event '%s' with ID %d.", event_name, event_id);
 	profile->event_instants = g_list_prepend(profile->event_instants, (gpointer) evinst_start);
+
+	/* Get command queue associated with end event. */
+	ocl_status = clGetEventInfo (ev2, CL_EVENT_COMMAND_QUEUE, sizeof(cl_command_queue), &q2, NULL);
+	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get end event command queue: OpenCL error %d.", ocl_status);
 
 	/* Get event end instant. */
 	ocl_status = clGetEventProfilingInfo(ev2, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &instant, NULL);
 	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get event end instant: OpenCL error %d.", ocl_status)
 
 	/* Add event end instant to list of event instants. */
-	evinst_end = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_END);
+	evinst_end = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_END, q2);
 	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_end == NULL, ret_status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for end of event '%s' with ID %d.", event_name, event_id);
 	profile->event_instants = g_list_prepend(profile->event_instants, (gpointer) evinst_end);
 
@@ -185,9 +195,10 @@ finish:
  * @param id Id of event.
  * @param instant Even instant in nanoseconds.
  * @param type Type of event instant: PROFCL_EV_START or PROFCL_EV_END
+ * @param queue Command queue associated with event.
  * @return A new event instant or NULL if operation failed.
  */
-ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instant, ProfCLEvInstType type) {
+ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instant, ProfCLEvInstType type, cl_command_queue queue) {
 	
 	/* Allocate memory for event instant data structure. */
 	ProfCLEvInst* event_instant = (ProfCLEvInst*) malloc(sizeof(ProfCLEvInst));
@@ -198,6 +209,7 @@ ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instan
 		event_instant->id = id;
 		event_instant->instant = instant;
 		event_instant->type = type;
+		event_instant->queue = queue;
 	}
 	/* Return event instant data structure. */
 	return event_instant;	
