@@ -95,39 +95,44 @@ static cl_uint clu_menu_device_selector_query(CLUDeviceInfo* devInfos, cl_uint n
  * @param device OpenCL device where kernel will run.
  * @param kwgi Kernel workgroup information structure, which will be populated by this function.
  * @param err Error structure, to be populated if an error occurs.
- * @return CL_SUCCESS if no error ocurred, or any other value otherwise.
+ * @return @link clu_error_codes::CLU_SUCCESS @endlink operation
+ * successfully completed or another value of #clu_error_codes if an 
+ * error occurs.
  */
-cl_uint clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err) {
+int clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err) {
 
-	/* Aux. var. */
-	cl_uint status;
+	/* Status flag returned by OpenCL. */
+	cl_int ocl_status;
+	/* Status flag returned by this function. */
+	int ret_status;
 
-	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &(kwgi->preferred_work_group_size_multiple), NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE")
+	ocl_status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &(kwgi->preferred_work_group_size_multiple), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE (OpenCL error %d).", ocl_status);
 	
-	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, 3 * sizeof(size_t), kwgi->compile_work_group_size, NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_COMPILE_WORK_GROUP_SIZE")
+	ocl_status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, 3 * sizeof(size_t), kwgi->compile_work_group_size, NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_COMPILE_WORK_GROUP_SIZE (OpenCL error %d).", ocl_status);
 
-	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &(kwgi->max_work_group_size), NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_WORK_GROUP_SIZE")
+	ocl_status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &(kwgi->max_work_group_size), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_WORK_GROUP_SIZE (OpenCL error %d).", ocl_status);
 
-	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &(kwgi->local_mem_size), NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_LOCAL_MEM_SIZE")
+	ocl_status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &(kwgi->local_mem_size), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_LOCAL_MEM_SIZE (OpenCL error %d).", ocl_status);
 
-	status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(cl_ulong), &(kwgi->private_mem_size), NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_PRIVATE_MEM_SIZE")
+	ocl_status = clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(cl_ulong), &(kwgi->private_mem_size), NULL);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "clu_workgroup_info_get: Unable to get CL_KERNEL_PRIVATE_MEM_SIZE (OpenCL error %d).", ocl_status);
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
+	ret_status = CLU_SUCCESS;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:	
 	/* Return. */
-	return status;
+	return ret_status;
 }
 
 /** 
@@ -222,7 +227,7 @@ char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strS
  */
 CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err) {
 	
-	/* Helper variables */
+	/* OpenCL status variable. */
 	cl_int status;
 	
 	/* OpenCL zone to initialize and return */
@@ -254,7 +259,7 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 	
 	/* Initialize zone */
 	zone = (CLUZone*) malloc(sizeof(CLUZone));
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == zone, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory OpenCL zone. ");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == zone, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory OpenCL zone (OpenCL error %d).", status);
 	zone->context = NULL;
 	zone->queues = NULL;
 	zone->program = NULL;
@@ -266,11 +271,11 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 		
 	/* Get number of platforms */
 	status = clGetPlatformIDs(0, NULL, &numPlatforms);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get number of platforms");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "clu_zone_new: get number of platforms (OpenCL error %d).", status);
 
 	/* Get existing platforms */
 	status = clGetPlatformIDs(numPlatforms, platfIds, NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get platform Ids");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "clu_zone_new: get platform Ids (OpenCL error %d).", status);
 
 	/* Cycle through platforms, get specified devices in existing platforms */
 	totalNumDevices = 0;
@@ -279,20 +284,20 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 		status = clGetDeviceIDs( platfIds[i], deviceType, CLU_MAX_DEVICES_PER_PLATFORM, devIds, &numDevices );
 		if (status != CL_DEVICE_NOT_FOUND) {
 			/* At least one device found, lets take note */
-			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device Ids");
+			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "clu_zone_new: get device Ids (OpenCL error %d).", status);
 			for (unsigned int j = 0; j < numDevices; j++) {
 				/* Keep device and platform IDs. */
 				devInfos[totalNumDevices].device_id = devIds[j];
 				devInfos[totalNumDevices].platform_id = platfIds[i];
 				/* Get device name. */
 				status = clGetDeviceInfo(devIds[j], CL_DEVICE_NAME, sizeof(devInfos[totalNumDevices].device_name), devInfos[totalNumDevices].device_name, NULL);
-				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device name info");
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "clu_zone_new: get device name info (OpenCL error %d).", status);
 				/* Get device vendor. */
 				status = clGetDeviceInfo(devIds[j], CL_DEVICE_VENDOR, sizeof(devInfos[totalNumDevices].device_vendor), devInfos[totalNumDevices].device_vendor, NULL);
-				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get device vendor info");
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "clu_zone_new: get device vendor info (OpenCL error %d).", status);
 				/* Get platform name. */
 				status = clGetPlatformInfo( platfIds[i], CL_PLATFORM_VENDOR, sizeof(devInfos[totalNumDevices].platform_name), devInfos[totalNumDevices].platform_name, NULL);
-				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "clu_zone_new: get platform info");
+				gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "clu_zone_new: get platform info (OpenCL error %d).", status);
 				/* Increment total number of found devices. */
 				totalNumDevices++;
 			}
@@ -302,7 +307,7 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 	/* Check whether any devices of the specified type were found */
 	if (totalNumDevices == 0) {
 		/* No devices of the specified type where found, return with error. */
-		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CL_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: device not found");
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CLU_ERROR_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: device not found.");
 	} else {
 		/* Several compatible devices found, choose one with given selector function. */
 		deviceInfoIndex = devSel(devInfos, totalNumDevices, dsExtraArg);
@@ -312,7 +317,7 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 		g_assert_cmpint(deviceInfoIndex, <, totalNumDevices);
 		/* If selector function returned -1, then no device is selectable. */
 		if (deviceInfoIndex == -1) {
-			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CL_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: specified device not found");
+			gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, CLU_ERROR_DEVICE_NOT_FOUND, error_handler, "clu_zone_new: specified device not found.");
 		}
 	}
 
@@ -322,19 +327,19 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 
 	/* Determine number of compute units for that device */
 	status = clGetDeviceInfo(zone->device_info.device_id, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &zone->cu, NULL);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: get target device info");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "cl_int clu_zone_new: get target device info (OpenCL error %d).", status);
 	
 	/* Create a context on that device. */
 	cps[1] = (cl_context_properties) devInfos[deviceInfoIndex].platform_id;
 	zone->context = clCreateContext(cps, 1, &zone->device_info.device_id, NULL, NULL, &status);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: creating context");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "cl_int clu_zone_new: creating context (OpenCL error %d).", status);
 	
 	/* Create the specified command queues on that device */
 	zone->numQueues = numQueues;
 	zone->queues = (cl_command_queue*) malloc(numQueues * sizeof(cl_command_queue));
 	for (unsigned int i = 0; i < numQueues; i++) {
 		zone->queues[i] = clCreateCommandQueue(zone->context, zone->device_info.device_id, queueProperties, &status);
-		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "cl_int clu_zone_new: creating command queue");
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, CLU_OCL_ERROR, error_handler, "cl_int clu_zone_new: creating command queue (OpenCL error %d).", status);
 	}
 
 	/* If we got here, everything is OK. */
@@ -365,50 +370,54 @@ finish:
  * @param numKernelFiles Number of strings identifying filenames containing kernels.
  * @param compilerOpts OpenCL compiler options.
  * @param err Error structure, to be populated if an error occurs.
- * @return CL_SUCCESS if no error ocurred, or any other value otherwise.
+ * @return @link clu_error_codes::CLU_SUCCESS @endlink operation
+ * successfully completed or another value of #clu_error_codes if an 
+ * error occurs.
  */
-cl_int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err) {
+int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err) {
 
 	/* Helper variables */
-	cl_int status, bpStatus;
-	char * buildLog = NULL;
+	cl_int ocl_status, ocl_build_status;
+	int ret_status;
+	char * build_log = NULL;
 	size_t logsize;
 	char** source = NULL;
 	
 	/* Import kernels */
 	source = (char**) malloc(numKernelFiles * sizeof(char*));
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == source, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for kernels source file. ");
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == source, ret_status = CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for kernels source file. ");
 	for (unsigned int i = 0; i < numKernelFiles; i++) { source[i] = NULL; }
 	for (unsigned int i = 0; i < numKernelFiles; i++) {
 		source[i] = clu_source_load(kernelFiles[i], err);
-		gef_if_error_goto(*err, GEF_USE_GERROR, status, error_handler);
+		gef_if_error_goto(*err, GEF_USE_GERROR, ret_status, error_handler);
 	}
 	
 	/* Load kernels sources and create program */
-	cl_program program = clCreateProgramWithSource(zone->context, numKernelFiles, (const char**) source, NULL, &status);
-	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Create program with source");
+	cl_program program = clCreateProgramWithSource(zone->context, numKernelFiles, (const char**) source, NULL, &ocl_status);
+	gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "Create program with source (OpenCL error %d).", ocl_status);
 	
 	/* Perform runtime source compilation of program */
-	bpStatus = clBuildProgram( program, 1, &zone->device_info.device_id, compilerOpts, NULL, NULL );
+	ocl_build_status = clBuildProgram( program, 1, &zone->device_info.device_id, compilerOpts, NULL, NULL );
 	/* Check for errors. */
-	if (bpStatus != CL_SUCCESS) {
+	if (ocl_build_status != CL_SUCCESS) {
 		/* If where here it's because program failed to build. However, error will only be thrown after getting build information. */
 		/* Get build log size. */
-		status = clGetProgramBuildInfo(program, zone->device_info.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &logsize);
-		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Error getting program build info (log size) after program failed to build with error %d", bpStatus);
+		ocl_status = clGetProgramBuildInfo(program, zone->device_info.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &logsize);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "Error getting program build info (log size, OpenCL error %d) after program failed to build (OpenCL error %d).", ocl_status, ocl_build_status);
 		/* Alocate memory for build log. */
-		buildLog = (char*) malloc(logsize);
-		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == buildLog, CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for build log after program failed to build with error %d", bpStatus);
+		build_log = (char*) malloc(logsize);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, NULL == build_log, ret_status = CLU_ERROR_NOALLOC, error_handler, "Unable to allocate memory for build log after program failed to build with OpenCL error %d.", ocl_build_status);
 		/* Get build log. */
-		status = clGetProgramBuildInfo(program, zone->device_info.device_id, CL_PROGRAM_BUILD_LOG, logsize, buildLog, NULL);
-		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "Error getting program build info (build log) after program failed to build with error %d", bpStatus);
+		ocl_status = clGetProgramBuildInfo(program, zone->device_info.device_id, CL_PROGRAM_BUILD_LOG, logsize, build_log, NULL);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, CL_SUCCESS != ocl_status, ret_status = CLU_OCL_ERROR, error_handler, "Error getting program build info (build log, OpenCL error %d) after program failed to build (OpenCL error %d).", ocl_status, ocl_build_status);
 		/* Throw error. */
-		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, bpStatus, error_handler, "Failed to build program. \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", buildLog);
+		gef_if_error_create_goto(*err, CLU_UTILS_ERROR, 1, ret_status = CLU_OCL_ERROR, error_handler, "Failed to build program (OpenCL error %d). \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", ocl_build_status, build_log);
 	}
 	zone->program = program;
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
+	ret_status = CLU_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -426,12 +435,12 @@ finish:
 		}
 		free(source);
 	}
-	if (buildLog != NULL) {
-		free(buildLog);
+	if (build_log != NULL) {
+		free(build_log);
 	}
 	
 	/* Return. */
-	return status;
+	return ret_status;
 }
 
 /** 
@@ -458,7 +467,7 @@ void clu_zone_free(CLUZone* zone) {
  * 
  * @param filename Filename from where to load kernel source.
  * @param err GLib error object for error reporting.
- * @return Kernel source code.
+ * @return Kernel source code or NULL if an error occurred.
  */
 char* clu_source_load(const char * filename, GError** err) {
 	

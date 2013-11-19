@@ -90,9 +90,12 @@
  * @brief Error codes.
  * */ 
 enum clu_error_codes {
+	CLU_SUCCESS = 0,        /**< Successful operation. */
 	CLU_ERROR_NOALLOC = 1,  /**< Error code thrown when no memory allocation is possible. */
 	CLU_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
-	CLU_ERROR_ARGS = 3      /**< Error code thrown when passed arguments are invalid. */
+	CLU_ERROR_ARGS = 3,     /**< Error code thrown when passed arguments are invalid. */
+	CLU_ERROR_DEVICE_NOT_FOUND = 4, /**< Error code thrown when no OpenCL device is found. */
+	CLU_OCL_ERROR = 10      /**< An OpenCL error ocurred. */
 };
 
 /** Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */
@@ -151,7 +154,7 @@ typedef struct clu_zone {
 typedef cl_uint (*clu_device_selector)(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Get kernel workgroup info. */
-cl_uint clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err);
+int clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err);
 
 /** @brief Print kernel workgroup info. */
 void clu_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi);
@@ -164,7 +167,7 @@ char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strS
 CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
-cl_int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err);
+int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err);
 
 /** @brief Free a previously created OpenCL zone. */
 void clu_zone_free(CLUZone* zone);
