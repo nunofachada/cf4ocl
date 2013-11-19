@@ -94,7 +94,8 @@ void profcl_profile_free(ProfCLProfile* profile) {
  * @param ev Event to get information of.
  * @param err Error structure, to be populated if an error occurs.
  * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an error occurs.
+ * successfully added, or another value of #profcl_error_codes if an 
+ * error occurs.
  */ 
 int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event ev, GError** err) {
 	/* Just call profcl_profile_add_composite sending the same event as start and end event. */
@@ -112,7 +113,8 @@ int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event 
  * @param ev2 Event to get end information of.
  * @param err Error structure, to be populated if an error occurs.
  * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an error occurs.
+ * successfully added, or another value of #profcl_error_codes if an 
+ * error occurs.
  */ 
 int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
 	
@@ -247,8 +249,9 @@ gint profcl_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an error occurs.
+ * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
+ * terminates successfully, or another value of #profcl_error_codes if 
+ * an error occurs.
  */ 
 int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	
@@ -408,8 +411,9 @@ finish:
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an error occurs.
+ * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
+ * terminates successfully, or another value of #profcl_error_codes if 
+ * an error occurs.
  * */
 int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	
@@ -591,8 +595,9 @@ gdouble profcl_time_elapsed(ProfCLProfile* profile) {
  * @param profile An OpenCL events profile.
  * @param evAggSortType Sorting strategy for aggregate event data instances.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an error occurs.
+ * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
+ * terminates successfully, or another value of #profcl_error_codes if 
+ * an error occurs.
  * */ 
 int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType, GError** err) {
 	
