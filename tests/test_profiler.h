@@ -35,6 +35,9 @@
 /** @brief Replaces OpenCL cl_int type. */ 
 typedef int cl_int;
 
+/** @brief Replaces OpenCL cl_command_queue type. */ 
+typedef void* cl_command_queue;
+
 /** @brief Replaces OpenCL cl_ulong type. */ 
 typedef unsigned long cl_ulong;
 
@@ -42,6 +45,7 @@ typedef unsigned long cl_ulong;
 typedef struct clEvent {
 	cl_ulong start;
 	cl_ulong end;
+	cl_command_queue queue;
 } cl_event;
 
 /** @brief Stub for cl_profiling_info enum. */ 
@@ -50,7 +54,15 @@ typedef enum clProfilingInfo {
 	CL_PROFILING_COMMAND_END	
 } cl_profiling_info;
 
+/** @brief Stub for cl_event_info enum. */ 
+typedef enum clEventInfo {
+	CL_EVENT_COMMAND_QUEUE	
+} cl_event_info;
+
 /** @brief Stub for clGetEventProfilingInfo function. */ 
 cl_int clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret);
+
+/** @brief Stub for clGetEventInfo function. */ 
+cl_int clGetEventInfo(cl_event event, cl_event_info param_name, size_t param_value_size, void *param_value, size_t *param_value_size_ret);
 
 #endif

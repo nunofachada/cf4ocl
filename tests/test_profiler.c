@@ -36,6 +36,7 @@ static void profilerTest() {
 	guint numEvents = 5;
 	cl_event ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8;
 	int status;
+	cl_command_queue queue = (cl_command_queue) malloc(sizeof(int));
 	
 	/* Profiling object. */
 	ProfCLProfile* profile = profcl_profile_new();
@@ -44,41 +45,49 @@ static void profilerTest() {
 	/* Test with 5 unique events */
 	ev1.start = 10;
 	ev1.end = 15;
+	ev1.queue = queue;
 	status = profcl_profile_add(profile, "Event 1", ev1, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev2.start = 16;
 	ev2.end = 20;
+	ev2.queue = queue;
 	status = profcl_profile_add(profile, "Event 2", ev2, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev3.start = 17;
 	ev3.end = 30;
+	ev3.queue = queue;
 	status = profcl_profile_add(profile, "Event 3", ev3, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev4.start = 19;
 	ev4.end = 25;
+	ev4.queue = queue;
 	status = profcl_profile_add(profile, "Event 4", ev4, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev5.start = 29;
 	ev5.end = 40;
+	ev5.queue = queue;
 	status = profcl_profile_add(profile, "Event 5", ev5, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev6.start = 35;
 	ev6.end = 45;
+	ev6.queue = queue;
 	status = profcl_profile_add(profile, "Event 1", ev6, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev7.start = 68;
 	ev7.end = 69;
+	ev7.queue = queue;
 	status = profcl_profile_add(profile, "Event 1", ev7, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev8.start = 50;
 	ev8.end = 70;
+	ev8.queue = queue;
 	status = profcl_profile_add(profile, "Event 1", ev8, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
@@ -137,6 +146,7 @@ static void profilerTest() {
 	//profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME);
 
 	/* Free profile. */
+	free(queue);
 	profcl_profile_free(profile);
 	
 }
@@ -166,10 +176,31 @@ int main(int argc, char** argv) {
 cl_int clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret) {
 	/* Ignore compiler warnings. */
 	param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
-	/* Return start or end instants. */
+	/* Return start or end instants in given memory location. */
 	if (param_name == CL_PROFILING_COMMAND_START)
 		*((cl_ulong*) param_value) = event.start;
 	else
 		*((cl_ulong*) param_value) = event.end;
+	/* Always return success. */
 	return CL_SUCCESS;
+}
+
+/** 
+ * @brief Stub for clGetEventInfo function. 
+ * 
+ * @param event Stub event.
+ * @param param_name Ignored (assumes CL_EVENT_COMMAND_QUEUE).
+ * @param param_value_size Ignored.
+ * @param param_value Memory location where to place fake queue.
+ * @param param_value_size_ret Ignored.
+ * @return Always returns CL_SUCCESS.
+ * */ 
+cl_int clGetEventInfo(cl_event event, cl_event_info param_name, size_t param_value_size, void *param_value, size_t *param_value_size_ret) {
+	/* Ignore compiler warnings. */
+	param_name = param_name; param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
+	/* Return the event command queue in given memor location. */
+	*((cl_command_queue*) param_value) = event.queue;
+	/* Always return success. */
+	return CL_SUCCESS;
+
 }
