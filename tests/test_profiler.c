@@ -96,6 +96,9 @@ static void profilerTest() {
 	status = profcl_profile_overmat(profile, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 	
+	//~ status = profcl_export_info_file(profile, "test_output.csv", NULL);
+	//~ g_assert(status == PROFCL_SUCCESS);
+	
 	/* ************************* */
 	/* Test aggregate statistics */
 	/* ************************* */
@@ -142,6 +145,9 @@ static void profilerTest() {
 			g_assert_cmpuint(profile->overmat[i * numEvents + j], ==, expectedOvermat[i][j]);
 		}
 	}
+	
+	/* Test if output file was correctly written. */
+	/// @todo Test if output file was correctly written
 	
 	//profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME);
 

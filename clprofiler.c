@@ -730,6 +730,166 @@ finish:
 
 }
 
+
+/** 
+ * @brief Export profiling info to a given stream.
+ * 
+ * Each line of the exported data will have the following format:
+ * 
+ *     queue start-time end-time event-name
+ * 
+ * For example:
+ * 
+ *     0    100    120    load_data1
+ *     1    100    132    load_data2
+ *     0    121    159    process_data1
+ *     1    133    145    process_data2
+ *     0    146    157    read_result
+ * 
+ * Several export parameters can be configured with the 
+ * profcl_export_conf() function, namely:
+ * 
+ * * separator  - field separator, defaults to tab (\\t).
+ * * newline    - defaults to Unix newline (\\n).
+ * * queue_enc  - queue enclosure, defaults to empty string.
+ * * evname_enc - event name enclosure, defaults to empty string.
+ * 
+ * @param profile An OpenCL events profile.
+ * @param stream Stream where export info to.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
+ * terminates successfully, or another value of #profcl_error_codes if 
+ * an error occurs.
+ * */ 
+int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
+	
+	/* Return status. */
+	int status;
+	/* Type of sorting to perform on event list. */
+	ProfCLEvSort sortType;
+	/* List of event instants (traversing pointer). */
+	GList* evInstContainer = NULL;
+	
+	/* Make sure profile is not NULL. */
+	g_assert(profile != NULL);
+	
+	/* Sort event instants by eid, and then by START, END order. */
+	sortType = PROFCL_EV_SORT_ID;
+	profile->event_instants = g_list_sort_with_data(profile->event_instants, profcl_evinst_comp, (gpointer) &sortType);
+	
+	/* Iterate through all event instants, determine complete event
+	 * information and export it to stream. */
+	evInstContainer = profile->event_instants;
+	while (evInstContainer) {
+
+		/* Loop aux. variables. */
+		ProfCLEvInst* currEvInst = NULL;
+		cl_command_queue q1, q2;
+		gulong qId;
+		cl_ulong startInst, endInst;
+		const char *ev1Name, *ev2Name;
+		
+		/* Get information from start instant. */
+		currEvInst = (ProfCLEvInst*) evInstContainer->data;
+		startInst = currEvInst->instant;
+		q1 = currEvInst->queue;
+		ev1Name = currEvInst->eventName;
+		
+		/* Get information from start instant. */
+		evInstContainer = evInstContainer->next;
+		currEvInst = (ProfCLEvInst*) evInstContainer->data;
+		endInst = currEvInst->instant;
+		q2 = currEvInst->queue;
+		ev2Name = currEvInst->eventName;
+		
+		/* Make sure both event instants correspond to the same event. */
+		g_assert_cmpstr(ev1Name, ==, ev2Name);
+		/* Make sure start instant occurs before end instant. */
+		g_assert_cmpint(startInst, <, endInst);
+		
+		/* Determine queue Id. */
+		qId = (q1 == q2) ? (gulong) q1 : ((gulong) q1) + ((gulong) q2);
+		
+		/* Write to stream. */
+		fprintf(stream, "%lu\t%lu\t%lu\t%s\n", qId, startInst, endInst, ev1Name);
+		
+		/* Get next START event instant. */
+		evInstContainer = evInstContainer->next;
+		
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	status = PROFCL_SUCCESS;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+	
+	/* Return status. */
+	return status;		
+	
+	
+	
+}
+
+/** 
+ * @brief Helper function which exports profiling info to a given file, 
+ * automatically opening and closing the file. Check the 
+ * profcl_export_info() for more information.
+ * 
+ * @param profile An OpenCL events profile.
+ * @param filename Name of file where information will be saved to.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
+ * terminates successfully, or another value of #profcl_error_codes if 
+ * an error occurs.
+ * */ 
+int profcl_export_info_file(ProfCLProfile* profile, const char* filename, GError** err) {
+
+	/* Aux. var. */
+	int status;
+	
+	/* Internal GError object. */
+	GError* errInt = NULL;
+	
+	/* Open file. */
+	FILE* fp = fopen(filename, "w");
+	gef_if_error_create_goto(*err, PROFCL_ERROR, fp == NULL, status = PROFCL_ERROR_OPENFILE, error_handler, "Unable to open file '%s' for exporting.", filename);
+	
+	/* Export data. */
+	status = profcl_export_info(profile, fp, &errInt);
+	gef_if_error_propagate_goto(errInt, err, GEF_USE_GERROR, status, error_handler);
+	
+	/* If we got here, everything is OK. */
+	g_assert (errInt == NULL);
+	status = PROFCL_SUCCESS;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	/* Free internal GError object. */
+	g_error_free(errInt);
+
+finish:	
+
+
+	/* Close file. */
+	if (fp) fclose(fp);
+
+	/* Return file contents in string form. */
+	return status;
+
+}
+
+
+//~ int profcl_export_conf(const char* key, const char* value) {
+//~ }
+
 /** 
  * @brief Resolves to error category identifying string, in this case an error in the OpenCL profiler library.
  * 

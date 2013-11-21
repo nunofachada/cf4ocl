@@ -159,6 +159,14 @@ void profcl_aggregate_free(gpointer agg);
 /** @brief Print profiling info. */
 int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType, GError** err);
 
+/** @brief Export profiling info to a given stream. */ 
+int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err);
+
+/** @brief Helper function which exports profiling info to a given file, 
+ * automatically opening and closing the file. Check the 
+ * profcl_export_info() for more information. */ 
+int profcl_export_info_file(ProfCLProfile* profile, const char* filename, GError** err);
+
 /** @brief Resolves to error category identifying string, in this case an error in the OpenCL profiler library. */
 GQuark profcl_error_quark(void);
 
