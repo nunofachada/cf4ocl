@@ -36,9 +36,10 @@ static void profilerTest() {
 	guint numEvents = 5;
 	cl_event ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8;
 	int status;
-	cl_command_queue queue1, queue2;
+	cl_command_queue queue1, queue2, queue3;
 	queue1 = (cl_command_queue) malloc(sizeof(int));
 	queue2 = (cl_command_queue) malloc(sizeof(int));
+	queue3 = (cl_command_queue) malloc(sizeof(int));
 	
 	/* Profiling object. */
 	ProfCLProfile* profile = profcl_profile_new();
@@ -48,49 +49,49 @@ static void profilerTest() {
 	ev1.start = 10;
 	ev1.end = 15;
 	ev1.queue = queue1;
-	status = profcl_profile_add(profile, "Event 1", ev1, NULL);
+	status = profcl_profile_add(profile, "Event1", ev1, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev2.start = 16;
 	ev2.end = 20;
 	ev2.queue = queue1;
-	status = profcl_profile_add(profile, "Event 2", ev2, NULL);
+	status = profcl_profile_add(profile, "Event2", ev2, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev3.start = 17;
 	ev3.end = 30;
 	ev3.queue = queue2;
-	status = profcl_profile_add(profile, "Event 3", ev3, NULL);
+	status = profcl_profile_add(profile, "Event3", ev3, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev4.start = 19;
 	ev4.end = 25;
-	ev4.queue = queue1;
-	status = profcl_profile_add(profile, "Event 4", ev4, NULL);
+	ev4.queue = queue3;
+	status = profcl_profile_add(profile, "Event4", ev4, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev5.start = 29;
 	ev5.end = 40;
-	ev5.queue = queue2;
-	status = profcl_profile_add(profile, "Event 5", ev5, NULL);
+	ev5.queue = queue1;
+	status = profcl_profile_add(profile, "Event5", ev5, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev6.start = 35;
 	ev6.end = 45;
-	ev6.queue = queue1;
-	status = profcl_profile_add(profile, "Event 1", ev6, NULL);
+	ev6.queue = queue2;
+	status = profcl_profile_add(profile, "Event1", ev6, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev7.start = 68;
 	ev7.end = 69;
 	ev7.queue = queue1;
-	status = profcl_profile_add(profile, "Event 1", ev7, NULL);
+	status = profcl_profile_add(profile, "Event1", ev7, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev8.start = 50;
 	ev8.end = 70;
-	ev8.queue = queue1;
-	status = profcl_profile_add(profile, "Event 1", ev8, NULL);
+	ev8.queue = queue3;
+	status = profcl_profile_add(profile, "Event1", ev8, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	status = profcl_profile_aggregate(profile, NULL);
@@ -104,23 +105,23 @@ static void profilerTest() {
 	
 	ProfCLEvAggregate* agg;
 	
-	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event 1");
+	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event1");
 	g_assert_cmpuint(agg->totalTime, ==, 36);
 	g_assert_cmpfloat(agg->relativeTime - 0.51728, <, 0.0001);
 	
-	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event 2");
+	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event2");
 	g_assert_cmpuint(agg->totalTime, ==, 4);
 	g_assert_cmpfloat(agg->relativeTime - 0.05714, <, 0.0001);
 
-	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event 3");
+	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event3");
 	g_assert_cmpuint(agg->totalTime, ==, 13);
 	g_assert_cmpfloat(agg->relativeTime - 0.18571, <, 0.0001);
 
-	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event 4");
+	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event4");
 	g_assert_cmpuint(agg->totalTime, ==, 6);
 	g_assert_cmpfloat(agg->relativeTime - 0.08571, <, 0.0001);
 
-	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event 5");
+	agg = (ProfCLEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event5");
 	g_assert_cmpuint(agg->totalTime, ==, 11);
 	g_assert_cmpfloat(agg->relativeTime - 0.15714, <, 0.0001);
 
@@ -151,9 +152,11 @@ static void profilerTest() {
 	
 	/* Set some export options. */
 	ProfCLExportOptions export_options = profcl_export_opts_get();
-	export_options.separator = ",";
-	export_options.queue_delim = "''";
-	export_options.evname_delim = "\"";
+	export_options.separator = "\t"; /* Default */
+	export_options.queue_delim = ""; /* Default */
+	export_options.evname_delim = ""; /* Default */
+	export_options.simple_queue_id = TRUE; /* Default */
+	export_options.zero_start = FALSE; /* Not default */
 	profcl_export_opts_set(export_options);
 	
 	/* Export options. */
@@ -168,7 +171,7 @@ static void profilerTest() {
 
 	/* Test if output file was correctly written. */
 	gchar* file_contents;
-	gchar* expected_contents = "''0'',10,15,\"Event 1\"\n''0'',16,20,\"Event 2\"\n''1'',17,30,\"Event 3\"\n''0'',19,25,\"Event 4\"\n''1'',29,40,\"Event 5\"\n''0'',35,45,\"Event 1\"\n''0'',68,69,\"Event 1\"\n''0'',50,70,\"Event 1\"\n";
+	gchar* expected_contents = "0\t10\t15\tEvent1\n0\t16\t20\tEvent2\n1\t17\t30\tEvent3\n2\t19\t25\tEvent4\n0\t29\t40\tEvent5\n1\t35\t45\tEvent1\n0\t68\t69\tEvent1\n2\t50\t70\tEvent1\n";
 	gboolean read_flag = g_file_get_contents(name_used, &file_contents, NULL, NULL);
 	g_assert(read_flag);
 	g_assert_cmpstr(file_contents, ==, expected_contents);
@@ -181,6 +184,7 @@ static void profilerTest() {
 	/* Free queue. */
 	free(queue1);
 	free(queue2);
+	free(queue3);
 	
 	/* Free profile. */
 	profcl_profile_free(profile);

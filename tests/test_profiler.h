@@ -29,8 +29,11 @@
 
 #include <stdlib.h>
 
-/** @brief Mimicks OpenCL success code. */
+/** @brief OpenCL success code. */
 #define CL_SUCCESS 0
+
+/** @brief OpenCL maximum unsigned long. */
+#define CL_ULONG_MAX ((cl_ulong) 0xFFFFFFFFFFFFFFFFULL)
 
 /** @brief Replaces OpenCL cl_int type. */ 
 typedef int cl_int;
