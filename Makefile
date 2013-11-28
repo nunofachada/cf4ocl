@@ -8,7 +8,7 @@ endif
 
 # Variables definitions
 CC = gcc
-CFLAGS = -Wextra -Wall -g -std=c99 `pkg-config --cflags glib-2.0`
+CFLAGS = -Wextra -Wall -g -std=gnu99 `pkg-config --cflags glib-2.0`
 CLLIB = -lOpenCL
 LFLAGS  = `pkg-config --libs glib-2.0`
 TESTSDIR = tests

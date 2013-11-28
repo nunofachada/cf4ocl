@@ -27,6 +27,15 @@
 
 #include "clprofiler.h"
 
+/* Default export options. */
+static ProfCLExportOptions export_options = {
+	.separator = "\t",
+	.newline = "\n",
+	.queue_delim = "",
+	.evname_delim = "",
+	.simple_queue_id = TRUE
+};
+
 /** 
  * @brief Create a new OpenCL events profile.
  * 
@@ -41,6 +50,8 @@ ProfCLProfile* profcl_profile_new() {
 	if (profile != NULL) {
 		/* ... create table of unique events, ... */
 		profile->unique_events = g_hash_table_new(g_str_hash, g_str_equal);
+		/* ... create table of command queues, ... */
+		profile->command_queues = g_hash_table_new(g_direct_hash, g_direct_equal);
 		/* ... create list of all event instants, ... */
 		profile->event_instants = NULL;
 		/* ... and set number of event instants to zero. */
@@ -71,6 +82,8 @@ void profcl_profile_free(ProfCLProfile* profile) {
 	g_assert(profile != NULL);
 	/* Destroy table of unique events. */
 	g_hash_table_destroy(profile->unique_events);
+	/* Destroy table of command queues. */
+	g_hash_table_destroy(profile->command_queues);
 	/* Destroy list of all event instants. */
 	g_list_free_full(profile->event_instants, profcl_evinst_free);
 	/* Destroy table of aggregate statistics. */
@@ -124,6 +137,8 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	int ret_status; 
 	/* Unique event ID. */
 	guint* unique_event_id;
+	/* Command queues ID. */
+	guint* queue_id;
 	/* Specific event ID. */
 	guint event_id;
 	/* Event instant. */
@@ -172,6 +187,20 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	evinst_end = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_END, q2);
 	gef_if_error_create_goto(*err, PROFCL_ERROR, evinst_end == NULL, ret_status = PROFCL_ALLOC_ERROR, error_handler, "Unable to allocate memory for ProfCLEvInst object for end of event '%s' with ID %d.", event_name, event_id);
 	profile->event_instants = g_list_prepend(profile->event_instants, (gpointer) evinst_end);
+	
+	/* Check if command queue of start event is already registered in the command queues table... */
+	if (!g_hash_table_contains(profile->command_queues, q1)) {
+		/* ...if not, register it. */
+		queue_id = GUINT_TO_POINTER(g_hash_table_size(profile->command_queues));
+		g_hash_table_insert(profile->command_queues, (gpointer) q1, (gpointer) queue_id);
+	}
+
+	/* Check if command queue of end event is already registered in the command queues table... */
+	if (!g_hash_table_contains(profile->command_queues, q2)) {
+		/* ...if not, register it. */
+		queue_id = GUINT_TO_POINTER(g_hash_table_size(profile->command_queues));
+		g_hash_table_insert(profile->command_queues, (gpointer) q2, (gpointer) queue_id);
+	}
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -747,12 +776,8 @@ finish:
  *     0    146    157    read_result
  * 
  * Several export parameters can be configured with the 
- * profcl_export_conf() function, namely:
- * 
- * * separator  - field separator, defaults to tab (\\t).
- * * newline    - defaults to Unix newline (\\n).
- * * queue_enc  - queue enclosure, defaults to empty string.
- * * evname_enc - event name enclosure, defaults to empty string.
+ * profcl_export_opts_get() and profcl_export_opts_set() functions, by
+ * manipulating a ::ProfCLExportOptions struct.
  * 
  * @param profile An OpenCL events profile.
  * @param stream Stream where export info to.
@@ -784,7 +809,7 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 
 		/* Loop aux. variables. */
 		ProfCLEvInst* currEvInst = NULL;
-		cl_command_queue q1, q2;
+		gulong q1, q2;
 		gulong qId;
 		cl_ulong startInst, endInst;
 		const char *ev1Name, *ev2Name;
@@ -792,14 +817,14 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 		/* Get information from start instant. */
 		currEvInst = (ProfCLEvInst*) evInstContainer->data;
 		startInst = currEvInst->instant;
-		q1 = currEvInst->queue;
+		q1 = export_options.simple_queue_id ? (gulong) GPOINTER_TO_UINT(g_hash_table_lookup(profile->command_queues, currEvInst->queue)) : (gulong) currEvInst->queue;
 		ev1Name = currEvInst->eventName;
 		
 		/* Get information from start instant. */
 		evInstContainer = evInstContainer->next;
 		currEvInst = (ProfCLEvInst*) evInstContainer->data;
 		endInst = currEvInst->instant;
-		q2 = currEvInst->queue;
+		q2 = export_options.simple_queue_id ? (gulong) GPOINTER_TO_UINT(g_hash_table_lookup(profile->command_queues, currEvInst->queue)) : (gulong) currEvInst->queue;
 		ev2Name = currEvInst->eventName;
 		
 		/* Make sure both event instants correspond to the same event. */
@@ -808,10 +833,15 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 		g_assert_cmpint(startInst, <, endInst);
 		
 		/* Determine queue Id. */
-		qId = (q1 == q2) ? (gulong) q1 : ((gulong) q1) + ((gulong) q2);
+		qId = (q1 == q2) ? q1 : (q1 + q2);
 		
 		/* Write to stream. */
-		fprintf(stream, "%lu\t%lu\t%lu\t%s\n", qId, startInst, endInst, ev1Name);
+		fprintf(stream, "%s%lu%s%s%lu%s%lu%s%s%s%s%s", 
+			export_options.queue_delim, qId, export_options.queue_delim, export_options.separator, 
+			startInst, export_options.separator, 
+			endInst, export_options.separator, 
+			export_options.evname_delim, ev1Name, export_options.evname_delim,
+			export_options.newline);
 		
 		/* Get next START event instant. */
 		evInstContainer = evInstContainer->next;
@@ -831,8 +861,6 @@ finish:
 	
 	/* Return status. */
 	return status;		
-	
-	
 	
 }
 
@@ -886,9 +914,24 @@ finish:
 
 }
 
+/**
+ * @brief Set export options using a ::ProfCLExportOptions struct.
+ * 
+ * @param export_opts Export options to set.
+ * */
+void profcl_export_opts_set(ProfCLExportOptions export_opts) {
+	export_options = export_opts;
+}
 
-//~ int profcl_export_conf(const char* key, const char* value) {
-//~ }
+/**
+ * @brief Get current export options.
+ * 
+ * @return Current export options.
+ * */
+ ProfCLExportOptions profcl_export_opts_get() {
+	return export_options;
+}
+
 
 /** 
  * @brief Resolves to error category identifying string, in this case an error in the OpenCL profiler library.

@@ -36,7 +36,9 @@ static void profilerTest() {
 	guint numEvents = 5;
 	cl_event ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8;
 	int status;
-	cl_command_queue queue = (cl_command_queue) malloc(sizeof(int));
+	cl_command_queue queue1, queue2;
+	queue1 = (cl_command_queue) malloc(sizeof(int));
+	queue2 = (cl_command_queue) malloc(sizeof(int));
 	
 	/* Profiling object. */
 	ProfCLProfile* profile = profcl_profile_new();
@@ -45,49 +47,49 @@ static void profilerTest() {
 	/* Test with 5 unique events */
 	ev1.start = 10;
 	ev1.end = 15;
-	ev1.queue = queue;
+	ev1.queue = queue1;
 	status = profcl_profile_add(profile, "Event 1", ev1, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev2.start = 16;
 	ev2.end = 20;
-	ev2.queue = queue;
+	ev2.queue = queue1;
 	status = profcl_profile_add(profile, "Event 2", ev2, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev3.start = 17;
 	ev3.end = 30;
-	ev3.queue = queue;
+	ev3.queue = queue2;
 	status = profcl_profile_add(profile, "Event 3", ev3, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev4.start = 19;
 	ev4.end = 25;
-	ev4.queue = queue;
+	ev4.queue = queue1;
 	status = profcl_profile_add(profile, "Event 4", ev4, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev5.start = 29;
 	ev5.end = 40;
-	ev5.queue = queue;
+	ev5.queue = queue2;
 	status = profcl_profile_add(profile, "Event 5", ev5, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev6.start = 35;
 	ev6.end = 45;
-	ev6.queue = queue;
+	ev6.queue = queue1;
 	status = profcl_profile_add(profile, "Event 1", ev6, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev7.start = 68;
 	ev7.end = 69;
-	ev7.queue = queue;
+	ev7.queue = queue1;
 	status = profcl_profile_add(profile, "Event 1", ev7, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
 	ev8.start = 50;
 	ev8.end = 70;
-	ev8.queue = queue;
+	ev8.queue = queue1;
 	status = profcl_profile_add(profile, "Event 1", ev8, NULL);
 	g_assert(status == PROFCL_SUCCESS);
 
@@ -95,9 +97,6 @@ static void profilerTest() {
 	g_assert(status == PROFCL_SUCCESS);
 	status = profcl_profile_overmat(profile, NULL);
 	g_assert(status == PROFCL_SUCCESS);
-	
-	//~ status = profcl_export_info_file(profile, "test_output.csv", NULL);
-	//~ g_assert(status == PROFCL_SUCCESS);
 	
 	/* ************************* */
 	/* Test aggregate statistics */
@@ -125,9 +124,9 @@ static void profilerTest() {
 	g_assert_cmpuint(agg->totalTime, ==, 11);
 	g_assert_cmpfloat(agg->relativeTime - 0.15714, <, 0.0001);
 
-	/* ********************* */
+	/* ******************* */
 	/* Test overlap matrix */
-	/* ********************* */
+	/* ******************* */
 	
 	/* Expected overlap matrix */
 	cl_ulong expectedOvermat[5][5] = 
@@ -146,13 +145,44 @@ static void profilerTest() {
 		}
 	}
 	
-	/* Test if output file was correctly written. */
-	/// @todo Test if output file was correctly written
+	/* ******************* */
+	/* Test export options */
+	/* ******************* */
 	
+	/* Set some export options. */
+	ProfCLExportOptions export_options = profcl_export_opts_get();
+	export_options.separator = ",";
+	export_options.queue_delim = "''";
+	export_options.evname_delim = "\"";
+	profcl_export_opts_set(export_options);
+	
+	/* Export options. */
+	gchar *name_used;
+	FILE* fp = fdopen(
+		g_file_open_tmp("test_profiler_XXXXXX.txt", &name_used, NULL),
+		"wb"
+	);
+	status = profcl_export_info(profile, fp, NULL);
+	g_assert(status == PROFCL_SUCCESS);
+	fclose(fp);
+
+	/* Test if output file was correctly written. */
+	gchar* file_contents;
+	gchar* expected_contents = "''0'',10,15,\"Event 1\"\n''0'',16,20,\"Event 2\"\n''1'',17,30,\"Event 3\"\n''0'',19,25,\"Event 4\"\n''1'',29,40,\"Event 5\"\n''0'',35,45,\"Event 1\"\n''0'',68,69,\"Event 1\"\n''0'',50,70,\"Event 1\"\n";
+	gboolean read_flag = g_file_get_contents(name_used, &file_contents, NULL, NULL);
+	g_assert(read_flag);
+	g_assert_cmpstr(file_contents, ==, expected_contents);
+	g_free(file_contents);
+	g_free(name_used);
+	
+	/** @todo Change profcl so that it prints to a stream, then test  */
 	//profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME);
 
+	/* Free queue. */
+	free(queue1);
+	free(queue2);
+	
 	/* Free profile. */
-	free(queue);
 	profcl_profile_free(profile);
 	
 }

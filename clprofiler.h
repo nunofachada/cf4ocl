@@ -57,6 +57,7 @@ enum profcl_error_codes {
  */
 typedef struct profcl_profile { 
 	GHashTable* unique_events;	/**< Hash table with keys equal to the unique events name, and values equal to a unique event id. */
+	GHashTable* command_queues; /**< Table of existing OpenCL command queues. */
 	GList* event_instants;		/**< Instants (start and end) of all events occuring in an OpenCL application. */
 	guint num_event_instants;	/**< Total number of event instants in ProfCLProfile#event_instants. */
 	GHashTable* aggregate;		/**< Aggregate statistics for all events in ProfCLProfile#event_instants. */
@@ -109,6 +110,17 @@ typedef struct profcl_ev_aggregate {
 	cl_ulong totalTime;		/**< Total time of events with name equal to ProfCLEvAggregate#eventName. */
 	double relativeTime;	/**< Relative time of events with name equal to ProfCLEvAggregate#eventName. */
 } ProfCLEvAggregate;
+
+/**
+ * @brief Export options.
+ * */
+typedef struct profcl_export_options {
+	const char* separator;    /**< Field separator, defaults to tab (\\t). */
+	const char* newline;      /**< Newline character, Defaults to Unix newline (\\n). */
+	const char* queue_delim;  /**< Queue name delimiter, defaults to empty string. */
+	const char* evname_delim; /**< Event name delimiter, defaults to empty string. */
+	gboolean simple_queue_id; /**< Use simple queue IDs (0,1...n) instead of using the queue memory location as ID (defaults to TRUE). */
+} ProfCLExportOptions;
 
 /** @brief Create a new OpenCL events profile. */
 ProfCLProfile* profcl_profile_new();
@@ -166,6 +178,12 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err);
  * automatically opening and closing the file. Check the 
  * profcl_export_info() for more information. */ 
 int profcl_export_info_file(ProfCLProfile* profile, const char* filename, GError** err);
+
+/** @brief Set export options using a ::ProfCLExportOptions struct. */
+void profcl_export_opts_set(ProfCLExportOptions export_opts);
+
+/** @brief Get current export options. */
+ ProfCLExportOptions profcl_export_opts_get();
 
 /** @brief Resolves to error category identifying string, in this case an error in the OpenCL profiler library. */
 GQuark profcl_error_quark(void);
