@@ -95,6 +95,7 @@ enum clu_error_codes {
 	CLU_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
 	CLU_ERROR_ARGS = 3,     /**< Error code thrown when passed arguments are invalid. */
 	CLU_ERROR_DEVICE_NOT_FOUND = 4, /**< Error code thrown when no OpenCL device is found. */
+	CLU_ERROR_STREAM_WRITE = 5,     /**< Error code thrown when an error occurs while writing to a stream. */
 	CLU_OCL_ERROR = 10      /**< An OpenCL error ocurred. */
 };
 
