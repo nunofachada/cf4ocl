@@ -46,6 +46,7 @@ enum profcl_error_codes {
 	PROFCL_SUCCESS = 0,        /**< Successful operation. */
 	PROFCL_ALLOC_ERROR = 1,    /**< Error code thrown when no memory allocation is possible. */
 	PROFCL_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
+	PROFCL_ERROR_STREAM_WRITE = 5,   /**< Error code thrown when an error occurs while writing to a stream. */
 	PROFCL_OCL_ERROR = 10      /**< An OpenCL error ocurred. */
 };
 
@@ -64,6 +65,7 @@ typedef struct profcl_profile {
 	cl_ulong* overmat;			/**< Overlap matrix for all events in event_instants. */
 	cl_ulong totalEventsTime;	/**< Total time taken by all events. */
 	cl_ulong totalEventsEffTime;/**< Total time taken by all events except intervals where events overlaped. */
+	cl_ulong startTime;         /**< Time at which the first (oldest) event started. */
 	GTimer* timer;				/**< Keeps track of time during the complete profiling session. */
 } ProfCLProfile;
 
@@ -120,6 +122,7 @@ typedef struct profcl_export_options {
 	const char* queue_delim;  /**< Queue name delimiter, defaults to empty string. */
 	const char* evname_delim; /**< Event name delimiter, defaults to empty string. */
 	gboolean simple_queue_id; /**< Use simple queue IDs (0,1...n) instead of using the queue memory location as ID (defaults to TRUE). */
+	gboolean zero_start;      /**< Start at instant 0 (TRUE, default), or start at oldest instant returned by OpenCL (FALSE). */
 } ProfCLExportOptions;
 
 /** @brief Create a new OpenCL events profile. */

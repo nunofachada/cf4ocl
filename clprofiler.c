@@ -33,7 +33,8 @@ static ProfCLExportOptions export_options = {
 	.newline = "\n",
 	.queue_delim = "",
 	.evname_delim = "",
-	.simple_queue_id = TRUE
+	.simple_queue_id = TRUE,
+	.zero_start = TRUE
 };
 
 /** 
@@ -65,6 +66,8 @@ ProfCLProfile* profcl_profile_new() {
 		/* ... and set total times to 0. */
 		profile->totalEventsTime = 0;
 		profile->totalEventsEffTime = 0;
+		/* ... and set absolute start time to maximum possible. */
+		profile->startTime = CL_ULONG_MAX;
 	}
 
 	/* Return new profile data structure */
@@ -169,6 +172,10 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	/* Get event start instant. */
 	ocl_status = clGetEventProfilingInfo(ev1, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &instant, NULL);
 	gef_if_error_create_goto(*err, PROFCL_ERROR, CL_SUCCESS != ocl_status, ret_status = PROFCL_OCL_ERROR, error_handler, "Get event start instant: OpenCL error %d.", ocl_status);
+	
+	/* Check if start instant is the oldest instant. If so, keep it. */
+	if (instant < profile->startTime)
+		profile->startTime = instant;
 		
 	/* Add event start instant to list of event instants. */
 	evinst_start = profcl_evinst_new(event_name, event_id, instant, PROFCL_EV_START, q1);
@@ -789,7 +796,7 @@ finish:
 int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 	
 	/* Return status. */
-	int status;
+	int ret_status, write_status;
 	/* Type of sorting to perform on event list. */
 	ProfCLEvSort sortType;
 	/* List of event instants (traversing pointer). */
@@ -816,14 +823,14 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 		
 		/* Get information from start instant. */
 		currEvInst = (ProfCLEvInst*) evInstContainer->data;
-		startInst = currEvInst->instant;
+		startInst = export_options.zero_start ? currEvInst->instant - profile->startTime : currEvInst->instant;
 		q1 = export_options.simple_queue_id ? (gulong) GPOINTER_TO_UINT(g_hash_table_lookup(profile->command_queues, currEvInst->queue)) : (gulong) currEvInst->queue;
 		ev1Name = currEvInst->eventName;
 		
-		/* Get information from start instant. */
+		/* Get information from end instant. */
 		evInstContainer = evInstContainer->next;
 		currEvInst = (ProfCLEvInst*) evInstContainer->data;
-		endInst = currEvInst->instant;
+		endInst = export_options.zero_start ? currEvInst->instant - profile->startTime : currEvInst->instant;
 		q2 = export_options.simple_queue_id ? (gulong) GPOINTER_TO_UINT(g_hash_table_lookup(profile->command_queues, currEvInst->queue)) : (gulong) currEvInst->queue;
 		ev2Name = currEvInst->eventName;
 		
@@ -836,12 +843,14 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 		qId = (q1 == q2) ? q1 : (q1 + q2);
 		
 		/* Write to stream. */
-		fprintf(stream, "%s%lu%s%s%lu%s%lu%s%s%s%s%s", 
+		write_status = fprintf(stream, "%s%lu%s%s%lu%s%lu%s%s%s%s%s", 
 			export_options.queue_delim, qId, export_options.queue_delim, export_options.separator, 
 			startInst, export_options.separator, 
 			endInst, export_options.separator, 
 			export_options.evname_delim, ev1Name, export_options.evname_delim,
 			export_options.newline);
+			
+		gef_if_error_create_goto(*err, PROFCL_ERROR, write_status < 0, ret_status = PROFCL_ERROR_STREAM_WRITE, error_handler, "Error while exporting profiling information (writing to stream).");
 		
 		/* Get next START event instant. */
 		evInstContainer = evInstContainer->next;
@@ -850,7 +859,7 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	status = PROFCL_SUCCESS;
+	ret_status = PROFCL_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -860,7 +869,7 @@ error_handler:
 finish:	
 	
 	/* Return status. */
-	return status;		
+	return ret_status;		
 	
 }
 
@@ -904,7 +913,6 @@ error_handler:
 	g_error_free(errInt);
 
 finish:	
-
 
 	/* Close file. */
 	if (fp) fclose(fp);
