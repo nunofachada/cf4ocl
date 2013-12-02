@@ -438,10 +438,29 @@ Finally, the complete benchmarking info can be printed:
 profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, NULL);
 ```
 
-Two detailed tables will be printed: one for individual events (sorted by 
-name or execution time), and another showing event overlaps, if any occurred.
+Two detailed tables will be shown on screen: one for individual events 
+(sorted by name or execution time), and another showing event overlaps, 
+if any occurred.
 
-Only at this time should the OpenCL events be freed.
+A list of all events can be exported to a file or stream using the 
+`profcl_export_info*` functions. 
+
+```c
+profcl_export_info_file(profile, "profileinfo.txt", NULL);
+```
+Export options, such as field delimiters, field separators, and so on, 
+can be set using the `profcl_export_opts_set()` function. 
+
+A Gantt chart type graph can be produced from the exported file (using
+the default options) via a Python script included with _cf4ocl_:
+
+`$ python plot_events.py profileinfo.txt`
+
+A similar plot can also be produced with [gnuplot] using the [gantt.py]
+script.
+
+The OpenCL events can be freed after they have been added to the 
+profiler structure and before the program terminates.
 
 ```c
 clReleaseEvent(ev_transf_in);
@@ -458,7 +477,7 @@ is not critical because all of the error-prone `profcl_*` functions also return
 their execution status code. No error handling is performed in this 
 explanation, though.
 
-For map events, CL Profiler provides the `profcl_profile_add_composite`
+For map events, CL Profiler provides the `profcl_profile_add_composite()`
 function, which accepts two OpenCL events, one relative to the _map_
 operation, and the other to the _unmap_ operation. The function uses
 the start instant of the _map_ event, and the _end_ instant of the
@@ -475,11 +494,15 @@ GErrorF uses GLib's `GError` object for function error reporting. This
 explanation assumes some familiarity with 
 [GLib's error reporting][gliberror].
 
-GErrorF is defined by two macros in `gerrorf.h`:
+GErrorF is defined by three macros in `gerrorf.h`:
 
 * `gef_if_error_create_goto` - Catches errors from non-GError aware
 functions.
 * `gef_if_error_goto` - Catches errors from GError aware functions.
+* `gef_if_error_propagate_goto` - Same as previous macro, but propagates 
+error in a source GError object to a new destination GError object.
+Useful for wrapping errors thrown by library / third-party GError aware
+functions.
 
 GErrorF establishes an error handling methodology for C programs not
 entirely dissimilar to the pattern used in Linux kernel development. 
@@ -702,6 +725,8 @@ Appendices
 [doxymd]: http://www.stack.nl/~dimitri/doxygen/manual/markdown.html "Doxygen Markdown"
 [ghmd]: https://help.github.com/articles/github-flavored-markdown "Github Flavored Markdown"
 [gliberror]: https://developer.gnome.org/glib/2.32/glib-Error-Reporting.html "GLib Error Reporting"
+[gnuplot]: http://www.gnuplot.info/
+[gantt.py]: http://se.wtb.tue.nl/sewiki/wonham/gantt.py
 
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
