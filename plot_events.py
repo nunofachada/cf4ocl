@@ -16,7 +16,8 @@
 # along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
 #
 """
-Plots something nice
+Plots a Gantt-like chart of OpenCL events using the profilling info
+exported by CFProfiler.
 """
 
 import sys
