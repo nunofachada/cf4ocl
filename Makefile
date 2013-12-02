@@ -41,7 +41,7 @@ export UTILSINCLUDEDIR := ${CURDIR}
 # Make rules
 all: library utils examples
 
-library: mkdirs clutils.o clprofiler.o
+library: mkdirs clutils.o clprofiler.o clerrors.o
 
 utils: mkdirs device_query kernel_info
 
@@ -56,6 +56,9 @@ clutils.o: clutils.c clutils.h gerrorf.h
 
 clprofiler.o: clprofiler.c clprofiler.h gerrorf.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(TESTMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@ 
+
+clerrors.o: clerrors.c clerrors.h
+	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@	
 
 # Make rules for utils
 device_query: device_query.o clutils.o 
