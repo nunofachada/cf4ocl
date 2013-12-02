@@ -51,7 +51,7 @@ examples: mkdirs clutils.o clprofiler.o
 	$(MAKE) -C $@
 
 # Make rules for library
-clutils.o: clutils.c clutils.h gerrorf.h
+clutils.o: clutils.c clutils.h gerrorf.h clerrors.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@	
 
 clprofiler.o: clprofiler.c clprofiler.h gerrorf.h
@@ -61,13 +61,13 @@ clerrors.o: clerrors.c clerrors.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@	
 
 # Make rules for utils
-device_query: device_query.o clutils.o 
+device_query: device_query.o clutils.o clerrors.o
 	$(CC) $(CFLAGS) $(CLMACROS) $(patsubst %,$(OBJDIR)/%,$^) $(CLINCLUDES) $(CLLIB) $(CLLIBDIR) -o $(BUILDDIR)/$(UTILS_IN_BIN_DIR)/$@ $(LFLAGS)
 	
 device_query.o: device_query.c gerrorf.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@
 	
-kernel_info: kernel_info.o clutils.o
+kernel_info: kernel_info.o clutils.o clerrors.o
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLLIBDIR) -o $(BUILDDIR)/$(UTILS_IN_BIN_DIR)/$@ $(patsubst %,$(OBJDIR)/%,$^) $(LFLAGS) $(CLLIB) 
 	
 kernel_info.o: kernel_info.c gerrorf.h

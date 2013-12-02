@@ -18,7 +18,7 @@ CFLAGS = -Wall -Wextra -g -std=c99 `pkg-config --cflags glib-2.0` -fopenmp
 CLMACROS = -DATI_OS_LINUX
 LFLAGS = -lOpenCL -lm `pkg-config --libs glib-2.0`
 UTILSINCLUDES = -I$(CF4OCLDIR)
-UTILOBJS = $(OBJDIR)/clutils.o $(OBJDIR)/clprofiler.o
+UTILOBJS = $(OBJDIR)/clutils.o $(OBJDIR)/clprofiler.o $(OBJDIR)/clerrors.o
 CLINCLUDES =
 CLLIBDIR =
 
