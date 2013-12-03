@@ -105,6 +105,6 @@ static const char* cl_errors[] = {
  * @param code OpenCL error code.
  * @return A readable string.
  * */
-const char* clerror_get(cl_int code) {
+const char* clerror_get(int code) {
 	return cl_errors[-1 * code];
 }

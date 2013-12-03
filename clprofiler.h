@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gerrorf.h"
+#include "clerrors.h"
 
 /**
  * @brief Error codes.

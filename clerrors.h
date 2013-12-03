@@ -16,8 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  * */
  
- #include <CL/cl.h>
- 
  /** 
  * @file
  * @brief Convert OpenCL error codes to readable strings (function header).
@@ -28,4 +26,4 @@
  * */
 
 /** @brief Convert OpenCL error code to a readable string. */
-const char* clerror_get(cl_int code);
+const char* clerror_get(int code);

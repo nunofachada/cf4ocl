@@ -51,10 +51,10 @@ examples: mkdirs clutils.o clprofiler.o
 	$(MAKE) -C $@
 
 # Make rules for library
-clutils.o: clutils.c clutils.h gerrorf.h clerrors.h
+clutils.o: clutils.c clutils.h gerrorf.h clerrors.c clerrors.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@	
 
-clprofiler.o: clprofiler.c clprofiler.h gerrorf.h
+clprofiler.o: clprofiler.c clprofiler.h gerrorf.h clerrors.c clerrors.h
 	$(CC) $(CFLAGS) $(CLMACROS) $(TESTMACROS) $(CLINCLUDES) -c $< -o $(OBJDIR)/$@ 
 
 clerrors.o: clerrors.c clerrors.h
@@ -81,7 +81,7 @@ tests_common:
 	mkdir -p $(BUILDDIR)/$(TESTS_IN_BIN_DIR)
 
 test_profiler: 	TESTMACROS += -DCLPROF_TEST
-test_profiler: test_profiler.o clprofiler.o
+test_profiler: test_profiler.o clprofiler.o clerrors.o
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLLIBDIR) -o $(BUILDDIR)/$(TESTS_IN_BIN_DIR)/$@ $(patsubst %,$(OBJDIR)/%,$^) $(LFLAGS) $(CLLIB)
 	
 test_profiler.o: $(TESTSDIR)/test_profiler.c
