@@ -100,6 +100,7 @@ docs:
 	    -e 's/```/~~~~~~~~~~~~~~~/g'      \
 	    README.md > README.doxy.md
 	doxygen 
+	cp -r images doc/html 
 	rm README.doxy.md
 	
 # Other make rules

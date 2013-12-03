@@ -41,6 +41,7 @@ _cf4ocl_ is divided into four parts, with the following structure:
 1. Library
     * CL Utils
     * CL Profiler
+    * CL Errors
     * GError framework
 2. Library tests
     * CL Profiler
@@ -59,7 +60,9 @@ Library
 
 The library offers functions which promote the rapid development of 
 OpenCL C programs, _CL Utils_, as well as their detailed benchmarking,
-_CL Profiler_. The library also exposes an error handling framework,
+_CL Profiler_. The library also facilitates error management in two
+ways: i) by converting OpenCL error codes into human readable strings, 
+_CL Errors_; ii) by exposing a generic error handling framework,
 _GError framework_, used internally by _CL Utils_ and _CL Profiler_.
 
 ### CL Utils
@@ -93,14 +96,20 @@ absolute execution times. Profiling information is obtained using
 OpenCL events, which can be associated with the relevant OpenCL 
 functions. _CL Profiler_ supports multiple command queues and 
 overlapping events, such as simultaneous kernel executions and data 
-transfers.
+transfers. Profiling information can be exported in a configurable
+format, and plotted using a script included in _cf4ocl_.
+
+### CL Errors
+
+_CL Errors_ offers a single function which converts a OpenCL error into
+a human readable string.
 
 ### GError framework
 
 The _GError framework_ is internally used by _CL Utils_ and 
 _CL Profiler_ for error handling purposes. However, the framework is not
 in any way tied to OpenCL, so it can be used generically in any C 
-program. It is composed of only two macros and it is based on the 
+program. It is composed of three macros and it is based on the 
 `GError` object from GLib.
 
 Utilities
@@ -456,6 +465,8 @@ the default options) via a Python script included with _cf4ocl_:
 
 `$ python plot_events.py profileinfo.txt`
 
+![Events plot for file exported by test_profiler](images/gantt.png)
+
 A similar plot can also be produced with [gnuplot] using the [gantt.py]
 script.
 
@@ -483,6 +494,29 @@ operation, and the other to the _unmap_ operation. The function uses
 the start instant of the _map_ event, and the _end_ instant of the
 _unmap_ event, in order to build a composite semantic event.
 
+### Using CL Errors
+
+OpenCL functions usually return an error or status code, so that the
+client programmer can check if the function call was successful, and if
+not, what kind of problem occurred. The programmer can either check for 
+all possible errors for a given function call using the OpenCL error
+constants (which map the error codes), or can just return or print the 
+error code, and then look at the [cl.h] header to determine what error
+occurred. _CL Errors_ allows for a third option: convert the error code
+into a human readable string. The usage is very simple, consisting of
+a single call to the `clerror_get()` function, passing the error code
+as an argument:
+
+```c
+cl_int status;
+...
+status = clFinish(some_command_queue);
+if (status != CL_SUCCESS) {
+	printf("An error occurred: %s\n", clerror_get(status));
+	...
+}
+...
+```
 ### Using GError Framework (GErrorF)
 
 The main purpose of GErrorF is to provide error handling constructs to 
@@ -727,6 +761,7 @@ Appendices
 [gliberror]: https://developer.gnome.org/glib/2.32/glib-Error-Reporting.html "GLib Error Reporting"
 [gnuplot]: http://www.gnuplot.info/
 [gantt.py]: http://se.wtb.tue.nl/sewiki/wonham/gantt.py
+[cl.h]: http://www.khronos.org/registry/cl/api/1.2/cl.h
 
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"

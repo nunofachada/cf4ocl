@@ -35,7 +35,8 @@ Table of contents
 1.1\.  [Library](#library)  
 1.1.1\.  [CL Utils](#clutils)  
 1.1.2\.  [CL Profiler](#clprofiler)  
-1.1.3\.  [GError framework](#gerrorframework)  
+1.1.3\.  [CL Errors](#clerrors)  
+1.1.4\.  [GError framework](#gerrorframework)  
 1.2\.  [Utilities](#utilities)  
 1.2.1\.  [Device query](#devicequery)  
 1.2.2\.  [Kernel info](#kernelinfo)  
@@ -48,7 +49,8 @@ Table of contents
 2.3.1\.  [Compiling and linking](#compilingandlinking)  
 2.3.2\.  [Using CL Utils](#usingclutils)  
 2.3.3\.  [Using CL Profiler](#usingclprofiler)  
-2.3.4\.  [Using GError Framework (GErrorF)](#usinggerrorframeworkgerrorf)  
+2.3.4\.  [Using CL Errors](#usingclerrors)  
+2.3.5\.  [Using GError Framework (GErrorF)](#usinggerrorframeworkgerrorf)  
 2.4\.  [Generating the API documentation](#generatingtheapidocumentation)  
 3\.  [Other useful C frameworks/utilities for OpenCL](#otherusefulcframeworks/utilitiesforopencl)  
 
@@ -62,6 +64,7 @@ _cf4ocl_ is divided into four parts, with the following structure:
 1. Library
     * CL Utils
     * CL Profiler
+    * CL Errors
     * GError framework
 2. Library tests
     * CL Profiler
@@ -82,7 +85,9 @@ The following sections describe each of the parts in additional detail.
 
 The library offers functions which promote the rapid development of 
 OpenCL C programs, _CL Utils_, as well as their detailed benchmarking,
-_CL Profiler_. The library also exposes an error handling framework,
+_CL Profiler_. The library also facilitates error management in two
+ways: i) by converting OpenCL error codes into human readable strings, 
+_CL Errors_; ii) by exposing a generic error handling framework,
 _GError framework_, used internally by _CL Utils_ and _CL Profiler_.
 
 <a name="clutils"></a>
@@ -120,16 +125,24 @@ absolute execution times. Profiling information is obtained using
 OpenCL events, which can be associated with the relevant OpenCL 
 functions. _CL Profiler_ supports multiple command queues and 
 overlapping events, such as simultaneous kernel executions and data 
-transfers.
+transfers. Profiling information can be exported in a configurable
+format, and plotted using a script included in _cf4ocl_.
+
+<a name="clerrors"></a>
+
+### 1.1.3\. CL Errors
+
+_CL Errors_ offers a single function which converts a OpenCL error into
+a human readable string.
 
 <a name="gerrorframework"></a>
 
-### 1.1.3\. GError framework
+### 1.1.4\. GError framework
 
 The _GError framework_ is internally used by _CL Utils_ and 
 _CL Profiler_ for error handling purposes. However, the framework is not
 in any way tied to OpenCL, so it can be used generically in any C 
-program. It is composed of only two macros and it is based on the 
+program. It is composed of three macros and it is based on the 
 `GError` object from GLib.
 
 <a name="utilities"></a>
@@ -509,6 +522,8 @@ the default options) via a Python script included with _cf4ocl_:
 
 `$ python plot_events.py profileinfo.txt`
 
+![Events plot for file exported by test_profiler](images/gantt.png)
+
 A similar plot can also be produced with [gnuplot] using the [gantt.py]
 script.
 
@@ -536,9 +551,34 @@ operation, and the other to the _unmap_ operation. The function uses
 the start instant of the _map_ event, and the _end_ instant of the
 _unmap_ event, in order to build a composite semantic event.
 
+<a name="usingclerrors"></a>
+
+### 2.3.4\. Using CL Errors
+
+OpenCL functions usually return an error or status code, so that the
+client programmer can check if the function call was successful, and if
+not, what kind of problem occurred. The programmer can either check for 
+all possible errors for a given function call using the OpenCL error
+constants (which map the error codes), or can just return or print the 
+error code, and then look at the [cl.h] header to determine what error
+occurred. _CL Errors_ allows for a third option: convert the error code
+into a human readable string. The usage is very simple, consisting of
+a single call to the `clerror_get()` function, passing the error code
+as an argument:
+
+```c
+cl_int status;
+...
+status = clFinish(some_command_queue);
+if (status != CL_SUCCESS) {
+	printf("An error occurred: %s\n", clerror_get(status));
+	...
+}
+...
+```
 <a name="usinggerrorframeworkgerrorf"></a>
 
-### 2.3.4\. Using GError Framework (GErrorF)
+### 2.3.5\. Using GError Framework (GErrorF)
 
 The main purpose of GErrorF is to provide error handling constructs to 
 CL Utils and CL Profiler. No knowledge of GErrorF is required to use
@@ -786,6 +826,7 @@ Appendices
 [gliberror]: https://developer.gnome.org/glib/2.32/glib-Error-Reporting.html "GLib Error Reporting"
 [gnuplot]: http://www.gnuplot.info/
 [gantt.py]: http://se.wtb.tue.nl/sewiki/wonham/gantt.py
+[cl.h]: http://www.khronos.org/registry/cl/api/1.2/cl.h
 
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
