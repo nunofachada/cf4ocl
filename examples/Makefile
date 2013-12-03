@@ -37,13 +37,13 @@ CLLIBDIR =
 .PHONY: all clean mkdirs
 
 # Make rules
-all: mkdirs BankConflictTest matmult
+all: mkdirs bank_conflicts matmult
 
-BankConflictTest: BankConflictTest.o exp_common.o
+bank_conflicts: bank_conflicts.o exp_common.o
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLLIBDIR) -o $(BUILDDIR)/$@ $(patsubst %,$(OBJDIR)/%,$^) $(UTILOBJS) $(LFLAGS)
-	cp BankConflictTest.cl $(BUILDDIR)
+	cp bank_conflicts.cl $(BUILDDIR)
 
-BankConflictTest.o: BankConflictTest.c 
+bank_conflicts.o: bank_conflicts.c 
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) $(UTILSINCLUDES) -c $< -o $(OBJDIR)/$@
 
 matmult.o: matmult.c matmult.h

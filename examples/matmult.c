@@ -91,6 +91,7 @@ static gchar* platf_name = NULL;
 static int kernel_id = KERNEL_ID;
 static gboolean verbose = VERBOSE;
 static guint32 seed = SEED;
+static gchar* output_export = NULL;
 
 /* Callback functions to parse pairs of numbers. */
 static gboolean mm_parse_a(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
@@ -120,6 +121,7 @@ static GOptionEntry entries[] = {
 	{"dvendor",   'e', 0, G_OPTION_ARG_STRING,   &dev_vendor,    "Device vendor, selects device by vendor",                                                "VENDOR"},
 	{"dplatf",    'p', 0, G_OPTION_ARG_STRING,   &platf_name,    "Platform name, selects device by platform name",                                         "NAME"},
 	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts, "Extra OpenCL compiler options",                                                          "OPTS"},
+	{"output",    'o', 0, G_OPTION_ARG_FILENAME, &output_export, "File where to export profiling info (default is none)",                                  "FILE"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -182,14 +184,32 @@ int main(int argc, char *argv[])
 		
 	/* Profiling / Timmings */
 	profile_dev = profcl_profile_new();
-	gef_if_error_create_goto(err, CLEXP_ERROR, profile_dev == NULL, CLEXP_FAIL, error_handler, "Unable to create device profiler object.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		profile_dev == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create device profiler object.");
 	profile_cpu = profcl_profile_new();
-	gef_if_error_create_goto(err, CLEXP_ERROR, profile_cpu == NULL, CLEXP_FAIL, error_handler, "Unable to create CPU profiler object.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		profile_cpu == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create CPU profiler object.");
 
 	/* Get the required CL zone. */
 	if ((dev_idx != -1) || ((dev_name == NULL) && (platf_name ==NULL))) {
 		/* Select device by index or user choice. */
-		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
+		zone = clu_zone_new(
+			CL_DEVICE_TYPE_ALL, 
+			1, 
+			CL_QUEUE_PROFILING_ENABLE, 
+			clu_menu_device_selector, 
+			(dev_idx != -1 ? &dev_idx : NULL), 
+			&err);
 	} else {
 		/* Select device by device name and/or platform name. */
 		if (dev_name != NULL) 
@@ -204,10 +224,19 @@ int main(int argc, char *argv[])
 			g_strlcpy(deviceInfo.platform_name, platf_name, CLU_MAX_AUX_BUFF);
 		else 
 			deviceInfo.platform_name[0] = '\0';
-		zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_info_device_selector, &deviceInfo, &err);
+		zone = clu_zone_new(
+			CL_DEVICE_TYPE_ALL, 
+			1, 
+			CL_QUEUE_PROFILING_ENABLE, 
+			clu_info_device_selector, 
+			&deviceInfo, 
+			&err);
 	}
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-	printf("\n   == Using device '%s' from '%s' (platform is '%s')\n", zone->device_info.device_name, zone->device_info.device_vendor, zone->device_info.platform_name);
+	printf("\n   == Using device '%s' from '%s' (platform is '%s')\n", 
+		zone->device_info.device_name, 
+		zone->device_info.device_vendor, 
+		zone->device_info.platform_name);
 	
 	/* Build program. */
 	status = clu_program_create(zone, kernelFiles, 1, compiler_opts, &err);
@@ -216,7 +245,15 @@ int main(int argc, char *argv[])
 	/* Kernel */
 	kernelName = g_strdup_printf("matmult%d", kernel_id);
 	kernel_matmult = clCreateKernel(zone->program, kernelName, &status);
-	gef_if_error_create_goto(err, CLEXP_ERROR, CL_SUCCESS != status, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to create '%s' kernel.", status, kernelName);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		CL_SUCCESS != status, 
+		CLEXP_FAIL, error_handler, 
+		"Unable to create '%s' kernel (OpenCL error %d: %s)", 
+		kernelName,
+		status,
+		clerror_get(status));
 
 	/* ********************************** */	
 	/* Create and initialize host buffers */
@@ -225,39 +262,96 @@ int main(int argc, char *argv[])
 	/* Matrix A */
 	sizeMatrixAInBytes = a_dim[0] * a_dim[1] * sizeof(cl_int);
 	matrixA_host = matmult_matrix_new(a_dim[0], a_dim[1], matrix_range, rng);
-	gef_if_error_create_goto(err, CLEXP_ERROR, matrixA_host == NULL, CLEXP_FAIL, error_handler, "Unable to create host matrix A.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		matrixA_host == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create host matrix A.");
 	
 	/* Matrix B */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
 		sizeMatrixBInBytes = b_dim[0] * b_dim[1] * sizeof(cl_int);
 		matrixB_host = matmult_matrix_new(b_dim[0], b_dim[1], matrix_range, rng);
-		gef_if_error_create_goto(err, CLEXP_ERROR, matrixB_host == NULL, CLEXP_FAIL, error_handler, "Unable to create host matrix B.");
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			matrixB_host == NULL, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable to create host matrix B.");
 	}
 	
 	/* Matrix C (result) */
 	sizeMatrixCInBytes = b_dim[0] * a_dim[1] * sizeof(cl_int);
 	matrixC_host = matmult_matrix_new(b_dim[0], a_dim[1], NULL, NULL);
-	gef_if_error_create_goto(err, CLEXP_ERROR, matrixC_host == NULL, CLEXP_FAIL, error_handler, "Unable to create host matrix C.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		matrixC_host == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create host matrix C.");
 
 	/* ********************* */
 	/* Create device buffers */
 	/* ********************* */
 
 	/* Matrix A */
-	matrixA_device = clCreateBuffer(zone->context, CL_MEM_READ_ONLY, sizeMatrixAInBytes, NULL, &status );
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to create device buffer for matrix A.", status);
+	matrixA_device = clCreateBuffer(
+		zone->context, 
+		CL_MEM_READ_ONLY, 
+		sizeMatrixAInBytes, 
+		NULL, 
+		&status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create device buffer for matrix A (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 	
 	/* Matrix B */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		matrixB_device = clCreateBuffer(zone->context, CL_MEM_READ_ONLY, sizeMatrixBInBytes, NULL, &status );
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to create device buffer for matrix B.", status);
+		matrixB_device = clCreateBuffer(
+			zone->context, 
+			CL_MEM_READ_ONLY, 
+			sizeMatrixBInBytes, 
+			NULL, 
+			&status);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable to create device buffer for matrix B (OpenCL error %d: %s).", 
+			status,
+			clerror_get(status));
 	}
 
 	/* Matrix C */
-	matrixC_device = clCreateBuffer(zone->context, CL_MEM_WRITE_ONLY, sizeMatrixCInBytes, NULL, &status );
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to create device buffer for matrix C.", status);
+	matrixC_device = clCreateBuffer(
+		zone->context, 
+		CL_MEM_WRITE_ONLY, 
+		sizeMatrixCInBytes, 
+		NULL, 
+		&status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create device buffer for matrix C (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 	
 	/* ************************* */
 	/* Initialize device buffers */
@@ -278,7 +372,15 @@ int main(int argc, char *argv[])
 		NULL, 
 		&(events[0]) 
 	);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to write matrix A on device.", status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to write matrix A on device (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	/* Copy matrix B to device. */
 	if (!IS_AAT(kernel_id)) {
@@ -294,7 +396,15 @@ int main(int argc, char *argv[])
 			NULL, 
 			&(events[1]) 
 		);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to write matrix B on device.", status);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable to write matrix B on device (OpenCL error %d: %s).", 
+			status,
+			clerror_get(status));
 	}
 	
 	/* ******************** */
@@ -303,14 +413,14 @@ int main(int argc, char *argv[])
 	
 	gws[0] = lws[0]* ceil(((float) b_dim[0]) / lws[0]);
 	gws[1] = lws[1] * ceil(((float) a_dim[1]) / lws[1]);
-	
-	
+		
 	/* ************************* */
 	/* Determine required memory */
 	/* ************************* */
 
 	/* Global memory requirements. */
-	globalMemSizeInBytes = sizeMatrixAInBytes + sizeMatrixBInBytes + sizeMatrixCInBytes;
+	globalMemSizeInBytes = 
+		sizeMatrixAInBytes + sizeMatrixBInBytes + sizeMatrixCInBytes;
 	
 	/* Local memory requirements. Default is 0 for non-optimized kernels 0 and 3. */
 	localMemSizeAInBytes = 0;
@@ -331,51 +441,162 @@ int main(int argc, char *argv[])
 	/* Print requirements information */
 	/* ****************************** */
 
-	clexp_reqs_print(gws, lws, globalMemSizeInBytes, localMemSizeAInBytes + localMemSizeBInBytes);
+	clexp_reqs_print(gws, lws, globalMemSizeInBytes, 
+		localMemSizeAInBytes + localMemSizeBInBytes);
 
 	/* *************************** */
 	/*  Set fixed kernel arguments */
 	/* *************************** */
 
 	/* Generic arguments */
-	status = clSetKernelArg(kernel_matmult, 0, sizeof(cl_mem), (void *) &matrixA_device);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 0 of '%s' kernel.", status, kernelName);
+	status = clSetKernelArg(
+		kernel_matmult, 0, sizeof(cl_mem), (void *) &matrixA_device);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable set arg 0 of '%s' kernel (OpenCL error %d: %s).", 
+		kernelName,
+		status,
+		clerror_get(status));
 
 	if (!IS_AAT(kernel_id)) {
 		/* Arguments only for C=AB */
-		status = clSetKernelArg(kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixB_device);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 1 of '%s' kernel.", status, kernelName);
+		status = clSetKernelArg(
+			kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixB_device);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
+			kernelName, 
+			status,
+			clerror_get(status));
 
-		status = clSetKernelArg(kernel_matmult, 2, sizeof(cl_mem), (void *) &matrixC_device);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 2 of '%s' kernel.", status, kernelName);
+		status = clSetKernelArg(
+			kernel_matmult, 2, sizeof(cl_mem), (void *) &matrixC_device);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
+			kernelName, 
+			status,
+			clerror_get(status));
 		
-		status = clSetKernelArg(kernel_matmult, 3, sizeof(cl_int2), (void *) &a_dim);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 3 of '%s' kernel.", status, kernelName);
+		status = clSetKernelArg(
+			kernel_matmult, 3, sizeof(cl_int2), (void *) &a_dim);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
+			kernelName,
+			status, 
+			clerror_get(status));
 		
-		status = clSetKernelArg(kernel_matmult, 4, sizeof(cl_int2), (void *) &b_dim);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 4 of '%s' kernel.", status, kernelName);
+		status = clSetKernelArg(
+			kernel_matmult, 4, sizeof(cl_int2), (void *) &b_dim);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).",
+			kernelName,
+			status,
+			clerror_get(status));
 		
 		if (kernel_id >= 1) {
-			status = clSetKernelArg(kernel_matmult, 5, localMemSizeAInBytes, NULL);
-			gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 5 of '%s' kernel.", status, kernelName);
+			status = clSetKernelArg(
+				kernel_matmult, 5, localMemSizeAInBytes, NULL);
+			gef_if_error_create_goto(
+				err, 
+				CLEXP_ERROR, 
+				status != CL_SUCCESS, 
+				CLEXP_FAIL, 
+				error_handler, 
+				"Unable set arg 5 of '%s' kernel (OpenCL error %d: %s).", 
+				kernelName,
+				status, 
+				clerror_get(status));
 		}
 		if (kernel_id == 2) {
-			status = clSetKernelArg(kernel_matmult, 6, localMemSizeBInBytes, NULL);
-			gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 6 of '%s' kernel.", status, kernelName);
+			status = clSetKernelArg(
+				kernel_matmult, 6, localMemSizeBInBytes, NULL);
+			gef_if_error_create_goto(
+				err, 
+				CLEXP_ERROR, 
+				status != CL_SUCCESS, 
+				CLEXP_FAIL, 
+				error_handler, 
+				"Unable set arg 6 of '%s' kernel (OpenCL error %d: %s).",
+				kernelName,
+				status, 
+				clerror_get(status));
 		}
 	} else {
 		/* Arguments only for C=AA^T */
-		status = clSetKernelArg(kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixC_device);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 1 of '%s' kernel.", status, kernelName);
+		status = clSetKernelArg(
+			kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixC_device);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
+			kernelName, 
+			status,
+			clerror_get(status));
 		
-		status = clSetKernelArg(kernel_matmult, 2, sizeof(cl_int2), (void *) &a_dim);
-		gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 2 of '%s' kernel.", status, kernelName);
+		status = clSetKernelArg(
+			kernel_matmult, 2, sizeof(cl_int2), (void *) &a_dim);
+		gef_if_error_create_goto(
+			err, 
+			CLEXP_ERROR, 
+			status != CL_SUCCESS, 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
+			kernelName,
+			status,
+			clerror_get(status));
 		
 		if (kernel_id == 4) {
-			status = clSetKernelArg(kernel_matmult, 3, localMemSizeAInBytes, NULL);
-			gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 3 of '%s' kernel.", status, kernelName);
-			status = clSetKernelArg(kernel_matmult, 4, localMemSizeBInBytes, NULL);
-			gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg 4 of '%s' kernel.", status, kernelName);
+			status = clSetKernelArg(
+				kernel_matmult, 3, localMemSizeAInBytes, NULL);
+			gef_if_error_create_goto(
+				err, 
+				CLEXP_ERROR, 
+				status != CL_SUCCESS, 
+				CLEXP_FAIL, 
+				error_handler, 
+				"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
+				kernelName, 
+				status,
+				clerror_get(status));
+			status = clSetKernelArg(
+				kernel_matmult, 4, localMemSizeBInBytes, NULL);
+			gef_if_error_create_goto(
+				err, 
+				CLEXP_ERROR, 
+				status != CL_SUCCESS, 
+				CLEXP_FAIL, 
+				error_handler, 
+				"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).", 
+				kernelName, 
+				status,
+				clerror_get(status));
 		}
 
 	}
@@ -395,7 +616,16 @@ int main(int argc, char *argv[])
 		NULL, 
 		&(events[2]) 
 	);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d while executing kernel '%s'.", status, kernelName);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Error while executing kernel '%s' (OpenCL error %d: %s).", 
+		kernelName,
+		status, 
+		clerror_get(status));
 
 	/* *********************** */
 	/*  Get result from device */
@@ -412,11 +642,27 @@ int main(int argc, char *argv[])
 		NULL, 
 		&(events[3]) 
 	);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to read matrix C from device.", status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to read matrix C from device (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	/* Finish execution. */
 	status = clFinish(zone->queues[0]); 
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d on clFinish() function.", status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Error on clFinish() function (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	/* ************************************** */
 	/*  Manage profiling of OpenCL operations */
@@ -425,18 +671,22 @@ int main(int argc, char *argv[])
 	/* Stop profiler. */
 	profcl_profile_stop(profile_dev); 
 
-	profcl_profile_add(profile_dev, "Transfer matrix A to device", events[0], &err);
+	profcl_profile_add(
+		profile_dev, "Transfer matrix A to device", events[0], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	if (!IS_AAT(kernel_id)) {
-		profcl_profile_add(profile_dev, "Transfer matrix B to device", events[1], &err);
+		profcl_profile_add(
+			profile_dev, "Transfer matrix B to device", events[1], &err);
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	}
 
-	profcl_profile_add(profile_dev, "Kernel execution (Matmult)", events[2], &err);
+	profcl_profile_add(
+		profile_dev, "Kernel execution (Matmult)", events[2], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	profcl_profile_add(profile_dev, "Transfer matrix C to host", events[3], &err);
+	profcl_profile_add(
+		profile_dev, "Transfer matrix C to host", events[3], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	profcl_profile_aggregate(profile_dev, &err);
@@ -445,6 +695,12 @@ int main(int argc, char *argv[])
 	/* Show profiling info. */
 	profcl_print_info(profile_dev, PROFCL_AGGEVDATA_SORT_TIME, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	
+	/* Export profiling info if a filename was given. */
+	if (output_export) {
+		profcl_export_info_file(profile_dev, output_export, &err);
+		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	}
 		
 	/* ********************************************************* */
 	/* Perform multiplication on the CPU with the help of OpenMP */
@@ -452,7 +708,13 @@ int main(int argc, char *argv[])
 
 	/* Allocate memory for a new results matrix. */
 	matrixC_test = matmult_matrix_new(b_dim[0], a_dim[1], NULL, NULL);
-	gef_if_error_create_goto(err, CLEXP_ERROR, matrixC_test == NULL, CLEXP_FAIL, error_handler, "Unable to create host matrix C (OpenMP test).");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		matrixC_test == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create host matrix C (OpenMP test).");
 
 	/* Start basic timming / profiling. */
 	profcl_profile_start(profile_cpu);
@@ -465,7 +727,10 @@ int main(int argc, char *argv[])
 			for (int row = 0; row < a_dim[1]; row++) {
 				matrixC_test[row * b_dim[0] + col] = 0;
 				for (int i = 0; i < a_dim[0]; i++) {
-					matrixC_test[row * b_dim[0] + col] += matrixA_host[row * a_dim[0] + i] * matrixB_host[i * b_dim[0] + col];
+					matrixC_test[row * b_dim[0] + col] += 
+						matrixA_host[row * a_dim[0] + i] 
+						* 
+						matrixB_host[i * b_dim[0] + col];
 				}
 			}
 		}
@@ -477,7 +742,10 @@ int main(int argc, char *argv[])
 			for (int col = 0; col < a_dim[1]; col++) {
 				matrixC_test[row * a_dim[1] + col] = 0;
 				for (int i = 0; i < a_dim[0]; i++) {
-					matrixC_test[row * a_dim[1] + col] += matrixA_host[row * a_dim[0] + i] * matrixA_host[col * a_dim[0] + i];
+					matrixC_test[row * a_dim[1] + col] += 
+						matrixA_host[row * a_dim[0] + i] 
+						* 
+						matrixA_host[col * a_dim[0] + i];
 				}
 			}
 		}	
@@ -497,8 +765,10 @@ int main(int argc, char *argv[])
 	}
 	
 	printf("\n   ============================== Results ==================================\n\n");
-	printf("     Total CPU Time (OpenMP)     : %fs\n", profcl_time_elapsed(profile_cpu));
-	printf("     SpeedUp (OpenCL vs. OpenMP) : %fx\n", profcl_time_elapsed(profile_cpu) / profcl_time_elapsed(profile_dev));
+	printf("     Total CPU Time (OpenMP)     : %fs\n", 
+		profcl_time_elapsed(profile_cpu));
+	printf("     SpeedUp (OpenCL vs. OpenMP) : %fx\n", 
+		profcl_time_elapsed(profile_cpu) / profcl_time_elapsed(profile_dev));
 	printf("     Error (Device-CPU)          : %d\n", error);
 	printf("\n");
 	
@@ -548,7 +818,12 @@ int main(int argc, char *argv[])
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err != NULL);
-	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", err->code, g_quark_to_string(err->domain), err->message);
+	fprintf(
+		stderr, 
+		"Error %d from domain '%s' with message: \"%s\"\n", 
+		err->code, 
+		g_quark_to_string(err->domain), 
+		err->message);
 	g_error_free(err);
 	status = CLEXP_FAIL;
 
@@ -567,6 +842,7 @@ cleanup:
 	if (dev_name) g_free(dev_name);
 	if (dev_vendor) g_free(dev_vendor);
 	if (platf_name) g_free(platf_name);
+	if (output_export) g_free(output_export);
 		
 	/* Free miscelaneous objects. */
 	if (kernelName) g_free(kernelName);
@@ -649,7 +925,13 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Create parsing context. */
 	context = g_option_context_new (" - " PROG_DESCRIPTION);
-	gef_if_error_create_goto(*err, CLEXP_ERROR, context == NULL, CLEXP_FAIL, error_handler, "Unable to create command line parsing context.");
+	gef_if_error_create_goto(
+		*err, 
+		CLEXP_ERROR, 
+		context == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create command line parsing context.");
 	
 	/* Add acceptable command line options to context. */ 
 	g_option_context_add_main_entries(context, entries, NULL);
@@ -661,7 +943,13 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	/* Make checks which depend if the multiplication is AB or AA^T (transpose) */
 	if (!IS_AAT(kernel_id)) {
 		/* Check if number of rows in B is the same as the number of columns in A. */
-		gef_if_error_create_goto(*err, CLEXP_ERROR, (b_dim[1] != a_dim[0]), CLEXP_FAIL, error_handler, "Number of rows in B must the same as the number of columns in A.");	
+		gef_if_error_create_goto(
+			*err, 
+			CLEXP_ERROR, 
+			(b_dim[1] != a_dim[0]), 
+			CLEXP_FAIL, 
+			error_handler, 
+			"Number of rows in B must the same as the number of columns in A.");	
 	} else {
 		/* In this case (transpose multiplication), dimensions of B are considered to be of dimensions of A^T. */
 		b_dim[0] = a_dim[1];
@@ -669,7 +957,13 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	}
 
 	/* Check if kernel ID is within 0 to 4. */
-	gef_if_error_create_goto(*err, CLEXP_ERROR, ((kernel_id < 0) || (kernel_id > 4)), CLEXP_FAIL, error_handler, "Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 (for C=AA^T kernels).");	
+	gef_if_error_create_goto(
+		*err, 
+		CLEXP_ERROR, 
+		((kernel_id < 0) || (kernel_id > 4)), 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 (for C=AA^T kernels).");	
 
 	/* If we get here, no need for error treatment, jump to cleanup. */
 	g_assert (err == NULL || *err == NULL);

@@ -72,10 +72,10 @@ static GOptionEntry entries[] = {
 };
 
 /* Kernel file. */
-static const char* kernelFiles[] = {"BankConflictTest.cl"};
+static const char* kernelFiles[] = {"bank_conflicts.cl"};
 
 /** 
- * @brief Bank conflicts test example main function.
+ * @brief Bank conflicts example main function.
  * 
  * The frequency of bank conflicts can be increased by doubling the 
  * stride `-s` parameter, e.g. 1, 2, 4, 16, 32. The maximum number of 
@@ -119,7 +119,13 @@ int main(int argc, char *argv[])
 	g_option_context_parse(context, &argc, &argv, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	/* Check if global worksize is multiple of local worksize. */
-	gef_if_error_create_goto(err, CLEXP_ERROR, (gws[0] % lws[0] != 0) || (gws[1] % lws[1] != 0), CLEXP_FAIL, error_handler, "Global worksize is not multiple of local worksize.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		(gws[0] % lws[0] != 0) || (gws[1] % lws[1] != 0), 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Global worksize is not multiple of local worksize.");
 	
 	/* ******************************************************* */
 	/* Initialize profiler, OpenCL variables and build program */
@@ -130,10 +136,22 @@ int main(int argc, char *argv[])
 		
 	/* Initialize profiling object. */
 	profile = profcl_profile_new();
-	gef_if_error_create_goto(err, CLEXP_ERROR, profile == NULL, CLEXP_FAIL, error_handler, "Unable to create profiler object.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		profile == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create profiler object.");
 	
 	/* Get the required CL zone. */
-	zone = clu_zone_new(CL_DEVICE_TYPE_GPU, 1, CL_QUEUE_PROFILING_ENABLE, clu_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
+	zone = clu_zone_new(
+		CL_DEVICE_TYPE_GPU, 
+		1, 
+		CL_QUEUE_PROFILING_ENABLE, 
+		clu_menu_device_selector, 
+		(dev_idx != -1 ? &dev_idx : NULL), 
+		&err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Build program. */
@@ -142,7 +160,15 @@ int main(int argc, char *argv[])
 
 	/* Kernel */
 	kernel_bankconf = clCreateKernel(zone->program, "bankconf", &status);
-	gef_if_error_create_goto(err, CLEXP_ERROR, CL_SUCCESS != status, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to create bankconf kernel.", status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		CL_SUCCESS != status, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create bankconf kernel (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	/* Start basic timming / profiling. */
 	profcl_profile_start(profile);
@@ -154,7 +180,13 @@ int main(int argc, char *argv[])
 	/* Data in host */
 	sizeDataInBytes = gws[0] * gws[1] * sizeof(cl_int);
 	data_host = (cl_int*) malloc(sizeDataInBytes);
-	gef_if_error_create_goto(err, CLEXP_ERROR, data_host == NULL, CLEXP_FAIL, error_handler, "Unable to allocate memory for host data.");
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		data_host == NULL, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to allocate memory for host data.");
 	for (unsigned int i = 0; i < gws[0] * gws[1]; i++)
 			data_host[i] = g_rand_int_range(rng, 0, 25);
 
@@ -163,15 +195,41 @@ int main(int argc, char *argv[])
 	/* ********************* */
 
 	/* Data in device */
-	data_device = clCreateBuffer(zone->context, CL_MEM_READ_WRITE, sizeDataInBytes, NULL, &status);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to create device buffer.", status);
+	data_device = clCreateBuffer(
+		zone->context, CL_MEM_READ_WRITE, sizeDataInBytes, NULL, &status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to create device buffer (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 	
 	/* ************************* */
 	/* Initialize device buffers */
 	/* ************************* */
 	
-	status = clEnqueueWriteBuffer(zone->queues[0], data_device, CL_TRUE, 0, sizeDataInBytes, data_host, 0, NULL, &(events[0]));
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to write data to device.", status);
+	status = clEnqueueWriteBuffer(
+		zone->queues[0], 
+		data_device, 
+		CL_TRUE, 
+		0, 
+		sizeDataInBytes, 
+		data_host, 
+		0, 
+		NULL, 
+		&(events[0]));
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to write data to device (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	/* ************************************************** */
 	/* Determine and print required memory and work sizes */
@@ -184,24 +242,76 @@ int main(int argc, char *argv[])
 	/*  Set fixed kernel arguments */
 	/* *************************** */
 
-	status = clSetKernelArg(kernel_bankconf, 0, sizeof(cl_mem), (void *) &data_device);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg. 0 of bankconf kernel.", status);
+	status = clSetKernelArg(
+		kernel_bankconf, 0, sizeof(cl_mem), (void *) &data_device);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable set arg. 0 of bankconf kernel (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
-	status = clSetKernelArg(kernel_bankconf, 1, localMemSizeInBytes, NULL);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg. 1 of bankconf kernel.", status);
+	status = clSetKernelArg(
+		kernel_bankconf, 1, localMemSizeInBytes, NULL);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable set arg. 1 of bankconf kernel (OpenCL error %d: %s).",
+		status,
+		clerror_get(status));
 	
-	status = clSetKernelArg(kernel_bankconf, 2, sizeof(cl_uint), (void *) &stride);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable set arg. 2 of bankconf kernel.", status);
+	status = clSetKernelArg(
+		kernel_bankconf, 2, sizeof(cl_uint), (void *) &stride);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable set arg. 2 of bankconf kernel (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	/* ************ */
 	/*  Run kernel! */
 	/* ************ */
 	
-	status = clEnqueueNDRangeKernel(zone->queues[0], kernel_bankconf, 2, NULL, gws, lws, 1, events, &(events[1]));
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d: unable to execute bankconf kernel.", status);
+	status = clEnqueueNDRangeKernel(
+		zone->queues[0], 
+		kernel_bankconf, 
+		2, 
+		NULL, 
+		gws, 
+		lws, 
+		1, 
+		events, 
+		&(events[1]));
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"Unable to execute bankconf kernel (OpenCL error %d: %s).", 
+		status,
+		clerror_get(status));
 
 	status = clFinish(zone->queues[0]);
-	gef_if_error_create_goto(err, CLEXP_ERROR, status != CL_SUCCESS, CLEXP_FAIL, error_handler, "OpenCL error %d in clFinish", status);
+	gef_if_error_create_goto(
+		err, 
+		CLEXP_ERROR, 
+		status != CL_SUCCESS, 
+		CLEXP_FAIL, 
+		error_handler, 
+		"OpenCL error %d (%s) in clFinish", 
+		status,
+		clerror_get(status));
 
 	/* ******************** */
 	/*  Show profiling info */
@@ -233,7 +343,12 @@ int main(int argc, char *argv[])
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err != NULL);
-	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", err->code, g_quark_to_string(err->domain), err->message);
+	fprintf(
+		stderr, 
+		"Error %d from domain '%s' with message: \"%s\"\n", 
+		err->code, 
+		g_quark_to_string(err->domain), 
+		err->message);
 	g_error_free(err);
 	status = CLEXP_FAIL;
 

@@ -34,6 +34,7 @@
 #include "clprofiler.h"
 #include "clutils.h"
 #include "gerrorf.h"
+#include "clerrors.h"
 
 /** Helper macro to convert int to string at compile time. */
 #define STR_HELPER(x) #x
