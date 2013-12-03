@@ -25,5 +25,10 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
+#ifndef CLERRORS_H
+#define CLERRORS_H
+
 /** @brief Convert OpenCL error code to a readable string. */
 const char* clerror_get(int code);
+
+#endif

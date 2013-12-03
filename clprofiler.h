@@ -24,8 +24,8 @@
  * @date 2013
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
-#ifndef PREDPREYPROFILER_H
-#define PREDPREYPROFILER_H
+#ifndef CLPROFILER_H
+#define CLPROFILER_H
 
 #ifdef CLPROF_TEST
 	#include "tests/test_profiler.h"
