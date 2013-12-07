@@ -30,36 +30,33 @@ CLLIBDIR =
 #CLMACROS += -DATI_OS_LINUX
 
 # The location of the OpenCL headers
-# In Ubuntu you can install the package opencl-headers, so that the line bellow remains commented
+# In Debian/Ubuntu you can install the package opencl-headers, so that the line bellow remains commented
 #CLINCLUDES += -I$$AMDAPPSDKROOT/include
 
 # The location of libOpenCL.so
 # If you have it in your LD_LIBRARY_PATH you can leave the line bellow commented
-#CLLIBDIR = -L$$AMDAPPSDKROOT/lib/x86_64
+# You can also install the ocl-icd-opencl-dev package in order to leave the line bellow commented
+#CLLIBDIR += -L$$AMDAPPSDKROOT/lib/x86_64
 
-EXAMPLES := bank_conflicts matmult
-BINS := $(addprefix $(BUILDDIR)/,$(EXAMPLES))
-OBJS := $(addprefix $(OBJDIR)/,$(foreach var,$(EXAMPLES),$(var).o)) $(OBJDIR)/exp_common.o
+UTILS := device_query kernel_info
+BINS := $(addprefix $(BUILDDIR)/,$(UTILS))
+OBJS := $(addprefix $(OBJDIR)/,$(foreach var,$(UTILS),$(var).o))
 CF4OCL_OBJS := $(addprefix $(OBJDIR)/,clutils.o clprofiler.o clerrors.o)
 
-# Phony targets
-.PHONY : all clean $(EXAMPLES)
+# Phony rules
+.PHONY : all clean $(UTILS)
 
 # Make rules
-all : $(EXAMPLES)
+all : $(UTILS)
 
-$(EXAMPLES) : % : $(BUILDDIR)/%
+$(UTILS) : % : $(BUILDDIR)/%
 
-$(OBJDIR)/%.o : %.c %.h
+$(OBJDIR)/%.o : %.c
 	$(CC) $(CFLAGS) $(CLMACROS) $(CLINCLUDES) $(CF4OCL_INC) -c $< -o $@
 
 $(BINS) : $(CF4OCL_OBJS)
-$(BINS) : $(BUILDDIR)/% : $(OBJDIR)/%.o $(OBJDIR)/exp_common.o | $(BUILDDIR)/%.cl
+$(BINS) : $(BUILDDIR)/% : $(OBJDIR)/%.o
 	$(CC) $(CFLAGS) $(CLMACROS) $^ $(CLLIBDIR) -o $@ $(LFLAGS)
-
-
-$(BUILDDIR)/%.cl : %.cl | $(BUILDDIR)
-	cp $< $@
 
 $(OBJS) : | $(OBJDIR)
 

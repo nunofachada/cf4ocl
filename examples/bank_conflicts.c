@@ -30,7 +30,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
-#include "exp_common.h"
+#include "bank_conflicts.h"
 
 /** Default global work size, dimension 0. */
 #define GWS_X 4096

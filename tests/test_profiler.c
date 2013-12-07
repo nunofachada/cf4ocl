@@ -25,7 +25,7 @@
  * */
 
 #include "test_profiler.h"
-#include "../clprofiler.h"
+#include "clprofiler.h"
 
 /**
  * @brief Tests the OpenCL profiling framework.

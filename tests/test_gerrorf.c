@@ -24,7 +24,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
  
-#include "../gerrorf.h"
+#include "gerrorf.h"
 
 /** Resolves to error category identifying string, in this case an error in the GErrorf tests. */
 #define TEST_GERRORF_ERROR test_gerrorf_error_quark()

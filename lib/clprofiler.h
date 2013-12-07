@@ -27,8 +27,8 @@
 #ifndef CLPROFILER_H
 #define CLPROFILER_H
 
-#ifdef CLPROF_TEST
-	#include "tests/test_profiler.h"
+#ifdef TESTING
+	#include "test_profiler.h"
 #else
 	#include <CL/cl.h>
 #endif
