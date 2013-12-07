@@ -169,7 +169,7 @@ to run `make` within the _cf4ocl_ directory.
 
 It is possible to build only specific targets, for example:
 
-    $ make library
+    $ make lib
     $ make utils
     $ make examples
 
