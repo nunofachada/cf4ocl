@@ -6,8 +6,8 @@ endif
 # Variables definitions
 CC = gcc
 CFLAGS = -Wextra -Wall -g -std=gnu99 `pkg-config --cflags glib-2.0`
-CLMACROS =
-CLINCLUDES =
+CLMACROS +=
+CLINCLUDES +=
 
 # If you use AMD APPSDK and Linux you may want to uncomment the line bellow
 #CLMACROS += -DATI_OS_LINUX

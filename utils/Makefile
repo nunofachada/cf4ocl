@@ -22,9 +22,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g -std=gnu99 `pkg-config --cflags glib-2.0` -fopenmp
 LFLAGS = -lOpenCL -lm `pkg-config --libs glib-2.0`
 CF4OCL_INC = -I$(CF4OCL_INCDIR)
-CLMACROS =
-CLINCLUDES =
-CLLIBDIR =
+CLMACROS +=
+CLINCLUDES +=
+CLLIBDIR +=
 
 # If you use AMD APPSDK and Linux you may want to uncomment the line bellow
 #CLMACROS += -DATI_OS_LINUX
