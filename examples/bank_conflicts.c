@@ -72,7 +72,7 @@ static GOptionEntry entries[] = {
 };
 
 /* Kernel file. */
-static const char* kernelFiles[] = {"bank_conflicts.cl"};
+static char* kernelFiles[] = {"bank_conflicts.cl"};
 
 /** 
  * @brief Bank conflicts example main function.

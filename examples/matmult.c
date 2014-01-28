@@ -126,7 +126,7 @@ static GOptionEntry entries[] = {
 };
 
 /* Kernel file. */
-static const char* kernelFiles[] = {"matmult.cl"};
+static char* kernelFiles[] = {"matmult.cl"};
 
 /** 
  * @brief OpenCL and OpenMP matrix multiplication main function. 

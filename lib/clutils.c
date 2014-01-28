@@ -576,7 +576,7 @@ finish:
  * successfully completed or another value of #clu_error_codes if an 
  * error occurs.
  */
-int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err) {
+int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err) {
 
 	/* Helper variables */
 	cl_int ocl_status, ocl_build_status;
@@ -745,7 +745,7 @@ void clu_zone_free(CLUZone* zone) {
  * @param err GLib error object for error reporting.
  * @return Kernel source code or NULL if an error occurred.
  */
-char* clu_source_load(const char * filename, GError** err) {
+char* clu_source_load(char *filename, GError** err) {
 	
 	/* Function vars. */
 	FILE * fp = NULL;

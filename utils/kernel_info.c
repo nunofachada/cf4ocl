@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 	
 	/* Build program. */
-	status = clu_program_create(zone, (const char**) &argv[1], 1, NULL, &err);
+	status = clu_program_create(zone, &argv[1], 1, NULL, &err);
 	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 
 	/* Kernel */

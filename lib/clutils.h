@@ -167,13 +167,13 @@ char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strS
 CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
-int clu_program_create(CLUZone* zone, const char** kernelFiles, cl_uint numKernelFiles, const char* compilerOpts, GError **err);
+int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err);
 
 /** @brief Free a previously created OpenCL zone. */
 void clu_zone_free(CLUZone* zone);
 
 /** @brief Load kernel source from given file. */
-char* clu_source_load(const char* filename, GError** err);
+char* clu_source_load(char* filename, GError** err);
 
 /** @brief Free kernel source. */
 void clu_source_free(char* source);
