@@ -3,28 +3,24 @@ ifndef OBJDIR
 export OBJDIR := ${CURDIR}/obj
 endif
 ifndef BASEBUILDDIR
-BASEBUILDDIR := ${CURDIR}/bin
+export BASEBUILDDIR := ${CURDIR}/bin
 endif
 ifndef CF4OCL_INCDIR
-export CF4OCL_INCDIR := $(abspath ${CURDIR}/lib)
+export CF4OCL_INCDIR := $(abspath ${CURDIR}/src/lib)
 endif
 ifndef CF4OCL_OBJDIR
 export CF4OCL_OBJDIR := $(OBJDIR)
 endif
 
-export BUILDDIR = $(BASEBUILDDIR)/$@
-
 # Phony rules
-.PHONY : all lib utils examples tests docs clean cleanobj cleanbin cleandocs
+.PHONY : all lib utils examples tests docs clean clean-all cleandocs
 
 
 # Make rules
 all : lib utils examples
 
-tests : cleanobj
-utils examples : lib
 lib utils examples tests :
-	$(MAKE) -C $@
+	$(MAKE) -C src $@
 
 docs :
 	sed -e 's/```c/~~~~~~~~~~~~~~~{.c}/g' \
@@ -34,13 +30,11 @@ docs :
 	cp -r images doc/html 
 	rm README.doxy.md
 	
-clean : cleanobj cleanbin cleandocs
-	
-cleanobj :
+clean :
 	rm -rf $(OBJDIR)
-
-cleanbin :
 	rm -rf $(BASEBUILDDIR)
+	
+clean-all : clean cleandocs
 
 cleandocs :
 	rm -rf doc
