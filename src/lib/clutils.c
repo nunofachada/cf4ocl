@@ -216,11 +216,11 @@ finish:
 void clu_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi) {
 	
 	printf("\n   =========================== Kernel Information ==========================\n\n");
-	printf("     Maximum workgroup size                  : %zu\n", kwgi->max_work_group_size);
-	printf("     Preferred multiple of workgroup size    : %zu\n", kwgi->preferred_work_group_size_multiple);
-	printf("     WG size in __attribute__ qualifier      : (%zu, %zu, %zu)\n", kwgi->compile_work_group_size[0], kwgi->compile_work_group_size[1], kwgi->compile_work_group_size[2]);
-	printf("     Local memory used by kernel             : %ld bytes\n", (long) kwgi->local_mem_size);
-	printf("     Min. private mem. used by each workitem : %ld bytes\n\n", (long) kwgi->private_mem_size);
+	printf("     Maximum workgroup size                  : %lu\n", (unsigned long) kwgi->max_work_group_size);
+	printf("     Preferred multiple of workgroup size    : %lu\n", (unsigned long) kwgi->preferred_work_group_size_multiple);
+	printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", (unsigned long) kwgi->compile_work_group_size[0], (unsigned long) kwgi->compile_work_group_size[1], (unsigned long) kwgi->compile_work_group_size[2]);
+	printf("     Local memory used by kernel             : %lu bytes\n", (unsigned long) kwgi->local_mem_size);
+	printf("     Min. private mem. used by each workitem : %lu bytes\n\n", (unsigned long) kwgi->private_mem_size);
 
 }
 

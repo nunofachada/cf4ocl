@@ -37,10 +37,10 @@
 void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 	
 	printf("\n   ========================= Execution requirements ========================\n\n");
-	printf("     Global work size       : (%zu, %zu)\n", gws[0], gws[1]);
-	printf("     Local work size        : (%zu, %zu)\n", lws[0], lws[1]);
-	printf("     Global memory required : %lu bytes (%zu Kb = %zu Mb)\n", gmem, gmem / 1024, gmem / 1024 / 1024);
-	printf("     Local memory required  : %zu bytes (%zu Kb)\n", lmem,  lmem / 1024);
+	printf("     Global work size       : (%lu, %lu)\n", (unsigned long) gws[0], (unsigned long) gws[1]);
+	printf("     Local work size        : (%lu, %lu)\n", (unsigned long) lws[0], (unsigned long) lws[1]);
+	printf("     Global memory required : %lu bytes (%lu Kb = %lu Mb)\n", (unsigned long) gmem, (unsigned long) (gmem / 1024), (unsigned long) (gmem / 1024 / 1024));
+	printf("     Local memory required  : %lu bytes (%lu Kb)\n", (unsigned long) lmem, (unsigned long) (lmem / 1024));
 }
 
 
