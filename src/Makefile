@@ -2,8 +2,8 @@
 ifndef OBJDIR
 export OBJDIR := ${CURDIR}/obj
 endif
-ifndef BASEBUILDDIR
-BASEBUILDDIR := ${CURDIR}/bin
+ifndef BUILDDIR
+BUILDDIR := ${CURDIR}/bin
 endif
 ifndef CF4OCL_INCDIR
 export CF4OCL_INCDIR := $(abspath ${CURDIR}/lib)
@@ -12,11 +12,10 @@ ifndef CF4OCL_OBJDIR
 export CF4OCL_OBJDIR := $(OBJDIR)
 endif
 
-export BUILDDIR = $(BASEBUILDDIR)/$@
+export BUILDSUBDIR = $(BUILDDIR)/$@
 
 # Phony rules
 .PHONY : all lib utils examples tests clean cleanobj cleanbin
-
 
 # Make rules
 all : lib utils examples
@@ -32,6 +31,6 @@ cleanobj :
 	rm -rf $(OBJDIR)
 
 cleanbin :
-	rm -rf $(BASEBUILDDIR)
+	rm -rf $(BUILDDIR)
 
 
