@@ -6,8 +6,11 @@ set(cf4ocl_VERSION_MAJOR 1)
 set(cf4ocl_VERSION_MINOR 3)
 set(cf4ocl_VERSION_PATCH 0)
 
+# Set executables prefix
+set(EXECS_PREFIX "cf4ocl_")
+
 # Compiler options
-set(CMAKE_C_FLAGS "-Wextra -Wall -g -std=gnu99")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -g -std=gnu99")
 
 # Find required libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
