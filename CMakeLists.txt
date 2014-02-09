@@ -11,11 +11,12 @@ set(CMAKE_C_FLAGS "-Wextra -Wall -g -std=gnu99")
 
 # Find required libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-find_package(GLIB2 REQUIRED)
+find_package (PkgConfig REQUIRED)
 find_package(OpenCL REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Library include directories
-include_directories(${GLIB2_INCLUDE_DIR} ${OPENCL_INCLUDE_DIRS})
+include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/src/lib)
 
 # Add src folder
 add_subdirectory(src)
