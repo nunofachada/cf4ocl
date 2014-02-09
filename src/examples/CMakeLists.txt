@@ -16,6 +16,12 @@ foreach(EXAMPLE ${EXAMPLES})
 	add_executable(${EXAMPLE} ${EXAMPLE}.c)
 	target_link_libraries(${EXAMPLE} ${COMMON_LIBS} ${${EXAMPLE}_EXTRALIBS})
 	set_target_properties(${EXAMPLE} PROPERTIES OUTPUT_NAME ${EXECS_PREFIX}${EXAMPLE})
+	# Copy the OpenCL kernel to the same location as the example executable
+	add_custom_command(TARGET ${EXAMPLE} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl
+		$<TARGET_FILE_DIR:${EXAMPLE}>
+	)
 endforeach(EXAMPLE)
 
 # Set specific matmult properties
