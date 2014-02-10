@@ -22,11 +22,21 @@ foreach(EXAMPLE ${EXAMPLES})
 		${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl
 		$<TARGET_FILE_DIR:${EXAMPLE}>
 	)
+	# How to install examples
+	install(TARGETS ${EXAMPLE} RUNTIME DESTINATION bin)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl DESTINATION bin)
 endforeach(EXAMPLE)
 
 # Set specific matmult properties
 set_target_properties(matmult PROPERTIES COMPILE_FLAGS ${OpenMP_C_FLAGS} LINK_FLAGS ${OpenMP_C_FLAGS})
 
+# Set examples version
+set_target_properties(${EXAMPLES} PROPERTIES 
+	VERSION 
+		${cf4ocl_VERSION_MAJOR}.${cf4ocl_VERSION_MINOR}.${cf4ocl_VERSION_PATCH})
+
 # Add a target which builds all examples
 add_custom_target(examples DEPENDS ${EXAMPLES})
+
+
 
