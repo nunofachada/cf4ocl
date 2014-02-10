@@ -15,4 +15,6 @@ set_target_properties(cf4ocl PROPERTIES
 		${cf4ocl_VERSION_MAJOR})
 
 # How to install lib
-install(TARGETS cf4ocl LIBRARY DESTINATION lib)
+install(TARGETS cf4ocl LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	RUNTIME DESTINATION bin)
