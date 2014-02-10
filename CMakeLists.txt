@@ -24,5 +24,13 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} ${CMAKE_SOURCE_D
 # Add src folder
 add_subdirectory(src)
 
+# build a CPack driven installer package
+include(InstallRequiredSystemLibraries)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_VERSION_MAJOR "${cf4ocl_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${cf4ocl_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${cf4ocl_VERSION_PATCH}")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+include (CPack)
 
 
