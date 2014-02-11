@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 project(cf4ocl)
 
 # The version number
-set(cf4ocl_VERSION_MAJOR 1)
-set(cf4ocl_VERSION_MINOR 3)
-set(cf4ocl_VERSION_PATCH 0)
+set(${PROJECT_NAME}_VERSION_MAJOR 1)
+set(${PROJECT_NAME}_VERSION_MINOR 3)
+set(${PROJECT_NAME}_VERSION_PATCH 0)
 
 # Set executables prefix
 set(EXECS_PREFIX "cf4ocl_")
@@ -24,12 +24,38 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} ${CMAKE_SOURCE_D
 # Add src folder
 add_subdirectory(src)
 
+# add a target to generate API documentation with Doxygen
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	set(DOCS_DIRECTORY "doc")
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	# Convert GitHub README.md into Doxygen MD format
+	file(READ ${CMAKE_CURRENT_SOURCE_DIR}/README.md README_CONTENTS)
+	string(REPLACE "```c" "~~~~~~~~~~~~~~~{.c}" README_CONTENTS_MOD1 ${README_CONTENTS})
+	string(REPLACE "```" "~~~~~~~~~~~~~~~" README_CONTENTS_MOD2 ${README_CONTENTS_MOD1})
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.doxy.md ${README_CONTENTS_MOD2})
+	# Add a build docs target
+	add_custom_target(doc
+		${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Generating API documentation with Doxygen" VERBATIM
+	)
+	# Copy images to doc directory 
+	add_custom_command(TARGET doc POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_CURRENT_SOURCE_DIR}/images 
+		${DOCS_DIRECTORY}/html/images
+	)
+	# Add documentation installation target
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ DESTINATION share/${PROJECT_NAME})
+endif()
+
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
-set(CPACK_PACKAGE_VERSION_MAJOR "${cf4ocl_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${cf4ocl_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${cf4ocl_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${${PROJECT_NAME}_VERSION_PATCH}")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 include (CPack)
 
