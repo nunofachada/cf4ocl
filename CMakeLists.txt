@@ -16,7 +16,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=gnu99")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package(PkgConfig REQUIRED)
 find_package(OpenCL REQUIRED)
-find_package(Doxygen 1.8.3)
+find_package(Doxygen 1.8.3 QUIET)
 pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Library include directories

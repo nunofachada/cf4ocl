@@ -4,6 +4,9 @@ set(SRC clerrors.c clprofiler.c clutils.c)
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
+# This is required for Windows compilation
+target_link_libraries(${PROJECT_NAME} ${GLIB_LIBRARIES} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
+
 # This target is just an alias for cf4ocl
 add_custom_target(lib DEPENDS ${PROJECT_NAME})
 
