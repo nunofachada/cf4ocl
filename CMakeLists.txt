@@ -7,15 +7,16 @@ set(${PROJECT_NAME}_VERSION_MINOR 3)
 set(${PROJECT_NAME}_VERSION_PATCH 0)
 
 # Set executables prefix
-set(EXECS_PREFIX "cf4ocl_")
+set(EXECS_PREFIX "${PROJECT_NAME}_")
 
 # Compiler options
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=gnu99")
 
 # Find required libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-find_package (PkgConfig REQUIRED)
+find_package(PkgConfig REQUIRED)
 find_package(OpenCL REQUIRED)
+find_package(Doxygen 1.8.3)
 pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Library include directories
@@ -24,8 +25,10 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} ${CMAKE_SOURCE_D
 # Add src folder
 add_subdirectory(src)
 
+# Add scripts folder
+add_subdirectory(scripts)
+
 # add a target to generate API documentation with Doxygen
-find_package(Doxygen)
 if(DOXYGEN_FOUND)
 	set(DOCS_DIRECTORY "doc")
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
@@ -46,8 +49,8 @@ if(DOXYGEN_FOUND)
 		${CMAKE_CURRENT_SOURCE_DIR}/images 
 		${DOCS_DIRECTORY}/html/images
 	)
-	# Add documentation installation target
-	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ DESTINATION share/${PROJECT_NAME})
+	# Add documentation installation target (if the docs have been built)
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ DESTINATION share/${PROJECT_NAME} OPTIONAL)
 endif()
 
 # build a CPack driven installer package

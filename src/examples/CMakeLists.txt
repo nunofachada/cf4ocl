@@ -2,7 +2,7 @@
 SET(EXAMPLES matmult bank_conflicts)
 
 # Common libraries for examples
-set(COMMON_LIBS cf4ocl ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} exp_common)
+set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} exp_common)
 set(matmult_EXTRALIBS m)
 
 # OpenMP required by matmult example
@@ -33,7 +33,7 @@ set_target_properties(matmult PROPERTIES COMPILE_FLAGS ${OpenMP_C_FLAGS} LINK_FL
 # Set examples version
 set_target_properties(${EXAMPLES} PROPERTIES 
 	VERSION 
-		${cf4ocl_VERSION_MAJOR}.${cf4ocl_VERSION_MINOR}.${cf4ocl_VERSION_PATCH})
+		${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
 
 # Add a target which builds all examples
 add_custom_target(examples DEPENDS ${EXAMPLES})

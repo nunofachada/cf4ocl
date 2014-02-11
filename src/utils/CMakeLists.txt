@@ -2,7 +2,7 @@
 set(UTILS device_query kernel_info)
 
 # Common libs for utilities
-set(COMMON_LIBS cf4ocl ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
+set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
 
 # Add a target for each utility
 foreach(UTIL ${UTILS})
@@ -14,7 +14,7 @@ endforeach(UTIL)
 # Set utils version
 set_target_properties(${UTILS} PROPERTIES 
 	VERSION 
-		${cf4ocl_VERSION_MAJOR}.${cf4ocl_VERSION_MINOR}.${cf4ocl_VERSION_PATCH})
+		${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
 
 # How to install utils
 install(TARGETS ${UTILS} RUNTIME DESTINATION bin)
