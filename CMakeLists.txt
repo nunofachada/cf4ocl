@@ -15,7 +15,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
 endif()
 
 # Find required libraries
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 find_package(PkgConfig REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package(Doxygen 1.8.3 QUIET)
