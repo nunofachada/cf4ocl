@@ -31,9 +31,7 @@ endforeach(EXAMPLE)
 set_target_properties(matmult PROPERTIES COMPILE_FLAGS ${OpenMP_C_FLAGS} LINK_FLAGS ${OpenMP_C_FLAGS})
 
 # Set examples version
-set_target_properties(${EXAMPLES} PROPERTIES 
-	VERSION 
-		${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
+set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
 
 # Add a target which builds all examples
 add_custom_target(examples DEPENDS ${EXAMPLES})

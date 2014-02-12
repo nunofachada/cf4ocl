@@ -13,8 +13,7 @@ endforeach(UTIL)
 
 # Set utils version
 set_target_properties(${UTILS} PROPERTIES 
-	VERSION 
-		${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
+	VERSION ${${PROJECT_NAME}_VERSION})
 
 # How to install utils
 install(TARGETS ${UTILS} RUNTIME DESTINATION bin)
