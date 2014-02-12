@@ -9,8 +9,10 @@ set(${PROJECT_NAME}_VERSION_PATCH 0)
 # Set executables prefix
 set(EXECS_PREFIX "${PROJECT_NAME}_")
 
-# Compiler options
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=gnu99")
+# Compiler options for GCC
+if(CMAKE_COMPILER_IS_GNUCC)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=gnu99")
+endif()
 
 # Find required libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
