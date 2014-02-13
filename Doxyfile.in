@@ -635,7 +635,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md @PROJECT_SOURCE_DIR@/src
+INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md @PROJECT_SOURCE_DIR@/src @PROJECT_SOURCE_DIR@/scripts
 USE_MDFILE_AS_MAINPAGE = README.doxy.md
 
 # This tag can be used to specify the character encoding of the source files 

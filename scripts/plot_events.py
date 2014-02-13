@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
 #
-"""
+
+""" plot_events.py
+
 Plots a Gantt-like chart of OpenCL events using the profilling info
 exported by CFProfiler.
 """
