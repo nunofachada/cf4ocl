@@ -153,6 +153,7 @@ int main(int argc, char *argv[])
 	cl_event events[4] = {NULL, NULL, NULL, NULL}; /* OpenCL events */
 	cl_kernel kernel_matmult = NULL;               /* Kernel object */
 	gchar* kernelName = NULL;                      /* Kernel name */
+	gchar* kernelPath = NULL;                      /* Full kernel path. */
 	cl_int *matrixA_host = NULL,                   /* Host matrix A */
 		*matrixB_host = NULL,                      /* Host matrix B */
 		*matrixC_host = NULL;                      /* Host matrix C (calcutated on OpenCL device). */
@@ -238,8 +239,12 @@ int main(int argc, char *argv[])
 		zone->device_info.device_vendor, 
 		zone->device_info.platform_name);
 	
+	/* Get location of kernel file, which should be in the same location 
+	 * has the matmult executable. */
+	kernelPath = clexp_kernelpath_get(kernelFiles[0], argv[0]);
+	
 	/* Build program. */
-	status = clu_program_create(zone, kernelFiles, 1, compiler_opts, &err);
+	status = clu_program_create(zone, &kernelPath, 1, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Kernel */
@@ -846,6 +851,7 @@ cleanup:
 		
 	/* Free miscelaneous objects. */
 	if (kernelName) g_free(kernelName);
+	if (kernelPath) g_free(kernelPath);
 
 	/* Free RNG */
 	if (rng) g_rand_free(rng);

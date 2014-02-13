@@ -100,6 +100,7 @@ int main(int argc, char *argv[])
 	cl_kernel kernel_bankconf = NULL;  /* Kernel. */
 	cl_event events[2] = {NULL, NULL}; /* Events. */
 	cl_mem data_device = NULL;         /* Data in device. */
+	gchar* kernelPath = NULL;          /* Full kernel path. */
 	cl_int *data_host = NULL;          /* Data in host. */
 	CLUZone* zone = NULL;              /* OpenCL zone. */
 	size_t sizeDataInBytes;            /* Size of data to be transfered to device. */
@@ -153,9 +154,13 @@ int main(int argc, char *argv[])
 		(dev_idx != -1 ? &dev_idx : NULL), 
 		&err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+
+	/* Get location of kernel file, which should be in the same location 
+	 * has the bank_conflicts executable. */
+	kernelPath = clexp_kernelpath_get(kernelFiles[0], argv[0]);
 	
 	/* Build program. */
-	status = clu_program_create(zone, kernelFiles, 1, compiler_opts, &err);
+	status = clu_program_create(zone, &kernelPath, 1, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Kernel */
@@ -383,6 +388,9 @@ cleanup:
 
 	/* Free host resources */
 	if (data_host) free(data_host);
+
+	/* Free kernel path. */
+	if (kernelPath) g_free(kernelPath);
 	
 	/* Return status. */
 	return status;

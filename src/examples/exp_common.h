@@ -72,6 +72,9 @@
 /** @brief Print device requirements for program. */
 void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
 
+/** @brief Get full kernel path name. */
+gchar* clexp_kernelpath_get(gchar* kernel_filename, char* exec_name);
+
 /** @brief Resolves to error category identifying string. Required by glib error reporting system. */
 #define CLEXP_ERROR clexp_error_quark()
 

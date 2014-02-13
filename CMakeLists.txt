@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(cf4ocl C)
+project(cf4ocl)
 
 # The version number
 set(${PROJECT_NAME}_VERSION_MAJOR 1)
