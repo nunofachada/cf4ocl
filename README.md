@@ -18,15 +18,15 @@ iii), aim to verify that the library functions are working properly.
 Finally, the examples show how to integrate the library functions in 
 fully working OpenCL programs.
 
-The target platform of _cf4ocl_ is Linux, although, being pure C99, it 
-can be compiled to other platforms as long as the dependencies, 
+_cf4ocl_ is tested in Linux and Windows, although, being pure C99, it 
+should compile on other platforms, as long as the dependencies, 
 [GLib][] and [OpenCL][], are met. The reference compiler is GCC with 
 `-Wall` and `-Wextra` flags activated. The code is verified with 
 [cppcheck][] and is fully commented. API documentation can be generated 
 with [Doxygen][] via `make`.
 
 Library code is licensed under [LGPLv3][], while the remaining code is 
-licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html).
+licensed under [GPLv3][].
 
 Table of contents
 =================
@@ -44,14 +44,17 @@ Table of contents
 2.1\.  [Dependencies](#dependencies)  
 2.1.1\.  [OpenCL](#opencl)  
 2.1.2\.  [GLib](#glib)  
-2.2\.  [Library, utilities, tests and examples](#libraryutilitiestestsandexamples)  
+2.2\.  [Download, build and install](#downloadbuildandinstall)  
 2.3\.  [Using the library in a new project](#usingthelibraryinanewproject)  
 2.3.1\.  [Compiling and linking](#compilingandlinking)  
+2.3.1.1\.  [CMake](#cmake)  
+2.3.1.2\.  [GNU Make](#gnumake)  
+2.3.1.2.1\.  [Compiling](#compiling)  
+2.3.1.2.2\.  [Linking](#linking)  
 2.3.2\.  [Using CL Utils](#usingclutils)  
 2.3.3\.  [Using CL Profiler](#usingclprofiler)  
 2.3.4\.  [Using CL Errors](#usingclerrors)  
 2.3.5\.  [Using GError Framework (GErrorF)](#usinggerrorframeworkgerrorf)  
-2.4\.  [Generating the API documentation](#generatingtheapidocumentation)  
 3\.  [Other useful C frameworks/utilities for OpenCL](#otherusefulcframeworks/utilitiesforopencl)  
 
 <a name="introduction"></a>
@@ -166,7 +169,7 @@ The `kernel_info` program performs static analysis of OpenCL kernels.
 <a name="howtouse_cf4ocl_"></a>
 
 2\. How to use _cf4ocl_
-=================
+===================
 
 <a name="dependencies"></a>
 
@@ -199,37 +202,88 @@ installed.
 
 ### 2.1.2\. GLib
 
-The simplest way to install [GLib][] is using the package manager of
-the Linux distribution. For Debian and Ubuntu:
+The simplest way to install [GLib][] on Linux is through the package 
+manager of the respective distribution. For Debian and Ubuntu:
 
     $ sudo apt-get install libglib2.0-dev
     
 It is also advisable to install the `libglib2.0-0-dbg` or equivalent
 package to allow debugging at the GLib level.
 
-<a name="libraryutilitiestestsandexamples"></a>
+This [tutorial](http://www.gtk.org/download/win32_tutorial.php) explains
+how to install GLib in Windows.
 
-2.2\. Library, utilities, tests and examples
---------------------------------------
+<a name="downloadbuildandinstall"></a>
 
-Assuming a working development environment with OpenCL and GLib 
-properly setup, to build the library, utils and examples it is necessary
-to run `make` within the _cf4ocl_ directory.
+2.2\. Download, build and install
+---------------------------
 
-It is possible to build only specific targets, for example:
+_cf4ocl_ uses the [CMake][] build system. Assuming a working development 
+environment with GCC and CMake installed, and the dependencies (OpenCL
+and GLib) properly setup, either clone or download and extract _cf4ocl_ 
+into a location of your preference. The _cf4ocl_ directory tree will 
+have the following structure:
 
-    $ make lib
-    $ make utils
-    $ make examples
+    cf4ocl/
+    |
+    +-- cmake
+    |   |
+    |   +-- Modules
+    |
+    +-- images
+    |
+    +-- scripts
+    |
+    +-- src
+        |
+        +-- examples
+        |
+        +-- lib
+        |
+        +-- tests
+        |
+        +-- utils
 
-If the build failed, confirm if OpenCL and GLib are properly installed,
-and if GCC can find the OpenCL headers and shared library. If not,
-set the headers location in the `CLINCLUDES` Makefile variable, and set
-the shared library location in the `CLLIBDIR` Makefile variable.
+Within the _cf4ocl_ directory, create a folder named `build`. This is
+where the project will be built, such that the contents of the _cf4ocl_ 
+folder (source code, scripts, etc.), are kept separate from the build 
+files. 
 
-The tests should be compiled separately with:
+Next, `cd` into the `build` folder and run the `cmake ..` command. If
+OpenCL and GLib are successfully found by CMake, the Makefiles required
+for building and installing _cf4ocl_ are created. If an error occurrs,
+it might be necessary to manually provide the location of these
+dependencies. In order to do so, run the `ccmake ..` command, which
+offers a configuration interface for this purpose. Alternatively, run
+the CMake GUI, chose the _cf4ocl_ directory as the source code 
+location and the `build` directory as the place where to build the
+binaries. Specify the library and include locations for OpenCL and 
+GLib, click "Configure", then "Generate". The makefiles should now have 
+been generated.
 
-    $ make tests
+In order to build the project, run `make` in the `build` folder. 
+Project installation can be accomplished with `make install`. By 
+default, _cf4ocl_ is installed system wide, which requires the later
+command to be executed as root or administrator (e.g. using `sudo` in
+Linux, or an elevated priviledge command prompt on Windows). The
+install location can be changed with the `ccmake` command, or with the
+CMake GUI. The tests can be compiled separately with `make tests`.
+
+After installation, the _cf4ocl_ shared library should be registered
+with `ldconfig` (Linux) or `regsvr32` (Windows), such that client
+applications can find it at runtime.
+
+The API documentation can be generated with `make` if [Doxygen][] 
+(version 1.8.3 or newer) is installed. In the _cf4ocl_ directory run:
+
+    $ make doc
+    
+The documentation will be generated in the `./doc` folder. The direct
+use of the `doxygen` command should be avoided because 
+[Doxygen's markdown][doxymd] is not 100% compatible with the 
+[GitHub Flavored Markdown][ghmd] used in this document. When building 
+the documentation with `make`, the required conversion is performed 
+first.
 
 <a name="usingthelibraryinanewproject"></a>
 
@@ -238,31 +292,67 @@ The tests should be compiled separately with:
 
 Any of the three elements of the library can be used in a workflow
 without the need to use the others. However, both CL Utils and CL 
-Profiler internally use the GError framework.
+Profiler internally use the GError framework. The _cf4ocl_ header
+includes all the definitions for the three elements of the library. This
+header can be included as follows:
+
+```c
+#include <cf4ocl.h>
+```
 
 <a name="compilingandlinking"></a>
 
 ### 2.3.1\. Compiling and linking
 
-When building a program based on _cf4ocl_ (or any OpenCL program) with 
-GCC, it may be necessary to specify the location of the OpenCL headers 
-with the `-I` flag, and the location of the shared library 
-(libOpenCL.so) with the `-L` flag. If the OpenCL development files were
-installed from the package manager (e.g. the `ocl-icd-opencl-dev` 
-package in Debian and Ubuntu), this is usually not required.
+<a name="cmake"></a>
 
-Additionally, in order to **compile** a program with GLib (required by 
-_cf4ocl_), the following line should be added to the GCC syntax:
+#### 2.3.1.1\. CMake
+
+If client code uses CMake as its build system, then it is very simple
+to integrate _cf4ocl_. Add the following lines to your CMakeLists.txt
+file:
+
+```
+# Find required libraries
+find_package(PkgConfig REQUIRED)
+find_package(Cf4ocl REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
+
+# Library include directories
+include_directories(${GLIB_INCLUDE_DIRS} ${CF4OCL_INCLUDE_DIRS})
+```
+
+_cf4ocl_ can be found by CMake through a module included in the project
+for this purpose. Take a look at the [CL-Ops](https://github.com/FakenMC/cl-ops/)
+project for an example on how to do so.
+
+<a name="gnumake"></a>
+
+#### 2.3.1.2\. GNU Make
+
+<a name="compiling"></a>
+
+##### 2.3.1.2.1\. Compiling
+
+Depending on how _cf4ocl_ was installed, it may be necessary to specify 
+the location of the _cf4ocl_ header with the `-I` flag. The same is true
+for the GLib and OpenCL headers, which are included by the _cf4ocl_
+header. For GLib, instead of directly specifying the header location,
+it is also possible to use PkgConfig instead:
 
     `pkg-config --cflags glib-2.0`
+
+<a name="linking"></a>
+
+##### 2.3.1.2.2\. Linking
+
+It is necessary to specify the use of the _cf4ocl_ with the `-l` flag,
+e.g.:
+
+    -lcf4ocl
     
-In order to **link** a program with GLib, it is necessary to add the 
-following line to the GCC syntax:
-
-    `pkg-config --libs glib-2.0`
-
-These two lines will expand correctly to the `-I` and `-l` flags 
-required for compiling and linking, respectively.
+Again, depending on how _cf4ocl_ was installed, it may be necessary to 
+specify the location of the _cf4ocl_ shared library with the `-L` flag. 
 
 <a name="usingclutils"></a>
 
@@ -774,23 +864,6 @@ This pattern avoids many bugs and makes error catching and handling
 possible in C. However it is not to everyone's taste, and is thus
 a completely optional aspect of _cf4ocl_.
 
-<a name="generatingtheapidocumentation"></a>
-
-2.4\. Generating the API documentation
---------------------------------
-
-The API documentation can be generated with `make` if [Doxygen][] 
-(version 1.8 or newer) is installed. In the _cf4ocl_ directory run:
-
-    $ make docs
-    
-The documentation will be generated in the `./doc` folder. The direct
-use of the `doxygen` command should be avoided because 
-[Doxygen's markdown][doxymd] is not 100% compatible with the 
-[GitHub Flavored Markdown][ghmd] used in this document. When building 
-the documentation with `make`, the required conversion is performed 
-first.
-
 <a name="otherusefulcframeworks/utilitiesforopencl"></a>
 
 3\. Other useful C frameworks/utilities for OpenCL
@@ -827,6 +900,7 @@ Appendices
 [gnuplot]: http://www.gnuplot.info/
 [gantt.py]: http://se.wtb.tue.nl/sewiki/wonham/gantt.py
 [cl.h]: http://www.khronos.org/registry/cl/api/1.2/cl.h
+[CMake]: http://www.cmake.org/
 
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
