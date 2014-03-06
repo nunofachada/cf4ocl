@@ -58,60 +58,60 @@ enum profcl_error_codes {
  * @brief Contains the profiling info of an OpenCL application.
  */
 typedef struct profcl_profile { 
-	GHashTable* unique_events;	/**< Hash table with keys equal to the unique events name, and values equal to a unique event id. */
+	GHashTable* unique_events;  /**< Hash table with keys equal to the unique events name, and values equal to a unique event id. */
 	GHashTable* command_queues; /**< Table of existing OpenCL command queues. */
-	GList* event_instants;		/**< Instants (start and end) of all events occuring in an OpenCL application. */
-	guint num_event_instants;	/**< Total number of event instants in ProfCLProfile#event_instants. */
-	GHashTable* aggregate;		/**< Aggregate statistics for all events in ProfCLProfile#event_instants. */
-	cl_ulong* overmat;			/**< Overlap matrix for all events in event_instants. */
-	cl_ulong totalEventsTime;	/**< Total time taken by all events. */
+	GList* event_instants;      /**< Instants (start and end) of all events occuring in an OpenCL application. */
+	guint num_event_instants;   /**< Total number of event instants in ProfCLProfile#event_instants. */
+	GHashTable* aggregate;      /**< Aggregate statistics for all events in ProfCLProfile#event_instants. */
+	cl_ulong* overmat;          /**< Overlap matrix for all events in event_instants. */
+	cl_ulong totalEventsTime;   /**< Total time taken by all events. */
 	cl_ulong totalEventsEffTime;/**< Total time taken by all events except intervals where events overlaped. */
 	cl_ulong startTime;         /**< Time at which the first (oldest) event started. */
-	GTimer* timer;				/**< Keeps track of time during the complete profiling session. */
+	GTimer* timer;              /**< Keeps track of time during the complete profiling session. */
 } ProfCLProfile;
 
 /**
  * @brief Type of event instant (ProfCLEvInst).
  */
 typedef enum {
-	PROFCL_EV_START,	/**< ProfCLEvInst is a start event instant. */
-	PROFCL_EV_END		/**< ProfCLEvInst is a end event instant. */
+	PROFCL_EV_START, /**< ProfCLEvInst is a start event instant. */
+	PROFCL_EV_END    /**< ProfCLEvInst is a end event instant. */
 } ProfCLEvInstType;
 
 /**
  * @brief Sorting strategy for event instants (ProfCLEvInst).
  */
 typedef enum {
-	PROFCL_EV_SORT_INSTANT,	/**< Sort event instants by instant. */
-	PROFCL_EV_SORT_ID		/**< Sort event instants by event id. */
+	PROFCL_EV_SORT_INSTANT, /**< Sort event instants by instant. */
+	PROFCL_EV_SORT_ID       /**< Sort event instants by event id. */
 } ProfCLEvSort;
 
 /**
  * @brief Sorting strategy for aggregate event data instances. 
  */
 typedef enum {
-	PROFCL_AGGEVDATA_SORT_NAME,	/**< Sort aggregate event data instances by name. */
-	PROFCL_AGGEVDATA_SORT_TIME	/**< Sort aggregate event data instances by time. */
+	PROFCL_AGGEVDATA_SORT_NAME, /**< Sort aggregate event data instances by name. */
+	PROFCL_AGGEVDATA_SORT_TIME  /**< Sort aggregate event data instances by time. */
 }  ProfCLEvAggDataSort;
 
 /**
  * @brief Event instant. 
  */
 typedef struct profcl_evinst { 
-	const char* eventName;	/**< Name of event which the instant refers to (ProfCLEvInfo#eventName). */
-	guint id;				/**< Event instant ID. */
-	cl_ulong instant;		/**< Event instant in nanoseconds from current device time counter. */
-	ProfCLEvInstType type;	/**< Type of event instant (ProfCLEvInstType#PROFCL_EV_START or ProfCLEvInstType#PROFCL_EV_END). */
-	cl_command_queue queue; /**< The command queue where the event took place. */
+	const char* eventName; /**< Name of event which the instant refers to (ProfCLEvInfo#eventName). */
+	guint id;              /**< Event instant ID. */
+	cl_ulong instant;      /**< Event instant in nanoseconds from current device time counter. */
+	ProfCLEvInstType type; /**< Type of event instant (ProfCLEvInstType#PROFCL_EV_START or ProfCLEvInstType#PROFCL_EV_END). */
+	cl_command_queue queue;/**< The command queue where the event took place. */
 } ProfCLEvInst;
 
 /**
  * @brief Aggregate event info.
  */
 typedef struct profcl_ev_aggregate {
-	const char* eventName;	/**< Name of event which the instant refers to (ProfCLEvInfo#eventName). */
-	cl_ulong totalTime;		/**< Total time of events with name equal to ProfCLEvAggregate#eventName. */
-	double relativeTime;	/**< Relative time of events with name equal to ProfCLEvAggregate#eventName. */
+	const char* eventName; /**< Name of event which the instant refers to (ProfCLEvInfo#eventName). */
+	cl_ulong totalTime;    /**< Total time of events with name equal to ProfCLEvAggregate#eventName. */
+	double relativeTime;   /**< Relative time of events with name equal to ProfCLEvAggregate#eventName. */
 } ProfCLEvAggregate;
 
 /**
@@ -125,6 +125,14 @@ typedef struct profcl_export_options {
 	gboolean simple_queue_id; /**< Use simple queue IDs (0,1...n) instead of using the queue memory location as ID (defaults to TRUE). */
 	gboolean zero_start;      /**< Start at instant 0 (TRUE, default), or start at oldest instant returned by OpenCL (FALSE). */
 } ProfCLExportOptions;
+
+/**
+ * @brief Associates an OpenCL event with a name.
+ * */
+typedef struct profcl_evname {
+	const char* eventName; /**< Event name. */
+	cl_event event;        /**< OpenCL event. */
+} ProfCLEvName;
 
 /** @brief Create a new OpenCL events profile. */
 ProfCLProfile* profcl_profile_new();
@@ -146,6 +154,10 @@ gdouble profcl_time_elapsed(ProfCLProfile* profile);
 /** @brief Add OpenCL event to events profile, more specifically adds 
  * the start and end instants of the given event to the profile. */
 int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event ev, GError** err);
+
+/** @brief Add OpenCL event to events profile. Receives a ProfCLEvName
+ * instead of a separate event and name like profcl_profile_add(). */
+int profcl_profile_add_evname(ProfCLProfile* profile, ProfCLEvName event_with_name, GError** err);
 
 /** @brief Add OpenCL events to events profile, more specifically adds 
  * the start of ev1 and end of ev2 to the profile. */ 

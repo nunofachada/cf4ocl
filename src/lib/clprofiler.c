@@ -126,6 +126,26 @@ int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event 
 	return profcl_profile_add_composite(profile, event_name, ev, ev, err);
 }
 
+/** 
+ * @brief Add OpenCL event to events profile. Receives a ProfCLEvName
+ * instead of a separate event and name like profcl_profile_add(). 
+ * 
+ * @param profile OpenCL events profile.
+ * @param event_with_name OpenCL event associated with a name.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
+ * successfully added, or another value of #profcl_error_codes if an 
+ * error occurs.
+ * */
+int profcl_profile_add_evname(ProfCLProfile* profile, ProfCLEvName event_with_name, GError** err) {
+	/* Just call profcl_profile_add_composite sending the same event as start and end event. */
+	return profcl_profile_add_composite(
+		profile, 
+		event_with_name.eventName, 
+		event_with_name.event,
+		event_with_name.event,
+		err);
+}
 
 /**
  * @brief Add OpenCL events to events profile, more specifically adds 
