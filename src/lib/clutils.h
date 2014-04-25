@@ -1,37 +1,41 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with cf4ocl. If not, see 
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with cf4ocl. If not, see
  * <http://www.gnu.org/licenses/>.
  * */
- 
-/** 
+
+/**
  * @file
  * @brief OpenCL utilities function headers.
- * 
+ *
  * @author Nuno Fachada
  * @date 2013
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
+
 #ifndef CLUTILS_H
 #define CLUTILS_H
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <CL/cl.h>
+#if defined(__APPLE__) || defined(__MACOSX)
+    #include <OpenCL/cl.h>
+#else
+    #include <CL/cl.h>
+#endif
 #include <glib.h>
 #include "gerrorf.h"
 #include "clerrors.h"
@@ -74,7 +78,7 @@
  * @{
  */
 
-/** Auxiliary maximum buffer size. */ 
+/** Auxiliary maximum buffer size. */
 #define CLU_MAX_AUX_BUFF 500
 /** Maximum number of platforms. */
 #define CLU_MAX_PLATFORMS 10
@@ -87,7 +91,7 @@
 
 /**
  * @brief Error codes.
- * */ 
+ * */
 enum clu_error_codes {
 	CLU_SUCCESS = 0,        /**< Successful operation. */
 	CLU_ERROR_NOALLOC = 1,  /**< Error code thrown when no memory allocation is possible. */
@@ -101,7 +105,7 @@ enum clu_error_codes {
 /** Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */
 #define CLU_UTILS_ERROR clu_utils_error_quark()
 
-/** 
+/**
  * @brief Kernel work group information.
  */
 typedef struct clu_kernel_work_group_info {
@@ -123,7 +127,7 @@ typedef struct clu_device_info {
 	char platform_name[CLU_MAX_AUX_BUFF]; /**< Platform name string. */
 } CLUDeviceInfo;
 
-/** 
+/**
  * @brief Complete information for an OpenCL execution session on a specific device.
  */
 typedef struct clu_zone {
@@ -138,15 +142,15 @@ typedef struct clu_zone {
 
 
 /**
- * @brief Pointer to function which will select device, if more than one 
+ * @brief Pointer to function which will select device, if more than one
  * is available.
- * 
+ *
  * Implementations of this function must always return a value between
  * 0 and @a numDevices.
- * 
+ *
  * @param devInfos Array of device information.
  * @param numDevices Number of devices on list.
- * @param extraArg Extra arguments which may be required by function 
+ * @param extraArg Extra arguments which may be required by function
  * implementations.
  * @return The array index of the selected device or -1 if no device is
  * selectable.
@@ -162,7 +166,7 @@ void clu_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi);
 /** @brief Get a string identifying the type of device. */
 char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strSize);
 
-/** @brief Create a new OpenCL zone, which will contain complete 
+/** @brief Create a new OpenCL zone, which will contain complete
  * information for an OpenCL execution session on a specific device. */
 CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err);
 
@@ -181,12 +185,12 @@ void clu_source_free(char* source);
 /** @brief Queries the user to select a device from a list. */
 cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
-/** @brief Implementation of ::clu_device_selector function which selects a 
+/** @brief Implementation of ::clu_device_selector function which selects a
  * device based on device information such as device name, device vendor
  * and platform name. */
 cl_uint clu_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
-/** @brief Resolves to error category identifying string, in this case 
+/** @brief Resolves to error category identifying string, in this case
  * an error in the OpenCL utilities library. */
 GQuark clu_utils_error_quark(void);
 
