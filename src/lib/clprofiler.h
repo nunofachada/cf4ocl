@@ -1,25 +1,25 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with cf4ocl. If not, see 
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with cf4ocl. If not, see
  * <http://www.gnu.org/licenses/>.
  * */
- 
-/** 
+
+/**
  * @file
  * @brief Function headers of a profiling tool for OpenCL.
- * 
+ *
  * @author Nuno Fachada
  * @date 2013
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
@@ -30,7 +30,11 @@
 #ifdef TESTING
 	#include "test_profiler.h"
 #else
-	#include <CL/cl.h>
+    #if defined(__APPLE__) || defined(__MACOSX)
+        #include <OpenCL/cl.h>
+    #else
+        #include <CL/cl.h>
+    #endif
 #endif
 
 #include <glib.h>
@@ -42,7 +46,7 @@
 
 /**
  * @brief Error codes.
- * */ 
+ * */
 enum profcl_error_codes {
 	PROFCL_SUCCESS = 0,        /**< Successful operation. */
 	PROFCL_ALLOC_ERROR = 1,    /**< Error code thrown when no memory allocation is possible. */
@@ -54,10 +58,10 @@ enum profcl_error_codes {
 /** Resolves to error category identifying string, in this case an error in the OpenCL profiler library. */
 #define PROFCL_ERROR profcl_error_quark()
 
-/** 
+/**
  * @brief Contains the profiling info of an OpenCL application.
  */
-typedef struct profcl_profile { 
+typedef struct profcl_profile {
 	GHashTable* unique_events;  /**< Hash table with keys equal to the unique events name, and values equal to a unique event id. */
 	GHashTable* command_queues; /**< Table of existing OpenCL command queues. */
 	GList* event_instants;      /**< Instants (start and end) of all events occuring in an OpenCL application. */
@@ -87,7 +91,7 @@ typedef enum {
 } ProfCLEvSort;
 
 /**
- * @brief Sorting strategy for aggregate event data instances. 
+ * @brief Sorting strategy for aggregate event data instances.
  */
 typedef enum {
 	PROFCL_AGGEVDATA_SORT_NAME, /**< Sort aggregate event data instances by name. */
@@ -95,9 +99,9 @@ typedef enum {
 }  ProfCLEvAggDataSort;
 
 /**
- * @brief Event instant. 
+ * @brief Event instant.
  */
-typedef struct profcl_evinst { 
+typedef struct profcl_evinst {
 	const char* eventName; /**< Name of event which the instant refers to (ProfCLEvInfo#eventName). */
 	guint id;              /**< Event instant ID. */
 	cl_ulong instant;      /**< Event instant in nanoseconds from current device time counter. */
@@ -146,12 +150,12 @@ void profcl_profile_start(ProfCLProfile* profile);
 /** @brief Indication that profiling sessions has ended. */
 void profcl_profile_stop(ProfCLProfile* profile);
 
-/** @brief If profiling has started but not stopped, returns the time 
- * since the profiling started. If profiling has been stopped, returns 
+/** @brief If profiling has started but not stopped, returns the time
+ * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
 gdouble profcl_time_elapsed(ProfCLProfile* profile);
 
-/** @brief Add OpenCL event to events profile, more specifically adds 
+/** @brief Add OpenCL event to events profile, more specifically adds
  * the start and end instants of the given event to the profile. */
 int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event ev, GError** err);
 
@@ -159,8 +163,8 @@ int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event 
  * instead of a separate event and name like profcl_profile_add(). */
 int profcl_profile_add_evname(ProfCLProfile* profile, ProfCLEvName event_with_name, GError** err);
 
-/** @brief Add OpenCL events to events profile, more specifically adds 
- * the start of ev1 and end of ev2 to the profile. */ 
+/** @brief Add OpenCL events to events profile, more specifically adds
+ * the start of ev1 and end of ev2 to the profile. */
 int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err);
 
 /** @brief Create new event instant. */
@@ -187,12 +191,12 @@ void profcl_aggregate_free(gpointer agg);
 /** @brief Print profiling info. */
 int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType, GError** err);
 
-/** @brief Export profiling info to a given stream. */ 
+/** @brief Export profiling info to a given stream. */
 int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err);
 
-/** @brief Helper function which exports profiling info to a given file, 
- * automatically opening and closing the file. Check the 
- * profcl_export_info() for more information. */ 
+/** @brief Helper function which exports profiling info to a given file,
+ * automatically opening and closing the file. Check the
+ * profcl_export_info() for more information. */
 int profcl_export_info_file(ProfCLProfile* profile, const char* filename, GError** err);
 
 /** @brief Set export options using a ::ProfCLExportOptions struct. */
@@ -205,5 +209,3 @@ void profcl_export_opts_set(ProfCLExportOptions export_opts);
 GQuark profcl_error_quark(void);
 
 #endif
-
-
