@@ -1,8 +1,8 @@
 Summary
 =======
 
-The C Framework for OpenCL, _cf4ocl_, is a pure C99 set of libraries 
-and utilities with the following goals:
+The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99 set 
+of libraries and utilities with the following goals:
 
 1. Promote the rapid development of OpenCL C programs.
 2. Assist in the benchmarking of OpenCL events, such as kernel execution 
@@ -18,8 +18,8 @@ iii), aim to verify that the library functions are working properly.
 Finally, the examples show how to integrate the library functions in 
 fully working OpenCL programs.
 
-_cf4ocl_ is tested in Linux and Windows, although, being pure C99, it 
-should compile on other platforms, as long as the dependencies, 
+_cf4ocl_ works in Linux, Windows and Mac OSX, although, being pure 
+C99, it should compile on other platforms, as long as the dependencies, 
 [GLib][] and [OpenCL][], are met. The reference compiler is GCC with 
 `-Wall` and `-Wextra` flags activated. The code is verified with 
 [cppcheck][] and is fully commented. API documentation can be generated 
