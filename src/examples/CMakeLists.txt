@@ -7,7 +7,6 @@ set(matmult_EXTRALIBS m)
 
 # Use OpenMP in matmult example?
 find_package(OpenMP)
-option(USE_OPENMP "Use OpenMP in matmult example" ON)
 
 # Add common examples library
 add_library(exp_common exp_common.c)
@@ -32,7 +31,7 @@ endforeach(EXAMPLE)
 set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
 
 # Set specific matmult properties
-if (USE_OPENMP AND OPENMP_FOUND)
+if (OPENMP_FOUND)
 	set_target_properties(matmult PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DCF4OCL_USE_OPENMP" LINK_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
