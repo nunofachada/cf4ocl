@@ -5,8 +5,9 @@ SET(EXAMPLES matmult bank_conflicts)
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} exp_common)
 set(matmult_EXTRALIBS m)
 
-# OpenMP required by matmult example
-find_package(OpenMP REQUIRED)
+# Use OpenMP in matmult example?
+find_package(OpenMP)
+option(USE_OPENMP "Use OpenMP in matmult example" ON)
 
 # Add common examples library
 add_library(exp_common exp_common.c)
@@ -27,14 +28,13 @@ foreach(EXAMPLE ${EXAMPLES})
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl DESTINATION bin)
 endforeach(EXAMPLE)
 
-# Set specific matmult properties
-set_target_properties(matmult PROPERTIES COMPILE_FLAGS ${OpenMP_C_FLAGS} LINK_FLAGS ${OpenMP_C_FLAGS})
-
 # Set examples version
 set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
 
+# Set specific matmult properties
+if (USE_OPENMP AND OPENMP_FOUND)
+	set_target_properties(matmult PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DCF4OCL_USE_OPENMP" LINK_FLAGS ${OpenMP_C_FLAGS})
+endif()
+
 # Add a target which builds all examples
 add_custom_target(examples DEPENDS ${EXAMPLES})
-
-
-

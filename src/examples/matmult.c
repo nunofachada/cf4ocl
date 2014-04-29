@@ -720,6 +720,8 @@ int main(int argc, char *argv[])
 		CLEXP_FAIL, 
 		error_handler, 
 		"Unable to create host matrix C (OpenMP test).");
+		
+	/* Get number of processors available to OpenMP. */
 
 	/* Start basic timming / profiling. */
 	profcl_profile_start(profile_cpu);
@@ -727,7 +729,9 @@ int main(int argc, char *argv[])
 	if (!IS_AAT(kernel_id)) {
 		/* C=AB */
 		/* The pragma below makes the loop parallel with threads = number of cores */
+#ifdef CF4OCL_USE_OPENMP		
 		#pragma omp parallel for
+#endif
 		for (int col = 0; col < b_dim[0]; col++) {
 			for (int row = 0; row < a_dim[1]; row++) {
 				matrixC_test[row * b_dim[0] + col] = 0;
@@ -742,7 +746,9 @@ int main(int argc, char *argv[])
 	} else {
 		/* C=AA^T */
 		/* The pragma below makes the loop parallel with threads = number of cores */
+#ifdef CF4OCL_USE_OPENMP		
 		#pragma omp parallel for
+#endif
 		for (int row = 0; row < a_dim[1]; row++) {
 			for (int col = 0; col < a_dim[1]; col++) {
 				matrixC_test[row * a_dim[1] + col] = 0;
@@ -770,9 +776,19 @@ int main(int argc, char *argv[])
 	}
 	
 	printf("\n   ============================== Results ==================================\n\n");
-	printf("     Total CPU Time (OpenMP)     : %fs\n", 
+	printf("     Total CPU Time %s: %fs\n", 
+#ifdef CF4OCL_USE_OPENMP	
+		"(Parallel)   ",
+#else
+		"(Serial)     ",
+#endif
 		profcl_time_elapsed(profile_cpu));
-	printf("     SpeedUp (OpenCL vs. OpenMP) : %fx\n", 
+	printf("     SpeedUp (OpenCL vs. %s) : %fx\n",
+#ifdef CF4OCL_USE_OPENMP	
+		"OpenMP",
+#else
+		"1x CPU",
+#endif
 		profcl_time_elapsed(profile_cpu) / profcl_time_elapsed(profile_dev));
 	printf("     Error (Device-CPU)          : %d\n", error);
 	printf("\n");

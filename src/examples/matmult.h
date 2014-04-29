@@ -26,8 +26,11 @@
 
 #ifndef MATMULT_H
 #define MATMULT_H
- 
+
+#ifdef CF4OCL_USE_OPENMP
 #include <omp.h>
+#endif
+
 #include "exp_common.h"
 
 /**
