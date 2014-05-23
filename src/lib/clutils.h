@@ -173,6 +173,11 @@ CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePropert
 /** @brief Create an OpenCL program given a set of source kernel files. */
 int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err);
 
+/** @brief Create an OpenCL program given a set of source kernel files. */
+cl_program clu_program_create_indep(cl_context context, 
+	cl_device_id device, char** kernelFiles, cl_uint numKernelFiles, 
+	char* compilerOpts, GError **err);
+
 /** @brief Free a previously created OpenCL zone. */
 void clu_zone_free(CLUZone* zone);
 

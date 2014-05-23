@@ -578,12 +578,56 @@ finish:
  */
 int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err) {
 
+	/* Function return status. */
+	int ret_status;
+	
+	/* Create program. */
+	zone->program = clu_program_create_indep(
+		zone->context, zone->device_info.device_id, kernelFiles, 
+		numKernelFiles, compilerOpts, err);
+	
+	/* Check for errors. */
+	gef_if_error_goto(*err, GEF_USE_GERROR, ret_status, error_handler);
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	ret_status = CLU_SUCCESS;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+	
+	/* Return. */
+	return ret_status;
+}
+
+/** 
+ * @brief Create an OpenCL program given a set of source kernel files.
+ * Returns an OpenCL program object instead of returning an OpenCL zone.
+ * 
+ * @param context OpenCL context.
+ * @param device OpenCL device.
+ * @param kernelFiles Array of strings identifying filenames containing kernels.
+ * @param numKernelFiles Number of strings identifying filenames containing kernels.
+ * @param compilerOpts OpenCL compiler options.
+ * @param err Error structure, to be populated if an error occurs.
+ * @return @link clu_error_codes::CLU_SUCCESS @endlink operation
+ * successfully completed or another value of #clu_error_codes if an 
+ * error occurs.
+ */
+cl_program clu_program_create_indep(cl_context context, 
+	cl_device_id device, char** kernelFiles, cl_uint numKernelFiles, 
+	char* compilerOpts, GError **err) {
+
 	/* Helper variables */
 	cl_int ocl_status, ocl_build_status;
-	int ret_status;
 	char * build_log = NULL;
 	size_t logsize;
 	char** source = NULL;
+	cl_program program;
 	
 	/* Import kernels */
 	source = (char**) malloc(numKernelFiles * sizeof(char*));
@@ -591,18 +635,18 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 		*err, 
 		CLU_UTILS_ERROR, 
 		NULL == source, 
-		ret_status = CLU_ERROR_NOALLOC, 
+		CLU_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory for kernels source file.");
 	for (unsigned int i = 0; i < numKernelFiles; i++) { source[i] = NULL; }
 	for (unsigned int i = 0; i < numKernelFiles; i++) {
 		source[i] = clu_source_load(kernelFiles[i], err);
-		gef_if_error_goto(*err, GEF_USE_GERROR, ret_status, error_handler);
+		gef_if_error_goto(*err, GEF_USE_STATUS, ocl_status, error_handler);
 	}
 	
 	/* Load kernels sources and create program */
-	cl_program program = clCreateProgramWithSource(
-		zone->context, 
+	program = clCreateProgramWithSource(
+		context, 
 		numKernelFiles, 
 		(const char**) source, 
 		NULL, 
@@ -611,7 +655,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 		*err, 
 		CLU_UTILS_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CLU_OCL_ERROR, 
+		CLU_OCL_ERROR, 
 		error_handler, 
 		"Create program with source (OpenCL error %d :%s).", 
 		ocl_status,
@@ -621,7 +665,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 	ocl_build_status = clBuildProgram(
 		program, 
 		1, 
-		&zone->device_info.device_id, 
+		&device, 
 		compilerOpts, 
 		NULL, 
 		NULL);
@@ -631,7 +675,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 		/* Get build log size. */
 		ocl_status = clGetProgramBuildInfo(
 			program, 
-			zone->device_info.device_id, 
+			device, 
 			CL_PROGRAM_BUILD_LOG, 
 			0, 
 			NULL, 
@@ -640,7 +684,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 			*err, 
 			CLU_UTILS_ERROR, 
 			CL_SUCCESS != ocl_status, 
-			ret_status = CLU_OCL_ERROR, 
+			CLU_OCL_ERROR, 
 			error_handler, 
 			"Error getting program build info (log size, OpenCL error %d: %s) after program failed to build (OpenCL error %d: %s).", 
 			ocl_status,
@@ -653,7 +697,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 			*err, 
 			CLU_UTILS_ERROR, 
 			NULL == build_log, 
-			ret_status = CLU_ERROR_NOALLOC, 
+			CLU_ERROR_NOALLOC, 
 			error_handler, 
 			"Unable to allocate memory for build log after program failed to build with OpenCL error %d (%s).", 
 			ocl_build_status,
@@ -661,7 +705,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 		/* Get build log. */
 		ocl_status = clGetProgramBuildInfo(
 			program, 
-			zone->device_info.device_id, 
+			device, 
 			CL_PROGRAM_BUILD_LOG, 
 			logsize, 
 			build_log, 
@@ -670,7 +714,7 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 			*err, 
 			CLU_UTILS_ERROR, 
 			CL_SUCCESS != ocl_status, 
-			ret_status = CLU_OCL_ERROR, 
+			CLU_OCL_ERROR, 
 			error_handler, 
 			"Error getting program build info (build log, OpenCL error %d: %s) after program failed to build (OpenCL error %d: %s).", 
 			ocl_status,
@@ -682,23 +726,22 @@ int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles
 			*err, 
 			CLU_UTILS_ERROR, 
 			1, 
-			ret_status = CLU_OCL_ERROR, 
+			CLU_OCL_ERROR, 
 			error_handler, 
 			"Failed to build program (OpenCL error %d: %s). \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", 
 			ocl_build_status, 
 			clerror_get(ocl_build_status),
 			build_log);
 	}
-	zone->program = program;
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	ret_status = CLU_SUCCESS;
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
+	program = NULL;
 
 finish:	
 
@@ -715,8 +758,8 @@ finish:
 		free(build_log);
 	}
 	
-	/* Return. */
-	return ret_status;
+	/* Return program. */
+	return program;
 }
 
 /** 
