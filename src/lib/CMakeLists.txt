@@ -1,5 +1,5 @@
 # Sources required for building library
-set(SRC clerrors.c clprofiler.c clutils.c)
+set(SRC clerrors.c clprofiler.c clutils.c cltypes.c)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
