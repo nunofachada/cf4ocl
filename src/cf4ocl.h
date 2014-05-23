@@ -26,9 +26,10 @@
 #ifndef CF4OCL_H
 #define CF4OCL_H
  
+#include <cf4ocl/gerrorf.h>
 #include <cf4ocl/clerrors.h>
 #include <cf4ocl/clutils.h>
 #include <cf4ocl/clprofiler.h>
-#include <cf4ocl/gerrorf.h>
+#include <cf4ocl/cltypes.h>
 
 #endif

@@ -21,7 +21,7 @@
  * @brief Use and pass abstract OpenCL types in C functions.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
