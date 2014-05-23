@@ -664,8 +664,8 @@ cl_program clu_program_create_indep(cl_context context,
 	/* Perform runtime source compilation of program */
 	ocl_build_status = clBuildProgram(
 		program, 
-		1, 
-		&device, 
+		device ? 1 : 0, 
+		device ? &device : NULL, 
 		compilerOpts, 
 		NULL, 
 		NULL);
