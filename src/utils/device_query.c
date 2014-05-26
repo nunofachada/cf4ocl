@@ -26,7 +26,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
-#include "clutils.h"
+#include "manager.h"
 
 /** Maximum number of devices to query. */
 #define MAX_DEVICES_QUERY 10

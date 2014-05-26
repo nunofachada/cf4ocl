@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gerrorf.h"
-#include "clerrors.h"
+#include "errors.h"
 
 /**
  * @brief Error codes.

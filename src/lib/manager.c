@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "clutils.h"
+#include "manager.h"
 
 /** 
  * @brief Private helper function, prints a list of available devices. 

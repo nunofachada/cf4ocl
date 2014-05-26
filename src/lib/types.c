@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "cltypes.h"
+#include "types.h"
 
 struct cf4_type_info {
 	const char* name;

@@ -31,10 +31,10 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "clprofiler.h"
-#include "clutils.h"
+#include "profiler.h"
+#include "manager.h"
 #include "gerrorf.h"
-#include "clerrors.h"
+#include "errors.h"
 
 /** Helper macro to convert int to string at compile time. */
 #define STR_HELPER(x) #x

@@ -25,7 +25,7 @@
  * 
  */
 
-#include "clutils.h"
+#include "manager.h"
 
 /** 
  * @brief Kernel info main function.

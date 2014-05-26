@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#include "clprofiler.h"
+#include "profiler.h"
 
 /* Default export options. */
 static ProfCLExportOptions export_options = {

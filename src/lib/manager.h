@@ -38,7 +38,7 @@
 #endif
 #include <glib.h>
 #include "gerrorf.h"
-#include "clerrors.h"
+#include "errors.h"
 
 /**
  * @defgroup CLU_DEVICE_TYPE_STR Device type string descriptions.

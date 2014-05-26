@@ -6,7 +6,7 @@ set(COMMON_LIBS ${GLIB_LIBRARIES})
 set(test_profiler_EXTRALIBS clprofiler)
 
 # Add clprofiler library for testing
-add_library(clprofiler ../lib/clprofiler.c ../lib/clerrors.c)
+add_library(clprofiler ../lib/profiler.c ../lib/errors.c)
 set_target_properties(clprofiler PROPERTIES COMPILE_FLAGS "-DTESTING -I${CMAKE_CURRENT_LIST_DIR}")
 
 # Add a target for each test

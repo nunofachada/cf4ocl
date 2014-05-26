@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "clerrors.h"
+#include "errors.h"
 
 static const char* cl_errors[] = {
 	"Successful operation", /* CL_SUCCESS - 0 */
