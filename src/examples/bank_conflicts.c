@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to create bankconf kernel (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* Start basic timming / profiling. */
 	profcl_profile_start(profile);
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to create device buffer (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 	
 	/* ************************* */
 	/* Initialize device buffers */
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to write data to device (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* ************************************************** */
 	/* Determine and print required memory and work sizes */
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable set arg. 0 of bankconf kernel (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	status = clSetKernelArg(
 		kernel_bankconf, 1, localMemSizeInBytes, NULL);
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable set arg. 1 of bankconf kernel (OpenCL error %d: %s).",
 		status,
-		clerror_get(status));
+		cl4_err(status));
 	
 	status = clSetKernelArg(
 		kernel_bankconf, 2, sizeof(cl_uint), (void *) &stride);
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable set arg. 2 of bankconf kernel (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* ************ */
 	/*  Run kernel! */
@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to execute bankconf kernel (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	status = clFinish(zone->queues[0]);
 	gef_if_error_create_goto(
@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"OpenCL error %d (%s) in clFinish", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* ******************** */
 	/*  Show profiling info */

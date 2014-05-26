@@ -42,13 +42,13 @@ typedef enum {
 	CF4_DOUBLE = 8
 } CF4CLType;
 
-typedef struct cf4_type_info CF4CLTypeInfo;
+typedef struct cl4_type_info CF4CLTypeInfo;
 
 /** @brief Return OpenCL type name. */
-const char* cf4_type_name_get(CF4CLType type);
+const char* cl4_type_name_get(CF4CLType type);
 
 /** @brief Return OpenCL type size in bytes. */
-int cf4_type_sizeof(CF4CLType type);
+int cl4_type_sizeof(CF4CLType type);
 
 #endif
 

@@ -583,7 +583,7 @@ constants (which map the error codes), or can just return or print the
 error code, and then look at the [cl.h] header to determine what error
 occurred. _CL Errors_ allows for a third option: convert the error code
 into a human readable string. The usage is very simple, consisting of
-a single call to the `clerror_get()` function, passing the error code
+a single call to the `cl4_err()` function, passing the error code
 as an argument:
 
 ```c
@@ -591,7 +591,7 @@ cl_int status;
 ...
 status = clFinish(some_command_queue);
 if (status != CL_SUCCESS) {
-	printf("An error occurred: %s\n", clerror_get(status));
+	printf("An error occurred: %s\n", cl4_err(status));
 	...
 }
 ...

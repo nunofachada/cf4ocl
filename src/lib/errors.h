@@ -29,6 +29,6 @@
 #define CLERRORS_H
 
 /** @brief Convert OpenCL error code to a readable string. */
-const char* clerror_get(int code);
+const char* cl4_err(int code);
 
 #endif

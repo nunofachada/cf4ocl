@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
 		"Unable to create '%s' kernel (OpenCL error %d: %s)", 
 		kernelName,
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* ********************************** */	
 	/* Create and initialize host buffers */
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to create device buffer for matrix A (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 	
 	/* Matrix B */
 	if (!IS_AAT(kernel_id)) {
@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
 			error_handler, 
 			"Unable to create device buffer for matrix B (OpenCL error %d: %s).", 
 			status,
-			clerror_get(status));
+			cl4_err(status));
 	}
 
 	/* Matrix C */
@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to create device buffer for matrix C (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 	
 	/* ************************* */
 	/* Initialize device buffers */
@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to write matrix A on device (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* Copy matrix B to device. */
 	if (!IS_AAT(kernel_id)) {
@@ -409,7 +409,7 @@ int main(int argc, char *argv[])
 			error_handler, 
 			"Unable to write matrix B on device (OpenCL error %d: %s).", 
 			status,
-			clerror_get(status));
+			cl4_err(status));
 	}
 	
 	/* ******************** */
@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
 		"Unable set arg 0 of '%s' kernel (OpenCL error %d: %s).", 
 		kernelName,
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	if (!IS_AAT(kernel_id)) {
 		/* Arguments only for C=AB */
@@ -480,7 +480,7 @@ int main(int argc, char *argv[])
 			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
 			kernelName, 
 			status,
-			clerror_get(status));
+			cl4_err(status));
 
 		status = clSetKernelArg(
 			kernel_matmult, 2, sizeof(cl_mem), (void *) &matrixC_device);
@@ -493,7 +493,7 @@ int main(int argc, char *argv[])
 			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
 			kernelName, 
 			status,
-			clerror_get(status));
+			cl4_err(status));
 		
 		status = clSetKernelArg(
 			kernel_matmult, 3, sizeof(cl_int2), (void *) &a_dim);
@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
 			"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
 			kernelName,
 			status, 
-			clerror_get(status));
+			cl4_err(status));
 		
 		status = clSetKernelArg(
 			kernel_matmult, 4, sizeof(cl_int2), (void *) &b_dim);
@@ -519,7 +519,7 @@ int main(int argc, char *argv[])
 			"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).",
 			kernelName,
 			status,
-			clerror_get(status));
+			cl4_err(status));
 		
 		if (kernel_id >= 1) {
 			status = clSetKernelArg(
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 				"Unable set arg 5 of '%s' kernel (OpenCL error %d: %s).", 
 				kernelName,
 				status, 
-				clerror_get(status));
+				cl4_err(status));
 		}
 		if (kernel_id == 2) {
 			status = clSetKernelArg(
@@ -547,7 +547,7 @@ int main(int argc, char *argv[])
 				"Unable set arg 6 of '%s' kernel (OpenCL error %d: %s).",
 				kernelName,
 				status, 
-				clerror_get(status));
+				cl4_err(status));
 		}
 	} else {
 		/* Arguments only for C=AA^T */
@@ -562,7 +562,7 @@ int main(int argc, char *argv[])
 			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
 			kernelName, 
 			status,
-			clerror_get(status));
+			cl4_err(status));
 		
 		status = clSetKernelArg(
 			kernel_matmult, 2, sizeof(cl_int2), (void *) &a_dim);
@@ -575,7 +575,7 @@ int main(int argc, char *argv[])
 			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
 			kernelName,
 			status,
-			clerror_get(status));
+			cl4_err(status));
 		
 		if (kernel_id == 4) {
 			status = clSetKernelArg(
@@ -589,7 +589,7 @@ int main(int argc, char *argv[])
 				"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
 				kernelName, 
 				status,
-				clerror_get(status));
+				cl4_err(status));
 			status = clSetKernelArg(
 				kernel_matmult, 4, localMemSizeBInBytes, NULL);
 			gef_if_error_create_goto(
@@ -601,7 +601,7 @@ int main(int argc, char *argv[])
 				"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).", 
 				kernelName, 
 				status,
-				clerror_get(status));
+				cl4_err(status));
 		}
 
 	}
@@ -630,7 +630,7 @@ int main(int argc, char *argv[])
 		"Error while executing kernel '%s' (OpenCL error %d: %s).", 
 		kernelName,
 		status, 
-		clerror_get(status));
+		cl4_err(status));
 
 	/* *********************** */
 	/*  Get result from device */
@@ -655,7 +655,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Unable to read matrix C from device (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* Finish execution. */
 	status = clFinish(zone->queues[0]); 
@@ -667,7 +667,7 @@ int main(int argc, char *argv[])
 		error_handler, 
 		"Error on clFinish() function (OpenCL error %d: %s).", 
 		status,
-		clerror_get(status));
+		cl4_err(status));
 
 	/* ************************************** */
 	/*  Manage profiling of OpenCL operations */

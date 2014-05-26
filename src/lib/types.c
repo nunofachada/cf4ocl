@@ -27,12 +27,12 @@
  
 #include "types.h"
 
-struct cf4_type_info {
+struct cl4_type_info {
 	const char* name;
 	const int size;
 };
 
-static const CF4CLTypeInfo cf4_types[] = {
+static const CF4CLTypeInfo cl4_types[] = {
 	
 	{"char",   1}, /* CF4_CHAR   = 0 */
 	{"uchar",  1}, /* CF4_UCHAR  = 1 */
@@ -53,10 +53,10 @@ static const CF4CLTypeInfo cf4_types[] = {
  * @param type Type constant.
  * @return A string containing the OpenCL type name.
  * */
-const char* cf4_type_name_get(CF4CLType type) {
+const char* cl4_type_name_get(CF4CLType type) {
 	g_assert_cmpint(type, <=, CF4_DOUBLE);
 	g_assert_cmpint(type, >=, CF4_CHAR);
-	return cf4_types[type].name;
+	return cl4_types[type].name;
 }
 
 /** 
@@ -65,8 +65,8 @@ const char* cf4_type_name_get(CF4CLType type) {
  * @param type Type constant.
  * @return The size of the OpenCL type in bytes.
  * */
-int cf4_type_sizeof(CF4CLType type) {
+int cl4_type_sizeof(CF4CLType type) {
 	g_assert_cmpint(type, <=, CF4_DOUBLE);
 	g_assert_cmpint(type, >=, CF4_CHAR);
-	return cf4_types[type].size;
+	return cl4_types[type].size;
 }

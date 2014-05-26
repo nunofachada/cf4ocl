@@ -212,7 +212,7 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		error_handler, 
 		"Get start event command queue: OpenCL error %d (%s).", 
 		ocl_status,
-		clerror_get(ocl_status));
+		cl4_err(ocl_status));
 	
 	/* Get event start instant. */
 	ocl_status = clGetEventProfilingInfo(
@@ -229,7 +229,7 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		error_handler, 
 		"Get event start instant: OpenCL error %d (%s).", 
 		ocl_status,
-		clerror_get(ocl_status));
+		cl4_err(ocl_status));
 	
 	/* Check if start instant is the oldest instant. If so, keep it. */
 	if (instant < profile->startTime)
@@ -269,7 +269,7 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		error_handler, 
 		"Get end event command queue: OpenCL error %d (%s).", 
 		ocl_status,
-		clerror_get(ocl_status));
+		cl4_err(ocl_status));
 
 	/* Get event end instant. */
 	ocl_status = clGetEventProfilingInfo(
@@ -285,7 +285,7 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		error_handler, 
 		"Get event end instant: OpenCL error %d (%s).", 
 		ocl_status,
-		clerror_get(ocl_status))
+		cl4_err(ocl_status))
 
 	/* Add event end instant to list of event instants. */
 	evinst_end = profcl_evinst_new(
