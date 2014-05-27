@@ -204,11 +204,11 @@ int main(int argc, char *argv[])
 	/* Get the required CL zone. */
 	if ((dev_idx != -1) || ((dev_name == NULL) && (platf_name ==NULL))) {
 		/* Select device by index or user choice. */
-		zone = clu_zone_new(
+		zone = cl4_man_zone_new(
 			CL_DEVICE_TYPE_ALL, 
 			1, 
 			CL_QUEUE_PROFILING_ENABLE, 
-			clu_menu_device_selector, 
+			cl4_man_menu_device_selector, 
 			(dev_idx != -1 ? &dev_idx : NULL), 
 			&err);
 	} else {
@@ -225,11 +225,11 @@ int main(int argc, char *argv[])
 			g_strlcpy(deviceInfo.platform_name, platf_name, CLU_MAX_AUX_BUFF);
 		else 
 			deviceInfo.platform_name[0] = '\0';
-		zone = clu_zone_new(
+		zone = cl4_man_zone_new(
 			CL_DEVICE_TYPE_ALL, 
 			1, 
 			CL_QUEUE_PROFILING_ENABLE, 
-			clu_info_device_selector, 
+			cl4_man_info_device_selector, 
 			&deviceInfo, 
 			&err);
 	}
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 	kernelPath = clexp_kernelpath_get(kernelFiles[0], argv[0]);
 	
 	/* Build program. */
-	status = clu_program_create(zone, &kernelPath, 1, compiler_opts, &err);
+	status = cl4_man_program_create(zone, &kernelPath, 1, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Kernel */
@@ -886,7 +886,7 @@ cleanup:
 	if (matrixC_device) clReleaseMemObject(matrixC_device);
 
 	/* Free OpenCL zone */
-	if (zone) clu_zone_free(zone);
+	if (zone) cl4_man_zone_free(zone);
 
 	/* Free host resources */
 	if (matrixA_host) matmult_matrix_free(matrixA_host);

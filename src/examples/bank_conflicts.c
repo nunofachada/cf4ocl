@@ -146,11 +146,11 @@ int main(int argc, char *argv[])
 		"Unable to create profiler object.");
 	
 	/* Get the required CL zone. */
-	zone = clu_zone_new(
+	zone = cl4_man_zone_new(
 		CL_DEVICE_TYPE_GPU, 
 		1, 
 		CL_QUEUE_PROFILING_ENABLE, 
-		clu_menu_device_selector, 
+		cl4_man_menu_device_selector, 
 		(dev_idx != -1 ? &dev_idx : NULL), 
 		&err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 	kernelPath = clexp_kernelpath_get(kernelFiles[0], argv[0]);
 	
 	/* Build program. */
-	status = clu_program_create(zone, &kernelPath, 1, compiler_opts, &err);
+	status = cl4_man_program_create(zone, &kernelPath, 1, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Kernel */
@@ -384,7 +384,7 @@ cleanup:
 	if (data_device) clReleaseMemObject(data_device);
 
 	/* Free OpenCL zone */
-	if (zone) clu_zone_free(zone);
+	if (zone) cl4_man_zone_free(zone);
 
 	/* Free host resources */
 	if (data_host) free(data_host);

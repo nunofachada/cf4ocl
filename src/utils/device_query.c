@@ -111,7 +111,7 @@ int main(int argc, char ** argv) {
 			status = clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(cl_device_type), &dtypeaux, NULL);
 			gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get device type.", status);
 
-			printf("\t           Type: %s\n", clu_device_type_str_get(dtypeaux, 0, pbuff, MAX_INFO_STRING));
+			printf("\t           Type: %s\n", cl4_man_device_type_str_get(dtypeaux, 0, pbuff, MAX_INFO_STRING));
 
 			/* OpenCL C version. */
 			status = clGetDeviceInfo(devices[j], CL_DEVICE_OPENCL_C_VERSION, sizeof(pbuff), pbuff, NULL);

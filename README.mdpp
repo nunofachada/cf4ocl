@@ -69,17 +69,17 @@ _GError framework_, used internally by _CL Utils_ and _CL Profiler_.
 
 The _CL Utils_ section of the library allows the initialization of 
 OpenCL environment objects, such as platform, device, context, 
-command queues and devices, with a single function, `clu_zone_new`, thus
+command queues and devices, with a single function, `cl4_man_zone_new`, thus
 avoiding the typical boilerplate code required for this setup. Device
 selection is decoupled from the OpenCL environment setup, being 
-performed with a function passed as a parameter to `clu_zone_new`. The
+performed with a function passed as a parameter to `cl4_man_zone_new`. The
 library supplies functions to accomplish this task automatically or 
 through user interaction, although the client programmer can supply its
 own function with the required selection criteria. The destruction of 
 the OpenCL environment, i.e. the removal of the respective objects from 
-memory, is also achieved with one function, namely `clu_zone_free`.
+memory, is also achieved with one function, namely `cl4_man_zone_free`.
 
-Kernel compilation is simplified by the `clu_program_create` function,
+Kernel compilation is simplified by the `cl4_man_program_create` function,
 which can be used to build OpenCL device programs by passing an array of 
 filenames containing kernel code.
 
@@ -310,11 +310,11 @@ CL Utils does not wrap any other OpenCL tasks, such as kernel execution
 or data transfers, which can be performed directly with the respective 
 OpenCL functions.
 
-The first task is performed with the `clu_zone_new` function, which
+The first task is performed with the `cl4_man_zone_new` function, which
 has the following prototype:
 
 ```c
-CLUZone* clu_zone_new(
+CLUZone* cl4_man_zone_new(
     /* Type of device, e.g. CL_DEVICE_TYPE_CPU, CL_DEVICE_TYPE_GPU, etc. */
     cl_uint deviceType,
     /* Number of command queues. */
@@ -322,7 +322,7 @@ CLUZone* clu_zone_new(
     /* Command queue properties, e.g. CL_QUEUE_PROFILING_ENABLE, etc. */
     cl_int queueProperties,
     /* Pointer to a device selector function. */
-    clu_device_selector devSel, 
+    cl4_man_device_selector devSel, 
     /* Extra arguments for device selector function. */
     void* dsExtraArg, 
     /* GLib's error reporting object (may be ignored). */
@@ -332,12 +332,12 @@ CLUZone* clu_zone_new(
 
 The returned `CLUZone` object will contain the context, command queues,
 device information and an uninitialized kernel program. The program is
-initialized with the `clu_program_create` function as part of the second 
+initialized with the `cl4_man_program_create` function as part of the second 
 task. This function has the following prototype:
 
 ```c
-cl_int clu_program_create(
-    /* The CLUZone object return by the clu_zone_new function. */
+cl_int cl4_man_program_create(
+    /* The CLUZone object return by the cl4_man_zone_new function. */
     CLUZone* zone, 
     /* List of files containing the source code for the kernels. */
     const char** kernelFiles, 
@@ -368,13 +368,13 @@ int main(int argc, char* argv[])
     /* command queue, no command queue options, if more than one  */ 
     /* GPU is available show selection menu to user, and ignore   */
     /* error reporting. */
-    zone = clu_zone_new(CL_DEVICE_TYPE_GPU, 1, 0, clu_menu_device_selector, NULL, NULL);
+    zone = cl4_man_zone_new(CL_DEVICE_TYPE_GPU, 1, 0, cl4_man_menu_device_selector, NULL, NULL);
     ...
 
     /* Create (compile) an OpenCL kernel program using three OpenCL */
     /* source files, no compiler options, and ignoring error        */
     /* reporting.                                                   */
-    status = clu_program_create(zone, oclSources, 3, NULL, NULL);
+    status = cl4_man_program_create(zone, oclSources, 3, NULL, NULL);
     ...
 
     /* Perform OpenCL tasks such as data transfer and kernel execution */
@@ -386,18 +386,18 @@ int main(int argc, char* argv[])
     /* This object should only be released after all OpenCL objects    */
     /* not controlled by CL Utils (kernels, events, memory objects)    */
     /* are released.                                                   */
-    clu_zone_free(zone);
+    cl4_man_zone_free(zone);
 
     ...
 
 }
 ```
 
-The fourth parameter of `clu_zone_new` is a pointer to a device 
+The fourth parameter of `cl4_man_zone_new` is a pointer to a device 
 selector function, which has the following definition:
 
 ```c
-typedef cl_uint (*clu_device_selector)(
+typedef cl_uint (*cl4_man_device_selector)(
     /* Array of available devices and respective information. */
     CLUDeviceInfo* devInfos,
     /* Number of devices in array. */
@@ -409,10 +409,10 @@ typedef cl_uint (*clu_device_selector)(
 
 CL Utils provides two ready to use device selector functions:
 
-* `clu_menu_device_selector` - If more than one device exists, presents
+* `cl4_man_menu_device_selector` - If more than one device exists, presents
 a selection menu to the user. If extra argument is given it should be 
 the array index of the preferred device.
-* `clu_info_device_selector` - Selects a device by device name, device
+* `cl4_man_info_device_selector` - Selects a device by device name, device
 vendor and/or platform name, any/all of which are given in the extra
 argument.
 

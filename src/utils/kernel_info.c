@@ -60,11 +60,11 @@ int main(int argc, char *argv[])
 	/* ********************************************* */
 	
 	/* Get the required CL zone. */
-	zone = clu_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, clu_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
+	zone = cl4_man_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, cl4_man_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
 	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 	
 	/* Build program. */
-	status = clu_program_create(zone, &argv[1], 1, NULL, &err);
+	status = cl4_man_program_create(zone, &argv[1], 1, NULL, &err);
 	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 
 	/* Kernel */
@@ -75,10 +75,10 @@ int main(int argc, char *argv[])
 	/*  Get and print kernel info  */
 	/* *************************** */
 	
-	status = clu_workgroup_info_get(kernel, zone->device_info.device_id, &kwgi, &err);
+	status = cl4_man_workgroup_info_get(kernel, zone->device_info.device_id, &kwgi, &err);
 	gef_if_error_create_goto(err, CLU_UTILS_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get kernel information.", status);
 	
-	clu_workgroup_info_print(&kwgi);	
+	cl4_man_workgroup_info_print(&kwgi);	
 	
 	/* ************** */
 	/* Error handling */
@@ -106,7 +106,7 @@ cleanup:
 	if (kernel) clReleaseKernel(kernel);
 
 	/* Free OpenCL zone */
-	if (zone) clu_zone_free(zone);
+	if (zone) cl4_man_zone_free(zone);
 	
 	/* Return status. */
 	return status;

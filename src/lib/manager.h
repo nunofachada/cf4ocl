@@ -92,7 +92,7 @@
 /**
  * @brief Error codes.
  * */
-enum clu_error_codes {
+enum cl4_man_error_codes {
 	CLU_SUCCESS = 0,        /**< Successful operation. */
 	CLU_ERROR_NOALLOC = 1,  /**< Error code thrown when no memory allocation is possible. */
 	CLU_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
@@ -103,12 +103,12 @@ enum clu_error_codes {
 };
 
 /** Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */
-#define CLU_UTILS_ERROR clu_utils_error_quark()
+#define CLU_UTILS_ERROR cl4_man_utils_error_quark()
 
 /**
  * @brief Kernel work group information.
  */
-typedef struct clu_kernel_work_group_info {
+typedef struct cl4_man_kernel_work_group_info {
 	size_t preferred_work_group_size_multiple; /**< Preferred multiple of workgroup size for launch. */
 	size_t compile_work_group_size[3];         /**< Work-group size specified by the @code __attribute__((reqd_work_gr oup_size(X, Y, Z))) @endcode qualifier. If the work-group size is not specified using the above attribute qualifier (0, 0, 0) is returned. */
 	size_t max_work_group_size;                /**< Maximum work-group size that can be used to execute a kernel on a specific device. */
@@ -119,7 +119,7 @@ typedef struct clu_kernel_work_group_info {
 /**
  * @brief Information about OpenCL device.
  */
-typedef struct clu_device_info {
+typedef struct cl4_man_device_info {
 	cl_device_id device_id;               /**< Device ID. */
 	cl_platform_id platform_id;           /**< Platform ID. */
 	char device_name[CLU_MAX_AUX_BUFF];   /**< Device name string. */
@@ -130,7 +130,7 @@ typedef struct clu_device_info {
 /**
  * @brief Complete information for an OpenCL execution session on a specific device.
  */
-typedef struct clu_zone {
+typedef struct cl4_man_zone {
 	cl_uint device_type;       /**< OpenCL device type. */
 	cl_uint cu;                /**< Compute units of device. */
 	cl_context context;        /**< OpenCL context. */
@@ -155,48 +155,48 @@ typedef struct clu_zone {
  * @return The array index of the selected device or -1 if no device is
  * selectable.
  */
-typedef cl_uint (*clu_device_selector)(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+typedef cl_uint (*cl4_man_device_selector)(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Get kernel workgroup info. */
-int clu_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err);
+int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err);
 
 /** @brief Print kernel workgroup info. */
-void clu_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi);
+void cl4_man_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi);
 
 /** @brief Get a string identifying the type of device. */
-char* clu_device_type_str_get(cl_device_type cldt, int full, char* str, int strSize);
+char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int strSize);
 
 /** @brief Create a new OpenCL zone, which will contain complete
  * information for an OpenCL execution session on a specific device. */
-CLUZone* clu_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, clu_device_selector devSel, void* dsExtraArg, GError **err);
+CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl4_man_device_selector devSel, void* dsExtraArg, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
-int clu_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err);
+int cl4_man_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
-cl_program clu_program_create_indep(cl_context context, 
+cl_program cl4_man_program_create_indep(cl_context context, 
 	cl_device_id device, char** kernelFiles, cl_uint numKernelFiles, 
 	char* compilerOpts, GError **err);
 
 /** @brief Free a previously created OpenCL zone. */
-void clu_zone_free(CLUZone* zone);
+void cl4_man_zone_free(CLUZone* zone);
 
 /** @brief Load kernel source from given file. */
-char* clu_source_load(char* filename, GError** err);
+char* cl4_man_source_load(char* filename, GError** err);
 
 /** @brief Free kernel source. */
-void clu_source_free(char* source);
+void cl4_man_source_free(char* source);
 
 /** @brief Queries the user to select a device from a list. */
-cl_uint clu_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+cl_uint cl4_man_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
-/** @brief Implementation of ::clu_device_selector function which selects a
+/** @brief Implementation of ::cl4_man_device_selector function which selects a
  * device based on device information such as device name, device vendor
  * and platform name. */
-cl_uint clu_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+cl_uint cl4_man_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Resolves to error category identifying string, in this case
  * an error in the OpenCL utilities library. */
-GQuark clu_utils_error_quark(void);
+GQuark cl4_man_utils_error_quark(void);
 
 #endif
