@@ -24,8 +24,8 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#ifndef TEST_PROFILER_H
-#define TEST_PROFILER_H
+#ifndef CL4_TEST_PROFILER_H
+#define CL4_TEST_PROFILER_H
 
 #include <stdlib.h>
 

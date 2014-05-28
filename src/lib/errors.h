@@ -21,12 +21,12 @@
  * @brief Convert OpenCL error codes to readable strings (function header).
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CLERRORS_H
-#define CLERRORS_H
+#ifndef CL4_ERRORS_H
+#define CL4_ERRORS_H
 
 /** @brief Convert OpenCL error code to a readable string. */
 const char* cl4_err(int code);

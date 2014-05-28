@@ -21,11 +21,14 @@
  * @brief Aggregate header for cf4ocl.
  * 
  * @author Nuno Fachada
+ * @date 2014
+ * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  */
 
 #ifndef CF4OCL_H
 #define CF4OCL_H
- 
+
+#include <cf4ocl/common.h> 
 #include <cf4ocl/gerrorf.h>
 #include <cf4ocl/errors.h>
 #include <cf4ocl/manager.h>

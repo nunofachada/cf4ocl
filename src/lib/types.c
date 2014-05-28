@@ -32,19 +32,19 @@ struct cl4_type_info {
 	const int size;
 };
 
-static const CF4CLTypeInfo cl4_types[] = {
+static const CL4TypeInfo cl4_types[] = {
 	
-	{"char",   1}, /* CF4_CHAR   = 0 */
-	{"uchar",  1}, /* CF4_UCHAR  = 1 */
-	{"short",  2}, /* CF4_SHORT  = 2 */
-	{"ushort", 2}, /* CF4_USHORT = 3 */
-	{"int",    4}, /* CF4_INT    = 4 */
-	{"uint",   4}, /* CF4_UINT   = 5 */
-	{"long",   8}, /* CF4_LONG   = 6 */
-	{"ulong",  8}, /* CF4_ULONG  = 7 */
-	{"half",   2}, /* CF4_HALF   = 8 */
-	{"float",  4}, /* CF4_FLOAT  = 9 */
-	{"double", 8}  /* CF4_DOUBLE = 10 */
+	{"char",   1}, /* CL4_CHAR   = 0 */
+	{"uchar",  1}, /* CL4_UCHAR  = 1 */
+	{"short",  2}, /* CL4_SHORT  = 2 */
+	{"ushort", 2}, /* CL4_USHORT = 3 */
+	{"int",    4}, /* CL4_INT    = 4 */
+	{"uint",   4}, /* CL4_UINT   = 5 */
+	{"long",   8}, /* CL4_LONG   = 6 */
+	{"ulong",  8}, /* CL4_ULONG  = 7 */
+	{"half",   2}, /* CL4_HALF   = 8 */
+	{"float",  4}, /* CL4_FLOAT  = 9 */
+	{"double", 8}  /* CL4_DOUBLE = 10 */
 };
 
 /** 
@@ -53,9 +53,9 @@ static const CF4CLTypeInfo cl4_types[] = {
  * @param type Type constant.
  * @return A string containing the OpenCL type name.
  * */
-const char* cl4_type_name_get(CF4CLType type) {
-	g_assert_cmpint(type, <=, CF4_DOUBLE);
-	g_assert_cmpint(type, >=, CF4_CHAR);
+const char* cl4_type_name_get(CL4Type type) {
+	g_assert_cmpint(type, <=, CL4_DOUBLE);
+	g_assert_cmpint(type, >=, CL4_CHAR);
 	return cl4_types[type].name;
 }
 
@@ -65,8 +65,8 @@ const char* cl4_type_name_get(CF4CLType type) {
  * @param type Type constant.
  * @return The size of the OpenCL type in bytes.
  * */
-int cl4_type_sizeof(CF4CLType type) {
-	g_assert_cmpint(type, <=, CF4_DOUBLE);
-	g_assert_cmpint(type, >=, CF4_CHAR);
+int cl4_type_sizeof(CL4Type type) {
+	g_assert_cmpint(type, <=, CL4_DOUBLE);
+	g_assert_cmpint(type, >=, CL4_CHAR);
 	return cl4_types[type].size;
 }

@@ -96,13 +96,13 @@ int main(int argc, char *argv[])
 	
 	int status;                        /* Function and program return status. */
 	GError *err = NULL;                /* Error management. */
-	ProfCLProfile* profile = NULL;     /* Profiling / Timmings. */
+	CL4ProfProfile* profile = NULL;     /* Profiling / Timmings. */
 	cl_kernel kernel_bankconf = NULL;  /* Kernel. */
 	cl_event events[2] = {NULL, NULL}; /* Events. */
 	cl_mem data_device = NULL;         /* Data in device. */
 	gchar* kernelPath = NULL;          /* Full kernel path. */
 	cl_int *data_host = NULL;          /* Data in host. */
-	CLUZone* zone = NULL;              /* OpenCL zone. */
+	CL4ManZone* zone = NULL;              /* OpenCL zone. */
 	size_t sizeDataInBytes;            /* Size of data to be transfered to device. */
 	size_t localMemSizeInBytes;        /* Size of local memory required. */
 	GOptionContext* context = NULL;    /* Command line options context. */
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 	rng = g_rand_new_with_seed(0);
 		
 	/* Initialize profiling object. */
-	profile = profcl_profile_new();
+	profile = cl4_prof_profile_new();
 	gef_if_error_create_goto(
 		err, 
 		CLEXP_ERROR, 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 		cl4_err(status));
 
 	/* Start basic timming / profiling. */
-	profcl_profile_start(profile);
+	cl4_prof_profile_start(profile);
 
 	/* ********************************** */	
 	/* Create and initialize host buffers */
@@ -322,18 +322,18 @@ int main(int argc, char *argv[])
 	/*  Show profiling info */
 	/* ******************** */
 	
-	profcl_profile_stop(profile); 
+	cl4_prof_profile_stop(profile); 
 
-	profcl_profile_add(profile, "Transfer matrix A to device", events[0], &err);
+	cl4_prof_profile_add(profile, "Transfer matrix A to device", events[0], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	profcl_profile_add(profile, "Kernel execution (bankconf)", events[1], &err);
+	cl4_prof_profile_add(profile, "Kernel execution (bankconf)", events[1], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	profcl_profile_aggregate(profile, &err);
+	cl4_prof_profile_aggregate(profile, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	profcl_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, &err);
+	cl4_prof_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
@@ -371,7 +371,7 @@ cleanup:
 	if (rng != NULL) g_rand_free(rng);
 	
 	/* Free profile */
-	if (profile) profcl_profile_free(profile);
+	if (profile) cl4_prof_profile_free(profile);
 	
 	/* Release events */
 	if (events[0]) clReleaseEvent(events[0]);

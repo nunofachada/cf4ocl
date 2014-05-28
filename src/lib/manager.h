@@ -21,12 +21,12 @@
  * @brief OpenCL utilities function headers.
  *
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CLUTILS_H
-#define CLUTILS_H
+#ifndef CL4_MAN_H
+#define CL4_MAN_H
 
 #include <string.h>
 #include <stdio.h>
@@ -37,73 +37,58 @@
     #include <CL/cl.h>
 #endif
 #include <glib.h>
+#include "common.h"
 #include "gerrorf.h"
 #include "errors.h"
 
 /**
- * @defgroup CLU_DEVICE_TYPE_STR Device type string descriptions.
+ * @defgroup CL4_MAN_DEVICE_TYPE_STR Device type string descriptions.
  *
  * @{
  */
 
 /** Default device type long (OpenCL) description. */
-#define CLU_DEVICE_TYPE_DEFAULT_STR_FULL "CL_DEVICE_TYPE_DEFAULT"
+#define CL4_MAN_DEVICE_TYPE_DEFAULT_STR_FULL "CL_DEVICE_TYPE_DEFAULT"
 /** CPU device type long (OpenCL) description. */
-#define CLU_DEVICE_TYPE_CPU_STR_FULL "CL_DEVICE_TYPE_CPU"
+#define CL4_MAN_DEVICE_TYPE_CPU_STR_FULL "CL_DEVICE_TYPE_CPU"
 /** GPU device type long (OpenCL) description. */
-#define CLU_DEVICE_TYPE_GPU_STR_FULL "CL_DEVICE_TYPE_GPU"
+#define CL4_MAN_DEVICE_TYPE_GPU_STR_FULL "CL_DEVICE_TYPE_GPU"
 /** Accelerator device type long (OpenCL) description. */
-#define CLU_DEVICE_TYPE_ACCELERATOR_STR_FULL "CL_DEVICE_TYPE_ACCELERATOR"
+#define CL4_MAN_DEVICE_TYPE_ACCELERATOR_STR_FULL "CL_DEVICE_TYPE_ACCELERATOR"
 /** All device types long (OpenCL) description. */
-#define CLU_DEVICE_TYPE_ALL_STR_FULL "CL_DEVICE_TYPE_ALL"
+#define CL4_MAN_DEVICE_TYPE_ALL_STR_FULL "CL_DEVICE_TYPE_ALL"
 
 /** Default device type description. */
-#define CLU_DEVICE_TYPE_DEFAULT_STR "Default"
+#define CL4_MAN_DEVICE_TYPE_DEFAULT_STR "Default"
 /** CPU device type description. */
-#define CLU_DEVICE_TYPE_CPU_STR "CPU"
+#define CL4_MAN_DEVICE_TYPE_CPU_STR "CPU"
 /** GPU device type description. */
-#define CLU_DEVICE_TYPE_GPU_STR "GPU"
+#define CL4_MAN_DEVICE_TYPE_GPU_STR "GPU"
 /** Accelerator device type description. */
-#define CLU_DEVICE_TYPE_ACCELERATOR_STR "Accelerator"
+#define CL4_MAN_DEVICE_TYPE_ACCELERATOR_STR "Accelerator"
 /** All device types description. */
-#define CLU_DEVICE_TYPE_ALL_STR "All"
+#define CL4_MAN_DEVICE_TYPE_ALL_STR "All"
 
 /** @} */
 
 
 
 /**
- * @defgroup CLU_MAX Maximum values/sizes for certain operations/data structures.
+ * @defgroup CL4_MAN_MAX Maximum values/sizes for certain operations/data structures.
  *
  * @{
  */
 
 /** Auxiliary maximum buffer size. */
-#define CLU_MAX_AUX_BUFF 500
+#define CL4_MAN_MAX_AUX_BUFF 500
 /** Maximum number of platforms. */
-#define CLU_MAX_PLATFORMS 10
+#define CL4_MAN_MAX_PLATFORMS 10
 /** Maximum number of devices per platform. */
-#define CLU_MAX_DEVICES_PER_PLATFORM 10
+#define CL4_MAN_MAX_DEVICES_PER_PLATFORM 10
 /** Maximum number of total devices. */
-#define CLU_MAX_DEVICES_TOTAL 20
+#define CL4_MAN_MAX_DEVICES_TOTAL 20
 
 /** @} */
-
-/**
- * @brief Error codes.
- * */
-enum cl4_man_error_codes {
-	CLU_SUCCESS = 0,        /**< Successful operation. */
-	CLU_ERROR_NOALLOC = 1,  /**< Error code thrown when no memory allocation is possible. */
-	CLU_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
-	CLU_ERROR_ARGS = 3,     /**< Error code thrown when passed arguments are invalid. */
-	CLU_ERROR_DEVICE_NOT_FOUND = 4, /**< Error code thrown when no OpenCL device is found. */
-	CLU_ERROR_STREAM_WRITE = 5,     /**< Error code thrown when an error occurs while writing to a stream. */
-	CLU_OCL_ERROR = 10      /**< An OpenCL error ocurred. */
-};
-
-/** Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */
-#define CLU_UTILS_ERROR cl4_man_utils_error_quark()
 
 /**
  * @brief Kernel work group information.
@@ -114,7 +99,7 @@ typedef struct cl4_man_kernel_work_group_info {
 	size_t max_work_group_size;                /**< Maximum work-group size that can be used to execute a kernel on a specific device. */
 	cl_ulong local_mem_size;                   /**< Amount of local memory in bytes being used by a kernel. */
 	cl_ulong private_mem_size;                 /**< Minimum amount of private memory, in bytes, used by each workitem in the kernel.  */
-} CLUKernelWorkgroupInfo;
+} CL4ManKernelWorkgroupInfo;
 
 /**
  * @brief Information about OpenCL device.
@@ -122,10 +107,10 @@ typedef struct cl4_man_kernel_work_group_info {
 typedef struct cl4_man_device_info {
 	cl_device_id device_id;               /**< Device ID. */
 	cl_platform_id platform_id;           /**< Platform ID. */
-	char device_name[CLU_MAX_AUX_BUFF];   /**< Device name string. */
-	char device_vendor[CLU_MAX_AUX_BUFF]; /**< Device vendor string. */
-	char platform_name[CLU_MAX_AUX_BUFF]; /**< Platform name string. */
-} CLUDeviceInfo;
+	char device_name[CL4_MAN_MAX_AUX_BUFF];   /**< Device name string. */
+	char device_vendor[CL4_MAN_MAX_AUX_BUFF]; /**< Device vendor string. */
+	char platform_name[CL4_MAN_MAX_AUX_BUFF]; /**< Platform name string. */
+} CL4ManDeviceInfo;
 
 /**
  * @brief Complete information for an OpenCL execution session on a specific device.
@@ -137,8 +122,8 @@ typedef struct cl4_man_zone {
 	cl_command_queue* queues;  /**< Command queues. */
 	cl_program program;        /**< OpenCL program. */
 	cl_uint numQueues;         /**< Number of command queues. */
-	CLUDeviceInfo device_info; /**< Device information. */
-} CLUZone;
+	CL4ManDeviceInfo device_info; /**< Device information. */
+} CL4ManZone;
 
 
 /**
@@ -155,23 +140,23 @@ typedef struct cl4_man_zone {
  * @return The array index of the selected device or -1 if no device is
  * selectable.
  */
-typedef cl_uint (*cl4_man_device_selector)(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+typedef cl_uint (*cl4_man_device_selector)(CL4ManDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Get kernel workgroup info. */
-int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err);
+int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKernelWorkgroupInfo* kwgi, GError **err);
 
 /** @brief Print kernel workgroup info. */
-void cl4_man_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi);
+void cl4_man_workgroup_info_print(CL4ManKernelWorkgroupInfo* kwgi);
 
 /** @brief Get a string identifying the type of device. */
 char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int strSize);
 
 /** @brief Create a new OpenCL zone, which will contain complete
  * information for an OpenCL execution session on a specific device. */
-CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl4_man_device_selector devSel, void* dsExtraArg, GError **err);
+CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl4_man_device_selector devSel, void* dsExtraArg, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
-int cl4_man_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err);
+int cl4_man_program_create(CL4ManZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err);
 
 /** @brief Create an OpenCL program given a set of source kernel files. */
 cl_program cl4_man_program_create_indep(cl_context context, 
@@ -179,7 +164,7 @@ cl_program cl4_man_program_create_indep(cl_context context,
 	char* compilerOpts, GError **err);
 
 /** @brief Free a previously created OpenCL zone. */
-void cl4_man_zone_free(CLUZone* zone);
+void cl4_man_zone_free(CL4ManZone* zone);
 
 /** @brief Load kernel source from given file. */
 char* cl4_man_source_load(char* filename, GError** err);
@@ -188,15 +173,11 @@ char* cl4_man_source_load(char* filename, GError** err);
 void cl4_man_source_free(char* source);
 
 /** @brief Queries the user to select a device from a list. */
-cl_uint cl4_man_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
+cl_uint cl4_man_menu_device_selector(CL4ManDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 /** @brief Implementation of ::cl4_man_device_selector function which selects a
  * device based on device information such as device name, device vendor
  * and platform name. */
-cl_uint cl4_man_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
-
-/** @brief Resolves to error category identifying string, in this case
- * an error in the OpenCL utilities library. */
-GQuark cl4_man_utils_error_quark(void);
+cl_uint cl4_man_info_device_selector(CL4ManDeviceInfo* devInfos, cl_uint numDevices, void* extraArg);
 
 #endif

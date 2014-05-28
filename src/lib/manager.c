@@ -33,7 +33,7 @@
  * @param devInfos List of device information.
  * @param numDevices Number of devices on list.
  * */
-static void cl4_man_menu_device_selector_list(CLUDeviceInfo* devInfos, cl_uint numDevices, cl_uint selected) {
+static void cl4_man_menu_device_selector_list(CL4ManDeviceInfo* devInfos, cl_uint numDevices, cl_uint selected) {
 	char* selectedStr;
 	printf("\n   =========================== Device Selection ============================\n\n");
 	for (cl_uint i = 0; i < numDevices; i++) {
@@ -53,7 +53,7 @@ static void cl4_man_menu_device_selector_list(CLUDeviceInfo* devInfos, cl_uint n
  * @param numDevices Number of devices on list.
  * @return The list index of the selected device.
  * */
-static cl_uint cl4_man_menu_device_selector_query(CLUDeviceInfo* devInfos, cl_uint numDevices) {
+static cl_uint cl4_man_menu_device_selector_query(CL4ManDeviceInfo* devInfos, cl_uint numDevices) {
 	
 	/* Index of selected device. */
 	cl_int index = -1;
@@ -95,11 +95,11 @@ static cl_uint cl4_man_menu_device_selector_query(CLUDeviceInfo* devInfos, cl_ui
  * @param device OpenCL device where kernel will run.
  * @param kwgi Kernel workgroup information structure, which will be populated by this function.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CLU_SUCCESS @endlink operation
+ * @return @link cl4_man_error_codes::CL4_MAN_SUCCESS @endlink operation
  * successfully completed or another value of #cl4_man_error_codes if an 
  * error occurs.
  */
-int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelWorkgroupInfo* kwgi, GError **err) {
+int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKernelWorkgroupInfo* kwgi, GError **err) {
 
 	/* Status flag returned by OpenCL. */
 	cl_int ocl_status;
@@ -116,9 +116,9 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelW
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CLU_OCL_ERROR, 
+		ret_status = CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -132,9 +132,9 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelW
 		kwgi->compile_work_group_size, 
 		NULL);
 	gef_if_error_create_goto(
-		*err, CLU_UTILS_ERROR, 
+		*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CLU_OCL_ERROR, 
+		ret_status = CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_COMPILE_WORK_GROUP_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -150,9 +150,9 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelW
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CLU_OCL_ERROR, 
+		ret_status = CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_WORK_GROUP_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -168,9 +168,9 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelW
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CLU_OCL_ERROR, 
+		ret_status = CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_LOCAL_MEM_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -186,9 +186,9 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelW
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CLU_OCL_ERROR, 
+		ret_status = CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_PRIVATE_MEM_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -196,7 +196,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CLUKernelW
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	ret_status = CLU_SUCCESS;
+	ret_status = CL4_MAN_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -213,7 +213,7 @@ finish:
  * 
  * @param kwgi Kernel workgroup information to print.
  */
-void cl4_man_workgroup_info_print(CLUKernelWorkgroupInfo* kwgi) {
+void cl4_man_workgroup_info_print(CL4ManKernelWorkgroupInfo* kwgi) {
 	
 	printf("\n   =========================== Kernel Information ==========================\n\n");
 	printf("     Maximum workgroup size                  : %lu\n", (unsigned long) kwgi->max_work_group_size);
@@ -240,7 +240,7 @@ char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int 
 	*str = 0;
 
 	if (cldt & CL_DEVICE_TYPE_DEFAULT) {
-		strcpy(temp, full ? CLU_DEVICE_TYPE_DEFAULT_STR_FULL : CLU_DEVICE_TYPE_DEFAULT_STR);
+		strcpy(temp, full ? CL4_MAN_DEVICE_TYPE_DEFAULT_STR_FULL : CL4_MAN_DEVICE_TYPE_DEFAULT_STR);
 		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
 		if ((int) strlen(temp) <= availSpace) {
 			strcat(str, " ");
@@ -249,7 +249,7 @@ char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int 
 		}
 	}
 	if (cldt & CL_DEVICE_TYPE_CPU) {
-		strcpy(temp, full ? CLU_DEVICE_TYPE_CPU_STR_FULL : CLU_DEVICE_TYPE_CPU_STR);
+		strcpy(temp, full ? CL4_MAN_DEVICE_TYPE_CPU_STR_FULL : CL4_MAN_DEVICE_TYPE_CPU_STR);
 		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
 		if ((int) strlen(temp) <= availSpace) {
 			strcat(str, " ");
@@ -258,7 +258,7 @@ char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int 
 		}
 	}
 	if (cldt & CL_DEVICE_TYPE_GPU) {
-		strcpy(temp, full ? CLU_DEVICE_TYPE_GPU_STR_FULL : CLU_DEVICE_TYPE_GPU_STR);
+		strcpy(temp, full ? CL4_MAN_DEVICE_TYPE_GPU_STR_FULL : CL4_MAN_DEVICE_TYPE_GPU_STR);
 		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
 		if ((int) strlen(temp) <= availSpace) {
 			strcat(str, " ");
@@ -267,7 +267,7 @@ char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int 
 		}
 	}
 	if (cldt & CL_DEVICE_TYPE_ACCELERATOR) {
-		strcpy(temp, full ? CLU_DEVICE_TYPE_ACCELERATOR_STR_FULL : CLU_DEVICE_TYPE_ACCELERATOR_STR);
+		strcpy(temp, full ? CL4_MAN_DEVICE_TYPE_ACCELERATOR_STR_FULL : CL4_MAN_DEVICE_TYPE_ACCELERATOR_STR);
 		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
 		if ((int) strlen(temp) <= availSpace) {
 			strcat(str, " ");
@@ -276,7 +276,7 @@ char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int 
 		}
 	}
 	if (cldt == CL_DEVICE_TYPE_ALL) {
-		strcpy(temp, full ? CLU_DEVICE_TYPE_ALL_STR_FULL : CLU_DEVICE_TYPE_ALL_STR);
+		strcpy(temp, full ? CL4_MAN_DEVICE_TYPE_ALL_STR_FULL : CL4_MAN_DEVICE_TYPE_ALL_STR);
 		int availSpace = strSize - occuSpace - 2; /* 1 for space + 1 for \0 */
 		if ((int) strlen(temp) <= availSpace) {
 			strcat(str, " ");
@@ -298,16 +298,16 @@ char* cl4_man_device_type_str_get(cl_device_type cldt, int full, char* str, int 
  * @param err Error structure, to be populated if an error occurs.
  * @return OpenCL zone or NULL if device wasn't properly initialized.
  */
-CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl4_man_device_selector devSel, void* dsExtraArg, GError **err) {
+CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queueProperties, cl4_man_device_selector devSel, void* dsExtraArg, GError **err) {
 	
 	/* OpenCL status variable. */
 	cl_int status;
 	
 	/* OpenCL zone to initialize and return */
-	CLUZone* zone;
+	CL4ManZone* zone;
 	
 	/* Information about devices */
-	CLUDeviceInfo devInfos[CLU_MAX_DEVICES_TOTAL];
+	CL4ManDeviceInfo devInfos[CL4_MAN_MAX_DEVICES_TOTAL];
 
 	/* Number of devices. */
 	cl_uint numDevices;
@@ -319,7 +319,7 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 	cl_context_properties cps[3] = {CL_CONTEXT_PLATFORM, 0, 0};
 
 	/* List of platform Ids. */
-	cl_platform_id platfIds[CLU_MAX_PLATFORMS];
+	cl_platform_id platfIds[CL4_MAN_MAX_PLATFORMS];
 
 	/* Number of platforms. */
 	cl_uint numPlatforms;
@@ -328,15 +328,15 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 	unsigned int totalNumDevices;
 
 	/* Device IDs for a given platform. */
-	cl_device_id devIds[CLU_MAX_DEVICES_PER_PLATFORM];
+	cl_device_id devIds[CL4_MAN_MAX_DEVICES_PER_PLATFORM];
 	
 	/* Initialize zone */
-	zone = (CLUZone*) malloc(sizeof(CLUZone));
+	zone = (CL4ManZone*) malloc(sizeof(CL4ManZone));
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		NULL == zone, 
-		CLU_ERROR_NOALLOC, 
+		CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory for OpenCL zone"
 	);
@@ -353,9 +353,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 	status = clGetPlatformIDs(0, NULL, &numPlatforms);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CLU_OCL_ERROR, 
+		CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: get number of platforms (OpenCL error %d: %s).",
 		status,
@@ -365,9 +365,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 	status = clGetPlatformIDs(numPlatforms, platfIds, NULL);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CLU_OCL_ERROR, 
+		CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: get platform Ids (OpenCL error %d: %s).", 
 		status,
@@ -380,16 +380,16 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 		status = clGetDeviceIDs(
 			platfIds[i], 
 			deviceType, 
-			CLU_MAX_DEVICES_PER_PLATFORM, 
+			CL4_MAN_MAX_DEVICES_PER_PLATFORM, 
 			devIds, 
 			&numDevices);
 		if (status != CL_DEVICE_NOT_FOUND) {
 			/* At least one device found, lets take note */
 			gef_if_error_create_goto(
 				*err, 
-				CLU_UTILS_ERROR, 
+				CL4_ERROR, 
 				CL_SUCCESS != status, 
-				CLU_OCL_ERROR, 
+				CL4_MAN_OCL_ERROR, 
 				error_handler, 
 				"cl4_man_zone_new: get device Ids (OpenCL error %d: %s).", 
 				status,
@@ -407,9 +407,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 					NULL);
 				gef_if_error_create_goto(
 					*err, 
-					CLU_UTILS_ERROR, 
+					CL4_ERROR, 
 					CL_SUCCESS != status, 
-					CLU_OCL_ERROR, 
+					CL4_MAN_OCL_ERROR, 
 					error_handler, 
 					"cl4_man_zone_new: get device name info (OpenCL error %d: %s).",
 					status,
@@ -423,9 +423,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 					NULL);
 				gef_if_error_create_goto(
 					*err, 
-					CLU_UTILS_ERROR, 
+					CL4_ERROR, 
 					CL_SUCCESS != status, 
-					CLU_OCL_ERROR, 
+					CL4_MAN_OCL_ERROR, 
 					error_handler, 
 					"cl4_man_zone_new: get device vendor info (OpenCL error %d: %s).", 
 					status,
@@ -439,9 +439,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 					NULL);
 				gef_if_error_create_goto(
 					*err, 
-					CLU_UTILS_ERROR, 
+					CL4_ERROR, 
 					CL_SUCCESS != status, 
-					CLU_OCL_ERROR, 
+					CL4_MAN_OCL_ERROR, 
 					error_handler, 
 					"cl4_man_zone_new: get platform info (OpenCL error %d: %s).",
 					status,
@@ -457,9 +457,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 		/* No devices of the specified type where found, return with error. */
 		gef_if_error_create_goto(
 			*err, 
-			CLU_UTILS_ERROR, 
+			CL4_ERROR, 
 			1, 
-			CLU_ERROR_DEVICE_NOT_FOUND, 
+			CL4_MAN_ERROR_DEVICE_NOT_FOUND, 
 			error_handler, 
 			"cl4_man_zone_new: device not found.");
 	} else {
@@ -473,9 +473,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 		if (deviceInfoIndex == -1) {
 			gef_if_error_create_goto(
 				*err, 
-				CLU_UTILS_ERROR, 
+				CL4_ERROR, 
 				1, 
-				CLU_ERROR_DEVICE_NOT_FOUND, 
+				CL4_MAN_ERROR_DEVICE_NOT_FOUND, 
 				error_handler, 
 				"cl4_man_zone_new: specified device not found.");
 		}
@@ -494,9 +494,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CLU_OCL_ERROR, 
+		CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: get target device info (OpenCL error %d: %s).", 
 		status,
@@ -507,9 +507,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 	zone->context = clCreateContext(cps, 1, &zone->device_info.device_id, NULL, NULL, &status);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CLU_OCL_ERROR, 
+		CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: creating context (OpenCL error %d: %s).", 
 		status,
@@ -520,9 +520,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 	zone->queues = (cl_command_queue*) malloc(numQueues * sizeof(cl_command_queue));
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		NULL == zone->queues, 
-		CLU_ERROR_NOALLOC, 
+		CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory to keep OpenCL command queues in Zone."
 	);
@@ -535,9 +535,9 @@ CLUZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queuePro
 			&status);
 		gef_if_error_create_goto(
 			*err, 
-			CLU_UTILS_ERROR, 
+			CL4_ERROR, 
 			CL_SUCCESS != status, 
-			CLU_OCL_ERROR, 
+			CL4_MAN_OCL_ERROR, 
 			error_handler, 
 			"cl4_man_zone_new: creating command queue (OpenCL error %d: %s).", 
 			status,
@@ -572,11 +572,11 @@ finish:
  * @param numKernelFiles Number of strings identifying filenames containing kernels.
  * @param compilerOpts OpenCL compiler options.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CLU_SUCCESS @endlink operation
+ * @return @link cl4_man_error_codes::CL4_MAN_SUCCESS @endlink operation
  * successfully completed or another value of #cl4_man_error_codes if an 
  * error occurs.
  */
-int cl4_man_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err) {
+int cl4_man_program_create(CL4ManZone* zone, char** kernelFiles, cl_uint numKernelFiles, char* compilerOpts, GError **err) {
 
 	/* Function return status. */
 	int ret_status;
@@ -591,7 +591,7 @@ int cl4_man_program_create(CLUZone* zone, char** kernelFiles, cl_uint numKernelF
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	ret_status = CLU_SUCCESS;
+	ret_status = CL4_MAN_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -614,7 +614,7 @@ finish:
  * @param numKernelFiles Number of strings identifying filenames containing kernels.
  * @param compilerOpts OpenCL compiler options.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CLU_SUCCESS @endlink operation
+ * @return @link cl4_man_error_codes::CL4_MAN_SUCCESS @endlink operation
  * successfully completed or another value of #cl4_man_error_codes if an 
  * error occurs.
  */
@@ -633,9 +633,9 @@ cl_program cl4_man_program_create_indep(cl_context context,
 	source = (char**) malloc(numKernelFiles * sizeof(char*));
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		NULL == source, 
-		CLU_ERROR_NOALLOC, 
+		CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory for kernels source file.");
 	for (unsigned int i = 0; i < numKernelFiles; i++) { source[i] = NULL; }
@@ -653,9 +653,9 @@ cl_program cl4_man_program_create_indep(cl_context context,
 		&ocl_status);
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		CLU_OCL_ERROR, 
+		CL4_MAN_OCL_ERROR, 
 		error_handler, 
 		"Create program with source (OpenCL error %d :%s).", 
 		ocl_status,
@@ -682,9 +682,9 @@ cl_program cl4_man_program_create_indep(cl_context context,
 			&logsize);
 		gef_if_error_create_goto(
 			*err, 
-			CLU_UTILS_ERROR, 
+			CL4_ERROR, 
 			CL_SUCCESS != ocl_status, 
-			CLU_OCL_ERROR, 
+			CL4_MAN_OCL_ERROR, 
 			error_handler, 
 			"Error getting program build info (log size, OpenCL error %d: %s) after program failed to build (OpenCL error %d: %s).", 
 			ocl_status,
@@ -695,9 +695,9 @@ cl_program cl4_man_program_create_indep(cl_context context,
 		build_log = (char*) malloc(logsize);
 		gef_if_error_create_goto(
 			*err, 
-			CLU_UTILS_ERROR, 
+			CL4_ERROR, 
 			NULL == build_log, 
-			CLU_ERROR_NOALLOC, 
+			CL4_ERROR_NOALLOC, 
 			error_handler, 
 			"Unable to allocate memory for build log after program failed to build with OpenCL error %d (%s).", 
 			ocl_build_status,
@@ -712,9 +712,9 @@ cl_program cl4_man_program_create_indep(cl_context context,
 			NULL);
 		gef_if_error_create_goto(
 			*err, 
-			CLU_UTILS_ERROR, 
+			CL4_ERROR, 
 			CL_SUCCESS != ocl_status, 
-			CLU_OCL_ERROR, 
+			CL4_MAN_OCL_ERROR, 
 			error_handler, 
 			"Error getting program build info (build log, OpenCL error %d: %s) after program failed to build (OpenCL error %d: %s).", 
 			ocl_status,
@@ -724,9 +724,9 @@ cl_program cl4_man_program_create_indep(cl_context context,
 		/* Throw error. */
 		gef_if_error_create_goto(
 			*err, 
-			CLU_UTILS_ERROR, 
+			CL4_ERROR, 
 			1, 
-			CLU_OCL_ERROR, 
+			CL4_MAN_OCL_ERROR, 
 			error_handler, 
 			"Failed to build program (OpenCL error %d: %s). \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", 
 			ocl_build_status, 
@@ -768,7 +768,7 @@ finish:
  * 
  * @param zone OpenCL zone to free.
  */
-void cl4_man_zone_free(CLUZone* zone) {
+void cl4_man_zone_free(CL4ManZone* zone) {
 	g_assert(zone != NULL);
 	if (zone->queues) {
 		for (unsigned int i = 0; i < zone->numQueues; i++)
@@ -798,9 +798,9 @@ char* cl4_man_source_load(char *filename, GError** err) {
 	fp = fopen(filename, "r");
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		fp == NULL, 
-		CLU_ERROR_OPENFILE, 
+		CL4_ERROR_OPENFILE, 
 		error_handler, 
 		"Unable to open kernels file '%s'.", 
 		filename);
@@ -813,9 +813,9 @@ char* cl4_man_source_load(char *filename, GError** err) {
 	sourcetmp = (char*) malloc((prog_size + 1)*sizeof(char));
 	gef_if_error_create_goto(
 		*err, 
-		CLU_UTILS_ERROR, 
+		CL4_ERROR, 
 		sourcetmp == NULL, 
-		CLU_ERROR_NOALLOC, 
+		CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory to place contents of file '%s'.", 
 		filename);
@@ -866,7 +866,7 @@ void cl4_man_source_free(char* source) {
  * @param extraArg Pointer to device index or NULL.
  * @return The index of the selected device.
  */
-cl_uint cl4_man_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
+cl_uint cl4_man_menu_device_selector(CL4ManDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
 	
 	/* numDevices must be greater than 0. */
 	g_assert_cmpuint(numDevices, >, 0);
@@ -904,33 +904,33 @@ cl_uint cl4_man_menu_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices
  * device based on device information such as device name, device vendor
  * and platform name.
  * 
- * `extraArg` must point to a ::CLUDeviceInfo structure, which should
+ * `extraArg` must point to a ::CL4ManDeviceInfo structure, which should
  * have at least one of the `char`-type fields containing partial 
  * information about the respective device information. The non-used
  * `char'-type fields must be set to NULL.
  * 
  * @param devInfos List of device information.
  * @param numDevices Number of devices on list.
- * @param extraArg Pointer to ::CLUDeviceInfo structure.
+ * @param extraArg Pointer to ::CL4ManDeviceInfo structure.
  * @return The index of the selected device of -1 if no device is
  * selectable.
  */
-cl_uint cl4_man_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
+cl_uint cl4_man_info_device_selector(CL4ManDeviceInfo* devInfos, cl_uint numDevices, void* extraArg) {
 	
 	/* numDevices must be greater than 0. */
 	g_assert_cmpuint(numDevices, >, 0);
 	
 	/* Index of selected device. */
 	cl_int index = -1;
-	/* Pointer to CLUDeviceInfo structure. */
-	CLUDeviceInfo* info;
+	/* Pointer to CL4ManDeviceInfo structure. */
+	CL4ManDeviceInfo* info;
 	/* Number of devices found which conform to the information. */
 	int numValidDevs = 0;
 	/* If more than 1 device is found this aux. struct. will be passed 
 	 * to a user query function. */
-    CLUDeviceInfo validDevInfos[CLU_MAX_DEVICES_TOTAL];
+    CL4ManDeviceInfo validDevInfos[CL4_MAN_MAX_DEVICES_TOTAL];
     /* Maps the aux. struct. dev. index to the main struct. dev. index. */
-	int map[CLU_MAX_DEVICES_TOTAL];
+	int map[CL4_MAN_MAX_DEVICES_TOTAL];
 	/* Flag to check if a device is conformant with the information. */
 	gboolean validDev;
 	/* Partial name must be a substring of complete name. */
@@ -938,7 +938,7 @@ cl_uint cl4_man_info_device_selector(CLUDeviceInfo* devInfos, cl_uint numDevices
 
 	/* Check if extraArg contains a valid NULL-terminated array of strings. */
 	if (extraArg != NULL) {
-		info = (CLUDeviceInfo*) extraArg;
+		info = (CL4ManDeviceInfo*) extraArg;
 		g_assert(info != NULL);
 		/* Cycle through available devices. */
 		for (unsigned int i = 0; i < numDevices; i++) {

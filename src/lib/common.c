@@ -16,40 +16,25 @@
  * <http://www.gnu.org/licenses/>.
  * */
  
- /** 
+/** 
  * @file
- * @brief Use and pass abstract OpenCL types in C functions.
+ * @brief Common cf4ocl definitions.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
-
-#ifndef CL4_TYPES_H
-#define CL4_TYPES_H
-
-#include <glib.h>
+ 
 #include "common.h"
 
-typedef enum {
-	CL4_CHAR = 0,
-	CL4_UCHAR = 1,
-	CL4_INT = 2,
-	CL4_UINT = 3,
-	CL4_LONG = 4,
-	CL4_ULONG = 5,
-	CL4_HALF = 6,
-	CL4_FLOAT = 7,
-	CL4_DOUBLE = 8
-} CF4CLType;
-
-typedef struct cl4_type_info CF4CLTypeInfo;
-
-/** @brief Return OpenCL type name. */
-const char* cl4_type_name_get(CF4CLType type);
-
-/** @brief Return OpenCL type size in bytes. */
-int cl4_type_sizeof(CF4CLType type);
-
-#endif
+/** 
+ * @brief Resolves to error category identifying string, in this case an
+ * error in cf4ocl.
+ * 
+ * @return A GQuark structure defined by category identifying string,
+ * which identifies the error as a cf4ocl generated error.
+ */
+GQuark cl4_error_quark() {
+	return g_quark_from_static_string("cl4-error-quark");
+}
 

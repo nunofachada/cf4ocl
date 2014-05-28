@@ -28,7 +28,7 @@
 #include "profiler.h"
 
 /* Default export options. */
-static ProfCLExportOptions export_options = {
+static CL4ProfExportOptions export_options = {
 	.separator = "\t",
 	.newline = "\n",
 	.queue_delim = "",
@@ -42,10 +42,10 @@ static ProfCLExportOptions export_options = {
  * 
  * @return A new profile or NULL if operation failed. 
  */
-ProfCLProfile* profcl_profile_new() {
+CL4ProfProfile* cl4_prof_profile_new() {
 	
 	/* Allocate memory for new profile data structure. */
-	ProfCLProfile* profile = (ProfCLProfile*) malloc(sizeof(ProfCLProfile));
+	CL4ProfProfile* profile = (CL4ProfProfile*) malloc(sizeof(CL4ProfProfile));
 
 	/* If allocation successful... */
 	if (profile != NULL) {
@@ -66,7 +66,7 @@ ProfCLProfile* profcl_profile_new() {
 			g_str_hash, 
 			g_str_equal, 
 			NULL, 
-			profcl_aggregate_free);
+			cl4_prof_aggregate_free);
 		/* ... and set overlap matrix to NULL. */
 		profile->overmat = NULL;
 		/* ... and set timer structure to NULL. */
@@ -88,7 +88,7 @@ ProfCLProfile* profcl_profile_new() {
  * 
  * @param profile OpenCL events profile to destroy. 
  */
-void profcl_profile_free(ProfCLProfile* profile) {
+void cl4_prof_profile_free(CL4ProfProfile* profile) {
 	/* Profile to free cannot be NULL. */
 	g_assert(profile != NULL);
 	/* Destroy table of unique events. */
@@ -96,7 +96,7 @@ void profcl_profile_free(ProfCLProfile* profile) {
 	/* Destroy table of command queues. */
 	g_hash_table_destroy(profile->command_queues);
 	/* Destroy list of all event instants. */
-	g_list_free_full(profile->event_instants, profcl_evinst_free);
+	g_list_free_full(profile->event_instants, cl4_prof_evinst_free);
 	/* Destroy table of aggregate statistics. */
 	g_hash_table_destroy(profile->aggregate);
 	/* Free the overlap matrix. */
@@ -117,29 +117,29 @@ void profcl_profile_free(ProfCLProfile* profile) {
  * @param event_name Event name.
  * @param ev Event to get information of.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if event 
+ * successfully added, or another value of #cl4_prof_error_codes if an 
  * error occurs.
  */ 
-int profcl_profile_add(ProfCLProfile* profile, const char* event_name, cl_event ev, GError** err) {
-	/* Just call profcl_profile_add_composite sending the same event as start and end event. */
-	return profcl_profile_add_composite(profile, event_name, ev, ev, err);
+int cl4_prof_profile_add(CL4ProfProfile* profile, const char* event_name, cl_event ev, GError** err) {
+	/* Just call cl4_prof_profile_add_composite sending the same event as start and end event. */
+	return cl4_prof_profile_add_composite(profile, event_name, ev, ev, err);
 }
 
 /** 
- * @brief Add OpenCL event to events profile. Receives a ProfCLEvName
- * instead of a separate event and name like profcl_profile_add(). 
+ * @brief Add OpenCL event to events profile. Receives a CL4ProfEvName
+ * instead of a separate event and name like cl4_prof_profile_add(). 
  * 
  * @param profile OpenCL events profile.
  * @param event_with_name OpenCL event associated with a name.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if event 
+ * successfully added, or another value of #cl4_prof_error_codes if an 
  * error occurs.
  * */
-int profcl_profile_add_evname(ProfCLProfile* profile, ProfCLEvName event_with_name, GError** err) {
-	/* Just call profcl_profile_add_composite sending the same event as start and end event. */
-	return profcl_profile_add_composite(
+int cl4_prof_profile_add_evname(CL4ProfProfile* profile, CL4ProfEvName event_with_name, GError** err) {
+	/* Just call cl4_prof_profile_add_composite sending the same event as start and end event. */
+	return cl4_prof_profile_add_composite(
 		profile, 
 		event_with_name.eventName, 
 		event_with_name.event,
@@ -156,11 +156,11 @@ int profcl_profile_add_evname(ProfCLProfile* profile, ProfCLEvName event_with_na
  * @param ev1 Event to get start information of.
  * @param ev2 Event to get end information of.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if event 
- * successfully added, or another value of #profcl_error_codes if an 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if event 
+ * successfully added, or another value of #cl4_prof_error_codes if an 
  * error occurs.
  */ 
-int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
+int cl4_prof_profile_add_composite(CL4ProfProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
 	
 	/* OpenCL return status. */
 	cl_int ocl_status;
@@ -175,8 +175,8 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 	/* Event instant. */
 	cl_ulong instant;
 	/* Event instant objects. */
-	ProfCLEvInst* evinst_start;
-	ProfCLEvInst* evinst_end;
+	CL4ProfEvInst* evinst_start;
+	CL4ProfEvInst* evinst_end;
 	/* Command queues to which the events are associated to. */
 	cl_command_queue q1, q2;
 	
@@ -206,9 +206,9 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		PROFCL_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = PROFCL_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"Get start event command queue: OpenCL error %d (%s).", 
 		ocl_status,
@@ -223,9 +223,9 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		NULL);
 	gef_if_error_create_goto(
 		*err, 
-		PROFCL_ERROR, 
+		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = PROFCL_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"Get event start instant: OpenCL error %d (%s).", 
 		ocl_status,
@@ -236,7 +236,7 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		profile->startTime = instant;
 		
 	/* Add event start instant to list of event instants. */
-	evinst_start = profcl_evinst_new(
+	evinst_start = cl4_prof_evinst_new(
 		event_name, 
 		event_id, 
 		instant, 
@@ -244,11 +244,11 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		q1);
 	gef_if_error_create_goto(
 		*err, 
-		PROFCL_ERROR, 
+		CL4_ERROR, 
 		evinst_start == NULL, 
-		ret_status = PROFCL_ALLOC_ERROR, 
+		ret_status = CL4_ERROR_NOALLOC, 
 		error_handler, 
-		"Unable to allocate memory for ProfCLEvInst object for start of event '%s' with ID %d.", 
+		"Unable to allocate memory for CL4ProfEvInst object for start of event '%s' with ID %d.", 
 		event_name, 
 		event_id);
 	profile->event_instants = g_list_prepend(
@@ -263,9 +263,9 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		&q2, 
 		NULL);
 	gef_if_error_create_goto(
-		*err, PROFCL_ERROR, 
+		*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = PROFCL_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"Get end event command queue: OpenCL error %d (%s).", 
 		ocl_status,
@@ -279,27 +279,27 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 		&instant, 
 		NULL);
 	gef_if_error_create_goto(
-		*err, PROFCL_ERROR, 
+		*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = PROFCL_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"Get event end instant: OpenCL error %d (%s).", 
 		ocl_status,
 		cl4_err(ocl_status))
 
 	/* Add event end instant to list of event instants. */
-	evinst_end = profcl_evinst_new(
+	evinst_end = cl4_prof_evinst_new(
 		event_name, 
 		event_id, 
 		instant, 
 		PROFCL_EV_END, 
 		q2);
 	gef_if_error_create_goto(
-		*err, PROFCL_ERROR, 
+		*err, CL4_ERROR, 
 		evinst_end == NULL, 
-		ret_status = PROFCL_ALLOC_ERROR, 
+		ret_status = CL4_ERROR_NOALLOC, 
 		error_handler, 
-		"Unable to allocate memory for ProfCLEvInst object for end of event '%s' with ID %d.", 
+		"Unable to allocate memory for CL4ProfEvInst object for end of event '%s' with ID %d.", 
 		event_name, 
 		event_id);
 	profile->event_instants = g_list_prepend(
@@ -326,7 +326,7 @@ int profcl_profile_add_composite(ProfCLProfile* profile, const char* event_name,
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	ret_status = PROFCL_SUCCESS;
+	ret_status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -349,11 +349,11 @@ finish:
  * @param queue Command queue associated with event.
  * @return A new event instant or NULL if operation failed.
  */
-ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instant, ProfCLEvInstType type, cl_command_queue queue) {
+CL4ProfEvInst* cl4_prof_evinst_new(const char* eventName, guint id, cl_ulong instant, CL4ProfEvInstType type, cl_command_queue queue) {
 	
 	/* Allocate memory for event instant data structure. */
-	ProfCLEvInst* event_instant = 
-		(ProfCLEvInst*) malloc(sizeof(ProfCLEvInst));
+	CL4ProfEvInst* event_instant = 
+		(CL4ProfEvInst*) malloc(sizeof(CL4ProfEvInst));
 	/* If allocation successful... */
 	if (event_instant != NULL) {
 		/* ...initialize structure fields. */
@@ -373,7 +373,7 @@ ProfCLEvInst* profcl_evinst_new(const char* eventName, guint id, cl_ulong instan
  * 
  * @param event_instant Event instant to destroy. 
  */
-void profcl_evinst_free(gpointer event_instant) {
+void cl4_prof_evinst_free(gpointer event_instant) {
 	free(event_instant);
 }
 
@@ -386,11 +386,11 @@ void profcl_evinst_free(gpointer event_instant) {
  * @param userdata Defines what type of sorting to do.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
-gint profcl_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
+gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 	/* Cast input parameters to event instant data structures. */
-	ProfCLEvInst* evInst1 = (ProfCLEvInst*) a;
-	ProfCLEvInst* evInst2 = (ProfCLEvInst*) b;
-	ProfCLEvSort* sortType = (ProfCLEvSort*) userdata;
+	CL4ProfEvInst* evInst1 = (CL4ProfEvInst*) a;
+	CL4ProfEvInst* evInst2 = (CL4ProfEvInst*) b;
+	CL4ProfEvSort* sortType = (CL4ProfEvSort*) userdata;
 	/* Perform comparison. */
 	if (*sortType == PROFCL_EV_SORT_INSTANT) {
 		/* Sort by instant */
@@ -409,15 +409,15 @@ gint profcl_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 
 /**
  * @brief Determine overlap matrix for the given OpenCL events profile.
- *         Must be called after profcl_profile_aggregate.
+ *         Must be called after cl4_prof_profile_aggregate.
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
- * terminates successfully, or another value of #profcl_error_codes if 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_prof_error_codes if 
  * an error occurs.
  */ 
-int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
+int cl4_prof_profile_overmat(CL4ProfProfile* profile, GError** err) {
 	
 	/* Return status. */
 	int status;
@@ -432,7 +432,7 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	/* Occurring events table. */
 	GHashTable* eventsOccurring = NULL;
 	/* Type of sorting to perform. */
-	ProfCLEvSort sortType;
+	CL4ProfEvSort sortType;
 	/* Container for current event instants. */
 	GList* currEvInstContainer;
 	
@@ -447,9 +447,9 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 		(cl_ulong*) malloc(numUniqEvts * numUniqEvts * sizeof(cl_ulong));
 	gef_if_error_create_goto(
 		*err, 
-		PROFCL_ERROR, 
+		CL4_ERROR, 
 		overlapMatrix == NULL, 
-		status = PROFCL_ALLOC_ERROR, 
+		status = CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory for overlapMatrix.");
 	for (guint i = 0; i < numUniqEvts * numUniqEvts; i++)
@@ -459,18 +459,18 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	overlaps = g_hash_table_new(g_direct_hash, g_direct_equal);
 	gef_if_error_create_goto(
 		*err, 
-		PROFCL_ERROR, 
+		CL4_ERROR, 
 		overlaps == NULL, 
-		status = PROFCL_ALLOC_ERROR, 
+		status = CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory for overlaps helper table: g_hash_table_new function returned NULL.");
 	
 	/* Setup ocurring events table (key: eventID, value: uniqueEventID) */
 	eventsOccurring = g_hash_table_new(g_int_hash, g_int_equal);
 	gef_if_error_create_goto(
-		*err, PROFCL_ERROR, 
+		*err, CL4_ERROR, 
 		eventsOccurring == NULL, 
-		status = PROFCL_ALLOC_ERROR, 
+		status = CL4_ERROR_NOALLOC, 
 		error_handler, 
 		"Unable to allocate memory for occurring events table: g_hash_table_new function returned NULL.");
 		
@@ -478,7 +478,7 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	sortType = PROFCL_EV_SORT_INSTANT;
 	profile->event_instants = g_list_sort_with_data(
 		profile->event_instants, 
-		profcl_evinst_comp, 
+		cl4_prof_evinst_comp, 
 		(gpointer) &sortType);
 	
 	/* Iterate through all event instants */
@@ -486,7 +486,7 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	while (currEvInstContainer) {
 		
 		/* Loop aux. variables. */
-		ProfCLEvInst* currEvInst = NULL;            /* Current event instant. */
+		CL4ProfEvInst* currEvInst = NULL;            /* Current event instant. */
 		GHashTable* innerTable = NULL;                /* Inner hash table (is value for overlap hash table). */
 		GHashTableIter iter;                          /* Hash table iterator. */
 		gpointer key_eid, ueid_curr_ev, ueid_occu_ev; /* Hashtable key, unique event ID for current event, unique event ID for occurring event. */
@@ -494,7 +494,7 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 		cl_ulong effOverlap;                          /* Event overlap in nanoseconds. */
 		
 		/* Get current event instant. */
-		currEvInst = (ProfCLEvInst*) currEvInstContainer->data;
+		currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
 		
 		/* Check if event time is START or END time */
 		if (currEvInst->type == PROFCL_EV_START) { 
@@ -528,9 +528,9 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 						(GDestroyNotify) g_hash_table_destroy);
 					gef_if_error_create_goto(
 						*err, 
-						PROFCL_ERROR, 
+						CL4_ERROR, 
 						innerTable == NULL, 
-						status = PROFCL_ALLOC_ERROR, 
+						status = CL4_ERROR_NOALLOC, 
 						error_handler, 
 						"Unable to allocate memory for events inner table: g_hash_table_new_full function returned NULL.");
 					g_hash_table_insert(
@@ -602,7 +602,7 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	status = PROFCL_SUCCESS;
+	status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -626,11 +626,11 @@ finish:
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
- * terminates successfully, or another value of #profcl_error_codes if 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_prof_error_codes if 
  * an error occurs.
  * */
-int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
+int cl4_prof_profile_aggregate(CL4ProfProfile* profile, GError** err) {
 	
 	/* Return status. */
 	int status;
@@ -639,15 +639,15 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	/* A pointer for a event name. */
 	gpointer eventName;
 	/* Aggregate event info. */
-	ProfCLEvAggregate* evagg = NULL;
+	CL4ProfEvAggregate* evagg = NULL;
 	/* Type of sorting to perform on event list. */
-	ProfCLEvSort sortType;
+	CL4ProfEvSort sortType;
 	/* Aux. pointer for event data structure kept in a GList. */
 	GList* currEvInstContainer = NULL;
-	/* A pointer to a ProfCLEvAggregate (agg. event info) variable. */
+	/* A pointer to a CL4ProfEvAggregate (agg. event info) variable. */
 	gpointer valueAgg;
 	/* Auxiliary aggregate event info variable.*/
-	ProfCLEvAggregate* currAgg = NULL;
+	CL4ProfEvAggregate* currAgg = NULL;
 	
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
@@ -655,14 +655,14 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	/* Initalize table, and set aggregate values to zero. */
 	g_hash_table_iter_init(&iter, profile->unique_events);
 	while (g_hash_table_iter_next(&iter, &eventName, NULL)) {
-		evagg = profcl_aggregate_new(eventName);
+		evagg = cl4_prof_aggregate_new(eventName);
 		gef_if_error_create_goto(
 			*err, 
-			PROFCL_ERROR, 
+			CL4_ERROR, 
 			evagg == NULL, 
-			status = PROFCL_ALLOC_ERROR, 
+			status = CL4_ERROR_NOALLOC, 
 			error_handler, 
-			"Unable to allocate memory for ProfCLEvAggregate object.");
+			"Unable to allocate memory for CL4ProfEvAggregate object.");
 		evagg->totalTime = 0;
 		g_hash_table_insert(profile->aggregate, eventName, (gpointer) evagg);
 	}
@@ -670,27 +670,27 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	/* Sort event instants by eid, and then by START, END order. */
 	sortType = PROFCL_EV_SORT_ID;
 	profile->event_instants = g_list_sort_with_data(
-		profile->event_instants, profcl_evinst_comp, (gpointer) &sortType);
+		profile->event_instants, cl4_prof_evinst_comp, (gpointer) &sortType);
 
 	/* Iterate through all event instants and determine total times. */
 	currEvInstContainer = profile->event_instants;
 	while (currEvInstContainer) {
 		
 		/* Loop aux. variables. */
-		ProfCLEvInst* currEvInst = NULL;
+		CL4ProfEvInst* currEvInst = NULL;
 		cl_ulong startInst, endInst;
 		
 		/* Get START event instant. */
-		currEvInst = (ProfCLEvInst*) currEvInstContainer->data;
+		currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
 		startInst = currEvInst->instant;
 		
 		/* Get END event instant */
 		currEvInstContainer = currEvInstContainer->next;
-		currEvInst = (ProfCLEvInst*) currEvInstContainer->data;
+		currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
 		endInst = currEvInst->instant;
 		
 		/* Add new interval to respective aggregate value. */
-		currAgg = (ProfCLEvAggregate*) g_hash_table_lookup(
+		currAgg = (CL4ProfEvAggregate*) g_hash_table_lookup(
 			profile->aggregate, currEvInst->eventName);
 		currAgg->totalTime += endInst - startInst;
 		profile->totalEventsTime += endInst - startInst;
@@ -702,7 +702,7 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 	/* Determine relative times. */
 	g_hash_table_iter_init(&iter, profile->aggregate);
 	while (g_hash_table_iter_next(&iter, &eventName, &valueAgg)) {
-		currAgg = (ProfCLEvAggregate*) valueAgg;
+		currAgg = (CL4ProfEvAggregate*) valueAgg;
 		currAgg->relativeTime = 
 			((double) currAgg->totalTime) 
 			/ 
@@ -711,7 +711,7 @@ int profcl_profile_aggregate(ProfCLProfile* profile, GError** err) {
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	status = PROFCL_SUCCESS;
+	status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -731,8 +731,8 @@ finish:
  * @param eventName Name of event.
  * @return New aggregate statistic or NULL if allocation unsuccessful.
  * */
-ProfCLEvAggregate* profcl_aggregate_new(const char* eventName) {
-	ProfCLEvAggregate* agg = (ProfCLEvAggregate*) malloc(sizeof(ProfCLEvAggregate));
+CL4ProfEvAggregate* cl4_prof_aggregate_new(const char* eventName) {
+	CL4ProfEvAggregate* agg = (CL4ProfEvAggregate*) malloc(sizeof(CL4ProfEvAggregate));
 	if (agg != NULL) {
 		agg->eventName = eventName;
 	}
@@ -744,7 +744,7 @@ ProfCLEvAggregate* profcl_aggregate_new(const char* eventName) {
  * 
  * @param agg Aggregate statistic to free.
  * */
-void profcl_aggregate_free(gpointer agg) {
+void cl4_prof_aggregate_free(gpointer agg) {
 	free(agg);
 }
 
@@ -757,11 +757,11 @@ void profcl_aggregate_free(gpointer agg) {
  * @param userdata Defines what type of sorting to do.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
-gint profcl_evagg_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
+gint cl4_prof_evagg_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 	/* Cast input parameters to event instant data structures. */
-	ProfCLEvAggregate* evAgg1 = (ProfCLEvAggregate*) a;
-	ProfCLEvAggregate* evAgg2 = (ProfCLEvAggregate*) b;
-	ProfCLEvAggDataSort* sortType = (ProfCLEvAggDataSort*) userdata;
+	CL4ProfEvAggregate* evAgg1 = (CL4ProfEvAggregate*) a;
+	CL4ProfEvAggregate* evAgg2 = (CL4ProfEvAggregate*) b;
+	CL4ProfEvAggDataSort* sortType = (CL4ProfEvAggDataSort*) userdata;
 	/* Perform comparison. */
 	if (*sortType == PROFCL_AGGEVDATA_SORT_NAME) {
 		/* Sort by event name */
@@ -780,7 +780,7 @@ gint profcl_evagg_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 * 
 * @param profile An OpenCL events profile.
 * */
-void profcl_profile_start(ProfCLProfile* profile) {
+void cl4_prof_profile_start(CL4ProfProfile* profile) {
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
 	/* Start timer. */
@@ -793,7 +793,7 @@ void profcl_profile_start(ProfCLProfile* profile) {
  * 
  * @param profile An OpenCL events profile. 
  * */
-void profcl_profile_stop(ProfCLProfile* profile) {
+void cl4_prof_profile_stop(CL4ProfProfile* profile) {
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
 	/* Stop timer. */
@@ -808,7 +808,7 @@ void profcl_profile_stop(ProfCLProfile* profile) {
  * @param profile An OpenCL events profile. 
  * @return number of seconds elapsed, including any fractional part.
  * */
-gdouble profcl_time_elapsed(ProfCLProfile* profile) {
+gdouble cl4_prof_time_elapsed(CL4ProfProfile* profile) {
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
 	/* Stop timer. */
@@ -821,11 +821,11 @@ gdouble profcl_time_elapsed(ProfCLProfile* profile) {
  * @param profile An OpenCL events profile.
  * @param evAggSortType Sorting strategy for aggregate event data instances.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
- * terminates successfully, or another value of #profcl_error_codes if 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_prof_error_codes if 
  * an error occurs.
  * */ 
-int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType, GError** err) {
+int cl4_prof_print_info(CL4ProfProfile* profile, CL4ProfEvAggDataSort evAggSortType, GError** err) {
 	
 	/* Function return status. */
 	int status;
@@ -840,7 +840,7 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 	/* List of aggregate events (traversing pointer). */
 	GList* evAggContainer = NULL;
 	/* Aggregate event info. */
-	ProfCLEvAggregate* evAgg = NULL;
+	CL4ProfEvAggregate* evAgg = NULL;
 	/* Number of unique event names. */
 	guint numUniqEvts;
 	/* String containing description of overlapping events. */
@@ -871,19 +871,19 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 		evAggList = g_hash_table_get_values(profile->aggregate);
 		gef_if_error_create_goto(
 			*err, 
-			PROFCL_ERROR, 
+			CL4_ERROR, 
 			evAggList == NULL, 
-			status = PROFCL_ALLOC_ERROR, 
+			status = CL4_ERROR_NOALLOC, 
 			error_handler, 
 			"Unable to allocate memory for GList object 'evAggList'.");
 		evAggList = g_list_sort_with_data(
-			evAggList, profcl_evagg_comp, &evAggSortType);
+			evAggList, cl4_prof_evagg_comp, &evAggSortType);
 		evAggContainer = evAggList;
 		printf("       ------------------------------------------------------------------\n");
 		printf("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
 		printf("       ------------------------------------------------------------------\n");
 		while (evAggContainer) {
-			evAgg = (ProfCLEvAggregate*) evAggContainer->data;
+			evAgg = (CL4ProfEvAggregate*) evAggContainer->data;
 			g_assert(evAgg != NULL);
 			printf(
 				"       | %-30.30s | %13.4f | %13.4e |\n", 
@@ -902,9 +902,9 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 		tmp = g_hash_table_new(g_direct_hash, g_direct_equal);
 		gef_if_error_create_goto(
 			*err, 
-			PROFCL_ERROR, 
+			CL4_ERROR, 
 			tmp == NULL, 
-			status = PROFCL_ALLOC_ERROR, 
+			status = CL4_ERROR_NOALLOC, 
 			error_handler, 
 			"Unable to allocate memory for 'tmp' table: g_hash_table_new function returned NULL.");
 		/* Populate temporary hash table. */
@@ -950,7 +950,7 @@ int profcl_print_info(ProfCLProfile* profile, ProfCLEvAggDataSort evAggSortType,
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	status = PROFCL_SUCCESS;
+	status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -986,22 +986,22 @@ finish:
  *     0    146    157    read_result
  * 
  * Several export parameters can be configured with the 
- * profcl_export_opts_get() and profcl_export_opts_set() functions, by
- * manipulating a ::ProfCLExportOptions struct.
+ * cl4_prof_export_opts_get() and cl4_prof_export_opts_set() functions, by
+ * manipulating a ::CL4ProfExportOptions struct.
  * 
  * @param profile An OpenCL events profile.
  * @param stream Stream where export info to.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
- * terminates successfully, or another value of #profcl_error_codes if 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_prof_error_codes if 
  * an error occurs.
  * */ 
-int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
+int cl4_prof_export_info(CL4ProfProfile* profile, FILE* stream, GError** err) {
 	
 	/* Return status. */
 	int ret_status, write_status;
 	/* Type of sorting to perform on event list. */
-	ProfCLEvSort sortType;
+	CL4ProfEvSort sortType;
 	/* List of event instants (traversing pointer). */
 	GList* evInstContainer = NULL;
 	
@@ -1011,7 +1011,7 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 	/* Sort event instants by eid, and then by START, END order. */
 	sortType = PROFCL_EV_SORT_ID;
 	profile->event_instants = g_list_sort_with_data(
-		profile->event_instants, profcl_evinst_comp, (gpointer) &sortType);
+		profile->event_instants, cl4_prof_evinst_comp, (gpointer) &sortType);
 	
 	/* Iterate through all event instants, determine complete event
 	 * information and export it to stream. */
@@ -1019,14 +1019,14 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 	while (evInstContainer) {
 
 		/* Loop aux. variables. */
-		ProfCLEvInst* currEvInst = NULL;
+		CL4ProfEvInst* currEvInst = NULL;
 		gulong q1, q2;
 		gulong qId;
 		cl_ulong startInst, endInst;
 		const char *ev1Name, *ev2Name;
 		
 		/* Get information from start instant. */
-		currEvInst = (ProfCLEvInst*) evInstContainer->data;
+		currEvInst = (CL4ProfEvInst*) evInstContainer->data;
 		startInst = export_options.zero_start 
 			? currEvInst->instant - profile->startTime 
 			: currEvInst->instant;
@@ -1039,7 +1039,7 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 		
 		/* Get information from end instant. */
 		evInstContainer = evInstContainer->next;
-		currEvInst = (ProfCLEvInst*) evInstContainer->data;
+		currEvInst = (CL4ProfEvInst*) evInstContainer->data;
 		endInst = export_options.zero_start 
 			? currEvInst->instant - profile->startTime 
 			: currEvInst->instant;
@@ -1075,9 +1075,9 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 			
 		gef_if_error_create_goto(
 			*err, 
-			PROFCL_ERROR, 
+			CL4_ERROR, 
 			write_status < 0, 
-			ret_status = PROFCL_ERROR_STREAM_WRITE, 
+			ret_status = CL4_ERROR_STREAM_WRITE, 
 			error_handler, 
 			"Error while exporting profiling information (writing to stream).");
 		
@@ -1088,7 +1088,7 @@ int profcl_export_info(ProfCLProfile* profile, FILE* stream, GError** err) {
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	ret_status = PROFCL_SUCCESS;
+	ret_status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -1105,16 +1105,16 @@ finish:
 /** 
  * @brief Helper function which exports profiling info to a given file, 
  * automatically opening and closing the file. Check the 
- * profcl_export_info() for more information.
+ * cl4_prof_export_info() for more information.
  * 
  * @param profile An OpenCL events profile.
  * @param filename Name of file where information will be saved to.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link profcl_error_codes::PROFCL_SUCCESS @endlink if function
- * terminates successfully, or another value of #profcl_error_codes if 
+ * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_prof_error_codes if 
  * an error occurs.
  * */ 
-int profcl_export_info_file(ProfCLProfile* profile, const char* filename, GError** err) {
+int cl4_prof_export_info_file(CL4ProfProfile* profile, const char* filename, GError** err) {
 
 	/* Aux. var. */
 	int status;
@@ -1126,21 +1126,21 @@ int profcl_export_info_file(ProfCLProfile* profile, const char* filename, GError
 	FILE* fp = fopen(filename, "w");
 	gef_if_error_create_goto(
 		*err, 
-		PROFCL_ERROR, 
+		CL4_ERROR, 
 		fp == NULL, 
-		status = PROFCL_ERROR_OPENFILE, 
+		status = CL4_ERROR_OPENFILE, 
 		error_handler, 
 		"Unable to open file '%s' for exporting.", 
 		filename);
 	
 	/* Export data. */
-	status = profcl_export_info(profile, fp, &errInt);
+	status = cl4_prof_export_info(profile, fp, &errInt);
 	gef_if_error_propagate_goto(
 		errInt, err, GEF_USE_GERROR, status, error_handler);
 	
 	/* If we got here, everything is OK. */
 	g_assert (errInt == NULL);
-	status = PROFCL_SUCCESS;
+	status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -1160,11 +1160,11 @@ finish:
 }
 
 /**
- * @brief Set export options using a ::ProfCLExportOptions struct.
+ * @brief Set export options using a ::CL4ProfExportOptions struct.
  * 
  * @param export_opts Export options to set.
  * */
-void profcl_export_opts_set(ProfCLExportOptions export_opts) {
+void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts) {
 	export_options = export_opts;
 }
 
@@ -1173,7 +1173,7 @@ void profcl_export_opts_set(ProfCLExportOptions export_opts) {
  * 
  * @return Current export options.
  * */
- ProfCLExportOptions profcl_export_opts_get() {
+ CL4ProfExportOptions cl4_prof_export_opts_get() {
 	return export_options;
 }
 
@@ -1183,6 +1183,6 @@ void profcl_export_opts_set(ProfCLExportOptions export_opts) {
  * 
  * @return A GQuark structure defined by category identifying string, which identifies the error as a CL profiler generated error.
  */
-GQuark profcl_error_quark() {
+GQuark cl4_prof_error_quark() {
 	return g_quark_from_static_string("profcl-error-quark");
 }
