@@ -26,6 +26,7 @@
  */
 
 #include "manager.h"
+#include "query.h"
 
 /** 
  * @brief Kernel info main function.
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
 	GError *err = NULL;          /* Error management. */
 	cl_kernel kernel = NULL;     /* Kernel. */
 	CL4ManZone* zone = NULL;        /* OpenCL zone. */
-	CL4ManKernelWorkgroupInfo kwgi; /* Information about kernel. */
+	CL4QueryKernelWorkgroupInfo kwgi; /* Information about kernel. */
 	int dev_idx = -1;
 	
 	/* ************************** */
@@ -75,10 +76,10 @@ int main(int argc, char *argv[])
 	/*  Get and print kernel info  */
 	/* *************************** */
 	
-	status = cl4_man_workgroup_info_get(kernel, zone->device_info.device_id, &kwgi, &err);
+	status = cl4_query_workgroup_info_get(kernel, zone->device_info.device_id, &kwgi, &err);
 	gef_if_error_create_goto(err, CL4_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get kernel information.", status);
 	
-	cl4_man_workgroup_info_print(&kwgi);	
+	cl4_query_workgroup_info_print(&kwgi);	
 	
 	/* ************** */
 	/* Error handling */

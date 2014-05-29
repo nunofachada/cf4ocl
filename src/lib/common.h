@@ -28,6 +28,8 @@
 #ifndef CL4_COMMON_H
 #define CL4_COMMON_H 
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <glib.h>
 
 /**
