@@ -34,8 +34,8 @@
  * @brief Program error codes.
  * */ 
 enum gerrorf_flags {
-	GEF_USE_STATUS = -6000,				/**< Don't change status variable. */
-	GEF_USE_GERROR = -7000				/**< Use error code in GError object. */
+	GEF_USE_STATUS = -6000, /**< Don't change status variable. */
+	GEF_USE_GERROR = -7000  /**< Use error code in GError object. */
 };
 
 
