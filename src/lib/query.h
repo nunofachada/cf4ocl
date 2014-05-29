@@ -39,22 +39,22 @@
 #endif
 
 /**
- * @brief Kernel work group information.
+ * @brief Kernel workgroup information.
  */
-typedef struct cl4_query_kernel_work_group_info {
-	size_t preferred_work_group_size_multiple; /**< Preferred multiple of workgroup size for launch. */
-	size_t compile_work_group_size[3];         /**< Work-group size specified by the @code __attribute__((reqd_work_gr oup_size(X, Y, Z))) @endcode qualifier. If the work-group size is not specified using the above attribute qualifier (0, 0, 0) is returned. */
-	size_t max_work_group_size;                /**< Maximum work-group size that can be used to execute a kernel on a specific device. */
-	cl_ulong local_mem_size;                   /**< Amount of local memory in bytes being used by a kernel. */
-	cl_ulong private_mem_size;                 /**< Minimum amount of private memory, in bytes, used by each workitem in the kernel.  */
-} CL4QueryKernelWorkgroupInfo;
+typedef struct cl4_query_kernel_workgroup {
+	size_t preferred_workgroup_size_multiple; /**< Preferred multiple of workgroup size for launch. */
+	size_t compile_workgroup_size[3];         /**< Work-group size specified by the @code __attribute__((reqd_work_gr oup_size(X, Y, Z))) @endcode qualifier. If the work-group size is not specified using the above attribute qualifier (0, 0, 0) is returned. */
+	size_t max_workgroup_size;                /**< Maximum work-group size that can be used to execute a kernel on a specific device. */
+	cl_ulong local_mem_size;                  /**< Amount of local memory in bytes being used by a kernel. */
+	cl_ulong private_mem_size;                /**< Minimum amount of private memory, in bytes, used by each workitem in the kernel.  */
+} CL4QueryKernelWorkgroup;
 
 
 /** @brief Get kernel workgroup info. */
-int cl4_query_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4QueryKernelWorkgroupInfo* kwgi, GError **err);
+int cl4_query_workgroup_get(cl_kernel kernel, cl_device_id device, CL4QueryKernelWorkgroup* kwgi, GError **err);
 
 /** @brief Print kernel workgroup info. */
-void cl4_query_workgroup_info_print(CL4QueryKernelWorkgroupInfo* kwgi);
+void cl4_query_workgroup_print(CL4QueryKernelWorkgroup* kwgi);
 
 
 #endif
