@@ -41,15 +41,15 @@ typedef enum {
 	CL4_HALF = 6,
 	CL4_FLOAT = 7,
 	CL4_DOUBLE = 8
-} CF4CLType;
+} CL4Type;
 
-typedef struct cl4_type_info CF4CLTypeInfo;
+typedef struct cl4_type_info CL4TypeInfo;
 
 /** @brief Return OpenCL type name. */
-const char* cl4_type_name_get(CF4CLType type);
+const char* cl4_type_name_get(CL4Type type);
 
 /** @brief Return OpenCL type size in bytes. */
-int cl4_type_sizeof(CF4CLType type);
+int cl4_type_sizeof(CL4Type type);
 
 #endif
 

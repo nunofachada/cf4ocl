@@ -95,7 +95,7 @@ static cl_uint cl4_man_menu_device_selector_query(CL4ManDeviceInfo* devInfos, cl
  * @param device OpenCL device where kernel will run.
  * @param kwgi Kernel workgroup information structure, which will be populated by this function.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CL4_MAN_SUCCESS @endlink operation
+ * @return @link cl4_man_error_codes::CL4_SUCCESS @endlink operation
  * successfully completed or another value of #cl4_man_error_codes if an 
  * error occurs.
  */
@@ -118,7 +118,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKern
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CL4_MAN_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -134,7 +134,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKern
 	gef_if_error_create_goto(
 		*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CL4_MAN_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_COMPILE_WORK_GROUP_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -152,7 +152,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKern
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CL4_MAN_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_WORK_GROUP_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -170,7 +170,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKern
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CL4_MAN_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_LOCAL_MEM_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -188,7 +188,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKern
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		ret_status = CL4_MAN_OCL_ERROR, 
+		ret_status = CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_workgroup_info_get: Unable to get CL_KERNEL_PRIVATE_MEM_SIZE (OpenCL error %d: %s).", 
 		ocl_status,
@@ -196,7 +196,7 @@ int cl4_man_workgroup_info_get(cl_kernel kernel, cl_device_id device, CL4ManKern
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	ret_status = CL4_MAN_SUCCESS;
+	ret_status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -355,7 +355,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CL4_MAN_OCL_ERROR, 
+		CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: get number of platforms (OpenCL error %d: %s).",
 		status,
@@ -367,7 +367,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CL4_MAN_OCL_ERROR, 
+		CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: get platform Ids (OpenCL error %d: %s).", 
 		status,
@@ -389,7 +389,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 				*err, 
 				CL4_ERROR, 
 				CL_SUCCESS != status, 
-				CL4_MAN_OCL_ERROR, 
+				CL4_OCL_ERROR, 
 				error_handler, 
 				"cl4_man_zone_new: get device Ids (OpenCL error %d: %s).", 
 				status,
@@ -409,7 +409,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 					*err, 
 					CL4_ERROR, 
 					CL_SUCCESS != status, 
-					CL4_MAN_OCL_ERROR, 
+					CL4_OCL_ERROR, 
 					error_handler, 
 					"cl4_man_zone_new: get device name info (OpenCL error %d: %s).",
 					status,
@@ -425,7 +425,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 					*err, 
 					CL4_ERROR, 
 					CL_SUCCESS != status, 
-					CL4_MAN_OCL_ERROR, 
+					CL4_OCL_ERROR, 
 					error_handler, 
 					"cl4_man_zone_new: get device vendor info (OpenCL error %d: %s).", 
 					status,
@@ -441,7 +441,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 					*err, 
 					CL4_ERROR, 
 					CL_SUCCESS != status, 
-					CL4_MAN_OCL_ERROR, 
+					CL4_OCL_ERROR, 
 					error_handler, 
 					"cl4_man_zone_new: get platform info (OpenCL error %d: %s).",
 					status,
@@ -459,7 +459,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 			*err, 
 			CL4_ERROR, 
 			1, 
-			CL4_MAN_ERROR_DEVICE_NOT_FOUND, 
+			CL4_OCL_ERROR, 
 			error_handler, 
 			"cl4_man_zone_new: device not found.");
 	} else {
@@ -475,7 +475,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 				*err, 
 				CL4_ERROR, 
 				1, 
-				CL4_MAN_ERROR_DEVICE_NOT_FOUND, 
+				CL4_OCL_ERROR, 
 				error_handler, 
 				"cl4_man_zone_new: specified device not found.");
 		}
@@ -496,7 +496,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CL4_MAN_OCL_ERROR, 
+		CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: get target device info (OpenCL error %d: %s).", 
 		status,
@@ -509,7 +509,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != status, 
-		CL4_MAN_OCL_ERROR, 
+		CL4_OCL_ERROR, 
 		error_handler, 
 		"cl4_man_zone_new: creating context (OpenCL error %d: %s).", 
 		status,
@@ -537,7 +537,7 @@ CL4ManZone* cl4_man_zone_new(cl_uint deviceType, cl_uint numQueues, cl_int queue
 			*err, 
 			CL4_ERROR, 
 			CL_SUCCESS != status, 
-			CL4_MAN_OCL_ERROR, 
+			CL4_OCL_ERROR, 
 			error_handler, 
 			"cl4_man_zone_new: creating command queue (OpenCL error %d: %s).", 
 			status,
@@ -572,7 +572,7 @@ finish:
  * @param numKernelFiles Number of strings identifying filenames containing kernels.
  * @param compilerOpts OpenCL compiler options.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CL4_MAN_SUCCESS @endlink operation
+ * @return @link cl4_man_error_codes::CL4_SUCCESS @endlink operation
  * successfully completed or another value of #cl4_man_error_codes if an 
  * error occurs.
  */
@@ -591,7 +591,7 @@ int cl4_man_program_create(CL4ManZone* zone, char** kernelFiles, cl_uint numKern
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	ret_status = CL4_MAN_SUCCESS;
+	ret_status = CL4_SUCCESS;
 	goto finish;
 	
 error_handler:
@@ -614,7 +614,7 @@ finish:
  * @param numKernelFiles Number of strings identifying filenames containing kernels.
  * @param compilerOpts OpenCL compiler options.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CL4_MAN_SUCCESS @endlink operation
+ * @return @link cl4_man_error_codes::CL4_SUCCESS @endlink operation
  * successfully completed or another value of #cl4_man_error_codes if an 
  * error occurs.
  */
@@ -655,7 +655,7 @@ cl_program cl4_man_program_create_indep(cl_context context,
 		*err, 
 		CL4_ERROR, 
 		CL_SUCCESS != ocl_status, 
-		CL4_MAN_OCL_ERROR, 
+		CL4_OCL_ERROR, 
 		error_handler, 
 		"Create program with source (OpenCL error %d :%s).", 
 		ocl_status,
@@ -684,7 +684,7 @@ cl_program cl4_man_program_create_indep(cl_context context,
 			*err, 
 			CL4_ERROR, 
 			CL_SUCCESS != ocl_status, 
-			CL4_MAN_OCL_ERROR, 
+			CL4_OCL_ERROR, 
 			error_handler, 
 			"Error getting program build info (log size, OpenCL error %d: %s) after program failed to build (OpenCL error %d: %s).", 
 			ocl_status,
@@ -714,7 +714,7 @@ cl_program cl4_man_program_create_indep(cl_context context,
 			*err, 
 			CL4_ERROR, 
 			CL_SUCCESS != ocl_status, 
-			CL4_MAN_OCL_ERROR, 
+			CL4_OCL_ERROR, 
 			error_handler, 
 			"Error getting program build info (build log, OpenCL error %d: %s) after program failed to build (OpenCL error %d: %s).", 
 			ocl_status,
@@ -726,7 +726,7 @@ cl_program cl4_man_program_create_indep(cl_context context,
 			*err, 
 			CL4_ERROR, 
 			1, 
-			CL4_MAN_OCL_ERROR, 
+			CL4_OCL_ERROR, 
 			error_handler, 
 			"Failed to build program (OpenCL error %d: %s). \n\n **** Start of build log **** \n\n%s\n **** End of build log **** \n", 
 			ocl_build_status, 

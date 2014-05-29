@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	/* Parse command line options */
 	/* ************************** */
 
-	gef_if_error_create_goto(err, CL4_ERROR, (argc < 3) || (argc > 4), CL4_MAN_ERROR_ARGS, error_handler, "Usage: %s <program_file> <kernel_name> [device_index]\n", argv[0]);
+	gef_if_error_create_goto(err, CL4_ERROR, (argc < 3) || (argc > 4), CL4_ERROR_ARGS, error_handler, "Usage: %s <program_file> <kernel_name> [device_index]\n", argv[0]);
 	if (argc == 4) dev_idx = atoi(argv[3]);
 	
 	/* ********************************************* */
