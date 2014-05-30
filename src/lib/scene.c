@@ -55,11 +55,14 @@ struct cl4_scene {
 };
 
 CL4Scene* cl4_scene_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
-	
+
+	/* The OpenCL scene to create. */
 	CL4Scene* scene;
 	
-	cl_uint ocl_status;
+	/* Return status of OpenCL function calls. */
+	cl_int ocl_status;
 	
+	/* Create scene. */
 	scene = (CL4Scene*) g_try_malloc0(sizeof(CL4Scene));
 	gef_if_error_create_goto(*err, CL4_ERROR, scene == NULL, 
 		CL4_ERROR_NOALLOC, error_handler, 
@@ -92,7 +95,14 @@ CL4Scene* cl4_scene_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
 		CL4_OCL_ERROR, error_handler, 
 		"Function '%s': get devices in context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
-	
+		
+	/* Get context platform using first device. */
+	ocl_status = clGetDeviceInfo(scene->devices[0], CL_DEVICE_PLATFORM,
+		sizeof(cl_platform_id), &(scene->platform), NULL);
+	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
+		CL4_OCL_ERROR, error_handler, 
+		"Function '%s': unable to get platform (OpenCL error %d: %s).", 
+		__func__, ocl_status, cl4_err(ocl_status));
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -114,19 +124,63 @@ finish:
 }
 
 void cl4_scene_destroy(CL4Scene* scene) {
+	
+	/* Aux. var. */
+	unsigned int i;
+	
 	/* If scene is not NULL */
 	if (scene) {
+		
+		/* Release kernels in scene. */
+		for (i = 0; i < scene->num_kernels; i++) {
+			/* Only release kernel if it's non-NULL */
+			if (scene->kernels[i]) {
+				clReleaseKernel(scene->kernels[i]);
+			}
+		}
+		/* Free kernel array. */
+		g_free(scene->kernels);
+		
+		/* Release queues in scene. */
+		for (i = 0; i < scene->num_queues; i++) {
+			/* Only release queue if it's non-NULL */
+			if (scene->queues[i]) {
+				clReleaseCommandQueue(scene->queues[i]);
+			}
+		}
+		/* Free queue array. */
+		g_free(scene->queues);
+
+		/* Release programs in scene. */
+		for (i = 0; i < scene->num_programs; i++) {
+			/* Only release program if it's non-NULL */
+			if (scene->programs[i]) {
+				clReleaseProgram(scene->programs[i]);
+			}
+		}
+		/* Free program array. */
+		g_free(scene->programs);
+
 		/* Release devices in scene. */
-		for (unsigned int i = 0; i < scene->num_devices; i++) {
+		for (i = 0; i < scene->num_devices; i++) {
 			/* Only release device if it's non-NULL */
 			if (scene->devices[i]) {
 				clReleaseDevice(scene->devices[i]);
 			}
 		}
+		/* Free device array. */
+		g_free(scene->devices);
+
 		/* Release context. */
 		if (scene->context) {
 			clReleaseContext(scene->context);
 		}
+		
+		/* Release platform. */
+		if (scene->platform) {
+			clReleasePlatform(scene->platform);
+		}
+		
 		/* Release scene. */
 		g_free(scene);
 	}
