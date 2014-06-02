@@ -45,6 +45,11 @@
  * @param err Error structure, to be populated if an error occurs.
  * @return An OpenCL context or NULL if no adequate context was found.
  */
-typedef cl_context (*cl4_devsel)(void *select_info, GError **err);
+typedef cl4_platform (*cl4_devsel)(void *select_info, GError **err);
+
+/** @brief Implementation of ::cl4_devsel function which selects one or
+ * more devices based on device information such as device name, device 
+ * vendor and platform name. */
+GHashTable* cl4_devsel_name(void *select_info, GError **err);
 
 #endif
