@@ -36,6 +36,8 @@
 #endif
 #include <glib.h>
 
+typedef struct cl4_devsel_map CL4DevSelMap;
+
 /**
  * @brief Abstract function for selecting OpenCL devices and the 
  * associated context based on the provided information.

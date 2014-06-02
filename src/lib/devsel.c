@@ -26,6 +26,11 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
+struct cl4_devsel_map {
+	
+	
+};
+ 
 #include "devsel.h"
 
 /** @brief Implementation of ::cl4_devsel function which selects one or

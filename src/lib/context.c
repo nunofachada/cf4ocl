@@ -18,8 +18,7 @@
  
 /** 
  * @file
- * @brief Objects and functions which assist on setting up the OpenCL 
- * runtime environment.
+ * @brief OpenCL context wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014

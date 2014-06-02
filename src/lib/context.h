@@ -18,16 +18,15 @@
 
 /**
  * @file
- * @brief Objects and functions which assist on setting up an OpenCL 
- * runtime environment.
+ * @brief OpenCL context wrapper.
  *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_SCENE_H
-#define CL4_SCENE_H
+#ifndef CL4_CONTEXT_H
+#define CL4_CONTEXT_H
 
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/cl.h>
@@ -46,7 +45,13 @@
  * */
 typedef struct cl4_context CL4Context;
 
-CL4Context* cl4_context_new(cl4_devsel dev_sel, void* ds_info, GError **err);
+// Filters key: a devsel function
+// Filters value: the devsel function arguments (or data)
+CL4Context* cl4_context_new(GHashTable* filters, GError **err);
+
+CL4Context* cl4_context_new_cpu(GError **err);
+
+CL4Context* cl4_context_new_gpu(GError **err);
 
 void cl4_context_destroy(CL4Context* scene);
 
