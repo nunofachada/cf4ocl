@@ -26,12 +26,12 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "scene.h"
+#include "context.h"
 
 /*
  * OpenCL runtime context and associated objects.
  */
-struct cl4_scene {
+struct cl4_context {
 	/* Platform. */
 	cl_platform_id platform;
 	/* Context. */
@@ -54,16 +54,16 @@ struct cl4_scene {
 	cl_kernel* kernels;
 };
 
-CL4Scene* cl4_scene_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
+CL4Context* cl4_context_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
 
 	/* The OpenCL scene to create. */
-	CL4Scene* scene;
+	CL4Context* scene;
 	
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
 	
 	/* Create scene. */
-	scene = (CL4Scene*) g_try_malloc0(sizeof(CL4Scene));
+	scene = (CL4Context*) g_try_malloc0(sizeof(CL4Context));
 	gef_if_error_create_goto(*err, CL4_ERROR, scene == NULL, 
 		CL4_ERROR_NOALLOC, error_handler, 
 		"Function '%s': unable to allocate memory for scene object.",
@@ -113,7 +113,7 @@ error_handler:
 	g_assert (err == NULL || *err != NULL);
 	
 	/* Destroy the scene, or what was possible to build of it. */
-	cl4_scene_destroy(scene);
+	cl4_context_destroy(scene);
 	scene = NULL;
 
 finish:	
@@ -123,7 +123,7 @@ finish:
 	
 }
 
-void cl4_scene_destroy(CL4Scene* scene) {
+void cl4_context_destroy(CL4Context* scene) {
 	
 	/* Aux. var. */
 	unsigned int i;

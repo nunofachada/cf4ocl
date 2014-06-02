@@ -42,12 +42,12 @@
 /**
  * @brief The scene object encompasses the OpenCL context, associated
  * devices, programs, queues and kernels. Should be accessed using
- * the cl4_scene_* group of functions.
+ * the cl4_context_* group of functions.
  * */
-typedef struct cl4_scene CL4Scene;
+typedef struct cl4_context CL4Context;
 
-CL4Scene* cl4_scene_new(cl4_devsel dev_sel, void* ds_info, GError **err);
+CL4Context* cl4_context_new(cl4_devsel dev_sel, void* ds_info, GError **err);
 
-void cl4_scene_destroy(CL4Scene* scene);
+void cl4_context_destroy(CL4Context* scene);
 
 #endif
