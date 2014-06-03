@@ -1,5 +1,6 @@
 # Sources required for building library
-set(SRC errors.c profiler.c manager.c types.c common.c query.c context.c platform.c device.c devsel.c)
+set(SRC errors.c profiler.c manager.c types.c common.c query.c platform.c device.c)
+#context.c  devsel.c
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})

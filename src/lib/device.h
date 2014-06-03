@@ -29,5 +29,29 @@
 #ifndef CL4_DEVICE_H
 #define CL4_DEVICE_H
 
+#include "common.h"
+#if defined(__APPLE__) || defined(__MACOSX)
+    #include <OpenCL/cl.h>
+#else
+    #include <CL/cl.h>
+#endif
+
+/**
+ * @brief Device wrapper object.
+ */
+typedef struct cl4_device CL4Device;
+
+CL4Device* cl4_device_new(cl_device_id id);
+
+void cl4_device_ref(CL4Device* device);
+
+void cl4_device_destroy(CL4Device* device);
+
+void cl4_device_unref(CL4Device* device);
+
+gpointer cl4_device_get_info(CL4Device* device, 
+	cl_device_info param_name);
+	
+cl_device_id cl4_device_get_cl_device_id(CL4Device* device);
 
 #endif

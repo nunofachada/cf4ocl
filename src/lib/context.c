@@ -56,48 +56,44 @@ struct cl4_context {
 CL4Context* cl4_context_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
 
 	/* The OpenCL scene to create. */
-	CL4Context* scene;
+	CL4Context* ctx;
 	
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
 	
-	/* Create scene. */
-	scene = (CL4Context*) g_try_malloc0(sizeof(CL4Context));
-	gef_if_error_create_goto(*err, CL4_ERROR, scene == NULL, 
-		CL4_ERROR_NOALLOC, error_handler, 
-		"Function '%s': unable to allocate memory for scene object.",
-		__func__);
+	/* Create ctx. */
+	ctx = g_slice_new0(CL4Context);
 	
 	/* Get the context from the devices/context selector. */
-	scene->context = dev_sel(ds_info, err);
+	ctx->context = dev_sel(ds_info, err);
 	gef_if_error_goto(*err, GEF_USE_GERROR, (*err)->code, error_handler);
 
 	/* Get number of devices in context. */
-	ocl_status = clGetContextInfo(scene->context, CL_CONTEXT_NUM_DEVICES,
-		sizeof(cl_uint), &(scene->num_devices), NULL);
+	ocl_status = clGetContextInfo(ctx->context, CL_CONTEXT_NUM_DEVICES,
+		sizeof(cl_uint), &(ctx->num_devices), NULL);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_OCL_ERROR, error_handler, 
 		"Function '%s': get number of devices in context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
-	g_assert_cmpuint(scene->num_devices, >, 0);
+	g_assert_cmpuint(ctx->num_devices, >, 0);
 		
 	/* Get devices in context. */
-	scene->devices = (cl_device_id*) g_try_malloc0_n(
-		scene->num_devices, sizeof(cl_device_id));
-	gef_if_error_create_goto(*err, CL4_ERROR, scene->devices == NULL, 
+	ctx->devices = (cl_device_id*) g_try_malloc0_n(
+		ctx->num_devices, sizeof(cl_device_id));
+	gef_if_error_create_goto(*err, CL4_ERROR, ctx->devices == NULL, 
 		CL4_ERROR_NOALLOC, error_handler, 
 		"Function '%s': unable to allocate memory for devices.", 
 		__func__);
-	ocl_status = clGetContextInfo(scene->context, CL_CONTEXT_DEVICES,
-		scene->num_devices * sizeof(cl_device_id), scene->devices, NULL);
+	ocl_status = clGetContextInfo(ctx->context, CL_CONTEXT_DEVICES,
+		ctx->num_devices * sizeof(cl_device_id), ctx->devices, NULL);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_OCL_ERROR, error_handler, 
 		"Function '%s': get devices in context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
 		
 	/* Get context platform using first device. */
-	ocl_status = clGetDeviceInfo(scene->devices[0], CL_DEVICE_PLATFORM,
-		sizeof(cl_platform_id), &(scene->platform), NULL);
+	ocl_status = clGetDeviceInfo(ctx->devices[0], CL_DEVICE_PLATFORM,
+		sizeof(cl_platform_id), &(ctx->platform), NULL);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_OCL_ERROR, error_handler, 
 		"Function '%s': unable to get platform (OpenCL error %d: %s).", 
@@ -111,77 +107,77 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 	
-	/* Destroy the scene, or what was possible to build of it. */
-	cl4_context_destroy(scene);
-	scene = NULL;
+	/* Destroy the ctx, or what was possible to build of it. */
+	cl4_context_destroy(ctx);
+	ctx = NULL;
 
 finish:	
 
-	/* Return scene. */
-	return scene;
+	/* Return ctx. */
+	return ctx;
 	
 }
 
-void cl4_context_destroy(CL4Context* scene) {
+void cl4_context_destroy(CL4Context* ctx) {
 	
 	/* Aux. var. */
 	unsigned int i;
 	
 	/* If scene is not NULL */
-	if (scene) {
+	if (ctx) {
 		
-		/* Release kernels in scene. */
-		for (i = 0; i < scene->num_kernels; i++) {
+		/* Release kernels in ctx. */
+		for (i = 0; i < ctx->num_kernels; i++) {
 			/* Only release kernel if it's non-NULL */
-			if (scene->kernels[i]) {
-				clReleaseKernel(scene->kernels[i]);
+			if (ctx->kernels[i]) {
+				clReleaseKernel(ctx->kernels[i]);
 			}
 		}
 		/* Free kernel array. */
-		g_free(scene->kernels);
+		g_free(ctx->kernels);
 		
-		/* Release queues in scene. */
-		for (i = 0; i < scene->num_queues; i++) {
+		/* Release queues in ctx. */
+		for (i = 0; i < ctx->num_queues; i++) {
 			/* Only release queue if it's non-NULL */
-			if (scene->queues[i]) {
-				clReleaseCommandQueue(scene->queues[i]);
+			if (ctx->queues[i]) {
+				clReleaseCommandQueue(ctx->queues[i]);
 			}
 		}
 		/* Free queue array. */
-		g_free(scene->queues);
+		g_free(ctx->queues);
 
-		/* Release programs in scene. */
-		for (i = 0; i < scene->num_programs; i++) {
+		/* Release programs in ctx. */
+		for (i = 0; i < ctx->num_programs; i++) {
 			/* Only release program if it's non-NULL */
-			if (scene->programs[i]) {
-				clReleaseProgram(scene->programs[i]);
+			if (ctx->programs[i]) {
+				clReleaseProgram(ctx->programs[i]);
 			}
 		}
 		/* Free program array. */
-		g_free(scene->programs);
+		g_free(ctx->programs);
 
-		/* Release devices in scene. */
-		for (i = 0; i < scene->num_devices; i++) {
+		/* Release devices in ctx. */
+		for (i = 0; i < ctx->num_devices; i++) {
 			/* Only release device if it's non-NULL */
-			if (scene->devices[i]) {
-				clReleaseDevice(scene->devices[i]);
+			if (ctx->devices[i]) {
+				clReleaseDevice(ctx->devices[i]);
 			}
 		}
 		/* Free device array. */
-		g_free(scene->devices);
+		g_free(ctx->devices);
 
 		/* Release context. */
-		if (scene->context) {
-			clReleaseContext(scene->context);
+		if (ctx->context) {
+			clReleaseContext(ctx->context);
 		}
 		
 		/* Release platform. */
-		if (scene->platform) {
-			clReleasePlatform(scene->platform);
+		if (ctx->platform) {
+			clReleasePlatform(ctx->platform);
 		}
 		
-		/* Release scene. */
-		g_free(scene);
+		/* Release ctx. */
+		g_slice_free(CL4Context, ctx);
 	}
 }
 
