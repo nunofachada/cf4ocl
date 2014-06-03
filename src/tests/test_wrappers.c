@@ -17,21 +17,26 @@
 
 /** 
  * @file
- * @brief Tests for scene library.
+ * @brief Tests for context, platforms and devices wrappers library.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "scene.h"
+#include "platforms.h"
+#include "platform.h"
+#include "device.h"
+//#include "context.h"
 
 /**
- * @brief Tests the scene library.
+ * @brief Tests platforms wrapper.
  * */
-static void createDestroyTest() {
+static void platforms_test() {
 	
+	CL4Platforms* platfs = cl4_platforms_new(NULL);
 	
+	cl4_platforms_destroy(platfs);
 }
 
 /**
@@ -42,7 +47,7 @@ static void createDestroyTest() {
  * */
 int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
-	g_test_add_func("/scene/scene", profilerTest);
+	g_test_add_func("/wrappers/platforms", platforms_test);
 	return g_test_run();
 }
 
