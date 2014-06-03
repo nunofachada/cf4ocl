@@ -76,7 +76,7 @@ void cl4_platform_destroy(CL4Platform* platform) {
 
 void cl4_platform_unref(CL4Platform* platform) {
 	
-	g_return_if_fail (platform != NULL);
+	g_return_if_fail(platform != NULL);
 
 	if (g_atomic_int_dec_and_test(&platform->ref_count)) {
 		if (platform->info) {
@@ -138,5 +138,3 @@ gchar* cl4_plaform_get_info(CL4Platform* platform,
 cl_platform_id cl4_platform_get_cl_platform_id(CL4Platform* platform) {
 	return platform->id;
 }
-
-
