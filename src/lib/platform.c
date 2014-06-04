@@ -87,7 +87,7 @@ void cl4_platform_unref(CL4Platform* platform) {
 			g_hash_table_destroy(platform->info);
 		}
 		if (platform->devices) {
-			for (guint i = 0; platform->num_devices; i++) {
+			for (guint i = 0; i < platform->num_devices; i++) {
 				cl4_device_destroy(platform->devices[i]);
 			}
 			g_slice_free1(
