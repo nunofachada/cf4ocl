@@ -122,5 +122,15 @@ void cl4_platforms_destroy(CL4Platforms* platforms) {
 		cl4_platform_unref(platforms->platfs[i]);
 	}
 	g_slice_free1(
-		sizeof(CL4Platform*) * platforms->num_platfs, platforms);
+		sizeof(CL4Platform*) * platforms->num_platfs, platforms->platfs);
+	g_slice_free(CL4Platforms*, platforms);
+}
+
+guint cl4_platforms_count(CL4Platforms* platforms) {
+	return platforms->num_platfs;
+}
+
+CL4Platform* cl4_platforms_get(CL4Platforms* platforms, guint index) {
+	 g_return_val_if_fail(index < platforms->num_platfs, NULL);
+	 return platforms->platfs[index];
 }

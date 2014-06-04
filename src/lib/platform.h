@@ -31,6 +31,8 @@
 
 #include "common.h"
 #include "device.h"
+#include "gerrorf.h"
+#include "errors.h"
 
 /**
  * @brief Platform wrapper object.
@@ -46,10 +48,12 @@ void cl4_platform_destroy(CL4Platform* platform);
 
 void cl4_platform_unref(CL4Platform* platform);
 
-gchar* cl4_plaform_get_info(CL4Platform* platform, 
-	cl_platform_info param_name);
+gchar* cl4_plaform_info(CL4Platform* platform, 
+	cl_platform_info param_name, GError **err);
 
-cl_platform_id cl4_platform_get_cl_platform_id(CL4Platform* platform);
+cl_platform_id cl4_platform_id(CL4Platform* platform);
+
+CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err);
 
 
 

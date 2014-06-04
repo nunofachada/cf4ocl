@@ -44,5 +44,8 @@ CL4Platforms* cl4_platforms_new(GError **err);
 
 void cl4_platforms_destroy(CL4Platforms* platforms);
 
+guint cl4_platforms_count(CL4Platforms* platforms);
+
+CL4Platform* cl4_platforms_get(CL4Platforms* platforms, guint index);
 
 #endif

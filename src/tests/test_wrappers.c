@@ -35,7 +35,35 @@
 static void platforms_test() {
 	
 	CL4Platforms* platfs = cl4_platforms_new(NULL);
+	CL4Platform* p = NULL;
+	gchar* info;
+	guint num_platfs = cl4_platforms_count(platfs);
 	
+	g_debug("== Found %d OpenCL platforms", num_platfs);
+	for (guint i = 0; i < num_platfs; i++) {
+	
+		p = cl4_platforms_get(platfs, i);
+		
+		g_debug("==== Platform %d:", i);
+
+		info = cl4_plaform_info(p, CL_PLATFORM_PROFILE);
+		g_debug("======== Profile : %s", info);
+		
+		info = cl4_plaform_info(p, CL_PLATFORM_VERSION);
+		g_debug("======== Version : %s", info);
+
+		info = cl4_plaform_info(p, CL_PLATFORM_NAME);
+		g_debug("======== Name    : %s", info);
+
+		info = cl4_plaform_info(p, CL_PLATFORM_VENDOR);
+		g_debug("======== Vendor  : %s", info);
+
+		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS);
+		g_debug("======== Extens. : %s", info);
+		
+		
+
+	}
 	cl4_platforms_destroy(platfs);
 }
 

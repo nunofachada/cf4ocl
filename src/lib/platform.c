@@ -32,10 +32,11 @@
  * @brief Platform wrapper object.
  */
 struct cl4_platform {
-	cl_platform_id id; /**< Platform ID. */
-	GHashTable* info;  /**< Platform information. */
-	CL4Device** devs;  /**< Devices available in platform. */
-	gint ref_count;    /**< Reference count. */
+	cl_platform_id id;   /**< Platform ID. */
+	GHashTable* info;    /**< Platform information. */
+	guint num_devices;   /**< Number of devices available in platform. */
+	CL4Device** devices; /**< Devices available in platform. */
+	gint ref_count;      /**< Reference count. */
 };
 
 
@@ -54,7 +55,7 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
 	platform->info = NULL;
 
 	/* Platform devices array will be lazy initialized when required. */
-	platform->devs = NULL;
+	platform->devices = NULL;
 	
 	/* Reference count is one initially. */
 	platform->ref_count = 1;
@@ -82,11 +83,11 @@ void cl4_platform_unref(CL4Platform* platform) {
 		if (platform->info) {
 			g_hash_table_destroy(platform->info);
 		}
-		if (platform->devs) {
-			for (guint i = 0; platform->devs[i]; i++) {
-				cl4_device_destroy(platform->devs[i]);
+		if (platform->devices) {
+			for (guint i = 0; platform->devices[i]; i++) {
+				cl4_device_destroy(platform->devices[i]);
 			}
-			g_free(platform->devs);
+			g_free(platform->devices);
 		}
 		
 		g_slice_free(CL4Platform, platform);
@@ -94,10 +95,10 @@ void cl4_platform_unref(CL4Platform* platform) {
 
 }
 
-gchar* cl4_plaform_get_info(CL4Platform* platform, 
-	cl_platform_info param_name) {
+gchar* cl4_plaform_info(CL4Platform* platform, 
+	cl_platform_info param_name, GError **err) {
 
-	gchar* param_value;
+	gchar* param_value = NULL;
 	
 	/* If platform information table is not yet initialized, then 
 	 * allocate memory for it. */
@@ -119,22 +120,101 @@ gchar* cl4_plaform_get_info(CL4Platform* platform,
 		
 		ocl_status = clGetPlatformInfo(
 			platform->id, param_name, 0, NULL, &size_ret);
+		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
+			CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get platform info [size] (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
 		
 		param_value = (gchar*) g_malloc(size_ret);
 		
 		ocl_status = clGetPlatformInfo(
 			platform->id, param_name, size_ret, param_value, NULL);
-		/// @todo Check ocl status	
+		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
+			CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get platform info [info] (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
 			
 		g_hash_table_insert(
 			platform->info, GUINT_TO_POINTER(param_name), param_value);
 		
 	}
 	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+finish:		
+
 	return param_value;
 
 }
 
-cl_platform_id cl4_platform_get_cl_platform_id(CL4Platform* platform) {
+cl_platform_id cl4_platform_id(CL4Platform* platform) {
 	return platform->id;
+}
+
+CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err) {
+	/// @todo Make this return const
+	
+	if (!platform->devices) {
+	
+		cl_int ocl_status;
+		
+		size_t dev_ids_size;
+		
+		cl_device_id* dev_ids;
+		
+		/* Determine number of devices. */
+		ocl_status = clGetDeviceIDs(platform->id, CL_DEVICE_TYPE_ALL, 0,
+			NULL, &platform->num_devices);
+		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
+			CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get number of devices (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
+		
+		/* Determine size in bytes of array of platform IDs. */
+		dev_ids_size = sizeof(cl_device_id) * platform->num_devices;
+		
+		/* Allocate memory for array of device IDs. */
+		dev_ids = (cl_device_id*) g_slice_alloc(dev_ids_size);
+		
+		/* Get existing device IDs. */
+		ocl_status = clGetDeviceIDs(platform->id, CL_DEVICE_TYPE_ALL, 
+			platform->num_devices, dev_ids, NULL);
+		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
+			CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get device IDs (OpenCL error %d: %s).",
+		__func__, ocl_status, cl4_err(ocl_status));
+		
+		/* Allocate memory for array of device wrapper objects. */
+		platform->devices = g_slice_alloc(
+			sizeof(CL4Device*) * platform->num_devices);
+	
+		/* Wrap device IDs in device wrapper objects. */
+		for (guint i = 0; i < platform->num_devices; i++) {
+			
+			/* Add device wrapper object to array of wrapper objects. */
+			platform->devices[i] = cl4_device_new(dev_ids[i]);
+		}
+
+		/* Free array of device ids. */
+		g_slice_free1(dev_ids_size, dev_ids);
+		
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+finish:		
+	
+	return platform->devices;
 }
