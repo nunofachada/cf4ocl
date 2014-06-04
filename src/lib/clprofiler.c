@@ -521,11 +521,8 @@ int profcl_profile_overmat(ProfCLProfile* profile, GError** err) {
 					 * inner table as value. Inner table will be initalized 
 					 * with second key (larger id) as key and event start 
 					 * instant as value. */
-					innerTable = g_hash_table_new_full(
-						g_direct_hash, 
-						g_direct_equal, 
-						NULL, 
-						(GDestroyNotify) g_hash_table_destroy);
+					innerTable = g_hash_table_new(
+						g_direct_hash, g_direct_equal);
 					gef_if_error_create_goto(
 						*err, 
 						PROFCL_ERROR, 
