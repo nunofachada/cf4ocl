@@ -24,7 +24,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "test_profiler.h"
+#include "mocks_stubs/profiler/cl_stub.h"
 #include "profiler.h"
 
 /**
@@ -203,44 +203,3 @@ int main(int argc, char** argv) {
 	return g_test_run();
 }
 
-/** 
- * @brief Stub for clGetEventProfilingInfo function. 
- * 
- * @param event Stub event.
- * @param param_name Specifies the profiling data to query.
- * @param param_value_size Ignored.
- * @param param_value A pointer to memory where the appropriate result being queried is returned.
- * @param param_value_size_ret Ignored.
- * @return Always returns CL_SUCCESS.
- * */ 
-cl_int clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret) {
-	/* Ignore compiler warnings. */
-	param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
-	/* Return start or end instants in given memory location. */
-	if (param_name == CL_PROFILING_COMMAND_START)
-		*((cl_ulong*) param_value) = event.start;
-	else
-		*((cl_ulong*) param_value) = event.end;
-	/* Always return success. */
-	return CL_SUCCESS;
-}
-
-/** 
- * @brief Stub for clGetEventInfo function. 
- * 
- * @param event Stub event.
- * @param param_name Ignored (assumes CL_EVENT_COMMAND_QUEUE).
- * @param param_value_size Ignored.
- * @param param_value Memory location where to place fake queue.
- * @param param_value_size_ret Ignored.
- * @return Always returns CL_SUCCESS.
- * */ 
-cl_int clGetEventInfo(cl_event event, cl_event_info param_name, size_t param_value_size, void *param_value, size_t *param_value_size_ret) {
-	/* Ignore compiler warnings. */
-	param_name = param_name; param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
-	/* Return the event command queue in given memor location. */
-	*((cl_command_queue*) param_value) = event.queue;
-	/* Always return success. */
-	return CL_SUCCESS;
-
-}

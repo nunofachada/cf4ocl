@@ -28,7 +28,7 @@
 #define CL4_PROFILER_H
 
 #ifdef TESTING
-	#include "test_profiler.h"
+	#include "mocks_stubs/profiler/cl_stub.h"
 #else
     #if defined(__APPLE__) || defined(__MACOSX)
         #include <OpenCL/cl.h>

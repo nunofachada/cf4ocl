@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Stubs for testing profiling framework.
+ * @brief OpenCL stubs for testing the profile module.
  * 
  * @author Nuno Fachada
  * @date 2013
