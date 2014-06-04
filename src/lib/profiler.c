@@ -406,7 +406,6 @@ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 	return 0;
 }
 
-
 /**
  * @brief Determine overlap matrix for the given OpenCL events profile.
  *         Must be called after cl4_prof_profile_aggregate.
@@ -456,7 +455,8 @@ int cl4_prof_profile_overmat(CL4ProfProfile* profile, GError** err) {
 		overlapMatrix[i] = 0;
 		
 	/* Initialize helper table to account for all overlapping events. */
-	overlaps = g_hash_table_new(g_direct_hash, g_direct_equal);
+	overlaps = g_hash_table_new_full(g_direct_hash, g_direct_equal, 
+		NULL, (GDestroyNotify) g_hash_table_destroy);
 	gef_if_error_create_goto(
 		*err, 
 		CL4_ERROR, 
