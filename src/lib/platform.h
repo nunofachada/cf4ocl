@@ -55,6 +55,6 @@ cl_platform_id cl4_platform_id(CL4Platform* platform);
 
 CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err);
 
-
+guint cl4_platform_device_count(CL4Platform* platform, GError **err);
 
 #endif

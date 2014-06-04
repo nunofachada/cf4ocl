@@ -34,10 +34,16 @@
  * */
 static void platforms_test() {
 	
-	CL4Platforms* platfs = cl4_platforms_new(NULL);
+	CL4Platforms* platfs = NULL;
 	CL4Platform* p = NULL;
+	CL4Device** devs = NULL;
 	gchar* info;
-	guint num_platfs = cl4_platforms_count(platfs);
+	guint num_devs;
+	guint num_platfs;
+	gpointer dev_info;
+
+	platfs = cl4_platforms_new(NULL);
+	num_platfs = cl4_platforms_count(platfs);
 	
 	g_debug("== Found %d OpenCL platforms", num_platfs);
 	for (guint i = 0; i < num_platfs; i++) {
@@ -46,22 +52,30 @@ static void platforms_test() {
 		
 		g_debug("==== Platform %d:", i);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_PROFILE);
+		info = cl4_plaform_info(p, CL_PLATFORM_PROFILE, NULL);
 		g_debug("======== Profile : %s", info);
 		
-		info = cl4_plaform_info(p, CL_PLATFORM_VERSION);
+		info = cl4_plaform_info(p, CL_PLATFORM_VERSION, NULL);
 		g_debug("======== Version : %s", info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_NAME);
+		info = cl4_plaform_info(p, CL_PLATFORM_NAME, NULL);
 		g_debug("======== Name    : %s", info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_VENDOR);
+		info = cl4_plaform_info(p, CL_PLATFORM_VENDOR, NULL);
 		g_debug("======== Vendor  : %s", info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS);
+		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, NULL);
 		g_debug("======== Extens. : %s", info);
 		
+		num_devs = cl4_platform_device_count(p, NULL);
+		devs = cl4_plaform_devices(p, NULL);
 		
+		g_debug("======== Devices : %d", num_devs);
+		
+		for (guint j = 0; j < num_devs; j++) {
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, NULL);
+			g_debug("============ Name : %s", (gchar*) dev_info);
+		}
 
 	}
 	cl4_platforms_destroy(platfs);

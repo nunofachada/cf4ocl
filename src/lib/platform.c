@@ -57,6 +57,9 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
 	/* Platform devices array will be lazy initialized when required. */
 	platform->devices = NULL;
 	
+	/* Set number of devices to zero, initially. */
+	platform->num_devices = 0;
+	
 	/* Reference count is one initially. */
 	platform->ref_count = 1;
 
@@ -84,10 +87,13 @@ void cl4_platform_unref(CL4Platform* platform) {
 			g_hash_table_destroy(platform->info);
 		}
 		if (platform->devices) {
-			for (guint i = 0; platform->devices[i]; i++) {
+			for (guint i = 0; platform->num_devices; i++) {
 				cl4_device_destroy(platform->devices[i]);
 			}
-			g_free(platform->devices);
+			g_slice_free1(
+				sizeof(CL4Device*) * platform->num_devices, 
+				platform->devices);
+
 		}
 		
 		g_slice_free(CL4Platform, platform);
@@ -217,4 +223,11 @@ error_handler:
 finish:		
 	
 	return platform->devices;
+}
+
+guint cl4_platform_device_count(CL4Platform* platform, GError **err) {
+	if (!platform->devices) {
+		cl4_plaform_devices(platform, err);
+	}
+	return platform->num_devices;
 }

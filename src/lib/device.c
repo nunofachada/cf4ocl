@@ -74,7 +74,7 @@ void cl4_device_destroy(CL4Device* device) {
 
 void cl4_device_unref(CL4Device* device) {
 	
-	g_return_if_fail (device != NULL);
+	g_return_if_fail(device != NULL);
 
 	if (g_atomic_int_dec_and_test(&device->ref_count)) {
 		if (device->info) {
@@ -86,8 +86,8 @@ void cl4_device_unref(CL4Device* device) {
 
 }
 
-gpointer cl4_device_get_info(CL4Device* device, 
-	cl_device_info param_name) {
+gpointer cl4_device_info(CL4Device* device, 
+	cl_device_info param_name, GError** err) {
 
 	gpointer param_value;
 	
@@ -127,7 +127,7 @@ gpointer cl4_device_get_info(CL4Device* device,
 
 }
 
-cl_device_id cl4_device_get_cl_device_id(CL4Device* device) {
+cl_device_id cl4_device_id(CL4Device* device) {
 	return device->id;
 }
 
