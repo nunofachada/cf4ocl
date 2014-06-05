@@ -9,9 +9,9 @@ add_library(test_profiler_lib ../lib/profiler.c ../lib/errors.c ../lib/common.c 
 set_target_properties(test_profiler_lib PROPERTIES COMPILE_FLAGS "-DTESTING -I${CMAKE_CURRENT_LIST_DIR}")
 set(test_profiler_EXTRALIBS test_profiler_lib)
 
-add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c)
+add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c mocks_stubs/wrappers/cl_stub.c)
 set_target_properties(test_wrappers_lib PROPERTIES COMPILE_FLAGS "-DTESTING -I${CMAKE_CURRENT_LIST_DIR}")
-set(test_wrappers_EXTRALIBS test_wrappers_lib ${OPENCL_LIBRARIES})
+set(test_wrappers_EXTRALIBS test_wrappers_lib)
 
 # Add a target for each test
 foreach(TEST ${TESTS})
