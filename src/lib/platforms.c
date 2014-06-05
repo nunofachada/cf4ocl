@@ -123,7 +123,7 @@ void cl4_platforms_destroy(CL4Platforms* platforms) {
 	}
 	g_slice_free1(
 		sizeof(CL4Platform*) * platforms->num_platfs, platforms->platfs);
-	g_slice_free(CL4Platforms*, platforms);
+	g_slice_free(CL4Platforms, platforms);
 }
 
 guint cl4_platforms_count(CL4Platforms* platforms) {
