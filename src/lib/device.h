@@ -30,6 +30,8 @@
 #define CL4_DEVICE_H
 
 #include "common.h"
+#include "gerrorf.h"
+#include "errors.h"
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/cl.h>
 #else

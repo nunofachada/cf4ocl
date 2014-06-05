@@ -111,17 +111,34 @@ gpointer cl4_device_info(CL4Device* device,
 		
 		ocl_status = clGetDeviceInfo(
 			device->id, param_name, 0, NULL, &size_ret);
-		/// @todo verify status here and in platform
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get device info [size] (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
 		
 		param_value = g_malloc(size_ret);
 		
 		ocl_status = clGetDeviceInfo(
 			device->id, param_name, size_ret, param_value, NULL);
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get device info [info] (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
 			
 		g_hash_table_insert(
 			device->info, GUINT_TO_POINTER(param_name), param_value);
 		
 	}
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+finish:		
 	
 	return param_value;
 
