@@ -67,11 +67,11 @@ static void platforms_test() {
 		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, NULL);
 		g_debug("======== Extens. : %s", info);
 		
-		//~ num_devs = cl4_platform_device_count(p, NULL);
-		//~ devs = cl4_plaform_devices(p, NULL);
-		//~ 
-		//~ g_debug("======== Devices : %d", num_devs);
-		//~ 
+		num_devs = cl4_platform_device_count(p, NULL);
+		devs = cl4_plaform_devices(p, NULL);
+		
+		g_debug("======== Devices : %d", num_devs);
+		
 		//~ for (guint j = 0; j < num_devs; j++) {
 			//~ dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, NULL);
 			//~ g_debug("============ Name : %s", (gchar*) dev_info);

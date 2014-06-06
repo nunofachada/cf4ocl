@@ -60,7 +60,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.devices = (const struct _cl_device_id[]) {
 			{ 
 				.name = "cf4ocl GPU device",
-				.type = CL_DEVICE_TYPE_GPU
+				.type = CL_DEVICE_TYPE_GPU || CL_DEVICE_TYPE_DEFAULT
 			},
 			{ 
 				.name = "cf4ocl CPU device",
@@ -78,7 +78,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.devices = (const struct _cl_device_id[]) {
 			{ 
 				.name = "cf4ocl Accelerator device",
-				.type = CL_DEVICE_TYPE_ACCELERATOR
+				.type = CL_DEVICE_TYPE_ACCELERATOR || CL_DEVICE_TYPE_DEFAULT
 			}
 		}
 	},
@@ -92,7 +92,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.devices = (const struct _cl_device_id[]) {
 			{ 
 				.name = "cf4ocl CPU device",
-				.type = CL_DEVICE_TYPE_CPU
+				.type = CL_DEVICE_TYPE_CPU || CL_DEVICE_TYPE_DEFAULT
 			}
 		}
 	}
@@ -115,8 +115,10 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 		if (num_entries == 0) {
 			status = CL_INVALID_VALUE;
 		} else {
-			for (guint i = 0; i < MIN(num_entries, cl4_test_num_platforms); i++)
-				platforms[i] = &cl4_test_platforms[i];
+			for (guint i = 0; 
+				i < MIN(num_entries, cl4_test_num_platforms); i++) {
+				platforms[i] = (cl_platform_id) &cl4_test_platforms[i];
+			}
 		}
 	}
 	
@@ -171,8 +173,29 @@ cl_int clGetDeviceIDs(cl_platform_id platform,
 	
 	cl_int status = CL_SUCCESS;
 
-	/// Fill
-	
+	if (platform == NULL) {
+		status = CL_INVALID_PLATFORM;
+	} else if (((num_entries == 0) && (devices != NULL)) 
+			|| ((num_devices == NULL) && (devices == NULL))) {
+		status = CL_INVALID_VALUE;
+	} else {
+		guint num_devices_found = 0;
+		for (guint i = 0; i < platform->num_devices; i++) {
+			if (platform->devices[i].type || device_type) {
+				if (devices != NULL)
+					devices[num_devices_found] = 
+						(cl_device_id) &platform->devices[i];
+				num_devices_found++;
+				if ((num_devices_found >= num_entries) 
+					&& (devices != NULL))
+					break;
+			}
+		}
+		if (num_devices != NULL) 
+			*num_devices = num_devices_found;
+		if (num_devices_found == 0)
+			status = CL_DEVICE_NOT_FOUND;
+	}
 	return status;
 }
 
