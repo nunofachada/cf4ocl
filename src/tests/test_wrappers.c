@@ -73,8 +73,13 @@ static void platforms_test() {
 		g_debug("======== Devices : %d", num_devs);
 		
 		for (guint j = 0; j < num_devs; j++) {
+			
 			dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, NULL);
 			g_debug("============ Name : %s", (gchar*) dev_info);
+			
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, NULL);
+			g_debug("============ Max. workitem sizes : %d, %d, %d", (int) ((size_t*) dev_info)[0], (int) ((size_t*) dev_info)[1], (int) ((size_t*) dev_info)[2]);
+
 		}
 
 	}

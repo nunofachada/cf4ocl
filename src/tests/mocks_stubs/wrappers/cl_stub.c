@@ -34,6 +34,7 @@
 
 struct _cl_device_id {
 	const char* built_in_kernels;
+	const size_t const* max_work_item_sizes;
 	const char* name;
 	const cl_device_type type;
 };
@@ -61,11 +62,13 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.devices = (const struct _cl_device_id[]) {
 			{
 				.built_in_kernels = "reduce;scan",
+				.max_work_item_sizes = (const size_t const[]) {4096, 2048, 2048, 0},
 				.name = "cf4ocl GPU device",
 				.type = CL_DEVICE_TYPE_GPU || CL_DEVICE_TYPE_DEFAULT
 			},
 			{ 
 				.built_in_kernels = "",
+				.max_work_item_sizes = (const size_t const[]) {256, 64, 16, 0},
 				.name = "cf4ocl CPU device",
 				.type = CL_DEVICE_TYPE_CPU
 			}
@@ -81,6 +84,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.devices = (const struct _cl_device_id[]) {
 			{ 
 				.built_in_kernels = NULL, /* Not available in OpenCL 1.1 */
+				.max_work_item_sizes = (const size_t const[]) {1024, 256, 16, 0},
 				.name = "cf4ocl Accelerator device",
 				.type = CL_DEVICE_TYPE_ACCELERATOR || CL_DEVICE_TYPE_DEFAULT
 			}
@@ -96,6 +100,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.devices = (const struct _cl_device_id[]) {
 			{ 
 				.built_in_kernels = "",
+				.max_work_item_sizes = (const size_t const[]) {512, 256, 8, 0},
 				.name = "cf4ocl CPU device",
 				.type = CL_DEVICE_TYPE_CPU || CL_DEVICE_TYPE_DEFAULT
 			}
@@ -130,6 +135,17 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 	return status;
 }
 
+static guint veclen(void* vector, size_t elem_size) {
+	gulong value;
+	guint len = 0;
+	do {
+		value = 0;
+		g_memmove(&value, ((char*) vector) + elem_size * len, elem_size);
+		len++;
+	} while (value != 0);
+	return len - 1;
+}
+
 #define cl4_test_char_info(object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
@@ -144,7 +160,24 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 			strlen(object->info) + 1); \
 	} \
 	break;
-	
+
+
+#define cl4_test_vector_info(type, object, info) \
+	if (param_value == NULL) { \
+		if (param_value_size_ret != NULL) { \
+			*param_value_size_ret = \
+				sizeof(type) * veclen((void*) object->info, sizeof(type)); \
+		} \
+	} else if (param_value_size < sizeof(type) * veclen((void*) object->info, sizeof(type))) { \
+		status = CL_INVALID_VALUE; \
+	} else if (object->info == NULL) { \
+		status = CL_INVALID_VALUE; \
+	} else { \
+		g_memmove(param_value, object->info, \
+			sizeof(type) * veclen((void*) object->info, sizeof(type))); \
+	} \
+	break;
+		
 #define cl4_test_basic_info(type, object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
@@ -231,6 +264,8 @@ cl_int clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 		switch (param_name) {
 			case CL_DEVICE_BUILT_IN_KERNELS:
 				cl4_test_char_info(device, built_in_kernels);
+			case CL_DEVICE_MAX_WORK_ITEM_SIZES:
+				cl4_test_vector_info(size_t, device, max_work_item_sizes);
 			case CL_DEVICE_NAME:
 				cl4_test_char_info(device, name);
 			case CL_DEVICE_TYPE:
