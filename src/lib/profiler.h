@@ -24,17 +24,14 @@
  * @date 2013
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
+ 
 #ifndef CL4_PROFILER_H
 #define CL4_PROFILER_H
 
-#ifdef TESTING
-	#include "mocks_stubs/profiler/cl_stub.h"
+#if defined(__APPLE__) || defined(__MACOSX)
+	#include <OpenCL/cl.h>
 #else
-    #if defined(__APPLE__) || defined(__MACOSX)
-        #include <OpenCL/cl.h>
-    #else
-        #include <CL/cl.h>
-    #endif
+	#include <CL/cl.h>
 #endif
 
 #include <glib.h>

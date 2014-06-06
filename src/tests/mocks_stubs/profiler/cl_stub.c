@@ -24,7 +24,23 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "cl_stub.h"
+#if defined(__APPLE__) || defined(__MACOSX)
+	#include <OpenCL/cl.h>
+#else
+	#include <CL/cl.h>
+#endif
+
+/** @brief Stub for cl_event objects. */ 
+struct _cl_event {
+	cl_ulong start;
+	cl_ulong end;
+	cl_command_queue queue;
+};
+
+/** @brief Stub for cl_command_queue objects. */ 
+struct _cl_command_queue {
+	int filler;
+};
 
 /** 
  * @brief Stub for clGetEventProfilingInfo function. 
@@ -45,9 +61,9 @@ cl_int clGetEventProfilingInfo(cl_event event,
 	
 	/* Return start or end instants in given memory location. */
 	if (param_name == CL_PROFILING_COMMAND_START)
-		*((cl_ulong*) param_value) = event.start;
+		*((cl_ulong*) param_value) = event->start;
 	else
-		*((cl_ulong*) param_value) = event.end;
+		*((cl_ulong*) param_value) = event->end;
 	
 	/* Always return success. */
 	return CL_SUCCESS;
@@ -70,8 +86,31 @@ cl_int clGetEventInfo(cl_event event, cl_event_info param_name,
 	/* Ignore compiler warnings. */
 	param_name = param_name; param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
 	/* Return the event command queue in given memor location. */
-	*((cl_command_queue*) param_value) = event.queue;
+	*((cl_command_queue*) param_value) = event->queue;
 	/* Always return success. */
 	return CL_SUCCESS;
 
+}
+
+cl_command_queue clCreateCommandQueue(cl_context context,
+	cl_device_id device, cl_command_queue_properties properties,
+	cl_int* errcode_ret) {
+		
+	context = context; device = device; properties = properties;
+	
+	if (errcode_ret != NULL)
+		*errcode_ret = CL_SUCCESS;
+		
+	cl_command_queue queue = 
+		(cl_command_queue) malloc(sizeof(struct _cl_command_queue));
+		
+	queue->filler = 0;
+	
+	return queue;
+		
+}
+
+cl_int clReleaseCommandQueue(cl_command_queue command_queue) {
+	free(command_queue);
+	return CL_SUCCESS;
 }

@@ -25,9 +25,9 @@
  * */
 
 #if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/cl.h>
+	#include <OpenCL/cl.h>
 #else
-    #include <CL/cl.h>
+	#include <CL/cl.h>
 #endif
 #include <glib.h>
 #include <string.h>

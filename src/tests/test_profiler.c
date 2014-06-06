@@ -24,8 +24,14 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "mocks_stubs/profiler/cl_stub.h"
 #include "profiler.h"
+
+/** @brief Stub for cl_event objects. */ 
+struct _cl_event {
+	cl_ulong start;
+	cl_ulong end;
+	cl_command_queue queue;
+};
 
 /**
  * @brief Tests the OpenCL profiling framework.
@@ -34,12 +40,12 @@ static void profilerTest() {
 	
 	/* Aux vars. */
 	guint numEvents = 5;
-	cl_event ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8;
+	struct _cl_event ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8;
 	int status;
 	cl_command_queue queue1, queue2, queue3;
-	queue1 = (cl_command_queue) malloc(sizeof(int));
-	queue2 = (cl_command_queue) malloc(sizeof(int));
-	queue3 = (cl_command_queue) malloc(sizeof(int));
+	queue1 = clCreateCommandQueue(NULL, NULL, 0, NULL);
+	queue2 = clCreateCommandQueue(NULL, NULL, 0, NULL);
+	queue3 = clCreateCommandQueue(NULL, NULL, 0, NULL);
 	
 	/* Profiling object. */
 	CL4ProfProfile* profile = cl4_prof_profile_new();
@@ -49,49 +55,49 @@ static void profilerTest() {
 	ev1.start = 10;
 	ev1.end = 15;
 	ev1.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event1", ev1, NULL);
+	status = cl4_prof_profile_add(profile, "Event1", &ev1, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev2.start = 16;
 	ev2.end = 20;
 	ev2.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event2", ev2, NULL);
+	status = cl4_prof_profile_add(profile, "Event2", &ev2, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev3.start = 17;
 	ev3.end = 30;
 	ev3.queue = queue2;
-	status = cl4_prof_profile_add(profile, "Event3", ev3, NULL);
+	status = cl4_prof_profile_add(profile, "Event3", &ev3, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev4.start = 19;
 	ev4.end = 25;
 	ev4.queue = queue3;
-	status = cl4_prof_profile_add(profile, "Event4", ev4, NULL);
+	status = cl4_prof_profile_add(profile, "Event4", &ev4, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev5.start = 29;
 	ev5.end = 40;
 	ev5.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event5", ev5, NULL);
+	status = cl4_prof_profile_add(profile, "Event5", &ev5, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev6.start = 35;
 	ev6.end = 45;
 	ev6.queue = queue2;
-	status = cl4_prof_profile_add(profile, "Event1", ev6, NULL);
+	status = cl4_prof_profile_add(profile, "Event1", &ev6, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev7.start = 68;
 	ev7.end = 69;
 	ev7.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event1", ev7, NULL);
+	status = cl4_prof_profile_add(profile, "Event1", &ev7, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev8.start = 50;
 	ev8.end = 70;
 	ev8.queue = queue3;
-	status = cl4_prof_profile_add(profile, "Event1", ev8, NULL);
+	status = cl4_prof_profile_add(profile, "Event1", &ev8, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	status = cl4_prof_profile_aggregate(profile, NULL);
@@ -182,9 +188,9 @@ static void profilerTest() {
 	//cl4_prof_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME);
 
 	/* Free queue. */
-	free(queue1);
-	free(queue2);
-	free(queue3);
+	clReleaseCommandQueue(queue1);
+	clReleaseCommandQueue(queue2);
+	clReleaseCommandQueue(queue3);
 	
 	/* Free profile. */
 	cl4_prof_profile_free(profile);
