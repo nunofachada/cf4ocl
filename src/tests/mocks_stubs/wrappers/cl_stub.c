@@ -33,6 +33,7 @@
 #include <string.h>
 
 struct _cl_device_id {
+	const char* built_in_kernels;
 	const char* name;
 	const cl_device_type type;
 };
@@ -58,11 +59,13 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.extensions = "cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing",
 		.num_devices = 2,
 		.devices = (const struct _cl_device_id[]) {
-			{ 
+			{
+				.built_in_kernels = "reduce;scan",
 				.name = "cf4ocl GPU device",
 				.type = CL_DEVICE_TYPE_GPU || CL_DEVICE_TYPE_DEFAULT
 			},
 			{ 
+				.built_in_kernels = "",
 				.name = "cf4ocl CPU device",
 				.type = CL_DEVICE_TYPE_CPU
 			}
@@ -77,6 +80,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
 			{ 
+				.built_in_kernels = NULL, /* Not available in OpenCL 1.1 */
 				.name = "cf4ocl Accelerator device",
 				.type = CL_DEVICE_TYPE_ACCELERATOR || CL_DEVICE_TYPE_DEFAULT
 			}
@@ -91,6 +95,7 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
 			{ 
+				.built_in_kernels = "",
 				.name = "cf4ocl CPU device",
 				.type = CL_DEVICE_TYPE_CPU || CL_DEVICE_TYPE_DEFAULT
 			}
@@ -125,18 +130,33 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 	return status;
 }
 
-#define cl4_test_platform_info(info) \
+#define cl4_test_char_info(object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
-			*param_value_size_ret = strlen(platform->info) + 1; \
+			*param_value_size_ret = strlen(object->info) + 1; \
 		} \
-	} else if (param_value_size < strlen(platform->info) + 1) { \
+	} else if (param_value_size < strlen(object->info) + 1) { \
+		status = CL_INVALID_VALUE; \
+	} else if (object->info == NULL) { \
 		status = CL_INVALID_VALUE; \
 	} else { \
-		g_memmove(param_value, platform->info, \
-			strlen(platform->info) + 1); \
+		g_memmove(param_value, object->info, \
+			strlen(object->info) + 1); \
 	} \
 	break;
+	
+#define cl4_test_basic_info(type, object, info) \
+	if (param_value == NULL) { \
+		if (param_value_size_ret != NULL) { \
+			*param_value_size_ret = sizeof(type); \
+		} \
+	} else if (param_value_size < sizeof(type)) { \
+		status = CL_INVALID_VALUE; \
+	} else { \
+		*((type*) param_value) = object->info; \
+	} \
+	break;
+
 
 cl_int clGetPlatformInfo(cl_platform_id platform, 
 	cl_platform_info param_name, size_t param_value_size, 
@@ -149,15 +169,15 @@ cl_int clGetPlatformInfo(cl_platform_id platform,
 	} else {
 		switch (param_name) {
 			case CL_PLATFORM_PROFILE:
-				cl4_test_platform_info(profile);
+				cl4_test_char_info(platform, profile);
 			case CL_PLATFORM_VERSION:
-				cl4_test_platform_info(version);
+				cl4_test_char_info(platform, version);
 			case CL_PLATFORM_NAME:
-				cl4_test_platform_info(name);
+				cl4_test_char_info(platform, name);
 			case CL_PLATFORM_VENDOR:
-				cl4_test_platform_info(vendor);
+				cl4_test_char_info(platform, vendor);
 			case CL_PLATFORM_EXTENSIONS:
-				cl4_test_platform_info(extensions);
+				cl4_test_char_info(platform, extensions);
 			default:
 				status = CL_INVALID_VALUE;
 		}
@@ -205,7 +225,22 @@ cl_int clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 		
 	cl_int status = CL_SUCCESS;
 
-	/// Fill
+	if (device == NULL) {
+		status = CL_INVALID_DEVICE;
+	} else {
+		switch (param_name) {
+			case CL_DEVICE_BUILT_IN_KERNELS:
+				cl4_test_char_info(device, built_in_kernels);
+			case CL_DEVICE_NAME:
+				cl4_test_char_info(device, name);
+			case CL_DEVICE_TYPE:
+				cl4_test_basic_info(cl_device_type, device, type);
+			default:
+				status = CL_INVALID_VALUE;
+		}
+	}
 	
+	
+		
 	return status;
 }

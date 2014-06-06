@@ -72,10 +72,10 @@ static void platforms_test() {
 		
 		g_debug("======== Devices : %d", num_devs);
 		
-		//~ for (guint j = 0; j < num_devs; j++) {
-			//~ dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, NULL);
-			//~ g_debug("============ Name : %s", (gchar*) dev_info);
-		//~ }
+		for (guint j = 0; j < num_devs; j++) {
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, NULL);
+			g_debug("============ Name : %s", (gchar*) dev_info);
+		}
 
 	}
 	cl4_platforms_destroy(platfs);
