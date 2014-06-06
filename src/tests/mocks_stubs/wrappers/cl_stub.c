@@ -115,9 +115,8 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 		if (num_entries == 0) {
 			status = CL_INVALID_VALUE;
 		} else {
-			g_memmove(platforms, cl4_test_platforms, 
-				sizeof(cl_platform_id) * 
-					MIN(num_entries, cl4_test_num_platforms));
+			for (guint i = 0; i < MIN(num_entries, cl4_test_num_platforms); i++)
+				platforms[i] = &cl4_test_platforms[i];
 		}
 	}
 	
@@ -127,13 +126,13 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 #define cl4_test_platform_info(info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
-			*param_value_size_ret = strlen(platform->info); \
+			*param_value_size_ret = strlen(platform->info) + 1; \
 		} \
-	} else if (param_value_size < strlen(platform->info)) { \
+	} else if (param_value_size < strlen(platform->info) + 1) { \
 		status = CL_INVALID_VALUE; \
 	} else { \
 		g_memmove(param_value, platform->info, \
-			strlen(platform->info)); \
+			strlen(platform->info) + 1); \
 	} \
 	break;
 
