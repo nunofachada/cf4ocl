@@ -33,7 +33,10 @@
 #include <string.h>
 
 struct _cl_device_id {
+	const cl_uint address_bits;
+	const cl_bool available;
 	const char* built_in_kernels;
+	const cl_bool compiler_available;
 	const size_t const* max_work_item_sizes;
 	const char* name;
 	const cl_device_type type;
@@ -61,13 +64,19 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.num_devices = 2,
 		.devices = (const struct _cl_device_id[]) {
 			{
+				.address_bits = 32,
+				.available = CL_TRUE,
 				.built_in_kernels = "reduce;scan",
+				.compiler_available = CL_TRUE,
 				.max_work_item_sizes = (const size_t const[]) {4096, 2048, 2048, 0},
 				.name = "cf4ocl GPU device",
-				.type = CL_DEVICE_TYPE_GPU || CL_DEVICE_TYPE_DEFAULT
+				.type = CL_DEVICE_TYPE_GPU | CL_DEVICE_TYPE_DEFAULT
 			},
 			{ 
+				.address_bits = 64,
+				.available = CL_TRUE,
 				.built_in_kernels = "",
+				.compiler_available = CL_TRUE,
 				.max_work_item_sizes = (const size_t const[]) {256, 64, 16, 0},
 				.name = "cf4ocl CPU device",
 				.type = CL_DEVICE_TYPE_CPU
@@ -83,10 +92,13 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
 			{ 
-				.built_in_kernels = NULL, /* Not available in OpenCL 1.1 */
+				.address_bits = 32,
+				.available = CL_TRUE,
+				.built_in_kernels = "", /* Not available in OpenCL 1.1 */
+				.compiler_available = CL_FALSE,
 				.max_work_item_sizes = (const size_t const[]) {1024, 256, 16, 0},
 				.name = "cf4ocl Accelerator device",
-				.type = CL_DEVICE_TYPE_ACCELERATOR || CL_DEVICE_TYPE_DEFAULT
+				.type = CL_DEVICE_TYPE_ACCELERATOR | CL_DEVICE_TYPE_DEFAULT
 			}
 		}
 	},
@@ -99,10 +111,13 @@ static const struct _cl_platform_id cl4_test_platforms[] = {
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
 			{ 
+				.address_bits = 64,
+				.available = CL_TRUE,
 				.built_in_kernels = "",
+				.compiler_available = CL_FALSE,
 				.max_work_item_sizes = (const size_t const[]) {512, 256, 8, 0},
 				.name = "cf4ocl CPU device",
-				.type = CL_DEVICE_TYPE_CPU || CL_DEVICE_TYPE_DEFAULT
+				.type = CL_DEVICE_TYPE_CPU | CL_DEVICE_TYPE_DEFAULT
 			}
 		}
 	}
@@ -262,8 +277,14 @@ cl_int clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 		status = CL_INVALID_DEVICE;
 	} else {
 		switch (param_name) {
+			case CL_DEVICE_ADDRESS_BITS:
+				cl4_test_basic_info(cl_uint, device, address_bits);
+			case CL_DEVICE_AVAILABLE:
+				cl4_test_basic_info(cl_bool, device, available);
 			case CL_DEVICE_BUILT_IN_KERNELS:
 				cl4_test_char_info(device, built_in_kernels);
+			case CL_DEVICE_COMPILER_AVAILABLE:
+				cl4_test_basic_info(cl_bool, device, compiler_available);
 			case CL_DEVICE_MAX_WORK_ITEM_SIZES:
 				cl4_test_vector_info(size_t, device, max_work_item_sizes);
 			case CL_DEVICE_NAME:
