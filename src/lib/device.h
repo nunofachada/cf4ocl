@@ -43,6 +43,13 @@
  */
 typedef struct cl4_device CL4Device;
 
+#define cl4_device_type2str(type) \
+	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \
+		(((type) & CL_DEVICE_TYPE_GPU) ? "GPU" : \
+			(((type) & CL_DEVICE_TYPE_ACCELERATOR) ? "Accelerator" : \
+				(((type) & CL_DEVICE_TYPE_CUSTOM) ? "Custom" : \
+					"Unknown"))))
+
 CL4Device* cl4_device_new(cl_device_id id);
 
 void cl4_device_ref(CL4Device* device);

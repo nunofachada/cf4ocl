@@ -129,16 +129,18 @@ gpointer cl4_device_info(CL4Device* device,
 			device->info, GUINT_TO_POINTER(param_name), param_value);
 		
 	}
-	
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
-	
+
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
-	
-finish:		
+
+	param_value = NULL;
+
+finish:
 	
 	return param_value;
 
