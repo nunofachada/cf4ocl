@@ -41,6 +41,7 @@ static void platforms_test() {
 	guint num_devs;
 	guint num_platfs;
 	gpointer dev_info;
+	GError* err = NULL;
 
 	platfs = cl4_platforms_new(NULL);
 	num_platfs = cl4_platforms_count(platfs);
@@ -52,22 +53,22 @@ static void platforms_test() {
 		
 		g_debug("==== Platform %d:", i);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_PROFILE, NULL);
+		info = cl4_plaform_info(p, CL_PLATFORM_PROFILE, &err);
 		g_debug("======== Profile : %s", info);
 		
-		info = cl4_plaform_info(p, CL_PLATFORM_VERSION, NULL);
+		info = cl4_plaform_info(p, CL_PLATFORM_VERSION, &err);
 		g_debug("======== Version : %s", info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_NAME, NULL);
+		info = cl4_plaform_info(p, CL_PLATFORM_NAME, &err);
 		g_debug("======== Name    : %s", info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_VENDOR, NULL);
+		info = cl4_plaform_info(p, CL_PLATFORM_VENDOR, &err);
 		g_debug("======== Vendor  : %s", info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, NULL);
+		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, &err);
 		g_debug("======== Extens. : %s", info);
 		
-		num_devs = cl4_platform_device_count(p, NULL);
+		num_devs = cl4_platform_device_count(p, &err);
 		devs = cl4_plaform_devices(p, NULL);
 		
 		g_debug("======== Devices : %d", num_devs);
@@ -76,25 +77,25 @@ static void platforms_test() {
 			
 			g_debug("================= Device #%d", j);
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, NULL);
-			g_debug("........................ Name : %s", (gchar*) dev_info);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, &err);
+			g_debug("........................ Name : %s", (err != NULL) ? (gchar*) dev_info : cl4_err(err->code));
 			
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_ADDRESS_BITS, NULL);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_ADDRESS_BITS, &err);
 			g_debug("................ Address bits : %d", *((cl_uint*) dev_info));
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, NULL);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
 			g_debug("................... Available : %s", *((cl_bool*) dev_info) ? "Yes" : "No");
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_BUILT_IN_KERNELS, NULL);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_BUILT_IN_KERNELS, &err);
 			g_debug("............ Built-in kernels : %s", dev_info != NULL ? (gchar*) dev_info : "N/A");
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, NULL);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
 			g_debug(".......... Compiler available : %s", *((cl_bool*) dev_info) ? "Yes" : "No");
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, NULL);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
 			g_debug("............ Max wkitem sizes : %d, %d, %d", (int) ((size_t*) dev_info)[0], (int) ((size_t*) dev_info)[1], (int) ((size_t*) dev_info)[2]);
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_TYPE, NULL);
+			dev_info = cl4_device_info(devs[j], CL_DEVICE_TYPE, &err);
 			g_debug("........................ Type : %s", cl4_device_type2str(*((cl_device_type*) dev_info)));
 		}
 

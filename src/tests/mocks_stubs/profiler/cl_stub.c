@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief OpenCL stubs for testing the profile module.
+ * @brief OpenCL stub for testing the profile module.
  * 
  * @author Nuno Fachada
  * @date 2014
