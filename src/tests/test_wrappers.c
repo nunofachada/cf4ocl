@@ -29,6 +29,23 @@
 #include "device.h"
 //#include "context.h"
 
+/* Max. length of information string. */
+#define CL4_TEST_WRAPPERS_MAXINFOSTR 200
+
+/* Test utility macro. Presents either the required information, or 
+ * the error message, if it occurred. Also frees the error object if 
+ * an error occurred. */
+#define cl4_test_wrappers_msg(base_msg, format, ...) \
+	if (err == NULL) { \
+		g_snprintf(info_str, CL4_TEST_WRAPPERS_MAXINFOSTR, \
+			format, ##__VA_ARGS__); \
+	} else { \
+		g_snprintf(info_str, CL4_TEST_WRAPPERS_MAXINFOSTR, \
+			"%s", err->message); \
+		g_clear_error(&err); \
+	} \
+	g_debug("%s %s", base_msg, info_str);
+		
 /**
  * @brief Tests platforms wrapper.
  * */
@@ -37,70 +54,104 @@ static void platforms_test() {
 	CL4Platforms* platfs = NULL;
 	CL4Platform* p = NULL;
 	CL4Device** devs = NULL;
-	gchar* info;
+	GError* err = NULL;
+	gpointer info;
 	guint num_devs;
 	guint num_platfs;
-	gpointer dev_info;
-	GError* err = NULL;
+	gchar info_str[CL4_TEST_WRAPPERS_MAXINFOSTR];
 
-	platfs = cl4_platforms_new(NULL);
-	num_platfs = cl4_platforms_count(platfs);
-	
-	g_debug("== Found %d OpenCL platforms", num_platfs);
-	for (guint i = 0; i < num_platfs; i++) {
-	
-		p = cl4_platforms_get(platfs, i);
+	/* Get platforms. */
+	platfs = cl4_platforms_new(&err);
+	if (err == NULL) {
 		
-		g_debug("==== Platform %d:", i);
+		/* Number of platforms. */
+		num_platfs = cl4_platforms_count(platfs);
+		g_debug("* Found %d OpenCL platforms", num_platfs);
+		
+		/* Cycle through platforms. */
+		for (guint i = 0; i < num_platfs; i++) {
+		
+			/* Get current platform. */
+			p = cl4_platforms_get(platfs, i);
+			g_debug(">> Platform %d:", i);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_PROFILE, &err);
-		g_debug("======== Profile : %s", info);
-		
-		info = cl4_plaform_info(p, CL_PLATFORM_VERSION, &err);
-		g_debug("======== Version : %s", info);
+			/* Get platform profile. */
+			info = cl4_plaform_info(p, CL_PLATFORM_PROFILE, &err);
+			cl4_test_wrappers_msg("==== Profile :", "%s", (gchar*) info);
 
-		info = cl4_plaform_info(p, CL_PLATFORM_NAME, &err);
-		g_debug("======== Name    : %s", info);
-
-		info = cl4_plaform_info(p, CL_PLATFORM_VENDOR, &err);
-		g_debug("======== Vendor  : %s", info);
-
-		info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, &err);
-		g_debug("======== Extens. : %s", info);
-		
-		num_devs = cl4_platform_device_count(p, &err);
-		devs = cl4_plaform_devices(p, NULL);
-		
-		g_debug("======== Devices : %d", num_devs);
-		
-		for (guint j = 0; j < num_devs; j++) {
+			/* Get platform version. */
+			info = cl4_plaform_info(p, CL_PLATFORM_VERSION, &err);
+			cl4_test_wrappers_msg("==== Version :", "%s", (gchar*) info);
 			
-			g_debug("================= Device #%d", j);
+			/* Get platform name. */
+			info = cl4_plaform_info(p, CL_PLATFORM_NAME, &err);
+			cl4_test_wrappers_msg("==== Name    :", "%s", (gchar*) info);
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_NAME, &err);
-			g_debug("........................ Name : %s", (err != NULL) ? (gchar*) dev_info : cl4_err(err->code));
+			/* Get platform vendor. */
+			info = cl4_plaform_info(p, CL_PLATFORM_VENDOR, &err);
+			cl4_test_wrappers_msg("==== Vendor  :", "%s", (gchar*) info);
+
+			/* Get platform extensions. */
+			info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, &err);
+			cl4_test_wrappers_msg("==== Extens. :", "%s", (gchar*) info);
 			
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_ADDRESS_BITS, &err);
-			g_debug("................ Address bits : %d", *((cl_uint*) dev_info));
+			/* Get number of devices. */
+			num_devs = cl4_platform_device_count(p, &err);
+			
+			/* Only test for device information if device count was 
+			 * successfully obtained. */
+			if (err != NULL) {
+				g_test_message("Error obtaining number of devices for platform %d (%s).",
+					i, err->message);
+				g_error_free(err);
+			} else {
+				
+				g_debug("==== # Devs  : %d", num_devs);
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
-			g_debug("................... Available : %s", *((cl_bool*) dev_info) ? "Yes" : "No");
+				/* Internally, the CL4Device wrapper already has the 
+				 * device list, so we won't check for errors here. */
+				devs = cl4_plaform_devices(p, NULL);
+				
+				/* Cycle through devices in platform. */
+				for (guint j = 0; j < num_devs; j++) {
+					
+					g_debug("====== Device #%d", j);
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_BUILT_IN_KERNELS, &err);
-			g_debug("............ Built-in kernels : %s", dev_info != NULL ? (gchar*) dev_info : "N/A");
+					info = cl4_device_info(devs[j], CL_DEVICE_NAME, &err);
+					cl4_test_wrappers_msg("...... Name :", "%s", (gchar*) info);
+					
+					info = cl4_device_info(devs[j], CL_DEVICE_ADDRESS_BITS, &err);
+					cl4_test_wrappers_msg("...... Address bits :", "%d", *((cl_uint*) info));
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
-			g_debug(".......... Compiler available : %s", *((cl_bool*) dev_info) ? "Yes" : "No");
+					info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
+					cl4_test_wrappers_msg("...... Available :", "%d", *((cl_bool*) info));
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
-			g_debug("............ Max wkitem sizes : %d, %d, %d", (int) ((size_t*) dev_info)[0], (int) ((size_t*) dev_info)[1], (int) ((size_t*) dev_info)[2]);
+					info = cl4_device_info(devs[j], CL_DEVICE_BUILT_IN_KERNELS, &err);
+					cl4_test_wrappers_msg("...... Built-in kernels :", "%s", (gchar*) info);
 
-			dev_info = cl4_device_info(devs[j], CL_DEVICE_TYPE, &err);
-			g_debug("........................ Type : %s", cl4_device_type2str(*((cl_device_type*) dev_info)));
+					info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
+					cl4_test_wrappers_msg("...... Compiler available :", "%d", *((cl_bool*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
+					cl4_test_wrappers_msg("...... Max wkitem sizes :", "%d, %d, %d", (int) ((size_t*) info)[0], (int) ((size_t*) info)[1], (int) ((size_t*) info)[2]);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_TYPE, &err);
+					cl4_test_wrappers_msg("...... Type :", "%s", cl4_device_type2str(*((cl_device_type*) info)));
+				}
+			}
 		}
 
+		/* Destroy list of platforms. */
+		cl4_platforms_destroy(platfs);
+		
+	} else {
+		
+		/* Unable to get any OpenCL platforms, test can't pass. */
+		g_test_message("Test failed due to following error: %s", 
+			err->message);
+		g_test_fail();
 	}
-	cl4_platforms_destroy(platfs);
+	
 }
 
 /**
