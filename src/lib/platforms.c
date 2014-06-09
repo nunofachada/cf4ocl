@@ -29,7 +29,7 @@
 #include "platforms.h"
 
 /**
- * @brief Object which represents the list of OpenCL platforms available
+ * @brief Object which contains the list of OpenCL platforms available
  * in the system.
  */
 struct cl4_platforms {
@@ -39,8 +39,18 @@ struct cl4_platforms {
 	cl_uint num_platfs;
 };
 
-
+/**
+ * @brief Creates a new CL4Platforms* object, which contains the list 
+ * of OpenCL platforms available in the system.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new CL4Platforms* object, or NULL in case an error occurs.
+ * */
 CL4Platforms* cl4_platforms_new(GError **err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	/* Return status of OpenCL functions. */
 	cl_int ocl_status;
@@ -97,6 +107,7 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 	goto finish;
 	
 error_handler:
+
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
 	
@@ -105,6 +116,8 @@ error_handler:
 	if (platforms) {
 		cl4_platforms_destroy(platforms);
 	}
+	
+	/* Set platforms to NULL, indicating an error occurred.*/
 	platforms = NULL;
 
 finish:		
@@ -114,23 +127,63 @@ finish:
 
 }
 
+/**
+ * @brief Destroy a CL4Platforms* object, including all underlying
+ * platforms, devices and data.
+ * 
+ * @param platforms CL4Platforms* object to destroy.
+ * */
 void cl4_platforms_destroy(CL4Platforms* platforms) {
 
+	/* Platforms object can't be NULL. */
 	g_return_if_fail(platforms != NULL);
 	
+	/* Destroy underlying platforms. */
 	for (guint i = 0; i < platforms->num_platfs; i++) {
 		cl4_platform_unref(platforms->platfs[i]);
 	}
+	
+	/* Free underlying platforms array. */
 	g_slice_free1(
 		sizeof(CL4Platform*) * platforms->num_platfs, platforms->platfs);
+		
+	/* Free CL4Platforms object. */	
 	g_slice_free(CL4Platforms, platforms);
 }
 
+
+/**
+ * @brief Return number of OpenCL platforms found in CL4Platforms* 
+ * object.
+ * 
+ * @param platforms Object containing the OpenCL platforms.
+ * @return The number of OpenCL platforms found.
+ * */
 guint cl4_platforms_count(CL4Platforms* platforms) {
+	
+	/* Platforms object can't be NULL. */
+	g_return_val_if_fail(platforms != NULL, 0);
+	
+	/* Return number of OpenCL platforms. */
 	return platforms->num_platfs;
 }
 
+/**
+ * @brief Get OpenCL platform at given index.
+ * 
+ * @param platforms Object containing the OpenCL platforms.
+ * @param index Index of platform to return.
+ * @return OpenCL platform at given index.
+ * */
 CL4Platform* cl4_platforms_get(CL4Platforms* platforms, guint index) {
-	 g_return_val_if_fail(index < platforms->num_platfs, NULL);
-	 return platforms->platfs[index];
+	
+	/* Platforms object can't be NULL. */
+	g_return_val_if_fail(platforms != NULL, 0);
+
+	/* Index of platform to return must be smaller than the number of
+	 * available platforms. */
+	g_return_val_if_fail(index < platforms->num_platfs, NULL);
+	 
+	/* Return platform at given index. */
+	return platforms->platfs[index];
 }

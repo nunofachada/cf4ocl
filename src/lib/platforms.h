@@ -18,8 +18,8 @@
  
 /** 
  * @file
- * @brief Wrapper object for OpenCL platforms. Contains platform and 
- * platform information.
+ * @brief Object which represents the list of OpenCL platforms available
+ * in the system and respective functions.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -35,17 +35,24 @@
 #include "errors.h"
 
 /**
- * @brief Platform wrapper object.
+ * @brief Object which contains the list of OpenCL platforms available
+ * in the system.
  */
 typedef struct cl4_platforms CL4Platforms;
 
-
+/** @brief Creates a new CL4Platforms* object, which contains the list 
+ * of OpenCL platforms available in the system. */
 CL4Platforms* cl4_platforms_new(GError **err);
 
+/** @brief Destroy a CL4Platforms* object, including all underlying
+ * platforms, devices and data. */
 void cl4_platforms_destroy(CL4Platforms* platforms);
 
+/** @brief Return number of OpenCL platforms found in CL4Platforms* 
+ * object. */
 guint cl4_platforms_count(CL4Platforms* platforms);
 
+/** @brief Get OpenCL platform at given index. */
 CL4Platform* cl4_platforms_get(CL4Platforms* platforms, guint index);
 
 #endif
