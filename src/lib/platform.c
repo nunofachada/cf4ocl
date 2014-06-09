@@ -104,6 +104,9 @@ void cl4_platform_unref(CL4Platform* platform) {
 gchar* cl4_plaform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
 	gchar* param_value = NULL;
 	
 	/* If platform information table is not yet initialized, then 
@@ -165,6 +168,9 @@ cl_platform_id cl4_platform_id(CL4Platform* platform) {
 
 CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err) {
 	/// @todo Make this return const
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	if (!platform->devices) {
 	
@@ -226,8 +232,13 @@ finish:
 }
 
 guint cl4_platform_device_count(CL4Platform* platform, GError **err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
 	if (!platform->devices) {
 		cl4_plaform_devices(platform, err);
 	}
+	/// @todo This is a bug, we might not have the device list... an error may have ocurred
 	return platform->num_devices;
 }
