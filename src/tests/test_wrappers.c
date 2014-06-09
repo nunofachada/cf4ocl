@@ -123,14 +123,102 @@ static void platforms_test() {
 					info = cl4_device_info(devs[j], CL_DEVICE_ADDRESS_BITS, &err);
 					cl4_test_wrappers_msg("...... Address bits :", "%d", *((cl_uint*) info));
 
-					info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
-					cl4_test_wrappers_msg("...... Available :", "%d", *((cl_bool*) info));
+					info = cl4_device_info(devs[j], CL_DEVICE_AVAILABLE, &err);
+					cl4_test_wrappers_msg("...... Device available :", "%s", *((cl_bool*) info) ? "Yes" : "No");
 
 					info = cl4_device_info(devs[j], CL_DEVICE_BUILT_IN_KERNELS, &err);
 					cl4_test_wrappers_msg("...... Built-in kernels :", "%s", (gchar*) info);
 
 					info = cl4_device_info(devs[j], CL_DEVICE_COMPILER_AVAILABLE, &err);
-					cl4_test_wrappers_msg("...... Compiler available :", "%d", *((cl_bool*) info));
+					cl4_test_wrappers_msg("...... Compiler available :", "%s", *((cl_bool*) info) ? "Yes" : "No");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_DOUBLE_FP_CONFIG, &err);
+					cl4_test_wrappers_msg("...... FP config (Double) :", "%lx", (cl_device_fp_config) *((cl_device_fp_config*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_SINGLE_FP_CONFIG, &err);
+					cl4_test_wrappers_msg("...... FP config (Single) :", "%lx", (cl_device_fp_config) *((cl_device_fp_config*) info));
+
+					// Currently unavailable
+					//info = cl4_device_info(devs[j], CL_DEVICE_HALF_FP_CONFIG, &err);
+					//cl4_test_wrappers_msg("...... FP config (Half) :", "%lx", (cl_device_fp_config) *((cl_device_fp_config*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_ENDIAN_LITTLE, &err);
+					cl4_test_wrappers_msg("...... Endian little :", "%s", *((cl_bool*) info) ? "Yes" : "No");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_ERROR_CORRECTION_SUPPORT, &err);
+					cl4_test_wrappers_msg("...... Error correction support :", "%s", *((cl_bool*) info) ? "Yes" : "No");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_EXECUTION_CAPABILITIES, &err);
+					cl4_test_wrappers_msg("...... FP config (Single) :", "%lx", (cl_device_exec_capabilities) *((cl_device_exec_capabilities*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_EXTENSIONS, &err);
+					cl4_test_wrappers_msg("...... Extensions :", "%s", (gchar*) info);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, &err);
+					cl4_test_wrappers_msg("...... Global mem. cache size :", "%ld", *((cl_ulong*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, &err);
+					cl4_test_wrappers_msg("...... Global mem. cache type :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, &err);
+					cl4_test_wrappers_msg("...... Global mem. cacheline size :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_GLOBAL_MEM_SIZE, &err);
+					cl4_test_wrappers_msg("...... Global mem. size :", "%ld", *((cl_ulong*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_HOST_UNIFIED_MEMORY, &err);
+					cl4_test_wrappers_msg("...... Host unified memory :", "%s", *((cl_bool*) info) ? "Yes" : "No");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE_SUPPORT, &err);
+					cl4_test_wrappers_msg("...... Image support :", "%s", *((cl_bool*) info) ? "Yes" : "No");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE2D_MAX_HEIGHT, &err);
+					cl4_test_wrappers_msg("...... Image2d max. height :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE2D_MAX_WIDTH, &err);
+					cl4_test_wrappers_msg("...... Image2d max. width :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE3D_MAX_DEPTH, &err);
+					cl4_test_wrappers_msg("...... Image3d max. depth :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE3D_MAX_HEIGHT, &err);
+					cl4_test_wrappers_msg("...... Image3d max. height :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE3D_MAX_WIDTH, &err);
+					cl4_test_wrappers_msg("...... Image3d max. width :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, &err);
+					cl4_test_wrappers_msg("...... Image max. buffer size :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, &err);
+					cl4_test_wrappers_msg("...... Image max. array size :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_LINKER_AVAILABLE, &err);
+					cl4_test_wrappers_msg("...... Linker available :", "%s", *((cl_bool*) info) ? "Yes" : "No");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_LOCAL_MEM_SIZE, &err);
+					cl4_test_wrappers_msg("...... Local mem. size :", "%ld", *((cl_ulong*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_LOCAL_MEM_TYPE, &err);
+					cl4_test_wrappers_msg("...... Local mem. type :", "%d", *((cl_device_local_mem_type*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, &err);
+					cl4_test_wrappers_msg("...... Max. clock frequency :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_COMPUTE_UNITS, &err);
+					cl4_test_wrappers_msg("...... Max. compute units :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_CONSTANT_ARGS, &err);
+					cl4_test_wrappers_msg("...... Max. constant args. :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, &err);
+					cl4_test_wrappers_msg("...... Max. constant buffer size :", "%ld", *((cl_ulong*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, &err);
+					cl4_test_wrappers_msg("...... Max. mem. alloc. size :", "%ld", *((cl_ulong*) info));
+
+
+
 
 					info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
 					cl4_test_wrappers_msg("...... Max wkitem sizes :", "%d, %d, %d", (int) ((size_t*) info)[0], (int) ((size_t*) info)[1], (int) ((size_t*) info)[2]);
