@@ -89,6 +89,9 @@ void cl4_device_unref(CL4Device* device) {
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
 	gpointer param_value;
 	
 	/* If device information table is not yet initialized, then 

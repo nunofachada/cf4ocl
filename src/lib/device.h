@@ -62,11 +62,5 @@ cl_device_id cl4_device_id(CL4Device* device);
 			(((type) & CL_DEVICE_TYPE_ACCELERATOR) ? "Accelerator" : \
 				(((type) & CL_DEVICE_TYPE_CUSTOM) ? "Custom" : \
 					"Unknown"))))
-					
-#define cl4_device_info_address_bits(device, err) \
-	cl4_device_info((device), CL_DEVICE_ADDRESS_BITS, err)
-
-
-
 
 #endif
