@@ -120,6 +120,8 @@ static void platforms_test() {
 					info = cl4_device_info(devs[j], CL_DEVICE_NAME, &err);
 					cl4_test_wrappers_msg("...... Name :", "%s", (gchar*) info);
 					
+					g_debug("...... Memory location : %p", *((void**) cl4_device_id(devs[j])));
+					
 					info = cl4_device_info(devs[j], CL_DEVICE_ADDRESS_BITS, &err);
 					cl4_test_wrappers_msg("...... Address bits :", "%d", *((cl_uint*) info));
 
@@ -217,14 +219,123 @@ static void platforms_test() {
 					info = cl4_device_info(devs[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, &err);
 					cl4_test_wrappers_msg("...... Max. mem. alloc. size :", "%ld", *((cl_ulong*) info));
 
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_PARAMETER_SIZE, &err);
+					cl4_test_wrappers_msg("...... Max. parameter size :", "%ld", (cl_ulong) *((size_t*) info));
 
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_READ_IMAGE_ARGS, &err);
+					cl4_test_wrappers_msg("...... Max. read image args. :", "%d", *((cl_uint*) info));
 
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_SAMPLERS, &err);
+					cl4_test_wrappers_msg("...... Max. samplers. :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, &err);
+					cl4_test_wrappers_msg("...... Max. work-group size :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, &err);
+					cl4_test_wrappers_msg("...... Max. work-item dims. :", "%d", *((cl_uint*) info));
 
 					info = cl4_device_info(devs[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
 					cl4_test_wrappers_msg("...... Max wkitem sizes :", "%d, %d, %d", (int) ((size_t*) info)[0], (int) ((size_t*) info)[1], (int) ((size_t*) info)[2]);
 
+					info = cl4_device_info(devs[j], CL_DEVICE_MAX_WRITE_IMAGE_ARGS, &err);
+					cl4_test_wrappers_msg("...... Max. write image args. :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MEM_BASE_ADDR_ALIGN, &err);
+					cl4_test_wrappers_msg("...... Mem. base address align :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, &err);
+					cl4_test_wrappers_msg("...... Min. data type align size (deprecated in OpenCL 1.2) :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, &err);
+					cl4_test_wrappers_msg("...... Native vector width char :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, &err);
+					cl4_test_wrappers_msg("...... Native vector width short :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, &err);
+					cl4_test_wrappers_msg("...... Native vector width int :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, &err);
+					cl4_test_wrappers_msg("...... Native vector width long :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, &err);
+					cl4_test_wrappers_msg("...... Native vector width float :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, &err);
+					cl4_test_wrappers_msg("...... Native vector width double :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, &err);
+					cl4_test_wrappers_msg("...... Native vector width half :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_OPENCL_C_VERSION, &err);
+					cl4_test_wrappers_msg("...... OpenCL C version :", "%s", (gchar*) info);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PARENT_DEVICE, &err);
+					cl4_test_wrappers_msg("...... Parent device :", "%p", *((void**) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PARTITION_MAX_SUB_DEVICES, &err);
+					cl4_test_wrappers_msg("...... Partition max. sub-devices :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PARTITION_PROPERTIES, &err);
+					cl4_test_wrappers_msg("...... Partition properties (only first) :", "%x", info != NULL ? (int) ((intptr_t*) info)[0] : 0);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PARTITION_AFFINITY_DOMAIN, &err);
+					cl4_test_wrappers_msg("...... Partition affinity domain :", "%lx", (cl_device_affinity_domain) *((cl_device_affinity_domain*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PARTITION_TYPE, &err);
+					cl4_test_wrappers_msg("...... Partition type (only first):", "%x", info != NULL ? (int) ((intptr_t*) info)[0] : 0);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width char :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width short :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width int :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width long :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width float :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width double :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, &err);
+					cl4_test_wrappers_msg("...... Preferred vector width half :", "%d", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PRINTF_BUFFER_SIZE, &err);
+					cl4_test_wrappers_msg("...... Printf buffer size :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, &err);
+					cl4_test_wrappers_msg("...... Preferred interop. user sync. :", "%s", *((cl_bool*) info) ? "User sync." : "Device sync.");
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PROFILE, &err);
+					cl4_test_wrappers_msg("...... Profile :", "%s", (gchar*) info);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_PROFILING_TIMER_RESOLUTION, &err);
+					cl4_test_wrappers_msg("...... Profiling timer resolution :", "%ld", (cl_ulong) *((size_t*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_QUEUE_PROPERTIES, &err);
+					cl4_test_wrappers_msg("...... Command queue properties :", "%s %s", ((cl_command_queue_properties) *((cl_command_queue_properties*) info) & CL_QUEUE_PROFILING_ENABLE) ? "Profiling" : "", ((cl_command_queue_properties) *((cl_command_queue_properties*) info) & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) ? "Out-Of-Order" : "");
+
 					info = cl4_device_info(devs[j], CL_DEVICE_TYPE, &err);
 					cl4_test_wrappers_msg("...... Type :", "%s", cl4_device_type2str(*((cl_device_type*) info)));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_VENDOR, &err);
+					cl4_test_wrappers_msg("...... Vendor :", "%s", (gchar*) info);
+
+					info = cl4_device_info(devs[j], CL_DEVICE_VENDOR_ID, &err);
+					cl4_test_wrappers_msg("...... Vendor ID :", "%x", *((cl_uint*) info));
+
+					info = cl4_device_info(devs[j], CL_DEVICE_VERSION, &err);
+					cl4_test_wrappers_msg("...... Device version :", "%s", (gchar*) info);
+
+					info = cl4_device_info(devs[j], CL_DRIVER_VERSION, &err);
+					cl4_test_wrappers_msg("...... Driver version :", "%s", (gchar*) info);
+
 				}
 			}
 		}
