@@ -39,13 +39,17 @@
  */
 typedef struct cl4_platform CL4Platform;
 
-
+/** @brief Creates a new platform wrapper object. */
 CL4Platform* cl4_platform_new(cl_platform_id id);
 
+/** @brief Increase the reference count of the platform wrapper object. */
 void cl4_platform_ref(CL4Platform* platform);
 
+/** @brief Alias for cl4_platform_unref(). */
 void cl4_platform_destroy(CL4Platform* platform);
 
+/** @brief Decrements the reference count of the platform wrapper object.
+ * If it reaches 0, the platform wrapper object is destroyed. */
 void cl4_platform_unref(CL4Platform* platform);
 
 gchar* cl4_plaform_info(CL4Platform* platform, 

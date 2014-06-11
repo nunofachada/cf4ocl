@@ -45,7 +45,7 @@ struct cl4_platform {
 };
 
 /**
- * @brief Create a new platform wrapper object.
+ * @brief Creates a new platform wrapper object.
  * 
  * @param id The OpenCL platform ID object.
  * @return A new platform wrapper object.
@@ -79,36 +79,61 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
 }
 
 /** 
- * @brief 
+ * @brief Increase the reference count of the platform wrapper object.
+ * 
+ * @param platform The platform wrapper object. 
  * */
 void cl4_platform_ref(CL4Platform* platform) {
 	g_atomic_int_inc(&platform->ref_count);
 }
 
+/** 
+ * @brief Alias for cl4_platform_unref().
+ *
+ * @param platform The platform wrapper object. 
+ * */
 void cl4_platform_destroy(CL4Platform* platform) {
 	
 	cl4_platform_unref(platform);
 
 }
 
-void cl4_platform_unref(CL4Platform* platform) {
+/** 
+ * @brief Decrements the reference count of the platform wrapper object.
+ * If it reaches 0, the platform wrapper object is destroyed.
+ *
+ * @param platform The platform wrapper object. 
+ * */
+ void cl4_platform_unref(CL4Platform* platform) {
 	
+	/* Make sure platform wrapper object is not NULL. */
 	g_return_if_fail(platform != NULL);
 
+	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&platform->ref_count)) {
+		
+		/* Destroy hash table containing platform information. */
 		if (platform->info) {
 			g_hash_table_destroy(platform->info);
 		}
+		
+		/* Reduce reference count of devices in device list, free the
+		 * device list. */
 		if (platform->devices) {
+			
+			/* Reduce reference count of devices in device list. */
 			for (guint i = 0; i < platform->num_devices; i++) {
-				cl4_device_destroy(platform->devices[i]);
+				cl4_device_unref(platform->devices[i]);
 			}
+			
+			/* Free the device list. */
 			g_slice_free1(
 				sizeof(CL4Device*) * platform->num_devices, 
 				platform->devices);
 
 		}
 		
+		/* Free the platform wrapper object. */
 		g_slice_free(CL4Platform, platform);
 	}	
 
