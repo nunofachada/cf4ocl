@@ -32,14 +32,24 @@
  * @brief Platform wrapper object.
  */
 struct cl4_platform {
-	cl_platform_id id;   /**< Platform ID. */
-	GHashTable* info;    /**< Platform information. */
-	guint num_devices;   /**< Number of devices available in platform. */
-	CL4Device** devices; /**< Devices available in platform. */
-	gint ref_count;      /**< Reference count. */
+	/** Platform ID. */
+	cl_platform_id id;
+	/** Platform information. */
+	GHashTable* info;
+	/** Number of devices available in platform. */
+	guint num_devices;
+	/** Devices available in platform. */
+	CL4Device** devices;
+	/** Reference count. */
+	gint ref_count;
 };
 
-
+/**
+ * @brief Create a new platform wrapper object.
+ * 
+ * @param id The OpenCL platform ID object.
+ * @return A new platform wrapper object.
+ * */
 CL4Platform* cl4_platform_new(cl_platform_id id) {
 	
 	/* The platform wrapper object. */
@@ -68,6 +78,9 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
 	
 }
 
+/** 
+ * @brief 
+ * */
 void cl4_platform_ref(CL4Platform* platform) {
 	g_atomic_int_inc(&platform->ref_count);
 }
