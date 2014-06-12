@@ -33,6 +33,12 @@
 #include "common.h"
 
 /** @brief Parse and verify command line arguments. */
-gint cl4_device_query_args_parse(int argc, char* argv[], GError** err);
+void cl4_devquery_args_parse(int argc, char* argv[], GError** err);
+
+void cl4_devquery_show_platform_info(CL4Platform* p, GError** err);
+void cl4_devquery_show_device_info_all(CL4Device* d, GError** err);
+void cl4_devquery_show_device_info_custom(CL4Device* d, GError** err);
+void cl4_devquery_show_device_info_basic(CL4Device* d, GError** err);
+
 
 #endif

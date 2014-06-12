@@ -31,13 +31,13 @@ platforms and devices"
 
 /* Command line arguments and respective default values. */
 static gboolean opt_all = FALSE;
-static gboolean opt_basic = FALSE;
+static gboolean opt_basic = TRUE; /* Default. */
 static gchar** opt_custom = NULL;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"all",    'a', 0, G_OPTION_ARG_NONE,         &opt_all,   "Show all the available device information",      NULL},
-	{"basic",  'b', 0, G_OPTION_ARG_NONE,         &opt_basic, "Show basic device information",                  NULL},
+	{"all",    'a', 0, G_OPTION_ARG_NONE,         &opt_all,   "Show all the available device information",       NULL},
+	{"basic",  'b', 0, G_OPTION_ARG_NONE,         &opt_basic, "Show basic device information (default)",         NULL},
 	{"custom", 'c', 0, G_OPTION_ARG_STRING_ARRAY, &opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
@@ -57,23 +57,57 @@ int main(int argc, char* argv[]) {
 	
 	/* List of platform wrapper objects. */
 	CL4Platforms* platforms = NULL;
-	gchar* str;
+	
+	/* Current platform and device. */
+	CL4Platform* p;
+	CL4Device* d;
+	
+	/* Number of devices in platform. */
+	guint num_devs;
 	
 	/* Function status. */
 	gint status;
 	
-	/* Parse command line options */
-	cl4_device_query_args_parse(argc, argv, &err);
+	/* Parse command line options. */
+	cl4_devquery_args_parse(argc, argv, &err);
+	gef_if_error_goto(err, CL4_ERROR_ARGS, status, error_handler);
+	
+	/* Get list of platform wrapper objects. */
+	platforms = cl4_platforms_new(&err);
 	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 	
-	printf("a : %s\n", opt_all ? "yes" : "no");
-	printf("b : %s\n", opt_basic ? "yes" : "no");
-	if (opt_custom != NULL)
-		for (int i = 0; (str = opt_custom[i]) != NULL; i++)
-			printf("c%d : %s\n", i, str);
-
+	/* Cycle through platforms. */
+	for (guint i = 0; i < cl4_platforms_count(platforms); i++) {
+		
+		/* Get current platform. */
+		p = cl4_platforms_get_platform(platforms, i);
+		
+		/* Show platform information. */
+		cl4_devquery_show_platform_info(p, &err);
+		
+		/* Get number of devices. */
+		num_devs = cl4_platform_device_count(p, &err);
+		gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 	
-	/* If we got here, everything is OK. */
+		/* Cycle through devices. */
+		for (guint j = 0; j < num_devs; j++) {
+			
+			/* Get current device. */
+			d = cl4_platform_get_device(p, j, &err);
+			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+			
+			/* Show device information. */
+			if (opt_all)
+				cl4_devquery_show_device_info_all(d, &err);
+			else if (opt_custom)
+				cl4_devquery_show_device_info_custom(d, &err);
+			else
+				cl4_devquery_show_device_info_basic(d, &err);
+			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+			
+		}
+	}
+	/* If we got here, everything is OK. */	
 	g_assert(err == NULL);
 	status = CL4_SUCCESS;
 	goto cleanup;
@@ -82,15 +116,13 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
-	fprintf(stderr, "%s\n", err->message);
-	status = err->code;
+	g_fprintf(stderr, "%s\n", err->message);
 	g_error_free(err);
 
 cleanup:
 		
 	/* Free stuff! */
 	if (platforms) cl4_platforms_destroy(platforms);
-	
 	g_strfreev(opt_custom);
 
 	/* Return status. */
@@ -104,13 +136,11 @@ cleanup:
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
  * @param err GLib error object for error reporting.
- * @return #CL4_SUCCESS if function returns with no error, or 
- * an error code otherwise.
  * */
-gint cl4_device_query_args_parse(int argc, char* argv[], GError** err) {
+void cl4_devquery_args_parse(int argc, char* argv[], GError** err) {
 	
-	/* Aux. var. */
-	gint status;
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
 
 	/* Command line options context. */
 	GOptionContext* context = NULL;
@@ -126,14 +156,14 @@ gint cl4_device_query_args_parse(int argc, char* argv[], GError** err) {
 	
 	/* Use context to parse command line options. */
 	g_option_context_parse(context, &argc, &argv, err);
-	gef_if_error_goto(*err, CL4_ERROR_ARGS, status, error_handler);
+	gef_if_err_goto(*err, error_handler);
 	
 	/* If we get here, no need for error treatment, jump to cleanup. */
 	g_assert(*err == NULL);
-	status = CL4_SUCCESS;
 	goto cleanup;
 	
 error_handler:
+
 	/* If we got here, everything is OK. */
 	g_assert(*err != NULL);
 
@@ -142,7 +172,35 @@ cleanup:
 	/* Free context. */
 	if (context) g_option_context_free(context);
 	
-	/* Return function status. */
-	return status;
+	/* Return. */
+	return;
+
+}
+
+void cl4_devquery_show_platform_info(CL4Platform* p, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
+
+}
+
+void cl4_devquery_show_device_info_all(CL4Device* d, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
+
+}
+
+void cl4_devquery_show_device_info_custom(CL4Device* d, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
+
+}
+
+void cl4_devquery_show_device_info_basic(CL4Device* d, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
 
 }

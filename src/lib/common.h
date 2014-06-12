@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
+#include <glib/gprintf.h>
 
 /**
  * @brief Error codes.
