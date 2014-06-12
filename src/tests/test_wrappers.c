@@ -114,7 +114,7 @@ static void create_info_destroy_test() {
 					
 					/* Get current device. */
 					d = cl4_platform_get_device(p, j, &err);
-					/// @todo Check for error here
+					g_assert_no_error(err);
 					g_debug("====== Device #%d", j);
 
 					info = cl4_device_info(d, CL_DEVICE_NAME, &err);
@@ -374,9 +374,28 @@ static void ref_unref_test() {
 		p = cl4_platforms_get_platform(platfs, 0);
 		
 		d = cl4_platform_get_device(p, 0, &err);
+		g_assert_no_error(err);
+		
+		g_assert_cmpint(cl4_platform_ref_count(p), ==, 1);
+		g_assert_cmpint(cl4_device_ref_count(d), ==, 1);
+
+		cl4_platform_ref(p);
+		cl4_device_ref(d);
+
+		g_assert_cmpint(cl4_platform_ref_count(p), ==, 2);
+		g_assert_cmpint(cl4_device_ref_count(d), ==, 2);
 		
 		cl4_platforms_destroy(platfs);
+		
+		g_assert_cmpint(cl4_platform_ref_count(p), ==, 1);
+		g_assert_cmpint(cl4_device_ref_count(d), ==, 2);
+		
+		cl4_platform_destroy(p);
 	
+		g_assert_cmpint(cl4_device_ref_count(d), ==, 1);
+		
+		cl4_device_destroy(d);
+
 	} else {
 		
 		/* Unable to get any OpenCL platforms, test can't pass. */
