@@ -52,7 +52,7 @@ void cl4_platforms_destroy(CL4Platforms* platforms);
  * object. */
 guint cl4_platforms_count(CL4Platforms* platforms);
 
-/** @brief Get OpenCL platform at given index. */
-CL4Platform* cl4_platforms_get(CL4Platforms* platforms, guint index);
+/** @brief Get CL4 platform wrapper object at given index. */
+CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index);
 
 #endif

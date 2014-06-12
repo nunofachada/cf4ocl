@@ -169,13 +169,13 @@ guint cl4_platforms_count(CL4Platforms* platforms) {
 }
 
 /**
- * @brief Get OpenCL platform at given index.
+ * @brief Get CL4 platform wrapper object at given index.
  * 
  * @param platforms Object containing the OpenCL platforms.
  * @param index Index of platform to return.
- * @return OpenCL platform at given index.
+ * @return Platform wrapper object at given index.
  * */
-CL4Platform* cl4_platforms_get(CL4Platforms* platforms, guint index) {
+CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index) {
 	
 	/* Platforms object can't be NULL. */
 	g_return_val_if_fail(platforms != NULL, 0);

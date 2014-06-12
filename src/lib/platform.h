@@ -57,9 +57,9 @@ gchar* cl4_plaform_info(CL4Platform* platform,
 /** @brief Get the OpenCL platform ID object. */
 cl_platform_id cl4_platform_id(CL4Platform* platform);
 
-/** @brief Return the list of devices which belong to the given platform. */
-CL4Device** cl4_plaform_devices(CL4Platform* platform, 
-	GError **err);
+/** @brief Get CL4 device wrapper at given index. */
+CL4Device* cl4_platform_get_device(
+	CL4Platform* platform, guint index, GError **err);
 
 /** @brief Return number of devices in platform. */
  guint cl4_platform_device_count(CL4Platform* platform, GError **err);
