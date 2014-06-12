@@ -31,26 +31,31 @@
  * OpenCL runtime context and associated objects.
  */
 struct cl4_context {
+	
 	/* Platform. */
-	cl_platform_id platform;
+	CL4Platform* platform;
+	
 	/* Context. */
 	cl_context context;
+	
 	/* Number of devices in context. */
 	cl_uint num_devices;
+	
 	/* Devices in context. */
-	cl_device_id* devices;
-	/* Number of programs in context. */
-	cl_uint num_programs;
-	/* Programs in context. */
-	cl_program* programs;
-	/* Number of queues in context. */
-	cl_uint num_queues;
-	/* Command queues */
-	cl_command_queue* queues;
-	/* Number of kernels in context. */
-	cl_uint num_kernels;
-	/* Kernels. */
-	cl_kernel* kernels;
+	CL4Device** devices;
+	
+	//~ /* Number of programs in context. */
+	//~ cl_uint num_programs;
+	//~ /* Programs in context. */
+	//~ cl_program* programs;
+	//~ /* Number of queues in context. */
+	//~ cl_uint num_queues;
+	//~ /* Command queues */
+	//~ cl_command_queue* queues;
+	//~ /* Number of kernels in context. */
+	//~ cl_uint num_kernels;
+	//~ /* Kernels. */
+	//~ cl_kernel* kernels;
 };
 
 CL4Context* cl4_context_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
