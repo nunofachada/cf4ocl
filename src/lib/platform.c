@@ -120,8 +120,6 @@ finish:
 	return;
 }
 
-
-
 /**
  * @brief Creates a new platform wrapper object.
  * 
@@ -162,7 +160,13 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
  * @param platform The platform wrapper object. 
  * */
 void cl4_platform_ref(CL4Platform* platform) {
+	
+	/* Make sure platform wrapper object is not NULL. */
+	g_return_if_fail(platform != NULL);
+
+	/* Increase reference count. */
 	g_atomic_int_inc(&platform->ref_count);
+	
 }
 
 /** 
@@ -219,7 +223,7 @@ void cl4_platform_destroy(CL4Platform* platform) {
 
 /**
  * @brief Returns the platform wrapper object reference count. For
- * debugging purposes only.
+ * debugging and testing purposes only.
  * 
  * @param platform The platform wrapper object.
  * @return The platform wrapper object reference count or -1 if platform
@@ -243,7 +247,7 @@ gint cl4_platform_ref_count(CL4Platform* platform) {
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return The requested platform information. This information will
- * be automatically be freed when the platform wrapper object is 
+ * be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
 gchar* cl4_plaform_info(CL4Platform* platform, 

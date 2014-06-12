@@ -51,7 +51,7 @@ void cl4_platform_destroy(CL4Platform* platform);
 void cl4_platform_unref(CL4Platform* platform);
 
 /** @brief Returns the platform wrapper object reference count. For
- * debugging purposes only. */
+ * debugging and testing purposes only. */
 gint cl4_platform_ref_count(CL4Platform* platform);
 
 /** @brief Get platform information. */

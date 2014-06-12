@@ -43,21 +43,36 @@
  */
 typedef struct cl4_device CL4Device;
 
+/** @brief Creates a new device wrapper object. */
 CL4Device* cl4_device_new(cl_device_id id);
 
+/** @brief Increase the reference count of the device wrapper object. */
 void cl4_device_ref(CL4Device* device);
 
+/** @brief Alias for cl4_device_unref(). */
 void cl4_device_destroy(CL4Device* device);
 
+/** @brief Decrements the reference count of the device wrapper object.
+ * If it reaches 0, the device wrapper object is destroyed. */
 void cl4_device_unref(CL4Device* device);
 
+/** @brief Returns the device wrapper object reference count. For
+ * debugging and testing purposes only. */
 gint cl4_device_ref_count(CL4Device* device);
 
+/** @brief Get device information. */
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
-	
+
+/** @brief Get the OpenCL device ID object. */	
 cl_device_id cl4_device_id(CL4Device* device);
 
+/** 
+ * @brief Map an OpenCL cl_device_type object to a string identifying
+ * the device type.
+ * 
+ * @param type The OpenCL cl_device_type.
+ * */
 #define cl4_device_type2str(type) \
 	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \
 		(((type) & CL_DEVICE_TYPE_GPU) ? "GPU" : \
