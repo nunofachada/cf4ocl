@@ -139,32 +139,49 @@ void cl4_platform_destroy(CL4Platform* platform) {
 
 }
 
+/**
+ * @brief Get platform information.
+ * 
+ * @param platform The platform wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested platform information. This information will
+ * be automatically be freed when the platform wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
 gchar* cl4_plaform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
+	/* Platform information placeholder. */
 	gchar* param_value = NULL;
 	
 	/* If platform information table is not yet initialized, then 
-	 * allocate memory for it. */
+	 * initialize it. */
 	if (!platform->info) {
 		platform->info = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal, NULL, g_free);
 	}
 
+	/* Check if requested information is already present in the 
+	 * platform information table. */
 	if (g_hash_table_contains(
 		platform->info, GUINT_TO_POINTER(param_name))) {
 		
+		/* If so, retrieve it from there. */
 		param_value = g_hash_table_lookup(
 			platform->info, GUINT_TO_POINTER(param_name));
 		
 	} else {
 		
+		/* Otherwise, get it from OpenCL platform.*/
 		cl_int ocl_status;
 		size_t size_ret;
 		
+		/* Get size of information. */
 		ocl_status = clGetPlatformInfo(
 			platform->id, param_name, 0, NULL, &size_ret);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
@@ -172,15 +189,18 @@ gchar* cl4_plaform_info(CL4Platform* platform,
 			"Function '%s': get platform info [size] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
+		/* Allocate memory for information. */
 		param_value = (gchar*) g_malloc(size_ret);
 		
+		/* Get information. */
 		ocl_status = clGetPlatformInfo(
 			platform->id, param_name, size_ret, param_value, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
 			CL4_OCL_ERROR, error_handler, 
 			"Function '%s': get platform info [info] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
-			
+		
+		/* Keep information in platform information table. */
 		g_hash_table_insert(
 			platform->info, GUINT_TO_POINTER(param_name), param_value);
 		
@@ -193,29 +213,57 @@ gchar* cl4_plaform_info(CL4Platform* platform,
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
+	param_value = NULL;
 	
 finish:		
 
+	/* Return the requested platform information. */
 	return param_value;
 
 }
 
+/**
+ * @brief Get the OpenCL platform ID object.
+ * 
+ * @param platform The platform wrapper object.
+ * @return The OpenCL platform ID object.
+ * */
 cl_platform_id cl4_platform_id(CL4Platform* platform) {
+	
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(platform != NULL, NULL);
+	
+	/* Return the OpenCL platform ID. */
 	return platform->id;
 }
 
-CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err) {
-	/// @todo Make this return const
+/**
+ * @brief Return the list of devices which belong to the given platform.
+ * 
+ * @param platform The platform wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The list of devices which belong to the given platform or 
+ * NULL if an error occurs.
+ * */
+CL4Device** cl4_plaform_devices(CL4Platform* platform, 
+	GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
-	if (!platform->devices) {
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(platform != NULL, NULL);
 	
+	/* The return value. */
+	CL4Device** devices_ret;
+	
+	/* Check if device list is already initialized. */
+	if (!platform->devices) {
+		/* Not initialized, initialize it. */
+		
 		cl_int ocl_status;
-		
 		size_t dev_ids_size;
-		
 		cl_device_id* dev_ids;
 		
 		/* Determine number of devices. */
@@ -258,25 +306,44 @@ CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err) {
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
+	devices_ret = platform->devices;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
+	devices_ret = NULL;
 	
 finish:		
 	
-	return platform->devices;
+	/* Return list of device wrappers. */
+	return devices_ret;
 }
 
+/**
+ * @brief Return number of devices in platform.
+ * 
+ * @param platform The platform wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The number of devices in platform or 0 if an error occurs or
+ * is otherwise not possible to get any device.
+ * */
 guint cl4_platform_device_count(CL4Platform* platform, GError **err) {
 	
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
 	
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(platform != NULL, 0);
+	
+	/* Check if device list has been initialized. */
 	if (!platform->devices) {
+		/* If not, initialize it (thus initializing the number of 
+		 * devices. */
 		cl4_plaform_devices(platform, err);
 	}
-	/// @todo This is a bug, we might not have the device list... an error may have ocurred
+	
+	/* Return the number of devices in platform. */
 	return platform->num_devices;
 }

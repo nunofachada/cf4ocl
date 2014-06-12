@@ -34,9 +34,7 @@
 #include "gerrorf.h"
 #include "errors.h"
 
-/**
- * @brief Platform wrapper object.
- */
+/** @brief The platform wrapper object. */
 typedef struct cl4_platform CL4Platform;
 
 /** @brief Creates a new platform wrapper object. */
@@ -52,13 +50,18 @@ void cl4_platform_destroy(CL4Platform* platform);
  * If it reaches 0, the platform wrapper object is destroyed. */
 void cl4_platform_unref(CL4Platform* platform);
 
+/** @brief Get platform information. */
 gchar* cl4_plaform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err);
 
+/** @brief Get the OpenCL platform ID object. */
 cl_platform_id cl4_platform_id(CL4Platform* platform);
 
-CL4Device** cl4_plaform_devices(CL4Platform* platform, GError **err);
+/** @brief Return the list of devices which belong to the given platform. */
+CL4Device** cl4_plaform_devices(CL4Platform* platform, 
+	GError **err);
 
-guint cl4_platform_device_count(CL4Platform* platform, GError **err);
+/** @brief Return number of devices in platform. */
+ guint cl4_platform_device_count(CL4Platform* platform, GError **err);
 
 #endif
