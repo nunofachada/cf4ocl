@@ -38,7 +38,7 @@ static gchar** opt_custom = NULL;
 static GOptionEntry entries[] = {
 	{"all",    'a', 0, G_OPTION_ARG_NONE,         &opt_all,   "Show all the available device information",      NULL},
 	{"basic",  'b', 0, G_OPTION_ARG_NONE,         &opt_basic, "Show basic device information",                  NULL},
-	{"custom", 'c', 0, G_OPTION_ARG_STRING_ARRAY, opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
+	{"custom", 'c', 0, G_OPTION_ARG_STRING_ARRAY, &opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -57,6 +57,7 @@ int main(int argc, char* argv[]) {
 	
 	/* List of platform wrapper objects. */
 	CL4Platforms* platforms = NULL;
+	gchar* str;
 	
 	/* Function status. */
 	gint status;
@@ -64,6 +65,13 @@ int main(int argc, char* argv[]) {
 	/* Parse command line options */
 	cl4_device_query_args_parse(argc, argv, &err);
 	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+	
+	printf("a : %s\n", opt_all ? "yes" : "no");
+	printf("b : %s\n", opt_basic ? "yes" : "no");
+	if (opt_custom != NULL)
+		for (int i = 0; (str = opt_custom[i]) != NULL; i++)
+			printf("c%d : %s\n", i, str);
+
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL);
@@ -74,14 +82,16 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
-	fprintf(stderr, "%s", err->message);
+	fprintf(stderr, "%s\n", err->message);
 	status = err->code;
 	g_error_free(err);
 
 cleanup:
 		
 	/* Free stuff! */
-	if (platforms) free(platforms);
+	if (platforms) cl4_platforms_destroy(platforms);
+	
+	g_strfreev(opt_custom);
 
 	/* Return status. */
 	return status;
@@ -106,7 +116,7 @@ gint cl4_device_query_args_parse(int argc, char* argv[], GError** err) {
 	GOptionContext* context = NULL;
 
 	/* Create parsing context. */
-	context = g_option_context_new (" - " CL4_DEVICE_QUERY_DESCRIPTION);
+	context = g_option_context_new(" - " CL4_DEVICE_QUERY_DESCRIPTION);
 	gef_if_error_create_goto(*err, CL4_ERROR, context == NULL, 
 		CL4_ERROR_ARGS, error_handler, 
 		"Unable to create command line parsing context.");
