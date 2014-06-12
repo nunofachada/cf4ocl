@@ -1133,7 +1133,7 @@ int cl4_prof_export_info_file(CL4ProfProfile* profile, const char* filename, GEr
 	/* Export data. */
 	status = cl4_prof_export_info(profile, fp, &errInt);
 	gef_if_error_propagate_goto(
-		errInt, err, GEF_USE_GERROR, status, error_handler);
+		err, errInt, GEF_USE_GERROR, status, error_handler);
 	
 	/* If we got here, everything is OK. */
 	g_assert (errInt == NULL);

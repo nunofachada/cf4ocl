@@ -84,19 +84,45 @@ enum gerrorf_flags {
  * @brief Same as gef_if_error_goto(), but rethrows error in a source
  * GError to a new destination GError object.
  * 
- * @param err_src Source GError* object.
  * @param err_dest Destination GError** object.
+ * @param err_src Source GError* object.
  * @param error_code Error code.
  * @param status Error status variable.
  * @param label Label to goto if error is detected.
  * */
-#define gef_if_error_propagate_goto(err_src, err_dest, error_code, status, label) \
+#define gef_if_error_propagate_goto(err_dest, err_src, error_code, status, label) \
 	if ((err_src) != NULL) { \
 		if ((error_code) != (int) GEF_USE_STATUS) { \
 			status = ((int) (error_code) == (int) GEF_USE_GERROR) ? (err_src)->code : (error_code); \
 		} \
 		g_propagate_error(err_dest, err_src); \
 		goto label; \
-	} \
+	}
+
+/** 
+ * @brief If error is detected in `err` object (`err != NULL`),
+ * go to the specified label.
+ * 
+ * @param err GError* object.
+ * @param label Label to goto if error is detected.
+ * */
+#define gef_if_err_goto(err, label)	\
+	if ((err) != NULL) { \
+		goto label; \
+	}
+
+/** 
+ * @brief Same as gef_if_err_goto(), but rethrows error in a source
+ * GError to a new destination GError object.
+ * 
+ * @param err_dest Destination GError** object.
+ * @param err_src Source GError* object.
+ * @param label Label to goto if error is detected.
+ * */
+#define gef_if_err_propagate_goto(err_dest, err_src, label) \
+	if ((err_src) != NULL) { \
+		g_propagate_error(err_dest, err_src); \
+		goto label; \
+	}
 
 #endif
