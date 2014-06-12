@@ -50,6 +50,10 @@ void cl4_platform_destroy(CL4Platform* platform);
  * If it reaches 0, the platform wrapper object is destroyed. */
 void cl4_platform_unref(CL4Platform* platform);
 
+/** @brief Returns the platform wrapper object reference count. For
+ * debugging purposes only. */
+gint cl4_platform_ref_count(CL4Platform* platform);
+
 /** @brief Get platform information. */
 gchar* cl4_plaform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err);

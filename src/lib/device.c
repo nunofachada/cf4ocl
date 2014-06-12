@@ -86,6 +86,14 @@ void cl4_device_unref(CL4Device* device) {
 
 }
 
+gint cl4_device_ref_count(CL4Device* device) {
+	
+	g_return_val_if_fail(device != NULL, -1);
+	
+	return device->ref_count;
+
+}
+
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err) {
 

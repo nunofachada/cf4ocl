@@ -51,6 +51,8 @@ void cl4_device_destroy(CL4Device* device);
 
 void cl4_device_unref(CL4Device* device);
 
+gint cl4_device_ref_count(CL4Device* device);
+
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 	

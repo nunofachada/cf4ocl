@@ -218,6 +218,24 @@ void cl4_platform_destroy(CL4Platform* platform) {
 }
 
 /**
+ * @brief Returns the platform wrapper object reference count. For
+ * debugging purposes only.
+ * 
+ * @param platform The platform wrapper object.
+ * @return The platform wrapper object reference count or -1 if platform
+ * is NULL.
+ * */
+gint cl4_platform_ref_count(CL4Platform* platform) {
+
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(platform != NULL, -1);
+	
+	/* Return the reference count. */
+	return platform->ref_count;
+
+}
+
+/**
  * @brief Get platform information.
  * 
  * @param platform The platform wrapper object.
@@ -233,7 +251,10 @@ gchar* cl4_plaform_info(CL4Platform* platform,
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
+	
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(platform != NULL, NULL);
+	
 	/* Platform information placeholder. */
 	gchar* param_value = NULL;
 	
