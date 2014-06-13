@@ -66,6 +66,6 @@ CL4Device* cl4_platform_get_device(
 	CL4Platform* platform, guint index, GError **err);
 
 /** @brief Return number of devices in platform. */
- guint cl4_platform_device_count(CL4Platform* platform, GError **err);
+guint cl4_platform_device_count(CL4Platform* platform, GError **err);
 
 #endif

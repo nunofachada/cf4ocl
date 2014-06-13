@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 		p = cl4_platforms_get_platform(platforms, i);
 		
 		/* Show platform information. */
-		cl4_devquery_show_platform_info(p, &err);
+		cl4_devquery_show_platform_info(p, i);
 		
 		/* Get number of devices. */
 		num_devs = cl4_platform_device_count(p, &err);
@@ -177,30 +177,64 @@ cleanup:
 
 }
 
-void cl4_devquery_show_platform_info(CL4Platform* p, GError** err) {
+void cl4_devquery_show_platform_info(CL4Platform* p, guint n) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_if_fail(err == NULL || *err == NULL);
+	/* Platform info variables. */
+	gchar *profile, *version, *name, *vendor;
+
+	/* Error location. */
+	GError* err = NULL;
+	
+	/* Get platform profile. */
+	profile = cl4_plaform_info(p, CL_PLATFORM_PROFILE, &err);
+	if (err != NULL) {
+		g_clear_error(&err);
+		profile = "Unknown profile";
+	}
+
+	/* Get platform version. */
+	version = cl4_plaform_info(p, CL_PLATFORM_VERSION, &err);
+	if (err != NULL) {
+		g_clear_error(&err);
+		profile = "Unknown version";
+	}
+			
+	/* Get platform name. */
+	name = cl4_plaform_info(p, CL_PLATFORM_NAME, &err);
+	if (err != NULL) {
+		g_clear_error(&err);
+		profile = "Unknown name";
+	}
+
+	/* Get platform vendor. */
+	vendor = cl4_plaform_info(p, CL_PLATFORM_VENDOR, &err);
+	if (err != NULL) {
+		g_clear_error(&err);
+		profile = "Unknown vendor";
+	}
+
+	/*  Send info to defined stream. */
+	g_fprintf(CL4_DEVQUERY_OUT, "Platform #%d: %s (%s) [%s, %s]\n",
+		n, name, vendor, version, profile);
+	
+	/* Bye. */
+	return;
+}
+
+void cl4_devquery_show_device_info_all(CL4Device* d, guint n) {
+
+
 
 }
 
-void cl4_devquery_show_device_info_all(CL4Device* d, GError** err) {
+void cl4_devquery_show_device_info_custom(CL4Device* d, guint n) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_if_fail(err == NULL || *err == NULL);
 
-}
-
-void cl4_devquery_show_device_info_custom(CL4Device* d, GError** err) {
-
-	/* Make sure err is NULL or it is not set. */
-	g_return_if_fail(err == NULL || *err == NULL);
 
 }
 
-void cl4_devquery_show_device_info_basic(CL4Device* d, GError** err) {
-
-	/* Make sure err is NULL or it is not set. */
-	g_return_if_fail(err == NULL || *err == NULL);
+void cl4_devquery_show_device_info_basic(CL4Device* d, guint n) {
+	
+	
 
 }
