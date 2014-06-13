@@ -48,175 +48,81 @@ static const gint info_map_size = 74;
 /* Map of strings to respective cl_device_info bitfields. */
 static const CL4DeviceInfoMap info_map[] = {
 
-	{"address_bits", CL_DEVICE_ADDRESS_BITS},
-	{"available", CL_DEVICE_AVAILABLE},
-	{"built_in_kernels", CL_DEVICE_BUILT_IN_KERNELS},
-	{"compiler_available", CL_DEVICE_COMPILER_AVAILABLE},
-	{"double_fp_config", CL_DEVICE_DOUBLE_FP_CONFIG},
-	{"endian_little", CL_DEVICE_ENDIAN_LITTLE},
-	{"error_correction_support", CL_DEVICE_ERROR_CORRECTION_SUPPORT},
-	{"execution_capabilities", CL_DEVICE_EXECUTION_CAPABILITIES},
-	{"extensions", CL_DEVICE_EXTENSIONS},
-	{"global_mem_cache_size", CL_DEVICE_GLOBAL_MEM_CACHE_SIZE},
-	{"global_mem_cache_type", CL_DEVICE_GLOBAL_MEM_CACHE_TYPE},
-	{"global_mem_cacheline_size", CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE},
-	{"global_mem_size", CL_DEVICE_GLOBAL_MEM_SIZE},
-	{"half_fp_config", CL_DEVICE_HALF_FP_CONFIG},
-	{"host_unified_memory", CL_DEVICE_HOST_UNIFIED_MEMORY},
-	{"image_support", CL_DEVICE_IMAGE_SUPPORT},
-	{"image2d_max_height", CL_DEVICE_IMAGE2D_MAX_HEIGHT},
-	{"image2d_max_width", CL_DEVICE_IMAGE2D_MAX_WIDTH},
-	{"image3d_max_depth", CL_DEVICE_IMAGE3D_MAX_DEPTH},
-	{"image3d_max_height", CL_DEVICE_IMAGE3D_MAX_HEIGHT},
-	{"image3d_max_width", CL_DEVICE_IMAGE3D_MAX_WIDTH},
-	{"image_max_buffer_size", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE},
-	{"image_max_array_size", CL_DEVICE_IMAGE_MAX_ARRAY_SIZE},
-	{"linker_available", CL_DEVICE_LINKER_AVAILABLE},
-	{"local_mem_size", CL_DEVICE_LOCAL_MEM_SIZE},
-	{"local_mem_type", CL_DEVICE_LOCAL_MEM_TYPE},
-	{"max_clock_frequency", CL_DEVICE_MAX_CLOCK_FREQUENCY},
-	{"max_compute_units", CL_DEVICE_MAX_COMPUTE_UNITS},
-	{"max_constant_args", CL_DEVICE_MAX_CONSTANT_ARGS},
-	{"max_constant_buffer_size", CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE},
-	{"max_mem_alloc_size", CL_DEVICE_MAX_MEM_ALLOC_SIZE},
-	{"max_parameter_size", CL_DEVICE_MAX_PARAMETER_SIZE},
-	{"max_read_image_args", CL_DEVICE_MAX_READ_IMAGE_ARGS},
-	{"max_samplers", CL_DEVICE_MAX_SAMPLERS},
-	{"max_work_group_size", CL_DEVICE_MAX_WORK_GROUP_SIZE},
-	{"max_work_item_dimensions", CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS},
-	{"max_work_item_sizes", CL_DEVICE_MAX_WORK_ITEM_SIZES},
-	{"max_write_image_args", CL_DEVICE_MAX_WRITE_IMAGE_ARGS},
-	{"mem_base_addr_align", CL_DEVICE_MEM_BASE_ADDR_ALIGN},
-	{"min_data_type_align_size", CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE},
-	{"name", CL_DEVICE_NAME},
-	{"native_vector_width_char", CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR},
-	{"native_vector_width_short", CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT},
-	{"native_vector_width_int", CL_DEVICE_NATIVE_VECTOR_WIDTH_INT},
-	{"native_vector_width_long", CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG},
-	{"native_vector_width_float", CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT},
-	{"native_vector_width_double", CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE},
-	{"native_vector_width_half", CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF},
-	{"opencl_c_version", CL_DEVICE_OPENCL_C_VERSION},
-	{"parent_device", CL_DEVICE_PARENT_DEVICE},
-	{"partition_max_sub_devices", CL_DEVICE_PARTITION_MAX_SUB_DEVICES},
-	{"partition_properties", CL_DEVICE_PARTITION_PROPERTIES},
-	{"partition_affinity_domain", CL_DEVICE_PARTITION_AFFINITY_DOMAIN},
-	{"partition_type", CL_DEVICE_PARTITION_TYPE},
-	{"platform", CL_DEVICE_PLATFORM},
-	{"preferred_vector_width_char", CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR},
-	{"preferred_vector_width_short", CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT},
-	{"preferred_vector_width_int", CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT},
-	{"preferred_vector_width_long", CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG},
-	{"preferred_vector_width_float", CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT},
-	{"preferred_vector_width_double", CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE},
-	{"preferred_vector_width_half", CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF},
-	{"printf_buffer_size", CL_DEVICE_PRINTF_BUFFER_SIZE},
-	{"preferred_interop_user_sync", CL_DEVICE_PREFERRED_INTEROP_USER_SYNC},
-	{"profile", CL_DEVICE_PROFILE},
-	{"profiling_timer_resolution", CL_DEVICE_PROFILING_TIMER_RESOLUTION},
-	{"queue_properties", CL_DEVICE_QUEUE_PROPERTIES},
-	{"reference_count", CL_DEVICE_REFERENCE_COUNT},
-	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG},
-	{"type", CL_DEVICE_TYPE},
-	{"vendor", CL_DEVICE_VENDOR},
-	{"vendor_id", CL_DEVICE_VENDOR_ID},
-	{"version", CL_DEVICE_VERSION},
-	{"driver_version", CL_DRIVER_VERSION}
+	{"address_bits", CL_DEVICE_ADDRESS_BITS, "Address space size (bits)"},
+	{"available", CL_DEVICE_AVAILABLE, "Device available"},
+	{"built_in_kernels", CL_DEVICE_BUILT_IN_KERNELS, "Built-in kernels"},
+	{"compiler_available", CL_DEVICE_COMPILER_AVAILABLE, "Compiler available"},
+	{"double_fp_config", CL_DEVICE_DOUBLE_FP_CONFIG, "Floating-point config. (double)"},
+	{"driver_version", CL_DRIVER_VERSION, "Driver version"},
+	{"endian_little", CL_DEVICE_ENDIAN_LITTLE, "Little endian"},
+	{"error_correction_support", CL_DEVICE_ERROR_CORRECTION_SUPPORT, "Error correction support"},
+	{"execution_capabilities", CL_DEVICE_EXECUTION_CAPABILITIES, "Execution capabilities"},
+	{"extensions", CL_DEVICE_EXTENSIONS, "Extensions"},
+	{"global_mem_cache_size", CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, "Global mem. cache size"},
+	{"global_mem_cache_type", CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, "Global mem. cache type"},
+	{"global_mem_cacheline_size", CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, "Global mem. cache line size"},
+	{"global_mem_size", CL_DEVICE_GLOBAL_MEM_SIZE, "Global mem. size"},
+	{"half_fp_config", CL_DEVICE_HALF_FP_CONFIG, "Floating-point config (half)"},
+	{"host_unified_memory", CL_DEVICE_HOST_UNIFIED_MEMORY, "Host unified memory subsystem"},
+	{"image_support", CL_DEVICE_IMAGE_SUPPORT, "Image support"},
+	{"image2d_max_height", CL_DEVICE_IMAGE2D_MAX_HEIGHT, "Max. height of 2D image (pixels)"},
+	{"image2d_max_width", CL_DEVICE_IMAGE2D_MAX_WIDTH, "Max. width of 1D/2D image (pixels)"},
+	{"image3d_max_depth", CL_DEVICE_IMAGE3D_MAX_DEPTH, "Max. depth of 3D image (pixels)"},
+	{"image3d_max_height", CL_DEVICE_IMAGE3D_MAX_HEIGHT, "Max. height of 3D image (pixels)"},
+	{"image3d_max_width", CL_DEVICE_IMAGE3D_MAX_WIDTH, "Max. width of 3D image (pixels)"},
+	{"image_max_buffer_size", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, "Max. pixels for 1D image from buffer object"},
+	{"image_max_array_size", CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, "Max. images in a 1D or 2D image array"},
+	{"linker_available", CL_DEVICE_LINKER_AVAILABLE, "Linker available"},
+	{"local_mem_size", CL_DEVICE_LOCAL_MEM_SIZE, "Local mem. size"},
+	{"local_mem_type", CL_DEVICE_LOCAL_MEM_TYPE, "Local mem. type"},
+	{"max_clock_frequency", CL_DEVICE_MAX_CLOCK_FREQUENCY, "Max. clock frequency"},
+	{"max_compute_units", CL_DEVICE_MAX_COMPUTE_UNITS, "Compute units"},
+	{"max_constant_args", CL_DEVICE_MAX_CONSTANT_ARGS, ""},
+	{"max_constant_buffer_size", CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, ""},
+	{"max_mem_alloc_size", CL_DEVICE_MAX_MEM_ALLOC_SIZE, ""},
+	{"max_parameter_size", CL_DEVICE_MAX_PARAMETER_SIZE, ""},
+	{"max_read_image_args", CL_DEVICE_MAX_READ_IMAGE_ARGS, ""},
+	{"max_samplers", CL_DEVICE_MAX_SAMPLERS, ""},
+	{"max_work_group_size", CL_DEVICE_MAX_WORK_GROUP_SIZE, ""},
+	{"max_work_item_dimensions", CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, ""},
+	{"max_work_item_sizes", CL_DEVICE_MAX_WORK_ITEM_SIZES, ""},
+	{"max_write_image_args", CL_DEVICE_MAX_WRITE_IMAGE_ARGS, ""},
+	{"mem_base_addr_align", CL_DEVICE_MEM_BASE_ADDR_ALIGN, ""},
+	{"min_data_type_align_size", CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, ""},
+	{"name", CL_DEVICE_NAME, ""},
+	{"native_vector_width_char", CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, ""},
+	{"native_vector_width_short", CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, ""},
+	{"native_vector_width_int", CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, ""},
+	{"native_vector_width_long", CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, ""},
+	{"native_vector_width_float", CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, ""},
+	{"native_vector_width_double", CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, ""},
+	{"native_vector_width_half", CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, ""},
+	{"opencl_c_version", CL_DEVICE_OPENCL_C_VERSION, ""},
+	{"parent_device", CL_DEVICE_PARENT_DEVICE, ""},
+	{"partition_max_sub_devices", CL_DEVICE_PARTITION_MAX_SUB_DEVICES, ""},
+	{"partition_properties", CL_DEVICE_PARTITION_PROPERTIES, ""},
+	{"partition_affinity_domain", CL_DEVICE_PARTITION_AFFINITY_DOMAIN, ""},
+	{"partition_type", CL_DEVICE_PARTITION_TYPE, ""},
+	{"platform", CL_DEVICE_PLATFORM, ""},
+	{"preferred_interop_user_sync", CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, ""},
+	{"preferred_vector_width_char", CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, ""},
+	{"preferred_vector_width_short", CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, ""},
+	{"preferred_vector_width_int", CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, ""},
+	{"preferred_vector_width_long", CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, ""},
+	{"preferred_vector_width_float", CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, ""},
+	{"preferred_vector_width_double", CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, ""},
+	{"preferred_vector_width_half", CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, ""},
+	{"printf_buffer_size", CL_DEVICE_PRINTF_BUFFER_SIZE, ""},
+	{"profile", CL_DEVICE_PROFILE, ""},
+	{"profiling_timer_resolution", CL_DEVICE_PROFILING_TIMER_RESOLUTION, ""},
+	{"queue_properties", CL_DEVICE_QUEUE_PROPERTIES, ""},
+	{"reference_count", CL_DEVICE_REFERENCE_COUNT, ""},
+	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG, ""},
+	{"type", CL_DEVICE_TYPE, ""},
+	{"vendor", CL_DEVICE_VENDOR, ""},
+	{"vendor_id", CL_DEVICE_VENDOR_ID, ""},
+	{"version", CL_DEVICE_VERSION, ""}
 };
-
-const CL4DeviceInfoMap* cl4_device_str2infolist(gchar* str, gint* size) {
-	
-	/* Make sure str is not NULL. */
-	g_return_val_if_fail(str != NULL, 0);
-	
-	/* Auxiliary string variables. */
-	gchar* str_lower;
-	gchar* str_final;
-	gsize len_str_final;
-	
-	/* Binary search indexes. */
-	guint idx_middle, idx_start, idx_end;
-	
-	/* String comparison result. */
-	gint cmp_res;
-	
-	/* Found info flag. */
-	gboolean found = FALSE;
-	
-	/* Found info. */
-	const CL4DeviceInfoMap* found_info_map = NULL;
-	
-	/* Make string lower-case. */
-	str_lower = g_ascii_strdown(str, -1);
-	
-	/* Remove possible cl_device or cl_ prefix */
-	if (g_str_has_prefix(str_lower, "cl_device_")) {
-		str_final = str_lower + strlen("cl_device_");
-	} else if (g_str_has_prefix(str_lower, "cl_")) {
-		str_final = str_lower + strlen("cl_");
-	} else {
-		str_final = str_lower;
-	}
-	len_str_final = strlen(str_final);
-	
-	/* Binary search. */
-	idx_start = 0;
-	idx_end = info_map_size - 1;
-	while (idx_end - idx_start > 1) {
-		idx_middle = (idx_start + idx_end) / 2;
-		cmp_res = g_ascii_strncasecmp(
-			str_final, info_map[idx_middle].param_name, len_str_final);
-		if (cmp_res == 0) {
-			found = TRUE;
-			break;
-		}
-		if (cmp_res > 0)
-			idx_start = idx_middle;
-		else 
-			idx_end = idx_middle;
-	}
-	if (found) {
-		/* Search for beginning. */
-		idx_start = idx_middle;
-		while (TRUE) {
-			if (idx_start == 0)
-				break;
-			if (g_ascii_strncasecmp(str_final, 
-				info_map[idx_start - 1].param_name, len_str_final) == 0)
-				idx_start--;
-			else
-				break;
-		}
-		/* Search for ending. */
-		idx_end = idx_middle;
-		while (TRUE) {
-			if (idx_end == (guint) (info_map_size - 1))
-				break;
-			if (g_ascii_strncasecmp(str_final, 
-				info_map[idx_end + 1].param_name, len_str_final) == 0)
-				idx_end++;
-			else
-				break;
-		}
-		
-		/* Set return values. */
-		*size = idx_end - idx_start + 1;
-		found_info_map = &info_map[idx_start];
-		
-	} else {
-		
-		/* Nothing found. */
-		*size = -1;
-		
-	}
-
-	/* Free string. */
-	g_free(str_lower);
-	
-	/* Return result */
-	return found_info_map;
-}
-
 
 /**
  * @brief Creates a new device wrapper object.
@@ -399,6 +305,118 @@ finish:
 	/* Return the requested device information. */
 	return param_value;
 
+}
+
+/// @todo this function
+//~ cl_device_info cl4_device_info_name(gchar* name) {
+//~ 
+	//~ /* Make sure name is not NULL. */
+	//~ g_return_val_if_fail(name != NULL, 0);
+//~ 
+	//~ 
+//~ }
+
+/**
+ * @brief Get a list of device information parameters which have the 
+ * given prefix.
+ * 
+ * @param prefix Device information parameter prefix. 
+ * @param size Size of returned list.
+ * @return List of device information parameters which have the given
+ * prefix.
+ * */
+const CL4DeviceInfoMap* cl4_device_info_list_prefix(
+	gchar* prefix, gint* size) {
+	
+	/* Make sure prefix is not NULL. */
+	g_return_val_if_fail(prefix != NULL, 0);
+	
+	/* Auxiliary string variables. */
+	gchar* str_lower;
+	gchar* str_final;
+	gsize len_str_final;
+	
+	/* Binary search indexes. */
+	guint idx_middle, idx_start, idx_end;
+	
+	/* String comparison result. */
+	gint cmp_res;
+	
+	/* Found info flag. */
+	gboolean found = FALSE;
+	
+	/* Found info. */
+	const CL4DeviceInfoMap* found_info_map = NULL;
+	
+	/* Make string lower-case. */
+	str_lower = g_ascii_strdown(prefix, -1);
+	
+	/* Remove possible cl_device or cl_ prefix */
+	if (g_str_has_prefix(str_lower, "cl_device_")) {
+		str_final = str_lower + strlen("cl_device_");
+	} else if (g_str_has_prefix(str_lower, "cl_")) {
+		str_final = str_lower + strlen("cl_");
+	} else {
+		str_final = str_lower;
+	}
+	len_str_final = strlen(str_final);
+	
+	/* Binary search. */
+	idx_start = 0;
+	idx_end = info_map_size - 1;
+	while (idx_end - idx_start > 1) {
+		idx_middle = (idx_start + idx_end) / 2;
+		cmp_res = g_ascii_strncasecmp(
+			str_final, info_map[idx_middle].param_name, len_str_final);
+		if (cmp_res == 0) {
+			found = TRUE;
+			break;
+		}
+		if (cmp_res > 0)
+			idx_start = idx_middle;
+		else 
+			idx_end = idx_middle;
+	}
+	if (found) {
+		/* Search for beginning. */
+		idx_start = idx_middle;
+		while (TRUE) {
+			if (idx_start == 0)
+				break;
+			if (g_ascii_strncasecmp(str_final, 
+				info_map[idx_start - 1].param_name, len_str_final) == 0)
+				idx_start--;
+			else
+				break;
+		}
+		/* Search for ending. */
+		idx_end = idx_middle;
+		while (TRUE) {
+			if (idx_end == (guint) (info_map_size - 1))
+				break;
+			if (g_ascii_strncasecmp(str_final, 
+				info_map[idx_end + 1].param_name, len_str_final) == 0)
+				idx_end++;
+			else
+				break;
+		}
+		
+		/* Set return values. */
+		*size = idx_end - idx_start + 1;
+		found_info_map = &info_map[idx_start];
+		
+	} else {
+		
+		/* Nothing found. */
+		*size = -1;
+		
+	}
+
+	/* Free string. */
+	g_free(str_lower);
+	
+	/* Return result */
+	return found_info_map;
 }
 
 /**

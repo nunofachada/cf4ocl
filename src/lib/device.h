@@ -51,10 +51,9 @@ typedef struct cl4_device_info_map {
 	
 	const gchar const* param_name;
 	const cl_device_info device_info;
+	const gchar const* description;
 	
 } CL4DeviceInfoMap;
-
-const CL4DeviceInfoMap* cl4_device_str2infolist(gchar* str, gint* size);
 
 /** @brief Creates a new device wrapper object. */
 CL4Device* cl4_device_new(cl_device_id id);
@@ -76,6 +75,11 @@ gint cl4_device_ref_count(CL4Device* device);
 /** @brief Get device information. */
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
+
+/** @brief Get a list of device information parameters which have the 
+ * given prefix. */
+const CL4DeviceInfoMap* cl4_device_info_list_prefix(
+	gchar* prefix, gint* size);
 
 /** @brief Get the OpenCL device ID object. */	
 cl_device_id cl4_device_id(CL4Device* device);

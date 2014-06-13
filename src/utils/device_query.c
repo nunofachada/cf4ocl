@@ -65,6 +65,9 @@ int main(int argc, char* argv[]) {
 	/* Number of devices in platform. */
 	guint num_devs;
 	
+	/* Device name. */
+	gchar* dev_name;
+	
 	/* Function status. */
 	gint status;
 	
@@ -95,10 +98,16 @@ int main(int argc, char* argv[]) {
 			
 			/* Get current device. */
 			d = cl4_platform_get_device(p, j, &err);
-			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+			gef_if_error_goto(
+				err, GEF_USE_GERROR, status, error_handler);
+				
+			/* Get device name. */
+			dev_name = (gchar*) cl4_device_info(d, CL_DEVICE_NAME, &err);
+			gef_if_error_goto(
+				err, GEF_USE_GERROR, status, error_handler);
 			
 			/* Show device information. */
-			g_fprintf(CL4_DEVQUERY_OUT, "\tDevice #%d: ", j);
+			g_fprintf(CL4_DEVQUERY_OUT, "\tDevice #%d: %s\n", j, dev_name);
 			if (opt_all)
 				cl4_devquery_show_device_info_all(d);
 			else if (opt_custom)
@@ -236,13 +245,15 @@ void cl4_devquery_show_device_info_custom(CL4Device* d) {
 	GError* err = NULL;
 	
 	for (guint i = 0; opt_custom[i] != NULL; i++) {
-		info_map = cl4_device_str2infolist(opt_custom[i], &size);
-		if (info_map) printf("Found info_map for option '%s' with size %d\n", opt_custom[i], size);
-		else printf("Didn't find an info map for option '%s'\n", opt_custom[i]);
-		for (gint j = 0; j < size; j++) {
-			param_value = cl4_device_info(d, info_map[j].device_info, &err);
-			if (err != NULL) g_clear_error(&err);
-			g_fprintf(CL4_DEVQUERY_OUT, "-> %s\n", info_map[j].param_name);
+		info_map = cl4_device_info_list_prefix(opt_custom[i], &size);
+		if (!info_map) {
+			g_fprintf(CL4_DEVQUERY_OUT, "\t\tNo parameters with prefix '%s'\n", opt_custom[i]);
+		} else {
+			for (gint j = 0; j < size; j++) {
+				param_value = cl4_device_info(d, info_map[j].device_info, &err);
+				if (err != NULL) g_clear_error(&err);
+				g_fprintf(CL4_DEVQUERY_OUT, "\t\t%s\n", info_map[j].param_name);
+			}
 		}
 	}
 
