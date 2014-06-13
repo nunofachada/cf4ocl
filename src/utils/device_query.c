@@ -83,7 +83,8 @@ int main(int argc, char* argv[]) {
 		p = cl4_platforms_get_platform(platforms, i);
 		
 		/* Show platform information. */
-		cl4_devquery_show_platform_info(p, i);
+		g_fprintf(CL4_DEVQUERY_OUT, "Platform #%d: ", i);
+		cl4_devquery_show_platform_info(p);
 		
 		/* Get number of devices. */
 		num_devs = cl4_platform_device_count(p, &err);
@@ -97,13 +98,13 @@ int main(int argc, char* argv[]) {
 			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 			
 			/* Show device information. */
+			g_fprintf(CL4_DEVQUERY_OUT, "\tDevice #%d: ", j);
 			if (opt_all)
-				cl4_devquery_show_device_info_all(d, &err);
+				cl4_devquery_show_device_info_all(d);
 			else if (opt_custom)
-				cl4_devquery_show_device_info_custom(d, &err);
+				cl4_devquery_show_device_info_custom(d);
 			else
-				cl4_devquery_show_device_info_basic(d, &err);
-			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+				cl4_devquery_show_device_info_basic(d);
 			
 		}
 	}
@@ -177,7 +178,7 @@ cleanup:
 
 }
 
-void cl4_devquery_show_platform_info(CL4Platform* p, guint n) {
+void cl4_devquery_show_platform_info(CL4Platform* p) {
 
 	/* Platform info variables. */
 	gchar *profile, *version, *name, *vendor;
@@ -214,26 +215,41 @@ void cl4_devquery_show_platform_info(CL4Platform* p, guint n) {
 	}
 
 	/*  Send info to defined stream. */
-	g_fprintf(CL4_DEVQUERY_OUT, "Platform #%d: %s (%s) [%s, %s]\n",
-		n, name, vendor, version, profile);
+	g_fprintf(CL4_DEVQUERY_OUT, "%s (%s) [%s, %s]\n",
+		name, vendor, version, profile);
 	
 	/* Bye. */
 	return;
 }
 
-void cl4_devquery_show_device_info_all(CL4Device* d, guint n) {
+void cl4_devquery_show_device_info_all(CL4Device* d) {
 
 
 
 }
 
-void cl4_devquery_show_device_info_custom(CL4Device* d, guint n) {
+void cl4_devquery_show_device_info_custom(CL4Device* d) {
 
+	const CL4DeviceInfoMap* info_map;
+	gint size;
+	gpointer param_value;
+	GError* err = NULL;
+	
+	for (guint i = 0; opt_custom[i] != NULL; i++) {
+		info_map = cl4_device_str2infolist(opt_custom[i], &size);
+		if (info_map) printf("Found info_map for option '%s' with size %d\n", opt_custom[i], size);
+		else printf("Didn't find an info map for option '%s'\n", opt_custom[i]);
+		for (gint j = 0; j < size; j++) {
+			param_value = cl4_device_info(d, info_map[j].device_info, &err);
+			if (err != NULL) g_clear_error(&err);
+			g_fprintf(CL4_DEVQUERY_OUT, "-> %s\n", info_map[j].param_name);
+		}
+	}
 
-
+	return;
 }
 
-void cl4_devquery_show_device_info_basic(CL4Device* d, guint n) {
+void cl4_devquery_show_device_info_basic(CL4Device* d) {
 	
 	
 

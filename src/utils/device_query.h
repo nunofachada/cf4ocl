@@ -39,10 +39,10 @@
 /** @brief Parse and verify command line arguments. */
 void cl4_devquery_args_parse(int argc, char* argv[], GError** err);
 
-void cl4_devquery_show_platform_info(CL4Platform* p, guint n);
-void cl4_devquery_show_device_info_all(CL4Device* d, guint n);
-void cl4_devquery_show_device_info_custom(CL4Device* d, guint n);
-void cl4_devquery_show_device_info_basic(CL4Device* d, guint n);
+void cl4_devquery_show_platform_info(CL4Platform* p);
+void cl4_devquery_show_device_info_all(CL4Device* d);
+void cl4_devquery_show_device_info_custom(CL4Device* d);
+void cl4_devquery_show_device_info_basic(CL4Device* d);
 
 
 #endif

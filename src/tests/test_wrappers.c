@@ -140,9 +140,8 @@ static void create_info_destroy_test() {
 					info = cl4_device_info(d, CL_DEVICE_SINGLE_FP_CONFIG, &err);
 					cl4_test_wrappers_msg("...... FP config (Single) :", "%lx", (cl_device_fp_config) *((cl_device_fp_config*) info));
 
-					// Currently unavailable
-					//info = cl4_device_info(d, CL_DEVICE_HALF_FP_CONFIG, &err);
-					//cl4_test_wrappers_msg("...... FP config (Half) :", "%lx", (cl_device_fp_config) *((cl_device_fp_config*) info));
+					info = cl4_device_info(d, CL_DEVICE_HALF_FP_CONFIG, &err);
+					cl4_test_wrappers_msg("...... FP config (Half) :", "%lx", (cl_device_fp_config) *((cl_device_fp_config*) info));
 
 					info = cl4_device_info(d, CL_DEVICE_ENDIAN_LITTLE, &err);
 					cl4_test_wrappers_msg("...... Endian little :", "%s", *((cl_bool*) info) ? "Yes" : "No");
