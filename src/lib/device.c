@@ -307,20 +307,142 @@ finish:
 
 }
 
-/// @todo this function
-//~ cl_device_info cl4_device_info_name(gchar* name) {
-//~ 
-	//~ /* Make sure name is not NULL. */
-	//~ g_return_val_if_fail(name != NULL, 0);
-//~ 
-	//~ 
-//~ }
+/**
+ * @brief Get a final device info prefix in the same format as 
+ * kept in the info_map.
+ * 
+ * @param prefix Raw device information prefix. Several forms are 
+ * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
+ * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
+ * accepted.
+ * @return A final device info prefix in the same format as 
+ * kept in the info_map.
+ * */
+static gchar* cl4_device_info_get_prefix_final(gchar* prefix) {
+	
+	/* Make sure prefix is not NULL. */
+	g_return_val_if_fail(prefix != NULL, 0);
+	
+	/* Auxiliary string variables. */
+	gchar* str_lower;
+	gchar* str_aux;
+	gchar* str_final;
+	
+	/* Make string lower-case. */
+	str_lower = g_ascii_strdown(prefix, -1);
+	
+	/* Remove possible cl_device or cl_ prefix */
+	if (g_str_has_prefix(str_lower, "cl_device_")) {
+		str_aux = str_lower + strlen("cl_device_");
+	} else if (g_str_has_prefix(str_lower, "cl_")) {
+		str_aux = str_lower + strlen("cl_");
+	} else {
+		str_aux = str_lower;
+	}
+	
+	/* Create a new string for returning. */
+	str_final = g_strdup(str_aux);
+
+	/* Free lowercase string. */
+	g_free(str_lower);
+	
+	/* Return result */
+	return str_final;
+	
+}
+
+/**
+ * @brief Return the index of the device information map object of the
+ * given parameter name.
+ * 
+ * @param A parameter name, in the format stored in the info_map static
+ * array.
+ * @return Index of the device information map object of the given 
+ * parameter name, or -1 if device information map is not found.
+ * */
+static gint cl4_device_info_get_index(gchar* name) {
+
+	/* Make sure name is not NULL. */
+	g_return_val_if_fail(name != NULL, 0);
+	
+	/* Search indexes. */
+	gint idx_middle;
+	guint idx_start, idx_end;
+	
+	/* String comparison result. */
+	gint cmp_res;
+	
+	/* Found info flag. */
+	gboolean found = FALSE;
+	
+	/* Size of name. */
+	gint len_name = strlen(name);
+
+	/* Binary search. */
+	idx_start = 0;
+	idx_end = info_map_size - 1;
+	while (idx_end - idx_start > 1) {
+		idx_middle = (idx_start + idx_end) / 2;
+		cmp_res = g_ascii_strncasecmp(
+			name, info_map[idx_middle].param_name, len_name);
+		if (cmp_res == 0) {
+			found = TRUE;
+			break;
+		}
+		if (cmp_res > 0)
+			idx_start = idx_middle;
+		else 
+			idx_end = idx_middle;
+	}
+	
+	/* Return result */
+	return found ? idx_middle : -1;
+}
+
+/**
+ * @brief Return a cl_device_info object given its name.
+ * 
+ * @param name Name of cl_device_info object. Several forms are 
+ * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
+ * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
+ * accepted.
+ * @return A cl_device_info object given its name or 0 if no suitable
+ * cl_device_info is found for the given name.
+ * */
+cl_device_info cl4_device_info_name(gchar* name) {
+
+	/* Make sure name is not NULL. */
+	g_return_val_if_fail(name != NULL, 0);
+
+	/* Final name */
+	gchar* name_final;
+	
+	/* Index of device info. */
+	gint idx;
+	
+	/* Get final name. */
+	name_final = cl4_device_info_get_prefix_final(name);
+	
+	/* Get index of cl_device_info given its final name. */
+	idx = cl4_device_info_get_index(name_final);
+	
+	/* Release memory holding the final name. */
+	g_free(name_final);
+	
+	/* Return the cl_device_info object if found, or 0 otherwise. */
+	if (idx >= 0)
+		return info_map[idx].device_info;
+	else
+		return 0;
+	
+}
 
 /**
  * @brief Get a list of device information parameters which have the 
  * given prefix.
  * 
- * @param prefix Device information parameter prefix. 
+ * @param prefix Device information parameter prefix. Can be in lower
+ * or uppercase, and start with "cl_device_" or not.
  * @param size Size of returned list.
  * @return List of device information parameters which have the given
  * prefix.
@@ -331,60 +453,39 @@ const CL4DeviceInfoMap* cl4_device_info_list_prefix(
 	/* Make sure prefix is not NULL. */
 	g_return_val_if_fail(prefix != NULL, 0);
 	
-	/* Auxiliary string variables. */
-	gchar* str_lower;
-	gchar* str_final;
-	gsize len_str_final;
+	/* Final prefix to search for. */
+	gchar* prefix_final;
 	
-	/* Binary search indexes. */
-	guint idx_middle, idx_start, idx_end;
+	/* Size of final prefix. */
+	gint len_prefix_final;
+	
+	/* Search index. */
+	gint idx_middle, idx_start, idx_end;
 	
 	/* String comparison result. */
 	gint cmp_res;
 	
-	/* Found info flag. */
-	gboolean found = FALSE;
-	
 	/* Found info. */
 	const CL4DeviceInfoMap* found_info_map = NULL;
 	
-	/* Make string lower-case. */
-	str_lower = g_ascii_strdown(prefix, -1);
+	/* Determine final prefix according to how parameter names are
+	 * stored in info_map. */
+	prefix_final = cl4_device_info_get_prefix_final(prefix);
 	
-	/* Remove possible cl_device or cl_ prefix */
-	if (g_str_has_prefix(str_lower, "cl_device_")) {
-		str_final = str_lower + strlen("cl_device_");
-	} else if (g_str_has_prefix(str_lower, "cl_")) {
-		str_final = str_lower + strlen("cl_");
-	} else {
-		str_final = str_lower;
-	}
-	len_str_final = strlen(str_final);
+	/* Determine prefix size. */
+	len_prefix_final = strlen(prefix_final);
 	
 	/* Binary search. */
-	idx_start = 0;
-	idx_end = info_map_size - 1;
-	while (idx_end - idx_start > 1) {
-		idx_middle = (idx_start + idx_end) / 2;
-		cmp_res = g_ascii_strncasecmp(
-			str_final, info_map[idx_middle].param_name, len_str_final);
-		if (cmp_res == 0) {
-			found = TRUE;
-			break;
-		}
-		if (cmp_res > 0)
-			idx_start = idx_middle;
-		else 
-			idx_end = idx_middle;
-	}
-	if (found) {
+	idx_middle = cl4_device_info_get_index(prefix_final);
+	
+	if (idx_middle >= 0) {
 		/* Search for beginning. */
 		idx_start = idx_middle;
 		while (TRUE) {
 			if (idx_start == 0)
 				break;
-			if (g_ascii_strncasecmp(str_final, 
-				info_map[idx_start - 1].param_name, len_str_final) == 0)
+			if (g_ascii_strncasecmp(prefix_final, 
+				info_map[idx_start - 1].param_name, len_prefix_final) == 0)
 				idx_start--;
 			else
 				break;
@@ -394,8 +495,8 @@ const CL4DeviceInfoMap* cl4_device_info_list_prefix(
 		while (TRUE) {
 			if (idx_end == (guint) (info_map_size - 1))
 				break;
-			if (g_ascii_strncasecmp(str_final, 
-				info_map[idx_end + 1].param_name, len_str_final) == 0)
+			if (g_ascii_strncasecmp(prefix_final, 
+				info_map[idx_end + 1].param_name, len_prefix_final) == 0)
 				idx_end++;
 			else
 				break;
@@ -412,8 +513,8 @@ const CL4DeviceInfoMap* cl4_device_info_list_prefix(
 		
 	}
 
-	/* Free string. */
-	g_free(str_lower);
+	/* Free final prefix. */
+	g_free(prefix_final);
 	
 	/* Return result */
 	return found_info_map;

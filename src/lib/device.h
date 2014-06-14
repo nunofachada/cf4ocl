@@ -76,6 +76,9 @@ gint cl4_device_ref_count(CL4Device* device);
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 
+/** @brief Return a cl_device_info object given its name. */	
+cl_device_info cl4_device_info_name(gchar* name);
+
 /** @brief Get a list of device information parameters which have the 
  * given prefix. */
 const CL4DeviceInfoMap* cl4_device_info_list_prefix(
