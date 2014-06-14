@@ -462,9 +462,6 @@ const CL4DeviceInfoMap* cl4_device_info_list_prefix(
 	/* Search index. */
 	gint idx_middle, idx_start, idx_end;
 	
-	/* String comparison result. */
-	gint cmp_res;
-	
 	/* Found info. */
 	const CL4DeviceInfoMap* found_info_map = NULL;
 	
@@ -493,7 +490,7 @@ const CL4DeviceInfoMap* cl4_device_info_list_prefix(
 		/* Search for ending. */
 		idx_end = idx_middle;
 		while (TRUE) {
-			if (idx_end == (guint) (info_map_size - 1))
+			if (idx_end == info_map_size - 1)
 				break;
 			if (g_ascii_strncasecmp(prefix_final, 
 				info_map[idx_end + 1].param_name, len_prefix_final) == 0)
