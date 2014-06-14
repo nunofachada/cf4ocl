@@ -406,6 +406,48 @@ static void ref_unref_test() {
 }
 
 /**
+ * @brief Test the cl4_device_info_name function of the device module.
+ * */
+static void device_info_name_test() {
+
+	/* Device information. */
+	cl_device_info info;
+
+	/* Test exact parameter name. */
+	info = cl4_device_info_name("CL_DEVICE_ENDIAN_LITTLE");
+	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+	info = cl4_device_info_name("CL_DEVICE_EXTENSIONS");
+	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+	info = cl4_device_info_name("CL_DRIVER_VERSION");
+	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+	/* Test mixed parameter name. */
+	info = cl4_device_info_name("cl_Device_Endian_Little");
+	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+	info = cl4_device_info_name("CL_device_Extensions");
+	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+	info = cl4_device_info_name("cl_DRIVer_version");
+	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+	/* Test lowercase parameter name without cl_device_ or cl_ prefix. */
+	info = cl4_device_info_name("endian_little");
+	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+	info = cl4_device_info_name("extensions");
+	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+	info = cl4_device_info_name("driver_version");
+	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+	
+	/* Test parameter name without CL_DEVICE_ or CL_ prefix. */
+	info = cl4_device_info_name("ENDIAN_LITTLE");
+	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+	info = cl4_device_info_name("EXTENSIONS");
+	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+	info = cl4_device_info_name("DRIVER_VERSION");
+	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+}
+
+/**
  * @brief Main function.
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
@@ -413,8 +455,9 @@ static void ref_unref_test() {
  * */
 int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
-	g_test_add_func("/wrappers/platforms", create_info_destroy_test);
+	g_test_add_func("/wrappers/create_info_destroy", create_info_destroy_test);
 	g_test_add_func("/wrappers/ref-unref", ref_unref_test);
+	g_test_add_func("/wrappers/device_info_name", device_info_name_test);
 	return g_test_run();
 }
 
