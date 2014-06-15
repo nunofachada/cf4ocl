@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 	gint status;
 	
 	/* Parse command line options. */
-	cl4_devquery_args_parse(argc, argv, &err);
+	cl4_device_query_args_parse(argc, argv, &err);
 	gef_if_error_goto(err, CL4_ERROR_ARGS, status, error_handler);
 	
 	/* Get list of platform wrapper objects. */
@@ -86,8 +86,8 @@ int main(int argc, char* argv[]) {
 		p = cl4_platforms_get_platform(platforms, i);
 		
 		/* Show platform information. */
-		g_fprintf(CL4_DEVQUERY_OUT, "Platform #%d: ", i);
-		cl4_devquery_show_platform_info(p);
+		g_fprintf(CL4_DEVICE_QUERY_OUT, "Platform #%d: ", i);
+		cl4_device_query_show_platform_info(p);
 		
 		/* Get number of devices. */
 		num_devs = cl4_platform_device_count(p, &err);
@@ -107,13 +107,13 @@ int main(int argc, char* argv[]) {
 				err, GEF_USE_GERROR, status, error_handler);
 			
 			/* Show device information. */
-			g_fprintf(CL4_DEVQUERY_OUT, "\tDevice #%d: %s\n", j, dev_name);
+			g_fprintf(CL4_DEVICE_QUERY_OUT, "\tDevice #%d: %s\n", j, dev_name);
 			if (opt_all)
-				cl4_devquery_show_device_info_all(d);
+				cl4_device_query_show_device_info_all(d);
 			else if (opt_custom)
-				cl4_devquery_show_device_info_custom(d);
+				cl4_device_query_show_device_info_custom(d);
 			else
-				cl4_devquery_show_device_info_basic(d);
+				cl4_device_query_show_device_info_basic(d);
 			
 		}
 	}
@@ -147,7 +147,7 @@ cleanup:
  * @param argv Command line arguments.
  * @param err GLib error object for error reporting.
  * */
-void cl4_devquery_args_parse(int argc, char* argv[], GError** err) {
+void cl4_device_query_args_parse(int argc, char* argv[], GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail(err == NULL || *err == NULL);
@@ -187,7 +187,7 @@ cleanup:
 
 }
 
-void cl4_devquery_show_platform_info(CL4Platform* p) {
+void cl4_device_query_show_platform_info(CL4Platform* p) {
 
 	/* Platform info variables. */
 	gchar *profile, *version, *name, *vendor;
@@ -224,35 +224,35 @@ void cl4_devquery_show_platform_info(CL4Platform* p) {
 	}
 
 	/*  Send info to defined stream. */
-	g_fprintf(CL4_DEVQUERY_OUT, "%s (%s) [%s, %s]\n",
+	g_fprintf(CL4_DEVICE_QUERY_OUT, "%s (%s) [%s, %s]\n",
 		name, vendor, version, profile);
 	
 	/* Bye. */
 	return;
 }
 
-void cl4_devquery_show_device_info_all(CL4Device* d) {
+void cl4_device_query_show_device_info_all(CL4Device* d) {
 
-
+	d = d;
 
 }
 
-void cl4_devquery_show_device_info_custom(CL4Device* d) {
+void cl4_device_query_show_device_info_custom(CL4Device* d) {
 
-	const CL4DeviceInfoMap* info_map;
+	const CL4DevQueryMap* info_map;
 	gint size;
 	gpointer param_value;
 	GError* err = NULL;
 	
 	for (guint i = 0; opt_custom[i] != NULL; i++) {
-		info_map = cl4_device_info_list_prefix(opt_custom[i], &size);
+		info_map = cl4_devquery_list_prefix(opt_custom[i], &size);
 		if (!info_map) {
-			g_fprintf(CL4_DEVQUERY_OUT, "\t\tNo parameters with prefix '%s'\n", opt_custom[i]);
+			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\tNo parameters with prefix '%s'\n", opt_custom[i]);
 		} else {
 			for (gint j = 0; j < size; j++) {
 				param_value = cl4_device_info(d, info_map[j].device_info, &err);
 				if (err != NULL) g_clear_error(&err);
-				g_fprintf(CL4_DEVQUERY_OUT, "\t\t%s\n", info_map[j].param_name);
+				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s\n", info_map[j].param_name);
 			}
 		}
 	}
@@ -260,8 +260,8 @@ void cl4_devquery_show_device_info_custom(CL4Device* d) {
 	return;
 }
 
-void cl4_devquery_show_device_info_basic(CL4Device* d) {
+void cl4_device_query_show_device_info_basic(CL4Device* d) {
 	
-	
+	d = d;
 
 }

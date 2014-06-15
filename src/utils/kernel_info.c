@@ -26,7 +26,7 @@
  */
 
 #include "manager.h"
-#include "query.h"
+#include "kernelquery.h"
 
 /** 
  * @brief Kernel info main function.

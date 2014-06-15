@@ -18,16 +18,15 @@
  
 /** 
  * @file
- * @brief Wrapper object for OpenCL devices. Contains device and device
- * information.
+ * @brief Functions for querying OpenCL devices.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_DEVICE_H
-#define CL4_DEVICE_H
+#ifndef CL4_DEVQUERY_H
+#define CL4_DEVQUERY_H
 
 #include "common.h"
 #include "gerrorf.h"
@@ -39,29 +38,38 @@
     #include <CL/cl.h>
 #endif
 
-/** @brief Device wrapper object. */
-typedef struct cl4_device CL4Device;
+#ifndef CL_DEVICE_HALF_FP_CONFIG
+	#define CL_DEVICE_HALF_FP_CONFIG 0x1033
+#endif
 
-/** @brief Creates a new device wrapper object. */
-CL4Device* cl4_device_new(cl_device_id id);
+/** @brief Maps a string to a cl_device_info bitfield. */
+typedef struct cl4_devquery_map {
+	
+	const gchar const* param_name;
+	const cl_device_info device_info;
+	const gchar const* description;
+	
+} CL4DevQueryMap;
 
-/** @brief Increase the reference count of the device wrapper object. */
-void cl4_device_ref(CL4Device* device);
+/** @brief Return a cl_device_info object given its name. */	
+cl_device_info cl4_devquery_name(gchar* name);
 
-/** @brief Alias for cl4_device_unref(). */
-void cl4_device_destroy(CL4Device* device);
+/** @brief Get a list of device information parameters which have the 
+ * given prefix. */
+const CL4DevQueryMap* cl4_devquery_list_prefix(
+	gchar* prefix, gint* size);
 
-/** @brief Decrements the reference count of the device wrapper object.
- * If it reaches 0, the device wrapper object is destroyed. */
-void cl4_device_unref(CL4Device* device);
-
-/** @brief Returns the device wrapper object reference count. For
- * debugging and testing purposes only. */
-gint cl4_device_ref_count(CL4Device* device);
-
-/** @brief Get device information. */
-gpointer cl4_device_info(CL4Device* device, 
-	cl_device_info param_name, GError** err);
-
+/** 
+ * @brief Map an OpenCL cl_device_type object to a string identifying
+ * the device type.
+ * 
+ * @param type The OpenCL cl_device_type.
+ * */
+#define cl4_devquery_type2str(type) \
+	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \
+		(((type) & CL_DEVICE_TYPE_GPU) ? "GPU" : \
+			(((type) & CL_DEVICE_TYPE_ACCELERATOR) ? "Accelerator" : \
+				(((type) & CL_DEVICE_TYPE_CUSTOM) ? "Custom" : \
+					"Unknown"))))
 
 #endif
