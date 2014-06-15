@@ -42,12 +42,16 @@
 	#define CL_DEVICE_HALF_FP_CONFIG 0x1033
 #endif
 
+typedef gchar* (*cl4_devquery_format)(
+	gpointer info, gchar* out, guint size);
+
 /** @brief Maps a string to a cl_device_info bitfield. */
 typedef struct cl4_devquery_map {
 	
 	const gchar const* param_name;
 	const cl_device_info device_info;
 	const gchar const* description;
+	const cl4_devquery_format format;
 	
 } CL4DevQueryMap;
 

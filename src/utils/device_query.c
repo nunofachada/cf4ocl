@@ -255,6 +255,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 	gint size;
 	gpointer param_value;
 	GError* err = NULL;
+	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
 	
 	for (guint i = 0; opt_custom[i] != NULL; i++) {
 		info_map = cl4_devquery_list_prefix(opt_custom[i], &size);
@@ -264,7 +265,11 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 			for (gint j = 0; j < size; j++) {
 				param_value = cl4_device_info(d, info_map[j].device_info, &err);
 				if (err != NULL) g_clear_error(&err);
-				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s\n", info_map[j].description);
+				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
+					info_map[j].description, 
+					info_map[j].format(
+						param_value, param_value_str, 
+						CL4_DEVICE_QUERY_MAXINFOLEN));
 			}
 		}
 	}
