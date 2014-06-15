@@ -37,6 +37,8 @@
 	#define CL4_DEVICE_QUERY_OUT stdout
 #endif
 
+#define CL4_DEVICE_QUERY_MAXINFOLEN 500
+
 /** @brief Parse and verify command line arguments. */
 void cl4_device_query_args_parse(int argc, char* argv[], GError** err);
 

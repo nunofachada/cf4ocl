@@ -33,12 +33,16 @@ platforms and devices"
 static gboolean opt_all = FALSE;
 static gboolean opt_basic = TRUE; /* Default. */
 static gchar** opt_custom = NULL;
+static guint opt_platf = G_MAXUINT;
+static guint opt_dev = G_MAXUINT;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"all",    'a', 0, G_OPTION_ARG_NONE,         &opt_all,   "Show all the available device information",       NULL},
-	{"basic",  'b', 0, G_OPTION_ARG_NONE,         &opt_basic, "Show basic device information (default)",         NULL},
-	{"custom", 'c', 0, G_OPTION_ARG_STRING_ARRAY, &opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
+	{"all",      'a', 0, G_OPTION_ARG_NONE,         &opt_all,    "Show all the available device information",       NULL},
+	{"basic",    'b', 0, G_OPTION_ARG_NONE,         &opt_basic,  "Show basic device information (default)",         NULL},
+	{"custom",   'c', 0, G_OPTION_ARG_STRING_ARRAY, &opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
+	{"device",   'd', 0, G_OPTION_ARG_INT,          &opt_dev,    "Specify a device to query",   "device"},
+	{"platform", 'p', 0, G_OPTION_ARG_INT,          &opt_platf,  "Specify a platform to query", "platform"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -82,6 +86,10 @@ int main(int argc, char* argv[]) {
 	/* Cycle through platforms. */
 	for (guint i = 0; i < cl4_platforms_count(platforms); i++) {
 		
+		/* Get out if this platform is not to be queried. */
+		if ((opt_platf != G_MAXUINT) && (i != opt_platf))
+			continue;
+		
 		/* Get current platform. */
 		p = cl4_platforms_get_platform(platforms, i);
 		
@@ -96,6 +104,10 @@ int main(int argc, char* argv[]) {
 		/* Cycle through devices. */
 		for (guint j = 0; j < num_devs; j++) {
 			
+			/* Get out if this device is not to be queried. */
+			if ((opt_dev != G_MAXUINT) && (j != opt_dev))
+				continue;
+
 			/* Get current device. */
 			d = cl4_platform_get_device(p, j, &err);
 			gef_if_error_goto(
@@ -252,7 +264,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 			for (gint j = 0; j < size; j++) {
 				param_value = cl4_device_info(d, info_map[j].device_info, &err);
 				if (err != NULL) g_clear_error(&err);
-				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s\n", info_map[j].param_name);
+				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s\n", info_map[j].description);
 			}
 		}
 	}
