@@ -27,6 +27,7 @@
 #include "platforms.h"
 #include "platform.h"
 #include "device.h"
+#include "devquery.h"
 //#include "context.h"
 
 /* Max. length of information string. */
@@ -321,7 +322,7 @@ static void create_info_destroy_test() {
 					cl4_test_wrappers_msg("...... Command queue properties :", "%s %s", ((cl_command_queue_properties) *((cl_command_queue_properties*) info) & CL_QUEUE_PROFILING_ENABLE) ? "Profiling" : "", ((cl_command_queue_properties) *((cl_command_queue_properties*) info) & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) ? "Out-Of-Order" : "");
 
 					info = cl4_device_info(d, CL_DEVICE_TYPE, &err);
-					cl4_test_wrappers_msg("...... Type :", "%s", cl4_device_type2str(*((cl_device_type*) info)));
+					cl4_test_wrappers_msg("...... Type :", "%s", cl4_devquery_type2str(*((cl_device_type*) info)));
 
 					info = cl4_device_info(d, CL_DEVICE_VENDOR, &err);
 					cl4_test_wrappers_msg("...... Vendor :", "%s", (gchar*) info);
@@ -406,43 +407,43 @@ static void ref_unref_test() {
 }
 
 /**
- * @brief Test the cl4_device_info_name function of the device module.
+ * @brief Test the cl4_devquery_name function of the device module.
  * */
-static void device_info_name_test() {
+static void devquery_name_test() {
 
 	/* Device information. */
 	cl_device_info info;
 
 	/* Test exact parameter name. */
-	info = cl4_device_info_name("CL_DEVICE_ENDIAN_LITTLE");
+	info = cl4_devquery_name("CL_DEVICE_ENDIAN_LITTLE");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_device_info_name("CL_DEVICE_EXTENSIONS");
+	info = cl4_devquery_name("CL_DEVICE_EXTENSIONS");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_device_info_name("CL_DRIVER_VERSION");
+	info = cl4_devquery_name("CL_DRIVER_VERSION");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 
 	/* Test mixed parameter name. */
-	info = cl4_device_info_name("cl_Device_Endian_Little");
+	info = cl4_devquery_name("cl_Device_Endian_Little");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_device_info_name("CL_device_Extensions");
+	info = cl4_devquery_name("CL_device_Extensions");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_device_info_name("cl_DRIVer_version");
+	info = cl4_devquery_name("cl_DRIVer_version");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 
 	/* Test lowercase parameter name without cl_device_ or cl_ prefix. */
-	info = cl4_device_info_name("endian_little");
+	info = cl4_devquery_name("endian_little");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_device_info_name("extensions");
+	info = cl4_devquery_name("extensions");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_device_info_name("driver_version");
+	info = cl4_devquery_name("driver_version");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 	
 	/* Test parameter name without CL_DEVICE_ or CL_ prefix. */
-	info = cl4_device_info_name("ENDIAN_LITTLE");
+	info = cl4_devquery_name("ENDIAN_LITTLE");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_device_info_name("EXTENSIONS");
+	info = cl4_devquery_name("EXTENSIONS");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_device_info_name("DRIVER_VERSION");
+	info = cl4_devquery_name("DRIVER_VERSION");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 
 }
@@ -457,7 +458,7 @@ int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
 	g_test_add_func("/wrappers/create_info_destroy", create_info_destroy_test);
 	g_test_add_func("/wrappers/ref-unref", ref_unref_test);
-	g_test_add_func("/wrappers/device_info_name", device_info_name_test);
+	g_test_add_func("/wrappers/devquery_name", devquery_name_test);
 	return g_test_run();
 }
 
