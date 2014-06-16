@@ -65,6 +65,18 @@ static gchar* cl4_devquery_format_sizet(gpointer info, gchar* out, guint size) {
 	return out;
 }
 
+static gchar* cl4_devquery_format_sizetvec(gpointer info, gchar* out, guint size) {
+	size_t veclen = (size_t) out[0];
+	GString* str = g_string_new("(");
+	for (guint i = 0; i < veclen; i++)
+		if (i > 0) g_string_append(str, ", ");
+		g_string_append_printf(str, "%ld", (guint) ((size_t*) info)[i]);
+	g_string_append(str, ")");
+	g_snprintf(out, size, "%s", str->str);
+	g_string_free(str);
+	return out;
+}
+
 static gchar* cl4_devquery_format_yesno(gpointer info, gchar* out, guint size) {
 	g_snprintf(out, size, "%s", *((cl_bool*) info) ? "Yes" : "No");
 	return out;
@@ -145,10 +157,10 @@ static const CL4DevQueryMap info_map[] = {
 	{"max_mem_alloc_size", CL_DEVICE_MAX_MEM_ALLOC_SIZE, "Max. size of a constant buffer allocation", cl4_devquery_format_ulongbytes},
 	{"max_parameter_size", CL_DEVICE_MAX_PARAMETER_SIZE, "Max. size of memory object allocation", cl4_devquery_format_ulongbytes},
 	{"max_read_image_args", CL_DEVICE_MAX_READ_IMAGE_ARGS, "Max. size of args that can be passed to kernel", cl4_devquery_format_sizetbytes},
-	{"max_samplers", CL_DEVICE_MAX_SAMPLERS, "", cl4_devquery_format_uint},
-	{"max_work_group_size", CL_DEVICE_MAX_WORK_GROUP_SIZE, "", cl4_devquery_format_uint},
-	{"max_work_item_dimensions", CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, "", cl4_devquery_format_uint},
-	{"max_work_item_sizes", CL_DEVICE_MAX_WORK_ITEM_SIZES, "", cl4_devquery_format_uint},
+	{"max_samplers", CL_DEVICE_MAX_SAMPLERS, "Max. samplers that can be used in kernel", cl4_devquery_format_uint},
+	{"max_work_group_size", CL_DEVICE_MAX_WORK_GROUP_SIZE, "Max. work-items in work-group executing a kernel on a single compute unit, using the data parallel execution model", cl4_devquery_format_sizet},
+	{"max_work_item_dimensions", CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, "Max. dims that specify the global and local work-item IDs used by the data parallel execution model", cl4_devquery_format_uint},
+	{"max_work_item_sizes", CL_DEVICE_MAX_WORK_ITEM_SIZES, "", cl4_devquery_format_sizetvec},
 	{"max_write_image_args", CL_DEVICE_MAX_WRITE_IMAGE_ARGS, "", cl4_devquery_format_uint},
 	{"mem_base_addr_align", CL_DEVICE_MEM_BASE_ADDR_ALIGN, "", cl4_devquery_format_uint},
 	{"min_data_type_align_size", CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, "", cl4_devquery_format_uint},
