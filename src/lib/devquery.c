@@ -32,8 +32,76 @@ static gchar* cl4_devquery_format_uint(gpointer info, gchar* out, guint size) {
 	return out;
 }
 
+#define cl4_devquery_format_bytes(spec) \
+	if (bytes < 1024) \
+		g_snprintf(out, size, "%" spec " bytes", bytes); \
+	else if (bytes < 1048576) \
+		g_snprintf(out, size, "%.1lf KiB (%" spec " bytes)", bytes / 1024.0, bytes); \
+	else if (bytes < 1073741824) \
+		g_snprintf(out, size, "%.1lf MiB (%" spec " bytes)", bytes / (1024.0 * 1024), bytes); \
+	else \
+		g_snprintf(out, size, "%.1lf GiB (%" spec " bytes)", bytes / (1024.0 * 1024 * 1024), bytes);
+
+static gchar* cl4_devquery_format_ulongbytes(gpointer info, gchar* out, guint size) {
+	cl_ulong bytes = *((cl_ulong*) info);
+	cl4_devquery_format_bytes("ld");
+	return out;
+}
+
+static gchar* cl4_devquery_format_uintbytes(gpointer info, gchar* out, guint size) {
+	cl_uint bytes = *((cl_uint*) info);
+	cl4_devquery_format_bytes("d");
+	return out;
+}
+
+static gchar* cl4_devquery_format_sizetbytes(gpointer info, gchar* out, guint size) {
+	cl_ulong bytes = *((size_t*) info);
+	cl4_devquery_format_bytes("ld");
+	return out;
+}
+
+static gchar* cl4_devquery_format_sizet(gpointer info, gchar* out, guint size) {
+	g_snprintf(out, size, "%ld", (gulong) *((size_t*) info));
+	return out;
+}
+
 static gchar* cl4_devquery_format_yesno(gpointer info, gchar* out, guint size) {
 	g_snprintf(out, size, "%s", *((cl_bool*) info) ? "Yes" : "No");
+	return out;
+}
+
+static gchar* cl4_devquery_format_char(gpointer info, gchar* out, guint size) {
+	g_snprintf(out, size, "%s", (gchar*) info);
+	return out;
+}
+
+static gchar* cl4_devquery_format_fpconfig(gpointer info, gchar* out, guint size) {
+	cl_device_fp_config fpc = *((cl_device_fp_config*) info);
+	g_snprintf(out, size, "%s%s%s%s%s%s%s", 
+		fpc & CL_FP_DENORM ? "DENORM " : "",
+		fpc & CL_FP_INF_NAN  ? "INF_NAN " : "",
+		fpc & CL_FP_ROUND_TO_NEAREST ? "ROUND_TO_NEAREST " : "",
+		fpc & CL_FP_ROUND_TO_ZERO ? "ROUND_TO_ZERO " : "",
+		fpc & CL_FP_ROUND_TO_INF ? "ROUND_TO_INF " : "",
+		fpc & CL_FP_FMA ? "FMA " : "",
+		fpc & CL_FP_SOFT_FLOAT ? "SOFT_FLOAT" : "");
+	return out;
+}
+
+static gchar* cl4_devquery_format_execcap(gpointer info, gchar* out, guint size) {
+	cl_device_exec_capabilities exc = *((cl_device_exec_capabilities*) info);
+	g_snprintf(out, size, "%s%s", 
+		exc & CL_EXEC_KERNEL ? " KERNEL" : "",
+		exc & CL_EXEC_NATIVE_KERNEL ? " NATIVE_KERNEL" : "");
+	return out;
+}
+
+static gchar* cl4_devquery_format_locmemtype(gpointer info, gchar* out, guint size) {
+	cl_device_local_mem_type lmt = *((cl_device_local_mem_type*) info);
+	g_snprintf(out, size, "%s%s%s", 
+		lmt & CL_LOCAL ? "LOCAL" : "",
+		lmt & CL_GLOBAL ? "GLOBAL" : "",
+		lmt & CL_NONE ? "NONE" : "");
 	return out;
 }
 
@@ -45,38 +113,38 @@ static const CL4DevQueryMap info_map[] = {
 
 	{"address_bits", CL_DEVICE_ADDRESS_BITS, "Address space size (bits)", cl4_devquery_format_uint},
 	{"available", CL_DEVICE_AVAILABLE, "Device available", cl4_devquery_format_yesno},
-	{"built_in_kernels", CL_DEVICE_BUILT_IN_KERNELS, "Built-in kernels", cl4_devquery_format_uint},
+	{"built_in_kernels", CL_DEVICE_BUILT_IN_KERNELS, "Built-in kernels", cl4_devquery_format_char},
 	{"compiler_available", CL_DEVICE_COMPILER_AVAILABLE, "Compiler available", cl4_devquery_format_yesno},
-	{"double_fp_config", CL_DEVICE_DOUBLE_FP_CONFIG, "Floating-point config. (double)", cl4_devquery_format_uint},
-	{"driver_version", CL_DRIVER_VERSION, "Driver version", cl4_devquery_format_uint},
+	{"double_fp_config", CL_DEVICE_DOUBLE_FP_CONFIG, "Floating-point config. (double)", cl4_devquery_format_fpconfig},
+	{"driver_version", CL_DRIVER_VERSION, "Driver version", cl4_devquery_format_char},
 	{"endian_little", CL_DEVICE_ENDIAN_LITTLE, "Little endian", cl4_devquery_format_yesno},
 	{"error_correction_support", CL_DEVICE_ERROR_CORRECTION_SUPPORT, "Error correction support", cl4_devquery_format_yesno},
-	{"execution_capabilities", CL_DEVICE_EXECUTION_CAPABILITIES, "Execution capabilities", cl4_devquery_format_uint},
-	{"extensions", CL_DEVICE_EXTENSIONS, "Extensions", cl4_devquery_format_uint},
-	{"global_mem_cache_size", CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, "Global mem. cache size", cl4_devquery_format_uint},
+	{"execution_capabilities", CL_DEVICE_EXECUTION_CAPABILITIES, "Execution capabilities", cl4_devquery_format_execcap},
+	{"extensions", CL_DEVICE_EXTENSIONS, "Extensions", cl4_devquery_format_char},
+	{"global_mem_cache_size", CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, "Global mem. cache size", cl4_devquery_format_ulongbytes},
 	{"global_mem_cache_type", CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, "Global mem. cache type", cl4_devquery_format_uint},
-	{"global_mem_cacheline_size", CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, "Global mem. cache line size", cl4_devquery_format_uint},
-	{"global_mem_size", CL_DEVICE_GLOBAL_MEM_SIZE, "Global mem. size", cl4_devquery_format_uint},
-	{"half_fp_config", CL_DEVICE_HALF_FP_CONFIG, "Floating-point config (half)", cl4_devquery_format_uint},
+	{"global_mem_cacheline_size", CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, "Global mem. cache line size", cl4_devquery_format_uintbytes},
+	{"global_mem_size", CL_DEVICE_GLOBAL_MEM_SIZE, "Global mem. size", cl4_devquery_format_ulongbytes},
+	{"half_fp_config", CL_DEVICE_HALF_FP_CONFIG, "Floating-point config (half)", cl4_devquery_format_fpconfig},
 	{"host_unified_memory", CL_DEVICE_HOST_UNIFIED_MEMORY, "Host unified memory subsystem", cl4_devquery_format_yesno},
+	{"image2d_max_height", CL_DEVICE_IMAGE2D_MAX_HEIGHT, "Max. height of 2D image (pixels)", cl4_devquery_format_sizet},
+	{"image2d_max_width", CL_DEVICE_IMAGE2D_MAX_WIDTH, "Max. width of 1D/2D image (pixels)", cl4_devquery_format_sizet},
+	{"image3d_max_depth", CL_DEVICE_IMAGE3D_MAX_DEPTH, "Max. depth of 3D image (pixels)", cl4_devquery_format_sizet},
+	{"image3d_max_height", CL_DEVICE_IMAGE3D_MAX_HEIGHT, "Max. height of 3D image (pixels)", cl4_devquery_format_sizet},
+	{"image3d_max_width", CL_DEVICE_IMAGE3D_MAX_WIDTH, "Max. width of 3D image (pixels)", cl4_devquery_format_sizet},
+	{"image_max_buffer_size", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, "Max. pixels for 1D image from buffer object", cl4_devquery_format_sizet},
+	{"image_max_array_size", CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, "Max. images in a 1D or 2D image array", cl4_devquery_format_sizet},
 	{"image_support", CL_DEVICE_IMAGE_SUPPORT, "Image support", cl4_devquery_format_yesno},
-	{"image2d_max_height", CL_DEVICE_IMAGE2D_MAX_HEIGHT, "Max. height of 2D image (pixels)", cl4_devquery_format_uint},
-	{"image2d_max_width", CL_DEVICE_IMAGE2D_MAX_WIDTH, "Max. width of 1D/2D image (pixels)", cl4_devquery_format_uint},
-	{"image3d_max_depth", CL_DEVICE_IMAGE3D_MAX_DEPTH, "Max. depth of 3D image (pixels)", cl4_devquery_format_uint},
-	{"image3d_max_height", CL_DEVICE_IMAGE3D_MAX_HEIGHT, "Max. height of 3D image (pixels)", cl4_devquery_format_uint},
-	{"image3d_max_width", CL_DEVICE_IMAGE3D_MAX_WIDTH, "Max. width of 3D image (pixels)", cl4_devquery_format_uint},
-	{"image_max_buffer_size", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, "Max. pixels for 1D image from buffer object", cl4_devquery_format_uint},
-	{"image_max_array_size", CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, "Max. images in a 1D or 2D image array", cl4_devquery_format_uint},
 	{"linker_available", CL_DEVICE_LINKER_AVAILABLE, "Linker available", cl4_devquery_format_yesno},
-	{"local_mem_size", CL_DEVICE_LOCAL_MEM_SIZE, "Local mem. size", cl4_devquery_format_uint},
-	{"local_mem_type", CL_DEVICE_LOCAL_MEM_TYPE, "Local mem. type", cl4_devquery_format_uint},
-	{"max_clock_frequency", CL_DEVICE_MAX_CLOCK_FREQUENCY, "Max. clock frequency", cl4_devquery_format_uint},
+	{"local_mem_size", CL_DEVICE_LOCAL_MEM_SIZE, "Local mem. size", cl4_devquery_format_ulongbytes},
+	{"local_mem_type", CL_DEVICE_LOCAL_MEM_TYPE, "Local mem. type", cl4_devquery_format_locmemtype},
+	{"max_clock_frequency", CL_DEVICE_MAX_CLOCK_FREQUENCY, "Max. clock frequency (Mhz)", cl4_devquery_format_uint},
 	{"max_compute_units", CL_DEVICE_MAX_COMPUTE_UNITS, "Compute units", cl4_devquery_format_uint},
 	{"max_constant_args", CL_DEVICE_MAX_CONSTANT_ARGS, "", cl4_devquery_format_uint},
-	{"max_constant_buffer_size", CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, "", cl4_devquery_format_uint},
-	{"max_mem_alloc_size", CL_DEVICE_MAX_MEM_ALLOC_SIZE, "", cl4_devquery_format_uint},
-	{"max_parameter_size", CL_DEVICE_MAX_PARAMETER_SIZE, "", cl4_devquery_format_uint},
-	{"max_read_image_args", CL_DEVICE_MAX_READ_IMAGE_ARGS, "", cl4_devquery_format_uint},
+	{"max_constant_buffer_size", CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, "Max. number of __constant args in kernel", cl4_devquery_format_uint},
+	{"max_mem_alloc_size", CL_DEVICE_MAX_MEM_ALLOC_SIZE, "Max. size of a constant buffer allocation", cl4_devquery_format_ulongbytes},
+	{"max_parameter_size", CL_DEVICE_MAX_PARAMETER_SIZE, "Max. size of memory object allocation", cl4_devquery_format_ulongbytes},
+	{"max_read_image_args", CL_DEVICE_MAX_READ_IMAGE_ARGS, "Max. size of args that can be passed to kernel", cl4_devquery_format_sizetbytes},
 	{"max_samplers", CL_DEVICE_MAX_SAMPLERS, "", cl4_devquery_format_uint},
 	{"max_work_group_size", CL_DEVICE_MAX_WORK_GROUP_SIZE, "", cl4_devquery_format_uint},
 	{"max_work_item_dimensions", CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, "", cl4_devquery_format_uint},
@@ -84,7 +152,7 @@ static const CL4DevQueryMap info_map[] = {
 	{"max_write_image_args", CL_DEVICE_MAX_WRITE_IMAGE_ARGS, "", cl4_devquery_format_uint},
 	{"mem_base_addr_align", CL_DEVICE_MEM_BASE_ADDR_ALIGN, "", cl4_devquery_format_uint},
 	{"min_data_type_align_size", CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, "", cl4_devquery_format_uint},
-	{"name", CL_DEVICE_NAME, "", cl4_devquery_format_uint},
+	{"name", CL_DEVICE_NAME, "", cl4_devquery_format_char},
 	{"native_vector_width_char", CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, "", cl4_devquery_format_uint},
 	{"native_vector_width_short", CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, "", cl4_devquery_format_uint},
 	{"native_vector_width_int", CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, "", cl4_devquery_format_uint},
@@ -92,7 +160,7 @@ static const CL4DevQueryMap info_map[] = {
 	{"native_vector_width_float", CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, "", cl4_devquery_format_uint},
 	{"native_vector_width_double", CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, "", cl4_devquery_format_uint},
 	{"native_vector_width_half", CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, "", cl4_devquery_format_uint},
-	{"opencl_c_version", CL_DEVICE_OPENCL_C_VERSION, "", cl4_devquery_format_uint},
+	{"opencl_c_version", CL_DEVICE_OPENCL_C_VERSION, "", cl4_devquery_format_char},
 	{"parent_device", CL_DEVICE_PARENT_DEVICE, "", cl4_devquery_format_uint},
 	{"partition_max_sub_devices", CL_DEVICE_PARTITION_MAX_SUB_DEVICES, "", cl4_devquery_format_uint},
 	{"partition_properties", CL_DEVICE_PARTITION_PROPERTIES, "", cl4_devquery_format_uint},
@@ -108,15 +176,15 @@ static const CL4DevQueryMap info_map[] = {
 	{"preferred_vector_width_double", CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, "", cl4_devquery_format_uint},
 	{"preferred_vector_width_half", CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, "", cl4_devquery_format_uint},
 	{"printf_buffer_size", CL_DEVICE_PRINTF_BUFFER_SIZE, "", cl4_devquery_format_uint},
-	{"profile", CL_DEVICE_PROFILE, "", cl4_devquery_format_uint},
+	{"profile", CL_DEVICE_PROFILE, "", cl4_devquery_format_char},
 	{"profiling_timer_resolution", CL_DEVICE_PROFILING_TIMER_RESOLUTION, "", cl4_devquery_format_uint},
 	{"queue_properties", CL_DEVICE_QUEUE_PROPERTIES, "", cl4_devquery_format_uint},
 	{"reference_count", CL_DEVICE_REFERENCE_COUNT, "", cl4_devquery_format_uint},
-	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG, "", cl4_devquery_format_uint},
+	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG, "", cl4_devquery_format_fpconfig},
 	{"type", CL_DEVICE_TYPE, "", cl4_devquery_format_uint},
-	{"vendor", CL_DEVICE_VENDOR, "", cl4_devquery_format_uint},
+	{"vendor", CL_DEVICE_VENDOR, "", cl4_devquery_format_char},
 	{"vendor_id", CL_DEVICE_VENDOR_ID, "", cl4_devquery_format_uint},
-	{"version", CL_DEVICE_VERSION, "", cl4_devquery_format_uint}
+	{"version", CL_DEVICE_VERSION, "", cl4_devquery_format_char}
 };
 
 /**
@@ -193,7 +261,7 @@ static gint cl4_devquery_get_index(gchar* name) {
 	/* Binary search. */
 	idx_start = 0;
 	idx_end = info_map_size - 1;
-	while (idx_end - idx_start > 1) { /// @todo This is a bug, we can't see address_bits like this
+	while (idx_end >= idx_start) {
 		idx_middle = (idx_start + idx_end) / 2;
 		cmp_res = g_ascii_strncasecmp(
 			name, info_map[idx_middle].param_name, len_name);
@@ -202,9 +270,9 @@ static gint cl4_devquery_get_index(gchar* name) {
 			break;
 		}
 		if (cmp_res > 0)
-			idx_start = idx_middle;
+			idx_start = idx_middle + 1;
 		else 
-			idx_end = idx_middle;
+			idx_end = idx_middle - 1;
 	}
 	
 	/* Return result */
