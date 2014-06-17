@@ -147,16 +147,16 @@ static gchar* cl4_devquery_format_partprop(gpointer info, gchar* out, guint size
 	for (guint i = 0; (pp[i] != 0) && (i < 3); i++) {
 		switch (pp[i]) {
 			case CL_DEVICE_PARTITION_EQUALLY:
-				g_string_append(str, "EQUALLY ");
+				g_string_append_printf(str, "EQUALLY(0x%lx) ", pp[i]);
 				break;
 			case CL_DEVICE_PARTITION_BY_COUNTS:
-				g_string_append(str, "BY_COUNTS ");
+				g_string_append_printf(str, "BY_COUNTS(0x%lx) ", pp[i]);
 				break;
 			case CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN:
-				g_string_append(str, "BY_AFFINITY_DOMAIN ");
+				g_string_append_printf(str, "BY_AFFINITY_DOMAIN(0x%lx) ", pp[i]);
 				break;
 			default:
-				g_string_append_printf(str, "UNKNOWN (0x%lx) ", pp[i]);
+				g_string_append_printf(str, "UNKNOWN(0x%lx) ", pp[i]);
 		}
 	}
 	g_snprintf(out, size, "%s", str->str);
