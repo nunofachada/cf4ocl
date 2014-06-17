@@ -56,6 +56,12 @@ typedef struct cl4_devquery_map {
 	
 } CL4DevQueryMap;
 
+extern const gint cl4_devquery_info_map_size;
+
+/** @brief Map of strings to respective cl_device_info bitfields. */
+extern const CL4DevQueryMap cl4_devquery_info_map[];
+
+
 /** @brief Return a cl_device_info object given its name. */	
 cl_device_info cl4_devquery_name(gchar* name);
 

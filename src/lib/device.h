@@ -63,5 +63,7 @@ gint cl4_device_ref_count(CL4Device* device);
 gpointer cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 
+/** @brief Get the OpenCL device ID object. */
+cl_device_id cl4_device_id(CL4Device* device);
 
 #endif

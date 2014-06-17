@@ -1,5 +1,5 @@
 # List of tests
-set(TESTS test_gerrorf test_profiler test_wrappers)
+set(TESTS test_gerrorf test_profiler test_wrappers test_devquery)
 
 # Use OpenCL stub when possible?
 option(USE_OPENCL_STUB "Use OpenCL stub when possible?" ON)
@@ -13,11 +13,21 @@ set_target_properties(test_profiler_lib PROPERTIES COMPILE_FLAGS "-DTESTING -I${
 set(test_profiler_EXTRALIBS test_profiler_lib)
 
 if (USE_OPENCL_STUB)
+
 	add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c mocks_stubs/wrappers/cl_stub.c)
 	set(test_wrappers_EXTRALIBS test_wrappers_lib)
+
+	add_library(test_devquery_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c mocks_stubs/wrappers/cl_stub.c)
+	set(test_devquery_EXTRALIBS test_devquery_lib)
+
 else()
+
 	add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c)
 	set(test_wrappers_EXTRALIBS test_wrappers_lib ${OPENCL_LIBRARIES})
+
+	add_library(test_devquery_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c)
+	set(test_devquery_EXTRALIBS test_devquery_lib ${OPENCL_LIBRARIES})
+
 endif()
 set_target_properties(test_wrappers_lib PROPERTIES COMPILE_FLAGS "-DTESTING -I${CMAKE_CURRENT_LIST_DIR}")
 

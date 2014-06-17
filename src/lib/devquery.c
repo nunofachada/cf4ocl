@@ -142,6 +142,7 @@ static gchar* cl4_devquery_format_locmemtype(gpointer info, gchar* out, guint si
 static gchar* cl4_devquery_format_partprop(gpointer info, gchar* out, guint size, const gchar const* units) {
 	units = units;
 	cl_device_partition_property* pp = (cl_device_partition_property*) info;
+	//printf("|||| info = %p, info[0] = %ld |||||\n", info, pp[0]);
 	GString* str = g_string_new("");
 	for (guint i = 0; (pp[i] != 0) && (i < 3); i++) {
 		switch (pp[i]) {
@@ -154,7 +155,9 @@ static gchar* cl4_devquery_format_partprop(gpointer info, gchar* out, guint size
 			case CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN:
 				g_string_append(str, "BY_AFFINITY_DOMAIN ");
 				break;
-			}
+			default:
+				g_string_append_printf(str, "UNKNOWN (0x%lx) ", pp[i]);
+		}
 	}
 	g_snprintf(out, size, "%s", str->str);
 	g_string_free(str, TRUE);
@@ -197,10 +200,10 @@ static gchar* cl4_devquery_format_queueprop(gpointer info, gchar* out, guint siz
 
 
 /* Size of information map. */
-static const gint info_map_size = 74;
+const gint cl4_devquery_info_map_size = 74;
 
 /* Map of strings to respective cl_device_info bitfields. */
-static const CL4DevQueryMap info_map[] = {
+const CL4DevQueryMap cl4_devquery_info_map[] = {
 
 	{"address_bits", CL_DEVICE_ADDRESS_BITS, 
 		"Address space size in bits", 
@@ -428,14 +431,14 @@ static const CL4DevQueryMap info_map[] = {
 
 /**
  * @brief Get a final device info prefix in the same format as 
- * kept in the info_map.
+ * kept in the cl4_devquery_info_map.
  * 
  * @param prefix Raw device information prefix. Several forms are 
  * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
  * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
  * accepted.
  * @return A final device info prefix in the same format as 
- * kept in the info_map.
+ * kept in the cl4_devquery_info_map.
  * */
 static gchar* cl4_devquery_get_prefix_final(gchar* prefix) {
 	
@@ -474,8 +477,8 @@ static gchar* cl4_devquery_get_prefix_final(gchar* prefix) {
  * @brief Return the index of the device information map object of the
  * given parameter name.
  * 
- * @param A parameter name, in the format stored in the info_map static
- * array.
+ * @param A parameter name, in the format stored in the 
+ * cl4_devquery_info_map array.
  * @return Index of the device information map object of the given 
  * parameter name, or -1 if device information map is not found.
  * */
@@ -499,11 +502,11 @@ static gint cl4_devquery_get_index(gchar* name) {
 
 	/* Binary search. */
 	idx_start = 0;
-	idx_end = info_map_size - 1;
+	idx_end = cl4_devquery_info_map_size - 1;
 	while (idx_end >= idx_start) {
 		idx_middle = (idx_start + idx_end) / 2;
 		cmp_res = g_ascii_strncasecmp(
-			name, info_map[idx_middle].param_name, len_name);
+			name, cl4_devquery_info_map[idx_middle].param_name, len_name);
 		if (cmp_res == 0) {
 			found = TRUE;
 			break;
@@ -550,7 +553,7 @@ cl_device_info cl4_devquery_name(gchar* name) {
 	
 	/* Return the cl_device_info object if found, or 0 otherwise. */
 	if (idx >= 0)
-		return info_map[idx].device_info;
+		return cl4_devquery_info_map[idx].device_info;
 	else
 		return 0;
 	
@@ -582,10 +585,10 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 	gint idx_middle, idx_start, idx_end;
 	
 	/* Found info. */
-	const CL4DevQueryMap* found_info_map = NULL;
+	const CL4DevQueryMap* found_cl4_devquery_info_map = NULL;
 	
 	/* Determine final prefix according to how parameter names are
-	 * stored in info_map. */
+	 * stored in cl4_devquery_info_map. */
 	prefix_final = cl4_devquery_get_prefix_final(prefix);
 	
 	/* Determine prefix size. */
@@ -601,7 +604,7 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 			if (idx_start == 0)
 				break;
 			if (g_ascii_strncasecmp(prefix_final, 
-				info_map[idx_start - 1].param_name, len_prefix_final) == 0)
+				cl4_devquery_info_map[idx_start - 1].param_name, len_prefix_final) == 0)
 				idx_start--;
 			else
 				break;
@@ -609,10 +612,10 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 		/* Search for ending. */
 		idx_end = idx_middle;
 		while (TRUE) {
-			if (idx_end == info_map_size - 1)
+			if (idx_end == cl4_devquery_info_map_size - 1)
 				break;
 			if (g_ascii_strncasecmp(prefix_final, 
-				info_map[idx_end + 1].param_name, len_prefix_final) == 0)
+				cl4_devquery_info_map[idx_end + 1].param_name, len_prefix_final) == 0)
 				idx_end++;
 			else
 				break;
@@ -620,7 +623,7 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 		
 		/* Set return values. */
 		*size = idx_end - idx_start + 1;
-		found_info_map = &info_map[idx_start];
+		found_cl4_devquery_info_map = &cl4_devquery_info_map[idx_start];
 		
 	} else {
 		
@@ -633,5 +636,5 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 	g_free(prefix_final);
 	
 	/* Return result */
-	return found_info_map;
+	return found_cl4_devquery_info_map;
 }
