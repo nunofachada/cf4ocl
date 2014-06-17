@@ -269,7 +269,8 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 						info_map[j].param_name, 
 						info_map[j].format(
 							param_value, param_value_str, 
-							CL4_DEVICE_QUERY_MAXINFOLEN));
+							CL4_DEVICE_QUERY_MAXINFOLEN,
+							info_map[j].units));
 				} else {
 					g_clear_error(&err);
 					g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 

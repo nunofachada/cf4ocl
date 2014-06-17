@@ -43,7 +43,7 @@
 #endif
 
 typedef gchar* (*cl4_devquery_format)(
-	gpointer info, gchar* out, guint size);
+	gpointer info, gchar* out, guint size, const gchar const* units);
 
 /** @brief Maps a string to a cl_device_info bitfield. */
 typedef struct cl4_devquery_map {
@@ -52,6 +52,7 @@ typedef struct cl4_devquery_map {
 	const cl_device_info device_info;
 	const gchar const* description;
 	const cl4_devquery_format format;
+	const gchar const* units;
 	
 } CL4DevQueryMap;
 

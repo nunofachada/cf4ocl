@@ -191,6 +191,10 @@ gpointer cl4_device_info(CL4Device* device,
 			CL_SUCCESS != ocl_status, CL4_OCL_ERROR, error_handler, 
 			"Function '%s': get device info [size] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			size_ret == 0, CL4_OCL_ERROR, error_handler, 
+			"Function '%s': get device info [size] (size is 0).",
+			__func__);
 		
 		/* Allocate memory for information. */
 		param_value = g_malloc(size_ret);
