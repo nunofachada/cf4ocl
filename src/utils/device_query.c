@@ -69,6 +69,9 @@ int main(int argc, char* argv[]) {
 	/* Number of devices in platform. */
 	guint num_devs;
 	
+	/* Device information value object. */
+	CL4DeviceInfoValue* info_value = NULL;
+	
 	/* Device name. */
 	gchar* dev_name;
 	
@@ -114,9 +117,10 @@ int main(int argc, char* argv[]) {
 				err, GEF_USE_GERROR, status, error_handler);
 				
 			/* Get device name. */
-			dev_name = (gchar*) cl4_device_info(d, CL_DEVICE_NAME, &err);
+			info_value = cl4_device_info(d, CL_DEVICE_NAME, &err);
 			gef_if_error_goto(
 				err, GEF_USE_GERROR, status, error_handler);
+			dev_name = (gchar*) info_value->value;
 			
 			/* Show device information. */
 			g_fprintf(CL4_DEVICE_QUERY_OUT, "\tDevice #%d: %s\n", j, dev_name);
@@ -253,7 +257,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 
 	const CL4DevQueryMap* info_map;
 	gint size;
-	gpointer param_value;
+	CL4DeviceInfoValue* param_value;
 	GError* err = NULL;
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
 	

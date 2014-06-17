@@ -33,9 +33,9 @@
 #include "common.h"
 #include <glib.h>
 #if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/cl.h>
+    #include <OpenCL/opencl.h>
 #else
-    #include <CL/cl.h>
+    #include <CL/opencl.h>
 #endif
 
 /**

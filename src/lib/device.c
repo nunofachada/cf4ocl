@@ -140,6 +140,37 @@ gint cl4_device_ref_count(CL4Device* device) {
 }
 
 /**
+ * @brief Create a new CL4DeviceInfoValue* object.
+ * 
+ * @param value Parameter value.
+ * @param size Parameter size in bytes.
+ * @return A new CL4DeviceInfoValue* object.
+ * */
+static CL4DeviceInfoValue* cl4_device_info_value_new(
+	gpointer value, gsize size) {
+	
+	CL4DeviceInfoValue* info_value = g_slice_new(CL4DeviceInfoValue);
+	
+	info_value->value = value;
+	info_value->size = size;
+	
+	return info_value;
+	
+}
+
+/**
+ * @brief Destroy a CL4DeviceInfoValue* object.
+ * 
+ * @param info_value Object to destroy.
+ * */
+static void cl4_device_info_value_destroy(
+	void* info_value) {
+		
+	g_free(((CL4DeviceInfoValue*) info_value)->value);
+	g_slice_free(CL4DeviceInfoValue, info_value);
+}
+
+/**
  * @brief Get device information.
  * 
  * @param device The device wrapper object.
@@ -150,7 +181,7 @@ gint cl4_device_ref_count(CL4Device* device) {
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-gpointer cl4_device_info(CL4Device* device, 
+CL4DeviceInfoValue* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -159,14 +190,15 @@ gpointer cl4_device_info(CL4Device* device,
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);
 	
-	/* Device information placeholder. */
-	gpointer param_value;
+	/* Device information value object. */
+	CL4DeviceInfoValue* info_value = NULL;
 	
 	/* If device information table is not yet initialized, then 
 	 * initialize it. */
 	if (!device->info) {
 		device->info = g_hash_table_new_full(
-			g_direct_hash, g_direct_equal, NULL, g_free);
+			g_direct_hash, g_direct_equal, 
+			NULL, cl4_device_info_value_destroy);
 	}
 
 	/* Check if requested information is already present in the 
@@ -175,14 +207,17 @@ gpointer cl4_device_info(CL4Device* device,
 		device->info, GUINT_TO_POINTER(param_name))) {
 		
 		/* If so, retrieve it from there. */
-		param_value = g_hash_table_lookup(
+		info_value = g_hash_table_lookup(
 			device->info, GUINT_TO_POINTER(param_name));
 		
 	} else {
 		
 		/* Otherwise, get it from OpenCL device.*/
 		cl_int ocl_status;
-		size_t size_ret;
+		/* Device information placeholder. */
+		gpointer param_value;
+		/* Size of device information in bytes. */
+		gsize size_ret;
 		
 		/* Get size of information. */
 		ocl_status = clGetDeviceInfo(
@@ -208,8 +243,10 @@ gpointer cl4_device_info(CL4Device* device,
 			__func__, ocl_status, cl4_err(ocl_status));
 			
 		/* Keep information in device information table. */
-		g_hash_table_insert(
-			device->info, GUINT_TO_POINTER(param_name), param_value);
+		info_value = cl4_device_info_value_new(param_value, size_ret);
+		g_hash_table_insert(device->info, 
+			GUINT_TO_POINTER(param_name), 
+			info_value);
 		
 	}
 
@@ -220,12 +257,12 @@ gpointer cl4_device_info(CL4Device* device,
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
-	param_value = NULL;
+	info_value = NULL;
 
 finish:
 	
 	/* Return the requested device information. */
-	return param_value;
+	return info_value;
 
 }
 

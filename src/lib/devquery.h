@@ -30,20 +30,18 @@
 
 #include "common.h"
 #include "gerrorf.h"
+#include "device.h"
 #include "errors.h"
 #include "string.h"
 #if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/cl.h>
+    #include <OpenCL/opencl.h>
 #else
-    #include <CL/cl.h>
-#endif
-
-#ifndef CL_DEVICE_HALF_FP_CONFIG
-	#define CL_DEVICE_HALF_FP_CONFIG 0x1033
+    #include <CL/opencl.h>
 #endif
 
 typedef gchar* (*cl4_devquery_format)(
-	gpointer info, gchar* out, guint size, const gchar const* units);
+	CL4DeviceInfoValue* info, gchar* out, guint size, 
+	const gchar const* units);
 
 /** @brief Maps a string to a cl_device_info bitfield. */
 typedef struct cl4_devquery_map {

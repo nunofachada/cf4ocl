@@ -27,19 +27,19 @@
  
 #include "devquery.h"
 
-static gchar* cl4_devquery_format_uint(gpointer info, gchar* out, guint size, const gchar const* units) {
-	g_snprintf(out, size, "%d %s", *((cl_uint*) info), units);
+static gchar* cl4_devquery_format_uint(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
+	g_snprintf(out, size, "%d %s", *((cl_uint*) info->value), units);
 	return out;
 }
 
-static gchar* cl4_devquery_format_uinthex(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_uinthex(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	g_snprintf(out, size, "0x%x", *((cl_uint*) info));
+	g_snprintf(out, size, "0x%x", *((cl_uint*) info->value));
 	return out;
 }
 
-static gchar* cl4_devquery_format_sizet(gpointer info, gchar* out, guint size, const gchar const* units) {
-	g_snprintf(out, size, "%ld %s", (gulong) *((size_t*) info), units);
+static gchar* cl4_devquery_format_sizet(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
+	g_snprintf(out, size, "%ld %s", (gulong) *((size_t*) info->value), units);
 	return out;
 }
 
@@ -53,62 +53,72 @@ static gchar* cl4_devquery_format_sizet(gpointer info, gchar* out, guint size, c
 	else \
 		g_snprintf(out, size, "%.1lf GiB (%" spec " bytes)", bytes / (1024.0 * 1024 * 1024), bytes);
 
-static gchar* cl4_devquery_format_ulongbytes(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_ulongbytes(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_ulong bytes = *((cl_ulong*) info);
+	cl_ulong bytes = *((cl_ulong*) info->value);
 	cl4_devquery_format_bytes("ld");
 	return out;
 }
 
-static gchar* cl4_devquery_format_uintbytes(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_uintbytes(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_uint bytes = *((cl_uint*) info);
+	cl_uint bytes = *((cl_uint*) info->value);
 	cl4_devquery_format_bytes("d");
 	return out;
 }
 
-static gchar* cl4_devquery_format_sizetbytes(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_sizetbytes(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_ulong bytes = *((size_t*) info);
+	cl_ulong bytes = *((size_t*) info->value);
 	cl4_devquery_format_bytes("ld");
 	return out;
 }
 
-static gchar* cl4_devquery_format_sizetvec(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_sizetvec(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	size_t* vec = (size_t*) info;
-	g_snprintf(out, size, "(%ld, %ld, %ld)", 
-		(gulong) vec[0], (gulong) vec[1], (gulong) vec[2]);
+	GString* str = g_string_new("(");
+	size_t* vec = (size_t*) info->value;
+	guint count = info->size / sizeof(gsize);
+
+	for (guint i = 0; i < count; i++) {
+		if (i > 0) g_string_append(str, ", ");
+		g_string_append_printf(str, "%ld", (gulong) vec[i]);
+	}
+	
+	g_string_append(str, ")");
+
+	g_snprintf(out, size, "%s", str->str);
+	g_string_free(str, TRUE);
 	return out;
 }
 
-static gchar* cl4_devquery_format_yesno(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_yesno(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	g_snprintf(out, size, "%s", *((cl_bool*) info) ? "Yes" : "No");
+	g_snprintf(out, size, "%s", *((cl_bool*) info->value) ? "Yes" : "No");
 	return out;
 }
 
-static gchar* cl4_devquery_format_char(gpointer info, gchar* out, guint size, const gchar const* units) {
-	g_snprintf(out, size, "%s %s", (gchar*) info, units);
+static gchar* cl4_devquery_format_char(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
+	g_snprintf(out, size, "%s %s", (gchar*) info->value, units);
 	return out;
 }
 
-static gchar* cl4_devquery_format_ptr(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_ptr(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	g_snprintf(out, size, "%p", *((void**) info));
+	g_snprintf(out, size, "%p", *((void**) info->value));
 	return out;
 }
 
-static gchar* cl4_devquery_format_type(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_type(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
 	g_snprintf(out, size, "%s", 
-		cl4_devquery_type2str(*((cl_device_type*) info)));
+		cl4_devquery_type2str(*((cl_device_type*) info->value)));
 	return out;
 }
 
-static gchar* cl4_devquery_format_fpconfig(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_fpconfig(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_device_fp_config fpc = *((cl_device_fp_config*) info);
+	cl_device_fp_config fpc = *((cl_device_fp_config*) info->value);
 	g_snprintf(out, size, "%s%s%s%s%s%s%s", 
 		fpc & CL_FP_DENORM ? "DENORM " : "",
 		fpc & CL_FP_INF_NAN  ? "INF_NAN " : "",
@@ -120,18 +130,18 @@ static gchar* cl4_devquery_format_fpconfig(gpointer info, gchar* out, guint size
 	return out;
 }
 
-static gchar* cl4_devquery_format_execcap(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_execcap(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_device_exec_capabilities exc = *((cl_device_exec_capabilities*) info);
+	cl_device_exec_capabilities exc = *((cl_device_exec_capabilities*) info->value);
 	g_snprintf(out, size, "%s%s", 
 		exc & CL_EXEC_KERNEL ? " KERNEL" : "",
 		exc & CL_EXEC_NATIVE_KERNEL ? " NATIVE_KERNEL" : "");
 	return out;
 }
 
-static gchar* cl4_devquery_format_locmemtype(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_locmemtype(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_device_local_mem_type lmt = *((cl_device_local_mem_type*) info);
+	cl_device_local_mem_type lmt = *((cl_device_local_mem_type*) info->value);
 	g_snprintf(out, size, "%s%s%s", 
 		lmt & CL_LOCAL ? "LOCAL" : "",
 		lmt & CL_GLOBAL ? "GLOBAL" : "",
@@ -139,12 +149,12 @@ static gchar* cl4_devquery_format_locmemtype(gpointer info, gchar* out, guint si
 	return out;
 }
 
-static gchar* cl4_devquery_format_partprop(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_partprop(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_device_partition_property* pp = (cl_device_partition_property*) info;
-	//printf("|||| info = %p, info[0] = %ld |||||\n", info, pp[0]);
+	cl_device_partition_property* pp = (cl_device_partition_property*) info->value;
 	GString* str = g_string_new("");
-	for (guint i = 0; (pp[i] != 0) && (i < 3); i++) {
+	guint count = info->size / sizeof(cl_device_partition_property);
+	for (guint i = 0; i < count; i++) {
 		switch (pp[i]) {
 			case CL_DEVICE_PARTITION_EQUALLY:
 				g_string_append_printf(str, "EQUALLY(0x%lx) ", pp[i]);
@@ -155,6 +165,18 @@ static gchar* cl4_devquery_format_partprop(gpointer info, gchar* out, guint size
 			case CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN:
 				g_string_append_printf(str, "BY_AFFINITY_DOMAIN(0x%lx) ", pp[i]);
 				break;
+			case CL_DEVICE_PARTITION_EQUALLY_EXT:
+				g_string_append_printf(str, "EQUALLY_EXT(0x%lx) ", pp[i]);
+				break;
+			case CL_DEVICE_PARTITION_BY_COUNTS_EXT:
+				g_string_append_printf(str, "BY_COUNTS_EXT(0x%lx) ", pp[i]);
+				break;
+			case CL_DEVICE_PARTITION_BY_NAMES_EXT:
+				g_string_append_printf(str, "BY_NAMES_EXT(0x%lx) ", pp[i]);
+				break;
+			case CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT:
+				g_string_append_printf(str, "BY_AFFINITY_DOMAIN_EXT(0x%lx) ", pp[i]);
+				break;
 			default:
 				g_string_append_printf(str, "UNKNOWN(0x%lx) ", pp[i]);
 		}
@@ -164,9 +186,9 @@ static gchar* cl4_devquery_format_partprop(gpointer info, gchar* out, guint size
 	return out;
 }
 
-static gchar* cl4_devquery_format_affdom(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_affdom(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_device_affinity_domain ad = *((cl_device_affinity_domain*) info);
+	cl_device_affinity_domain ad = *((cl_device_affinity_domain*) info->value);
 	g_snprintf(out, size, "%s%s%s%s%s%s", 
 		ad & CL_DEVICE_AFFINITY_DOMAIN_NUMA ? "NUMA " : "",
 		ad & CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE ? "L4_CACHE " : "",
@@ -177,9 +199,9 @@ static gchar* cl4_devquery_format_affdom(gpointer info, gchar* out, guint size, 
 	return out;
 }
 
-static gchar* cl4_devquery_format_cachetype(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_cachetype(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_device_mem_cache_type mct = *((cl_device_mem_cache_type*) info);
+	cl_device_mem_cache_type mct = *((cl_device_mem_cache_type*) info->value);
 	g_snprintf(out, size, "%s%s%s", 
 		mct & CL_READ_ONLY_CACHE ? "READ_ONLY" : "",
 		mct & CL_READ_WRITE_CACHE ? "READ_WRITE" : "",
@@ -187,9 +209,9 @@ static gchar* cl4_devquery_format_cachetype(gpointer info, gchar* out, guint siz
 	return out;
 }
 
-static gchar* cl4_devquery_format_queueprop(gpointer info, gchar* out, guint size, const gchar const* units) {
+static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoValue* info, gchar* out, guint size, const gchar const* units) {
 	units = units;
-	cl_command_queue_properties qp = *((cl_command_queue_properties*) info);
+	cl_command_queue_properties qp = *((cl_command_queue_properties*) info->value);
 	g_snprintf(out, size, "%s%s", 
 		qp & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ? "OUT_OF_ORDER_EXEC_MODE_ENABLE " : "",
 		qp & CL_QUEUE_PROFILING_ENABLE ? "PROFILING_ENABLE " : "");

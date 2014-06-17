@@ -42,7 +42,7 @@ static void helpers_test() {
 	GError* err = NULL;
 	guint num_devs;
 	guint num_platfs;
-	gpointer param_value;
+	CL4DeviceInfoValue* info;
 	gchar param_value_str[CL4_TEST_DEVQUERY_MAXINFOLEN];
 
 
@@ -83,12 +83,12 @@ static void helpers_test() {
 					g_debug("====== Device #%d", j);
 
 					for (gint k = 0; k < cl4_devquery_info_map_size; k++) {
-						param_value = cl4_device_info(d, cl4_devquery_info_map[k].device_info, &err);
+						info = cl4_device_info(d, cl4_devquery_info_map[k].device_info, &err);
 						if (err == NULL) {
 							g_debug("\t%s : %s", 
 								cl4_devquery_info_map[k].param_name, 
 								cl4_devquery_info_map[k].format(
-									param_value, param_value_str, 
+									info, param_value_str, 
 									CL4_TEST_DEVQUERY_MAXINFOLEN,
 									cl4_devquery_info_map[k].units));
 						} else {
