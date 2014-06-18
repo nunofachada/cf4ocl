@@ -253,7 +253,27 @@ void cl4_device_query_show_platform_info(CL4Platform* p) {
 
 void cl4_device_query_show_device_info_all(CL4Device* d) {
 
-	d = d;
+	CL4DeviceInfoValue* param_value;
+	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	GError* err = NULL;
+
+	for (gint k = 0; k < cl4_devquery_info_map_size; k++) {
+		param_value = cl4_device_info(d, cl4_devquery_info_map[k].device_info, &err);
+		if (err == NULL) {
+			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
+				cl4_devquery_info_map[k].param_name, 
+				cl4_devquery_info_map[k].format(
+				param_value, param_value_str, 
+					CL4_DEVICE_QUERY_MAXINFOLEN,
+					cl4_devquery_info_map[k].units));
+		} else {
+			g_clear_error(&err);
+			if (opt_nfound)
+				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s", 
+					cl4_devquery_info_map[k].param_name, "N/A\n");
+		}
+	}
+
 
 }
 
