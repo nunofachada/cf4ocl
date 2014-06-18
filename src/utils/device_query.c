@@ -35,6 +35,8 @@ static gboolean opt_basic = TRUE; /* Default. */
 static gchar** opt_custom = NULL;
 static guint opt_platf = G_MAXUINT;
 static guint opt_dev = G_MAXUINT;
+static gboolean opt_nfound = FALSE;
+static gboolean opt_verb = FALSE;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
@@ -43,6 +45,8 @@ static GOptionEntry entries[] = {
 	{"custom",   'c', 0, G_OPTION_ARG_STRING_ARRAY, &opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
 	{"device",   'd', 0, G_OPTION_ARG_INT,          &opt_dev,    "Specify a device to query",   "device"},
 	{"platform", 'p', 0, G_OPTION_ARG_INT,          &opt_platf,  "Specify a platform to query", "platform"},
+	{"notfound", 'n', 0, G_OPTION_ARG_NONE,         &opt_nfound, "Show known parameters even if not found in device", NULL},
+	{"verbose",  'v', 0, G_OPTION_ARG_NONE,         &opt_verb,   "Show description of each parameter", NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -255,34 +259,39 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 
 void cl4_device_query_show_device_info_custom(CL4Device* d) {
 
-	const CL4DevQueryMap* info_map;
-	gint size;
+	const CL4DevQueryMap* info_row;
 	CL4DeviceInfoValue* param_value;
 	GError* err = NULL;
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	gint idx;
+	
 	
 	for (guint i = 0; opt_custom[i] != NULL; i++) {
-		info_map = cl4_devquery_list_prefix(opt_custom[i], &size);
-		if (!info_map) {
-			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\tNo parameters with prefix '%s'\n", opt_custom[i]);
-		} else {
-			for (gint j = 0; j < size; j++) {
-				param_value = cl4_device_info(d, info_map[j].device_info, &err);
-				if (err == NULL) {
+
+		idx = 0;
+		info_row = cl4_devquery_match(opt_custom[i], &idx);
+		while (info_row != NULL) {
+
+			param_value = cl4_device_info(d, info_row->device_info, &err);
+			
+			if (err == NULL) {
+				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
+					info_row->param_name, 
+					info_row->format(
+						param_value, param_value_str, 
+						CL4_DEVICE_QUERY_MAXINFOLEN,
+						info_row->units));
+			} else {
+				g_clear_error(&err);
+				if (opt_nfound)
 					g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
-						info_map[j].param_name, 
-						info_map[j].format(
-							param_value, param_value_str, 
-							CL4_DEVICE_QUERY_MAXINFOLEN,
-							info_map[j].units));
-				} else {
-					g_clear_error(&err);
-					g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
-						info_map[j].param_name, "N/A");
-					
-				}
+						info_row->param_name, "N/A");
+				
 			}
-		}
+			info_row = cl4_devquery_match(opt_custom[i], &idx);
+			
+		};
+
 	}
 
 	return;

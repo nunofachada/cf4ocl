@@ -854,3 +854,48 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 	/* Return result */
 	return found_cl4_devquery_info_map;
 }
+
+/**
+ * @brief Search for a device information parameter by matching part
+ * of its name. This function is supposed to be used in a loop. 
+ * 
+ * @param substr String to match with parameter name.
+ * @param idx Next index, should be zero in the first call, and the 
+ * function updates within calls.
+ * @return A matching CL4DevQueryMap, or NULL if search is over.
+ * */
+const CL4DevQueryMap* cl4_devquery_match(gchar* substr, gint* idx) {
+	
+	/* Make sure substr is not NULL. */
+	g_return_val_if_fail(substr != NULL, NULL);
+	
+	/* Make sure idx is not NULL. */
+	g_return_val_if_fail(idx != NULL, NULL);
+	
+	/* Found flag. */
+	gboolean found = FALSE;
+
+	/* Found result. */
+	const CL4DevQueryMap* info_row = NULL;
+	
+	/* Linear search. */
+	for ( ; *idx < cl4_devquery_info_map_size; (*idx)++) {
+		if (g_strstr_len(
+			cl4_devquery_info_map[*idx].param_name, -1, substr)) {
+				
+			found = TRUE;
+			break;
+		}
+	}
+	
+	/* Set found result. */
+	if (found)
+		info_row = &cl4_devquery_info_map[*idx];
+
+	/* Increment index (for next iteration). */
+	(*idx)++;
+
+	/* Return result. */
+	return info_row;
+	
+}

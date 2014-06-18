@@ -128,6 +128,10 @@ cl_device_info cl4_devquery_name(gchar* name);
 const CL4DevQueryMap* cl4_devquery_list_prefix(
 	gchar* prefix, gint* size);
 
+/** @brief Search for a device information parameter by matching part
+ * of its name. This function is supposed to be used in a loop. */
+const CL4DevQueryMap* cl4_devquery_match(gchar* substr, gint* idx);
+
 /** 
  * @brief Map an OpenCL cl_device_type object to a string identifying
  * the device type.
