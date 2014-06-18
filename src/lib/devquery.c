@@ -441,12 +441,12 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"image3d_max_width", CL_DEVICE_IMAGE3D_MAX_WIDTH, 
 		"Max. width of 3D image (pixels)", 
 		cl4_devquery_format_sizet, "px"},
-	{"image_max_buffer_size", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, 
-		"Max. pixels for 1D image from buffer object", 
-		cl4_devquery_format_sizet, "px"},
 	{"image_max_array_size", CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, 
 		"Max. images in a 1D or 2D image array", 
 		cl4_devquery_format_sizet, "images"},
+	{"image_max_buffer_size", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, 
+		"Max. pixels for 1D image from buffer object", 
+		cl4_devquery_format_sizet, "px"},
 	{"image_support", CL_DEVICE_IMAGE_SUPPORT, 
 		"Image support", 
 		cl4_devquery_format_yesno, ""},
@@ -546,15 +546,15 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"parent_device", CL_DEVICE_PARENT_DEVICE, 
 		"The cl_device_id of the parent device to which the sub-device belongs", 
 		cl4_devquery_format_ptr, ""},
+	{"partition_affinity_domain", CL_DEVICE_PARTITION_AFFINITY_DOMAIN, 
+		"Supported affinity domains for partitioning the device using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN", 
+		cl4_devquery_format_affdom, ""},
 	{"partition_max_sub_devices", CL_DEVICE_PARTITION_MAX_SUB_DEVICES, 
 		"Max. sub-devices that can be created when device is partitioned", 
 		cl4_devquery_format_uint, "devices"},
 	{"partition_properties", CL_DEVICE_PARTITION_PROPERTIES, 
 		"Partition types supported by device", 
 		cl4_devquery_format_partprop, ""},
-	{"partition_affinity_domain", CL_DEVICE_PARTITION_AFFINITY_DOMAIN, 
-		"Supported affinity domains for partitioning the device using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN", 
-		cl4_devquery_format_affdom, ""},
 	{"partition_type", CL_DEVICE_PARTITION_TYPE, 
 		"Properties specified in clCreateSubDevices if device is a subdevice", 
 		cl4_devquery_format_uint, ""},
@@ -641,7 +641,8 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 		cl4_devquery_format_uint, ""},
 	{"wavefront_width_amd", CL_DEVICE_WAVEFRONT_WIDTH_AMD, 
 		"Wavefront width", 
-		cl4_devquery_format_uint, ""}		
+		cl4_devquery_format_uint, ""},
+	{NULL, 0, NULL, NULL, NULL}	
 		
 };
 
@@ -776,16 +777,17 @@ cl_device_info cl4_devquery_name(gchar* name) {
 }
 
 /**
- * @brief Get a list of device information parameters which have the 
- * given prefix.
+ * @brief Get a pointer to the first device information parameter which 
+ * has the given prefix.
  * 
  * @param prefix Device information parameter prefix. Can be in lower
  * or uppercase, and start with "cl_device_" or not.
- * @param size Size of returned list.
- * @return List of device information parameters which have the given
- * prefix.
+ * @param size Location where to put number of matching parameters, or
+ * NULL if it is to be ignored.
+ * @return pointer to the first device information parameter which 
+ * has the given prefix or NULL if nothing found.
  * */
-const CL4DevQueryMap* cl4_devquery_list_prefix(
+const CL4DevQueryMap* cl4_devquery_prefix(
 	gchar* prefix, gint* size) {
 	
 	/* Make sure prefix is not NULL. */
@@ -838,14 +840,16 @@ const CL4DevQueryMap* cl4_devquery_list_prefix(
 		}
 		
 		/* Set return values. */
-		*size = idx_end - idx_start + 1;
+		if (size != NULL)
+			*size = idx_end - idx_start + 1;
 		found_cl4_devquery_info_map = &cl4_devquery_info_map[idx_start];
 		
 	} else {
 		
 		/* Nothing found. */
-		*size = -1;
-		
+		if (size != NULL)
+			*size = -1;
+
 	}
 
 	/* Free final prefix. */

@@ -125,7 +125,7 @@ cl_device_info cl4_devquery_name(gchar* name);
 
 /** @brief Get a list of device information parameters which have the 
  * given prefix. */
-const CL4DevQueryMap* cl4_devquery_list_prefix(
+const CL4DevQueryMap* cl4_devquery_prefix(
 	gchar* prefix, gint* size);
 
 /** @brief Search for a device information parameter by matching part
