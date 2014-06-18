@@ -38,12 +38,19 @@ static gchar* cl4_devquery_format_uint(CL4DeviceInfoValue* info,
 }
 
 /* Implementation of cl4_devquery_format() function for outputting
- * unsigned integers as hexadecimal numbers. */
-static gchar* cl4_devquery_format_uinthex(CL4DeviceInfoValue* info, 
+ * device information as a hexadecimal number. */
+static gchar* cl4_devquery_format_hex(CL4DeviceInfoValue* info, 
 	gchar* out, guint size, const gchar const* units) {
-	units = units;
-	
-	g_snprintf(out, size, "0x%x", *((cl_uint*) info->value));
+		
+	GString* str = g_string_new("0x");
+	for (guint i = 0; i < info->size; i++) {
+		g_string_append_printf(str, "%x", ((cl_char*) info->value)[i]);
+	}
+	if (units && units[0])
+		g_string_append_printf(str, " %s", units);
+		
+	g_snprintf(out, size, "%s", str->str);
+	g_string_free(str, TRUE);
 	return out;
 	
 }
@@ -316,10 +323,18 @@ static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoValue* info,
 
 }
 
+static gchar* cl4_devquery_format_testsize(CL4DeviceInfoValue* info, 
+	gchar* out, guint size, const gchar const* units) {
+	
+	g_snprintf(out, size, "%ld %s", (gulong) info->size, units);
+	return out;
+
+}
+
 /** 
  * @brief Size of parameter information map. 
  * */
-const gint cl4_devquery_info_map_size = 81;
+const gint cl4_devquery_info_map_size = 96;
 
 /** 
  * @brief Map of parameter name strings to respective cl_device_info 
@@ -327,6 +342,26 @@ const gint cl4_devquery_info_map_size = 81;
  * units suffix. 
  * */
 const CL4DevQueryMap cl4_devquery_info_map[] = {
+	
+//~ #define           0x4032
+//~ 
+//~ /*********************************
+//~ * cl_amd_device_attribute_query *
+//~ *********************************/
+//~ #define         0x4036
+//~ #define                       0x4037
+//~ #define CL_DEVICE_BOARD_NAME_AMD                    0x4038
+//~ #define CL_DEVICE_GLOBAL_FREE_MEMORY_AMD            0x4039
+//~ #define CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD         0x4040
+//~ #define CL_DEVICE_SIMD_WIDTH_AMD                    0x4041
+//~ #define CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD        0x4042
+//~ #define CL_DEVICE_WAVEFRONT_WIDTH_AMD               0x4043
+//~ #define CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD           0x4044
+//~ #define CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD      0x4045
+//~ #define CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD 0x4046
+//~ #define CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD   0x4047
+//~ #define CL_DEVICE_LOCAL_MEM_BANKS_AMD               0x4048
+//~ #define CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD        0x4049	
 
 	{"address_bits", CL_DEVICE_ADDRESS_BITS, 
 		"Address space size in bits", 
@@ -424,6 +459,9 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"local_mem_type", CL_DEVICE_LOCAL_MEM_TYPE, 
 		"Local mem. type", 
 		cl4_devquery_format_locmemtype, ""},
+	{"max_atomic_counters_ext", CL_DEVICE_MAX_ATOMIC_COUNTERS_EXT, 
+		"Max. atomic counters", 
+		cl4_devquery_format_uint, ""},
 	{"max_clock_frequency", CL_DEVICE_MAX_CLOCK_FREQUENCY, 
 		"Max. clock frequency (MHz)", 
 		cl4_devquery_format_uint, "MHz"},
@@ -541,6 +579,9 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"profile", CL_DEVICE_PROFILE, 
 		"Profile name supported by the device (FULL or EMBEDDED)", 
 		cl4_devquery_format_char, ""},
+	{"profiling_timer_offset_amd", CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, 
+		"Offset between event timestamps in nanoseconds", 
+		cl4_devquery_format_sizet, "ns"},
 	{"profiling_timer_resolution", CL_DEVICE_PROFILING_TIMER_RESOLUTION, 
 		"Resolution of device timer in nanoseconds", 
 		cl4_devquery_format_sizet, "ns"},
@@ -556,6 +597,9 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG, 
 		"Floating-point device configuration (single)", 
 		cl4_devquery_format_fpconfig, ""},
+	{"topology_amd", CL_DEVICE_TOPOLOGY_AMD, 
+		"Description of the topology used to connect the device to the host", 
+		cl4_devquery_format_hex, ""},
 	{"type", CL_DEVICE_TYPE, 
 		"Type of OpenCL device", 
 		cl4_devquery_format_type, ""},
@@ -564,7 +608,7 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 		cl4_devquery_format_char, ""},
 	{"vendor_id", CL_DEVICE_VENDOR_ID, 
 		"Unique device vendor identifier", 
-		cl4_devquery_format_uinthex, ""},
+		cl4_devquery_format_hex, ""},
 	{"version", CL_DEVICE_VERSION, 
 		"OpenCL software driver version", 
 		cl4_devquery_format_char, ""},
