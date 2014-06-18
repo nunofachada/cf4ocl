@@ -319,7 +319,7 @@ static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoValue* info,
 /** 
  * @brief Size of parameter information map. 
  * */
-const gint cl4_devquery_info_map_size = 74;
+const gint cl4_devquery_info_map_size = 81;
 
 /** 
  * @brief Map of parameter name strings to respective cl_device_info 
@@ -340,6 +340,12 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"compiler_available", CL_DEVICE_COMPILER_AVAILABLE, 
 		"Is a compiler available for device", 
 		cl4_devquery_format_yesno, ""},
+	{"compute_capability_major_nv", CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV, 
+		"Major revision number that defines the CUDA compute capability of the device", 
+		cl4_devquery_format_uint, ""},
+	{"compute_capability_minor_nv", CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV, 
+		"Minor revision number that defines the CUDA compute capability of the device", 
+		cl4_devquery_format_uint, ""},
 	{"double_fp_config", CL_DEVICE_DOUBLE_FP_CONFIG, 
 		"Floating-point device configuration (double)", 
 		cl4_devquery_format_fpconfig, ""},
@@ -399,6 +405,12 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 		cl4_devquery_format_sizet, "images"},
 	{"image_support", CL_DEVICE_IMAGE_SUPPORT, 
 		"Image support", 
+		cl4_devquery_format_yesno, ""},
+	{"integrated_memory_nv", CL_DEVICE_INTEGRATED_MEMORY_NV, 
+		"Is device integrated with the memory subsystem?", 
+		cl4_devquery_format_yesno, ""},
+	{"kernel_exec_timeout_nv", CL_DEVICE_KERNEL_EXEC_TIMEOUT_NV, 
+		"Is there a limit for kernels executed on device?", 
 		cl4_devquery_format_yesno, ""},
 	{"linker_available", CL_DEVICE_LINKER_AVAILABLE, 
 		"Linker available", 
@@ -478,6 +490,9 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"opencl_c_version", CL_DEVICE_OPENCL_C_VERSION, 
 		"Highest OpenCL C version supported by the device compiler", 
 		cl4_devquery_format_char, ""},
+	{"gpu_overlap_nv", CL_DEVICE_GPU_OVERLAP_NV, 
+		"Can device concurrently copy memory between host and device while executing a kernel", 
+		cl4_devquery_format_yesno, ""},
 	{"parent_device", CL_DEVICE_PARENT_DEVICE, 
 		"The cl_device_id of the parent device to which the sub-device belongs", 
 		cl4_devquery_format_ptr, ""},
@@ -535,6 +550,9 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"reference_count", CL_DEVICE_REFERENCE_COUNT, 
 		"Device reference count", 
 		cl4_devquery_format_uint, ""},
+	{"registers_per_block_nv", CL_DEVICE_REGISTERS_PER_BLOCK_NV, 
+		"Maximum number of 32-bit registers available to a work-group", 
+		cl4_devquery_format_uint, ""},
 	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG, 
 		"Floating-point device configuration (single)", 
 		cl4_devquery_format_fpconfig, ""},
@@ -549,7 +567,10 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 		cl4_devquery_format_uinthex, ""},
 	{"version", CL_DEVICE_VERSION, 
 		"OpenCL software driver version", 
-		cl4_devquery_format_char, ""}
+		cl4_devquery_format_char, ""},
+	{"warp_size_nv", CL_DEVICE_WARP_SIZE_NV, 
+		"Warp size in work-items", 
+		cl4_devquery_format_char, ""}		
 };
 
 /**
