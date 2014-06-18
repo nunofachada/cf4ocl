@@ -570,7 +570,7 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 		cl4_devquery_format_char, ""},
 	{"warp_size_nv", CL_DEVICE_WARP_SIZE_NV, 
 		"Warp size in work-items", 
-		cl4_devquery_format_char, ""}		
+		cl4_devquery_format_uint, ""}		
 };
 
 /**
