@@ -45,12 +45,12 @@ typedef struct cl4_device CL4Device;
 /**
  * @brief Value type of info hash table.
  * */
-typedef struct cl4_device_info_value {
+typedef struct cl4_device_info_wrapper {
 	/** Device information. */
 	gpointer value;
 	/** Size in bytes of device information. */
 	gsize size;
-} CL4DeviceInfoValue;
+} CL4DeviceInfoWrapper;
 
 /** @brief Creates a new device wrapper object. */
 CL4Device* cl4_device_new(cl_device_id id);
@@ -70,7 +70,7 @@ void cl4_device_unref(CL4Device* device);
 gint cl4_device_ref_count(CL4Device* device);
 
 /** @brief Get device information. */
-CL4DeviceInfoValue* cl4_device_info(CL4Device* device, 
+CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 
 /** @brief Get the OpenCL device ID object. */

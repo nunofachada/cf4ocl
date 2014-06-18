@@ -26,9 +26,6 @@
 
 #include "device_query.h"
 
-#define CL4_DEVICE_QUERY_DESCRIPTION "Utility for querying OpenCL \
-platforms and devices"
-
 /* Command line arguments and respective default values. */
 static gboolean opt_all = FALSE;
 static gboolean opt_basic = TRUE; /* Default. */
@@ -40,14 +37,21 @@ static gboolean opt_verb = FALSE;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"all",      'a', 0, G_OPTION_ARG_NONE,         &opt_all,    "Show all the available device information",       NULL},
-	{"basic",    'b', 0, G_OPTION_ARG_NONE,         &opt_basic,  "Show basic device information (default)",         NULL},
-	{"custom",   'c', 0, G_OPTION_ARG_STRING_ARRAY, &opt_custom, "Show specific information, repeat as necessary", "cl_device_info"},
-	{"device",   'd', 0, G_OPTION_ARG_INT,          &opt_dev,    "Specify a device to query",   "device"},
-	{"platform", 'p', 0, G_OPTION_ARG_INT,          &opt_platf,  "Specify a platform to query", "platform"},
-	{"notfound", 'n', 0, G_OPTION_ARG_NONE,         &opt_nfound, "Show known parameters even if not found in device", NULL},
-	{"verbose",  'v', 0, G_OPTION_ARG_NONE,         &opt_verb,   "Show description of each parameter", NULL},
-	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
+	{"all",      'a', 0, G_OPTION_ARG_NONE,               &opt_all,
+	 "Show all the available device information",         NULL},
+	{"basic",    'b', 0, G_OPTION_ARG_NONE,               &opt_basic,
+	 "Show basic device information (default)",           NULL},
+	{"custom",   'c', 0, G_OPTION_ARG_STRING_ARRAY,       &opt_custom,
+	 "Show specific information, repeat as necessary",    "cl_device_info"},
+	{"device",   'd', 0, G_OPTION_ARG_INT,                &opt_dev,
+	 "Specify a device to query",                         "device"},
+	{"platform", 'p', 0, G_OPTION_ARG_INT,                &opt_platf,
+	 "Specify a platform to query",                       "platform"},
+	{"notfound", 'n', 0, G_OPTION_ARG_NONE,               &opt_nfound,
+	 "Show known parameters even if not found in device", NULL},
+	{"verbose",  'v', 0, G_OPTION_ARG_NONE,               &opt_verb,
+	 "Show description of each parameter",                NULL},
+	{ NULL, 0, 0, 0, NULL, NULL, NULL }
 };
 
 /* Information queried for basic CLI option. */
@@ -88,7 +92,7 @@ int main(int argc, char* argv[]) {
 	guint num_devs;
 	
 	/* Device information value object. */
-	CL4DeviceInfoValue* info_value = NULL;
+	CL4DeviceInfoWrapper* info_value = NULL;
 	
 	/* Device name. */
 	gchar* dev_name;
@@ -221,6 +225,11 @@ cleanup:
 
 }
 
+/**
+ * @brief Show platform information.
+ * 
+ * @param p Platform wrapper object.
+ * */
 void cl4_device_query_show_platform_info(CL4Platform* p) {
 
 	/* Platform info variables. */
@@ -265,15 +274,33 @@ void cl4_device_query_show_platform_info(CL4Platform* p) {
 	return;
 }
 
+/**
+ * @brief Show all available device information.
+ * 
+ * @param d Device wrapper object.
+ * */
 void cl4_device_query_show_device_info_all(CL4Device* d) {
 
-	CL4DeviceInfoValue* param_value;
+	/* Parameter value and size. */
+	CL4DeviceInfoWrapper* param_value;
+	
+	/* Parameter value string. */
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	
+	/* Error reporting object. */
 	GError* err = NULL;
 
+	/* Cycle through all supported device information names. */
 	for (gint k = 0; k < cl4_devquery_info_map_size; k++) {
-		param_value = cl4_device_info(d, cl4_devquery_info_map[k].device_info, &err);
+		
+		/* Get the device information value and size. */
+		param_value = cl4_device_info(
+			d, cl4_devquery_info_map[k].device_info, &err);
+		
+		/* Check for errors. */
 		if (err == NULL) {
+			
+			/* If no error, show current parameter value... */
 			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
 				cl4_devquery_info_map[k].param_name, 
 				cl4_devquery_info_map[k].format(
@@ -281,88 +308,144 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 					CL4_DEVICE_QUERY_MAXINFOLEN,
 					cl4_devquery_info_map[k].units));
 		} else {
+			
+			/* ...otherwise clear error... */
 			g_clear_error(&err);
 			if (opt_nfound)
+				/* ...and show that parameter is not available, if user 
+				 * requested so. */
 				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s", 
 					cl4_devquery_info_map[k].param_name, "N/A\n");
 		}
 	}
 
-
 }
 
+/**
+ * @brief Show user specified device information.
+ * 
+ * @param d Device wrapper object.
+ * */
 void cl4_device_query_show_device_info_custom(CL4Device* d) {
 
+	/* A row of the device info_map. */
 	const CL4DevQueryMap* info_row;
-	CL4DeviceInfoValue* param_value;
-	GError* err = NULL;
+	
+	/* Parameter value and size. */
+	CL4DeviceInfoWrapper* param_value;
+
+	/* Parameter value string. */
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+
+	/* Error reporting object. */
+	GError* err = NULL;
+
+	/* Index of next row of the device info_map. */
 	gint idx;
 	
-	
+	/* Cycle through all user specified parameter substrings. */
 	for (guint i = 0; opt_custom[i] != NULL; i++) {
 
+		/* Set index of next row to zero. */
 		idx = 0;
+		
+		/* Get next row (the first one). */
 		info_row = cl4_devquery_match(opt_custom[i], &idx);
+		
+		/* Keep getting rows until we reach the end of the device 
+		 * info_map. */
 		while (info_row != NULL) {
 
+			/* Get parameter value for current info_map row. */
 			param_value = cl4_device_info(d, info_row->device_info, &err);
 			
+			/* Check for errors. */
 			if (err == NULL) {
+
+				/* If no error, show current parameter value... */
 				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
 					info_row->param_name, 
 					info_row->format(
 						param_value, param_value_str, 
 						CL4_DEVICE_QUERY_MAXINFOLEN,
 						info_row->units));
+						
 			} else {
+				
+				/* ...otherwise clear error... */
 				g_clear_error(&err);
 				if (opt_nfound)
+					/* ...and show that parameter is not available, if user 
+					* requested so. */
 					g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
 						info_row->param_name, "N/A");
 				
 			}
+			
+			/* Get next row. */
 			info_row = cl4_devquery_match(opt_custom[i], &idx);
 			
 		};
 
 	}
 
-	return;
 }
 
+/**
+ * @brief Show basic device information.
+ * 
+ * @param d Device wrapper object.
+ * */
 void cl4_device_query_show_device_info_basic(CL4Device* d) {
 	
+	/* A row of the device info_map. */
 	const CL4DevQueryMap* info_row;
-	CL4DeviceInfoValue* param_value;
+
+	/* Parameter value and size. */
+	CL4DeviceInfoWrapper* param_value;
+
+	/* Parameter value string. */
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+
+	/* Error reporting object. */
 	GError* err = NULL;
 
+	/* Cycle through the pre-defined basic information array. */
 	for (guint i = 0; basic_info[i] != NULL; i++) {
 
+		/* Get next row. */
 		info_row = cl4_devquery_prefix(basic_info[i], NULL);
+
+		/* Check that its a valid parameter, otherwise we have a 
+		 * programming error, so it is better to abort. */
 		g_assert_nonnull(info_row);
 		
+		/* Get parameter value for current info_map row. */
 		param_value = cl4_device_info(d, info_row->device_info, &err);
 			
+		/* Check for errors. */
 		if (err == NULL) {
+
+			/* If no error, show current parameter value... */
 			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
 				info_row->param_name, 
 				info_row->format(
 					param_value, param_value_str, 
 					CL4_DEVICE_QUERY_MAXINFOLEN,
 					info_row->units));
+					
 		} else {
+
+			/* ...otherwise clear error... */
 			g_clear_error(&err);
 			if (opt_nfound)
+				/* ...and show that parameter is not available, if user 
+				 * requested so. */
 				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
 					info_row->param_name, "N/A");
 			
 		}
 		
 	}
-
-	return;
-	
 
 }

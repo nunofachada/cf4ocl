@@ -29,7 +29,7 @@
 
 /* Implementation of cl4_devquery_format() function for outputting
  * unsigned integers. */
-static gchar* cl4_devquery_format_uint(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_uint(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 		
 	g_snprintf(out, size, "%d %s", *((cl_uint*) info->value), units);
@@ -39,7 +39,7 @@ static gchar* cl4_devquery_format_uint(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * device information as a hexadecimal number. */
-static gchar* cl4_devquery_format_hex(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_hex(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 		
 	GString* str = g_string_new("0x");
@@ -63,7 +63,7 @@ static gchar* cl4_devquery_format_hex(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * size_t unsigned integers. */
-static gchar* cl4_devquery_format_sizet(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_sizet(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 		
 	g_snprintf(out, size, "%ld %s", (gulong) *((size_t*) info->value), units);
@@ -87,7 +87,7 @@ static gchar* cl4_devquery_format_sizet(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * unsigned long integers which represent bytes. */
-static gchar* cl4_devquery_format_ulongbytes(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_ulongbytes(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -99,7 +99,7 @@ static gchar* cl4_devquery_format_ulongbytes(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * unsigned integers which represent bytes. */
-static gchar* cl4_devquery_format_uintbytes(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_uintbytes(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -111,7 +111,7 @@ static gchar* cl4_devquery_format_uintbytes(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * unsigned size_t integers which represent bytes. */
-static gchar* cl4_devquery_format_sizetbytes(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_sizetbytes(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -123,7 +123,7 @@ static gchar* cl4_devquery_format_sizetbytes(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * a vector of size_t integers. */
-static gchar* cl4_devquery_format_sizetvec(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_sizetvec(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -145,7 +145,7 @@ static gchar* cl4_devquery_format_sizetvec(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * boolean values as a "Yes" or "No" string. */
-static gchar* cl4_devquery_format_yesno(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_yesno(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -156,7 +156,7 @@ static gchar* cl4_devquery_format_yesno(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * strings. */
-static gchar* cl4_devquery_format_char(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_char(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	g_snprintf(out, size, "%s %s", (gchar*) info->value, units);
@@ -166,7 +166,7 @@ static gchar* cl4_devquery_format_char(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * memory addresses. */
-static gchar* cl4_devquery_format_ptr(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_ptr(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -177,7 +177,7 @@ static gchar* cl4_devquery_format_ptr(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * a string representing a device type. */
-static gchar* cl4_devquery_format_type(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_type(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -189,7 +189,7 @@ static gchar* cl4_devquery_format_type(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * the device floating-point (FP) configuration for a FP type. */
-static gchar* cl4_devquery_format_fpconfig(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_fpconfig(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -208,7 +208,7 @@ static gchar* cl4_devquery_format_fpconfig(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * the device execution capabilities. */
-static gchar* cl4_devquery_format_execcap(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_execcap(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 
 	units = units;
@@ -222,7 +222,7 @@ static gchar* cl4_devquery_format_execcap(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting
  * a local memory type. */
-static gchar* cl4_devquery_format_locmemtype(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_locmemtype(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -237,7 +237,7 @@ static gchar* cl4_devquery_format_locmemtype(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting the
  * partition properties of a device. */
-static gchar* cl4_devquery_format_partprop(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_partprop(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -281,7 +281,7 @@ static gchar* cl4_devquery_format_partprop(CL4DeviceInfoValue* info,
 /* Implementation of cl4_devquery_format() function for outputting the
  * supported affinity domains for partitioning a device using 
  * CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN. */
-static gchar* cl4_devquery_format_affdom(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_affdom(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -301,7 +301,7 @@ static gchar* cl4_devquery_format_affdom(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting the
  * cache type of a device. */
-static gchar* cl4_devquery_format_cachetype(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_cachetype(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -316,7 +316,7 @@ static gchar* cl4_devquery_format_cachetype(CL4DeviceInfoValue* info,
 
 /* Implementation of cl4_devquery_format() function for outputting the
  * queue properties of a device. */
-static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoValue* info, 
+static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoWrapper* info, 
 	gchar* out, guint size, const gchar const* units) {
 	
 	units = units;
@@ -331,7 +331,7 @@ static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoValue* info,
 
 //~ /* Implementation of cl4_devquery_format() function for debugging
  //~ * purposes. */
-//~ static gchar* cl4_devquery_format_testsize(CL4DeviceInfoValue* info, 
+//~ static gchar* cl4_devquery_format_testsize(CL4DeviceInfoWrapper* info, 
 	//~ gchar* out, guint size, const gchar const* units) {
 	//~ 
 	//~ g_snprintf(out, size, "%ld %s", (gulong) info->size, units);

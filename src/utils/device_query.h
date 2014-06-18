@@ -34,18 +34,30 @@
 #include "common.h"
 
 #ifndef CL4_DEVICE_QUERY_OUT
+	/** Default device information output stream. */
 	#define CL4_DEVICE_QUERY_OUT stdout
 #endif
+/** Program description. */
 
+#define CL4_DEVICE_QUERY_DESCRIPTION "Utility for querying OpenCL \
+platforms and devices"
+
+/** Maximum length of device information output, per parameter. */
 #define CL4_DEVICE_QUERY_MAXINFOLEN 500
 
 /** @brief Parse and verify command line arguments. */
 void cl4_device_query_args_parse(int argc, char* argv[], GError** err);
 
+/** @brief Show platform information. */
 void cl4_device_query_show_platform_info(CL4Platform* p);
-void cl4_device_query_show_device_info_all(CL4Device* d);
-void cl4_device_query_show_device_info_custom(CL4Device* d);
-void cl4_device_query_show_device_info_basic(CL4Device* d);
 
+/** @brief Show all available device information. */
+void cl4_device_query_show_device_info_all(CL4Device* d);
+
+/** @brief Show user specified device information. */
+void cl4_device_query_show_device_info_custom(CL4Device* d);
+
+/** @brief Show basic device information. */
+void cl4_device_query_show_device_info_basic(CL4Device* d);
 
 #endif

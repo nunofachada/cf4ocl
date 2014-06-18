@@ -42,7 +42,7 @@ static void helpers_test() {
 	GError* err = NULL;
 	guint num_devs;
 	guint num_platfs;
-	CL4DeviceInfoValue* info;
+	CL4DeviceInfoWrapper* info;
 	gchar param_value_str[CL4_TEST_DEVQUERY_MAXINFOLEN];
 
 

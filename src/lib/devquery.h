@@ -91,7 +91,7 @@
  * @return Formatted output (same address as parameter out).
  * */
 typedef gchar* (*cl4_devquery_format)(
-	CL4DeviceInfoValue* info, gchar* out, guint size, 
+	CL4DeviceInfoWrapper* info, gchar* out, guint size, 
 	const gchar const* units);
 
 /** 

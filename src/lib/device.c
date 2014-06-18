@@ -140,16 +140,16 @@ gint cl4_device_ref_count(CL4Device* device) {
 }
 
 /**
- * @brief Create a new CL4DeviceInfoValue* object.
+ * @brief Create a new CL4DeviceInfoWrapper* object.
  * 
  * @param value Parameter value.
  * @param size Parameter size in bytes.
- * @return A new CL4DeviceInfoValue* object.
+ * @return A new CL4DeviceInfoWrapper* object.
  * */
-static CL4DeviceInfoValue* cl4_device_info_value_new(
+static CL4DeviceInfoWrapper* cl4_device_info_value_new(
 	gpointer value, gsize size) {
 	
-	CL4DeviceInfoValue* info_value = g_slice_new(CL4DeviceInfoValue);
+	CL4DeviceInfoWrapper* info_value = g_slice_new(CL4DeviceInfoWrapper);
 	
 	info_value->value = value;
 	info_value->size = size;
@@ -159,15 +159,15 @@ static CL4DeviceInfoValue* cl4_device_info_value_new(
 }
 
 /**
- * @brief Destroy a CL4DeviceInfoValue* object.
+ * @brief Destroy a CL4DeviceInfoWrapper* object.
  * 
  * @param info_value Object to destroy.
  * */
 static void cl4_device_info_value_destroy(
 	void* info_value) {
 		
-	g_free(((CL4DeviceInfoValue*) info_value)->value);
-	g_slice_free(CL4DeviceInfoValue, info_value);
+	g_free(((CL4DeviceInfoWrapper*) info_value)->value);
+	g_slice_free(CL4DeviceInfoWrapper, info_value);
 }
 
 /**
@@ -181,7 +181,7 @@ static void cl4_device_info_value_destroy(
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-CL4DeviceInfoValue* cl4_device_info(CL4Device* device, 
+CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -191,7 +191,7 @@ CL4DeviceInfoValue* cl4_device_info(CL4Device* device,
 	g_return_val_if_fail(device != NULL, NULL);
 	
 	/* Device information value object. */
-	CL4DeviceInfoValue* info_value = NULL;
+	CL4DeviceInfoWrapper* info_value = NULL;
 	
 	/* If device information table is not yet initialized, then 
 	 * initialize it. */
