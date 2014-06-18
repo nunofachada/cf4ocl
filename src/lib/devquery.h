@@ -39,26 +39,44 @@
     #include <CL/opencl.h>
 #endif
 
+/** 
+ * @brief Output formatting function.
+ * 
+ * @param info CL device information bitfield.
+ * @param out Char buffer (pre-allocated) were to write formatted output.
+ * @param size Maximum output length.
+ * @param units Parameter units suffix.
+ * @return Formatted output (same address as parameter out).
+ * */
 typedef gchar* (*cl4_devquery_format)(
 	CL4DeviceInfoValue* info, gchar* out, guint size, 
 	const gchar const* units);
 
-/** @brief Maps a string to a cl_device_info bitfield. */
+/** 
+ * @brief Maps a string to a cl_device_info bitfield. 
+ * */
 typedef struct cl4_devquery_map {
 	
+	/** Parameter name string. */
 	const gchar const* param_name;
+	/** CL device information bitfield. */
 	const cl_device_info device_info;
+	/** Long description of parameter. */
 	const gchar const* description;
+	/** Output formatting function. */
 	const cl4_devquery_format format;
+	/** Parameter units suffix. */
 	const gchar const* units;
 	
 } CL4DevQueryMap;
 
+/** @brief Size of parameter information map. */
 extern const gint cl4_devquery_info_map_size;
 
-/** @brief Map of strings to respective cl_device_info bitfields. */
+/** @brief Map of parameter name strings to respective cl_device_info 
+ * bitfields, long description string, format output function and a
+ * units suffix. */
 extern const CL4DevQueryMap cl4_devquery_info_map[];
-
 
 /** @brief Return a cl_device_info object given its name. */	
 cl_device_info cl4_devquery_name(gchar* name);
