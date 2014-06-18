@@ -39,6 +39,48 @@
     #include <CL/opencl.h>
 #endif
 
+/* Some of these AMD query constants may not be defined in standard 
+ * OpenCL headers, so we defined them here if necessary. */
+#ifndef CL_DEVICE_TOPOLOGY_AMD
+	#define CL_DEVICE_TOPOLOGY_AMD                      0x4037
+#endif
+#ifndef CL_DEVICE_BOARD_NAME_AMD
+	#define CL_DEVICE_BOARD_NAME_AMD                    0x4038
+#endif
+#ifndef CL_DEVICE_GLOBAL_FREE_MEMORY_AMD
+	#define CL_DEVICE_GLOBAL_FREE_MEMORY_AMD            0x4039
+#endif
+#ifndef CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD
+	#define CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD         0x4040
+#endif
+#ifndef CL_DEVICE_SIMD_WIDTH_AMD
+	#define CL_DEVICE_SIMD_WIDTH_AMD                    0x4041
+#endif
+#ifndef CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD
+	#define CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD        0x4042
+#endif
+#ifndef CL_DEVICE_WAVEFRONT_WIDTH_AMD
+	#define CL_DEVICE_WAVEFRONT_WIDTH_AMD               0x4043
+#endif
+#ifndef CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD
+	#define CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD           0x4044
+#endif
+#ifndef CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD
+	#define CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD      0x4045
+#endif
+#ifndef CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD
+	#define CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD 0x4046
+#endif
+#ifndef CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD
+	#define CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD   0x4047
+#endif
+#ifndef CL_DEVICE_LOCAL_MEM_BANKS_AMD
+	#define CL_DEVICE_LOCAL_MEM_BANKS_AMD               0x4048
+#endif
+#ifndef CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD
+	#define CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD        0x4049
+#endif
+
 /** 
  * @brief Output formatting function.
  * 

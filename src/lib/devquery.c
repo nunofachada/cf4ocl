@@ -43,8 +43,14 @@ static gchar* cl4_devquery_format_hex(CL4DeviceInfoValue* info,
 	gchar* out, guint size, const gchar const* units) {
 		
 	GString* str = g_string_new("0x");
-	for (guint i = 0; i < info->size; i++) {
-		g_string_append_printf(str, "%x", ((cl_char*) info->value)[i]);
+	gboolean start = FALSE;
+	gchar val;
+	
+	for (gint i = info->size - 1; i >= 0 ; i--) {
+		val = ((cl_char*) info->value)[i];
+		if (val) start = TRUE;
+		if (start)
+			g_string_append_printf(str, "%.2x", val);
 	}
 	if (units && units[0])
 		g_string_append_printf(str, " %s", units);
@@ -323,13 +329,15 @@ static gchar* cl4_devquery_format_queueprop(CL4DeviceInfoValue* info,
 
 }
 
-static gchar* cl4_devquery_format_testsize(CL4DeviceInfoValue* info, 
-	gchar* out, guint size, const gchar const* units) {
-	
-	g_snprintf(out, size, "%ld %s", (gulong) info->size, units);
-	return out;
-
-}
+//~ /* Implementation of cl4_devquery_format() function for debugging
+ //~ * purposes. */
+//~ static gchar* cl4_devquery_format_testsize(CL4DeviceInfoValue* info, 
+	//~ gchar* out, guint size, const gchar const* units) {
+	//~ 
+	//~ g_snprintf(out, size, "%ld %s", (gulong) info->size, units);
+	//~ return out;
+//~ 
+//~ }
 
 /** 
  * @brief Size of parameter information map. 
@@ -342,26 +350,6 @@ const gint cl4_devquery_info_map_size = 96;
  * units suffix. 
  * */
 const CL4DevQueryMap cl4_devquery_info_map[] = {
-	
-//~ #define           0x4032
-//~ 
-//~ /*********************************
-//~ * cl_amd_device_attribute_query *
-//~ *********************************/
-//~ #define         0x4036
-//~ #define                       0x4037
-//~ #define CL_DEVICE_BOARD_NAME_AMD                    0x4038
-//~ #define CL_DEVICE_GLOBAL_FREE_MEMORY_AMD            0x4039
-//~ #define CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD         0x4040
-//~ #define CL_DEVICE_SIMD_WIDTH_AMD                    0x4041
-//~ #define CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD        0x4042
-//~ #define CL_DEVICE_WAVEFRONT_WIDTH_AMD               0x4043
-//~ #define CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD           0x4044
-//~ #define CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD      0x4045
-//~ #define CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD 0x4046
-//~ #define CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD   0x4047
-//~ #define CL_DEVICE_LOCAL_MEM_BANKS_AMD               0x4048
-//~ #define CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD        0x4049	
 
 	{"address_bits", CL_DEVICE_ADDRESS_BITS, 
 		"Address space size in bits", 
@@ -369,6 +357,9 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"available", CL_DEVICE_AVAILABLE, 
 		"Is device available", 
 		cl4_devquery_format_yesno, ""},
+	{"board_name_amd", CL_DEVICE_BOARD_NAME_AMD, 
+		"Name of the GPU board and model of the specific device", 
+		cl4_devquery_format_char, ""},
 	{"built_in_kernels", CL_DEVICE_BUILT_IN_KERNELS, 
 		"Device built-in kernels", 
 		cl4_devquery_format_char, ""},
@@ -399,6 +390,12 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"extensions", CL_DEVICE_EXTENSIONS, 
 		"Extensions", 
 		cl4_devquery_format_char, ""},
+	/* The parameter bellow has in fact a length of 16 bytes,
+	 * but due to the lack of documentation, only the first half 
+	 * of it is shown for now. */
+	{"global_free_memory_amd", CL_DEVICE_GLOBAL_FREE_MEMORY_AMD, 
+		"Free device memory", 
+		cl4_devquery_format_ulongbytes, ""},
 	{"global_mem_cache_size", CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, 
 		"Global mem. cache size", 
 		cl4_devquery_format_ulongbytes, ""},
@@ -408,6 +405,15 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"global_mem_cacheline_size", CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, 
 		"Global mem. cache line size", 
 		cl4_devquery_format_uintbytes, ""},
+	{"global_mem_channel_bank_width_amd", CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD, 
+		"Global mem. channel bank width", 
+		cl4_devquery_format_uint, ""},
+	{"global_mem_channel_banks_amd", CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, 
+		"Global mem. channel banks", 
+		cl4_devquery_format_uint, ""},
+	{"global_mem_channels_amd", CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD, 
+		"Global mem. channels", 
+		cl4_devquery_format_uint, ""},
 	{"global_mem_size", CL_DEVICE_GLOBAL_MEM_SIZE, 
 		"Global mem. size", 
 		cl4_devquery_format_ulongbytes, ""},
@@ -453,9 +459,15 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"linker_available", CL_DEVICE_LINKER_AVAILABLE, 
 		"Linker available", 
 		cl4_devquery_format_yesno, ""},
+	{"local_mem_banks_amd", CL_DEVICE_LOCAL_MEM_BANKS_AMD, 
+		"Local mem. banks", 
+		cl4_devquery_format_uint, ""},
 	{"local_mem_size", CL_DEVICE_LOCAL_MEM_SIZE, 
 		"Local mem. size", 
 		cl4_devquery_format_ulongbytes, ""},
+	{"local_mem_size_per_compute_unit_amd", CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD, 
+		"Local mem. size per compute unit", 
+		cl4_devquery_format_uintbytes, ""},
 	{"local_mem_type", CL_DEVICE_LOCAL_MEM_TYPE, 
 		"Local mem. type", 
 		cl4_devquery_format_locmemtype, ""},
@@ -594,9 +606,21 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 	{"registers_per_block_nv", CL_DEVICE_REGISTERS_PER_BLOCK_NV, 
 		"Maximum number of 32-bit registers available to a work-group", 
 		cl4_devquery_format_uint, ""},
+	{"simd_instruction_width_amd", CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, 
+		"SIMD instruction width", 
+		cl4_devquery_format_uint, ""},
+	{"simd_per_compute_unit_amd", CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD, 
+		"SIMD per compute unit", 
+		cl4_devquery_format_uint, ""},
+	{"simd_width_amd", CL_DEVICE_SIMD_WIDTH_AMD, 
+		"SIMD width", 
+		cl4_devquery_format_uint, ""},
 	{"single_fp_config", CL_DEVICE_SINGLE_FP_CONFIG, 
 		"Floating-point device configuration (single)", 
 		cl4_devquery_format_fpconfig, ""},
+	{"thread_trace_supported_amd", CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD, 
+		"Is thread trace supported", 
+		cl4_devquery_format_yesno, ""},
 	{"topology_amd", CL_DEVICE_TOPOLOGY_AMD, 
 		"Description of the topology used to connect the device to the host", 
 		cl4_devquery_format_hex, ""},
@@ -614,7 +638,11 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 		cl4_devquery_format_char, ""},
 	{"warp_size_nv", CL_DEVICE_WARP_SIZE_NV, 
 		"Warp size in work-items", 
+		cl4_devquery_format_uint, ""},
+	{"wavefront_width_amd", CL_DEVICE_WAVEFRONT_WIDTH_AMD, 
+		"Wavefront width", 
 		cl4_devquery_format_uint, ""}		
+		
 };
 
 /**
