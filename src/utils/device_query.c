@@ -50,6 +50,20 @@ static GOptionEntry entries[] = {
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
+/* Information queried for basic CLI option. */
+static gchar* basic_info[] = {
+	"type",
+	"vendor",
+	"opencl_c_version",
+	"max_compute_units",
+	"global_mem_size",
+	"max_mem_alloc_size",
+	"local_mem_size",
+	"local_mem_type",
+	"max_work_group_size",
+	NULL
+};
+
 /**
  * @brief Device query main program function.
  * 
@@ -319,6 +333,36 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 
 void cl4_device_query_show_device_info_basic(CL4Device* d) {
 	
-	d = d;
+	const CL4DevQueryMap* info_row;
+	CL4DeviceInfoValue* param_value;
+	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	GError* err = NULL;
+
+	for (guint i = 0; basic_info[i] != NULL; i++) {
+
+		info_row = cl4_devquery_prefix(basic_info[i], NULL);
+		g_assert_nonnull(info_row);
+		
+		param_value = cl4_device_info(d, info_row->device_info, &err);
+			
+		if (err == NULL) {
+			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
+				info_row->param_name, 
+				info_row->format(
+					param_value, param_value_str, 
+					CL4_DEVICE_QUERY_MAXINFOLEN,
+					info_row->units));
+		} else {
+			g_clear_error(&err);
+			if (opt_nfound)
+				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
+					info_row->param_name, "N/A");
+			
+		}
+		
+	}
+
+	return;
+	
 
 }
