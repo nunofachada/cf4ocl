@@ -159,6 +159,40 @@ static void name_test() {
 }
 
 /**
+ * @brief Tests if the cl4_devquery_info_map array is well built,
+ * namely (i) if the param_name fields are alphabetically ordered, and 
+ * (ii) if the size of the array corresponds to the 
+ * cl4_devquery_info_map_size variable.
+ * */
+static void infomap_test() {
+	
+	/* Determined size of info map. */
+	gint imsize;
+	
+	/* Cycle through info map. */
+	for (imsize = 0; 
+		cl4_devquery_info_map[imsize].param_name != NULL; 
+		imsize++) {
+			
+		if ((imsize > 0) 
+			&& 
+			(cl4_devquery_info_map[imsize].param_name != NULL)) {
+			
+			/* Test if parameter names are alphabetically ordered. */
+			g_assert_cmpstr(
+				cl4_devquery_info_map[imsize - 1].param_name,
+				<, 
+				cl4_devquery_info_map[imsize].param_name);
+		}
+	}
+	
+	/* Test if size corresponds. */
+	g_assert_cmpint(imsize, ==, cl4_devquery_info_map_size);
+		
+	 
+}
+
+/**
  * @brief Main function.
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
@@ -168,6 +202,7 @@ int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
 	g_test_add_func("/devquery/helpers", helpers_test);
 	g_test_add_func("/devquery/name", name_test);
+	g_test_add_func("/devquery/infomap", infomap_test);
 	return g_test_run();
 }
 
