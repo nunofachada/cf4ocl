@@ -33,26 +33,24 @@
 #else
     #include <CL/opencl.h>
 #endif
-#include "devsel.h"
+
+//#include "devsel.h"
 #include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
+#include "device.h"
+#include "platform.h"
 
 /**
- * @brief The scene object encompasses the OpenCL context, associated
- * devices, programs, queues and kernels. Should be accessed using
- * the cl4_context_* group of functions.
+ * @brief The context wrapper object encompasses the OpenCL context and
+ * associated wrappers: devices, programs, queues and kernels. Should be 
+ * accessed using the cl4_context_* group of functions.
  * */
 typedef struct cl4_context CL4Context;
 
-// Filters key: a devsel function
-// Filters value: the devsel function arguments (or data)
-CL4Context* cl4_context_new(GHashTable* filters, GError **err);
+CL4Context* cl4_context_new(cl_uint num_devices, 
+	const cl_device_id *devices, GError **err);
 
-CL4Context* cl4_context_new_cpu(GError **err);
-
-CL4Context* cl4_context_new_gpu(GError **err);
-
-void cl4_context_destroy(CL4Context* scene);
+void cl4_context_destroy(CL4Context* ctx);
 
 #endif

@@ -79,23 +79,23 @@ static void create_info_destroy_test() {
 			g_debug(">> Platform %d:", i);
 
 			/* Get platform profile. */
-			platf_info = cl4_plaform_info(p, CL_PLATFORM_PROFILE, &err);
+			platf_info = cl4_platform_info(p, CL_PLATFORM_PROFILE, &err);
 			cl4_test_wrappers_msg("==== Profile :", "%s", platf_info);
 
 			/* Get platform version. */
-			platf_info = cl4_plaform_info(p, CL_PLATFORM_VERSION, &err);
+			platf_info = cl4_platform_info(p, CL_PLATFORM_VERSION, &err);
 			cl4_test_wrappers_msg("==== Version :", "%s", platf_info);
 			
 			/* Get platform name. */
-			platf_info = cl4_plaform_info(p, CL_PLATFORM_NAME, &err);
+			platf_info = cl4_platform_info(p, CL_PLATFORM_NAME, &err);
 			cl4_test_wrappers_msg("==== Name    :", "%s", platf_info);
 
 			/* Get platform vendor. */
-			platf_info = cl4_plaform_info(p, CL_PLATFORM_VENDOR, &err);
+			platf_info = cl4_platform_info(p, CL_PLATFORM_VENDOR, &err);
 			cl4_test_wrappers_msg("==== Vendor  :", "%s", platf_info);
 
 			/* Get platform extensions. */
-			platf_info = cl4_plaform_info(p, CL_PLATFORM_EXTENSIONS, &err);
+			platf_info = cl4_platform_info(p, CL_PLATFORM_EXTENSIONS, &err);
 			cl4_test_wrappers_msg("==== Extens. :", "%s", platf_info);
 			
 			/* Get number of devices. */

@@ -171,13 +171,13 @@ static void cl4_device_info_value_destroy(
 }
 
 /**
- * @brief Get device information.
+ * @brief Get device information wrapper.
  * 
  * @param device The device wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested device information. This information will
+ * @return The requested device information wrapper. This object will
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
@@ -265,6 +265,60 @@ finish:
 	return info_value;
 
 }
+
+/** 
+ * @brief Get device information value.
+ * 
+ * @param device The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested device information value. This value will
+ * be automatically freed when the device wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+gpointer cl4_device_info_value(CL4Device* device, 
+	cl_device_info param_name, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Make sure device is not NULL. */
+	g_return_val_if_fail(device != NULL, NULL);
+	
+	/* Get information wrapper. */
+	CL4DeviceInfoWrapper* diw = cl4_device_info(device, param_name, err);
+	
+	/* Return value if information wrapper is not NULL. */	
+	return diw != NULL ? diw->value : NULL;
+}
+
+/** 
+ * @brief Get device information size.
+ * 
+ * @param device The device wrapper object.
+ * @param param_name Name of information/parameter to get size of.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested device information size. If an error occurs, 
+ * a size of 0 is returned.
+ * */
+ gsize cl4_device_info_size(CL4Device* device, 
+	cl_device_info param_name, GError** err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Make sure device is not NULL. */
+	g_return_val_if_fail(device != NULL, NULL);
+	
+	/* Get information wrapper. */
+	CL4DeviceInfoWrapper* diw = cl4_device_info(device, param_name, err);
+	
+	/* Return value if information wrapper is not NULL. */	
+	return diw != NULL ? diw->size : 0;
+}
+
 
 /**
  * @brief Get the OpenCL device ID object.

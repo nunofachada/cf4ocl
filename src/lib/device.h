@@ -69,8 +69,16 @@ void cl4_device_unref(CL4Device* device);
  * debugging and testing purposes only. */
 gint cl4_device_ref_count(CL4Device* device);
 
-/** @brief Get device information. */
+/** @brief Get device information wrapper. */
 CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device, 
+	cl_device_info param_name, GError** err);
+
+/** @brief Get device information value. */
+gpointer cl4_device_info_value(CL4Device* device, 
+	cl_device_info param_name, GError** err);
+
+/** @brief Get device information size. */
+gsize cl4_device_info_size(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 
 /** @brief Get the OpenCL device ID object. */

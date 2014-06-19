@@ -250,7 +250,7 @@ gint cl4_platform_ref_count(CL4Platform* platform) {
  * be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-gchar* cl4_plaform_info(CL4Platform* platform, 
+gchar* cl4_platform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err) {
 
 	/* Make sure err is NULL or it is not set. */

@@ -27,8 +27,8 @@
  
 #include "context.h"
 
-/*
- * OpenCL runtime context and associated objects.
+/**
+ * Context wrapper object.
  */
 struct cl4_context {
 	
@@ -44,64 +44,69 @@ struct cl4_context {
 	/* Devices in context. */
 	CL4Device** devices;
 	
-	//~ /* Number of programs in context. */
-	//~ cl_uint num_programs;
-	//~ /* Programs in context. */
-	//~ cl_program* programs;
-	//~ /* Number of queues in context. */
-	//~ cl_uint num_queues;
-	//~ /* Command queues */
-	//~ cl_command_queue* queues;
-	//~ /* Number of kernels in context. */
-	//~ cl_uint num_kernels;
-	//~ /* Kernels. */
-	//~ cl_kernel* kernels;
 };
 
-CL4Context* cl4_context_new(cl4_devsel dev_sel, void* ds_info, GError **err) {
+CL4Context* cl4_context_new(cl_uint num_devices, 
+	const cl_device_id *devices, GError **err) {
+
+	/* Make sure number of devices is not zero. */
+	g_return_val_if_fail(num_devices > 0, NULL);
+	
+	/* Make sure device list is not NULL. */
+	g_return_val_if_fail(devices != NULL, NULL);
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	/* The OpenCL scene to create. */
-	CL4Context* ctx;
+	CL4Context* ctx = NULL;
 	
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
 	
+	/* OpenCL platform ID. */
+	cl_platform_id platform = NULL;
+	
+	/* Context properties. */
+	cl_context_properties ctx_props[3] = {CL_CONTEXT_PLATFORM, 0, 0};
+	
 	/* Create ctx. */
 	ctx = g_slice_new0(CL4Context);
 	
-	/* Get the context from the devices/context selector. */
-	ctx->context = dev_sel(ds_info, err);
-	gef_if_error_goto(*err, GEF_USE_GERROR, (*err)->code, error_handler);
+	/* Set number of devices. */
+	ctx->num_devices = num_devices;
+	
+	/* Allocate space for device wrappers. */
+	ctx->devices = g_slice_alloc0(num_devices * sizeof(CL4Device*));
+	
+	/* Add device wrappers to list of device wrappers. */
+	for (guint i = 0; i < num_devices; i++) {
 
-	/* Get number of devices in context. */
-	ocl_status = clGetContextInfo(ctx->context, CL_CONTEXT_NUM_DEVICES,
-		sizeof(cl_uint), &(ctx->num_devices), NULL);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_OCL_ERROR, error_handler, 
-		"Function '%s': get number of devices in context (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
-	g_assert_cmpuint(ctx->num_devices, >, 0);
-		
-	/* Get devices in context. */
-	ctx->devices = (cl_device_id*) g_try_malloc0_n(
-		ctx->num_devices, sizeof(cl_device_id));
-	gef_if_error_create_goto(*err, CL4_ERROR, ctx->devices == NULL, 
-		CL4_ERROR_NOALLOC, error_handler, 
-		"Function '%s': unable to allocate memory for devices.", 
-		__func__);
-	ocl_status = clGetContextInfo(ctx->context, CL_CONTEXT_DEVICES,
-		ctx->num_devices * sizeof(cl_device_id), ctx->devices, NULL);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_OCL_ERROR, error_handler, 
-		"Function '%s': get devices in context (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
+		/* Make sure devices in list are not NULL. */
+		g_return_val_if_fail(devices[i] != NULL, NULL);
+
+		/* Create new device wrapper, add it to list. */
+		ctx->devices[i] = cl4_device_new(devices[i]);
+
+	}
 		
 	/* Get context platform using first device. */
-	ocl_status = clGetDeviceInfo(ctx->devices[0], CL_DEVICE_PLATFORM,
-		sizeof(cl_platform_id), &(ctx->platform), NULL);
+	platform = (cl_platform_id) cl4_device_info_value(
+		ctx->devices[0], CL_DEVICE_PLATFORM, err);	
+	gef_if_err_goto(err, error_handler);
+	
+	/* Create a platform wrapper object and keep it. */
+	ctx->platform = cl4_platform_new(platform);
+
+	/* Set platform ID in context properties. */
+	ctx_props[1] = (cl_context_properties) platform;
+	
+	/* Create OpenCL context. */
+	ctx->context = clCreateContext(ctx_props, num_devices, devices, NULL,
+		NULL, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_OCL_ERROR, error_handler, 
-		"Function '%s': unable to get platform (OpenCL error %d: %s).", 
+		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
 	
 	/* If we got here, everything is OK. */
@@ -123,67 +128,32 @@ finish:
 	
 }
 
+
 void cl4_context_destroy(CL4Context* ctx) {
 	
-	/* Aux. var. */
-	unsigned int i;
-	
-	/* If scene is not NULL */
-	if (ctx) {
-		
-		/* Release kernels in ctx. */
-		for (i = 0; i < ctx->num_kernels; i++) {
-			/* Only release kernel if it's non-NULL */
-			if (ctx->kernels[i]) {
-				clReleaseKernel(ctx->kernels[i]);
-			}
-		}
-		/* Free kernel array. */
-		g_free(ctx->kernels);
-		
-		/* Release queues in ctx. */
-		for (i = 0; i < ctx->num_queues; i++) {
-			/* Only release queue if it's non-NULL */
-			if (ctx->queues[i]) {
-				clReleaseCommandQueue(ctx->queues[i]);
-			}
-		}
-		/* Free queue array. */
-		g_free(ctx->queues);
+	/* Make sure context wrapper object is not NULL. */
+	g_return_if_fail(ctx != NULL);
 
-		/* Release programs in ctx. */
-		for (i = 0; i < ctx->num_programs; i++) {
-			/* Only release program if it's non-NULL */
-			if (ctx->programs[i]) {
-				clReleaseProgram(ctx->programs[i]);
-			}
-		}
-		/* Free program array. */
-		g_free(ctx->programs);
-
-		/* Release devices in ctx. */
-		for (i = 0; i < ctx->num_devices; i++) {
-			/* Only release device if it's non-NULL */
-			if (ctx->devices[i]) {
-				clReleaseDevice(ctx->devices[i]);
-			}
-		}
-		/* Free device array. */
-		g_free(ctx->devices);
-
-		/* Release context. */
-		if (ctx->context) {
-			clReleaseContext(ctx->context);
-		}
-		
-		/* Release platform. */
-		if (ctx->platform) {
-			clReleasePlatform(ctx->platform);
-		}
-		
-		/* Release ctx. */
-		g_slice_free(CL4Context, ctx);
+	/* Release devices in ctx. */
+	for (guint i = 0; i < ctx->num_devices; i++) {
+		cl4_device_unref(ctx->devices[i]);
 	}
+	
+	/* Free device array. */
+	g_slice_free1(
+		ctx->num_devices * sizeof(CL4Device*), ctx->devices);
+              
+	/* Release context. */
+	if (ctx->context) {
+		clReleaseContext(ctx->context);
+	}
+	
+	/* Release platform. */
+	if (ctx->platform) {
+		cl4_platform_unref(ctx->platform);
+	}
+	
+	/* Release ctx. */
+	g_slice_free(CL4Context, ctx);
+
 }
-
-
