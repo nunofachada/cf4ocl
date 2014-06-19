@@ -473,7 +473,7 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 
 		/* Check that its a valid parameter, otherwise we have a 
 		 * programming error, so it is better to abort. */
-		g_assert_nonnull(info_row);
+		g_assert(info_row != NULL);
 		
 		/* Get parameter value for current info_map row. */
 		param_value = cl4_device_info(d, info_row->device_info, &err);

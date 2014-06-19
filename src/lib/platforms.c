@@ -178,7 +178,7 @@ guint cl4_platforms_count(CL4Platforms* platforms) {
 CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index) {
 	
 	/* Platforms object can't be NULL. */
-	g_return_val_if_fail(platforms != NULL, 0);
+	g_return_val_if_fail(platforms != NULL, NULL);
 
 	/* Index of platform to return must be smaller than the number of
 	 * available platforms. */
