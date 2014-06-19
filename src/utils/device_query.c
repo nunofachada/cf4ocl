@@ -34,6 +34,7 @@ static guint opt_platf = G_MAXUINT;
 static guint opt_dev = G_MAXUINT;
 static gboolean opt_nfound = FALSE;
 static gboolean opt_verb = FALSE;
+static gboolean opt_list = FALSE;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
@@ -45,6 +46,8 @@ static GOptionEntry entries[] = {
 	 "Show specific information, repeat as necessary",    "cl_device_info"},
 	{"device",   'd', 0, G_OPTION_ARG_INT,                &opt_dev,
 	 "Specify a device to query",                         "device"},
+	{"list",     'l', 0, G_OPTION_ARG_NONE,               &opt_list,
+	 "List known information parameters",                 NULL},
 	{"platform", 'p', 0, G_OPTION_ARG_INT,                &opt_platf,
 	 "Specify a platform to query",                       "platform"},
 	{"notfound", 'n', 0, G_OPTION_ARG_NONE,               &opt_nfound,
@@ -104,55 +107,82 @@ int main(int argc, char* argv[]) {
 	cl4_device_query_args_parse(argc, argv, &err);
 	gef_if_error_goto(err, CL4_ERROR_ARGS, status, error_handler);
 	
-	/* Get list of platform wrapper objects. */
-	platforms = cl4_platforms_new(&err);
-	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
-	
-	/* Cycle through platforms. */
-	for (guint i = 0; i < cl4_platforms_count(platforms); i++) {
+	/* Check if user requested a list of known information parameters. */
+	if (opt_list) {
 		
-		/* Get out if this platform is not to be queried. */
-		if ((opt_platf != G_MAXUINT) && (i != opt_platf))
-			continue;
+		/*Yes, user requested list, present it. */
 		
-		/* Get current platform. */
-		p = cl4_platforms_get_platform(platforms, i);
-		
-		/* Show platform information. */
-		g_fprintf(CL4_DEVICE_QUERY_OUT, "Platform #%d: ", i);
-		cl4_device_query_show_platform_info(p);
-		
-		/* Get number of devices. */
-		num_devs = cl4_platform_device_count(p, &err);
-		gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
-	
-		/* Cycle through devices. */
-		for (guint j = 0; j < num_devs; j++) {
-			
-			/* Get out if this device is not to be queried. */
-			if ((opt_dev != G_MAXUINT) && (j != opt_dev))
-				continue;
+		g_fprintf(CL4_DEVICE_QUERY_OUT, "\nKnown information parameters:\n\n");
+		for (gint i = 0; i < cl4_devquery_info_map_size; i++) {
+			if (opt_verb) {
+				g_fprintf(CL4_DEVICE_QUERY_OUT,	
+					"\t%s\n\t\t%s.\n\n", 
+					cl4_devquery_info_map[i].param_name,
+					cl4_devquery_info_map[i].description);
+			} else {
+				g_fprintf(CL4_DEVICE_QUERY_OUT,	
+					"\t%s\n", 
+					cl4_devquery_info_map[i].param_name);
+			}
+		}
+		g_fprintf(CL4_DEVICE_QUERY_OUT, "\n");
 
-			/* Get current device. */
-			d = cl4_platform_get_device(p, j, &err);
-			gef_if_error_goto(
-				err, GEF_USE_GERROR, status, error_handler);
+	} else {
+	
+		/* User didn't request list, proceed as normal query. */
+		
+		/* Get list of platform wrapper objects. */
+		platforms = cl4_platforms_new(&err);
+		gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+		
+		/* Cycle through platforms. */
+		for (guint i = 0; i < cl4_platforms_count(platforms); i++) {
+			
+			/* Get out if this platform is not to be queried. */
+			if ((opt_platf != G_MAXUINT) && (i != opt_platf))
+				continue;
+			
+			/* Get current platform. */
+			p = cl4_platforms_get_platform(platforms, i);
+			
+			/* Show platform information. */
+			cl4_device_query_show_platform_info(p, i);
+			
+			/* Get number of devices. */
+			num_devs = cl4_platform_device_count(p, &err);
+			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+		
+			/* Cycle through devices. */
+			for (guint j = 0; j < num_devs; j++) {
 				
-			/* Get device name. */
-			info_value = cl4_device_info(d, CL_DEVICE_NAME, &err);
-			gef_if_error_goto(
-				err, GEF_USE_GERROR, status, error_handler);
-			dev_name = (gchar*) info_value->value;
-			
-			/* Show device information. */
-			g_fprintf(CL4_DEVICE_QUERY_OUT, "\tDevice #%d: %s\n", j, dev_name);
-			if (opt_all)
-				cl4_device_query_show_device_info_all(d);
-			else if (opt_custom)
-				cl4_device_query_show_device_info_custom(d);
-			else
-				cl4_device_query_show_device_info_basic(d);
-			
+				/* Get out if this device is not to be queried. */
+				if ((opt_dev != G_MAXUINT) && (j != opt_dev))
+					continue;
+
+				/* Get current device. */
+				d = cl4_platform_get_device(p, j, &err);
+				gef_if_error_goto(
+					err, GEF_USE_GERROR, status, error_handler);
+					
+				/* Get device name. */
+				info_value = cl4_device_info(d, CL_DEVICE_NAME, &err);
+				gef_if_error_goto(
+					err, GEF_USE_GERROR, status, error_handler);
+				dev_name = (gchar*) info_value->value;
+				
+				/* Show device information. */
+				g_fprintf(CL4_DEVICE_QUERY_OUT, 
+					"\n\t[ Device #%d: %s ]\n\n", 
+					j, dev_name);
+				if (opt_all)
+					cl4_device_query_show_device_info_all(d);
+				else if (opt_custom)
+					cl4_device_query_show_device_info_custom(d);
+				else
+					cl4_device_query_show_device_info_basic(d);
+				
+			}
+			g_fprintf(CL4_DEVICE_QUERY_OUT,	"\n");
 		}
 	}
 	/* If we got here, everything is OK. */	
@@ -229,8 +259,9 @@ cleanup:
  * @brief Show platform information.
  * 
  * @param p Platform wrapper object.
+ * @param idx Platform index.
  * */
-void cl4_device_query_show_platform_info(CL4Platform* p) {
+void cl4_device_query_show_platform_info(CL4Platform* p, guint idx) {
 
 	/* Platform info variables. */
 	gchar *profile, *version, *name, *vendor;
@@ -267,12 +298,26 @@ void cl4_device_query_show_platform_info(CL4Platform* p) {
 	}
 
 	/*  Send info to defined stream. */
-	g_fprintf(CL4_DEVICE_QUERY_OUT, "%s (%s) [%s, %s]\n",
-		name, vendor, version, profile);
+	g_fprintf(CL4_DEVICE_QUERY_OUT, "\n* Platform #%d: %s (%s)\n               %s, %s\n",
+		idx, name, vendor, version, profile);
 	
 	/* Bye. */
 	return;
 }
+
+#define cl4_device_query_output_device_info(key, value, desc) \
+	if (opt_verb) { \
+		g_fprintf(CL4_DEVICE_QUERY_OUT, \
+			"\t\t   Parameter : %s\n" \
+			"\t\t Description : %s\n" \
+			"\t\t       Value : %s\n\n", \
+			key, desc, value); \	
+	} else { \
+		g_fprintf(CL4_DEVICE_QUERY_OUT, \
+			"\t\t %-40.40s | %s\n", \
+			key, value); \
+	}
+	
 
 /**
  * @brief Show all available device information.
@@ -301,21 +346,26 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 		if (err == NULL) {
 			
 			/* If no error, show current parameter value... */
-			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
+			cl4_device_query_output_device_info(
 				cl4_devquery_info_map[k].param_name, 
 				cl4_devquery_info_map[k].format(
-				param_value, param_value_str, 
+					param_value, param_value_str, 
 					CL4_DEVICE_QUERY_MAXINFOLEN,
-					cl4_devquery_info_map[k].units));
+					cl4_devquery_info_map[k].units),
+				cl4_devquery_info_map[k].description);
+				
 		} else {
 			
 			/* ...otherwise clear error... */
 			g_clear_error(&err);
-			if (opt_nfound)
+			if (opt_nfound) {
 				/* ...and show that parameter is not available, if user 
 				 * requested so. */
-				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s", 
-					cl4_devquery_info_map[k].param_name, "N/A\n");
+				cl4_device_query_output_device_info(
+					cl4_devquery_info_map[k].param_name,
+					CL4_DEVICE_QUERY_DEVINFO_NA,
+					cl4_devquery_info_map[k].description);
+			}
 		}
 	}
 
@@ -363,23 +413,28 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 			if (err == NULL) {
 
 				/* If no error, show current parameter value... */
-				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
-					info_row->param_name, 
+				cl4_device_query_output_device_info(
+					info_row->param_name,
 					info_row->format(
 						param_value, param_value_str, 
 						CL4_DEVICE_QUERY_MAXINFOLEN,
-						info_row->units));
+						info_row->units),
+					info_row->description);
+
+
 						
 			} else {
 				
 				/* ...otherwise clear error... */
 				g_clear_error(&err);
-				if (opt_nfound)
+				if (opt_nfound) {
 					/* ...and show that parameter is not available, if user 
 					* requested so. */
-					g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
-						info_row->param_name, "N/A");
-				
+					cl4_device_query_output_device_info(
+						info_row->param_name,
+						CL4_DEVICE_QUERY_DEVINFO_NA,
+						info_row->description);
+				}
 			}
 			
 			/* Get next row. */
@@ -427,23 +482,26 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 		if (err == NULL) {
 
 			/* If no error, show current parameter value... */
-			g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
-				info_row->param_name, 
+			cl4_device_query_output_device_info(
+				info_row->param_name,
 				info_row->format(
 					param_value, param_value_str, 
 					CL4_DEVICE_QUERY_MAXINFOLEN,
-					info_row->units));
-					
+					info_row->units),
+				info_row->description);
+
 		} else {
 
 			/* ...otherwise clear error... */
 			g_clear_error(&err);
-			if (opt_nfound)
+			if (opt_nfound) {
 				/* ...and show that parameter is not available, if user 
 				 * requested so. */
-				g_fprintf(CL4_DEVICE_QUERY_OUT, "\t\t%s : %s\n", 
-					info_row->param_name, "N/A");
-			
+				cl4_device_query_output_device_info(
+					info_row->param_name,
+					CL4_DEVICE_QUERY_DEVINFO_NA,
+					info_row->description);
+			}
 		}
 		
 	}

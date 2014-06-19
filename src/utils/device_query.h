@@ -37,8 +37,12 @@
 	/** Default device information output stream. */
 	#define CL4_DEVICE_QUERY_OUT stdout
 #endif
-/** Program description. */
 
+#ifndef CL4_DEVICE_QUERY_DEVINFO_NA
+	#define CL4_DEVICE_QUERY_DEVINFO_NA "N/A"
+#endif
+
+/** Program description. */
 #define CL4_DEVICE_QUERY_DESCRIPTION "Utility for querying OpenCL \
 platforms and devices"
 
@@ -49,7 +53,7 @@ platforms and devices"
 void cl4_device_query_args_parse(int argc, char* argv[], GError** err);
 
 /** @brief Show platform information. */
-void cl4_device_query_show_platform_info(CL4Platform* p);
+void cl4_device_query_show_platform_info(CL4Platform* p, guint idx);
 
 /** @brief Show all available device information. */
 void cl4_device_query_show_device_info_all(CL4Device* d);
