@@ -429,7 +429,7 @@ static void context_create_info_destroy_test() {
 	
 	d_id = cl4_device_id(d);
 		
-	ctx = cl4_context_new(1, &d_id, &err);	
+	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);	
 	g_assert_no_error(err);	
 	
 	cl4_platforms_destroy(ps);

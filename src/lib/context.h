@@ -48,9 +48,14 @@
  * */
 typedef struct cl4_context CL4Context;
 
-CL4Context* cl4_context_new(cl_uint num_devices, 
+/** @brief Creates a context wrapper given a list of cl_device_id's. */
+CL4Context* cl4_context_new_from_cldevices(cl_uint num_devices, 
 	const cl_device_id *devices, GError **err);
 
-void cl4_context_destroy(CL4Context* ctx);
+/** @brief Creates a context wrapper from a cl_context object. */
+CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err);
+
+/** @brief Destroy a context wrapper object. */
+ void cl4_context_destroy(CL4Context* ctx);
 
 #endif

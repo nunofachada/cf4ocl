@@ -46,7 +46,19 @@ struct cl4_context {
 	
 };
 
-CL4Context* cl4_context_new(cl_uint num_devices, 
+/**
+ * @brief Creates a context wrapper given a list of cl_device_id's.
+ * 
+ * This function obtains the cl_platform_id object from the first
+ * device and uses no special cl_context_properties.
+ * 
+ * @param num_devices Number of cl_devices_id's in list.
+ * @param devices List of cl_device_id's.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object.
+ * */
+CL4Context* cl4_context_new_from_cldevices(cl_uint num_devices, 
 	const cl_device_id *devices, GError **err) {
 
 	/* Make sure number of devices is not zero. */
@@ -132,7 +144,28 @@ finish:
 	
 }
 
+/** 
+ * @brief Creates a context wrapper from a cl_context object.
+ * 
+ * This function is useful when the client wants more control over the
+ * cl_context object creation.
+ * 
+ * @param ctx The OpenCL cl_context object to wrap.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object.
+ * */
+CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err) {
 
+	/// @todo
+	return NULL;
+}
+
+/**
+ * @brief Destroy a context wrapper object.
+ * 
+ * @param ctx Context wrapper object to destroy.
+ * */
 void cl4_context_destroy(CL4Context* ctx) {
 	
 	/* Make sure context wrapper object is not NULL. */
