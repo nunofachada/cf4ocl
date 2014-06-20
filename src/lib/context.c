@@ -94,8 +94,8 @@ CL4Context* cl4_context_new(cl_uint num_devices,
 	}
 		
 	/* Get context platform using first device. */
-	platform = (cl_platform_id) cl4_device_info_value(
-		ctx->devices[0], CL_DEVICE_PLATFORM, &err_internal);	
+	platform = *((cl_platform_id*) cl4_device_info_value(
+		ctx->devices[0], CL_DEVICE_PLATFORM, &err_internal));
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Create a platform wrapper object and keep it. */
@@ -120,8 +120,6 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 
-	printf("\n\n******** %s *********\n\n", err->message);
-	
 	/* Destroy the ctx, or what was possible to build of it. */
 	if (ctx != NULL)
 		cl4_context_destroy(ctx);
@@ -129,8 +127,6 @@ error_handler:
 
 finish:	
 
-	printf("\n\n******** %p *********\n\n", (void*) ctx);
-	
 	/* Return ctx. */
 	return ctx;
 	

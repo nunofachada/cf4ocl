@@ -33,15 +33,6 @@
 /* Max. length of information string. */
 #define CL4_TEST_WRAPPERS_MAXINFOSTR 200
 
-/* Macro for error checking. */
-#define cl4_test_wrappers_checkerror(err) \
-	if (err != NULL) { \
-		g_test_message("Test failed due to following error: %s", \
-			err->message); \
-		g_clear_error(&err); \
-		g_test_fail(); \
-	}
-
 /* Test utility macro. Presents either the required information, or 
  * the error message, if it occurred. Also frees the error object if 
  * an error occurred. */
@@ -74,7 +65,7 @@ static void platforms_create_info_destroy_test() {
 
 	/* Get platforms. */
 	platfs = cl4_platforms_new(&err);
-	cl4_test_wrappers_checkerror(err);
+	g_assert_no_error(err);
 	
 	/* Number of platforms. */
 	num_platfs = cl4_platforms_count(platfs);
@@ -373,7 +364,7 @@ static void platforms_ref_unref_test() {
 
 	/* Get platforms. */
 	platfs = cl4_platforms_new(&err);
-	cl4_test_wrappers_checkerror(err);		
+	g_assert_no_error(err);		
 	
 	/* Use first device of first platform. */
 	p = cl4_platforms_get_platform(platfs, 0);
@@ -417,18 +408,18 @@ static void context_create_info_destroy_test() {
 	cl_device_id d_id = NULL;
 	
 	ps = cl4_platforms_new(&err);
-	cl4_test_wrappers_checkerror(err);
+	g_assert_no_error(err);
 
 	p = cl4_platforms_get_platform(ps, 0);
 	g_assert(p != NULL);
 	
 	d = cl4_platform_get_device(p, 0, &err);
-	cl4_test_wrappers_checkerror(err);
+	g_assert_no_error(err);
 	
 	d_id = cl4_device_id(d);
 		
 	ctx = cl4_context_new(1, &d_id, &err);	
-	cl4_test_wrappers_checkerror(err);	
+	g_assert_no_error(err);	
 	
 	cl4_platforms_destroy(ps);
 	cl4_context_destroy(ctx);
