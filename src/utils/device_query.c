@@ -311,7 +311,7 @@ void cl4_device_query_show_platform_info(CL4Platform* p, guint idx) {
 			"\t\t   Parameter : %s\n" \
 			"\t\t Description : %s\n" \
 			"\t\t       Value : %s\n\n", \
-			key, desc, value); \	
+			key, desc, value); \
 	} else { \
 		g_fprintf(CL4_DEVICE_QUERY_OUT, \
 			"\t\t %-40.40s | %s\n", \
