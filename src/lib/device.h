@@ -39,6 +39,48 @@
     #include <CL/opencl.h>
 #endif
 
+/** 
+ * @brief Macro which returns a scalar device information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param device The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested device information value. This 
+ * value will be automatically freed when the device wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_device_info_value_scalar(device, param_name, param_type, err) \
+	(cl4_device_info_value(device, param_name, err) != NULL ? \
+		*((param_type*) (cl4_device_info_value(device, param_name, err))) : \
+		0)
+
+/** 
+ * @brief Macro which returns an array device information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param device The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested device information value. This 
+ * value will be automatically freed when the device wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+ #define cl4_device_info_value_array(device, param_name, param_type, err) \
+	(cl4_device_info_value(device, param_name, err) != NULL ? \
+		(param_type) (cl4_device_info_value(device, param_name, err)) : \
+		NULL)
+		
 /** @brief Device wrapper object. */
 typedef struct cl4_device CL4Device;
 
@@ -73,7 +115,7 @@ gint cl4_device_ref_count(CL4Device* device);
 CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 
-/** @brief Get device information value. */
+/** @brief Get pointer to device information value. */
 gpointer cl4_device_info_value(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 

@@ -267,14 +267,14 @@ finish:
 }
 
 /** 
- * @brief Get device information value.
+ * @brief Get pointer to device information value.
  * 
  * @param device The device wrapper object.
  * @param param_name Name of information/parameter to get value of.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested device information value. This value will
- * be automatically freed when the device wrapper object is 
+ * @return A pointer to the requested device information value. This 
+ * value will be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
 gpointer cl4_device_info_value(CL4Device* device, 

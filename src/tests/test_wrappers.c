@@ -62,6 +62,9 @@ static void platforms_create_info_destroy_test() {
 	guint num_devs;
 	guint num_platfs;
 	gchar info_str[CL4_TEST_WRAPPERS_MAXINFOSTR];
+	
+	char* info_check_array;
+	cl_uint info_check_scalar;
 
 	/* Get platforms. */
 	platfs = cl4_platforms_new(&err);
@@ -328,8 +331,16 @@ static void platforms_create_info_destroy_test() {
 				info = cl4_device_info(d, CL_DEVICE_VENDOR, &err);
 				cl4_test_wrappers_msg("...... Vendor :", "%s", (gchar*) info->value);
 
+				/* Special check for info_value_array macro. */
+				info_check_array = cl4_device_info_value_array(d, CL_DEVICE_VENDOR, char*, &err);
+				g_assert_cmpstr((char*) info->value, ==, info_check_array);
+
 				info = cl4_device_info(d, CL_DEVICE_VENDOR_ID, &err);
 				cl4_test_wrappers_msg("...... Vendor ID :", "%x", *((cl_uint*) info->value));
+
+				/* Special check for info_value_scalar macro. */
+				info_check_scalar = cl4_device_info_value_scalar(d, CL_DEVICE_VENDOR_ID, cl_uint, &err);
+				g_assert_cmphex(info_check_scalar, ==, *((cl_uint*) info->value));
 
 				info = cl4_device_info(d, CL_DEVICE_VERSION, &err);
 				cl4_test_wrappers_msg("...... Device version :", "%s", (gchar*) info->value);
