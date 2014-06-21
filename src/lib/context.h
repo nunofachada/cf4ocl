@@ -48,6 +48,10 @@
  * */
 typedef struct cl4_context CL4Context;
 
+#define cl4_context_new_from_filters(num_filters, filters, err) \
+	cl4_context_new_from_filters_full( \
+		NULL, (num_filters), (filters), NULL, NULL, (err))
+
 /** @brief Macro to create a context wrapper given a list of 
  * cl_device_id's.
  * 
@@ -64,6 +68,13 @@ typedef struct cl4_context CL4Context;
 	cl4_context_new_from_cldevices_full( \
 		NULL, (num_devices), (devices), NULL, NULL, (err))
 
+CL4Context* cl4_context_new_from_filters_full(
+	const cl_context_properties* properties, 
+	guint num_filters, 
+	cl4_devsel* filters,
+	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+    void* user_data,
+	GError **err);
 
 /** @brief Creates a context wrapper using the exact parameters received
  * by the clCreateContext function. */

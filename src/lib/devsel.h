@@ -18,8 +18,7 @@
 
 /**
  * @file
- * @brief Functions for selection OpenCL devices and the associated 
- * context.
+ * @brief Functions for filtering and selecting OpenCL devices.
  *
  * @author Nuno Fachada
  * @date 2014
@@ -36,7 +35,6 @@
 #endif
 #include <glib.h>
 
-typedef struct cl4_devsel_map CL4DevSelMap;
 
 /**
  * @brief Abstract function for selecting OpenCL devices and the 
@@ -48,10 +46,5 @@ typedef struct cl4_devsel_map CL4DevSelMap;
  * @return An OpenCL context or NULL if no adequate context was found.
  */
 typedef cl4_platform (*cl4_devsel)(void *select_info, GError **err);
-
-/** @brief Implementation of ::cl4_devsel function which selects one or
- * more devices based on device information such as device name, device 
- * vendor and platform name. */
-GHashTable* cl4_devsel_name(void *select_info, GError **err);
 
 #endif

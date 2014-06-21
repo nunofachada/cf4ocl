@@ -46,53 +46,143 @@ struct cl4_context {
 	
 };
 
-//~ CL4Context* cl4_context_new(
-	//~ cl4_devsel* filters, guint num_filters, GError **err) {
-//~ 
-	//~ /* Make sure number ds is not NULL. */
-	//~ g_return_val_if_fail(num_devices > 0, NULL);
-	//~ 
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-//~ 
-	//~ /* Error reporting object. */
-	//~ GError* err_internal = NULL;
-	//~ 
-	//~ /* Complete list of devices. */
-	//~ GSList* devices = NULL;  
-	//~ 
-	//~ /* Context wrapper to create. */
-	//~ CL4Context* ctx;
-//~ 
-	//~ /* Initialize complete list of devices. */
-	//~ devices = cl4_devsel_list(&err_internal);
-	//~ 
-	//~ /* Filter devices. */
-	//~ for (guint i = 0; i < num_filters; i++) {
-		//~ devices = filters[i](devices, &err_internal);
-	//~ }
-	//~ 
-	//~ /* Create context wrapper object with remaining devices. */
-	//~ 
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-//~ 
-	//~ /* Destroy the ctx, or what was possible to build of it. */
-	//~ if (ctx != NULL)
-		//~ cl4_context_destroy(ctx);
-	//~ ctx = NULL;
-//~ 
-//~ finish:
-//~ 
-	//~ /* Free list of devices. */
-	//~ if (devices != NULL)
-		//~ g_slist_free(devices);
-//~ 
-	//~ /* Return ctx. */
-	//~ return ctx;
-//~ }
+/** 
+ * @brief Returns a list of all available devices, wrapped in CL4Device
+ * wrapper objects. 
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A list of all available devices, wrapped in CL4Device
+ * wrapper objects.
+ * */
+static GSList* cl4_context_device_list(GError** err) {
+
+	CL4Platforms* platforms = NULL;
+	CL4Platform* platform = NULL;
+	CL4Device* device = NULL;
+	guint num_platfs;
+	guint num_devs;
+	GError* err = NULL;
+	GSList* devices = NULL;
+	
+	platforms = cl4_platforms_new(&err);
+	/// @todo Check error
+	
+	num_platfs = cl4_platforms_count(platforms);
+	
+	for (guint i = 0; i < num_platfs; i++) {
+		
+		platform = cl4_platforms_get_platform(platforms, i);
+		
+		num_devs = cl4_platform_device_count(platform, &err);
+		/// @todo Check error
+		
+		for (guint j = 0; j < num_devs; j++) {
+			
+			device = cl4_platform_get_device(platform, j, &err);
+			/// @todo Check error
+			
+			cl4_device_ref(device);
+			
+			devices = g_slist_prepend(devices, (gpointer) device);
+			
+		} 
+		
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:
+
+	/* Free allocated stuff. */
+	cl4_platforms_destroy(platforms);
+
+	/* Return ctx. */
+	return devices;
+
+}
+
+CL4Context* cl4_context_new_from_filters_full(
+	const cl_context_properties* properties, 
+	guint num_filters, 
+	cl4_devsel* filters,
+	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+    void* user_data,
+	GError **err) {
+
+	/* Make sure number ds is not NULL. */
+	g_return_val_if_fail(num_devices > 0, NULL);
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+	
+	/* Complete list of devices. */
+	GSList* devices = NULL;
+	
+	/* Number of selected devices. */
+	guint num_devs;
+	
+	/* Array of selected/filtered devices (unwrapped). */
+	cl_device_id* cl_devices = NULL;
+	
+	/* Context wrapper to create. */
+	CL4Context* ctx = NULL;
+
+	/* Initialize complete list of devices. */
+	devices = cl4_context_device_list(&err_internal);
+	/// @todo Check error
+	
+	/* Filter devices. */
+	for (guint i = 0; i < num_filters; i++) {
+		devices = filters[i](devices, &err_internal);
+		/// @todo Check error
+	}
+	
+	/* Count remaining/selected devices. */
+	num_devs = g_slist_length(devices);
+	
+	/* Create an array for the selected devices. */
+	cl_devices = g_slice_alloc(num_devs * sizeof(cl_device_id));
+	
+	/* Unwrap selected devices and add them to array. */
+	for (guint i = 0; i < num_devs; i++) {
+		
+	}
+	  
+	/* Create context. */
+	
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+	/* Destroy the ctx, or what was possible to build of it. */
+	if (ctx != NULL)
+		cl4_context_destroy(ctx);
+	ctx = NULL;
+
+finish:
+
+	/* Free list of devices. */
+	if (devices != NULL)
+		g_slist_free(devices);
+
+	/* Return ctx. */
+	return ctx;
+}
 
 /**
  * @brief Creates a context wrapper using the exact parameters received
