@@ -48,9 +48,33 @@
  * */
 typedef struct cl4_context CL4Context;
 
-/** @brief Creates a context wrapper given a list of cl_device_id's. */
-CL4Context* cl4_context_new_from_cldevices(cl_uint num_devices, 
-	const cl_device_id *devices, GError **err);
+/** @brief Macro to create a context wrapper given a list of 
+ * cl_device_id's.
+ * 
+ * This macro simply calls cl4_context_new_from_cldevices_full()
+ * setting properties, callback and user data to NULL.
+ * 
+ * @param num_devices Number of cl_devices_id's in list.
+ * @param devices List of cl_device_id's.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object.
+ * */
+#define cl4_context_new_from_cldevices(num_devices, devices, err) \
+	cl4_context_new_from_cldevices_full( \
+		NULL, (num_devices), (devices), NULL, NULL, (err))
+
+
+/** @brief Creates a context wrapper using the exact parameters received
+ * by the clCreateContext function. */
+CL4Context* cl4_context_new_from_cldevices_full(
+	const cl_context_properties* properties, 
+	cl_uint num_devices,
+	const cl_device_id* devices,
+	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+    void* user_data,
+    GError** err);
+
 
 /** @brief Creates a context wrapper from a cl_context object. */
 CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err);

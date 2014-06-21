@@ -46,62 +46,80 @@ struct cl4_context {
 	
 };
 
-CL4Context* cl4_context_new(
-	cl4_devsel* filters, guint num_filters, GError **err) {
-
-	/* Make sure number ds is not NULL. */
-	g_return_val_if_fail(num_devices > 0, NULL);
-	
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
-	/* Error reporting object. */
-	GError* err_internal = NULL;
-	
-	GSList* devices = NULL;  
-	
-	CL4Context* ctx;
-
-	devices = cl4_devsel_list(&err_internal);
-	
-	for (guint i = 0; i < num_filters; i++) {
-		devices = filters[i](devices, &err_internal);
-	}
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy the ctx, or what was possible to build of it. */
-	if (ctx != NULL)
-		cl4_context_destroy(ctx);
-	ctx = NULL;
-
-finish:
-
-	/* Free list of devices. */
-	if (devices != NULL)
-		g_slist_free(devices);
-
-	/* Return ctx. */
-	return ctx;
-}
-
+//~ CL4Context* cl4_context_new(
+	//~ cl4_devsel* filters, guint num_filters, GError **err) {
+//~ 
+	//~ /* Make sure number ds is not NULL. */
+	//~ g_return_val_if_fail(num_devices > 0, NULL);
+	//~ 
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+//~ 
+	//~ /* Error reporting object. */
+	//~ GError* err_internal = NULL;
+	//~ 
+	//~ /* Complete list of devices. */
+	//~ GSList* devices = NULL;  
+	//~ 
+	//~ /* Context wrapper to create. */
+	//~ CL4Context* ctx;
+//~ 
+	//~ /* Initialize complete list of devices. */
+	//~ devices = cl4_devsel_list(&err_internal);
+	//~ 
+	//~ /* Filter devices. */
+	//~ for (guint i = 0; i < num_filters; i++) {
+		//~ devices = filters[i](devices, &err_internal);
+	//~ }
+	//~ 
+	//~ /* Create context wrapper object with remaining devices. */
+	//~ 
+	//~ 
+//~ error_handler:
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert (err == NULL || *err != NULL);
+//~ 
+	//~ /* Destroy the ctx, or what was possible to build of it. */
+	//~ if (ctx != NULL)
+		//~ cl4_context_destroy(ctx);
+	//~ ctx = NULL;
+//~ 
+//~ finish:
+//~ 
+	//~ /* Free list of devices. */
+	//~ if (devices != NULL)
+		//~ g_slist_free(devices);
+//~ 
+	//~ /* Return ctx. */
+	//~ return ctx;
+//~ }
 
 /**
- * @brief Creates a context wrapper given a list of cl_device_id's.
+ * @brief Creates a context wrapper using the exact parameters received
+ * by the clCreateContext function.
  * 
- * This function obtains the cl_platform_id object from the first
- * device and uses no special cl_context_properties.
+ * If the properties parameter is NULL, this function obtains the 
+ * cl_platform_id object from the first device.
  * 
+ * @param properties
  * @param num_devices Number of cl_devices_id's in list.
  * @param devices List of cl_device_id's.
+ * @param pfn_notify
+ * @param user_data
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return A new context wrapper object.
  * */
-CL4Context* cl4_context_new_from_cldevices(cl_uint num_devices, 
-	const cl_device_id *devices, GError **err) {
+CL4Context* cl4_context_new_from_cldevices_full(
+	const cl_context_properties* properties, 
+	cl_uint num_devices,
+	const cl_device_id* devices,
+	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+    void* user_data,
+    GError** err) {
+		
+	/// @todo Ignored for now
+	properties = properties;
 
 	/* Make sure number of devices is not zero. */
 	g_return_val_if_fail(num_devices > 0, NULL);
@@ -124,7 +142,7 @@ CL4Context* cl4_context_new_from_cldevices(cl_uint num_devices,
 	/* OpenCL platform ID. */
 	cl_platform_id platform = NULL;
 	
-	/* Context properties. */
+	/* Default context properties. */
 	cl_context_properties ctx_props[3] = {CL_CONTEXT_PLATFORM, 0, 0};
 	
 	/* Create ctx. */
@@ -159,8 +177,8 @@ CL4Context* cl4_context_new_from_cldevices(cl_uint num_devices,
 	ctx_props[1] = (cl_context_properties) platform;
 	
 	/* Create OpenCL context. */
-	ctx->context = clCreateContext(ctx_props, num_devices, devices, NULL,
-		NULL, &ocl_status);
+	ctx->context = clCreateContext(ctx_props, num_devices, devices, 
+		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_OCL_ERROR, error_handler, 
 		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
@@ -186,22 +204,22 @@ finish:
 	
 }
 
-/** 
- * @brief Creates a context wrapper from a cl_context object.
- * 
- * This function is useful when the client wants more control over the
- * cl_context object creation.
- * 
- * @param ctx The OpenCL cl_context object to wrap.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return A new context wrapper object.
- * */
-CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err) {
-
-	/// @todo
-	return NULL;
-}
+//~ /** 
+ //~ * @brief Creates a context wrapper from a cl_context object.
+ //~ * 
+ //~ * This function is useful when the client wants more control over the
+ //~ * cl_context object creation.
+ //~ * 
+ //~ * @param ctx The OpenCL cl_context object to wrap.
+ //~ * @param err Return location for a GError, or NULL if error reporting
+ //~ * is to be ignored.
+ //~ * @return A new context wrapper object.
+ //~ * */
+//~ CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err) {
+//~ 
+	//~ /// @todo
+	//~ return NULL;
+//~ }
 
 /**
  * @brief Destroy a context wrapper object.
