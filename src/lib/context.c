@@ -46,6 +46,48 @@ struct cl4_context {
 	
 };
 
+CL4Context* cl4_context_new(
+	cl4_devsel* filters, guint num_filters, GError **err) {
+
+	/* Make sure number ds is not NULL. */
+	g_return_val_if_fail(num_devices > 0, NULL);
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+	
+	GSList* devices = NULL;  
+	
+	CL4Context* ctx;
+
+	devices = cl4_devsel_list(&err_internal);
+	
+	for (guint i = 0; i < num_filters; i++) {
+		devices = filters[i](devices, &err_internal);
+	}
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+	/* Destroy the ctx, or what was possible to build of it. */
+	if (ctx != NULL)
+		cl4_context_destroy(ctx);
+	ctx = NULL;
+
+finish:
+
+	/* Free list of devices. */
+	if (devices != NULL)
+		g_slist_free(devices);
+
+	/* Return ctx. */
+	return ctx;
+}
+
+
 /**
  * @brief Creates a context wrapper given a list of cl_device_id's.
  * 
