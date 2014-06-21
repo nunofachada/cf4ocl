@@ -118,9 +118,6 @@ CL4Context* cl4_context_new_from_cldevices_full(
     void* user_data,
     GError** err) {
 		
-	/// @todo Ignored for now
-	properties = properties;
-
 	/* Make sure number of devices is not zero. */
 	g_return_val_if_fail(num_devices > 0, NULL);
 	
@@ -136,14 +133,17 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	/* Error reporting object. */
 	GError* err_internal = NULL;
 	
+	/* Context properties, in case the properties parameter is NULL. */
+	cl_context_properties* ctx_props = NULL;
+	
+	/* Was memory allocated for ctx_props? */
+	gboolean ctx_props_alloc = FALSE;
+	
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
 	
 	/* OpenCL platform ID. */
 	cl_platform_id platform = NULL;
-	
-	/* Default context properties. */
-	cl_context_properties ctx_props[3] = {CL_CONTEXT_PLATFORM, 0, 0};
 	
 	/* Create ctx. */
 	ctx = g_slice_new0(CL4Context);
@@ -165,19 +165,36 @@ CL4Context* cl4_context_new_from_cldevices_full(
 
 	}
 		
-	/* Get context platform using first device. */
-	platform = *((cl_platform_id*) cl4_device_info_value(
-		ctx->devices[0], CL_DEVICE_PLATFORM, &err_internal));
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	/* If the properties parameter is NULL, assume some default context 
+	 * properties. */
+	if (properties == NULL) {
+		
+		/* Allocate memory for default properties. */
+		ctx_props = g_slice_alloc(3 * sizeof(cl_context_properties));
+		ctx_props_alloc = TRUE;
+
+		/* Get context platform using first device. */
+		platform = *((cl_platform_id*) cl4_device_info_value(
+			ctx->devices[0], CL_DEVICE_PLATFORM, &err_internal));
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+		/* Set context properties using discovered platform. */
+		ctx_props[0] = CL_CONTEXT_PLATFORM;
+		ctx_props[1] = (cl_context_properties) platform;
+		ctx_props[2] = 0;
+		
+	} else {
+		
+		/* If properties parameter is not NULL, use it. */
+		ctx_props = (cl_context_properties*) properties;
+	}
 	
 	/* Create a platform wrapper object and keep it. */
 	ctx->platform = cl4_platform_new(platform);
-
-	/* Set platform ID in context properties. */
-	ctx_props[1] = (cl_context_properties) platform;
 	
 	/* Create OpenCL context. */
-	ctx->context = clCreateContext(ctx_props, num_devices, devices, 
+	ctx->context = clCreateContext(
+		(const cl_context_properties*) ctx_props, num_devices, devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_OCL_ERROR, error_handler, 
@@ -197,8 +214,12 @@ error_handler:
 		cl4_context_destroy(ctx);
 	ctx = NULL;
 
-finish:	
+finish:
 
+	/* Free stuff. */
+	if (ctx_props_alloc) g_slice_free1(
+		3 * sizeof(cl_context_properties), ctx_props);
+	
 	/* Return ctx. */
 	return ctx;
 	
