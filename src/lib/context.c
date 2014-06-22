@@ -103,8 +103,8 @@ finish:
 	/* Free allocated stuff. */
 	cl4_platforms_destroy(platforms);
 
-	/* Return ctx. */
-	return devices;
+	/* Return device list. */
+	return g_slist_reverse(devices);
 
 }
 
@@ -137,7 +137,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	/* Context wrapper to create. */
 	CL4Context* ctx = NULL;
 
-	/* Initialize complete list of devices. */
+	/* Get complete list of devices. */
 	devices = cl4_context_device_list(&err_internal);
 	/// @todo Check error
 	
@@ -155,7 +155,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	
 	/* Unwrap selected devices and add them to array. */
 	for (guint i = 0; i < num_devs; i++) {
-		
+		cl_devices[i] = cl4_device_id(devices[i]);
 	}
 	  
 	/* Create context. */
