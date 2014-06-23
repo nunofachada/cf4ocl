@@ -135,7 +135,17 @@ CL4Context* cl4_context_new_from_filters_full(
 
 	/* Get selected/filtered devices. */
 	devices = cl4_devsel_select(filters, &err_internal);
-	/// @todo Check error
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Check if any device was found. */
+	gef_if_error_create_goto(*err, CL4_ERROR, devices->len == 0, 
+		CL4_ERROR_DEVICE_NOT_FOUND, error_handler, 
+		"Function '%s': no device found for selected filters.", 
+		__func__);
+
+	/* Set device wrappers. */
+	ctx->devices = (CL4Device**) devices->pdata;
+	ctx->num_devices = devices->len;
 	
 	/* Create an array for the selected cl_device_id's. */
 	cl_devices = g_slice_alloc(devices->len * sizeof(cl_device_id));
@@ -167,14 +177,9 @@ CL4Context* cl4_context_new_from_filters_full(
 		(const cl_context_properties*) ctx_props, devices->len, cl_devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_OCL_ERROR, error_handler, 
+		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
-
-
-	/* Set device wrappers. */
-	ctx->devices = (CL4Device**) devices->pdata;
-	ctx->num_devices = devices->len;
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -283,7 +288,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 		(const cl_context_properties*) ctx_props, num_devices, devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_OCL_ERROR, error_handler, 
+		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
 	

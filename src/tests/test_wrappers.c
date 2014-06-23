@@ -417,7 +417,9 @@ static void context_create_info_destroy_test() {
 	CL4Platform* p = NULL;
 	CL4Device* d = NULL;
 	cl_device_id d_id = NULL;
+	CL4DevSelFilters filters = NULL;
 	
+	/* Test context creating from cl_devices. */
 	ps = cl4_platforms_new(&err);
 	g_assert_no_error(err);
 
@@ -429,11 +431,30 @@ static void context_create_info_destroy_test() {
 	
 	d_id = cl4_device_id(d);
 		
-	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);	
+	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);
 	g_assert_no_error(err);	
 	
 	cl4_platforms_destroy(ps);
 	cl4_context_destroy(ctx);
+
+	/* Test context creating by device filtering. */
+	cl4_devsel_add_filter(&filters, cl4_devsel_gpu, NULL);
+	
+	ctx = cl4_context_new_from_filters(&filters, &err);
+	g_assert((err != NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+
+	if (err) g_clear_error(&err);
+	else cl4_context_destroy(ctx);
+	filters = NULL;
+
+	cl4_devsel_add_filter(&filters, cl4_devsel_cpu, NULL);
+	
+	ctx = cl4_context_new_from_filters(&filters, &err);
+	g_assert((err != NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+
+	if (err) g_clear_error(&err);
+	else cl4_context_destroy(ctx);
+	filters = NULL;
 
 }
 

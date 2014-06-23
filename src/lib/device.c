@@ -223,11 +223,11 @@ CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device,
 		ocl_status = clGetDeviceInfo(
 			device->id, param_name, 0, NULL, &size_ret);
 		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_OCL_ERROR, error_handler, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get device info [size] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		gef_if_error_create_goto(*err, CL4_ERROR, 
-			size_ret == 0, CL4_OCL_ERROR, error_handler, 
+			size_ret == 0, CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get device info [size] (size is 0).",
 			__func__);
 		
@@ -238,7 +238,7 @@ CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device,
 		ocl_status = clGetDeviceInfo(
 			device->id, param_name, size_ret, param_value, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_OCL_ERROR, error_handler, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get device info [info] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 			

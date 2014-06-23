@@ -72,7 +72,7 @@ static void cl4_plaform_init_devices(
 		ocl_status = clGetDeviceIDs(platform->id, CL_DEVICE_TYPE_ALL, 0,
 			NULL, &platform->num_devices);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_OCL_ERROR, error_handler, 
+			CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get number of devices (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
@@ -86,7 +86,7 @@ static void cl4_plaform_init_devices(
 		ocl_status = clGetDeviceIDs(platform->id, CL_DEVICE_TYPE_ALL, 
 			platform->num_devices, dev_ids, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_OCL_ERROR, error_handler, 
+			CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get device IDs (OpenCL error %d: %s).",
 		__func__, ocl_status, cl4_err(ocl_status));
 		
@@ -288,7 +288,7 @@ gchar* cl4_platform_info(CL4Platform* platform,
 		ocl_status = clGetPlatformInfo(
 			platform->id, param_name, 0, NULL, &size_ret);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_OCL_ERROR, error_handler, 
+			CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get platform info [size] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
@@ -299,7 +299,7 @@ gchar* cl4_platform_info(CL4Platform* platform,
 		ocl_status = clGetPlatformInfo(
 			platform->id, param_name, size_ret, param_value, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_OCL_ERROR, error_handler, 
+			CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get platform info [info] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		

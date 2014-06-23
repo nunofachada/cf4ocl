@@ -48,9 +48,9 @@
  * */
 typedef struct cl4_context CL4Context;
 
-#define cl4_context_new_from_filters(num_filters, filters, err) \
+#define cl4_context_new_from_filters(filters, err) \
 	cl4_context_new_from_filters_full( \
-		NULL, (num_filters), (filters), NULL, NULL, (err))
+		NULL, (filters), NULL, NULL, (err))
 
 /** @brief Macro to create a context wrapper given a list of 
  * cl_device_id's.

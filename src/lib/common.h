@@ -42,7 +42,8 @@ enum cl4_error_codes {
 	CL4_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
 	CL4_ERROR_ARGS = 3,     /**< Error code thrown when passed arguments are invalid. */
 	CL4_ERROR_STREAM_WRITE = 5,     /**< Error code thrown when an error occurs while writing to a stream. */
-	CL4_OCL_ERROR = 10      /**< An OpenCL error ocurred. */
+	CL4_ERROR_DEVICE_NOT_FOUND = 6, /**< The requested OpenCL device was not found. */
+	CL4_ERROR_OCL = 10      /**< An OpenCL error ocurred. */
 };
 
 /** Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */

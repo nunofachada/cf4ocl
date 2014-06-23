@@ -53,7 +53,7 @@
  * is to be ignored.
  * @return The requested device information value. This 
  * value will be automatically freed when the device wrapper object is 
- * destroyed. If an error occurs, NULL is returned.
+ * destroyed. If an error occurs, zero is returned.
  * */
 #define cl4_device_info_value_scalar(device, param_name, param_type, err) \
 	(cl4_device_info_value(device, param_name, err) != NULL ? \

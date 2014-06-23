@@ -36,9 +36,6 @@ struct cl4_devsel_filter {
 void cl4_devsel_add_filter(
 	CL4DevSelFilters* filters, cl4_devsel filt_fun, gpointer filt_data) {
 
-	/* Make sure filters is not NULL. */
-	g_return_val_if_fail(filters != NULL, NULL);
-
 	/* Initialize filters if required. */
 	if (*filters == NULL)
 		*filters = g_ptr_array_new();
@@ -189,6 +186,54 @@ finish:
 }
 
 
+static gboolean cl4_devsel_type(
+	CL4Device* device, cl_device_type type_to_check, GError **err) {
+	
+	/* Make sure device is not NULL. */ 
+	g_return_val_if_fail(device != NULL, FALSE);
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	
+	GError* err_internal = NULL;
+	
+	cl_device_type type = cl4_device_info_value_scalar(
+		device, CL_DEVICE_TYPE, cl_device_type, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+finish:
+	
+	/* Return the selected devices. */
+	return (gboolean) (type & type_to_check);
+}
 
+gboolean cl4_devsel_gpu(CL4Device* device, void *select_data, GError **err) {
+
+	select_data = select_data;
+	return cl4_devsel_type(device, CL_DEVICE_TYPE_GPU, err);
+	
+}
+
+gboolean cl4_devsel_cpu(CL4Device* device, void *select_data, GError **err) {
+
+	select_data = select_data;
+	return cl4_devsel_type(device, CL_DEVICE_TYPE_CPU, err);
+
+}
+
+gboolean cl4_devsel_accel(CL4Device* device, void *select_data, GError **err) {
+
+	select_data = select_data;
+	return cl4_devsel_type(device, CL_DEVICE_TYPE_ACCELERATOR, err);
+
+}
 
 

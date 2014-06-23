@@ -41,12 +41,12 @@
  * @brief Abstract function for selecting OpenCL devices.
  *
  * @param device
- * @param select_info 
+ * @param select_data
  * @param err 
  * @return 
  */
 typedef gboolean (*cl4_devsel)(
-	CL4Device* device, void *select_info, GError **err);
+	CL4Device* device, void *select_data, GError **err);
 	
 typedef struct cl4_devsel_filter CL4DevSelFilter;
 	
@@ -58,6 +58,11 @@ CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err);
 
 void cl4_devsel_add_filter(
 	CL4DevSelFilters* filters, cl4_devsel filter, gpointer data);
-	
+
+gboolean cl4_devsel_gpu(CL4Device* device, void *select_data, GError **err);
+
+gboolean cl4_devsel_cpu(CL4Device* device, void *select_data, GError **err);
+
+gboolean cl4_devsel_accel(CL4Device* device, void *select_data, GError **err);
 
 #endif
