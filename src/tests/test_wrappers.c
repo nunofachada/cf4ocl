@@ -441,18 +441,18 @@ static void context_create_info_destroy_test() {
 	cl4_devsel_add_filter(&filters, cl4_devsel_gpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
-	g_assert((err != NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 
-	if (err) g_clear_error(&err);
+	if (err != NULL) g_clear_error(&err);
 	else cl4_context_destroy(ctx);
 	filters = NULL;
 
 	cl4_devsel_add_filter(&filters, cl4_devsel_cpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
-	g_assert((err != NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 
-	if (err) g_clear_error(&err);
+	if (err != NULL) g_clear_error(&err);
 	else cl4_context_destroy(ctx);
 	filters = NULL;
 
