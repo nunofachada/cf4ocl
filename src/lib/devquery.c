@@ -647,50 +647,6 @@ const CL4DevQueryMap cl4_devquery_info_map[] = {
 };
 
 /**
- * @brief Get a final device info prefix in the same format as 
- * kept in the cl4_devquery_info_map.
- * 
- * @param prefix Raw device information prefix. Several forms are 
- * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
- * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
- * accepted.
- * @return A final device info prefix in the same format as 
- * kept in the cl4_devquery_info_map.
- * */
-static gchar* cl4_devquery_get_prefix_final(gchar* prefix) {
-	
-	/* Make sure prefix is not NULL. */
-	g_return_val_if_fail(prefix != NULL, 0);
-	
-	/* Auxiliary string variables. */
-	gchar* str_upper;
-	gchar* str_aux;
-	gchar* str_final;
-	
-	/* Make string uppercase. */
-	str_upper = g_ascii_strup(prefix, -1);
-	
-	/* Remove possible cl_device or cl_ prefix */
-	if (g_str_has_prefix(str_upper, "CL_DEVICE_")) {
-		str_aux = str_upper + strlen("CL_DEVICE_");
-	} else if (g_str_has_prefix(str_upper, "CL_")) {
-		str_aux = str_upper + strlen("CL_");
-	} else {
-		str_aux = str_upper;
-	}
-	
-	/* Create a new string for returning. */
-	str_final = g_strdup(str_aux);
-
-	/* Free lowercase string. */
-	g_free(str_upper);
-	
-	/* Return result */
-	return str_final;
-	
-}
-
-/**
  * @brief Return the index of the device information map object of the
  * given parameter name.
  * 
@@ -736,6 +692,50 @@ static gint cl4_devquery_get_index(gchar* name) {
 	
 	/* Return result */
 	return found ? idx_middle : -1;
+}
+
+/**
+ * @brief Get a final device info prefix in the same format as 
+ * kept in the cl4_devquery_info_map.
+ * 
+ * @param prefix Raw device information prefix. Several forms are 
+ * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
+ * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
+ * accepted.
+ * @return A final device info prefix in the same format as 
+ * kept in the cl4_devquery_info_map. Should be freed with g_free().
+ * */
+gchar* cl4_devquery_get_prefix_final(gchar* prefix) {
+	
+	/* Make sure prefix is not NULL. */
+	g_return_val_if_fail(prefix != NULL, 0);
+	
+	/* Auxiliary string variables. */
+	gchar* str_upper;
+	gchar* str_aux;
+	gchar* str_final;
+	
+	/* Make string uppercase. */
+	str_upper = g_ascii_strup(prefix, -1);
+	
+	/* Remove possible cl_device or cl_ prefix */
+	if (g_str_has_prefix(str_upper, "CL_DEVICE_")) {
+		str_aux = str_upper + strlen("CL_DEVICE_");
+	} else if (g_str_has_prefix(str_upper, "CL_")) {
+		str_aux = str_upper + strlen("CL_");
+	} else {
+		str_aux = str_upper;
+	}
+	
+	/* Create a new string for returning. */
+	str_final = g_strdup(str_aux);
+
+	/* Free lowercase string. */
+	g_free(str_upper);
+	
+	/* Return result */
+	return str_final;
+	
 }
 
 /**

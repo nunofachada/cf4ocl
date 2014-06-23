@@ -389,7 +389,10 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 
 	/* Error reporting object. */
 	GError* err = NULL;
-
+	
+	/* Custom parameter name in proper format. */
+	gchar* custom_param_name;
+	
 	/* Index of next row of the device info_map. */
 	gint idx;
 	
@@ -399,8 +402,11 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 		/* Set index of next row to zero. */
 		idx = 0;
 		
+		/* Put info name in proper format. */
+		custom_param_name = cl4_devquery_get_prefix_final(opt_custom[i]);
+		
 		/* Get next row (the first one). */
-		info_row = cl4_devquery_match(opt_custom[i], &idx);
+		info_row = cl4_devquery_match(custom_param_name, &idx);
 		
 		/* Keep getting rows until we reach the end of the device 
 		 * info_map. */
@@ -438,9 +444,12 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 			}
 			
 			/* Get next row. */
-			info_row = cl4_devquery_match(opt_custom[i], &idx);
+			info_row = cl4_devquery_match(custom_param_name, &idx);
 			
-		};
+		}
+		
+		/* Free the proper format custom parameter name. */
+		g_free(custom_param_name);
 
 	}
 

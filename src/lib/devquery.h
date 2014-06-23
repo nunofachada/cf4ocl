@@ -120,6 +120,10 @@ extern const gint cl4_devquery_info_map_size;
  * units suffix. */
 extern const CL4DevQueryMap cl4_devquery_info_map[];
 
+/** @brief Get a final device info prefix in the same format as 
+ * kept in the cl4_devquery_info_map. */
+gchar* cl4_devquery_get_prefix_final(gchar* prefix);
+
 /** @brief Return a cl_device_info object given its name. */	
 cl_device_info cl4_devquery_name(gchar* name);
 
