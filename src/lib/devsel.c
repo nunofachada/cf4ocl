@@ -36,71 +36,127 @@ struct cl4_devsel_filter {
 void cl4_devsel_add_filter(
 	CL4DevSelFilters* filters, cl4_devsel filt_fun, gpointer filt_data) {
 
+	/* Make sure filters is not NULL. */
+	g_return_val_if_fail(filters != NULL, NULL);
+
+	/* Initialize filters if required. */
+	if (*filters == NULL)
+		*filters = g_ptr_array_new();
+	
+	/* Allocate space for new filter. */	
 	CL4DevSelFilter* filter = g_slice_new0(CL4DevSelFilter);
 	
+	/* Set filter function and filter data. */
 	filter->function = filt_fun;
 	filter->data = filt_data;
 	
-	g_ptr_array_add(filters, filter);
+	/* Add filter to filters array. */
+	g_ptr_array_add(*filters, filter);
 	
 }
 
-GPtrArray* cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
+CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
 
-
-	/// @todo Assert that filters and filters->list are not NULL, also check err
+	/* Make sure filters is not NULL. */
+	g_return_val_if_fail(filters != NULL, NULL);
 	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Platforms wrapper object. */
 	CL4Platforms* platforms = NULL;
+	
+	/* Platform wrapper object. */
 	CL4Platform* platform = NULL;
+	
+	/* Device wrapper object. */
 	CL4Device* device = NULL;
-	guint num_platfs;
-	guint num_devices;
-	GError* err_internal = NULL;
+	
+	/* Array of device wrapper objects. Devices will be selected from
+	 * this array.  */
 	GPtrArray* devices = NULL;
+
+	/* Number of platforms. */
+	guint num_platfs;
 	
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Get all OpenCL platforms in system wrapped in a CL4Platforms
+	 * object. */
 	platforms = cl4_platforms_new(&err_internal);
-	/// @todo Check error
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
+	/* Determine number of platforms. */
 	num_platfs = cl4_platforms_count(platforms);
 	
+	/* Create array of device wrapper objects. */
 	devices = g_ptr_array_new_with_free_func(
 		(GDestroyNotify) cl4_device_destroy);
 	
+	/* *** Populate array of device wrapper objects with all OpenCL ***
+	 * *** devices present in the system. *** */
+	 
+	/* Cycle through OpenCL platforms. */
 	for (guint i = 0; i < num_platfs; i++) {
 		
+		/* Get next platform wrapper. */
 		platform = cl4_platforms_get_platform(platforms, i);
 		
-		num_devices = cl4_platform_device_count(platform, &err_internal);
-		/// @todo Check error
+		/* Get number of devices in current platform.*/
+		guint num_devices = cl4_platform_device_count(
+			platform, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
+		/* Cycle through devices in current platform. */
 		for (guint j = 0; j < num_devices; j++) {
 			
+			/* Get current device wrapper. */
 			device = cl4_platform_get_device(platform, j, &err_internal);
-			/// @todo Check error
+			gef_if_err_propagate_goto(err, err_internal, error_handler);
 			
-			cl4_device_ref(device);
-			
+			/* Add device wrapper to array of device wrapper objects. */
 			g_ptr_array_add(devices, (gpointer) device);
+			
+			/* Update device reference (because it is kept also in
+			 * the array of device wrapper objects). */
+			cl4_device_ref(device);
 			
 		} 
 		
 	}
 	
-	/* Filter devices. */
+	/* *** Filter devices. *** */
+
+	/* Cycle through all devices. */
 	for (guint i = 0; i < devices->len; i++) {
 		
+		/* Get current device wrapper. */
 		CL4Device* curr_device = (CL4Device*) g_ptr_array_index(devices, i);
 		
-		/* Check if current device is accepted by all filters. */
-		for (guint j = 0; j < filters->len; j++) {
+		/* Cycle through all filters. */
+		for (guint j = 0; j < (*filters)->len; j++) {
 
-			CL4DevSelFilter* curr_filter = g_ptr_array_index(filters, j);
+			/* Get current filter. */
+			CL4DevSelFilter* curr_filter = g_ptr_array_index(*filters, j);
 
-			gboolean pass = curr_filter->function(curr_device, curr_filter->data, &err_internal);
-			/// @todo Check error
+			/* Check if current device is accepted by current filter. */
+			gboolean pass = curr_filter->function(
+				curr_device, curr_filter->data, &err_internal);
+			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			
+			/* If current device didn't pass current filter... */
 			if (!pass) {
-				g_ptr_array_remove_index_fast(devices, i);
-				i--; /// @todo There is surely a less hacky way to do this
+				
+				/* Remove device wrapper from device wrapper array. */
+				g_ptr_array_remove_index(devices, i);
+				
+				/* Force device index decrement, because next device to
+				 * be checked will be in this index. */
+				i--;
+				
+				/* Get out of the filtering loop, device didn't pass,
+				 * no need to test with other filters. */
 				break;
 			}
 		};
@@ -117,14 +173,18 @@ error_handler:
 
 finish:
 
-	/* Free allocated stuff. */
+	/* Free platforms wrapper object. */
 	cl4_platforms_destroy(platforms);
 	
+	/* Free individual filters. */
+	for (guint i = 0; i < (*filters)->len; i++)
+		g_slice_free(CL4DevSelFilter, g_ptr_array_index(*filters, i));
+		
+	/* Free filter array. */
+	g_ptr_array_free(*filters, TRUE);
 
-	/// @todo Free filters
-	
+	/* Return the selected devices. */
 	return devices;
-
 
 }
 

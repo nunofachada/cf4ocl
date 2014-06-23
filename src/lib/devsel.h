@@ -50,11 +50,11 @@ typedef gboolean (*cl4_devsel)(
 	
 typedef struct cl4_devsel_filter CL4DevSelFilter;
 	
-#define CL4DevSelFilters GPtrArray
+typedef GPtrArray* CL4DevSelFilters;
 
-#define cl4_devsel_filters_init() g_ptr_array_new()
+typedef GPtrArray* CL4DevSelDevices;
 
-GPtrArray* cl4_devsel_select(CL4DevSelFilters* filters, GError **err);
+CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err);
 
 void cl4_devsel_add_filter(
 	CL4DevSelFilters* filters, cl4_devsel filter, gpointer data);
