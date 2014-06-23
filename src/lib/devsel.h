@@ -34,17 +34,30 @@
     #include <CL/opencl.h>
 #endif
 #include <glib.h>
-
+#include "device.h"
+#include "platforms.h"
 
 /**
- * @brief Abstract function for selecting OpenCL devices and the 
- * associated context based on the provided information.
+ * @brief Abstract function for selecting OpenCL devices.
  *
- * @param select_info Information required for selection (implementation
- * dependent).
- * @param err Error structure, to be populated if an error occurs.
- * @return An OpenCL context or NULL if no adequate context was found.
+ * @param device
+ * @param select_info 
+ * @param err 
+ * @return 
  */
-typedef cl4_platform (*cl4_devsel)(void *select_info, GError **err);
+typedef gboolean (*cl4_devsel)(
+	CL4Device* device, void *select_info, GError **err);
+	
+typedef struct cl4_devsel_filter CL4DevSelFilter;
+	
+#define CL4DevSelFilters GPtrArray
+
+#define cl4_devsel_filters_init() g_ptr_array_new()
+
+GPtrArray* cl4_devsel_select(CL4DevSelFilters* filters, GError **err);
+
+void cl4_devsel_add_filter(
+	CL4DevSelFilters* filters, cl4_devsel filter, gpointer data);
+	
 
 #endif

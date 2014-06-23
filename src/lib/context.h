@@ -34,7 +34,7 @@
     #include <CL/opencl.h>
 #endif
 
-//#include "devsel.h"
+#include "devsel.h"
 #include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
@@ -70,8 +70,7 @@ typedef struct cl4_context CL4Context;
 
 CL4Context* cl4_context_new_from_filters_full(
 	const cl_context_properties* properties, 
-	guint num_filters, 
-	cl4_devsel* filters,
+	CL4DevSelFilters* filters,
 	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
     void* user_data,
 	GError **err);
