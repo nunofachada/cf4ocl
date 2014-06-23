@@ -152,7 +152,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	
 	/* Unwrap selected devices and add them to array. */
 	for (guint i = 0; i < devices->len; i++) {
-		cl_devices[i] = g_ptr_array_index(devices, i);
+		cl_devices[i] = cl4_device_id((CL4Device*) g_ptr_array_index(devices, i));
 	}
 
 	/* If the properties parameter is NULL, assume some default context 
@@ -171,6 +171,8 @@ CL4Context* cl4_context_new_from_filters_full(
 	  
 	/* Lazy initialization of the platform wrapper object. */
 	ctx->platform = NULL;
+	
+	/// @todo Check if devices belong to same platform
 	
 	/* Create OpenCL context. */
 	ctx->context = clCreateContext(
