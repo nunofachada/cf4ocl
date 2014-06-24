@@ -419,6 +419,10 @@ static void context_create_info_destroy_test() {
 	cl_device_id d_id = NULL;
 	CL4DevSelFilters filters = NULL;
 	CL4Info* info = NULL;
+	cl_context_properties* ctx_props = NULL;
+	cl_platform_id platform;
+	cl_context context;
+	cl_int ocl_status;
 	
 	/* Test context creating from cl_devices. */
 	ps = cl4_platforms_new(&err);
@@ -443,8 +447,33 @@ static void context_create_info_destroy_test() {
 	g_assert_no_error(err);
 	g_assert(((cl_device_id*) info->value)[0] == d_id);
 
-	cl4_platforms_destroy(ps);
 	cl4_context_destroy(ctx);
+
+	/* Test context creating by cl_context. */
+	
+	ctx_props = g_new0(cl_context_properties, 3);
+	platform = cl4_platform_unwrap(p);
+	ctx_props[0] = CL_CONTEXT_PLATFORM;
+	ctx_props[1] = (cl_context_properties) platform;
+	ctx_props[2] = 0;
+
+	context = clCreateContext(
+		(const cl_context_properties*) ctx_props, 
+		1, &d_id, NULL, NULL, &ocl_status);
+	g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
+
+	ctx = cl4_context_new_from_clcontext(context);
+	g_assert(cl4_context_unwrap(ctx) == context);
+	d = cl4_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+	g_assert(cl4_device_unwrap(d) == d_id);
+
+	info = cl4_context_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
+	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
+
+	cl4_context_destroy(ctx);
+	cl4_platforms_destroy(ps);
+	g_free(ctx_props);
 
 	/* Test context creating by device filtering. */
 	cl4_devsel_add_filter(&filters, cl4_devsel_gpu, NULL);

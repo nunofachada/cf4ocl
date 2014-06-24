@@ -38,10 +38,10 @@ struct cl4_context {
 	/** Context. */
 	cl_context context;
 	
-	/** Context information. */
+	/** Context information (can be lazy initialized). */
 	GHashTable* info;
 	
-	/** Number of devices in context. */
+	/** Number of devices in context (can be lazy initialized). */
 	cl_uint num_devices;
 	
 	/** Devices in context (can be lazy initialized). */
@@ -197,6 +197,14 @@ static void cl4_context_init_devices(
 		
 		CL4Info* info_devs;
 		GError* err_internal = NULL;
+		
+		/* Get number of devices. */
+		info_devs = cl4_context_info(
+			ctx, CL_CONTEXT_NUM_DEVICES, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* Keep number of devices. */
+		ctx->num_devices = *((cl_uint*) info_devs->value);
 		
 		/* Get device IDs. */
 		info_devs = cl4_context_info(
@@ -674,9 +682,6 @@ CL4Device* cl4_context_get_device(
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
 	
-	/* Make sure device index is less than the number of devices. */
-	g_return_val_if_fail(index < ctx->num_devices, NULL);
-	
 	/* The return value. */
 	CL4Device* device_ret;
 	
@@ -684,7 +689,7 @@ CL4Device* cl4_context_get_device(
 	GError* err_internal = NULL;
 	
 	/* Check if device list is already initialized. */
-	if (ctx->devices != NULL) {
+	if (ctx->devices == NULL) {
 		
 		/* Not initialized, initialize it. */
 		cl4_context_init_devices(ctx, &err_internal);
@@ -693,6 +698,9 @@ CL4Device* cl4_context_get_device(
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 	}
+	
+	/* Make sure device index is less than the number of devices. */
+	g_return_val_if_fail(index < ctx->num_devices, NULL);
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -716,15 +724,29 @@ finish:
  * @brief Return number of devices in context.
  * 
  * @param ctx The context wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
  * @return The number of devices in context or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
-guint cl4_context_device_count(CL4Context* ctx) {
+guint cl4_context_device_count(CL4Context* ctx, GError** err) {
 	
 	/* Make sure context is not NULL. */
 	g_return_val_if_fail(ctx != NULL, 0);
 	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+
+	/* Check if device list is already initialized. */
+	if (!ctx->devices) {
+		
+		/* Not initialized, initialize it. */
+		cl4_context_init_devices(ctx, err);
+		
+	}
+	
 	/* Return the number of devices in context. */
 	return ctx->num_devices;
+	
 }
 
