@@ -49,27 +49,42 @@ struct cl4_context {
 	
 };
 
-/* Macro which allocates space for a CL4Context object. */
-#define cl4_context_new() \
-	g_slice_new0(CL4Context);
 
 /* Macro which allocates space for the devices wrappers kept in a 
  * CL4Context object. */
 #define cl4_context_device_wrappers_new(num_devices) \
 	g_new0(CL4Device*, num_devices)
+	
+static CL4Context* cl4_context_new_internal(cl_context context, 
+	CL4Platform* platform, cl_uint num_devices, CL4Device** devices) {
+	
+	CL4Context* ctx;
+	
+	ctx = g_slice_new0(CL4Context);
+	ctx->context = context;
+	ctx->platform = platform;
+	ctx->num_devices = num_devices;
+	ctx->devices = devices;
+	ctx->ref_count = 1;
+	
+	return ctx;
+		
+}
 
 
-#define cl4_context_properties_default_free(properties) \
-	g_slice_free1(3 * sizeof(cl_context_properties), properties)
+#define cl4_context_properties_default_free(properties, ctx_props) \
+	if (properties == NULL) \
+		g_slice_free1(3 * sizeof(cl_context_properties), ctx_props)
 	
 static cl_context_properties* cl4_context_properties_default(
+	const cl_context_properties* properties, 
 	CL4Device* device, GError** err) {
 	
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
+	
 	/* Context properties. */
 	cl_context_properties* ctx_props = NULL;
 	
@@ -77,19 +92,27 @@ static cl_context_properties* cl4_context_properties_default(
 	
 	/* Internal error handler. */
 	GError* err_internal = NULL;
+	
+	if (properties == NULL) {
+		
+		/* Allocate memory for default properties. */
+		ctx_props = g_slice_alloc(3 * sizeof(cl_context_properties));
 
-	/* Allocate memory for default properties. */
-	ctx_props = g_slice_alloc(3 * sizeof(cl_context_properties));
+		/* Get context platform using first device. */
+		platform = *((cl_platform_id*) cl4_device_info_value(
+			device, CL_DEVICE_PLATFORM, &err_internal));
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Get context platform using first device. */
-	platform = *((cl_platform_id*) cl4_device_info_value(
-		device, CL_DEVICE_PLATFORM, &err_internal));
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+		/* Set context properties using discovered platform. */
+		ctx_props[0] = CL_CONTEXT_PLATFORM;
+		ctx_props[1] = (cl_context_properties) platform;
+		ctx_props[2] = 0;
 
-	/* Set context properties using discovered platform. */
-	ctx_props[0] = CL_CONTEXT_PLATFORM;
-	ctx_props[1] = (cl_context_properties) platform;
-	ctx_props[2] = 0;
+	} else {
+		
+		/* If properties parameter is not NULL, use it. */
+		ctx_props = (cl_context_properties*) properties;
+	}
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -126,17 +149,12 @@ CL4Context* cl4_context_new_from_filters_full(
 	cl_device_id* cl_devices = NULL;
 	/* Context wrapper to create. */
 	CL4Context* ctx = NULL;
+	/* OpenCL context. */
+	cl_context cl_ctx = NULL;
 	/* Context properties, in case the properties parameter is NULL. */
 	cl_context_properties* ctx_props = NULL;
-	/* Was memory allocated for ctx_props? */
-	gboolean ctx_props_alloc = FALSE;
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
-
-	/* Create ctx. */
-	ctx = cl4_context_new();
-	
-	ctx->ref_count = 1;	
 
 	/* Get selected/filtered devices. */
 	devices = cl4_devsel_select(filters, &err_internal);
@@ -148,10 +166,6 @@ CL4Context* cl4_context_new_from_filters_full(
 		"Function '%s': no device found for selected filters.", 
 		__func__);
 
-	/* Set device wrappers. */
-	ctx->devices = (CL4Device**) devices->pdata;
-	ctx->num_devices = devices->len;
-	
 	/* Create an array for the selected cl_device_id's. */
 	cl_devices = g_slice_alloc(devices->len * sizeof(cl_device_id));
 	
@@ -162,31 +176,24 @@ CL4Context* cl4_context_new_from_filters_full(
 
 	/* If the properties parameter is NULL, assume some default context 
 	 * properties. */
-	if (properties == NULL) {
-		
-		ctx_props_alloc = TRUE;
-		ctx_props = cl4_context_properties_default(
-			ctx->devices[0], &err_internal);
-		
-	} else {
-		
-		/* If properties parameter is not NULL, use it. */
-		ctx_props = (cl_context_properties*) properties;
-	}
-	  
-	/* Lazy initialization of the platform wrapper object. */
-	ctx->platform = NULL;
-	
+	ctx_props = cl4_context_properties_default(
+			properties, g_ptr_array_index(devices, 0), &err_internal);
+	 
 	/// @todo Check if devices belong to same platform
 	
+	
 	/* Create OpenCL context. */
-	ctx->context = clCreateContext(
+	cl_ctx = clCreateContext(
 		(const cl_context_properties*) ctx_props, devices->len, cl_devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
+		
+	/* Create CL4 context wrapper. */
+	ctx = cl4_context_new_internal(
+		cl_ctx, NULL, devices->len, (CL4Device**) devices->pdata);
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -196,14 +203,12 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 
-	/* Destroy the ctx, or what was possible to build of it. */
-	if (ctx != NULL)
-		cl4_context_destroy(ctx);
-	ctx = NULL;
-
+	/* Destroy what was built for the context wrapper. */
+	/// @todo This
+	
 finish:
 
-	if (ctx_props_alloc) cl4_context_properties_default_free(ctx_props);
+	cl4_context_properties_default_free(properties, ctx_props);
 	
 	/* Destroy array of selected cl_device_id's. */
 	g_slice_free1(devices->len * sizeof(cl_device_id), cl_devices);
@@ -245,28 +250,22 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* The OpenCL scene to create. */
+	/* The OpenCL context to create. */
 	CL4Context* ctx = NULL;
+	
+	cl_context cl_ctx = NULL;
+	
+	CL4Device** dev_wrappers = NULL;
 	/* Error reporting object. */
 	GError* err_internal = NULL;
 	/* Context properties, in case the properties parameter is NULL. */
 	cl_context_properties* ctx_props = NULL;
-	/* Was memory allocated for ctx_props? */
-	gboolean ctx_props_alloc = FALSE;
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
 	
-	/* Create ctx. */
-	ctx = cl4_context_new();
-	
-	/* Set number of devices. */
-	ctx->num_devices = num_devices;
-	
-	ctx->ref_count = 1;
-	
 	/* Allocate space for device wrappers. */
-	ctx->devices = cl4_context_device_wrappers_new(num_devices);
-	
+	dev_wrappers = cl4_context_device_wrappers_new(num_devices);
+
 	/* Add device wrappers to list of device wrappers. */
 	for (guint i = 0; i < num_devices; i++) {
 
@@ -274,35 +273,25 @@ CL4Context* cl4_context_new_from_cldevices_full(
 		g_return_val_if_fail(devices[i] != NULL, NULL);
 
 		/* Create new device wrapper, add it to list. */
-		ctx->devices[i] = cl4_device_new(devices[i]);
+		dev_wrappers[i] = cl4_device_new(devices[i]);
 
 	}
 
-	/* If the properties parameter is NULL, assume some default context 
-	 * properties. */
-	if (properties == NULL) {
-		
-		ctx_props_alloc = TRUE;
-		ctx_props = cl4_context_properties_default(
-			ctx->devices[0], &err_internal);
-		
-	} else {
-		
-		/* If properties parameter is not NULL, use it. */
-		ctx_props = (cl_context_properties*) properties;
-	}
-	
-	/* Lazy initialization of the platform wrapper object. */
-	ctx->platform = NULL;
+	ctx_props = cl4_context_properties_default(
+			properties, dev_wrappers[0], &err_internal);
 	
 	/* Create OpenCL context. */
-	ctx->context = clCreateContext(
+	cl_ctx = clCreateContext(
 		(const cl_context_properties*) ctx_props, num_devices, devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
+
+	/* Create CL4 context wrapper. */
+	ctx = cl4_context_new_internal(
+		cl_ctx, NULL, num_devices, dev_wrappers);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -312,15 +301,13 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 
-	/* Destroy the ctx, or what was possible to build of it. */
-	if (ctx != NULL)
-		cl4_context_destroy(ctx);
-	ctx = NULL;
+	/* Destroy what was built for the context wrapper. */
+	/// @todo This
 
 finish:
 
 	/* Free stuff. */
-	if (ctx_props_alloc) cl4_context_properties_default_free(ctx_props);
+	cl4_context_properties_default_free(properties, ctx_props);
 	
 	/* Return ctx. */
 	return ctx;
