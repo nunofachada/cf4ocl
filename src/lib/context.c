@@ -345,16 +345,20 @@ finish:
 
 /**
  * @brief Creates a context wrapper using the exact parameters received
- * by the clCreateContext function.
+ * by the clCreateContext function. For simpler context wrapper creation
+ * use the cl4_context_new_from_cldevices() macro.
  * 
  * If the properties parameter is NULL, this function obtains the 
  * cl_platform_id object from the first device.
  * 
- * @param properties
- * @param num_devices Number of cl_devices_id's in list.
- * @param devices List of cl_device_id's.
- * @param pfn_notify
- * @param user_data
+ * @param properties Context properties, may be NULL.
+ * @param num_devices Number of cl_devices_id's in devices array.
+ * @param devices Array of cl_device_id's.
+ * @param pfn_notify A callback function used by the OpenCL 
+ * implementation to report information on errors during context 
+ * creation as well as errors that occur at runtime in this context.
+ * Ignored if NULL.
+ * @param user_data Passed as argument to pfn_notify, can be NULL.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return A new context wrapper object.
@@ -435,22 +439,29 @@ finish:
 	
 }
 
-//~ /** 
- //~ * @brief Creates a context wrapper from a cl_context object.
- //~ * 
- //~ * This function is useful when the client wants more control over the
- //~ * cl_context object creation.
- //~ * 
- //~ * @param ctx The OpenCL cl_context object to wrap.
- //~ * @param err Return location for a GError, or NULL if error reporting
- //~ * is to be ignored.
- //~ * @return A new context wrapper object.
- //~ * */
-//~ CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err) {
-//~ 
-	//~ /// @todo
-	//~ return NULL;
-//~ }
+/** 
+ * @brief Creates a context wrapper from a cl_context object.
+ * 
+ * This function is useful when the client wants more control over the
+ * cl_context object creation.
+ * 
+ * @param context The OpenCL cl_context object to wrap up.
+ * @return A new context wrapper object.
+ * */
+CL4Context* cl4_context_new_from_clcontext(cl_context context) {
+
+	/* Make sure OpenCL context is not NULL. */
+	g_return_val_if_fail(context != NULL, NULL);
+
+	/* Context wrapper to create. */
+	CL4Context* ctx = cl4_context_new_internal();
+	
+	/* Set OpenCL context. */
+	ctx->context = context;
+	
+	/* Return new context wrapper. */
+	return ctx;
+}
 
 /** 
  * @brief Increase the reference count of the context wrapper object.

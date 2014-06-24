@@ -95,7 +95,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
     GError** err);
 
 /** @brief Creates a context wrapper from a cl_context object. */
-CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err);
+CL4Context* cl4_context_new_from_clcontext(cl_context ctx);
 
 /** @brief Increase the reference count of the context wrapper object. */
 void cl4_context_ref(CL4Context* ctx);
