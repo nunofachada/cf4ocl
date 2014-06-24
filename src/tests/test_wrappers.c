@@ -57,7 +57,7 @@ static void platforms_create_info_destroy_test() {
 	CL4Platform* p = NULL;
 	CL4Device* d = NULL;
 	GError* err = NULL;
-	CL4DeviceInfoWrapper* info;
+	CL4Info* info;
 	gchar* platf_info;
 	guint num_devs;
 	guint num_platfs;

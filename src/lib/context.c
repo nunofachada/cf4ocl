@@ -32,16 +32,19 @@
  */
 struct cl4_context {
 	
-	/** Platform. */
+	/** Platform (can be lazy initialized). */
 	CL4Platform* platform;
 	
 	/** Context. */
 	cl_context context;
 	
+	/** Context information. */
+	GHashTable* info;
+	
 	/** Number of devices in context. */
 	cl_uint num_devices;
 	
-	/** Devices in context. */
+	/** Devices in context (can be lazy initialized). */
 	CL4Device** devices;
 	
 	/** Reference count. */
@@ -79,6 +82,7 @@ static CL4Context* cl4_context_new_internal() {
 	
 	/* Set fields empty and reference count to 1. */
 	ctx->context = NULL;
+	ctx->info = NULL;
 	ctx->platform = NULL;
 	ctx->num_devices = 0;
 	ctx->devices = NULL;
@@ -169,6 +173,61 @@ finish:
 	/* Return properties. */
 	return ctx_props;
 
+}
+
+/** 
+ * @brief Initialize internal device list of context wrapper object. 
+ * 
+ * @param ctx The context wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * */
+static void cl4_context_init_devices(
+	CL4Context* ctx, GError **err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	
+	/* Check if device list is already initialized. */
+	if (!ctx->devices) {
+		/* Not initialized, initialize it. */
+		
+		CL4Info* info_devs;
+		GError* err_internal = NULL;
+		
+		/* Get device IDs. */
+		info_devs = cl4_context_info(
+			ctx, CL_CONTEXT_DEVICES, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* Allocate memory for array of device wrapper objects. */
+		ctx->devices = cl4_context_device_wrappers_new(ctx->num_devices);
+	
+		/* Wrap device IDs in device wrapper objects. */
+		for (guint i = 0; i < ctx->num_devices; i++) {
+			
+			/* Add device wrapper object to array of wrapper objects. */
+			ctx->devices[i] = cl4_device_new(
+				((cl_device_id*) info_devs->value)[i]);
+		}
+
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+finish:		
+	
+	/* Terminate function. */
+	return;
 }
 
 /**
@@ -324,11 +383,12 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	/* Context wrapper to create. */
 	CL4Context* ctx = cl4_context_new_internal();
 	
-	/* Allocate space for device wrappers and set number of devices in
-	 * the context wrapper object. */
-	ctx->devices = cl4_context_device_wrappers_new(num_devices);
+	/* Set number of devices in the context wrapper object. */
 	ctx->num_devices = num_devices;
-
+	
+	/* Allocate space for device wrappers. */
+	ctx->devices = cl4_context_device_wrappers_new(num_devices);
+	
 	/* Add device wrappers to list of device wrappers. */
 	for (guint i = 0; i < num_devices; i++) {
 
@@ -339,7 +399,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 		ctx->devices[i] = cl4_device_new(devices[i]);
 
 	}
-
+	
 	/* Get a set of default context properties, if required. */
 	ctx_props = cl4_context_properties_default(
 			properties, ctx->devices[0], &err_internal);
@@ -421,13 +481,17 @@ void cl4_context_unref(CL4Context* ctx) {
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&ctx->ref_count)) {
 
-		/* Release devices in ctx. */
-		for (guint i = 0; i < ctx->num_devices; i++) {
-			cl4_device_unref(ctx->devices[i]);
+		if (ctx->devices != NULL) {
+
+			/* Release devices in ctx. */
+			for (guint i = 0; i < ctx->num_devices; i++) {
+				if (ctx->devices[i])
+					cl4_device_unref(ctx->devices[i]);
+			}
+			
+			/* Free device wrapper array. */
+			g_free(ctx->devices);
 		}
-		
-		/* Free device wrapper array. */
-		g_free(ctx->devices);
 				  
 		/* Release context. */
 		if (ctx->context) {
@@ -437,6 +501,11 @@ void cl4_context_unref(CL4Context* ctx) {
 		/* Release platform. */
 		if (ctx->platform) {
 			cl4_platform_unref(ctx->platform);
+		}
+		
+		/* Destroy hash table containing context information. */
+		if (ctx->info) {
+			g_hash_table_destroy(ctx->info);
 		}
 		
 		/* Release ctx. */
@@ -465,6 +534,102 @@ gint cl4_context_ref_count(CL4Context* ctx) {
 }
 
 /**
+ * @brief Get context information object.
+ * 
+ * @param ctx The context wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested context information object. This object will
+ * be automatically freed when the device wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+CL4Info* cl4_context_info(CL4Context* ctx, 
+	cl_context_info param_name, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	
+	/* Context information object. */
+	CL4Info* info = NULL;
+	
+	/* If context information table is not yet initialized, then 
+	 * initialize it. */
+	if (!ctx->info) {
+		ctx->info = g_hash_table_new_full(
+			g_direct_hash, g_direct_equal, 
+			NULL, cl4_info_destroy);
+	}
+
+	/* Check if requested information is already present in the 
+	 * context information table. */
+	if (g_hash_table_contains(
+		ctx->info, GUINT_TO_POINTER(param_name))) {
+		
+		/* If so, retrieve it from there. */
+		info = g_hash_table_lookup(
+			ctx->info, GUINT_TO_POINTER(param_name));
+		
+	} else {
+		
+		/* Otherwise, get it from OpenCL device.*/
+		cl_int ocl_status;
+		/* Device information placeholder. */
+		gpointer param_value;
+		/* Size of device information in bytes. */
+		gsize size_ret;
+		
+		/* Get size of information. */
+		ocl_status = clGetContextInfo(
+			ctx->context, param_name, 0, NULL, &size_ret);
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+			"Function '%s': get context info [size] (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			size_ret == 0, CL4_ERROR_OCL, error_handler, 
+			"Function '%s': get context info [size] (size is 0).",
+			__func__);
+		
+		/* Allocate memory for information. */
+		param_value = g_malloc(size_ret);
+		
+		/* Get information. */
+		ocl_status = clGetContextInfo(
+			ctx->context, param_name, size_ret, param_value, NULL);
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+			"Function '%s': get context info [info] (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
+			
+		/* Keep information in context information table. */
+		info = cl4_info_new(param_value, size_ret);
+		g_hash_table_insert(ctx->info, 
+			GUINT_TO_POINTER(param_name), 
+			info);
+		
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	info = NULL;
+
+finish:
+	
+	/* Return the requested device information. */
+	return info;
+
+}
+
+/**
  * @brief Get the OpenCL context object.
  * 
  * @param context The context wrapper object.
@@ -484,19 +649,56 @@ cl_context cl4_context_unwrap(CL4Context* ctx) {
  * 
  * @param context The context wrapper object.
  * @param index Index of device in context.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
  * @return The CL4 device wrapper at given index or NULL if an error 
  * occurs.
  * */
-CL4Device* cl4_context_get_device(CL4Context* ctx, guint index) {
+CL4Device* cl4_context_get_device(
+	CL4Context* ctx, guint index, GError** err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
 	
 	/* Make sure device index is less than the number of devices. */
-	g_return_val_if_fail(index < ctx->num_devices, NULL);	
+	g_return_val_if_fail(index < ctx->num_devices, NULL);
+	
+	/* The return value. */
+	CL4Device* device_ret;
+	
+	/* Internal error object. */
+	GError* err_internal = NULL;
+	
+	/* Check if device list is already initialized. */
+	if (ctx->devices != NULL) {
+		
+		/* Not initialized, initialize it. */
+		cl4_context_init_devices(ctx, &err_internal);
+		
+		/* Check for errors. */
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	device_ret = ctx->devices[index];
+	goto finish;
+	
+error_handler:
 
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	device_ret = NULL;
+	
+finish:		
+	
 	/* Return list of device wrappers. */
-	return ctx->devices[index];
+	return device_ret;
+
 }
 
 /**

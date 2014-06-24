@@ -27,6 +27,36 @@
  
 #include "common.h"
 
+/**
+ * @brief Create a new CL4Info* object.
+ * 
+ * @param value Parameter value.
+ * @param size Parameter size in bytes.
+ * @return A new CL4Info* object.
+ * */
+CL4Info* cl4_info_new(gpointer value, gsize size) {
+	
+	CL4Info* info_value = g_slice_new(CL4Info);
+	
+	info_value->value = value;
+	info_value->size = size;
+	
+	return info_value;
+	
+}
+
+/**
+ * @brief Destroy a CL4Info* object.
+ * 
+ * @param info_value Object to destroy.
+ * */
+void cl4_info_destroy(void* info_value) {
+		
+	g_free(((CL4Info*) info_value)->value);
+	g_slice_free(CL4Info, info_value);
+	
+}
+
 /** 
  * @brief Resolves to error category identifying string, in this case an
  * error in cf4ocl.

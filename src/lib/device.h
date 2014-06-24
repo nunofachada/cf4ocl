@@ -92,16 +92,6 @@
 /** @brief Device wrapper object. */
 typedef struct cl4_device CL4Device;
 
-/**
- * @brief Value type of info hash table.
- * */
-typedef struct cl4_device_info_wrapper {
-	/** Device information. */
-	gpointer value;
-	/** Size in bytes of device information. */
-	gsize size;
-} CL4DeviceInfoWrapper;
-
 /** @brief Creates a new device wrapper object. */
 CL4Device* cl4_device_new(cl_device_id id);
 
@@ -119,8 +109,8 @@ void cl4_device_unref(CL4Device* device);
  * debugging and testing purposes only. */
 gint cl4_device_ref_count(CL4Device* device);
 
-/** @brief Get device information wrapper. */
-CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device, 
+/** @brief Get device information object. */
+CL4Info* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err);
 
 /** @brief Get pointer to device information value. */

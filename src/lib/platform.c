@@ -76,7 +76,7 @@ static void cl4_plaform_init_devices(
 			"Function '%s': get number of devices (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
-		/* Determine size in bytes of array of platform IDs. */
+		/* Determine size in bytes of array of device IDs. */
 		dev_ids_size = sizeof(cl_device_id) * platform->num_devices;
 		
 		/* Allocate memory for array of device IDs. */

@@ -129,48 +129,17 @@ gint cl4_device_ref_count(CL4Device* device) {
 }
 
 /**
- * @brief Create a new CL4DeviceInfoWrapper* object.
- * 
- * @param value Parameter value.
- * @param size Parameter size in bytes.
- * @return A new CL4DeviceInfoWrapper* object.
- * */
-static CL4DeviceInfoWrapper* cl4_device_info_value_new(
-	gpointer value, gsize size) {
-	
-	CL4DeviceInfoWrapper* info_value = g_slice_new(CL4DeviceInfoWrapper);
-	
-	info_value->value = value;
-	info_value->size = size;
-	
-	return info_value;
-	
-}
-
-/**
- * @brief Destroy a CL4DeviceInfoWrapper* object.
- * 
- * @param info_value Object to destroy.
- * */
-static void cl4_device_info_value_destroy(
-	void* info_value) {
-		
-	g_free(((CL4DeviceInfoWrapper*) info_value)->value);
-	g_slice_free(CL4DeviceInfoWrapper, info_value);
-}
-
-/**
- * @brief Get device information wrapper.
+ * @brief Get device information object.
  * 
  * @param device The device wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested device information wrapper. This object will
+ * @return The requested device information object. This object will
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device, 
+CL4Info* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -180,14 +149,14 @@ CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device,
 	g_return_val_if_fail(device != NULL, NULL);
 	
 	/* Device information value object. */
-	CL4DeviceInfoWrapper* info_value = NULL;
+	CL4Info* info_value = NULL;
 	
 	/* If device information table is not yet initialized, then 
 	 * initialize it. */
 	if (!device->info) {
 		device->info = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal, 
-			NULL, cl4_device_info_value_destroy);
+			NULL, cl4_info_destroy);
 	}
 
 	/* Check if requested information is already present in the 
@@ -232,7 +201,7 @@ CL4DeviceInfoWrapper* cl4_device_info(CL4Device* device,
 			__func__, ocl_status, cl4_err(ocl_status));
 			
 		/* Keep information in device information table. */
-		info_value = cl4_device_info_value_new(param_value, size_ret);
+		info_value = cl4_info_new(param_value, size_ret);
 		g_hash_table_insert(device->info, 
 			GUINT_TO_POINTER(param_name), 
 			info_value);
@@ -276,7 +245,7 @@ gpointer cl4_device_info_value(CL4Device* device,
 	g_return_val_if_fail(device != NULL, NULL);
 	
 	/* Get information wrapper. */
-	CL4DeviceInfoWrapper* diw = cl4_device_info(device, param_name, err);
+	CL4Info* diw = cl4_device_info(device, param_name, err);
 	
 	/* Return value if information wrapper is not NULL. */	
 	return diw != NULL ? diw->value : NULL;
@@ -302,7 +271,7 @@ gpointer cl4_device_info_value(CL4Device* device,
 	g_return_val_if_fail(device != NULL, NULL);
 	
 	/* Get information wrapper. */
-	CL4DeviceInfoWrapper* diw = cl4_device_info(device, param_name, err);
+	CL4Info* diw = cl4_device_info(device, param_name, err);
 	
 	/* Return value if information wrapper is not NULL. */	
 	return diw != NULL ? diw->size : 0;

@@ -49,6 +49,22 @@ enum cl4_error_codes {
 /** Resolves to error category identifying string, in this case an error in the OpenCL utilities library. */
 #define CL4_ERROR cl4_error_quark()
 
+/**
+ * @brief Information about a wrapped OpenCL entity.
+ * */
+typedef struct cl4_info {
+	/** Device information. */
+	gpointer value;
+	/** Size in bytes of device information. */
+	gsize size;
+} CL4Info;
+
+/** @brief Create a new CL4Info* object. */
+CL4Info* cl4_info_new(gpointer value, gsize size);
+
+/** @brief Destroy a CL4Info* object. */
+void cl4_info_destroy(void* info_value);
+
 /** @brief Resolves to error category identifying string, in this case
  * an error in the OpenCL utilities library. */
 GQuark cl4_error_quark(void);

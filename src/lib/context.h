@@ -108,11 +108,16 @@ void cl4_context_unref(CL4Context* ctx);
  * debugging and testing purposes only. */
 gint cl4_context_ref_count(CL4Context* ctx);
 
+/** @brief Get context information object. */
+CL4Info* cl4_context_info(CL4Context* ctx, 
+	cl_context_info param_name, GError** err);
+
 /** @brief Get the OpenCL context object. */
 cl_context cl4_context_unwrap(CL4Context* ctx);
  
 /** @brief Get CL4 device wrapper at given index. */
-CL4Device* cl4_context_get_device(CL4Context* ctx, guint index);
+CL4Device* cl4_context_get_device(
+	CL4Context* ctx, guint index, GError** err);
 
 /** @brief Return number of devices in context. */
 guint cl4_context_device_count(CL4Context* ctx);

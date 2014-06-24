@@ -25,9 +25,9 @@
  * */
 
 #if defined(__APPLE__) || defined(__MACOSX)
-	#include <OpenCL/cl.h>
+	#include <OpenCL/opencl.h>
 #else
-	#include <CL/cl.h>
+	#include <CL/opencl.h>
 #endif
 #include <glib.h>
 #include <string.h>
@@ -122,6 +122,8 @@ struct _cl_context {
 	const cl_context_properties* properties;
 	const cl_device_id* devices;
 	cl_uint num_devices;
+	cl_bool d3d;
+	cl_uint ref_count;
 };
 
 static const cl_uint cl4_test_num_platforms = 3;
@@ -528,6 +530,20 @@ static guint veclen(void* vector, size_t elem_size) {
 			sizeof(type) * veclen((void*) object->info, sizeof(type))); \
 	} \
 	break;
+
+#define cl4_test_predefvector_info(type, qty, object, info) \
+	if (param_value == NULL) { \
+		if (param_value_size_ret != NULL) { \
+			*param_value_size_ret = sizeof(type) * qty; \
+		} \
+	} else if (param_value_size < sizeof(type) * qty) { \
+		status = CL_INVALID_VALUE; \
+	} else if (object->info == NULL) { \
+		status = CL_INVALID_VALUE; \
+	} else { \
+		g_memmove(param_value, object->info, sizeof(type) * qty); \
+	} \
+	break;
 		
 #define cl4_test_basic_info(type, object, info) \
 	if (param_value == NULL) { \
@@ -639,8 +655,8 @@ cl_int clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 				cl4_test_basic_info(cl_uint, device, global_mem_cacheline_size);
 			case CL_DEVICE_GLOBAL_MEM_SIZE:
 				cl4_test_basic_info(cl_ulong, device, global_mem_size);
-			//case CL_DEVICE_HALF_FP_CONFIG:
-			//	cl4_test_basic_info(cl_device_fp_config, device, half_fp_config);
+			case CL_DEVICE_HALF_FP_CONFIG:
+				cl4_test_basic_info(cl_device_fp_config, device, half_fp_config);
 			case CL_DEVICE_HOST_UNIFIED_MEMORY:
 				cl4_test_basic_info(cl_bool, device, host_unified_memory);
 			case CL_DEVICE_IMAGE_SUPPORT:
@@ -778,6 +794,7 @@ cl_context clCreateContext(const cl_context_properties* properties,
 	ctx->properties = properties;
 	ctx->devices = devices;
 	ctx->num_devices = num_devices;
+	ctx->d3d = FALSE;
 	pfn_notify = pfn_notify;
 	user_data = user_data;
 	*errcode_ret = CL_SUCCESS;
@@ -789,4 +806,37 @@ cl_context clCreateContext(const cl_context_properties* properties,
 cl_int clReleaseContext(cl_context context) {
 	g_free(context);
 	return CL_SUCCESS;
+}
+
+cl_int clGetContextInfo(cl_context context, cl_context_info param_name,
+	size_t param_value_size, void* param_value, 
+	size_t* param_value_size_ret) {
+		
+	cl_int status = CL_SUCCESS;
+
+	if (context == NULL) {
+		status = CL_INVALID_CONTEXT;
+	} else {
+		switch (param_name) {
+			
+			case CL_CONTEXT_REFERENCE_COUNT:
+				cl4_test_basic_info(cl_uint, context, ref_count);
+			case CL_CONTEXT_NUM_DEVICES:
+				cl4_test_basic_info(cl_uint, context, num_devices);
+			case CL_CONTEXT_DEVICES:
+				cl4_test_predefvector_info(
+					cl_device_id, context->num_devices, context, devices);
+			case CL_CONTEXT_PROPERTIES:
+				cl4_test_vector_info(cl_context_properties, context, properties);
+			//~ case CL_CONTEXT_D3D10_PREFER_SHARED_RESOURCES_KHR:
+				//~ cl4_test_basic_info(cl_bool, context, d3d);
+			//~ case CL_CONTEXT_D3D11_PREFER_SHARED_RESOURCES_KHR:			
+				//~ cl4_test_basic_info(cl_bool, context, d3d);
+			default:
+				status = CL_INVALID_VALUE;
+		}
+	}
+		
+	return status;
+		
 }
