@@ -118,6 +118,12 @@ struct _cl_platform_id {
 	const struct _cl_device_id const* devices;
 };
 
+struct _cl_context {
+	const cl_context_properties* properties;
+	const cl_device_id* devices;
+	cl_uint num_devices;
+};
+
 static const cl_uint cl4_test_num_platforms = 3;
 
 static const struct _cl_platform_id cl4_test_platforms[] = {
@@ -759,4 +765,28 @@ cl_int clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 	}
 		
 	return status;
+}
+
+/* Context API */
+cl_context clCreateContext(const cl_context_properties* properties,
+	cl_uint num_devices, const cl_device_id* devices,
+	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+	void* user_data,
+	cl_int* errcode_ret) {
+	
+	cl_context ctx = g_new(struct _cl_context, 1);
+	ctx->properties = properties;
+	ctx->devices = devices;
+	ctx->num_devices = num_devices;
+	pfn_notify = pfn_notify;
+	user_data = user_data;
+	*errcode_ret = CL_SUCCESS;
+	
+	return ctx;
+		
+}
+
+cl_int clReleaseContext(cl_context context) {
+	g_free(context);
+	return CL_SUCCESS;
 }

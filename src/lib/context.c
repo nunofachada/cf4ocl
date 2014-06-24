@@ -200,6 +200,9 @@ finish:
 
 	if (ctx_props_alloc) cl4_context_properties_default_free(ctx_props);
 	
+	/* Destroy array of selected cl_device_id's. */
+	g_slice_free1(devices->len * sizeof(cl_device_id), cl_devices);
+	
 	g_ptr_array_free(devices, FALSE);
 
 	/* Return ctx. */
