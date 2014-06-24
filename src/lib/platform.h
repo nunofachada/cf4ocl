@@ -37,14 +37,19 @@
 /** @brief The platform wrapper object. */
 typedef struct cl4_platform CL4Platform;
 
+/**
+ * @brief Alias to cl4_platform_unref().
+ * 
+ * @param platform Platform wrapper object to destroy if reference count
+ * is 1, otherwise just decrement the reference count.
+ * */
+#define cl4_platform_destroy(platform) cl4_platform_unref(platform)
+
 /** @brief Creates a new platform wrapper object. */
 CL4Platform* cl4_platform_new(cl_platform_id id);
 
 /** @brief Increase the reference count of the platform wrapper object. */
 void cl4_platform_ref(CL4Platform* platform);
-
-/** @brief Alias for cl4_platform_unref(). */
-void cl4_platform_destroy(CL4Platform* platform);
 
 /** @brief Decrements the reference count of the platform wrapper object.
  * If it reaches 0, the platform wrapper object is destroyed. */
@@ -59,7 +64,7 @@ gchar* cl4_platform_info(CL4Platform* platform,
 	cl_platform_info param_name, GError **err);
 
 /** @brief Get the OpenCL platform ID object. */
-cl_platform_id cl4_platform_id(CL4Platform* platform);
+cl_platform_id cl4_platform_unwrap(CL4Platform* platform);
 
 /** @brief Get CL4 device wrapper at given index. */
 CL4Device* cl4_platform_get_device(

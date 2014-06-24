@@ -86,17 +86,6 @@ void cl4_device_ref(CL4Device* device) {
 }
 
 /** 
- * @brief Alias for cl4_device_unref().
- *
- * @param device The device wrapper object. 
- * */
-void cl4_device_destroy(CL4Device* device) {
-	
-	cl4_device_unref(device);
-
-}
-
-/** 
  * @brief Decrements the reference count of the device wrapper object.
  * If it reaches 0, the device wrapper object is destroyed.
  *
@@ -326,7 +315,7 @@ gpointer cl4_device_info_value(CL4Device* device,
  * @param device The device wrapper object.
  * @return The OpenCL device ID object.
  * */
-cl_device_id cl4_device_id(CL4Device* device) {
+cl_device_id cl4_device_unwrap(CL4Device* device) {
 
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);

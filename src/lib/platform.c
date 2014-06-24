@@ -170,17 +170,6 @@ void cl4_platform_ref(CL4Platform* platform) {
 }
 
 /** 
- * @brief Alias for cl4_platform_unref().
- *
- * @param platform The platform wrapper object. 
- * */
-void cl4_platform_destroy(CL4Platform* platform) {
-	
-	cl4_platform_unref(platform);
-
-}
-
-/** 
  * @brief Decrements the reference count of the platform wrapper object.
  * If it reaches 0, the platform wrapper object is destroyed.
  *
@@ -331,7 +320,7 @@ finish:
  * @param platform The platform wrapper object.
  * @return The OpenCL platform ID object.
  * */
-cl_platform_id cl4_platform_id(CL4Platform* platform) {
+cl_platform_id cl4_platform_unwrap(CL4Platform* platform) {
 	
 	/* Make sure platform is not NULL. */
 	g_return_val_if_fail(platform != NULL, NULL);

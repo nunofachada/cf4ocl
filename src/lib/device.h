@@ -80,6 +80,14 @@
 	(cl4_device_info_value(device, param_name, err) != NULL ? \
 		(param_type) (cl4_device_info_value(device, param_name, err)) : \
 		NULL)
+
+/**
+ * @brief Alias to cl4_device_unref().
+ * 
+ * @param device Device wrapper object to destroy if reference count
+ * is 1, otherwise just decrement the reference count.
+ * */
+#define cl4_device_destroy(device) cl4_device_unref(device)
 		
 /** @brief Device wrapper object. */
 typedef struct cl4_device CL4Device;
@@ -124,6 +132,6 @@ gsize cl4_device_info_size(CL4Device* device,
 	cl_device_info param_name, GError** err);
 
 /** @brief Get the OpenCL device ID object. */
-cl_device_id cl4_device_id(CL4Device* device);
+cl_device_id cl4_device_unwrap(CL4Device* device);
 
 #endif

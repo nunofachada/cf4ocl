@@ -89,7 +89,7 @@ CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
 	
 	/* Create array of device wrapper objects. */
 	devices = g_ptr_array_new_with_free_func(
-		(GDestroyNotify) cl4_device_destroy);
+		(GDestroyNotify) cl4_device_unref);
 	
 	/* *** Populate array of device wrapper objects with all OpenCL ***
 	 * *** devices present in the system. *** */

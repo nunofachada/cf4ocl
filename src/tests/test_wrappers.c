@@ -125,7 +125,7 @@ static void platforms_create_info_destroy_test() {
 				info = cl4_device_info(d, CL_DEVICE_NAME, &err);
 				cl4_test_wrappers_msg("...... Name :", "%s", (gchar*) info->value);
 				
-				g_debug("...... Memory location : %p", *((void**) cl4_device_id(d)));
+				g_debug("...... Memory location : %p", *((void**) cl4_device_unwrap(d)));
 				
 				info = cl4_device_info(d, CL_DEVICE_ADDRESS_BITS, &err);
 				cl4_test_wrappers_msg("...... Address bits :", "%d", *((cl_uint*) info->value));
@@ -429,7 +429,7 @@ static void context_create_info_destroy_test() {
 	d = cl4_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);
 	
-	d_id = cl4_device_id(d);
+	d_id = cl4_device_unwrap(d);
 		
 	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);
 	g_assert_no_error(err);	
@@ -469,7 +469,68 @@ static void context_create_info_destroy_test() {
  * */
 static void context_ref_unref_test() {
 
-	/// @todo Test ref/unref context
+	CL4Context* ctx = NULL;
+	GError* err = NULL;
+	CL4Platforms* ps = NULL;
+	CL4Platform* p = NULL;
+	CL4Device* d = NULL;
+	cl_device_id d_id = NULL;
+	CL4DevSelFilters filters = NULL;
+	
+	/* Test context creating from cl_devices. */
+	ps = cl4_platforms_new(&err);
+	g_assert_no_error(err);
+
+	p = cl4_platforms_get_platform(ps, 0);
+	g_assert(p != NULL);
+	
+	d = cl4_platform_get_device(p, 0, &err);
+	g_assert_no_error(err);
+	
+	d_id = cl4_device_unwrap(d);
+		
+	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);
+	g_assert_no_error(err);
+	
+	g_assert_cmpuint(cl4_device_ref_count(d), ==, 1);
+	g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+	
+	cl4_context_ref(ctx);
+	g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 2);
+	cl4_context_unref(ctx);
+	g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+	
+	cl4_platforms_destroy(ps);
+	cl4_context_destroy(ctx);
+
+	/* Test context creating by device filtering. */
+	cl4_devsel_add_filter(&filters, cl4_devsel_gpu, NULL);
+	
+	ctx = cl4_context_new_from_filters(&filters, &err);
+	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+
+	if (err != NULL) {
+		g_clear_error(&err);
+	} else {
+		g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+		cl4_context_destroy(ctx);
+	}
+	filters = NULL;
+
+	cl4_devsel_add_filter(&filters, cl4_devsel_cpu, NULL);
+	
+	ctx = cl4_context_new_from_filters(&filters, &err);
+	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+
+	if (err != NULL) {
+		g_clear_error(&err);
+	} else {
+		g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+		cl4_context_destroy(ctx);
+	}
+	filters = NULL;
+
+	/// @todo Test context from CL4Platform, check that devices have ref=2 (kept by CL4Platform and CL4Context)
 	/// @todo Test ref/unref program
 	/// @todo Test ref/unref queue
 	/// @todo Test ref/unref kernels

@@ -52,7 +52,8 @@ typedef struct cl4_context CL4Context;
 	cl4_context_new_from_filters_full( \
 		NULL, (filters), NULL, NULL, (err))
 
-/** @brief Macro to create a context wrapper given a list of 
+/** 
+ * @brief Macro to create a context wrapper given a list of 
  * cl_device_id's.
  * 
  * This macro simply calls cl4_context_new_from_cldevices_full()
@@ -67,6 +68,14 @@ typedef struct cl4_context CL4Context;
 #define cl4_context_new_from_cldevices(num_devices, devices, err) \
 	cl4_context_new_from_cldevices_full( \
 		NULL, (num_devices), (devices), NULL, NULL, (err))
+		
+/**
+ * @brief Alias to cl4_context_unref().
+ * 
+ * @param ctx Context wrapper object to destroy if reference count is 1,
+ * otherwise just decrement the reference count.
+ * */
+#define cl4_context_destroy(ctx) cl4_context_unref(ctx)
 
 CL4Context* cl4_context_new_from_filters_full(
 	const cl_context_properties* properties, 
@@ -85,11 +94,27 @@ CL4Context* cl4_context_new_from_cldevices_full(
     void* user_data,
     GError** err);
 
-
 /** @brief Creates a context wrapper from a cl_context object. */
 CL4Context* cl4_context_new_from_clcontext(cl_context ctx, GError **err);
 
-/** @brief Destroy a context wrapper object. */
- void cl4_context_destroy(CL4Context* ctx);
+/** @brief Increase the reference count of the context wrapper object. */
+void cl4_context_ref(CL4Context* ctx);
+
+/** @brief Decrements the reference count of the context wrapper object.
+ * If it reaches 0, the context wrapper object is destroyed. */
+void cl4_context_unref(CL4Context* ctx);
+
+/** @brief Returns the context wrapper object reference count. For
+ * debugging and testing purposes only. */
+gint cl4_context_ref_count(CL4Context* ctx);
+
+/** @brief Get the OpenCL context object. */
+cl_context cl4_context_unwrap(CL4Context* ctx);
+ 
+/** @brief Get CL4 device wrapper at given index. */
+CL4Device* cl4_context_get_device(CL4Context* ctx, guint index);
+
+/** @brief Return number of devices in context. */
+guint cl4_context_device_count(CL4Context* ctx);
 
 #endif

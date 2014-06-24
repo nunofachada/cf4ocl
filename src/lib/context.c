@@ -32,17 +32,20 @@
  */
 struct cl4_context {
 	
-	/* Platform. */
+	/** Platform. */
 	CL4Platform* platform;
 	
-	/* Context. */
+	/** Context. */
 	cl_context context;
 	
-	/* Number of devices in context. */
+	/** Number of devices in context. */
 	cl_uint num_devices;
 	
-	/* Devices in context. */
+	/** Devices in context. */
 	CL4Device** devices;
+	
+	/** Reference count. */
+	gint ref_count;    	
 	
 };
 
@@ -132,6 +135,8 @@ CL4Context* cl4_context_new_from_filters_full(
 
 	/* Create ctx. */
 	ctx = cl4_context_new();
+	
+	ctx->ref_count = 1;	
 
 	/* Get selected/filtered devices. */
 	devices = cl4_devsel_select(filters, &err_internal);
@@ -152,7 +157,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	
 	/* Unwrap selected devices and add them to array. */
 	for (guint i = 0; i < devices->len; i++) {
-		cl_devices[i] = cl4_device_id((CL4Device*) g_ptr_array_index(devices, i));
+		cl_devices[i] = cl4_device_unwrap((CL4Device*) g_ptr_array_index(devices, i));
 	}
 
 	/* If the properties parameter is NULL, assume some default context 
@@ -257,6 +262,8 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	/* Set number of devices. */
 	ctx->num_devices = num_devices;
 	
+	ctx->ref_count = 1;
+	
 	/* Allocate space for device wrappers. */
 	ctx->devices = cl4_context_device_wrappers_new(num_devices);
 	
@@ -337,35 +344,126 @@ finish:
 	//~ return NULL;
 //~ }
 
-/**
- * @brief Destroy a context wrapper object.
+/** 
+ * @brief Increase the reference count of the context wrapper object.
  * 
- * @param ctx Context wrapper object to destroy.
+ * @param context The context wrapper object. 
  * */
-void cl4_context_destroy(CL4Context* ctx) {
+void cl4_context_ref(CL4Context* ctx) {
+	
+	/* Make sure platform wrapper object is not NULL. */
+	g_return_if_fail(ctx != NULL);
+
+	/* Increase reference count. */
+	g_atomic_int_inc(&ctx->ref_count);
+	
+}
+
+/** 
+ * @brief Decrements the reference count of the context wrapper object.
+ * If it reaches 0, the context wrapper object is destroyed.
+ *
+ * @param ctx The context wrapper object. 
+ * */
+void cl4_context_unref(CL4Context* ctx) {
 	
 	/* Make sure context wrapper object is not NULL. */
 	g_return_if_fail(ctx != NULL);
 
-	/* Release devices in ctx. */
-	for (guint i = 0; i < ctx->num_devices; i++) {
-		cl4_device_unref(ctx->devices[i]);
-	}
-	
-	/* Free device wrapper array. */
-	g_free(ctx->devices);
-              
-	/* Release context. */
-	if (ctx->context) {
-		clReleaseContext(ctx->context);
-	}
-	
-	/* Release platform. */
-	if (ctx->platform) {
-		cl4_platform_unref(ctx->platform);
-	}
-	
-	/* Release ctx. */
-	g_slice_free(CL4Context, ctx);
+	/* Decrement reference count and check if it reaches 0. */
+	if (g_atomic_int_dec_and_test(&ctx->ref_count)) {
+
+		/* Release devices in ctx. */
+		for (guint i = 0; i < ctx->num_devices; i++) {
+			cl4_device_unref(ctx->devices[i]);
+		}
+		
+		/* Free device wrapper array. */
+		g_free(ctx->devices);
+				  
+		/* Release context. */
+		if (ctx->context) {
+			clReleaseContext(ctx->context);
+		}
+		
+		/* Release platform. */
+		if (ctx->platform) {
+			cl4_platform_unref(ctx->platform);
+		}
+		
+		/* Release ctx. */
+		g_slice_free(CL4Context, ctx);
+
+	}	
 
 }
+
+/**
+ * @brief Returns the context wrapper object reference count. For
+ * debugging and testing purposes only.
+ * 
+ * @param ctx The context wrapper object.
+ * @return The context wrapper object reference count or -1 if device
+ * is NULL.
+ * */
+gint cl4_context_ref_count(CL4Context* ctx) {
+	
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, -1);
+	
+	/* Return reference count. */
+	return ctx->ref_count;
+
+}
+
+/**
+ * @brief Get the OpenCL context object.
+ * 
+ * @param context The context wrapper object.
+ * @return The OpenCL context object.
+ * */
+cl_context cl4_context_unwrap(CL4Context* ctx) {
+	
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	
+	/* Return the OpenCL context object. */
+	return ctx->context;
+}
+ 
+/** 
+ * @brief Get CL4 device wrapper at given index. 
+ * 
+ * @param context The context wrapper object.
+ * @param index Index of device in context.
+ * @return The CL4 device wrapper at given index or NULL if an error 
+ * occurs.
+ * */
+CL4Device* cl4_context_get_device(CL4Context* ctx, guint index) {
+
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	
+	/* Make sure device index is less than the number of devices. */
+	g_return_val_if_fail(index < ctx->num_devices, NULL);	
+
+	/* Return list of device wrappers. */
+	return ctx->devices[index];
+}
+
+/**
+ * @brief Return number of devices in context.
+ * 
+ * @param ctx The context wrapper object.
+ * @return The number of devices in context or 0 if an error occurs or
+ * is otherwise not possible to get any device.
+ * */
+guint cl4_context_device_count(CL4Context* ctx) {
+	
+	/* Make sure context is not NULL. */
+	g_return_val_if_fail(ctx != NULL, 0);
+	
+	/* Return the number of devices in context. */
+	return ctx->num_devices;
+}
+
