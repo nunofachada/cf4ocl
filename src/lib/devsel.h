@@ -112,6 +112,9 @@ gboolean cl4_devsel_indep_cpu(
 
 gboolean cl4_devsel_indep_accel(
 	CL4Device* device, void *data, GError **err);
+	
+gboolean cl4_devsel_indep_platform(
+	CL4Device* device, void *data, GError **err);
 
 /** @} */
 

@@ -328,7 +328,7 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 
 	CL4Device* dev;
 	cl_platform_id platf_ref, platf_curr;
-	GError *err_internal;
+	GError *err_internal = NULL;
 	
 	data = data;
 	

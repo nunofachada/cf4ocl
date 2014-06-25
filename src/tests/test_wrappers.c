@@ -420,11 +420,14 @@ static void context_create_info_destroy_test() {
 	CL4DevSelFilters filters = NULL;
 	CL4Info* info = NULL;
 	cl_context_properties* ctx_props = NULL;
-	cl_platform_id platform;
+	cl_platform_id platform, platf_ref;
 	cl_context context;
+	guint num_devices;
 	cl_int ocl_status;
 	
-	/* Test context creating from cl_devices. */
+	/* 
+	 * Test context creation from cl_devices. 
+	 * */
 	ps = cl4_platforms_new(&err);
 	g_assert_no_error(err);
 
@@ -449,7 +452,9 @@ static void context_create_info_destroy_test() {
 
 	cl4_context_destroy(ctx);
 
-	/* Test context creating by cl_context. */
+	/* 
+	 * Test context creation by cl_context. 
+	 * */
 	
 	ctx_props = g_new0(cl_context_properties, 3);
 	platform = cl4_platform_unwrap(p);
@@ -475,7 +480,11 @@ static void context_create_info_destroy_test() {
 	cl4_platforms_destroy(ps);
 	g_free(ctx_props);
 
-	/* Test context creating by device filtering. */
+	/* 
+	 * Test context creation by device filtering (indep. filters). 
+	 * */
+	 
+	/* GPU device type filter. */
 	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_gpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
@@ -485,6 +494,7 @@ static void context_create_info_destroy_test() {
 	else cl4_context_destroy(ctx);
 	filters = NULL;
 
+	/* CPU device type filter. */
 	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_cpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
@@ -494,6 +504,7 @@ static void context_create_info_destroy_test() {
 	else cl4_context_destroy(ctx);
 	filters = NULL;
 
+	/* Accel. device type filter. */
 	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_accel, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
@@ -502,7 +513,59 @@ static void context_create_info_destroy_test() {
 	if (err != NULL) g_clear_error(&err);
 	else cl4_context_destroy(ctx);
 	filters = NULL;
+	
+	/* Specific platform filter. */
+	cl4_devsel_add_indep_filter(
+		&filters, cl4_devsel_indep_platform, (gpointer) platform);
 
+	ctx = cl4_context_new_from_filters(&filters, &err);
+	g_assert_no_error(err);
+	
+	d = cl4_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+	
+	platf_ref = cl4_device_info_value_scalar(d, CL_DEVICE_PLATFORM,
+		cl_platform_id, &err);
+	g_assert_no_error(err);
+
+	g_assert(platf_ref == platform);
+	
+	cl4_context_destroy(ctx);
+	filters = NULL;
+	
+	/* 
+	 * Test context creation by device filtering (dep. filters). 
+	 * */
+	 
+	/* Same platform filter. */
+	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
+
+	ctx = cl4_context_new_from_filters(&filters, &err);
+	g_assert_no_error(err);
+	
+	d = cl4_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+	
+	platf_ref = cl4_device_info_value_scalar(d, CL_DEVICE_PLATFORM,
+		cl_platform_id, &err);
+	g_assert_no_error(err);
+	
+	num_devices = cl4_context_device_count(ctx, &err);
+	g_assert_no_error(err);
+	
+	for (guint i = 1; i < num_devices; i++) {
+		
+		d = cl4_context_get_device(ctx, i, &err);
+		g_assert_no_error(err);
+		
+		platform = cl4_device_info_value_scalar(d, CL_DEVICE_PLATFORM,
+			cl_platform_id, &err);
+		g_assert_no_error(err);
+			
+		g_assert(platf_ref == platform);
+	}
+	
+	cl4_context_destroy(ctx);
 }
 
 /** 
