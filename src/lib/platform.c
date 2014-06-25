@@ -229,24 +229,6 @@ gint cl4_platform_ref_count(CL4Platform* platform) {
 }
 
 /**
- * @brief Get platform information.
- * 
- * @param platform The platform wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return The requested platform information. This information will
- * be automatically freed when the platform wrapper object is 
- * destroyed. If an error occurs, NULL is returned.
- * */
-gpointer cl4_platform_info(CL4Platform* platform, 
-	cl_platform_info param_name, GError **err) {
-
-	/* Use the generic get info macro. */
-	cl4_info_get(platform, param_name, clGetPlatformInfo, err);
-}
-
-/**
  * @brief Get the OpenCL platform ID object.
  * 
  * @param platform The platform wrapper object.

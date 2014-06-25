@@ -45,6 +45,21 @@ typedef struct cl4_platform CL4Platform;
  * */
 #define cl4_platform_destroy(platform) cl4_platform_unref(platform)
 
+/**
+ * @brief Get platform information.
+ * 
+ * @param platform The platform wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested platform information. This information will
+ * be automatically freed when the platform wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_platform_info(platform, param_name, err) \
+	((gchar*) cl4_info_get_value((CL4Wrapper*) platform, param_name, \
+		(cl4_info_function) clGetPlatformInfo, err))
+
 /** @brief Creates a new platform wrapper object. */
 CL4Platform* cl4_platform_new(cl_platform_id id);
 
@@ -58,10 +73,6 @@ void cl4_platform_unref(CL4Platform* platform);
 /** @brief Returns the platform wrapper object reference count. For
  * debugging and testing purposes only. */
 gint cl4_platform_ref_count(CL4Platform* platform);
-
-/** @brief Get platform information. */
-gpointer cl4_platform_info(CL4Platform* platform, 
-	cl_platform_info param_name, GError **err);
 
 /** @brief Get the OpenCL platform ID object. */
 cl_platform_id cl4_platform_unwrap(CL4Platform* platform);

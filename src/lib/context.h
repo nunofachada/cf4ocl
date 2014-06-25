@@ -65,6 +65,22 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
 
+
+/**
+ * @brief Get context information object.
+ * 
+ * @param ctx The context wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested context information object. This object will
+ * be automatically freed when the device wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_context_info(ctx, param_name, err) \
+	cl4_info_get((CL4Wrapper*) ctx, param_name, \
+		(cl4_info_function) clGetContextInfo, err)
+
 /**
  * @defgroup CL4_CONTEXT_CONSTRUCTORS Context wrapper constructors,
  * i.e. cl4_context_new_* functions.
@@ -152,10 +168,6 @@ void cl4_context_unref(CL4Context* ctx);
 /** @brief Returns the context wrapper object reference count. For
  * debugging and testing purposes only. */
 gint cl4_context_ref_count(CL4Context* ctx);
-
-/** @brief Get context information object. */
-CL4Info* cl4_context_info(CL4Context* ctx, 
-	cl_context_info param_name, GError** err);
 
 /** @brief Get the OpenCL context object. */
 cl_context cl4_context_unwrap(CL4Context* ctx);

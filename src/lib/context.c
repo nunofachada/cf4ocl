@@ -32,14 +32,14 @@
  */
 struct cl4_context {
 	
-	/** Platform (can be lazy initialized). */
-	CL4Platform* platform;
-	
 	/** Context. */
 	cl_context cl_object;
 	
 	/** Context information (can be lazy initialized). */
 	GHashTable* info;
+	
+	/** Platform (can be lazy initialized). */
+	CL4Platform* platform;
 	
 	/** Number of devices in context (can be lazy initialized). */
 	cl_uint num_devices;
@@ -549,25 +549,6 @@ gint cl4_context_ref_count(CL4Context* ctx) {
 	
 	/* Return reference count. */
 	return ctx->ref_count;
-
-}
-
-/**
- * @brief Get context information object.
- * 
- * @param ctx The context wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return The requested context information object. This object will
- * be automatically freed when the device wrapper object is 
- * destroyed. If an error occurs, NULL is returned.
- * */
-CL4Info* cl4_context_info(CL4Context* ctx, 
-	cl_context_info param_name, GError** err) {
-
-	/* Use the generic get info macro. */
-	cl4_info_get(ctx, param_name, clGetContextInfo, err);
 
 }
 
