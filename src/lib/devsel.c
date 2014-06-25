@@ -27,29 +27,60 @@
  
 #include "devsel.h"
 
-struct cl4_devsel_filter {
-	cl4_devsel function;
+	
+/** @brief Filter type. */
+typedef enum cl4_devsel_filter_type {
+	/** Single-device filter. */
+	CL4_DEVSEL_SINGLE,
+	/** Multi-device filter. */
+	CL4_DEVSEL_MULTI
+} CL4DevSelFilterType;
+
+/** 
+ * @brief Filter object, includes a filter function (single or multi
+ * device) and the respective filter data.
+ * */
+typedef struct cl4_devsel_filter {
+	
+	/** Filter function. */
+	gpointer function;
+	/** Filter data. */
 	gpointer data;
-};
+	/** Filter type. */
+	CL4DevSelFilterType type;
+	
+} CL4DevSelFilter;
 
-
-void cl4_devsel_add_filter(
-	CL4DevSelFilters* filters, cl4_devsel filt_fun, gpointer filt_data) {
+static void cl4_devsel_add_filter(CL4DevSelFilters* filters, 
+	gpointer function, gpointer data, CL4DevSelFilterType type) {
 
 	/* Initialize filters if required. */
 	if (*filters == NULL)
 		*filters = g_ptr_array_new();
 	
-	/* Allocate space for new filter. */	
+	/* Allocate space for new filter. */
 	CL4DevSelFilter* filter = g_slice_new0(CL4DevSelFilter);
 	
-	/* Set filter function and filter data. */
-	filter->function = filt_fun;
-	filter->data = filt_data;
+	/* Set filter function, filter data and type (single-device filter). */
+	filter->function = function;
+	filter->data = data;
+	filter->type = type;
 	
 	/* Add filter to filters array. */
 	g_ptr_array_add(*filters, filter);
 	
+}
+
+void cl4_devsel_add_single_filter(
+	CL4DevSelFilters* filters, cl4_devsel_single function, gpointer data) {
+
+	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_SINGLE);
+}
+
+void cl4_devsel_add_multi_filter(
+	CL4DevSelFilters* filters, cl4_devsel_multi function, gpointer data) {
+
+	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_MULTI);
 }
 
 CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
@@ -125,40 +156,52 @@ CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
 	
 	/* *** Filter devices. *** */
 
-	/* Cycle through all devices. */
-	for (guint i = 0; i < devices->len; i++) {
+	/* Cycle through all filters. */
+	for (guint i = 0; i < (*filters)->len; i++) {
 		
-		/* Get current device wrapper. */
-		CL4Device* curr_device = (CL4Device*) g_ptr_array_index(devices, i);
+		/* Get current filter. */
+		CL4DevSelFilter* curr_filter = g_ptr_array_index(*filters, i);
 		
-		/* Cycle through all filters. */
-		for (guint j = 0; j < (*filters)->len; j++) {
-
-			/* Get current filter. */
-			CL4DevSelFilter* curr_filter = g_ptr_array_index(*filters, j);
-
-			/* Check if current device is accepted by current filter. */
-			gboolean pass = curr_filter->function(
-				curr_device, curr_filter->data, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
+		/* Check type of filter, proceed accordingly. */
+		if (curr_filter->type == CL4_DEVSEL_MULTI) {
 			
-			/* If current device didn't pass current filter... */
-			if (!pass) {
+			/* It's a multi-device filter.*/
+			devices = ((cl4_devsel_multi) (curr_filter->function))(
+				devices, curr_filter->data, &err_internal);
+			gef_if_err_propagate_goto(err, err_internal, error_handler);
 				
-				/* Remove device wrapper from device wrapper array. */
-				g_ptr_array_remove_index(devices, i);
+		} else {
+			/* It's a single-device filter. */
+			
+			/* Cycle through all devices. */
+			for (guint j = 0; j < devices->len; j++) {
 				
-				/* Force device index decrement, because next device to
-				 * be checked will be in this index. */
-				i--;
-				
-				/* Get out of the filtering loop, device didn't pass,
-				 * no need to test with other filters. */
-				break;
-			}
-		};
-		
-	};
+				/* Get current device wrapper. */
+				CL4Device* curr_device = 
+					(CL4Device*) g_ptr_array_index(devices, j);
+
+				/* Check if current device is accepted by current 
+				 * filter. */
+				gboolean pass = 
+					((cl4_devsel_single) curr_filter->function)(
+						curr_device, curr_filter->data, &err_internal);
+				gef_if_err_propagate_goto(
+					err, err_internal, error_handler);
+
+				/* If current device didn't pass current filter... */
+				if (!pass) {
+					
+					/* Remove device wrapper from device wrapper array. */
+					g_ptr_array_remove_index(devices, j);
+					
+					/* Force device index decrement, because next device to
+					 * be checked will be in this index. */
+					j--;
+					
+				}
+			}			
+		}
+	}
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -215,23 +258,23 @@ finish:
 	return (gboolean) (type & type_to_check);
 }
 
-gboolean cl4_devsel_gpu(CL4Device* device, void *select_data, GError **err) {
+gboolean cl4_devsel_gpu(CL4Device* device, void *data, GError **err) {
 
-	select_data = select_data;
+	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_GPU, err);
 	
 }
 
-gboolean cl4_devsel_cpu(CL4Device* device, void *select_data, GError **err) {
+gboolean cl4_devsel_cpu(CL4Device* device, void *data, GError **err) {
 
-	select_data = select_data;
+	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_CPU, err);
 
 }
 
-gboolean cl4_devsel_accel(CL4Device* device, void *select_data, GError **err) {
+gboolean cl4_devsel_accel(CL4Device* device, void *data, GError **err) {
 
-	select_data = select_data;
+	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_ACCELERATOR, err);
 
 }
