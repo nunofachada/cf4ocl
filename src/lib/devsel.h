@@ -41,36 +41,36 @@
 typedef GPtrArray* CL4DevSelDevices;
 
 /**
- * @brief Single-device filter function: Abstract function for filtering 
+ * @brief Independent filter function: Abstract function for filtering 
  * one OpenCL device at a time.
  *
  * @param device OpenCL device to filter.
- * @param select_data Filter data, implementation dependent.
+ * @param data Filter data, implementation dependent.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return TRUE if filter accepts device, FALSE otherwise.
  */
-typedef gboolean (*cl4_devsel_single)(
-	CL4Device* device, void *select_data, GError **err);
+typedef gboolean (*cl4_devsel_indep)(
+	CL4Device* device, void *data, GError **err);
 	
 /**
- * @brief Multi-device filter function: Abstract function for filtering 
- * several OpenCL device at once.
+ * @brief Dependent filter function: Abstract function for filtering 
+ * several OpenCL devices depending on the available device choices.
  *
  * @param devices OpenCL devices to filter.
- * @param select_data Filter data, implementation dependent.
+ * @param data Filter data, implementation dependent.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  */
- typedef CL4DevSelDevices (*cl4_devsel_multi)(
-	CL4DevSelDevices devices, void *select_data, GError **err);
+typedef CL4DevSelDevices (*cl4_devsel_dep)(
+	CL4DevSelDevices devices, void *data, GError **err);
 
 /**
- * @brief A set of single and multi-device filters.
+ * @brief A set of independent and dependent device filters.
  * 
- * Use the cl4_devsel_add_single_filter() function to add single-device
- * filters and the cl4_devsel_add_multi_filter() function to add multi-
+ * Use the cl4_devsel_add_indep_filter() function to add independent
+ * filters and the cl4_devsel_add_dep_filter() function to add dependent
  * device filters.
  * 
  * This object should be initialized to NULL:
@@ -80,7 +80,7 @@ typedef gboolean (*cl4_devsel_single)(
  * And its location should be passed to the cl4_devsel_add_*_filter() 
  * functions:
  * 
- *     cl4_devsel_add_single_filter(&filters, cl4_devsel_cpu, NULL);
+ *     cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_cpu, NULL);
  * 
  * Filters are processed in the order they are added to the set.
  * */
@@ -90,33 +90,39 @@ typedef GPtrArray* CL4DevSelFilters;
  * filters.  */
 CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err);
 
-/** @brief Add a single-device filter to the filter set. */
-void cl4_devsel_add_single_filter(
-	CL4DevSelFilters* filters, cl4_devsel_single filter, gpointer data);
+/** @brief Add a independent device filter to the filter set. */
+void cl4_devsel_add_indep_filter(
+	CL4DevSelFilters* filters, cl4_devsel_indep filter, gpointer data);
 
 /** @brief Add a multi-device filter to the filter set. */
-void cl4_devsel_add_multi_filter(
-	CL4DevSelFilters* filters, cl4_devsel_multi filter, gpointer data);
+void cl4_devsel_add_dep_filter(
+	CL4DevSelFilters* filters, cl4_devsel_dep filter, gpointer data);
 
 /**
- * @defgroup CL4_DEVSEL_SINGLE_FILTERS Single-device filters.
+ * @defgroup CL4_DEVSEL_INDEP_FILTERS Single-device filters.
  *
  * @{
  */
 
-gboolean cl4_devsel_gpu(CL4Device* device, void *select_data, GError **err);
+gboolean cl4_devsel_indep_gpu(
+	CL4Device* device, void *data, GError **err);
 
-gboolean cl4_devsel_cpu(CL4Device* device, void *select_data, GError **err);
+gboolean cl4_devsel_indep_cpu(
+	CL4Device* device, void *data, GError **err);
 
-gboolean cl4_devsel_accel(CL4Device* device, void *select_data, GError **err);
+gboolean cl4_devsel_indep_accel(
+	CL4Device* device, void *data, GError **err);
 
 /** @} */
 
 /**
- * @defgroup CL4_DEVSEL_SINGLE_FILTERS Multi-device filters.
+ * @defgroup CL4_DEVSEL_DEP_FILTERS Multi-device filters.
  *
  * @{
  */
+
+CL4DevSelDevices cl4_devsel_dep_platform(
+	CL4DevSelDevices devices, void *data, GError **err);
 
 
 /** @} */

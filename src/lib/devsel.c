@@ -30,15 +30,18 @@
 	
 /** @brief Filter type. */
 typedef enum cl4_devsel_filter_type {
-	/** Single-device filter. */
-	CL4_DEVSEL_SINGLE,
-	/** Multi-device filter. */
-	CL4_DEVSEL_MULTI
+	
+	/** Independent filter, filters one device at a time. */
+	CL4_DEVSEL_INDEP,
+	/** Dependent filter, filters devices depending on the currently
+	 * available device choices. */
+	CL4_DEVSEL_DEP
+	
 } CL4DevSelFilterType;
 
 /** 
- * @brief Filter object, includes a filter function (single or multi
- * device) and the respective filter data.
+ * @brief Filter object, includes a filter function (independent or 
+ * dependent) and the respective filter data.
  * */
 typedef struct cl4_devsel_filter {
 	
@@ -61,7 +64,7 @@ static void cl4_devsel_add_filter(CL4DevSelFilters* filters,
 	/* Allocate space for new filter. */
 	CL4DevSelFilter* filter = g_slice_new0(CL4DevSelFilter);
 	
-	/* Set filter function, filter data and type (single-device filter). */
+	/* Set filter function, filter data and type. */
 	filter->function = function;
 	filter->data = data;
 	filter->type = type;
@@ -71,16 +74,16 @@ static void cl4_devsel_add_filter(CL4DevSelFilters* filters,
 	
 }
 
-void cl4_devsel_add_single_filter(
-	CL4DevSelFilters* filters, cl4_devsel_single function, gpointer data) {
+void cl4_devsel_add_indep_filter(
+	CL4DevSelFilters* filters, cl4_devsel_indep function, gpointer data) {
 
-	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_SINGLE);
+	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_INDEP);
 }
 
-void cl4_devsel_add_multi_filter(
-	CL4DevSelFilters* filters, cl4_devsel_multi function, gpointer data) {
+void cl4_devsel_add_dep_filter(
+	CL4DevSelFilters* filters, cl4_devsel_dep function, gpointer data) {
 
-	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_MULTI);
+	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_DEP);
 }
 
 CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
@@ -163,15 +166,15 @@ CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
 		CL4DevSelFilter* curr_filter = g_ptr_array_index(*filters, i);
 		
 		/* Check type of filter, proceed accordingly. */
-		if (curr_filter->type == CL4_DEVSEL_MULTI) {
+		if (curr_filter->type == CL4_DEVSEL_DEP) {
 			
-			/* It's a multi-device filter.*/
-			devices = ((cl4_devsel_multi) (curr_filter->function))(
+			/* It's a dependent filter.*/
+			devices = ((cl4_devsel_dep) (curr_filter->function))(
 				devices, curr_filter->data, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 				
 		} else {
-			/* It's a single-device filter. */
+			/* It's an independent filter. */
 			
 			/* Cycle through all devices. */
 			for (guint j = 0; j < devices->len; j++) {
@@ -183,7 +186,7 @@ CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
 				/* Check if current device is accepted by current 
 				 * filter. */
 				gboolean pass = 
-					((cl4_devsel_single) curr_filter->function)(
+					((cl4_devsel_indep) curr_filter->function)(
 						curr_device, curr_filter->data, &err_internal);
 				gef_if_err_propagate_goto(
 					err, err_internal, error_handler);
@@ -228,7 +231,6 @@ finish:
 
 }
 
-
 static gboolean cl4_devsel_type(
 	CL4Device* device, cl_device_type type_to_check, GError **err) {
 	
@@ -258,21 +260,21 @@ finish:
 	return (gboolean) (type & type_to_check);
 }
 
-gboolean cl4_devsel_gpu(CL4Device* device, void *data, GError **err) {
+gboolean cl4_devsel_indep_gpu(CL4Device* device, void *data, GError **err) {
 
 	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_GPU, err);
 	
 }
 
-gboolean cl4_devsel_cpu(CL4Device* device, void *data, GError **err) {
+gboolean cl4_devsel_indep_cpu(CL4Device* device, void *data, GError **err) {
 
 	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_CPU, err);
 
 }
 
-gboolean cl4_devsel_accel(CL4Device* device, void *data, GError **err) {
+gboolean cl4_devsel_indep_accel(CL4Device* device, void *data, GError **err) {
 
 	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_ACCELERATOR, err);

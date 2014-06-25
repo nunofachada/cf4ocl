@@ -476,7 +476,7 @@ static void context_create_info_destroy_test() {
 	g_free(ctx_props);
 
 	/* Test context creating by device filtering. */
-	cl4_devsel_add_single_filter(&filters, cl4_devsel_gpu, NULL);
+	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_gpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
@@ -485,7 +485,7 @@ static void context_create_info_destroy_test() {
 	else cl4_context_destroy(ctx);
 	filters = NULL;
 
-	cl4_devsel_add_single_filter(&filters, cl4_devsel_cpu, NULL);
+	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_cpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
@@ -494,7 +494,7 @@ static void context_create_info_destroy_test() {
 	else cl4_context_destroy(ctx);
 	filters = NULL;
 
-	cl4_devsel_add_single_filter(&filters, cl4_devsel_accel, NULL);
+	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_accel, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
@@ -551,7 +551,7 @@ static void context_ref_unref_test() {
 	cl4_context_destroy(ctx);
 
 	/* Test context creating by device filtering. */
-	cl4_devsel_add_single_filter(&filters, cl4_devsel_gpu, NULL);
+	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_gpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
@@ -564,7 +564,7 @@ static void context_ref_unref_test() {
 	}
 	filters = NULL;
 
-	cl4_devsel_add_single_filter(&filters, cl4_devsel_cpu, NULL);
+	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_cpu, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
