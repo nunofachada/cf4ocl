@@ -267,18 +267,117 @@ gboolean cl4_devsel_indep_gpu(CL4Device* device, void *data, GError **err) {
 	
 }
 
-gboolean cl4_devsel_indep_cpu(CL4Device* device, void *data, GError **err) {
+gboolean cl4_devsel_indep_cpu(
+	CL4Device* device, void *data, GError **err) {
 
 	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_CPU, err);
 
 }
 
-gboolean cl4_devsel_indep_accel(CL4Device* device, void *data, GError **err) {
+gboolean cl4_devsel_indep_accel(
+	CL4Device* device, void *data, GError **err) {
 
 	data = data;
 	return cl4_devsel_type(device, CL_DEVICE_TYPE_ACCELERATOR, err);
 
 }
 
+gboolean cl4_devsel_indep_platform(
+	CL4Device* device, void *data, GError **err) {
+		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+
+	cl_platform_id platf;
+	
+	GError* err_internal = NULL;
+	
+	gboolean pass;
+
+	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
+		CL4_ERROR_INVALID_DATA, error_handler,
+		"Function '%s': invalid filter data", __func__); 
+	
+	platf = cl4_device_info_value_scalar(device, CL_DEVICE_PLATFORM,
+		cl_platform_id, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	pass = (platf == (cl_platform_id) data) ? TRUE : FALSE;
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	pass = FALSE;
+	
+finish:
+
+	return pass;
+}
+
+CL4DevSelDevices cl4_devsel_dep_platform(
+	CL4DevSelDevices devices, void *data, GError **err) {
+		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	CL4Device* dev;
+	cl_platform_id platf_ref, platf_curr;
+	GError *err_internal;
+	
+	data = data;
+	
+	/* Determine platform. */
+	dev = (CL4Device*) g_ptr_array_index(devices, 0);
+		
+	platf_ref = cl4_device_info_value_scalar(dev, CL_DEVICE_PLATFORM,
+		cl_platform_id, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+	/* Check if devices belong to platform, remove them if they don't. */
+	for (guint i = 1; i < devices->len; i++) {
+		
+		/* Get current device. */
+		dev = (CL4Device*) g_ptr_array_index(devices, i);
+		
+		/* Get current device platform. */
+		platf_curr = cl4_device_info_value_scalar(
+			dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+		/* If current device doesn't belong to the same platform... */
+		if (platf_ref != platf_curr) {
+			
+			/* Remove device wrapper from device wrapper array. */
+			g_ptr_array_remove_index(devices, i);
+			
+			/* Force device index decrement, because next device to
+			 * be checked will be in this index. */
+			i--;
+			
+		}
+		
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	/* Set return value to NULL to conform to specification. */
+	devices = NULL;
+	
+finish:
+
+	/* Return filtered devices. */
+	return devices;
+}
 

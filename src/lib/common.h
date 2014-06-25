@@ -41,6 +41,7 @@ enum cl4_error_codes {
 	CL4_ERROR_NOALLOC = 1,  /**< Error code thrown when no memory allocation is possible. */
 	CL4_ERROR_OPENFILE = 2, /**< Error code thrown when it's not possible to open file. */
 	CL4_ERROR_ARGS = 3,     /**< Error code thrown when passed arguments are invalid. */
+	CL4_ERROR_INVALID_DATA = 4,     /**< Error code thrown when invalid data is passed to a function. */
 	CL4_ERROR_STREAM_WRITE = 5,     /**< Error code thrown when an error occurs while writing to a stream. */
 	CL4_ERROR_DEVICE_NOT_FOUND = 6, /**< The requested OpenCL device was not found. */
 	CL4_ERROR_OCL = 10      /**< An OpenCL error ocurred. */
