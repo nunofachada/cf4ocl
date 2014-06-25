@@ -28,7 +28,9 @@
 #include "devsel.h"
 
 	
-/** @brief Filter type. */
+/** 
+ * @brief Filter type. 
+ * */
 typedef enum cl4_devsel_filter_type {
 	
 	/** Independent filter, filters one device at a time. */
@@ -54,6 +56,17 @@ typedef struct cl4_devsel_filter {
 	
 } CL4DevSelFilter;
 
+/**
+ * @brief Add any filter to the filter set.
+ * 
+ * This private function is used by the public cl4_devsel_add_*_filter()
+ * functions.
+ * 
+ * @param filters The filter set.
+ * @param function Filter function (independent or dependent).
+ * @param data Filter data.
+ * @param type Type of filter: independent or dependent.
+ * */
 static void cl4_devsel_add_filter(CL4DevSelFilters* filters, 
 	gpointer function, gpointer data, CL4DevSelFilterType type) {
 
@@ -74,19 +87,48 @@ static void cl4_devsel_add_filter(CL4DevSelFilters* filters,
 	
 }
 
+/**
+ * @brief Add an independent filter to the filter set.
+ * 
+ * @param filters The filter set.
+ * @param function Indendent filter function.
+ * @param data Filter data.
+ * */
 void cl4_devsel_add_indep_filter(
 	CL4DevSelFilters* filters, cl4_devsel_indep function, gpointer data) {
 
 	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_INDEP);
 }
 
+/**
+ * @brief Add a dependent filter to the filter set.
+ * 
+ * @param filters The filter set.
+ * @param function Indendent filter function.
+ * @param data Filter data.
+ * */
 void cl4_devsel_add_dep_filter(
 	CL4DevSelFilters* filters, cl4_devsel_dep function, gpointer data) {
 
 	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_DEP);
 }
 
-CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err) {
+/** 
+ * @brief Select one or more OpenCL devices based on the provided
+ * filters.
+ * 
+ * This function is internally used by the 
+ * cl4_context_new_from_filters_full() function for selecting context
+ * devices. Clients should not need to use it frequently.
+ * 
+ * @param filters Filters used to select device(s).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return One or more OpenCL devices selected based on the provided
+ * filters.
+ *  */
+CL4DevSelDevices cl4_devsel_select(
+	CL4DevSelFilters* filters, GError **err) {
 
 	/* Make sure filters is not NULL. */
 	g_return_val_if_fail(filters != NULL, NULL);
@@ -231,8 +273,21 @@ finish:
 
 }
 
-static gboolean cl4_devsel_type(
-	CL4Device* device, cl_device_type type_to_check, GError **err) {
+/**
+ * @brief Independent filter function which accepts devices of the type
+ * given in the data parameter.
+ * 
+ * This function is used by the cl4_devsel_indep_type_*() group of
+ * functions. Using these is simpler than using this function directly.
+ * 
+ * @param device OpenCL device to filter depending on type.
+ * @param data Filter data, must point to a cl_device_type value.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return TRUE if device is of the given type, FALSE otherwise.
+ * */
+gboolean cl4_devsel_indep_type(
+	CL4Device* device, void* data, GError **err) {
 	
 	/* Make sure device is not NULL. */ 
 	g_return_val_if_fail(device != NULL, FALSE);
@@ -240,8 +295,18 @@ static gboolean cl4_devsel_type(
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
 	
+	/* Internal error object. */
 	GError* err_internal = NULL;
 	
+	/* Make sure data is not NULL. */
+	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
+		CL4_ERROR_INVALID_DATA, error_handler,
+		"Function '%s': invalid filter data", __func__); 
+	
+	/* Get type to check for. */
+	cl_device_type type_to_check = *((cl_device_type*) data);
+	
+	/* Get device type. */
 	cl_device_type type = cl4_device_info_value_scalar(
 		device, CL_DEVICE_TYPE, cl_device_type, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
@@ -260,49 +325,115 @@ finish:
 	return (gboolean) (type & type_to_check);
 }
 
-gboolean cl4_devsel_indep_gpu(CL4Device* device, void *data, GError **err) {
+/**
+ * @brief Independent filter function which only accepts GPU devices.
+ * 
+ * @param device OpenCL device to check for GPU type.
+ * @param data Filter data, ignored.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return TRUE if device is a GPU, FALSE otherwise.
+ * */
+gboolean cl4_devsel_indep_type_gpu(
+	CL4Device* device, void *data, GError **err) {
 
+	/* Set device type to GPU. */
+	cl_device_type type_to_check = CL_DEVICE_TYPE_GPU;
+	
+	/* Data not used, ignore compiler warnings. */
 	data = data;
-	return cl4_devsel_type(device, CL_DEVICE_TYPE_GPU, err);
+	
+	/* Return result. */
+	return cl4_devsel_indep_type(device, (void*) &type_to_check, err);
 	
 }
 
-gboolean cl4_devsel_indep_cpu(
+/**
+ * @brief Independent filter function which only accepts CPU devices.
+ * 
+ * @param device OpenCL device to check for CPU type.
+ * @param data Filter data, ignored.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return TRUE if device is a CPU, FALSE otherwise.
+ * */
+gboolean cl4_devsel_indep_type_cpu(
 	CL4Device* device, void *data, GError **err) {
 
+	/* Set device type to CPU. */
+	cl_device_type type_to_check = CL_DEVICE_TYPE_CPU;
+	
+	/* Data not used, ignore compiler warnings. */
 	data = data;
-	return cl4_devsel_type(device, CL_DEVICE_TYPE_CPU, err);
+	
+	/* Return result. */
+	return cl4_devsel_indep_type(device, (void*) &type_to_check, err);
 
 }
 
-gboolean cl4_devsel_indep_accel(
+/**
+ * @brief Independent filter function which only accepts accelerator 
+ * devices.
+ * 
+ * @param device OpenCL device to check for accelerator type.
+ * @param data Filter data, ignored.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return TRUE if device is a accelerator, FALSE otherwise.
+ * */
+gboolean cl4_devsel_indep_type_accel(
 	CL4Device* device, void *data, GError **err) {
 
+	/* Set device type to Accelerator. */
+	cl_device_type type_to_check = CL_DEVICE_TYPE_ACCELERATOR;
+	
+	/* Data not used, ignore compiler warnings. */
 	data = data;
-	return cl4_devsel_type(device, CL_DEVICE_TYPE_ACCELERATOR, err);
+	
+	/* Return result. */
+	return cl4_devsel_indep_type(device, (void*) &type_to_check, err);
 
 }
 
+/**
+ * @brief Independent filter function which only accepts devices of a
+ * specified platform.
+ * 
+ * @param device OpenCL device to filter by platform.
+ * @param data Filter data, must be a cl_platform_id.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return TRUE if device belongs to the specified platform, FALSE 
+ * otherwise.
+ * */
 gboolean cl4_devsel_indep_platform(
 	CL4Device* device, void *data, GError **err) {
 		
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
 
+	/* Device platform. */
 	cl_platform_id platf;
 	
+	/* Internal error object. */
 	GError* err_internal = NULL;
 	
+	/* Return value, i.e., flag indicating if device belongs to the 
+	 * specified platform. */
 	gboolean pass;
 
+	/* Check if data is NULL, throw error if so. */
 	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
 		CL4_ERROR_INVALID_DATA, error_handler,
 		"Function '%s': invalid filter data", __func__); 
 	
+	/* Get device platform. */
 	platf = cl4_device_info_value_scalar(device, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
+	/* Determine filtering result, i.e. if device platform is the same
+	 * as the specified platform. */
 	pass = (platf == (cl_platform_id) data) ? TRUE : FALSE;
 
 	/* If we got here, everything is OK. */
@@ -313,33 +444,53 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 	
+	/* Filter will not accept device in case an error occurs. */
 	pass = FALSE;
 	
 finish:
 
+	/* Return filtering result. */
 	return pass;
 }
 
+/**
+ * @brief Dependent filter function which only accepts devices of the
+ * same platform (the platform to which the first device belong to).
+ * 
+ * @param devices Currently available OpenCL devices.
+ * @param data Filter data, ignored.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The OpenCL devices which were accepted by the filter.
+ * */
 CL4DevSelDevices cl4_devsel_dep_platform(
 	CL4DevSelDevices devices, void *data, GError **err) {
 		
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
+	/* Current device. */
 	CL4Device* dev;
+	
+	/* Reference platform and current device platform.*/
 	cl_platform_id platf_ref, platf_curr;
+	
+	/* Internal error object. */
 	GError *err_internal = NULL;
 	
+	/* Filter data is ignored by this filter. */
 	data = data;
 	
-	/* Determine platform. */
+	/* Get first device, which will determine the reference platform. */
 	dev = (CL4Device*) g_ptr_array_index(devices, 0);
-		
+	
+	/* Determine reference platform (i.e. platform of first device). */
 	platf_ref = cl4_device_info_value_scalar(dev, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
-	/* Check if devices belong to platform, remove them if they don't. */
+	/* Check if devices belong to the reference platform, remove them if 
+	 * they don't. */
 	for (guint i = 1; i < devices->len; i++) {
 		
 		/* Get current device. */
@@ -350,7 +501,8 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 			dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
-		/* If current device doesn't belong to the same platform... */
+		/* If current device doesn't belong to the reference 
+		 * platform... */
 		if (platf_ref != platf_curr) {
 			
 			/* Remove device wrapper from device wrapper array. */
@@ -380,4 +532,3 @@ finish:
 	/* Return filtered devices. */
 	return devices;
 }
-

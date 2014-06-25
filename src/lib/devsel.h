@@ -80,39 +80,51 @@ typedef CL4DevSelDevices (*cl4_devsel_dep)(
  * And its location should be passed to the cl4_devsel_add_*_filter() 
  * functions:
  * 
- *     cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_cpu, NULL);
+ *     cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_cpu, NULL);
  * 
  * Filters are processed in the order they are added to the set.
  * */
 typedef GPtrArray* CL4DevSelFilters;
 
-/** @brief Select one or more OpenCL devices based on the provided
- * filters.  */
-CL4DevSelDevices cl4_devsel_select(CL4DevSelFilters* filters, GError **err);
-
 /** @brief Add a independent device filter to the filter set. */
 void cl4_devsel_add_indep_filter(
 	CL4DevSelFilters* filters, cl4_devsel_indep filter, gpointer data);
 
-/** @brief Add a multi-device filter to the filter set. */
+/** @brief Add a dependent device filter to the filter set. */
 void cl4_devsel_add_dep_filter(
 	CL4DevSelFilters* filters, cl4_devsel_dep filter, gpointer data);
+
+/** @brief Select one or more OpenCL devices based on the provided
+ * filters.  */
+CL4DevSelDevices cl4_devsel_select(
+	CL4DevSelFilters* filters, GError **err);
 
 /**
  * @defgroup CL4_DEVSEL_INDEP_FILTERS Single-device filters.
  *
  * @{
  */
+ 
+/** @brief Independent filter function which accepts devices of the type
+ * given in the data parameter. */
+gboolean cl4_devsel_indep_type(
+	CL4Device* device, void* data, GError **err);
 
-gboolean cl4_devsel_indep_gpu(
+/** @brief Independent filter function which only accepts GPU devices. */
+gboolean cl4_devsel_indep_type_gpu(
 	CL4Device* device, void *data, GError **err);
 
-gboolean cl4_devsel_indep_cpu(
+/** @brief Independent filter function which only accepts CPU devices. */
+gboolean cl4_devsel_indep_type_cpu(
 	CL4Device* device, void *data, GError **err);
 
-gboolean cl4_devsel_indep_accel(
+/** @brief Independent filter function which only accepts accelerator 
+ * devices. */
+gboolean cl4_devsel_indep_type_accel(
 	CL4Device* device, void *data, GError **err);
-	
+
+/** @brief Independent filter function which only accepts devices of a
+ * specified platform. */
 gboolean cl4_devsel_indep_platform(
 	CL4Device* device, void *data, GError **err);
 
@@ -124,6 +136,8 @@ gboolean cl4_devsel_indep_platform(
  * @{
  */
 
+/** @brief Dependent filter function which only accepts devices of the
+ * same platform (the platform to which the first device belong to). */
 CL4DevSelDevices cl4_devsel_dep_platform(
 	CL4DevSelDevices devices, void *data, GError **err);
 
