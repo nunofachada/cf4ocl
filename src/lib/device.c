@@ -34,7 +34,7 @@
 struct cl4_device {
 
 	/** OpenCL device ID. */
-	cl_device_id id;
+	cl_device_id cl_object;
 	/** Device information. */
 	GHashTable* info;
 	/** Reference count. */
@@ -57,7 +57,7 @@ CL4Device* cl4_device_new(cl_device_id id) {
 	device = g_slice_new(CL4Device);
 	
 	/* Set the device ID. */
-	device->id = id;
+	device->cl_object = id;
 		
 	/* Device information will be lazy initialized when required. */
 	device->info = NULL;
@@ -142,85 +142,8 @@ gint cl4_device_ref_count(CL4Device* device) {
 CL4Info* cl4_device_info(CL4Device* device, 
 	cl_device_info param_name, GError** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
-	/* Make sure device is not NULL. */
-	g_return_val_if_fail(device != NULL, NULL);
-	
-	/* Device information value object. */
-	CL4Info* info_value = NULL;
-	
-	/* If device information table is not yet initialized, then 
-	 * initialize it. */
-	if (!device->info) {
-		device->info = g_hash_table_new_full(
-			g_direct_hash, g_direct_equal, 
-			NULL, cl4_info_destroy);
-	}
-
-	/* Check if requested information is already present in the 
-	 * device information table. */
-	if (g_hash_table_contains(
-		device->info, GUINT_TO_POINTER(param_name))) {
-		
-		/* If so, retrieve it from there. */
-		info_value = g_hash_table_lookup(
-			device->info, GUINT_TO_POINTER(param_name));
-		
-	} else {
-		
-		/* Otherwise, get it from OpenCL device.*/
-		cl_int ocl_status;
-		/* Device information placeholder. */
-		gpointer param_value;
-		/* Size of device information in bytes. */
-		gsize size_ret;
-		
-		/* Get size of information. */
-		ocl_status = clGetDeviceInfo(
-			device->id, param_name, 0, NULL, &size_ret);
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get device info [size] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			size_ret == 0, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get device info [size] (size is 0).",
-			__func__);
-		
-		/* Allocate memory for information. */
-		param_value = g_malloc(size_ret);
-		
-		/* Get information. */
-		ocl_status = clGetDeviceInfo(
-			device->id, param_name, size_ret, param_value, NULL);
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get device info [info] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
-			
-		/* Keep information in device information table. */
-		info_value = cl4_info_new(param_value, size_ret);
-		g_hash_table_insert(device->info, 
-			GUINT_TO_POINTER(param_name), 
-			info_value);
-		
-	}
-
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
-
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	info_value = NULL;
-
-finish:
-	
-	/* Return the requested device information. */
-	return info_value;
+	/* Use the generic get info macro. */
+	cl4_info_get(device, param_name, clGetDeviceInfo, err);
 
 }
 
@@ -290,5 +213,5 @@ cl_device_id cl4_device_unwrap(CL4Device* device) {
 	g_return_val_if_fail(device != NULL, NULL);
 	
 	/* Return the OpenCL device ID. */
-	return device->id;
+	return device->cl_object;
 }

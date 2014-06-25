@@ -36,7 +36,7 @@ struct cl4_context {
 	CL4Platform* platform;
 	
 	/** Context. */
-	cl_context context;
+	cl_context cl_object;
 	
 	/** Context information (can be lazy initialized). */
 	GHashTable* info;
@@ -81,7 +81,7 @@ static CL4Context* cl4_context_new_internal() {
 	ctx = g_slice_new0(CL4Context);
 	
 	/* Set fields empty and reference count to 1. */
-	ctx->context = NULL;
+	ctx->cl_object = NULL;
 	ctx->info = NULL;
 	ctx->platform = NULL;
 	ctx->num_devices = 0;
@@ -309,7 +309,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	/// @todo Check if devices belong to same platform
 	
 	/* Create OpenCL context. */
-	ctx->context = clCreateContext(
+	ctx->cl_object = clCreateContext(
 		(const cl_context_properties*) ctx_props, devices->len, cl_devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
@@ -417,7 +417,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 			properties, ctx->devices[0], &err_internal);
 	
 	/* Create OpenCL context. */
-	ctx->context = clCreateContext(
+	ctx->cl_object = clCreateContext(
 		(const cl_context_properties*) ctx_props, num_devices, devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
@@ -465,7 +465,7 @@ CL4Context* cl4_context_new_from_clcontext(cl_context context) {
 	CL4Context* ctx = cl4_context_new_internal();
 	
 	/* Set OpenCL context. */
-	ctx->context = context;
+	ctx->cl_object = context;
 	
 	/* Return new context wrapper. */
 	return ctx;
@@ -513,8 +513,8 @@ void cl4_context_unref(CL4Context* ctx) {
 		}
 				  
 		/* Release context. */
-		if (ctx->context) {
-			clReleaseContext(ctx->context);
+		if (ctx->cl_object) {
+			clReleaseContext(ctx->cl_object);
 		}
 		
 		/* Release platform. */
@@ -566,85 +566,8 @@ gint cl4_context_ref_count(CL4Context* ctx) {
 CL4Info* cl4_context_info(CL4Context* ctx, 
 	cl_context_info param_name, GError** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
-	
-	/* Context information object. */
-	CL4Info* info = NULL;
-	
-	/* If context information table is not yet initialized, then 
-	 * initialize it. */
-	if (!ctx->info) {
-		ctx->info = g_hash_table_new_full(
-			g_direct_hash, g_direct_equal, 
-			NULL, cl4_info_destroy);
-	}
-
-	/* Check if requested information is already present in the 
-	 * context information table. */
-	if (g_hash_table_contains(
-		ctx->info, GUINT_TO_POINTER(param_name))) {
-		
-		/* If so, retrieve it from there. */
-		info = g_hash_table_lookup(
-			ctx->info, GUINT_TO_POINTER(param_name));
-		
-	} else {
-		
-		/* Otherwise, get it from OpenCL device.*/
-		cl_int ocl_status;
-		/* Device information placeholder. */
-		gpointer param_value;
-		/* Size of device information in bytes. */
-		gsize size_ret;
-		
-		/* Get size of information. */
-		ocl_status = clGetContextInfo(
-			ctx->context, param_name, 0, NULL, &size_ret);
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get context info [size] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			size_ret == 0, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get context info [size] (size is 0).",
-			__func__);
-		
-		/* Allocate memory for information. */
-		param_value = g_malloc(size_ret);
-		
-		/* Get information. */
-		ocl_status = clGetContextInfo(
-			ctx->context, param_name, size_ret, param_value, NULL);
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get context info [info] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
-			
-		/* Keep information in context information table. */
-		info = cl4_info_new(param_value, size_ret);
-		g_hash_table_insert(ctx->info, 
-			GUINT_TO_POINTER(param_name), 
-			info);
-		
-	}
-
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
-
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	info = NULL;
-
-finish:
-	
-	/* Return the requested device information. */
-	return info;
+	/* Use the generic get info macro. */
+	cl4_info_get(ctx, param_name, clGetContextInfo, err);
 
 }
 
@@ -660,7 +583,7 @@ cl_context cl4_context_unwrap(CL4Context* ctx) {
 	g_return_val_if_fail(ctx != NULL, NULL);
 	
 	/* Return the OpenCL context object. */
-	return ctx->context;
+	return ctx->cl_object;
 }
  
 /** 

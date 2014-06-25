@@ -60,7 +60,7 @@ void cl4_platform_unref(CL4Platform* platform);
 gint cl4_platform_ref_count(CL4Platform* platform);
 
 /** @brief Get platform information. */
-gchar* cl4_platform_info(CL4Platform* platform, 
+gpointer cl4_platform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err);
 
 /** @brief Get the OpenCL platform ID object. */

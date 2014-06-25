@@ -33,7 +33,7 @@
  */
 struct cl4_platform {
 	/** Platform ID. */
-	cl_platform_id id;
+	cl_platform_id cl_object;
 	/** Platform information. */
 	GHashTable* info;
 	/** Number of devices available in platform. */
@@ -69,7 +69,7 @@ static void cl4_plaform_init_devices(
 		cl_device_id* dev_ids;
 		
 		/* Determine number of devices. */
-		ocl_status = clGetDeviceIDs(platform->id, CL_DEVICE_TYPE_ALL, 0,
+		ocl_status = clGetDeviceIDs(platform->cl_object, CL_DEVICE_TYPE_ALL, 0,
 			NULL, &platform->num_devices);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
 			CL4_ERROR_OCL, error_handler, 
@@ -83,7 +83,7 @@ static void cl4_plaform_init_devices(
 		dev_ids = (cl_device_id*) g_slice_alloc(dev_ids_size);
 		
 		/* Get existing device IDs. */
-		ocl_status = clGetDeviceIDs(platform->id, CL_DEVICE_TYPE_ALL, 
+		ocl_status = clGetDeviceIDs(platform->cl_object, CL_DEVICE_TYPE_ALL, 
 			platform->num_devices, dev_ids, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
 			CL4_ERROR_OCL, error_handler, 
@@ -135,7 +135,7 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
 	platform = g_slice_new(CL4Platform);
 	
 	/* Set the platform ID. */
-	platform->id = id;
+	platform->cl_object = id;
 		
 	/* Platform information will be lazy initialized when required. */
 	platform->info = NULL;
@@ -239,79 +239,11 @@ gint cl4_platform_ref_count(CL4Platform* platform) {
  * be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-gchar* cl4_platform_info(CL4Platform* platform, 
+gpointer cl4_platform_info(CL4Platform* platform, 
 	cl_platform_info param_name, GError **err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	
-	/* Make sure platform is not NULL. */
-	g_return_val_if_fail(platform != NULL, NULL);
-	
-	/* Platform information placeholder. */
-	gchar* param_value = NULL;
-	
-	/* If platform information table is not yet initialized, then 
-	 * initialize it. */
-	if (!platform->info) {
-		platform->info = g_hash_table_new_full(
-			g_direct_hash, g_direct_equal, NULL, g_free);
-	}
-
-	/* Check if requested information is already present in the 
-	 * platform information table. */
-	if (g_hash_table_contains(
-		platform->info, GUINT_TO_POINTER(param_name))) {
-		
-		/* If so, retrieve it from there. */
-		param_value = g_hash_table_lookup(
-			platform->info, GUINT_TO_POINTER(param_name));
-		
-	} else {
-		
-		/* Otherwise, get it from OpenCL platform.*/
-		cl_int ocl_status;
-		size_t size_ret;
-		
-		/* Get size of information. */
-		ocl_status = clGetPlatformInfo(
-			platform->id, param_name, 0, NULL, &size_ret);
-		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get platform info [size] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
-		
-		/* Allocate memory for information. */
-		param_value = (gchar*) g_malloc(size_ret);
-		
-		/* Get information. */
-		ocl_status = clGetPlatformInfo(
-			platform->id, param_name, size_ret, param_value, NULL);
-		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_ERROR_OCL, error_handler, 
-			"Function '%s': get platform info [info] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
-		
-		/* Keep information in platform information table. */
-		g_hash_table_insert(
-			platform->info, GUINT_TO_POINTER(param_name), param_value);
-		
-	}
-	
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	param_value = NULL;
-	
-finish:		
-
-	/* Return the requested platform information. */
-	return param_value;
-
+	/* Use the generic get info macro. */
+	cl4_info_get(platform, param_name, clGetPlatformInfo, err);
 }
 
 /**
@@ -326,7 +258,7 @@ cl_platform_id cl4_platform_unwrap(CL4Platform* platform) {
 	g_return_val_if_fail(platform != NULL, NULL);
 	
 	/* Return the OpenCL platform ID. */
-	return platform->id;
+	return platform->cl_object;
 }
  
 /** 
