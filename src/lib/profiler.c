@@ -117,8 +117,8 @@ void cl4_prof_profile_free(CL4ProfProfile* profile) {
  * @param event_name Event name.
  * @param ev Event to get information of.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if event 
- * successfully added, or another value of #cl4_prof_error_codes if an 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if event 
+ * successfully added, or another value of #cl4_error_codes if an 
  * error occurs.
  */ 
 int cl4_prof_profile_add(CL4ProfProfile* profile, const char* event_name, cl_event ev, GError** err) {
@@ -133,8 +133,8 @@ int cl4_prof_profile_add(CL4ProfProfile* profile, const char* event_name, cl_eve
  * @param profile OpenCL events profile.
  * @param event_with_name OpenCL event associated with a name.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if event 
- * successfully added, or another value of #cl4_prof_error_codes if an 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if event 
+ * successfully added, or another value of #cl4_error_codes if an 
  * error occurs.
  * */
 int cl4_prof_profile_add_evname(CL4ProfProfile* profile, CL4ProfEvName event_with_name, GError** err) {
@@ -156,8 +156,8 @@ int cl4_prof_profile_add_evname(CL4ProfProfile* profile, CL4ProfEvName event_wit
  * @param ev1 Event to get start information of.
  * @param ev2 Event to get end information of.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if event 
- * successfully added, or another value of #cl4_prof_error_codes if an 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if event 
+ * successfully added, or another value of #cl4_error_codes if an 
  * error occurs.
  */ 
 int cl4_prof_profile_add_composite(CL4ProfProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
@@ -412,8 +412,8 @@ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
- * terminates successfully, or another value of #cl4_prof_error_codes if 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  */ 
 int cl4_prof_profile_overmat(CL4ProfProfile* profile, GError** err) {
@@ -623,8 +623,8 @@ finish:
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
- * terminates successfully, or another value of #cl4_prof_error_codes if 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */
 int cl4_prof_profile_aggregate(CL4ProfProfile* profile, GError** err) {
@@ -818,8 +818,8 @@ gdouble cl4_prof_time_elapsed(CL4ProfProfile* profile) {
  * @param profile An OpenCL events profile.
  * @param evAggSortType Sorting strategy for aggregate event data instances.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
- * terminates successfully, or another value of #cl4_prof_error_codes if 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */ 
 int cl4_prof_print_info(CL4ProfProfile* profile, CL4ProfEvAggDataSort evAggSortType, GError** err) {
@@ -989,8 +989,8 @@ finish:
  * @param profile An OpenCL events profile.
  * @param stream Stream where export info to.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
- * terminates successfully, or another value of #cl4_prof_error_codes if 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */ 
 int cl4_prof_export_info(CL4ProfProfile* profile, FILE* stream, GError** err) {
@@ -1107,8 +1107,8 @@ finish:
  * @param profile An OpenCL events profile.
  * @param filename Name of file where information will be saved to.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_prof_error_codes::CL4_SUCCESS @endlink if function
- * terminates successfully, or another value of #cl4_prof_error_codes if 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
+ * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */ 
 int cl4_prof_export_info_file(CL4ProfProfile* profile, const char* filename, GError** err) {

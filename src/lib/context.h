@@ -48,6 +48,39 @@
  * */
 typedef struct cl4_context CL4Context;
 
+/** 
+ * @brief A callback function used by the OpenCL 
+ * implementation to report information on errors during context 
+ * creation as well as errors that occur at runtime in this context.
+ * Ignored if NULL.
+ * 
+ * @param errinfo Pointer to an error string.
+ * @param private_info Pointer to binary data returned OpenCL, used to 
+ * log additional debugging information.
+ * @param cb Size of private_info data.
+ * @param user_data Passed as the user_data argument when pfn_notify is 
+ * called. user_data can be NULL.
+ * */
+typedef void (CL_CALLBACK* cl4_context_callback)(
+	const char* errinfo, const void* private_info, size_t cb, 
+	void* user_data);
+
+/**
+ * @defgroup CL4_CONTEXT_CONSTRUCTORS Context wrapper constructors,
+ * i.e. cl4_context_new_* functions.
+ *
+ * @{
+ */
+ 
+/** 
+ * @brief Create a new context wrapper object selecting devices using
+ * the given set of filters. 
+ *  
+ * @param filters Filters for selecting device.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object.
+ * */
 #define cl4_context_new_from_filters(filters, err) \
 	cl4_context_new_from_filters_full( \
 		NULL, (filters), NULL, NULL, (err))
@@ -68,15 +101,9 @@ typedef struct cl4_context CL4Context;
 #define cl4_context_new_from_cldevices(num_devices, devices, err) \
 	cl4_context_new_from_cldevices_full( \
 		NULL, (num_devices), (devices), NULL, NULL, (err))
-		
-/**
- * @brief Alias to cl4_context_unref().
- * 
- * @param ctx Context wrapper object to destroy if reference count is 1,
- * otherwise just decrement the reference count.
- * */
-#define cl4_context_destroy(ctx) cl4_context_unref(ctx)
 
+/** @brief Create a new context wrapper object selecting devices using
+ * the given set of filters. */
 CL4Context* cl4_context_new_from_filters_full(
 	const cl_context_properties* properties, 
 	CL4DevSelFilters* filters,
@@ -97,12 +124,27 @@ CL4Context* cl4_context_new_from_cldevices_full(
 /** @brief Creates a context wrapper from a cl_context object. */
 CL4Context* cl4_context_new_from_clcontext(cl_context context);
 
+/* @todo Future work */
+// CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
+// CL4Context* cl4_context_new_from_platform(CL4Platform* platform, GError** err);
+// CL4Context* cl4_context_new_from_devices(CL4Devices** devices, GError** err);
+
+/** @} */
+
 /** @brief Increase the reference count of the context wrapper object. */
 void cl4_context_ref(CL4Context* ctx);
 
 /** @brief Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
 void cl4_context_unref(CL4Context* ctx);
+
+/**
+ * @brief Alias to cl4_context_unref().
+ * 
+ * @param ctx Context wrapper object to destroy if reference count is 1,
+ * otherwise just decrement the reference count.
+ * */
+#define cl4_context_destroy(ctx) cl4_context_unref(ctx)
 
 /** @brief Returns the context wrapper object reference count. For
  * debugging and testing purposes only. */
@@ -120,6 +162,6 @@ CL4Device* cl4_context_get_device(
 	CL4Context* ctx, guint index, GError** err);
 
 /** @brief Return number of devices in context. */
-guint cl4_context_device_count(CL4Context* ctx, GError** err);
+guint cl4_context_num_devices(CL4Context* ctx, GError** err);
 
 #endif

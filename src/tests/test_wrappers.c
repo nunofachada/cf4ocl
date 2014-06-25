@@ -102,7 +102,7 @@ static void platforms_create_info_destroy_test() {
 		cl4_test_wrappers_msg("==== Extens. :", "%s", platf_info);
 		
 		/* Get number of devices. */
-		num_devs = cl4_platform_device_count(p, &err);
+		num_devs = cl4_platform_num_devices(p, &err);
 		
 		/* Only test for device information if device count was 
 		 * successfully obtained. */
@@ -615,7 +615,7 @@ static void context_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Get number of devices. */
-	num_devices = cl4_context_device_count(ctx, &err);
+	num_devices = cl4_context_num_devices(ctx, &err);
 	g_assert_no_error(err);
 	
 	/* Check that all devices belong to the same platform. */
@@ -657,7 +657,7 @@ static void context_create_info_destroy_test() {
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert_no_error(err);
 	
-	num_devices = cl4_context_device_count(ctx, &err);
+	num_devices = cl4_context_num_devices(ctx, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(num_devices, >, 0);
 

@@ -393,7 +393,7 @@ finish:
  * @return The number of devices in platform or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
-guint cl4_platform_device_count(CL4Platform* platform, GError **err) {
+guint cl4_platform_num_devices(CL4Platform* platform, GError **err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);

@@ -100,7 +100,7 @@ CL4DevSelDevices cl4_devsel_select(
 	CL4DevSelFilters* filters, GError **err);
 
 /**
- * @defgroup CL4_DEVSEL_INDEP_FILTERS Single-device filters.
+ * @defgroup CL4_DEVSEL_INDEP_FILTERS Independent filters.
  *
  * @{
  */
@@ -131,7 +131,7 @@ gboolean cl4_devsel_indep_platform(
 /** @} */
 
 /**
- * @defgroup CL4_DEVSEL_DEP_FILTERS Multi-device filters.
+ * @defgroup CL4_DEVSEL_DEP_FILTERS Dependent filters.
  *
  * @{
  */
@@ -140,7 +140,6 @@ gboolean cl4_devsel_indep_platform(
  * same platform (the platform to which the first device belong to). */
 CL4DevSelDevices cl4_devsel_dep_platform(
 	CL4DevSelDevices devices, void *data, GError **err);
-
 
 /** @} */
 

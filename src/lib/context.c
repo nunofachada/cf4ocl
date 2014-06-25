@@ -261,7 +261,7 @@ finish:
 CL4Context* cl4_context_new_from_filters_full(
 	const cl_context_properties* properties, 
 	CL4DevSelFilters* filters,
-	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+	cl4_context_callback pfn_notify,
     void* user_data,
 	GError **err) {
 
@@ -375,7 +375,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	const cl_context_properties* properties, 
 	cl_uint num_devices,
 	const cl_device_id* devices,
-	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+	cl4_context_callback pfn_notify,
     void* user_data,
     GError** err) {
 		
@@ -474,7 +474,7 @@ CL4Context* cl4_context_new_from_clcontext(cl_context context) {
 /** 
  * @brief Increase the reference count of the context wrapper object.
  * 
- * @param context The context wrapper object. 
+ * @param ctx The context wrapper object. 
  * */
 void cl4_context_ref(CL4Context* ctx) {
 	
@@ -651,7 +651,7 @@ finish:
 /**
  * @brief Get the OpenCL context object.
  * 
- * @param context The context wrapper object.
+ * @param ctx The context wrapper object.
  * @return The OpenCL context object.
  * */
 cl_context cl4_context_unwrap(CL4Context* ctx) {
@@ -666,7 +666,7 @@ cl_context cl4_context_unwrap(CL4Context* ctx) {
 /** 
  * @brief Get CL4 device wrapper at given index. 
  * 
- * @param context The context wrapper object.
+ * @param ctx The context wrapper object.
  * @param index Index of device in context.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
@@ -729,7 +729,7 @@ finish:
  * @return The number of devices in context or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
-guint cl4_context_device_count(CL4Context* ctx, GError** err) {
+guint cl4_context_num_devices(CL4Context* ctx, GError** err) {
 	
 	/* Make sure context is not NULL. */
 	g_return_val_if_fail(ctx != NULL, 0);

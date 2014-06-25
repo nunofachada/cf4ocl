@@ -177,7 +177,7 @@ CL4DevSelDevices cl4_devsel_select(
 		platform = cl4_platforms_get_platform(platforms, i);
 		
 		/* Get number of devices in current platform.*/
-		guint num_devices = cl4_platform_device_count(
+		guint num_devices = cl4_platform_num_devices(
 			platform, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		

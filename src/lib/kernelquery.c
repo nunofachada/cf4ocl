@@ -35,8 +35,8 @@
  * @param device OpenCL device where kernel will run.
  * @param kwgi Kernel workgroup information structure, which will be populated by this function.
  * @param err Error structure, to be populated if an error occurs.
- * @return @link cl4_man_error_codes::CL4_SUCCESS @endlink operation
- * successfully completed or another value of #cl4_man_error_codes if an 
+ * @return @link cl4_error_codes::CL4_SUCCESS @endlink operation
+ * successfully completed or another value of #cl4_error_codes if an 
  * error occurs.
  */
 int cl4_query_workgroup_get(cl_kernel kernel, cl_device_id device, CL4QueryKernelWorkgroup* kwgi, GError **err) {
