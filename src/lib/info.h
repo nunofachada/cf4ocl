@@ -16,25 +16,39 @@
  * <http://www.gnu.org/licenses/>.
  * */
  
-/** 
+ /** 
  * @file
- * @brief Common cf4ocl definitions.
+ * @brief Functions for obtaining information about OpenCL entities
+ * such as platforms, devices, contexts, queues, kernels, etc.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "common.h"
+#ifndef CL4_INFO_H
+#define CL4_INFO_H 
 
-/** 
- * @brief Resolves to error category identifying string, in this case an
- * error in cf4ocl.
- * 
- * @return A GQuark structure defined by category identifying string,
- * which identifies the error as a cf4ocl generated error.
- */
-GQuark cl4_error_quark() {
-	return g_quark_from_static_string("cl4-error-quark");
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include <glib.h>
+#include <glib/gprintf.h>
+
+/**
+ * @brief Information about a wrapped OpenCL entity.
+ * */
+typedef struct cl4_info {
+	/** Device information. */
+	gpointer value;
+	/** Size in bytes of device information. */
+	gsize size;
+} CL4Info;
+
+/** @brief Create a new CL4Info* object. */
+CL4Info* cl4_info_new(gpointer value, gsize size);
+
+/** @brief Destroy a CL4Info* object. */
+void cl4_info_destroy(void* info_value);
+
+#endif
 

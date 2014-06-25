@@ -14,18 +14,18 @@ set(test_profiler_EXTRALIBS test_profiler_lib)
 
 if (USE_OPENCL_STUB)
 
-	add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c mocks_stubs/wrappers/cl_stub.c)
+	add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c ../lib/info.c mocks_stubs/wrappers/cl_stub.c)
 	set(test_wrappers_EXTRALIBS test_wrappers_lib)
 
-	add_library(test_devquery_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c  mocks_stubs/wrappers/cl_stub.c)
+	add_library(test_devquery_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c ../lib/info.c mocks_stubs/wrappers/cl_stub.c)
 	set(test_devquery_EXTRALIBS test_devquery_lib)
 
 else()
 
-	add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c)
+	add_library(test_wrappers_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c ../lib/info.c)
 	set(test_wrappers_EXTRALIBS test_wrappers_lib ${OPENCL_LIBRARIES})
 
-	add_library(test_devquery_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c)
+	add_library(test_devquery_lib ../lib/platforms.c ../lib/platform.c ../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c ../lib/context.c ../lib/info.c)
 	set(test_devquery_EXTRALIBS test_devquery_lib ${OPENCL_LIBRARIES})
 
 endif()

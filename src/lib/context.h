@@ -128,6 +128,9 @@ CL4Context* cl4_context_new_from_clcontext(cl_context context);
 // CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
 // CL4Context* cl4_context_new_from_platform(CL4Platform* platform, GError** err);
 // CL4Context* cl4_context_new_from_devices(CL4Devices** devices, GError** err);
+// CL4Context* cl4_context_new_cpu(GError** err);
+// CL4Context* cl4_context_new_gpu(GError** err);
+// CL4Context* cl4_context_new_accel(GError** err);
 
 /** @} */
 

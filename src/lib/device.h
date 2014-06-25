@@ -31,6 +31,7 @@
 
 #include "common.h"
 #include "gerrorf.h"
+#include "info.h"
 #include "errors.h"
 #include "string.h"
 #if defined(__APPLE__) || defined(__MACOSX)
