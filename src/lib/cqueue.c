@@ -39,9 +39,10 @@ struct cl4_cqueue {
 
 /** 
  * @brief Decrements the reference count of the command queue wrapper 
- * object. If it reaches 0, the context wrapper object is destroyed.
+ * object. If it reaches 0, the command queue wrapper object is 
+ * destroyed.
  *
- * @param cq The context wrapper object.
+ * @param cq The command queue wrapper object.
  * */
 void cl4_cqueue_destroy(CL4CQueue* cq) {
 	
@@ -67,7 +68,7 @@ void cl4_cqueue_destroy(CL4CQueue* cq) {
 		/* Release cq. */
 		g_slice_free(CL4CQueue, cq);
 		
-		/* Release OpenCL context. */
+		/* Release OpenCL command queue. */
 		clReleaseCommandQueue(command_queue);
 		
 	}

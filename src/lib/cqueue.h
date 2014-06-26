@@ -40,7 +40,8 @@
 typedef struct cl4_cqueue CL4CQueue;
 
 /** @brief Decrements the reference count of the command queue wrapper 
- * object. If it reaches 0, the context wrapper object is destroyed. */
+ * object. If it reaches 0, the command queue wrapper object is 
+ * destroyed. */
 void cl4_cqueue_destroy(CL4CQueue* cq);
 
 /**

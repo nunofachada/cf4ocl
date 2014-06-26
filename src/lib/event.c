@@ -32,12 +32,44 @@
  */
 struct cl4_event {
 
-	/** OpenCL event. */
-	cl_event cl_object;
-	/** Object information. */
-	GHashTable* info;
-	/** Reference count. */
-	gint ref_count;    
+	/** Parent wrapper object. */
+	CL4Wrapper base;
 	
 };
 
+/** 
+ * @brief Decrements the reference count of the event wrapper 
+ * object. If it reaches 0, the event wrapper object is 
+ * destroyed.
+ *
+ * @param evt The event wrapper object.
+ * */
+void cl4_event_destroy(CL4Event* evt) {
+	
+	/* Make sure event wrapper object is not NULL. */
+	g_return_if_fail(evt != NULL);
+	
+	/* Wrapped OpenCL object (a event in this case), returned by
+	 * the parent wrapper unref function in case its reference count 
+	 * reaches 0. */
+	cl_event event;
+	
+	/* Decrease reference count using the parent wrapper object unref 
+	 * function. */
+	event = (cl_event) cl4_wrapper_unref((CL4Wrapper*) evt);
+	
+	/* If an OpenCL event was returned, the reference count of 
+	 * the wrapper object reached 0, so we must destroy remaining 
+	 * event wrapper properties and the OpenCL event
+	 * itself. */
+	if (event != NULL) {
+
+		/* Release evt. */
+		g_slice_free(CL4Event, evt);
+		
+		/* Release OpenCL event. */
+		clReleaseEvent(event);
+		
+	}
+
+}
