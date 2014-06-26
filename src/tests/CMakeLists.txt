@@ -11,7 +11,7 @@ set(COMMON_LIBS ${GLIB_LIBRARIES})
 set(CF4OCL_SRC ../lib/platforms.c ../lib/platform.c ../lib/device.c 
 	../lib/errors.c ../lib/common.c ../lib/devquery.c ../lib/devsel.c 
 	../lib/context.c ../lib/wrapper.c ../lib/profiler.c ../lib/cqueue.c
-	../lib/event.c)
+	../lib/event.c ../lib/kernel.c ../lib/program.c)
 
 # Specific libraries for tests
 add_library(test_profiler_lib ${CF4OCL_SRC} mocks_stubs/profiler/cl_stub.c)

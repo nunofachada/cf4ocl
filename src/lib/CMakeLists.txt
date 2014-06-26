@@ -1,7 +1,7 @@
 # Sources required for building library
 set(SRC errors.c profiler.c manager.c types.c common.c kernelquery.c 
 	devquery.c platform.c platforms.c device.c context.c devsel.c 
-	wrapper.c cqueue.c event.c)
+	wrapper.c cqueue.c event.c kernel.c program.c)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
