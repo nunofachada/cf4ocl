@@ -32,11 +32,8 @@
  */
 struct cl4_context {
 	
-	/** Context. */
-	cl_context cl_object;
-	
-	/** Context information (can be lazy initialized). */
-	GHashTable* info;
+	/** Parent wrapper object. */
+	CL4Wrapper base;
 	
 	/** Platform (can be lazy initialized). */
 	CL4Platform* platform;
@@ -46,9 +43,6 @@ struct cl4_context {
 	
 	/** Devices in context (can be lazy initialized). */
 	CL4Device** devices;
-	
-	/** Reference count. */
-	gint ref_count;    	
 	
 };
 
@@ -80,13 +74,11 @@ static CL4Context* cl4_context_new_internal() {
 	/* Allocate memory for context wrapper object. */
 	ctx = g_slice_new0(CL4Context);
 	
-	/* Set fields empty and reference count to 1. */
-	ctx->cl_object = NULL;
-	ctx->info = NULL;
+	/* Initialize fields. */
+	cl4_wrapper_init(&ctx->base);
 	ctx->platform = NULL;
 	ctx->num_devices = 0;
 	ctx->devices = NULL;
-	ctx->ref_count = 1;
 	
 	/* Return new context wrapper object. */
 	return ctx;
@@ -195,7 +187,7 @@ static void cl4_context_init_devices(
 	if (!ctx->devices) {
 		/* Not initialized, initialize it. */
 		
-		CL4Info* info_devs;
+		CL4WrapperInfo* info_devs;
 		GError* err_internal = NULL;
 		
 		/* Get number of devices. */
@@ -309,7 +301,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	/// @todo Check if devices belong to same platform
 	
 	/* Create OpenCL context. */
-	ctx->cl_object = clCreateContext(
+	ctx->base.cl_object = (gpointer) clCreateContext(
 		(const cl_context_properties*) ctx_props, devices->len, cl_devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
@@ -417,7 +409,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 			properties, ctx->devices[0], &err_internal);
 	
 	/* Create OpenCL context. */
-	ctx->cl_object = clCreateContext(
+	ctx->base.cl_object = clCreateContext(
 		(const cl_context_properties*) ctx_props, num_devices, devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
@@ -465,41 +457,39 @@ CL4Context* cl4_context_new_from_clcontext(cl_context context) {
 	CL4Context* ctx = cl4_context_new_internal();
 	
 	/* Set OpenCL context. */
-	ctx->cl_object = context;
+	ctx->base.cl_object = context;
 	
 	/* Return new context wrapper. */
 	return ctx;
 }
 
 /** 
- * @brief Increase the reference count of the context wrapper object.
- * 
- * @param ctx The context wrapper object. 
- * */
-void cl4_context_ref(CL4Context* ctx) {
-	
-	/* Make sure platform wrapper object is not NULL. */
-	g_return_if_fail(ctx != NULL);
-
-	/* Increase reference count. */
-	g_atomic_int_inc(&ctx->ref_count);
-	
-}
-
-/** 
  * @brief Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed.
  *
- * @param ctx The context wrapper object. 
+ * @param ctx The context wrapper object.
  * */
-void cl4_context_unref(CL4Context* ctx) {
+void cl4_context_destroy(CL4Context* ctx) {
 	
 	/* Make sure context wrapper object is not NULL. */
 	g_return_if_fail(ctx != NULL);
+	
+	/* Wrapped OpenCL object (a context in this case), returned by the
+	 * parent wrapper unref function in case its reference count 
+	 * reaches 0. */
+	cl_context context;
+	
+	/* Decrease reference count using the parent wrapper object unref 
+	 * function. */
+	context = (cl_context) cl4_wrapper_unref((CL4Wrapper*) ctx);
+	
+	/* If an OpenCL context was returned, the reference count of the
+	 * wrapper object reached 0, so we must destroy remaining context
+	 * wrapper properties and the OpenCL context itself. */
+	if (context != NULL) {
 
-	/* Decrement reference count and check if it reaches 0. */
-	if (g_atomic_int_dec_and_test(&ctx->ref_count)) {
-
+		/* Check if any devices are associated with this context
+		 * wrapper. */
 		if (ctx->devices != NULL) {
 
 			/* Release devices in ctx. */
@@ -512,59 +502,19 @@ void cl4_context_unref(CL4Context* ctx) {
 			g_free(ctx->devices);
 		}
 				  
-		/* Release context. */
-		if (ctx->cl_object) {
-			clReleaseContext(ctx->cl_object);
-		}
-		
 		/* Release platform. */
 		if (ctx->platform) {
 			cl4_platform_unref(ctx->platform);
 		}
 		
-		/* Destroy hash table containing context information. */
-		if (ctx->info) {
-			g_hash_table_destroy(ctx->info);
-		}
-		
 		/* Release ctx. */
 		g_slice_free(CL4Context, ctx);
+		
+		/* Release OpenCL context. */
+		clReleaseContext(context);
+		
+	}
 
-	}	
-
-}
-
-/**
- * @brief Returns the context wrapper object reference count. For
- * debugging and testing purposes only.
- * 
- * @param ctx The context wrapper object.
- * @return The context wrapper object reference count or -1 if device
- * is NULL.
- * */
-gint cl4_context_ref_count(CL4Context* ctx) {
-	
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, -1);
-	
-	/* Return reference count. */
-	return ctx->ref_count;
-
-}
-
-/**
- * @brief Get the OpenCL context object.
- * 
- * @param ctx The context wrapper object.
- * @return The OpenCL context object.
- * */
-cl_context cl4_context_unwrap(CL4Context* ctx) {
-	
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
-	
-	/* Return the OpenCL context object. */
-	return ctx->cl_object;
 }
  
 /** 

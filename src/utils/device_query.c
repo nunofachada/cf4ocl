@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 	guint num_devs;
 	
 	/* Device information value object. */
-	CL4Info* info_value = NULL;
+	CL4WrapperInfo* info_value = NULL;
 	
 	/* Device name. */
 	gchar* dev_name;
@@ -327,7 +327,7 @@ void cl4_device_query_show_platform_info(CL4Platform* p, guint idx) {
 void cl4_device_query_show_device_info_all(CL4Device* d) {
 
 	/* Parameter value and size. */
-	CL4Info* param_value;
+	CL4WrapperInfo* param_value;
 	
 	/* Parameter value string. */
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
@@ -382,7 +382,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 	const CL4DevQueryMap* info_row;
 	
 	/* Parameter value and size. */
-	CL4Info* param_value;
+	CL4WrapperInfo* param_value;
 
 	/* Parameter value string. */
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
@@ -466,7 +466,7 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 	const CL4DevQueryMap* info_row;
 
 	/* Parameter value and size. */
-	CL4Info* param_value;
+	CL4WrapperInfo* param_value;
 
 	/* Parameter value string. */
 	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];

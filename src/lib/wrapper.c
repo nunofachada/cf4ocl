@@ -26,40 +26,138 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "info.h"
+#include "wrapper.h"
 
-struct cl4_wrapper {
-	gpointer cl_object;
-	GHashTable* info;
-};
+/** 
+ * @brief Initialize wrapper fields. 
+ * 
+ * @param wrapper Wrapper object.
+ * */
+void cl4_wrapper_init(CL4Wrapper* wrapper) {
+	
+	wrapper->cl_object = NULL;
+	wrapper->info = NULL;
+	wrapper->ref_count = 1;
+	
+}
+
+/** 
+ * @brief Increase the reference count of the wrapper object.
+ * 
+ * @param wrapper The wrapper object. 
+ * */
+void cl4_wrapper_ref(CL4Wrapper* wrapper) {
+	
+	/* Make sure wrapper object is not NULL. */
+	g_return_if_fail(wrapper != NULL);
+	
+	/* Increment wrapper reference count. */
+	g_atomic_int_inc(&wrapper->ref_count);
+	
+}
+
+/** 
+ * @brief Decrements the reference count of the wrapper object.
+ * If it reaches 0, the wrapper object is destroyed.
+ *
+ * @param wrapper The wrapper object. 
+ * @return The OpenCL wrapped object if the wrapper object was 
+ * effectively destroyed due to its reference count becoming zero, or 
+ * NULL otherwie.
+ * */
+gpointer cl4_wrapper_unref(CL4Wrapper* wrapper) {
+	
+	/* Make sure wrapper object is not NULL. */
+	g_return_val_if_fail(wrapper != NULL, FALSE);
+	
+	/* OpenCL wrapped object, NULL by default. */
+	gpointer cl_object = NULL;
+
+	/* Decrement reference count and check if it reaches 0. */
+	if (g_atomic_int_dec_and_test(&wrapper->ref_count)) {
+
+		/* Keep reference to the OpenCL wrapped object, so we can
+		 * return it to caller. */
+		cl_object = wrapper->cl_object;
+		
+		/* Destroy hash table containing device information. */
+		if (wrapper->info) {
+			g_hash_table_destroy(wrapper->info);
+		}
+		
+		/* Free the device wrapper object. */
+		g_slice_free(CL4Wrapper, wrapper);
+		
+	}
+	
+	/* Return OpenCL wrapped object if wrapper was destroyed. */
+	return cl_object;
+
+}
 
 /**
- * @brief Create a new CL4Info* object.
+ * @brief Returns the wrapper object reference count. For debugging and 
+ * testing purposes only.
  * 
- * @param value Parameter value.
- * @param size Parameter size in bytes.
- * @return A new CL4Info* object.
+ * @param wrapper The wrapper object.
+ * @return The wrapper object reference count or -1 if device is NULL.
  * */
-CL4Info* cl4_info_new(gpointer value, gsize size) {
+gint cl4_wrapper_ref_count(CL4Wrapper* wrapper) {
 	
-	CL4Info* info_value = g_slice_new(CL4Info);
+	/* Make sure wrapper is not NULL. */
+	g_return_val_if_fail(wrapper != NULL, -1);
 	
-	info_value->value = value;
-	info_value->size = size;
+	/* Return reference count. */
+	return wrapper->ref_count;
+
+}
+
+/**
+ * @brief Get the wrapped OpenCL object.
+ * 
+ * @param wrapper The wrapper object.
+ * @return The wrapped OpenCL object.
+ * */
+gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper) {
+
+	/* Make sure wrapper is not NULL. */
+	g_return_val_if_fail(wrapper != NULL, NULL);
 	
-	return info_value;
+	/* Return the OpenCL wrapped object. */
+	return wrapper->cl_object;
+}
+
+
+
+/**
+ * @brief Create a new CL4WrapperInfo* object with a given value size.
+ * 
+ * @param size Parameter size in bytes.
+ * @return A new CL4WrapperInfo* object.
+ * */
+CL4WrapperInfo* cl4_wrapper_info_new(gsize size) {
+	
+	CL4WrapperInfo* info = g_slice_new(CL4WrapperInfo);
+	
+	info->value = g_slice_alloc0(size);
+	info->size = size;
+	
+	return info;
 	
 }
 
 /**
- * @brief Destroy a CL4Info* object.
+ * @brief Destroy a CL4WrapperInfo* object.
  * 
  * @param info_value Object to destroy.
  * */
-void cl4_info_destroy(void* info_value) {
+void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
 		
-	g_free(((CL4Info*) info_value)->value);
-	g_slice_free(CL4Info, info_value);
+	/* Make sure info is not NULL. */
+	g_return_if_fail(info != NULL);
+
+	g_slice_free1(info->size, info->value);
+	g_slice_free(CL4WrapperInfo, info);
 	
 }
 
@@ -78,8 +176,8 @@ void cl4_info_destroy(void* info_value) {
  * be automatically freed when the respective wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-CL4Info* cl4_info_get(CL4Wrapper* wrapper, cl_uint param_name, 
-	cl4_info_function info_fun, GError** err) {
+CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, cl_uint param_name, 
+	cl4_wrapper_info_function info_fun, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -88,14 +186,14 @@ CL4Info* cl4_info_get(CL4Wrapper* wrapper, cl_uint param_name,
 	g_return_val_if_fail(wrapper != NULL, NULL);
 	
 	/* Information object. */
-	CL4Info* info = NULL;
+	CL4WrapperInfo* info = NULL;
 	
 	/* If information table is not yet initialized, then
 	 * initialize it. */
 	if (!wrapper->info) {
 		wrapper->info = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal,
-			NULL, cl4_info_destroy);
+			NULL, (GDestroyNotify) cl4_wrapper_info_destroy);
 	}
 	
 	/* Check if requested information is already present in the
@@ -111,8 +209,6 @@ CL4Info* cl4_info_get(CL4Wrapper* wrapper, cl_uint param_name,
 		
 		/* Otherwise, get it from OpenCL device.*/
 		cl_int ocl_status;
-		/* Device information placeholder. */
-		gpointer param_value;
 		/* Size of device information in bytes. */
 		gsize size_ret;
 		
@@ -129,18 +225,17 @@ CL4Info* cl4_info_get(CL4Wrapper* wrapper, cl_uint param_name,
 			__func__);
 		
 		/* Allocate memory for information. */
-		param_value = g_malloc(size_ret);
+		info = cl4_wrapper_info_new(size_ret);
 		
 		/* Get information. */
 		ocl_status = info_fun(
-			wrapper->cl_object, param_name, size_ret, param_value, NULL);
+			wrapper->cl_object, param_name, size_ret, info->value, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
 			"Function '%s': get context info [info] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
 		/* Keep information in information table. */
-		info = cl4_info_new(param_value, size_ret);
 		g_hash_table_insert(wrapper->info,
 			GUINT_TO_POINTER(param_name),
 			info);
@@ -175,8 +270,8 @@ finish:
  * value will be automatically freed when the wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-gpointer cl4_info_get_value(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_info_function info_fun, GError** err) {
+gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper, 
+	cl_uint param_name, cl4_wrapper_info_function info_fun, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -185,7 +280,7 @@ gpointer cl4_info_get_value(CL4Wrapper* wrapper,
 	g_return_val_if_fail(wrapper != NULL, NULL);
 	
 	/* Get information object. */
-	CL4Info* diw = cl4_info_get(wrapper, param_name, info_fun, err);
+	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper, param_name, info_fun, err);
 	
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->value : NULL;
@@ -202,8 +297,8 @@ gpointer cl4_info_get_value(CL4Wrapper* wrapper,
  * @return The requested information size. If an error occurs, 
  * a size of 0 is returned.
  * */
-gsize cl4_info_get_size(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_info_function info_fun, GError** err) {
+gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper, 
+	cl_uint param_name, cl4_wrapper_info_function info_fun, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -212,7 +307,7 @@ gsize cl4_info_get_size(CL4Wrapper* wrapper,
 	g_return_val_if_fail(wrapper != NULL, NULL);
 	
 	/* Get information object. */
-	CL4Info* diw = cl4_info_get(wrapper, param_name, info_fun, err);
+	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper, param_name, info_fun, err);
 	
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->size : 0;

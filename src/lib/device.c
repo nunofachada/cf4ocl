@@ -33,12 +33,8 @@
  */
 struct cl4_device {
 
-	/** OpenCL device ID. */
-	cl_device_id cl_object;
-	/** Device information. */
-	GHashTable* info;
-	/** Reference count. */
-	gint ref_count;    
+	/** Parent wrapper object. */
+	CL4Wrapper base;
 	
 };
 
@@ -56,32 +52,14 @@ CL4Device* cl4_device_new(cl_device_id id) {
 	/* Allocate memory for the device wrapper object. */
 	device = g_slice_new(CL4Device);
 	
+	/* Initialize parent object. */
+	cl4_wrapper_init(&device->base);
+	
 	/* Set the device ID. */
-	device->cl_object = id;
-		
-	/* Device information will be lazy initialized when required. */
-	device->info = NULL;
-
-	/* Reference count is one initially. */
-	device->ref_count = 1;
+	device->base.cl_object = id;
 
 	/* Return the new device wrapper object. */
 	return device;
-	
-}
-
-/** 
- * @brief Increase the reference count of the device wrapper object.
- * 
- * @param device The device wrapper object. 
- * */
-void cl4_device_ref(CL4Device* device) {
-	
-	/* Make sure device wrapper object is not NULL. */
-	g_return_if_fail(device != NULL);
-	
-	/* Increase reference count. */
-	g_atomic_int_inc(&device->ref_count);
 	
 }
 
@@ -91,54 +69,28 @@ void cl4_device_ref(CL4Device* device) {
  *
  * @param device The device wrapper object. 
  * */
-void cl4_device_unref(CL4Device* device) {
+void cl4_device_destroy(CL4Device* device) {
 	
 	/* Make sure device wrapper object is not NULL. */
 	g_return_if_fail(device != NULL);
 
-	/* Decrement reference count and check if it reaches 0. */
-	if (g_atomic_int_dec_and_test(&device->ref_count)) {
+	/* Wrapped OpenCL object (a device_id in this case), returned by the
+	 * parent wrapper unref function in case its reference count 
+	 * reaches 0. */
+	cl_device_id device_id;
+	
+	/* Decrease reference count using the parent wrapper object unref 
+	 * function. */
+	device_id = (cl_device_id) cl4_wrapper_unref((CL4Wrapper*) device);
+	
+	/* If an OpenCL device_id was returned, the reference count of the
+	 * wrapper object reached 0, so we must destroy remaining device
+	 * wrapper properties. */
+	if (device_id != NULL) {
 
-		/* Destroy hash table containing device information. */
-		if (device->info) {
-			g_hash_table_destroy(device->info);
-		}
-		
 		/* Free the device wrapper object. */
 		g_slice_free(CL4Device, device);
-	}	
+		
+	}
 
-}
-
-/**
- * @brief Returns the device wrapper object reference count. For
- * debugging and testing purposes only.
- * 
- * @param device The device wrapper object.
- * @return The device wrapper object reference count or -1 if device
- * is NULL.
- * */
-gint cl4_device_ref_count(CL4Device* device) {
-	
-	/* Make sure device is not NULL. */
-	g_return_val_if_fail(device != NULL, -1);
-	
-	/* Return reference count. */
-	return device->ref_count;
-
-}
-
-/**
- * @brief Get the OpenCL device ID object.
- * 
- * @param device The device wrapper object.
- * @return The OpenCL device ID object.
- * */
-cl_device_id cl4_device_unwrap(CL4Device* device) {
-
-	/* Make sure device is not NULL. */
-	g_return_val_if_fail(device != NULL, NULL);
-	
-	/* Return the OpenCL device ID. */
-	return device->cl_object;
 }

@@ -31,7 +31,7 @@
 
 #include "common.h"
 #include "gerrorf.h"
-#include "info.h"
+#include "wrapper.h"
 #include "errors.h"
 #include "string.h"
 #if defined(__APPLE__) || defined(__MACOSX)
@@ -39,6 +39,15 @@
 #else
     #include <CL/opencl.h>
 #endif
+
+/** @brief Device wrapper object. */
+typedef struct cl4_device CL4Device;
+
+/** @brief Creates a new device wrapper object. */
+CL4Device* cl4_device_new(cl_device_id id);
+
+/** @brief Alias for cl4_device_unref(). */
+void cl4_device_destroy(CL4Device* device);
 
 /**
  * @brief Get device information object.
@@ -52,8 +61,8 @@
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define cl4_device_info(device, param_name, err) \
-	cl4_info_get((CL4Wrapper*) device, param_name, \
-		(cl4_info_function) clGetDeviceInfo, err)
+	cl4_wrapper_get_info((CL4Wrapper*) device, param_name, \
+		(cl4_wrapper_info_function) clGetDeviceInfo, err)
 
 /** 
  * @brief Get pointer to device information value.
@@ -67,8 +76,8 @@
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define cl4_device_info_value(device, param_name, err) \
-	cl4_info_get_value((CL4Wrapper*) device, param_name, \
-		(cl4_info_function) clGetDeviceInfo, err)
+	cl4_wrapper_get_info_value((CL4Wrapper*) device, param_name, \
+		(cl4_wrapper_info_function) clGetDeviceInfo, err)
 
 /** 
  * @brief Get device information size.
@@ -81,8 +90,8 @@
  * a size of 0 is returned.
  * */
 #define cl4_device_info_size(device, param_name, err) \
-	cl4_info_get_size((CL4Wrapper*) device, param_name, \
-		(cl4_info_function) clGetDeviceInfo, err)
+	cl4_wrapper_get_info_size((CL4Wrapper*) device, param_name, \
+		(cl4_wrapper_info_function) clGetDeviceInfo, err)
 
 /** 
  * @brief Macro which returns a scalar device information value. 
@@ -126,35 +135,29 @@
 		(param_type) (cl4_device_info_value(device, param_name, err)) : \
 		NULL)
 
+/** 
+ * @brief Increase the reference count of the device wrapper object.
+ * 
+ * @param device The device wrapper object. 
+ * */
+#define cl4_device_ref(device) \
+	cl4_wrapper_ref((CL4Wrapper*) device)
+
 /**
- * @brief Alias to cl4_device_unref().
+ * @brief Alias to cl4_device_destroy().
  * 
  * @param device Device wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_device_destroy(device) cl4_device_unref(device)
-		
-/** @brief Device wrapper object. */
-typedef struct cl4_device CL4Device;
+#define cl4_device_unref(device) cl4_device_destroy(device)
 
-/** @brief Creates a new device wrapper object. */
-CL4Device* cl4_device_new(cl_device_id id);
-
-/** @brief Increase the reference count of the device wrapper object. */
-void cl4_device_ref(CL4Device* device);
-
-/** @brief Alias for cl4_device_unref(). */
-void cl4_device_destroy(CL4Device* device);
-
-/** @brief Decrements the reference count of the device wrapper object.
- * If it reaches 0, the device wrapper object is destroyed. */
-void cl4_device_unref(CL4Device* device);
-
-/** @brief Returns the device wrapper object reference count. For
- * debugging and testing purposes only. */
-gint cl4_device_ref_count(CL4Device* device);
-
-/** @brief Get the OpenCL device ID object. */
-cl_device_id cl4_device_unwrap(CL4Device* device);
+/**
+ * @brief Get the OpenCL device_id object.
+ * 
+ * @param device The device wrapper object.
+ * @return The OpenCL device_id object.
+ * */
+#define cl4_device_unwrap(device) \
+	((cl_device_id) cl4_wrapper_unwrap((CL4Wrapper*) device))
 
 #endif

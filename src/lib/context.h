@@ -65,22 +65,6 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
 
-
-/**
- * @brief Get context information object.
- * 
- * @param ctx The context wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return The requested context information object. This object will
- * be automatically freed when the device wrapper object is 
- * destroyed. If an error occurs, NULL is returned.
- * */
-#define cl4_context_info(ctx, param_name, err) \
-	cl4_info_get((CL4Wrapper*) ctx, param_name, \
-		(cl4_info_function) clGetContextInfo, err)
-
 /**
  * @defgroup CL4_CONTEXT_CONSTRUCTORS Context wrapper constructors,
  * i.e. cl4_context_new_* functions.
@@ -150,27 +134,49 @@ CL4Context* cl4_context_new_from_clcontext(cl_context context);
 
 /** @} */
 
-/** @brief Increase the reference count of the context wrapper object. */
-void cl4_context_ref(CL4Context* ctx);
-
 /** @brief Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
-void cl4_context_unref(CL4Context* ctx);
+void cl4_context_destroy(CL4Context* ctx);
 
 /**
- * @brief Alias to cl4_context_unref().
+ * @brief Get context information object.
+ * 
+ * @param ctx The context wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested context information object. This object will
+ * be automatically freed when the device wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_context_info(ctx, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) ctx, param_name, \
+		(cl4_wrapper_info_function) clGetContextInfo, err)
+
+/** 
+ * @brief Increase the reference count of the context wrapper object.
+ * 
+ * @param ctx The context wrapper object. 
+ * */
+#define cl4_context_ref(ctx) \
+	cl4_wrapper_ref((CL4Wrapper*) ctx)
+
+/**
+ * @brief Alias to cl4_context_destroy().
  * 
  * @param ctx Context wrapper object to destroy if reference count is 1,
  * otherwise just decrement the reference count.
  * */
-#define cl4_context_destroy(ctx) cl4_context_unref(ctx)
+#define cl4_context_unref(ctx) cl4_context_destroy(ctx)
 
-/** @brief Returns the context wrapper object reference count. For
- * debugging and testing purposes only. */
-gint cl4_context_ref_count(CL4Context* ctx);
-
-/** @brief Get the OpenCL context object. */
-cl_context cl4_context_unwrap(CL4Context* ctx);
+/**
+ * @brief Get the OpenCL context object.
+ * 
+ * @param ctx The context wrapper object.
+ * @return The OpenCL context object.
+ * */
+#define cl4_context_unwrap(ctx) \
+	((cl_context) cl4_wrapper_unwrap((CL4Wrapper*) ctx))
  
 /** @brief Get CL4 device wrapper at given index. */
 CL4Device* cl4_context_get_device(

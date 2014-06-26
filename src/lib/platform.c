@@ -32,16 +32,16 @@
  * @brief Platform wrapper object.
  */
 struct cl4_platform {
-	/** Platform ID. */
-	cl_platform_id cl_object;
-	/** Platform information. */
-	GHashTable* info;
+
+	/** Parent wrapper object. */
+	CL4Wrapper base;
+
 	/** Number of devices available in platform. */
 	guint num_devices;
+
 	/** Devices available in platform. */
 	CL4Device** devices;
-	/** Reference count. */
-	gint ref_count;
+
 };
 
 /** 
@@ -69,10 +69,10 @@ static void cl4_plaform_init_devices(
 		cl_device_id* dev_ids;
 		
 		/* Determine number of devices. */
-		ocl_status = clGetDeviceIDs(platform->cl_object, CL_DEVICE_TYPE_ALL, 0,
-			NULL, &platform->num_devices);
-		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_ERROR_OCL, error_handler, 
+		ocl_status = clGetDeviceIDs(platform->base.cl_object, 
+			CL_DEVICE_TYPE_ALL, 0, NULL, &platform->num_devices);
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get number of devices (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
@@ -83,10 +83,10 @@ static void cl4_plaform_init_devices(
 		dev_ids = (cl_device_id*) g_slice_alloc(dev_ids_size);
 		
 		/* Get existing device IDs. */
-		ocl_status = clGetDeviceIDs(platform->cl_object, CL_DEVICE_TYPE_ALL, 
-			platform->num_devices, dev_ids, NULL);
-		gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-			CL4_ERROR_OCL, error_handler, 
+		ocl_status = clGetDeviceIDs(platform->base.cl_object, 
+			CL_DEVICE_TYPE_ALL, platform->num_devices, dev_ids, NULL);
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
 			"Function '%s': get device IDs (OpenCL error %d: %s).",
 		__func__, ocl_status, cl4_err(ocl_status));
 		
@@ -134,38 +134,20 @@ CL4Platform* cl4_platform_new(cl_platform_id id) {
 	/* Allocate memory for the platform wrapper object. */
 	platform = g_slice_new(CL4Platform);
 	
+	/* Initialize parent object. */
+	cl4_wrapper_init(&platform->base);
+	
 	/* Set the platform ID. */
-	platform->cl_object = id;
-		
-	/* Platform information will be lazy initialized when required. */
-	platform->info = NULL;
+	platform->base.cl_object = id;
 
 	/* Platform devices array will be lazy initialized when required. */
 	platform->devices = NULL;
 	
 	/* Set number of devices to zero, initially. */
 	platform->num_devices = 0;
-	
-	/* Reference count is one initially. */
-	platform->ref_count = 1;
 
 	/* Return the new platform wrapper object. */
 	return platform;
-	
-}
-
-/** 
- * @brief Increase the reference count of the platform wrapper object.
- * 
- * @param platform The platform wrapper object. 
- * */
-void cl4_platform_ref(CL4Platform* platform) {
-	
-	/* Make sure platform wrapper object is not NULL. */
-	g_return_if_fail(platform != NULL);
-
-	/* Increase reference count. */
-	g_atomic_int_inc(&platform->ref_count);
 	
 }
 
@@ -175,19 +157,26 @@ void cl4_platform_ref(CL4Platform* platform) {
  *
  * @param platform The platform wrapper object. 
  * */
- void cl4_platform_unref(CL4Platform* platform) {
+ void cl4_platform_destroy(CL4Platform* platform) {
 	
 	/* Make sure platform wrapper object is not NULL. */
 	g_return_if_fail(platform != NULL);
+	
+	/* Wrapped OpenCL object (a platform_id in this case), returned by 
+	 * the parent wrapper unref function in case its reference count 
+	 * reaches 0. */
+	cl_platform_id platform_id;
+	
+	/* Decrease reference count using the parent wrapper object unref 
+	 * function. */
+	platform_id = 
+		(cl_platform_id) cl4_wrapper_unref((CL4Wrapper*) platform);
+	
+	/* If an OpenCL platform was returned, the reference count of the
+	 * wrapper object reached 0, so we must destroy remaining platform
+	 * wrapper properties. */
+	if (platform_id != NULL) {
 
-	/* Decrement reference count and check if it reaches 0. */
-	if (g_atomic_int_dec_and_test(&platform->ref_count)) {
-		
-		/* Destroy hash table containing platform information. */
-		if (platform->info) {
-			g_hash_table_destroy(platform->info);
-		}
-		
 		/* Reduce reference count of devices in device list, free the
 		 * device list. */
 		if (platform->devices) {
@@ -206,41 +195,9 @@ void cl4_platform_ref(CL4Platform* platform) {
 		
 		/* Free the platform wrapper object. */
 		g_slice_free(CL4Platform, platform);
-	}	
-
-}
-
-/**
- * @brief Returns the platform wrapper object reference count. For
- * debugging and testing purposes only.
- * 
- * @param platform The platform wrapper object.
- * @return The platform wrapper object reference count or -1 if platform
- * is NULL.
- * */
-gint cl4_platform_ref_count(CL4Platform* platform) {
-
-	/* Make sure platform is not NULL. */
-	g_return_val_if_fail(platform != NULL, -1);
+		
+	}
 	
-	/* Return the reference count. */
-	return platform->ref_count;
-
-}
-
-/**
- * @brief Get the OpenCL platform ID object.
- * 
- * @param platform The platform wrapper object.
- * @return The OpenCL platform ID object.
- * */
-cl_platform_id cl4_platform_unwrap(CL4Platform* platform) {
-	
-	/* Make sure platform is not NULL. */
-	g_return_val_if_fail(platform != NULL, NULL);
-	
-	/* Return the OpenCL platform ID. */
-	return platform->cl_object;
 }
  
 /** 

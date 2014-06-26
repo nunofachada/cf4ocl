@@ -37,13 +37,12 @@
 /** @brief The platform wrapper object. */
 typedef struct cl4_platform CL4Platform;
 
-/**
- * @brief Alias to cl4_platform_unref().
- * 
- * @param platform Platform wrapper object to destroy if reference count
- * is 1, otherwise just decrement the reference count.
- * */
-#define cl4_platform_destroy(platform) cl4_platform_unref(platform)
+/** @brief Creates a new platform wrapper object. */
+CL4Platform* cl4_platform_new(cl_platform_id id);
+
+/** @brief Decrements the reference count of the platform wrapper 
+ * object. If it reaches 0, the platform wrapper object is destroyed. */
+void cl4_platform_destroy(CL4Platform* platform);
 
 /**
  * @brief Get platform information.
@@ -57,26 +56,34 @@ typedef struct cl4_platform CL4Platform;
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define cl4_platform_info(platform, param_name, err) \
-	((gchar*) cl4_info_get_value((CL4Wrapper*) platform, param_name, \
-		(cl4_info_function) clGetPlatformInfo, err))
+	((gchar*) cl4_wrapper_get_info_value((CL4Wrapper*) platform, param_name, \
+		(cl4_wrapper_info_function) clGetPlatformInfo, err))
 
-/** @brief Creates a new platform wrapper object. */
-CL4Platform* cl4_platform_new(cl_platform_id id);
+/** 
+ * @brief Increase the reference count of the platform wrapper object.
+ * 
+ * @param platform The platform wrapper object.
+ * */
+#define cl4_platform_ref(platform) \
+	cl4_wrapper_ref((CL4Wrapper*) platform)
 
-/** @brief Increase the reference count of the platform wrapper object. */
-void cl4_platform_ref(CL4Platform* platform);
+/**
+ * @brief Alias to cl4_platform_destroy().
+ * 
+ * @param platform Platform wrapper object to destroy if reference count
+ * is 1, otherwise just decrement the reference count.
+ * */
+#define cl4_platform_unref(platform) cl4_platform_destroy(platform)
 
-/** @brief Decrements the reference count of the platform wrapper object.
- * If it reaches 0, the platform wrapper object is destroyed. */
-void cl4_platform_unref(CL4Platform* platform);
-
-/** @brief Returns the platform wrapper object reference count. For
- * debugging and testing purposes only. */
-gint cl4_platform_ref_count(CL4Platform* platform);
-
-/** @brief Get the OpenCL platform ID object. */
-cl_platform_id cl4_platform_unwrap(CL4Platform* platform);
-
+/**
+ * @brief Get the OpenCL context object.
+ * 
+ * @param ctx The context wrapper object.
+ * @return The OpenCL context object.
+ * */
+#define cl4_context_unwrap(ctx) \
+	((cl_context) cl4_wrapper_unwrap((CL4Wrapper*) ctx))
+ 
 /** @brief Get CL4 device wrapper at given index. */
 CL4Device* cl4_platform_get_device(
 	CL4Platform* platform, guint index, GError **err);

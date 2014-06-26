@@ -57,7 +57,7 @@ static void platforms_create_info_destroy_test() {
 	CL4Platform* p = NULL;
 	CL4Device* d = NULL;
 	GError* err = NULL;
-	CL4Info* info;
+	CL4WrapperInfo* info;
 	gchar* platf_info;
 	guint num_devs;
 	guint num_platfs;
@@ -383,23 +383,23 @@ static void platforms_ref_unref_test() {
 	d = cl4_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);
 	
-	g_assert_cmpint(cl4_platform_ref_count(p), ==, 1);
-	g_assert_cmpint(cl4_device_ref_count(d), ==, 1);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) p), ==, 1);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 1);
 
 	cl4_platform_ref(p);
 	cl4_device_ref(d);
 
-	g_assert_cmpint(cl4_platform_ref_count(p), ==, 2);
-	g_assert_cmpint(cl4_device_ref_count(d), ==, 2);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) p), ==, 2);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 2);
 		
 	cl4_platforms_destroy(platfs);
 		
-	g_assert_cmpint(cl4_platform_ref_count(p), ==, 1);
-	g_assert_cmpint(cl4_device_ref_count(d), ==, 2);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) p), ==, 1);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 2);
 		
 	cl4_platform_destroy(p);
 	
-	g_assert_cmpint(cl4_device_ref_count(d), ==, 1);
+	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 1);
 		
 	cl4_device_destroy(d);
 
@@ -431,7 +431,7 @@ static void context_create_info_destroy_test() {
 	CL4Device* d = NULL;
 	cl_device_id d_id = NULL;
 	CL4DevSelFilters filters = NULL;
-	CL4Info* info = NULL;
+	CL4WrapperInfo* info = NULL;
 	cl_context_properties* ctx_props = NULL;
 	cl_platform_id platform, platf_ref;
 	cl_context context;
@@ -485,7 +485,7 @@ static void context_create_info_destroy_test() {
 	
 	/* Create some context properties. */
 	ctx_props = g_new0(cl_context_properties, 3);
-	platform = cl4_platform_unwrap(p);
+	platform = (cl_platform_id) cl4_wrapper_unwrap((CL4Wrapper*) p);
 	ctx_props[0] = CL_CONTEXT_PLATFORM;
 	ctx_props[1] = (cl_context_properties) platform;
 	ctx_props[2] = 0;
@@ -701,13 +701,13 @@ static void context_ref_unref_test() {
 	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);
 	g_assert_no_error(err);
 	
-	g_assert_cmpuint(cl4_device_ref_count(d), ==, 1);
-	g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 1);
+	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
 	
 	cl4_context_ref(ctx);
-	g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 2);
+	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 2);
 	cl4_context_unref(ctx);
-	g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
 	
 	cl4_platforms_destroy(ps);
 	cl4_context_destroy(ctx);
@@ -721,7 +721,7 @@ static void context_ref_unref_test() {
 	if (err != NULL) {
 		g_clear_error(&err);
 	} else {
-		g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+		g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
 		cl4_context_destroy(ctx);
 	}
 	filters = NULL;
@@ -734,7 +734,7 @@ static void context_ref_unref_test() {
 	if (err != NULL) {
 		g_clear_error(&err);
 	} else {
-		g_assert_cmpuint(cl4_context_ref_count(ctx), ==, 1);
+		g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
 		cl4_context_destroy(ctx);
 	}
 	filters = NULL;
