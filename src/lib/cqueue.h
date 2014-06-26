@@ -28,15 +28,20 @@
 #ifndef CL4_CQUEUE_H
 #define CL4_CQUEUE_H 
 
+#include <glib.h>
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/opencl.h>
 #else
     #include <CL/opencl.h>
 #endif
-#include <glib.h>
+#include "wrapper.h"
 
 /** @brief Command queue wrapper object. */
 typedef struct cl4_cqueue CL4CQueue;
+
+/** @brief Decrements the reference count of the command queue wrapper 
+ * object. If it reaches 0, the context wrapper object is destroyed. */
+void cl4_cqueue_destroy(CL4CQueue* cq);
 
 /**
  * @brief Get command queue information object.
@@ -52,5 +57,30 @@ typedef struct cl4_cqueue CL4CQueue;
 #define cl4_cqueue_info(queue, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) queue, param_name, \
 		(cl4_wrapper_info_function) clGetCommandQueueInfo, err)
+
+/** 
+ * @brief Increase the reference count of the command queue object.
+ * 
+ * @param cq The command queue wrapper object. 
+ * */
+#define cl4_cqueue_ref(cq) \
+	cl4_wrapper_ref((CL4Wrapper*) cq)
+
+/**
+ * @brief Alias to cl4_queue_destroy().
+ * 
+ * @param cq Command queue wrapper object to destroy if reference count 
+ * is 1, otherwise just decrement the reference count.
+ * */
+#define cl4_cqueue_unref(cq) cl4_cqueue_destroy(cq)
+
+/**
+ * @brief Get the OpenCL command queue object.
+ * 
+ * @param cq The command queue wrapper object.
+ * @return The OpenCL command queue object.
+ * */
+#define cl4_cqueue_unwrap(cq) \
+	((cl_command_queue) cl4_wrapper_unwrap((CL4Wrapper*) cq))		
 
 #endif

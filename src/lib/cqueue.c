@@ -32,11 +32,44 @@
  */
 struct cl4_cqueue {
 
-	/** OpenCL command queue. */
-	cl_command_queue cl_object;
-	/** Object information. */
-	GHashTable* info;
-	/** Reference count. */
-	gint ref_count;    
+	/** Parent wrapper object. */
+	CL4Wrapper base;
 	
 };
+
+/** 
+ * @brief Decrements the reference count of the command queue wrapper 
+ * object. If it reaches 0, the context wrapper object is destroyed.
+ *
+ * @param cq The context wrapper object.
+ * */
+void cl4_cqueue_destroy(CL4CQueue* cq) {
+	
+	/* Make sure command queue wrapper object is not NULL. */
+	g_return_if_fail(cq != NULL);
+	
+	/* Wrapped OpenCL object (a command queue in this case), returned by
+	 * the parent wrapper unref function in case its reference count 
+	 * reaches 0. */
+	cl_command_queue command_queue;
+	
+	/* Decrease reference count using the parent wrapper object unref 
+	 * function. */
+	command_queue = 
+		(cl_command_queue) cl4_wrapper_unref((CL4Wrapper*) cq);
+	
+	/* If an OpenCL command queue was returned, the reference count of 
+	 * the wrapper object reached 0, so we must destroy remaining 
+	 * command queue wrapper properties and the OpenCL command queue
+	 * itself. */
+	if (command_queue != NULL) {
+
+		/* Release cq. */
+		g_slice_free(CL4CQueue, cq);
+		
+		/* Release OpenCL context. */
+		clReleaseCommandQueue(command_queue);
+		
+	}
+
+}
