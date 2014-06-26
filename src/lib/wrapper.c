@@ -85,9 +85,6 @@ gpointer cl4_wrapper_unref(CL4Wrapper* wrapper) {
 			g_hash_table_destroy(wrapper->info);
 		}
 		
-		/* Free the device wrapper object. */
-		g_slice_free(CL4Wrapper, wrapper);
-		
 	}
 	
 	/* Return OpenCL wrapped object if wrapper was destroyed. */
