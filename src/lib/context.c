@@ -445,22 +445,54 @@ finish:
  * @brief Creates a context wrapper from a cl_context object.
  * 
  * This function is useful when the client wants more control over the
- * cl_context object creation.
+ * cl_context object creation. Clients should explicitly release the
+ * passed context.
  * 
  * @param context The OpenCL cl_context object to wrap up.
- * @return A new context wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
  * */
-CL4Context* cl4_context_new_from_clcontext(cl_context context) {
+CL4Context* cl4_context_new_from_clcontext(
+	cl_context context, GError** err) {
 
 	/* Make sure OpenCL context is not NULL. */
 	g_return_val_if_fail(context != NULL, NULL);
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Return status of OpenCL function. */
+	cl_int ocl_status;
+	
 	/* Context wrapper to create. */
 	CL4Context* ctx = cl4_context_new_internal();
 	
 	/* Set OpenCL context. */
 	ctx->base.cl_object = context;
 	
+	/* Increase the reference count of the OpenCL context. */
+	ocl_status = clRetainContext(context);
+	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
+		CL4_ERROR_OCL, error_handler, 
+		"Function '%s': unable to retain cl_context (OpenCL error %d: %s).", 
+		__func__, ocl_status, cl4_err(ocl_status));
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+	/* Destroy what was built for the context wrapper. */
+	cl4_context_destroy(ctx);
+	ctx = NULL;
+
+finish:	
+
 	/* Return new context wrapper. */
 	return ctx;
 }

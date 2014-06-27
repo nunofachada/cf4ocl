@@ -796,6 +796,7 @@ cl_context clCreateContext(const cl_context_properties* properties,
 	ctx->devices = devices;
 	ctx->num_devices = num_devices;
 	ctx->d3d = FALSE;
+	ctx->ref_count = 1;
 	pfn_notify = pfn_notify;
 	user_data = user_data;
 	*errcode_ret = CL_SUCCESS;
@@ -805,8 +806,23 @@ cl_context clCreateContext(const cl_context_properties* properties,
 }
 
 cl_int clReleaseContext(cl_context context) {
-	g_free(context);
+	
+	/* Decrement reference count and check if it reaches 0. */
+	if (g_atomic_int_dec_and_test(&context->ref_count)) {
+
+		g_free(context);
+		
+	}
+	
 	return CL_SUCCESS;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clRetainContext(cl_context context) {
+
+	g_atomic_int_inc(&context->ref_count);
+	return CL_SUCCESS;
+
 }
 
 cl_int clGetContextInfo(cl_context context, cl_context_info param_name,

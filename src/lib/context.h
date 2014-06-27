@@ -122,7 +122,8 @@ CL4Context* cl4_context_new_from_cldevices_full(
     GError** err);
 
 /** @brief Creates a context wrapper from a cl_context object. */
-CL4Context* cl4_context_new_from_clcontext(cl_context context);
+CL4Context* cl4_context_new_from_clcontext(
+	cl_context context, GError** err);
 
 /* @todo Future work */
 // CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
