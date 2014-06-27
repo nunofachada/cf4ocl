@@ -54,6 +54,8 @@ typedef struct cl4_wrapper {
 	
 } CL4Wrapper;
 
+typedef cl_int (*cl4_wrapper_release_function)(gpointer cl_object);
+
 /** @brief Initialize wrapper fields. */
 void cl4_wrapper_init(CL4Wrapper* wrapper);
 
@@ -71,8 +73,10 @@ gint cl4_wrapper_ref_count(CL4Wrapper* wrapper);
 /** @brief Get the wrapped OpenCL object. */
 gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper);
 
-
-
+/** @brief Release an OpenCL object using the provided function if it's
+ * safe to do so (i.e. if the object has been initialized). */
+cl_int cl4_wrapper_release_cl_object(gpointer cl_object, 
+	cl4_wrapper_release_function cl_release_function);
 
 typedef cl_int (*cl4_wrapper_info_function)(gpointer cl_object,
 	cl_uint param_name, size_t param_value_size, void* param_value,

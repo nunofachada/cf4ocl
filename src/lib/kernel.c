@@ -67,8 +67,9 @@ void cl4_kernel_destroy(CL4Kernel* krnl) {
 		/* Release krnl. */
 		g_slice_free(CL4Kernel, krnl);
 		
-		/* Release OpenCL kernel. */
-		clReleaseKernel(kernel);
+		/* Release OpenCL kernel, ignore possible errors. */
+		cl4_wrapper_release_cl_object(kernel, 
+			(cl4_wrapper_release_function) clReleaseKernel);		
 		
 	}
 

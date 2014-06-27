@@ -67,8 +67,9 @@ void cl4_event_destroy(CL4Event* evt) {
 		/* Release evt. */
 		g_slice_free(CL4Event, evt);
 		
-		/* Release OpenCL event. */
-		clReleaseEvent(event);
+		/* Release OpenCL event, ignore possible errors. */
+		cl4_wrapper_release_cl_object(event, 
+			(cl4_wrapper_release_function) clReleaseEvent);
 		
 	}
 

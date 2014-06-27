@@ -548,8 +548,12 @@ static void context_create_info_destroy_test() {
 	any_device |= (ctx != NULL);
 
 	/* Free context if no error and set filters to NULL. */
-	if (err != NULL) g_clear_error(&err);
-	else cl4_context_destroy(ctx);
+	if (err != NULL) {
+		g_test_message("%s", err->message);
+		g_clear_error(&err);
+	} else { 
+		cl4_context_destroy(ctx);
+	}
 	filters = NULL;
 
 	/* 3.2. CPU device type filter. */
@@ -561,8 +565,12 @@ static void context_create_info_destroy_test() {
 	any_device |= (ctx != NULL);
 
 	/* Free context if no error and set filters to NULL. */
-	if (err != NULL) g_clear_error(&err);
-	else cl4_context_destroy(ctx);
+	if (err != NULL) {
+		g_test_message("%s", err->message);
+		g_clear_error(&err);
+	} else { 
+		cl4_context_destroy(ctx);
+	}
 	filters = NULL;
 
 	/* 3.3. Accel. device type filter. */
@@ -575,8 +583,12 @@ static void context_create_info_destroy_test() {
 	any_device |= (ctx != NULL);
 
 	/* Free context if no error and set filters to NULL. */
-	if (err != NULL) g_clear_error(&err);
-	else cl4_context_destroy(ctx);
+	if (err != NULL) {
+		g_test_message("%s", err->message);
+		g_clear_error(&err);
+	} else { 
+		cl4_context_destroy(ctx);
+	}
 	filters = NULL;
 	
 	/* Check that at least one device type context was created. */
@@ -731,6 +743,7 @@ static void context_ref_unref_test() {
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 
 	if (err != NULL) {
+		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else {
 		g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
@@ -744,6 +757,7 @@ static void context_ref_unref_test() {
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 
 	if (err != NULL) {
+		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else {
 		g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);

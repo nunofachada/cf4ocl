@@ -67,8 +67,9 @@ void cl4_program_destroy(CL4Program* prg) {
 		/* Release prg. */
 		g_slice_free(CL4Program, prg);
 		
-		/* Release OpenCL program. */
-		clReleaseProgram(program);
+		/* Release OpenCL program, ignore possible errors. */
+		cl4_wrapper_release_cl_object(program, 
+			(cl4_wrapper_release_function) clReleaseProgram);		
 		
 	}
 

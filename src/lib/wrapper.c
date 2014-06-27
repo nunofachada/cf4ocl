@@ -28,6 +28,8 @@
  
 #include "wrapper.h"
 
+#define CL4_WRAPPER_UNINIT() GINT_TO_POINTER(-1)
+
 /** 
  * @brief Initialize wrapper fields. 
  * 
@@ -35,7 +37,7 @@
  * */
 void cl4_wrapper_init(CL4Wrapper* wrapper) {
 	
-	wrapper->cl_object = NULL;
+	wrapper->cl_object = CL4_WRAPPER_UNINIT();
 	wrapper->info = NULL;
 	wrapper->ref_count = 1;
 	
@@ -124,7 +126,26 @@ gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper) {
 	return wrapper->cl_object;
 }
 
+/** 
+ * @brief Release an OpenCL object using the provided function if it's
+ * safe to do so (i.e. if the object has been initialized). 
+ * 
+ * @param cl_object OpenCL object to be released.
+ * @param cl_release_function Function to release OpenCL object.
+ * @return CL_SUCCESS if (i) object was successfully released, or 
+ * (ii) if the object wasn't initialized; or an OpenCL error code 
+ * provided by the release function if there was an error releasing the 
+ * object.
+ * */
+cl_int cl4_wrapper_release_cl_object(gpointer cl_object, 
+	cl4_wrapper_release_function cl_release_function) {
 
+	if ((cl_object != CL4_WRAPPER_UNINIT()) && (cl_object != NULL))
+		return cl_release_function(cl_object);
+	else
+		return CL_SUCCESS;
+
+}
 
 /**
  * @brief Create a new CL4WrapperInfo* object with a given value size.
@@ -134,6 +155,9 @@ gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper) {
  * */
 CL4WrapperInfo* cl4_wrapper_info_new(gsize size) {
 	
+	/* Make sure size is > 0. */
+	g_return_val_if_fail(size > 0, NULL);
+		
 	CL4WrapperInfo* info = g_slice_new(CL4WrapperInfo);
 	
 	info->value = g_slice_alloc0(size);
@@ -207,7 +231,7 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, cl_uint param_name,
 		/* Otherwise, get it from OpenCL device.*/
 		cl_int ocl_status;
 		/* Size of device information in bytes. */
-		gsize size_ret;
+		gsize size_ret = 0;
 		
 		/* Get size of information. */
 		ocl_status = info_fun(

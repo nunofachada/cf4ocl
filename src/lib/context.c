@@ -314,12 +314,19 @@ CL4Context* cl4_context_new_from_filters_full(
 	goto finish;
 	
 error_handler:
+
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 
 	/* Destroy what was built for the context wrapper. */
 	cl4_context_destroy(ctx);
 	ctx = NULL;
+	
+	/* In case an error occured, the devices internal array may have
+	 * not been assigned to the context wrapper, in which case we must
+	 * free it. */
+	if (devices)
+		g_free(devices->pdata);
 	
 finish:
 
@@ -330,7 +337,7 @@ finish:
 	g_slice_free1(devices->len * sizeof(cl_device_id), cl_devices);
 	
 	/* Free array object containing device wrappers but not the
-	 * underlying device wrappers (now reference in the context
+	 * underlying device wrappers (now referenced in the context
 	 * wrapper object). */
 	g_ptr_array_free(devices, FALSE);
 
@@ -473,7 +480,6 @@ void cl4_context_destroy(CL4Context* ctx) {
 	 * parent wrapper unref function in case its reference count 
 	 * reaches 0. */
 	cl_context context;
-	
 	/* Decrease reference count using the parent wrapper object unref 
 	 * function. */
 	context = (cl_context) cl4_wrapper_unref((CL4Wrapper*) ctx);
@@ -505,8 +511,9 @@ void cl4_context_destroy(CL4Context* ctx) {
 		/* Release ctx. */
 		g_slice_free(CL4Context, ctx);
 		
-		/* Release OpenCL context. */
-		clReleaseContext(context);
+		/* Release OpenCL context, ignore possible errors. */
+		cl4_wrapper_release_cl_object(context, 
+			(cl4_wrapper_release_function) clReleaseContext);
 		
 	}
 
