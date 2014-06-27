@@ -28,7 +28,8 @@
 #include "platform.h"
 #include "device.h"
 #include "devquery.h"
-		
+#include "common.h"
+
 #define CL4_TEST_DEVQUERY_MAXINFOLEN 500
 
 /**

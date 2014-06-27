@@ -27,7 +27,6 @@
  
 #include "kernelquery.h"
 
-
 /** 
  * @brief Get kernel workgroup info. 
  * 

@@ -29,6 +29,7 @@
 #include "device.h"
 #include "devquery.h"
 #include "context.h"
+#include "common.h"
 
 /* Max. length of information string. */
 #define CL4_TEST_WRAPPERS_MAXINFOSTR 200
@@ -465,9 +466,11 @@ static void context_create_info_destroy_test() {
 	
 	/* Get number of devices from context wrapper, check that this
 	 * number is 1. */
+#ifdef CL_VERSION_1_1
 	info = cl4_context_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
+#endif
 	
 	/* Get the cl_device_id from context via context info and check
 	 * that it corresponds to the cl_device_id with which the context
@@ -475,6 +478,10 @@ static void context_create_info_destroy_test() {
 	info = cl4_context_info(ctx, CL_CONTEXT_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert(((cl_device_id*) info->value)[0] == d_id);
+
+	/* Check again that the number of devices is 1, this time not using
+	 * CL_CONTEXT_NUM_DEVICES, which is not available in OpenCL 1.0. */
+	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
 
 	/* Free context. */
 	cl4_context_destroy(ctx);
@@ -511,8 +518,13 @@ static void context_create_info_destroy_test() {
 
 	/* Check that the context number of devices taken using context
 	 * info is 1. */
+#ifdef CL_VERSION_1_1
 	info = cl4_context_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
 	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
+#else
+	info = cl4_context_info(ctx, CL_CONTEXT_DEVICES, &err);
+	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
+#endif
 
 	/* Free context, platforms and context properties. */
 	cl4_context_destroy(ctx);

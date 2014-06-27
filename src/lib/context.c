@@ -189,20 +189,15 @@ static void cl4_context_init_devices(
 		
 		CL4WrapperInfo* info_devs;
 		GError* err_internal = NULL;
-		
-		/* Get number of devices. */
-		info_devs = cl4_context_info(
-			ctx, CL_CONTEXT_NUM_DEVICES, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		
-		/* Keep number of devices. */
-		ctx->num_devices = *((cl_uint*) info_devs->value);
-		
+
 		/* Get device IDs. */
 		info_devs = cl4_context_info(
 			ctx, CL_CONTEXT_DEVICES, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
+		/* Determine number of devices. */
+		ctx->num_devices = info_devs->size / sizeof(cl_device_id);
+
 		/* Allocate memory for array of device wrapper objects. */
 		ctx->devices = cl4_context_device_wrappers_new(ctx->num_devices);
 	

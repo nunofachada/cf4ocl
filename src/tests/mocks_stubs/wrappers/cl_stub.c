@@ -31,6 +31,7 @@
 #endif
 #include <glib.h>
 #include <string.h>
+#include "oclversions.h"
 
 struct _cl_device_id {
 	const cl_uint address_bits;
@@ -821,8 +822,10 @@ cl_int clGetContextInfo(cl_context context, cl_context_info param_name,
 			
 			case CL_CONTEXT_REFERENCE_COUNT:
 				cl4_test_basic_info(cl_uint, context, ref_count);
+#ifdef CL_VERSION_1_1
 			case CL_CONTEXT_NUM_DEVICES:
 				cl4_test_basic_info(cl_uint, context, num_devices);
+#endif
 			case CL_CONTEXT_DEVICES:
 				cl4_test_predefvector_info(
 					cl_device_id, context->num_devices, context, devices);

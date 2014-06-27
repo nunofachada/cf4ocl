@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <glib.h>
 #include <glib/gprintf.h>
+#include "oclversions.h"
 
 /**
  * @brief Error codes.

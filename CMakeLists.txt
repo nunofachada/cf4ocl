@@ -25,6 +25,17 @@ find_package(OpenCL REQUIRED)
 find_package(Doxygen 1.8.3 QUIET)
 pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
+# Use provided OpenCL headers or system OpenCL headers?
+option(USE_LOCAL_OPENCL_HEADERS "Use local OpenCL headers?" OFF)
+
+SET(LOCAL_OPENCL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
+
+SET_PROPERTY(CACHE LOCAL_OPENCL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0") 
+
+IF (USE_LOCAL_OPENCL_HEADERS)
+	SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${LOCAL_OPENCL_HEADERS}")
+ENDIF()
+
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/src/lib)
 

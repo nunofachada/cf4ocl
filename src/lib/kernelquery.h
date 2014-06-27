@@ -25,18 +25,19 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_QUERY_H
-#define CL4_QUERY_H 
+#ifndef CL4_KERNELQUERY_H
+#define CL4_KERNELQUERY_H 
 
-#include "errors.h"
-#include "gerrorf.h"
-#include "common.h"
 #include <glib.h>
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/opencl.h>
 #else
     #include <CL/opencl.h>
 #endif
+#include "errors.h"
+#include "gerrorf.h"
+#include "common.h"
+#include "oclversions.h"
 
 /**
  * @brief Kernel workgroup information.
