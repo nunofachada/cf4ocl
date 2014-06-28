@@ -132,6 +132,7 @@ CL4Context* cl4_context_new_from_clcontext(
 // CL4Context* cl4_context_new_cpu(GError** err);
 // CL4Context* cl4_context_new_gpu(GError** err);
 // CL4Context* cl4_context_new_accel(GError** err);
+// CL4Context* cl4_context_new_menu(GError** err);
 
 /** @} */
 
