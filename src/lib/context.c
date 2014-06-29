@@ -292,6 +292,7 @@ CL4Context* cl4_context_new_from_filters_full(
 	/* Determine context properties. */
 	ctx_props = cl4_context_properties_default(
 			properties, g_ptr_array_index(devices, 0), &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	 
 	/// @todo Check if devices belong to same platform
 	

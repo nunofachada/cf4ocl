@@ -107,7 +107,7 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 CL4Context* cl4_context_new_from_filters_full(
 	const cl_context_properties* properties, 
 	CL4DevSelFilters* filters,
-	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+	cl4_context_callback pfn_notify,
     void* user_data,
 	GError **err);
 
@@ -117,7 +117,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	const cl_context_properties* properties, 
 	cl_uint num_devices,
 	const cl_device_id* devices,
-	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+	cl4_context_callback pfn_notify,
     void* user_data,
     GError** err);
 
@@ -133,6 +133,7 @@ CL4Context* cl4_context_new_from_clcontext(
 // CL4Context* cl4_context_new_gpu(GError** err);
 // CL4Context* cl4_context_new_accel(GError** err);
 // CL4Context* cl4_context_new_menu(GError** err);
+// CL4Context* cl4_context_new_any(GError** err);
 
 /** @} */
 
