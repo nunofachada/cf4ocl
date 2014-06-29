@@ -421,7 +421,7 @@ static gboolean cl4_devsel_indep_test_true(
 
 /**
  * @brief Tests creation, getting info from and destruction of 
- * context, program, queue and kernel wrapper objects.
+ * context wrapper objects.
  * */
 static void context_create_info_destroy_test() {
 	
@@ -703,8 +703,8 @@ static void context_create_info_destroy_test() {
  * composing object still exists and must be freed by the function
  * which increase its reference count.
  * 
- * This function tests the following modules: context, program, queue
- * and kernel object wrappers.
+ * This function tests the following modules: context, device and 
+ * platform.
  * */
 static void context_ref_unref_test() {
 
@@ -778,6 +778,24 @@ static void context_ref_unref_test() {
 
 }
 
+#define CL4_TEST_WRAPPERS_PROGRAM_SUM \
+	"__kernel void sum(" \
+	"		__global const float *a," \
+	"		__global const float *b," \
+	"		__global float *c)" \
+	"{" \
+	"	int gid = get_global_id(0);" \
+	"	c[gid] = a[gid] + b[gid];" \
+	"}"
+
+/**
+ * @brief Tests creation, getting info from and destruction of 
+ * program wrapper objects.
+ * */
+static void program_create_info_destroy_test() {
+	
+}
+
 /**
  * @brief Main function.
  * @param argc Number of command line arguments.
@@ -803,6 +821,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/context-ref-unref", 
 		context_ref_unref_test);
+		
+	g_test_add_func(
+		"/wrappers/program-create-info-destroy", 
+		program_create_info_destroy_test);		
 
 	return g_test_run();
 }

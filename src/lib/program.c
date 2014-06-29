@@ -37,6 +37,93 @@ struct cl4_program {
 	
 };
 
+CL4Program* cl4_program_new(
+	CL4Context* ctx, const char* file, GError** err) {
+
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	/* Make sure file is not NULL. */
+	g_return_val_if_fail(file != NULL, NULL);
+
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+	
+	CL4Program* prg = NULL;
+	
+	gchar* src = NULL;
+
+	g_file_get_contents(file, &src, NULL, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	prg = cl4_program_new_with_source(ctx, 1, (const char**) &src, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:
+
+	if (src != NULL)
+		g_free(src);
+		
+	/* Return prg. */
+	return prg;	
+
+}
+
+CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count, 
+	const char **strings, GError** err) {
+
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	/* Make sure count > 0. */
+	g_return_val_if_fail(count > 0, NULL);
+	/* Make sure strings is not NULL. */
+	g_return_val_if_fail(strings != NULL, NULL);
+
+	cl_int ocl_status;
+	
+	CL4Program* prg = NULL;
+		
+	prg = g_slice_new(CL4Program);
+	cl4_wrapper_init(&prg->base);
+	
+	prg->base.cl_object = (cl_program) clCreateProgramWithSource(
+		cl4_context_unwrap(ctx), count, strings, NULL, &ocl_status);
+	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
+		CL4_ERROR_OCL, error_handler, 
+		"Function '%s': unable to create cl_program from source (OpenCL error %d: %s).", 
+		__func__, ocl_status, cl4_err(ocl_status));
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+	/* Destroy what was built for the context wrapper. */
+	cl4_program_destroy(prg);
+	prg = NULL;
+	
+finish:
+
+	/* Return prg. */
+	return prg;	
+}
+
 /** 
  * @brief Decrements the reference count of the program wrapper 
  * object. If it reaches 0, the program wrapper object is 

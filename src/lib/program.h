@@ -34,10 +34,35 @@
 #else
     #include <CL/opencl.h>
 #endif
+#include "context.h"
 #include "wrapper.h"
 
 /** @brief Program wrapper object. */
 typedef struct cl4_program CL4Program;
+
+typedef void (CL_CALLBACK* cl4_program_callback)(
+	cl_program program, void* user_data);
+
+CL4Program* cl4_program_new(
+	CL4Context* ctx, const char* file, GError** err);
+
+CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count, 
+	const char **strings, GError** err);
+
+/* @todo Future work */	
+//~ CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
+	//~ cl_uint num_devices, CL4Device** devices, const size_t *lengths,
+ 	//~ const unsigned char **binaries,	cl_int *binary_status, GError** err);
+//~ CL4Program* cl4_program_new_with_built_in_kernels(CL4Context* ctx,
+ 	//~ cl_uint num_devices, CL4Device** devices, const char *kernel_names,
+ 	//~ GError** err);
+ 
+gboolean cl4_program_build(CL4Program* program, char *options, GError* err);
+
+cl_int cl4_program_build_full(CL4Program* program, cl_uint num_devices,	
+	CL4Device** devices, const char *options, 
+	cl4_program_callback pfn_notify, void *user_data);
+
 
 /** @brief Decrements the reference count of the program wrapper 
  * object. If it reaches 0, the program wrapper object is 
