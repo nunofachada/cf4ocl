@@ -793,7 +793,15 @@ static void context_ref_unref_test() {
  * program wrapper objects.
  * */
 static void program_create_info_destroy_test() {
-	
+
+	CL4Context* ctx = NULL;
+	GError* err = NULL;
+
+	ctx = cl4_context_new_any(&err);
+	g_assert_no_error(err);
+
+	cl4_context_destroy(ctx);
+
 }
 
 /**

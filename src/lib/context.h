@@ -101,6 +101,58 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 #define cl4_context_new_from_cldevices(num_devices, devices, err) \
 	cl4_context_new_from_cldevices_full( \
 		NULL, (num_devices), (devices), NULL, NULL, (err))
+		
+/** 
+ * @brief Creates a context wrapper for a CPU device.
+ * 
+ * The first found CPU device is used. More than one CPU might be used
+ * if all CPUs belong to the same platform.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
+ * */
+#define cl4_context_new_cpu(err) \
+	cl4_context_new_from_indep_filter(cl4_devsel_indep_type_cpu, err)
+	
+/** 
+ * @brief Creates a context wrapper for a GPU device.
+ * 
+ * The first found GPU device is used. More than one GPU might be used
+ * if all GPUs belong to the same platform.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
+ * */
+#define cl4_context_new_gpu(err) \
+	cl4_context_new_from_indep_filter(cl4_devsel_indep_type_gpu, err)
+	
+/** 
+ * @brief Creates a context wrapper for an Accelerator device.
+ * 
+ * The first found Accelerator device is used. More than one Accelerator
+ * might be used if all Accelerators belong to the same platform.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
+ * */
+#define cl4_context_new_accel(err) \
+	cl4_context_new_from_indep_filter(cl4_devsel_indep_type_accel, err)
+	
+/** 
+ * @brief Creates a context wrapper for the fist found device(s).
+ * 
+ * The first found device is used. More than one device might be used if 
+ * all devices belong to the same platform.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
+ * */
+#define cl4_context_new_any(err) \
+	cl4_context_new_from_indep_filter(NULL, err)	
 
 /** @brief Create a new context wrapper object selecting devices using
  * the given set of filters. */
@@ -125,15 +177,15 @@ CL4Context* cl4_context_new_from_cldevices_full(
 CL4Context* cl4_context_new_from_clcontext(
 	cl_context context, GError** err);
 
+/** @brief Creates a context wrapper using one independent device filter
+ * specified in the function parameters. */
+CL4Context* cl4_context_new_from_indep_filter(
+	cl4_devsel_indep type_filter, GError** err);
+
 /* @todo Future work */
 // CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
 // CL4Context* cl4_context_new_from_platform(CL4Platform* platform, GError** err);
 // CL4Context* cl4_context_new_from_devices(CL4Devices** devices, GError** err);
-// CL4Context* cl4_context_new_cpu(GError** err);
-// CL4Context* cl4_context_new_gpu(GError** err);
-// CL4Context* cl4_context_new_accel(GError** err);
-// CL4Context* cl4_context_new_menu(GError** err);
-// CL4Context* cl4_context_new_any(GError** err);
 
 /** @} */
 

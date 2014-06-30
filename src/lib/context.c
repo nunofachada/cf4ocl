@@ -229,10 +229,14 @@ finish:
  * @brief Create a new context wrapper object selecting devices using
  * the given set of filters. 
  * 
- * This function accepts all the parameters
- * required for the clCreateContext() OpenCL function. For simple
- * context creation use the cl4_context_new_from_filters() macro
- * instead.
+ * This function accepts all the parameters required for the 
+ * clCreateContext() OpenCL function. For simple context creation use 
+ * the cl4_context_new_from_filters() macro instead.
+ * 
+ * The client should provide the necessary filters such that the
+ * filtered devices belong to the same platform. Adding the 
+ * cl4_devsel_dep_platform() filter last to the filters set will ensure
+ * this.
  * 
  * @param properties A set of OpenCL context properties.
  * @param filters Filters for selecting device.
@@ -294,8 +298,6 @@ CL4Context* cl4_context_new_from_filters_full(
 			properties, g_ptr_array_index(devices, 0), &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	 
-	/// @todo Check if devices belong to same platform
-	
 	/* Create OpenCL context. */
 	ctx->base.cl_object = (gpointer) clCreateContext(
 		(const cl_context_properties*) ctx_props, devices->len, cl_devices, 
@@ -496,6 +498,62 @@ finish:
 
 	/* Return new context wrapper. */
 	return ctx;
+}
+
+/** 
+ * @brief Creates a context wrapper using one independent device filter
+ * specified in the function parameters.
+ * 
+ * The first device accepted by the given filter is used. More than one
+ * device may be used if all devices belong to the same platform (and 
+ * pass the given filter).
+ * 
+ * @param filter An independent device filter. If NULL, no independent
+ * filter is used, and the first found device(s) is used.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
+ * */
+CL4Context* cl4_context_new_from_indep_filter(
+	cl4_devsel_indep filter, GError** err) {
+		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+	
+	/* Context wrapper to create. */
+	CL4Context* ctx;
+	
+	/* Set of device selection filters. */
+	CL4DevSelFilters filters = NULL;
+
+	/* Add specific independent filter. */
+	if (filter != NULL)
+		cl4_devsel_add_indep_filter(&filters, filter, NULL);
+
+	/* Found devices should belong to the same platform. */
+	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
+	
+	/* Create a context with selected device(s). */
+	ctx = cl4_context_new_from_filters(&filters, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+
+	/* Return new context wrapper. */
+	return ctx;
+		
 }
 
 /** 
