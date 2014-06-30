@@ -30,6 +30,8 @@
 #include "devquery.h"
 #include "context.h"
 #include "common.h"
+#include "program.h"
+#include <glib/gstdio.h>
 
 /* Max. length of information string. */
 #define CL4_TEST_WRAPPERS_MAXINFOSTR 200
@@ -778,7 +780,8 @@ static void context_ref_unref_test() {
 
 }
 
-#define CL4_TEST_WRAPPERS_PROGRAM_SUM \
+#define CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "sum.cl"
+#define CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT \
 	"__kernel void sum(" \
 	"		__global const float *a," \
 	"		__global const float *b," \
@@ -795,11 +798,24 @@ static void context_ref_unref_test() {
 static void program_create_info_destroy_test() {
 
 	CL4Context* ctx = NULL;
+	CL4Program* prg = NULL;
 	GError* err = NULL;
+	
+	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
+		CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT, -1, &err);
+	g_assert_no_error(err);
 
 	ctx = cl4_context_new_any(&err);
 	g_assert_no_error(err);
 
+	prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
+	g_assert_no_error(err);
+
+	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
+		g_message("Unable to delete temporary file '"
+			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
+
+	cl4_program_destroy(prg);
 	cl4_context_destroy(ctx);
 
 }
