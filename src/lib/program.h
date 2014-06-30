@@ -56,18 +56,24 @@ CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count,
 //~ CL4Program* cl4_program_new_with_built_in_kernels(CL4Context* ctx,
  	//~ cl_uint num_devices, CL4Device** devices, const char *kernel_names,
  	//~ GError** err);
- 
-gboolean cl4_program_build(CL4Program* program, char *options, GError* err);
-
-cl_int cl4_program_build_full(CL4Program* program, cl_uint num_devices,	
-	CL4Device** devices, const char *options, 
-	cl4_program_callback pfn_notify, void *user_data);
-
-
+ 	
 /** @brief Decrements the reference count of the program wrapper 
  * object. If it reaches 0, the program wrapper object is 
  * destroyed. */
-void cl4_program_destroy(CL4Program* prg);
+void cl4_program_destroy(CL4Program* prg); 	
+ 
+#define cl4_program_build(prg, options, err) \
+	cl4_program_build_from_devices_full( \
+		prg, 0, NULL, options, NULL, NULL, err)
+
+gboolean cl4_program_build_from_devices_full(CL4Program* prg, 
+	cl_uint num_devices, CL4Device** devices, const char *options, 
+	cl4_program_callback pfn_notify, void *user_data, GError** err);
+
+gboolean cl4_program_build_from_cldevices_full(CL4Program* prg, 
+	cl_uint num_devices, cl_device_id* device_list, const char *options, 
+	cl4_program_callback pfn_notify, void *user_data, GError** err);
+
 
 /**
  * @brief Get program information object.

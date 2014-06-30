@@ -37,6 +37,20 @@ struct cl4_program {
 	
 };
 
+static CL4Program* cl4_program_new_internal() {
+
+	/* The program wrapper object. */
+	CL4Program* prg;
+	
+	/* Allocate memory for program wrapper object. */
+	prg = g_slice_new0(CL4Program);
+	cl4_wrapper_init(&prg->base);
+	
+	/* Return new context wrapper object. */
+	return prg;
+
+}
+
 CL4Program* cl4_program_new(
 	CL4Context* ctx, const char* file, GError** err) {
 
@@ -95,8 +109,7 @@ CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count,
 	
 	CL4Program* prg = NULL;
 		
-	prg = g_slice_new(CL4Program);
-	cl4_wrapper_init(&prg->base);
+	prg = cl4_program_new_internal();
 	
 	prg->base.cl_object = (cl_program) clCreateProgramWithSource(
 		cl4_context_unwrap(ctx), count, strings, NULL, &ocl_status);
@@ -162,4 +175,89 @@ void cl4_program_destroy(CL4Program* prg) {
 
 }
 
+gboolean cl4_program_build_from_devices_full(CL4Program* prg, 
+	cl_uint num_devices, CL4Device** devices, const char *options, 
+	cl4_program_callback pfn_notify, void *user_data, GError** err) {
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	/* Make sure devices and num_devices are coherent. */
+	g_return_val_if_fail(((num_devices == 0) && (devices == NULL)) 
+		|| ((num_devices > 0) && (devices != NULL)), FALSE);
 
+	/* Array of unwrapped devices. */
+	cl_device_id* cl_devices = NULL;
+	
+	/* Result of function call. */
+	gboolean result;
+	
+	/* Check if its necessary to unwrap devices. */
+	if (devices != NULL) {
+		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
+		/* Unwrap devices. */
+		for (guint i = 0; i < num_devices; i++)
+			cl_devices[i] = cl4_device_unwrap(devices[i]);
+	}
+
+	/* Build the program. */
+	result = cl4_program_build_from_cldevices_full(
+		prg, num_devices, cl_devices, options, pfn_notify, 
+		user_data, err);
+	
+	/* Check if necessary to release array of unwrapped devices. */
+	if (cl_devices != NULL) {
+		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
+	}
+	
+	/* Return result of function call. */
+	return result;
+
+}
+
+gboolean cl4_program_build_from_cldevices_full(CL4Program* prg, 
+	cl_uint num_devices, cl_device_id* device_list, const char *options, 
+	cl4_program_callback pfn_notify, void *user_data, GError** err) {
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	/* Make sure devices and num_devices are coherent. */
+	g_return_val_if_fail(((num_devices == 0) && (device_list == NULL)) 
+		|| ((num_devices > 0) && (device_list != NULL)), FALSE);
+
+	/* Status of OpenCL function call. */
+	cl_int ocl_status;
+
+	/* Result of function call. */
+	gboolean result;
+
+	/* Build program. */
+	ocl_status = clBuildProgram(cl4_program_unwrap(prg),
+		num_devices, device_list, options, pfn_notify, user_data);
+	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
+		CL4_ERROR_OCL, error_handler, 
+		"Function '%s': unable to build program (OpenCL error %d: %s).", 
+		__func__, ocl_status, cl4_err(ocl_status));
+		
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	result = TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+	/* Bad result. */
+	result = FALSE;
+	
+finish:
+
+	/* Return result of function call. */
+	return result;
+
+}
