@@ -538,7 +538,8 @@ static void context_create_info_destroy_test() {
 	g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
 	
 	/* 
-	 * 3. Test context creation by device filtering (indep. filters). 
+	 * 3. Test context creation by device filtering 
+	 * (using shortcut macros). 
 	 * */
 	 
 	/* For the next device type filters, at least one device must be
@@ -546,10 +547,9 @@ static void context_create_info_destroy_test() {
 	any_device = FALSE;
 	 
 	/* 3.1. GPU device type filter. */
-	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_gpu, NULL);
-	
+		
 	/* Check that either there was no error or that no GPU was found. */
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = cl4_context_new_gpu(&err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 	any_device |= (ctx != NULL);
 
@@ -563,10 +563,9 @@ static void context_create_info_destroy_test() {
 	filters = NULL;
 
 	/* 3.2. CPU device type filter. */
-	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_cpu, NULL);
-	
+
 	/* Check that either there was no error or that no CPU was found. */
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = cl4_context_new_cpu(&err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 	any_device |= (ctx != NULL);
 
@@ -580,11 +579,10 @@ static void context_create_info_destroy_test() {
 	filters = NULL;
 
 	/* 3.3. Accel. device type filter. */
-	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_accel, NULL);
 	
 	/* Check that either there was no error or that no accelerator was 
 	 * found. */
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = cl4_context_new_accel(&err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
 	any_device |= (ctx != NULL);
 
@@ -601,11 +599,10 @@ static void context_create_info_destroy_test() {
 	g_assert(any_device);
 	
 	/* 3.4. Specific platform filter. */
-	cl4_devsel_add_indep_filter(
-		&filters, cl4_devsel_indep_platform, (gpointer) platform);
 
 	/* Check that a context wrapper was created. */
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = cl4_context_new_from_indep_filter(
+		cl4_devsel_indep_platform, (void*) platform, &err);
 	g_assert_no_error(err);
 	
 	/* Check that context wrapper contains a device. */
@@ -624,7 +621,8 @@ static void context_create_info_destroy_test() {
 	filters = NULL;
 	
 	/* 
-	 * 4. Test context creation by device filtering (dep. filters). 
+	 * 4. Test context creation by device filtering 
+	 * (explicit dependent filters). 
 	 * */
 	 
 	/* Same platform filter. */
@@ -666,8 +664,8 @@ static void context_create_info_destroy_test() {
 	filters = NULL;
 
 	/* 
-	 * 5. Test context creation by device filtering (both independent
-	 * and dependent filters). 
+	 * 5. Test context creation by device filtering 
+	 * (explicit independent and dependent filters). 
 	 * */
 	
 	/* Add pass all independent filter for testing. */
@@ -744,6 +742,7 @@ static void context_ref_unref_test() {
 
 	/* Test context creating by device filtering. */
 	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_gpu, NULL);
+	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);	
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
@@ -758,6 +757,7 @@ static void context_ref_unref_test() {
 	filters = NULL;
 
 	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_cpu, NULL);
+	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
 	
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));

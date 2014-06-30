@@ -113,7 +113,8 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define cl4_context_new_cpu(err) \
-	cl4_context_new_from_indep_filter(cl4_devsel_indep_type_cpu, err)
+	cl4_context_new_from_indep_filter( \
+		cl4_devsel_indep_type_cpu, NULL, err)
 	
 /** 
  * @brief Creates a context wrapper for a GPU device.
@@ -126,7 +127,8 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define cl4_context_new_gpu(err) \
-	cl4_context_new_from_indep_filter(cl4_devsel_indep_type_gpu, err)
+	cl4_context_new_from_indep_filter( \
+		cl4_devsel_indep_type_gpu, NULL, err)
 	
 /** 
  * @brief Creates a context wrapper for an Accelerator device.
@@ -139,7 +141,8 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define cl4_context_new_accel(err) \
-	cl4_context_new_from_indep_filter(cl4_devsel_indep_type_accel, err)
+	cl4_context_new_from_indep_filter( \
+		cl4_devsel_indep_type_accel, NULL, err)
 	
 /** 
  * @brief Creates a context wrapper for the fist found device(s).
@@ -152,7 +155,7 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define cl4_context_new_any(err) \
-	cl4_context_new_from_indep_filter(NULL, err)	
+	cl4_context_new_from_indep_filter(NULL, NULL, err)	
 
 /** @brief Create a new context wrapper object selecting devices using
  * the given set of filters. */
@@ -180,7 +183,7 @@ CL4Context* cl4_context_new_from_clcontext(
 /** @brief Creates a context wrapper using one independent device filter
  * specified in the function parameters. */
 CL4Context* cl4_context_new_from_indep_filter(
-	cl4_devsel_indep type_filter, GError** err);
+	cl4_devsel_indep filter, void* data, GError** err);
 
 /* @todo Future work */
 // CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);

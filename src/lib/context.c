@@ -273,6 +273,9 @@ CL4Context* cl4_context_new_from_filters_full(
 	cl_int ocl_status;
 	/* Context wrapper to create. */
 	CL4Context* ctx = cl4_context_new_internal();
+	/* Base platform and comparison platform for checking that all
+	 * devices belong to the same platform. */
+	cl_platform_id p_base, p_cmp;
 
 	/* Get selected/filtered devices. */
 	devices = cl4_devsel_select(filters, &err_internal);
@@ -287,8 +290,24 @@ CL4Context* cl4_context_new_from_filters_full(
 	/* Create an array for the selected cl_device_id's. */
 	cl_devices = g_slice_alloc(devices->len * sizeof(cl_device_id));
 	
+	/* Determine base platform. */
+	p_base = cl4_device_info_value_scalar(devices->pdata[0], 
+		CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
 	/* Unwrap selected devices and add them to array. */
 	for (guint i = 0; i < devices->len; i++) {
+		
+		/* Get device platform. */
+		p_cmp = (cl_platform_id) cl4_device_info_value_scalar(
+			devices->pdata[0], CL_DEVICE_PLATFORM, cl_platform_id, 
+			&err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* Warn if device platform is not the same than base platform. */
+		g_warn_if_fail(p_cmp == p_base);
+		
+		/* Unwrap! */
 		cl_devices[i] = cl4_device_unwrap(
 			(CL4Device*) g_ptr_array_index(devices, i));
 	}
@@ -510,12 +529,13 @@ finish:
  * 
  * @param filter An independent device filter. If NULL, no independent
  * filter is used, and the first found device(s) is used.
+ * @param data Specific filter data.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 CL4Context* cl4_context_new_from_indep_filter(
-	cl4_devsel_indep filter, GError** err) {
+	cl4_devsel_indep filter, void* data, GError** err) {
 		
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -531,7 +551,7 @@ CL4Context* cl4_context_new_from_indep_filter(
 
 	/* Add specific independent filter. */
 	if (filter != NULL)
-		cl4_devsel_add_indep_filter(&filters, filter, NULL);
+		cl4_devsel_add_indep_filter(&filters, filter, data);
 
 	/* Found devices should belong to the same platform. */
 	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
