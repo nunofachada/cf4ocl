@@ -811,6 +811,9 @@ static void program_create_info_destroy_test() {
 	prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
 	g_assert_no_error(err);
 
+	cl4_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
+
 	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
 		g_message("Unable to delete temporary file '"
 			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");

@@ -89,13 +89,30 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 		NULL, (filters), NULL, NULL, (err))
 
 /** 
- * @brief Creates a context wrapper given a list of cl_device_id's.
+ * @brief Creates a context wrapper given an array of ::CL4Device 
+ * wrappers.
+ * 
+ * This macro simply calls cl4_context_new_from_devices_full() 
+ * setting properties, callback and user data to NULL.
+ * 
+ * @param num_devices Number of cl_devices_id's in list.
+ * @param devices Array of ::CL4Device wrappers.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return A new context wrapper object.
+ * */
+#define cl4_context_new_from_devices(num_devices, devices, err) \
+	cl4_context_new_from_cldevices_full( \
+		NULL, (num_devices), (devices), NULL, NULL, (err))
+
+/** 
+ * @brief Creates a context wrapper given an array of cl_device_id's.
  * 
  * This macro simply calls cl4_context_new_from_cldevices_full() 
  * setting properties, callback and user data to NULL.
  * 
  * @param num_devices Number of cl_devices_id's in list.
- * @param devices List of cl_device_id's.
+ * @param devices Array of cl_device_id's.
  * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object.
@@ -168,6 +185,17 @@ CL4Context* cl4_context_new_from_filters_full(
     void* user_data,
 	GError **err);
 
+/** @brief Creates a context wrapper given an array of ::CL4Device 
+ * wrappers and the remaining parameters required by the 
+ * clCreateContext function. */
+CL4Context* cl4_context_new_from_devices_full(
+	const cl_context_properties* properties, 
+	cl_uint num_devices,
+	CL4Device** devices,
+	cl4_context_callback pfn_notify,
+    void* user_data,
+    GError** err);
+
 /** @brief Creates a context wrapper using the exact parameters received 
  * by the clCreateContext function. */
 CL4Context* cl4_context_new_from_cldevices_full(
@@ -190,7 +218,6 @@ CL4Context* cl4_context_new_from_indep_filter(
 /* @todo Future work */
 // CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
 // CL4Context* cl4_context_new_from_platform(CL4Platform* platform, GError** err);
-// CL4Context* cl4_context_new_from_devices(CL4Device** devices, GError** err);
 
 /** @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed. */

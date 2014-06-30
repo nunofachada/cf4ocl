@@ -112,7 +112,7 @@ static CL4Context* cl4_context_new_internal() {
  * */	
 static cl_context_properties* cl4_context_properties_default(
 	const cl_context_properties* properties, 
-	CL4Device* device, GError** err) {
+	cl_device_id device, GError** err) {
 	
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);
@@ -125,8 +125,8 @@ static cl_context_properties* cl4_context_properties_default(
 	/* The OpenCL platform object. */
 	cl_platform_id platform;
 	
-	/* Internal error handler. */
-	GError* err_internal = NULL;
+	/* OpenCL function call status. */
+	cl_int ocl_status;
 	
 	/* Check if the original const properties object is NULL... */
 	if (properties == NULL) {
@@ -137,9 +137,12 @@ static cl_context_properties* cl4_context_properties_default(
 		ctx_props = g_slice_alloc(3 * sizeof(cl_context_properties));
 
 		/* Get context platform using first device. */
-		platform = *((cl_platform_id*) cl4_device_info_value(
-			device, CL_DEVICE_PLATFORM, &err_internal));
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ocl_status = clGetDeviceInfo(device, CL_DEVICE_PLATFORM, 
+			sizeof(cl_platform_id), &platform, NULL);
+		gef_if_error_create_goto(*err, CL4_ERROR, 
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+			"Function '%s': unable to get platform from device (OpenCL error %d: %s).", 
+			__func__, ocl_status, cl4_err(ocl_status));
 
 		/* Set context properties using discovered platform. */
 		ctx_props[0] = CL_CONTEXT_PLATFORM;
@@ -265,22 +268,15 @@ CL4Context* cl4_context_new_from_filters_full(
 	g_return_val_if_fail(filters != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
 	/* Error reporting object. */
 	GError* err_internal = NULL;
 	
 	/* Array of selected/filtered CL4 device wrappers. */
 	GPtrArray* devices = NULL;
-	/* Array of selected/filtered devices (unwrapped). */
-	cl_device_id* cl_devices = NULL;
-	/* Context properties, in case the properties parameter is NULL. */
-	cl_context_properties* ctx_props = NULL;
-	/* Return status of OpenCL function calls. */
-	cl_int ocl_status;
+
 	/* Context wrapper to create. */
-	CL4Context* ctx = cl4_context_new_internal();
-	/* Base platform and comparison platform for checking that all
-	 * devices belong to the same platform. */
-	cl_platform_id p_base, p_cmp;
+	CL4Context* ctx = NULL;
 
 	/* Get selected/filtered devices. */
 	devices = cl4_devsel_select(filters, &err_internal);
@@ -292,49 +288,10 @@ CL4Context* cl4_context_new_from_filters_full(
 		"Function '%s': no device found for selected filters.", 
 		__func__);
 
-	/* Create an array for the selected cl_device_id's. */
-	cl_devices = g_slice_alloc(devices->len * sizeof(cl_device_id));
-	
-	/* Determine base platform. */
-	p_base = cl4_device_info_value_scalar(devices->pdata[0], 
-		CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
+	/* Create context wrapper. */
+	ctx = cl4_context_new_from_devices_full(properties, devices->len,
+		(CL4Device**) devices->pdata, pfn_notify, user_data, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
-	
-	/* Unwrap selected devices and add them to array. */
-	for (guint i = 0; i < devices->len; i++) {
-		
-		/* Get device platform. */
-		p_cmp = (cl_platform_id) cl4_device_info_value_scalar(
-			devices->pdata[0], CL_DEVICE_PLATFORM, cl_platform_id, 
-			&err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		
-		/* Warn if device platform is not the same than base platform. */
-		g_warn_if_fail(p_cmp == p_base);
-		
-		/* Unwrap! */
-		cl_devices[i] = cl4_device_unwrap(
-			(CL4Device*) g_ptr_array_index(devices, i));
-	}
-
-	/* Determine context properties. */
-	ctx_props = cl4_context_properties_default(
-			properties, g_ptr_array_index(devices, 0), &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
-	 
-	/* Create OpenCL context. */
-	ctx->base.cl_object = (gpointer) clCreateContext(
-		(const cl_context_properties*) ctx_props, devices->len, cl_devices, 
-		pfn_notify, user_data, &ocl_status);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
-		
-	/* Set number of devices and device wrappers in context wrapper 
-	 * object. */
-	ctx->num_devices = devices->len;
-	ctx->devices = (CL4Device**) devices->pdata;
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -344,32 +301,77 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	cl4_context_destroy(ctx);
-	ctx = NULL;
-	
-	/* In case an error occured, the devices internal array may have
-	 * not been assigned to the context wrapper, in which case we must
-	 * free it. */
-	if (devices)
-		g_free(devices->pdata);
 	
 finish:
 
-	/* Free default context properties if required. */
-	cl4_context_properties_default_free(properties, ctx_props);
-	
-	/* Destroy array of selected cl_device_id's. */
-	g_slice_free1(devices->len * sizeof(cl_device_id), cl_devices);
-	
-	/* Free array object containing device wrappers but not the
-	 * underlying device wrappers (now referenced in the context
-	 * wrapper object). */
-	g_ptr_array_free(devices, FALSE);
+	/* Free array object containing device wrappers. */
+	g_ptr_array_free(devices, TRUE);
 
 	/* Return ctx. */
 	return ctx;
+}
+
+/** 
+ * @brief Creates a context wrapper given an array of ::CL4Device 
+ * wrappers and the remaining parameters required by the 
+ * clCreateContext function. 
+ * 
+ * If the properties parameter is NULL, this function obtains 
+ * the cl_platform_id object from the first device.
+ * 
+ * @param properties Context properties, may be NULL.
+ * @param num_devices Number of ::CL4Device wrappers in array.
+ * @param devices Array of ::CL4Device wrappers.
+ * @param pfn_notify A callback function used by the OpenCL 
+ * implementation to report information on errors during context 
+ * creation as well as errors that occur at runtime in this context. 
+ * Ignored if NULL.
+ * @param user_data Passed as argument to pfn_notify, can be NULL.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return A new context wrapper object.
+ * */
+CL4Context* cl4_context_new_from_devices_full(
+	const cl_context_properties* properties, 
+	cl_uint num_devices,
+	CL4Device** devices,
+	cl4_context_callback pfn_notify,
+    void* user_data,
+    GError** err) {
+
+	/* Make sure number of devices is not zero. */
+	g_return_val_if_fail(num_devices > 0, NULL);
+	/* Make sure device array is not NULL. */
+	g_return_val_if_fail(devices != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Array of unwrapped devices. */
+	cl_device_id* cl_devices = NULL;
+	
+	/* New context wrapper. */
+	CL4Context* ctx = NULL;
+	
+	/* Check if its necessary to unwrap devices. */
+	if (devices != NULL) {
+		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
+		/* Unwrap devices. */
+		for (guint i = 0; i < num_devices; i++)
+			cl_devices[i] = cl4_device_unwrap(devices[i]);
+	}
+
+	/* Create context wrapper. */
+	ctx = cl4_context_new_from_cldevices_full(properties, num_devices,
+		cl_devices, pfn_notify, user_data, err);
+	
+	/* Check if necessary to release array of unwrapped devices. */
+	if (cl_devices != NULL) {
+		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
+	}
+	
+	/* Return result of function call. */
+	return ctx;
+
 }
 
 /**
@@ -402,7 +404,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 		
 	/* Make sure number of devices is not zero. */
 	g_return_val_if_fail(num_devices > 0, NULL);
-	/* Make sure device list is not NULL. */
+	/* Make sure device array is not NULL. */
 	g_return_val_if_fail(devices != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -416,26 +418,9 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	/* Context wrapper to create. */
 	CL4Context* ctx = cl4_context_new_internal();
 	
-	/* Set number of devices in the context wrapper object. */
-	ctx->num_devices = num_devices;
-	
-	/* Allocate space for device wrappers. */
-	ctx->devices = cl4_context_device_wrappers_new(num_devices);
-	
-	/* Add device wrappers to list of device wrappers. */
-	for (guint i = 0; i < num_devices; i++) {
-
-		/* Make sure devices in list are not NULL. */
-		g_return_val_if_fail(devices[i] != NULL, NULL);
-
-		/* Create new device wrapper, add it to list. */
-		ctx->devices[i] = cl4_device_new(devices[i]);
-
-	}
-	
 	/* Get a set of default context properties, if required. */
 	ctx_props = cl4_context_properties_default(
-			properties, ctx->devices[0], &err_internal);
+			properties, devices[0], &err_internal);
 	
 	/* Create OpenCL context. */
 	ctx->base.cl_object = clCreateContext(
