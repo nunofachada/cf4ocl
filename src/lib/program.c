@@ -35,6 +35,9 @@ struct cl4_program {
 	/** Parent wrapper object. */
 	CL4Wrapper base;
 	
+	/** Program kernels. */
+	GHashTable* krnls;
+	
 };
 
 static CL4Program* cl4_program_new_internal() {
@@ -45,6 +48,8 @@ static CL4Program* cl4_program_new_internal() {
 	/* Allocate memory for program wrapper object. */
 	prg = g_slice_new0(CL4Program);
 	cl4_wrapper_init(&prg->base);
+	
+	prg->krnls = NULL;
 	
 	/* Return new context wrapper object. */
 	return prg;
@@ -261,3 +266,16 @@ finish:
 	return result;
 
 }
+
+CL4Kernel* cl4_program_get_kernel(
+	CL4Program* prg, const char* kernel_name, GError** err) {
+		
+	if (prg->krnls == NULL) {
+		prg->krnls = g_hash_table_new_full(g_str_hash, g_str_equal,
+			NULL, (GDestroyNotify) cl4_kernel_destroy);
+	}
+	
+	return NULL;
+		
+}
+

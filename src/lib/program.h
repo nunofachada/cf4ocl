@@ -36,6 +36,9 @@
 #endif
 #include "context.h"
 #include "wrapper.h"
+#include "event.h"
+#include "cqueue.h"
+#include "kernel.h"
 
 /** @brief Program wrapper object. */
 typedef struct cl4_program CL4Program;
@@ -73,6 +76,12 @@ gboolean cl4_program_build_from_devices_full(CL4Program* prg,
 gboolean cl4_program_build_from_cldevices_full(CL4Program* prg, 
 	cl_uint num_devices, cl_device_id* device_list, const char *options, 
 	cl4_program_callback pfn_notify, void *user_data, GError** err);
+
+CL4Kernel* cl4_program_get_kernel(
+	CL4Program* prg, const char* kernel_name, GError** err);
+
+CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue, 
+	const char* kernel_name, size_t gws, size_t lws, ...);
 
 
 /**
