@@ -42,17 +42,27 @@
 #include "platform.h"
 
 /**
- * @brief The context wrapper object encompasses the OpenCL context and
- * associated wrappers: devices, programs, queues and kernels. Should be 
- * accessed using the cl4_context_* group of functions.
+ * @defgroup CONTEXT The context wrapper module.
+ *
+ * @brief A wrapper object for OpenCL contexts and functions to manage 
+ * it.
+ * 
+ * Todo: detailed description of module.
+ * 
+ * @{
+ */
+ 
+/**
+ * @brief The context wrapper object wraps the OpenCL context and 
+ * associated devices. Should be managed with the @ref CONTEXT "context module" 
+ * group of functions and macros.
  * */
 typedef struct cl4_context CL4Context;
 
 /** 
- * @brief A callback function used by the OpenCL 
- * implementation to report information on errors during context 
- * creation as well as errors that occur at runtime in this context.
- * Ignored if NULL.
+ * @brief A callback function used by the OpenCL implementation to 
+ * report information on errors during context creation as well as 
+ * errors that occur at runtime in this context. Ignored if NULL.
  * 
  * @param errinfo Pointer to an error string.
  * @param private_info Pointer to binary data returned OpenCL, used to 
@@ -64,20 +74,13 @@ typedef struct cl4_context CL4Context;
 typedef void (CL_CALLBACK* cl4_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
-
-/**
- * @defgroup CL4_CONTEXT_CONSTRUCTORS Context wrapper constructors,
- * i.e. cl4_context_new_* functions.
- *
- * @{
- */
- 
+  
 /** 
- * @brief Create a new context wrapper object selecting devices using
+ * @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. 
  *  
  * @param filters Filters for selecting device.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -86,15 +89,14 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 		NULL, (filters), NULL, NULL, (err))
 
 /** 
- * @brief Macro to create a context wrapper given a list of 
- * cl_device_id's.
+ * @brief Creates a context wrapper given a list of cl_device_id's.
  * 
- * This macro simply calls cl4_context_new_from_cldevices_full()
+ * This macro simply calls cl4_context_new_from_cldevices_full() 
  * setting properties, callback and user data to NULL.
  * 
  * @param num_devices Number of cl_devices_id's in list.
  * @param devices List of cl_device_id's.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -105,10 +107,10 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 /** 
  * @brief Creates a context wrapper for a CPU device.
  * 
- * The first found CPU device is used. More than one CPU might be used
+ * The first found CPU device is used. More than one CPU might be used 
  * if all CPUs belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
@@ -119,10 +121,10 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 /** 
  * @brief Creates a context wrapper for a GPU device.
  * 
- * The first found GPU device is used. More than one GPU might be used
+ * The first found GPU device is used. More than one GPU might be used 
  * if all GPUs belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
@@ -133,7 +135,7 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
 /** 
  * @brief Creates a context wrapper for an Accelerator device.
  * 
- * The first found Accelerator device is used. More than one Accelerator
+ * The first found Accelerator device is used. More than one Accelerator 
  * might be used if all Accelerators belong to the same platform.
  * 
  * @param err Return location for a GError, or NULL if error reporting
@@ -150,14 +152,14 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
  * The first found device is used. More than one device might be used if 
  * all devices belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define cl4_context_new_any(err) \
 	cl4_context_new_from_indep_filter(NULL, NULL, err)	
 
-/** @brief Create a new context wrapper object selecting devices using
+/** @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. */
 CL4Context* cl4_context_new_from_filters_full(
 	const cl_context_properties* properties, 
@@ -166,7 +168,7 @@ CL4Context* cl4_context_new_from_filters_full(
     void* user_data,
 	GError **err);
 
-/** @brief Creates a context wrapper using the exact parameters received
+/** @brief Creates a context wrapper using the exact parameters received 
  * by the clCreateContext function. */
 CL4Context* cl4_context_new_from_cldevices_full(
 	const cl_context_properties* properties, 
@@ -180,7 +182,7 @@ CL4Context* cl4_context_new_from_cldevices_full(
 CL4Context* cl4_context_new_from_clcontext(
 	cl_context context, GError** err);
 
-/** @brief Creates a context wrapper using one independent device filter
+/** @brief Creates a context wrapper using one independent device filter 
  * specified in the function parameters. */
 CL4Context* cl4_context_new_from_indep_filter(
 	cl4_devsel_indep filter, void* data, GError** err);
@@ -188,11 +190,9 @@ CL4Context* cl4_context_new_from_indep_filter(
 /* @todo Future work */
 // CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
 // CL4Context* cl4_context_new_from_platform(CL4Platform* platform, GError** err);
-// CL4Context* cl4_context_new_from_devices(CL4Devices** devices, GError** err);
+// CL4Context* cl4_context_new_from_devices(CL4Device** devices, GError** err);
 
-/** @} */
-
-/** @brief Decrements the reference count of the context wrapper object.
+/** @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed. */
 void cl4_context_destroy(CL4Context* ctx);
 
@@ -201,9 +201,9 @@ void cl4_context_destroy(CL4Context* ctx);
  * 
  * @param ctx The context wrapper object.
  * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return The requested context information object. This object will
+ * @return The requested context information object. This object will 
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
@@ -222,10 +222,11 @@ void cl4_context_destroy(CL4Context* ctx);
 /**
  * @brief Alias to cl4_context_destroy().
  * 
- * @param ctx Context wrapper object to destroy if reference count is 1,
+ * @param ctx Context wrapper object to destroy if reference count is 1, 
  * otherwise just decrement the reference count.
  * */
-#define cl4_context_unref(ctx) cl4_context_destroy(ctx)
+#define cl4_context_unref(ctx) \
+	cl4_context_destroy(ctx)
 
 /**
  * @brief Get the OpenCL context object.
@@ -236,11 +237,13 @@ void cl4_context_destroy(CL4Context* ctx);
 #define cl4_context_unwrap(ctx) \
 	((cl_context) cl4_wrapper_unwrap((CL4Wrapper*) ctx))
  
-/** @brief Get CL4 device wrapper at given index. */
+/** @brief Get ::CL4Device wrapper at given index. */
 CL4Device* cl4_context_get_device(
 	CL4Context* ctx, guint index, GError** err);
 
 /** @brief Return number of devices in context. */
 guint cl4_context_num_devices(CL4Context* ctx, GError** err);
+
+/** @} */
 
 #endif

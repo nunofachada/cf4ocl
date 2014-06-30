@@ -50,9 +50,9 @@ struct cl4_context {
  * @brief Macro which allocates space for the devices wrappers kept in a 
  * CL4Context object.
  * 
- * @param num_devices Number of device wrapper objects to allocate space
+ * @param num_devices Number of device wrapper objects to allocate space 
  * for.
- * @return Pointer to newly allocated memory for the given number of
+ * @return Pointer to newly allocated memory for the given number of 
  * device wrapper objects. 
  * */
 #define cl4_context_device_wrappers_new(num_devices) \
@@ -90,7 +90,7 @@ static CL4Context* cl4_context_new_internal() {
  * 
  * @param properties The original const properties, may be NULL, in 
  * which case the ctx_props parameter will be freed.
- * @param ctx_props Context properties to be freed, if different than
+ * @param ctx_props Context properties to be freed, if different than 
  * the original const properties parameter.
  * */
 #define cl4_context_properties_default_free(properties, ctx_props) \
@@ -98,14 +98,14 @@ static CL4Context* cl4_context_new_internal() {
 		g_slice_free1(3 * sizeof(cl_context_properties), ctx_props)
 
 /**
- * @brief Create a default context properties object, if required. The
- * only property set in the default properties object is the OpenCL
+ * @brief Create a default context properties object, if required. The 
+ * only property set in the default properties object is the OpenCL 
  * cl_platform_id object.
  * 
- * @param properties Original const properties, which if NULL imply that
+ * @param properties Original const properties, which if NULL imply that 
  * a new default properties object should be created.
  * @param device Reference device to build the context properties for.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return The properties parameter if not NULL, or a default set of 
  * context properties.
@@ -171,7 +171,7 @@ finish:
  * @brief Initialize internal device list of context wrapper object. 
  * 
  * @param ctx The context wrapper object.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * */
 static void cl4_context_init_devices(
@@ -225,27 +225,32 @@ finish:
 	return;
 }
 
+/** 
+ * @addtogroup CONTEXT
+ * @{
+ */
+
 /**
- * @brief Create a new context wrapper object selecting devices using
+ * @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. 
  * 
  * This function accepts all the parameters required for the 
  * clCreateContext() OpenCL function. For simple context creation use 
- * the cl4_context_new_from_filters() macro instead.
+ * the cl4_context_new_from_filters() macro instead. 
  * 
- * The client should provide the necessary filters such that the
+ * The client should provide the necessary filters such that the 
  * filtered devices belong to the same platform. Adding the 
- * cl4_devsel_dep_platform() filter last to the filters set will ensure
+ * cl4_devsel_dep_platform() filter last to the filters set will ensure 
  * this.
  * 
  * @param properties A set of OpenCL context properties.
  * @param filters Filters for selecting device.
  * @param pfn_notify A callback function used by the OpenCL 
  * implementation to report information on errors during context 
- * creation as well as errors that occur at runtime in this context.
+ * creation as well as errors that occur at runtime in this context. 
  * Ignored if NULL.
  * @param user_data Passed as argument to pfn_notify, can be NULL.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -368,22 +373,22 @@ finish:
 }
 
 /**
- * @brief Creates a context wrapper using the exact parameters received
- * by the clCreateContext function. For simpler context wrapper creation
+ * @brief Creates a context wrapper using the exact parameters received 
+ * by the clCreateContext function. For simpler context wrapper creation 
  * use the cl4_context_new_from_cldevices() macro.
  * 
- * If the properties parameter is NULL, this function obtains the 
- * cl_platform_id object from the first device.
+ * If the properties parameter is NULL, this function obtains 
+ * the cl_platform_id object from the first device.
  * 
  * @param properties Context properties, may be NULL.
  * @param num_devices Number of cl_devices_id's in devices array.
  * @param devices Array of cl_device_id's.
  * @param pfn_notify A callback function used by the OpenCL 
  * implementation to report information on errors during context 
- * creation as well as errors that occur at runtime in this context.
+ * creation as well as errors that occur at runtime in this context. 
  * Ignored if NULL.
  * @param user_data Passed as argument to pfn_notify, can be NULL.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -466,12 +471,12 @@ finish:
 /** 
  * @brief Creates a context wrapper from a cl_context object.
  * 
- * This function is useful when the client wants more control over the
- * cl_context object creation. Clients should explicitly release the
- * passed context.
+ * This function is useful when the client wants more control 
+ * over the cl_context object creation. Clients should explicitly 
+ * release the passed context.
  * 
  * @param context The OpenCL cl_context object to wrap up.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
@@ -520,17 +525,17 @@ finish:
 }
 
 /** 
- * @brief Creates a context wrapper using one independent device filter
+ * @brief Creates a context wrapper using one independent device filter 
  * specified in the function parameters.
  * 
- * The first device accepted by the given filter is used. More than one
- * device may be used if all devices belong to the same platform (and 
- * pass the given filter).
+ * The first device accepted by the given filter is used. More 
+ * than one device may be used if all devices belong to the same 
+ * platform (and pass the given filter).
  * 
- * @param filter An independent device filter. If NULL, no independent
+ * @param filter An independent device filter. If NULL, no independent 
  * filter is used, and the first found device(s) is used.
  * @param data Specific filter data.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
@@ -577,7 +582,7 @@ finish:
 }
 
 /** 
- * @brief Decrements the reference count of the context wrapper object.
+ * @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed.
  *
  * @param ctx The context wrapper object.
@@ -631,13 +636,13 @@ void cl4_context_destroy(CL4Context* ctx) {
 }
  
 /** 
- * @brief Get CL4 device wrapper at given index. 
+ * @brief Get ::CL4Device wrapper at given index. 
  * 
  * @param ctx The context wrapper object.
  * @param index Index of device in context.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return The CL4 device wrapper at given index or NULL if an error 
+ * @return The ::CL4Device wrapper at given index or NULL if an error 
  * occurs.
  * */
 CL4Device* cl4_context_get_device(
@@ -691,9 +696,9 @@ finish:
  * @brief Return number of devices in context.
  * 
  * @param ctx The context wrapper object.
- * @param err Return location for a GError, or NULL if error reporting
+ * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return The number of devices in context or 0 if an error occurs or
+ * @return The number of devices in context or 0 if an error occurs or 
  * is otherwise not possible to get any device.
  * */
 guint cl4_context_num_devices(CL4Context* ctx, GError** err) {
@@ -716,4 +721,6 @@ guint cl4_context_num_devices(CL4Context* ctx, GError** err) {
 	return ctx->num_devices;
 	
 }
+
+/** @}*/
 
