@@ -78,6 +78,20 @@ gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper);
 cl_int cl4_wrapper_release_cl_object(gpointer cl_object, 
 	cl4_wrapper_release_function cl_release_function);
 
+/**
+ * @brief Generic type for OpenCL clget*Info() functions.
+ * 
+ * @param cl_object OpenCL object to be queried.
+ * @param param_name Parameter to query.
+ * @param param_value_size Used to specify the size in bytes of memory 
+ * pointed to by param_value.
+ * @param param_value A pointer to memory where the appropriate result 
+ * being queried is returned
+ * @param param_value_size_ret Returns the actual size in bytes of data 
+ * copied to param_value. If param_value_size_ret is NULL, it is ignored.
+ * @return Returns CL_SUCCESS if the function is executed successfully,
+ * or an error code otherwise.
+ * */
 typedef cl_int (*cl4_wrapper_info_function)(gpointer cl_object,
 	cl_uint param_name, size_t param_value_size, void* param_value,
 	size_t* param_value_size_ret);
@@ -95,7 +109,7 @@ typedef struct cl4_info {
 /** @brief Create a new CL4WrapperInfo* object with a given value size. */
 CL4WrapperInfo* cl4_wrapper_info_new(gsize size);
 
-/** @brief Destroy a CL4WrapperInfo* object. */
+/** @brief Destroy a ::CL4WrapperInfo object. */
 void cl4_wrapper_info_destroy(CL4WrapperInfo* info);
 
 /** @brief Get information about any wrapped OpenCL object. */

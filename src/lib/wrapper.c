@@ -168,9 +168,9 @@ CL4WrapperInfo* cl4_wrapper_info_new(gsize size) {
 }
 
 /**
- * @brief Destroy a CL4WrapperInfo* object.
+ * @brief Destroy a ::CL4WrapperInfo object.
  * 
- * @param info_value Object to destroy.
+ * @param info Object to destroy.
  * */
 void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
 		
