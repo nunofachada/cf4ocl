@@ -59,6 +59,7 @@ static void platforms_create_info_destroy_test() {
 	CL4Platforms* platfs = NULL;
 	CL4Platform* p = NULL;
 	CL4Device* d = NULL;
+	CL4Device** ds = NULL;
 	GError* err = NULL;
 	CL4WrapperInfo* info;
 	gchar* platf_info;
@@ -353,6 +354,20 @@ static void platforms_create_info_destroy_test() {
 
 			}
 		}
+	}
+	
+	/* Test get_all_devices method of platform module. */
+	for (guint i = 0; i < cl4_platforms_count(platfs); i++) {
+		p = cl4_platforms_get_platform(platfs, i);
+		ds = cl4_platform_get_all_devices(p, &err);
+		g_assert_no_error(err);
+		for (guint j = 0; j < cl4_platform_num_devices(p, &err); j++) {
+			g_assert_no_error(err);
+			d = cl4_platform_get_device(p, j, &err);
+			g_assert_no_error(err);
+			g_assert(d == ds[j]);
+		}
+		g_assert_no_error(err);
 	}
 
 	/* Destroy list of platforms. */

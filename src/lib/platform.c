@@ -255,6 +255,41 @@ finish:
 	return device_ret;
 }
 
+/** 
+ * @brief Get all device wrappers in platform. 
+ * 
+ * This function returns the internal array containing the platform
+ * device wrappers. As such, clients should not modify the returned 
+ * array (e.g. they should not free it directly).
+ * 
+ * @param platform The platform wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return An array containing the ::CL4Device wrappers which belong to
+ * this platform, or NULL if an error occurs.
+ */
+CL4Device** cl4_platform_get_all_devices(
+	CL4Platform* platform, GError **err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+	
+	/* Make sure platform is not NULL. */
+	g_return_val_if_fail(platform != NULL, 0);
+	
+	/* Check if device list is already initialized. */
+	if (!platform->devices) {
+		
+		/* Not initialized, initialize it. */
+		cl4_plaform_init_devices(platform, err);
+		
+	}
+	
+	/* Return all devices in platform. */
+	return platform->devices;
+
+}
+
 /**
  * @brief Return number of devices in platform.
  * 

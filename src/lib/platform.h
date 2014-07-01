@@ -88,6 +88,10 @@ void cl4_platform_destroy(CL4Platform* platform);
 CL4Device* cl4_platform_get_device(
 	CL4Platform* platform, guint index, GError **err);
 
+/** @brief Get all device wrappers in platform. */
+CL4Device** cl4_platform_get_all_devices(
+	CL4Platform* platform, GError **err);
+
 /** @brief Return number of devices in platform. */
 guint cl4_platform_num_devices(CL4Platform* platform, GError **err);
 
