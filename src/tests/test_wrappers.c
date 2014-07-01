@@ -815,48 +815,48 @@ static void context_ref_unref_test() {
  * */
 static void program_create_info_destroy_test() {
 
-	CL4Context* ctx = NULL;
-	CL4Program* prg = NULL;
-	CL4Kernel* krnl = NULL;
-	CL4WrapperInfo* info = NULL;
+	//~ CL4Context* ctx = NULL;
+	//~ CL4Program* prg = NULL;
+	//~ CL4Kernel* krnl = NULL;
+	//~ CL4WrapperInfo* info = NULL;
 	GError* err = NULL;
 	
 	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
 		CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT, -1, &err);
 	g_assert_no_error(err);
 
-	ctx = cl4_context_new_any(&err);
-	g_assert_no_error(err);
-
-	prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
-	g_assert_no_error(err);
-
-	cl4_program_build(prg, NULL, &err);
-	g_assert_no_error(err);
-
-	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
-		g_message("Unable to delete temporary file '"
-			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
-			
-	krnl = cl4_program_get_kernel(
-		prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
-	g_assert_no_error(err);
-
-	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
-	g_assert_no_error(err);
-	g_assert_cmpstr(
-		(gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
-
-	info = cl4_kernel_info(krnl, CL_KERNEL_CONTEXT, &err);
-	g_assert_no_error(err);
-	g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
-
-	info = cl4_kernel_info(krnl, CL_KERNEL_PROGRAM, &err);
-	g_assert_no_error(err);
-	g_assert(*((cl_program*) info->value) == cl4_program_unwrap(prg));
-
-	cl4_program_destroy(prg);
-	cl4_context_destroy(ctx);
+	//~ ctx = cl4_context_new_any(&err);
+	//~ g_assert_no_error(err);
+//~ 
+	//~ prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
+	//~ g_assert_no_error(err);
+//~ 
+	//~ cl4_program_build(prg, NULL, &err);
+	//~ g_assert_no_error(err);
+//~ 
+	//~ if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
+		//~ g_message("Unable to delete temporary file '"
+			//~ CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
+			//~ 
+	//~ krnl = cl4_program_get_kernel(
+		//~ prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
+	//~ g_assert_no_error(err);
+//~ 
+	//~ info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
+	//~ g_assert_no_error(err);
+	//~ g_assert_cmpstr(
+		//~ (gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
+//~ 
+	//~ info = cl4_kernel_info(krnl, CL_KERNEL_CONTEXT, &err);
+	//~ g_assert_no_error(err);
+	//~ g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
+//~ 
+	//~ info = cl4_kernel_info(krnl, CL_KERNEL_PROGRAM, &err);
+	//~ g_assert_no_error(err);
+	//~ g_assert(*((cl_program*) info->value) == cl4_program_unwrap(prg));
+//~ 
+	//~ cl4_program_destroy(prg);
+	//~ cl4_context_destroy(ctx);
 
 }
 

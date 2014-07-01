@@ -12,35 +12,19 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with cf4ocl. If not, see <http://www.gnu.org/licenses/>.
+ * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
-
-/** 
+ 
+ /** 
  * @file
- * @brief OpenCL stub for testing the profile module.
+ * @brief OpenCL event stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
-
-#if defined(__APPLE__) || defined(__MACOSX)
-	#include <OpenCL/cl.h>
-#else
-	#include <CL/cl.h>
-#endif
-
-/** @brief Stub for cl_event objects. */ 
-struct _cl_event {
-	cl_ulong start;
-	cl_ulong end;
-	cl_command_queue queue;
-};
-
-/** @brief Stub for cl_command_queue objects. */ 
-struct _cl_command_queue {
-	int filler;
-};
+ 
+#include "ocl_env.h"
 
 /** 
  * @brief Stub for clGetEventProfilingInfo function. 
@@ -92,25 +76,7 @@ cl_int clGetEventInfo(cl_event event, cl_event_info param_name,
 
 }
 
-cl_command_queue clCreateCommandQueue(cl_context context,
-	cl_device_id device, cl_command_queue_properties properties,
-	cl_int* errcode_ret) {
-		
-	context = context; device = device; properties = properties;
-	
-	if (errcode_ret != NULL)
-		*errcode_ret = CL_SUCCESS;
-		
-	cl_command_queue queue = 
-		(cl_command_queue) malloc(sizeof(struct _cl_command_queue));
-		
-	queue->filler = 0;
-	
-	return queue;
-		
-}
 
-cl_int clReleaseCommandQueue(cl_command_queue command_queue) {
-	free(command_queue);
-	return CL_SUCCESS;
-}
+
+
+

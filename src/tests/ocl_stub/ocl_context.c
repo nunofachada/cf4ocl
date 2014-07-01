@@ -1,0 +1,108 @@
+/*   
+ * This file is part of cf4ocl (C Framework for OpenCL).
+ * 
+ * cf4ocl is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * cf4ocl is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
+ * */
+ 
+ /** 
+ * @file
+ * @brief OpenCL context stub functions.
+ * 
+ * @author Nuno Fachada
+ * @date 2014
+ * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
+ * */
+ 
+#include "ocl_env.h"
+#include "utils.h"
+
+cl_context clCreateContext(const cl_context_properties* properties,
+	cl_uint num_devices, const cl_device_id* devices,
+	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
+	void* user_data,
+	cl_int* errcode_ret) {
+	
+	cl_context ctx = g_new(struct _cl_context, 1);
+	ctx->properties = properties;
+	ctx->devices = devices;
+	ctx->num_devices = num_devices;
+	ctx->d3d = FALSE;
+	ctx->ref_count = 1;
+	pfn_notify = pfn_notify;
+	user_data = user_data;
+	*errcode_ret = CL_SUCCESS;
+	
+	return ctx;
+		
+}
+
+cl_int clReleaseContext(cl_context context) {
+	
+	/* Decrement reference count and check if it reaches 0. */
+	if (g_atomic_int_dec_and_test(&context->ref_count)) {
+
+		g_free(context);
+		
+	}
+	
+	return CL_SUCCESS;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clRetainContext(cl_context context) {
+
+	g_atomic_int_inc(&context->ref_count);
+	return CL_SUCCESS;
+
+}
+
+cl_int clGetContextInfo(cl_context context, cl_context_info param_name,
+	size_t param_value_size, void* param_value, 
+	size_t* param_value_size_ret) {
+		
+	cl_int status = CL_SUCCESS;
+
+	if (context == NULL) {
+		status = CL_INVALID_CONTEXT;
+	} else {
+		switch (param_name) {
+			
+			case CL_CONTEXT_REFERENCE_COUNT:
+				cl4_test_basic_info(cl_uint, context, ref_count);
+#ifdef CL_VERSION_1_1
+			case CL_CONTEXT_NUM_DEVICES:
+				cl4_test_basic_info(cl_uint, context, num_devices);
+#endif
+			case CL_CONTEXT_DEVICES:
+				cl4_test_predefvector_info(
+					cl_device_id, context->num_devices, context, devices);
+			case CL_CONTEXT_PROPERTIES:
+				cl4_test_vector_info(cl_context_properties, context, properties);
+			//~ case CL_CONTEXT_D3D10_PREFER_SHARED_RESOURCES_KHR:
+				//~ cl4_test_basic_info(cl_bool, context, d3d);
+			//~ case CL_CONTEXT_D3D11_PREFER_SHARED_RESOURCES_KHR:			
+				//~ cl4_test_basic_info(cl_bool, context, d3d);
+			default:
+				status = CL_INVALID_VALUE;
+		}
+	}
+		
+	return status;
+		
+}
+
+
+
+
+
