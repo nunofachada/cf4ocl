@@ -215,10 +215,6 @@ CL4Context* cl4_context_new_from_clcontext(
 CL4Context* cl4_context_new_from_indep_filter(
 	cl4_devsel_indep filter, void* data, GError** err);
 
-/* @todo Future work */
-// CL4Context* cl4_context_new_from_clplatform(cl_platform_id platform, GError** err);
-// CL4Context* cl4_context_new_from_platform(CL4Platform* platform, GError** err);
-
 /** @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed. */
 void cl4_context_destroy(CL4Context* ctx);

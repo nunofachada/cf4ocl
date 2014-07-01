@@ -76,13 +76,13 @@ void cl4_platform_destroy(CL4Platform* platform);
 #define cl4_platform_unref(platform) cl4_platform_destroy(platform)
 
 /**
- * @brief Get the OpenCL context object.
+ * @brief Get the OpenCL platform object.
  * 
- * @param ctx The context wrapper object.
- * @return The OpenCL context object.
+ * @param platform The platform wrapper object.
+ * @return The OpenCL platform object.
  * */
-#define cl4_context_unwrap(ctx) \
-	((cl_context) cl4_wrapper_unwrap((CL4Wrapper*) ctx))
+#define cl4_platform_unwrap(platform) \
+	((cl_platform) cl4_wrapper_unwrap((CL4Wrapper*) platform))
  
 /** @brief Get CL4 device wrapper at given index. */
 CL4Device* cl4_platform_get_device(
