@@ -169,6 +169,17 @@ void cl4_program_destroy(CL4Program* prg) {
 	 * itself. */
 	if (program != NULL) {
 
+		/* If the kernels table was created...*/
+		if (prg->krnls) {
+			
+			/* Free the kernel table and reduce reference count of 
+			 * kernels in table (this is done automatically by the
+			 * cl4_kernel_destroy() function passed as a destructor
+			 * parameter during table creation). */
+			g_hash_table_destroy(prg->krnls);
+			
+		}
+
 		/* Release prg. */
 		g_slice_free(CL4Program, prg);
 		
@@ -270,12 +281,71 @@ finish:
 CL4Kernel* cl4_program_get_kernel(
 	CL4Program* prg, const char* kernel_name, GError** err) {
 		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+	
+	/* Make sure kernel_name is not NULL. */
+	g_return_val_if_fail(kernel_name != NULL, NULL);
+
+	/* Kernel wrapper object. */
+	CL4Kernel* krnl = NULL;
+
+	/* If kernels table is not yet initialized, then
+	 * initialize it. */
 	if (prg->krnls == NULL) {
 		prg->krnls = g_hash_table_new_full(g_str_hash, g_str_equal,
 			NULL, (GDestroyNotify) cl4_kernel_destroy);
 	}
 	
-	return NULL;
+	/* Check if requested kernel is already present in the kernels 
+	 * table. */
+	if (g_hash_table_contains(
+		prg->krnls, kernel_name)) {
+		
+		/* If so, retrieve it from there. */
+		krnl = g_hash_table_lookup(
+			prg->krnls, kernel_name);
+		
+	} else {
+		
+		/* Otherwise, get it from OpenCL program object.*/
+		cl_int ocl_status;
+		
+		/* The OpenCL kernel object to get. */
+		cl_kernel kernel = NULL;
+		
+		/* Get kernel. */
+		kernel = clCreateKernel(
+			cl4_program_unwrap(prg), kernel_name, &ocl_status);
+		gef_if_error_create_goto(*err, CL4_ERROR,
+			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
+			"Function '%s': unable to create kernel (OpenCL error %d: %s).",
+			__func__, ocl_status, cl4_err(ocl_status));
+		
+		/* Create kernel wrapper. */
+		krnl = cl4_kernel_new(kernel);
+		
+		/* Keep new kernel wrapper in table. */
+		g_hash_table_insert(prg->krnls, (gpointer) kernel_name, krnl);
+		
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+finish:
+
+	/* Return kernel wrapper. */
+	return krnl;
 		
 }
 

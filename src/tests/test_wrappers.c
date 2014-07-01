@@ -795,9 +795,12 @@ static void context_ref_unref_test() {
 
 }
 
-#define CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "sum.cl"
+#define CL4_TEST_WRAPPERS_PROGRAM_SUM "sum"
+
+#define CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME CL4_TEST_WRAPPERS_PROGRAM_SUM ".cl"
+
 #define CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT \
-	"__kernel void sum(" \
+	"__kernel void " CL4_TEST_WRAPPERS_PROGRAM_SUM "(" \
 	"		__global const float *a," \
 	"		__global const float *b," \
 	"		__global float *c)" \
@@ -814,6 +817,8 @@ static void program_create_info_destroy_test() {
 
 	CL4Context* ctx = NULL;
 	CL4Program* prg = NULL;
+	CL4Kernel* krnl = NULL;
+	CL4WrapperInfo* info = NULL;
 	GError* err = NULL;
 	
 	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
@@ -832,6 +837,23 @@ static void program_create_info_destroy_test() {
 	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
 		g_message("Unable to delete temporary file '"
 			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
+			
+	krnl = cl4_program_get_kernel(
+		prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
+	g_assert_no_error(err);
+
+	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
+	g_assert_no_error(err);
+	g_assert_cmpstr(
+		(gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
+
+	info = cl4_kernel_info(krnl, CL_KERNEL_CONTEXT, &err);
+	g_assert_no_error(err);
+	g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
+
+	info = cl4_kernel_info(krnl, CL_KERNEL_PROGRAM, &err);
+	g_assert_no_error(err);
+	g_assert(*((cl_program*) info->value) == cl4_program_unwrap(prg));
 
 	cl4_program_destroy(prg);
 	cl4_context_destroy(ctx);

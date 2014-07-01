@@ -38,6 +38,33 @@ struct cl4_kernel {
 };
 
 /** 
+ * @brief Create a ::CL4Kernel wrapper object by wrapping a given
+ * OpenCL kernel. 
+ * 
+ * @param kernel OpenCL kernel object to wrap.
+ * @return ::CL4Kernel wrapper object.
+ * */
+CL4Kernel* cl4_kernel_new(cl_kernel kernel) {
+
+	/* The kernel wrapper object. */
+	CL4Kernel* krnl;
+		
+	/* Allocate memory for the kernel wrapper object. */
+	krnl = g_slice_new(CL4Kernel);
+	
+	/* Initialize parent object. */
+	cl4_wrapper_init(&krnl->base);
+	
+	/* Set the OpenCL kernel object. */
+	krnl->base.cl_object = kernel;
+
+	/* Return the new platform wrapper object. */
+	return krnl;
+
+}
+
+
+/** 
  * @brief Decrements the reference count of the kernel wrapper 
  * object. If it reaches 0, the kernel wrapper object is 
  * destroyed.
