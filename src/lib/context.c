@@ -352,22 +352,17 @@ CL4Context* cl4_context_new_from_devices_full(
 	/* New context wrapper. */
 	CL4Context* ctx = NULL;
 	
-	/* Check if its necessary to unwrap devices. */
-	if (devices != NULL) {
-		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
-		/* Unwrap devices. */
-		for (guint i = 0; i < num_devices; i++)
-			cl_devices[i] = cl4_device_unwrap(devices[i]);
-	}
+	/* Unwrap devices. */
+	cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
+	for (guint i = 0; i < num_devices; i++)
+		cl_devices[i] = cl4_device_unwrap(devices[i]);
 
 	/* Create context wrapper. */
 	ctx = cl4_context_new_from_cldevices_full(properties, num_devices,
 		cl_devices, pfn_notify, user_data, err);
 	
-	/* Check if necessary to release array of unwrapped devices. */
-	if (cl_devices != NULL) {
-		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
-	}
+	/* Release array of unwrapped devices. */
+	g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
 	
 	/* Return result of function call. */
 	return ctx;

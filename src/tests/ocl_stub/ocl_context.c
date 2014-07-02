@@ -32,10 +32,22 @@ cl_context clCreateContext(const cl_context_properties* properties,
 	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
 	void* user_data,
 	cl_int* errcode_ret) {
+
+	/* Allocate memory for context. */
+	cl_context ctx = g_slice_new(struct _cl_context);
 	
-	cl_context ctx = g_new(struct _cl_context, 1);
-	ctx->properties = properties;
-	ctx->devices = devices;
+	/* Copy properties to local context object. */
+	if (properties != NULL) {
+		for (ctx->prop_len = 0; 
+			properties[ctx->prop_len] != 0; ctx->prop_len++);
+		ctx->prop_len++; /* Space for the last element: 0 */
+		ctx->properties = g_slice_copy(
+			ctx->prop_len * sizeof(cl_context_properties), properties);
+	} else {
+		ctx->properties = NULL;
+	}
+	ctx->devices = 
+		g_slice_copy(num_devices * sizeof(cl_device_id), devices);
 	ctx->num_devices = num_devices;
 	ctx->d3d = FALSE;
 	ctx->ref_count = 1;
@@ -52,7 +64,13 @@ cl_int clReleaseContext(cl_context context) {
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&context->ref_count)) {
 
-		g_free(context);
+		if (context->properties != NULL)
+			g_slice_free1(context->prop_len * sizeof(cl_context_properties), 
+				context->properties);
+		g_slice_free1(
+			context->num_devices * sizeof(cl_device_id), 
+			context->devices);
+		g_slice_free(struct _cl_context, context);
 		
 	}
 	

@@ -139,8 +139,9 @@ struct _cl_platform_id {
 };
 
 struct _cl_context {
-	const cl_context_properties* properties;
-	const cl_device_id* devices;
+	cl_context_properties* properties;
+	cl_uint prop_len;
+	cl_device_id* devices;
 	cl_uint num_devices;
 	cl_bool d3d;
 	cl_uint ref_count;
