@@ -30,8 +30,7 @@
 cl_context clCreateContext(const cl_context_properties* properties,
 	cl_uint num_devices, const cl_device_id* devices,
 	void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
-	void* user_data,
-	cl_int* errcode_ret) {
+	void* user_data, cl_int* errcode_ret) {
 
 	/* Allocate memory for context. */
 	cl_context ctx = g_slice_new(struct _cl_context);
@@ -53,7 +52,7 @@ cl_context clCreateContext(const cl_context_properties* properties,
 	ctx->ref_count = 1;
 	pfn_notify = pfn_notify;
 	user_data = user_data;
-	*errcode_ret = CL_SUCCESS;
+	seterrcode(errcode_ret, CL_SUCCESS);
 	
 	return ctx;
 		

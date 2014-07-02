@@ -32,8 +32,7 @@ cl_command_queue clCreateCommandQueue(cl_context context,
 		
 	context = context; device = device; properties = properties;
 	
-	if (errcode_ret != NULL)
-		*errcode_ret = CL_SUCCESS;
+	seterrcode(errcode_ret, CL_SUCCESS);
 		
 	cl_command_queue queue = 
 		(cl_command_queue) malloc(sizeof(struct _cl_command_queue));

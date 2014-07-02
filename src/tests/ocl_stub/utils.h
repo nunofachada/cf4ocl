@@ -28,6 +28,9 @@
 
 guint veclen(void* vector, size_t elem_size);
 
+#define seterrcode(errcode_ret, errcode) \
+	if ((errcode_ret) != NULL) *(errcode_ret) = (errcode)
+
 #define cl4_test_char_info(object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
@@ -57,6 +60,22 @@ guint veclen(void* vector, size_t elem_size);
 	} else { \
 		g_memmove(param_value, object->info, \
 			sizeof(type) * veclen((void*) object->info, sizeof(type))); \
+	} \
+	break;
+
+#define cl4_test_predefvector2d_info(type, qty, object, sizes, info) \
+	if (param_value == NULL) { \
+		if (param_value_size_ret != NULL) { \
+			*param_value_size_ret = sizeof(type*) * qty; \
+		} \
+	} else if (param_value_size < sizeof(type*) * qty) { \
+		status = CL_INVALID_VALUE; \
+	} else if (object->info == NULL) { \
+		status = CL_INVALID_VALUE; \
+	} else { \
+		for (cl_uint __i = 0; __i < qty; ++__i) \
+			g_memmove(param_value[__i], \
+				object->info[__i], sizeof(type) * sizes[__i]); \
 	} \
 	break;
 

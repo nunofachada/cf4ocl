@@ -149,6 +149,26 @@ struct _cl_context {
 
 struct _cl_program {
 	cl_uint ref_count;
+	cl_context context;
+	cl_uint num_devices;
+	cl_device_id* devices;
+	char* source;
+	size_t* binary_sizes;
+	unsigned char** binaries;
+	size_t num_kernels;
+	char* kernel_names;
+	cl_build_status build_status;
+	char** build_options;
+	char** build_log;
+};
+
+struct _cl_kernel {
+	cl_uint ref_count;
+	cl_program program;
+	cl_context context;
+	const char* function_name;
+	cl_uint num_args;
+	const char* attributes;
 };
 
 #endif
