@@ -157,7 +157,7 @@ struct _cl_program {
 	unsigned char** binaries;
 	size_t num_kernels;
 	char* kernel_names;
-	cl_build_status build_status;
+	cl_build_status* build_status;
 	char** build_options;
 	char** build_log;
 };

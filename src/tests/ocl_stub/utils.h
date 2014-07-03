@@ -74,8 +74,8 @@ guint veclen(void* vector, size_t elem_size);
 		status = CL_INVALID_VALUE; \
 	} else { \
 		for (cl_uint __i = 0; __i < qty; ++__i) \
-			g_memmove(param_value[__i], \
-				object->info[__i], sizeof(type) * sizes[__i]); \
+			g_memmove(((type**) param_value)[__i], \
+				object->info[__i], sizeof(type) * object->sizes[__i]); \
 	} \
 	break;
 
