@@ -49,11 +49,17 @@ static cl_program clCreateProgram(cl_context context,
 		: g_slice_alloc0(program->num_devices * sizeof(size_t));
 	program->binaries = g_slice_alloc0(
 		program->num_devices * sizeof(unsigned char*));
+	program->binary_type = g_slice_alloc0(
+		program->num_devices * sizeof(cl_program_binary_type));
 	if (binaries != NULL) {
 		for (cl_uint i = 0; i < program->num_devices; ++i) {
-			if ((binaries[i] != NULL) && (lengths[i] > 0))
+			if ((binaries[i] != NULL) && (lengths[i] > 0)) {
 				program->binaries[i] = (unsigned char*)
 					g_strndup((const char*) binaries[i], lengths[i]);
+				program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_EXECUTABLE;
+			} else {
+				program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_NONE;
+			}
 		}
 	}
 	program->build_status =
@@ -66,6 +72,8 @@ static cl_program clCreateProgram(cl_context context,
 		program->build_status[i] = CL_BUILD_NONE;
 		program->build_options[i] = NULL;
 		program->build_log[i] = NULL;
+		if (binaries == NULL)
+			program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_NONE;
 	}
 	
 	program->num_kernels = 0;
@@ -243,6 +251,11 @@ clReleaseProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
 				program->binary_sizes);
 		}
 		
+		/* Free binary types. */
+		if (program->binary_type != NULL)
+			g_slice_free1(program->num_devices * sizeof(cl_program_binary_type), 
+				program->binary_type);
+		
 		/* Free program source. */
 		if (program->source != NULL) {
 			g_free(program->source);
@@ -397,12 +410,52 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 
 		
 }
-//~ 
-//~ CL_API_ENTRY cl_int CL_API_CALL
-//~ clGetProgramBuildInfo(cl_program program, cl_device_id device,
-	//~ cl_program_build_info param_name, size_t param_value_size,
-	//~ void* param_value, size_t* param_value_size_ret) 
-	//~ CL_API_SUFFIX__VERSION_1_0 {
-		//~ 
-		//~ /// @todo
-//~ }
+
+CL_API_ENTRY cl_int CL_API_CALL
+clGetProgramBuildInfo(cl_program program, cl_device_id device,
+	cl_program_build_info param_name, size_t param_value_size,
+	void* param_value, size_t* param_value_size_ret) 
+	CL_API_SUFFIX__VERSION_1_0 {
+		
+	cl_int status = CL_SUCCESS;
+	cl_bool found = CL_FALSE;
+	cl_uint i;
+	
+	if (program == NULL) {
+		status = CL_INVALID_PROGRAM;
+	} else if (device == NULL) {
+		status = CL_INVALID_DEVICE;
+	} else {
+		/* Find index of device in program. */
+		for (i = 0; i < program->num_devices; ++i) {
+			if (device == program->devices[i]) {
+				found = CL_TRUE;
+				break;
+			}
+		}
+	}
+		
+	if (!found) {
+		status = CL_INVALID_DEVICE;
+	} else {
+		
+		/* Get info. */
+		switch (param_name) {
+			case CL_PROGRAM_BUILD_STATUS:
+				cl4_test_basic_info(cl_build_status, program, build_status[i]);
+			case CL_PROGRAM_BUILD_OPTIONS:
+				cl4_test_char_info(program, build_options[i]);
+			case CL_PROGRAM_BUILD_LOG:
+				cl4_test_char_info(program, build_log[i]);
+			case CL_PROGRAM_BINARY_TYPE:
+				cl4_test_basic_info(cl_program_binary_type, program, binary_type[i]);
+			default:
+				status = CL_INVALID_VALUE;
+		}
+	}
+		
+	return status;
+
+	
+
+}

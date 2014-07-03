@@ -60,8 +60,24 @@ void cl4_kernel_destroy(CL4Kernel* krnl);
  * occurs, NULL is returned.
  * */
 #define cl4_kernel_info(krnl, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) krnl, param_name, \
-		(cl4_wrapper_info_function) clGetKernelInfo, err)
+	cl4_wrapper_get_info((CL4Wrapper*) krnl, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetKernelInfo, err)
+
+/**
+ * @brief Get kernel workgroup information object.
+ * 
+ * @param krnl The kernel wrapper object.
+ * @param dev The device wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested information object. This object will be 
+ * automatically freed when the wrapper object is destroyed. If an error 
+ * occurs, NULL is returned.
+ * */
+#define cl4_kernel_workgroup_info(krnl, dev, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) krnl, (CL4Wrapper*) dev, NULL, \
+		param_name, (cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, err)
 
 /** 
  * @brief Increase the reference count of the kernel object.

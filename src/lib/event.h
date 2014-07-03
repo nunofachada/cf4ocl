@@ -56,8 +56,8 @@ void cl4_event_destroy(CL4Event* evt);
  * occurs, NULL is returned.
  * */
 #define cl4_event_info(evt, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) evt, param_name, \
-		(cl4_wrapper_info_function) clGetEventInfo, err)
+	cl4_wrapper_get_info((CL4Wrapper*) evt, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetEventInfo, err)
 
 /** 
  * @brief Increase the reference count of the event object.

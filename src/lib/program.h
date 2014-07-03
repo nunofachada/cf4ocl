@@ -96,8 +96,24 @@ CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue,
  * occurs, NULL is returned.
  * */
 #define cl4_program_info(prg, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) prg, param_name, \
-		(cl4_wrapper_info_function) clGetProgramInfo, err)
+	cl4_wrapper_get_info((CL4Wrapper*) prg, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetProgramInfo, err)
+
+/**
+ * @brief Get program build information object.
+ * 
+ * @param prg The program wrapper object.
+ * @param dev The device wrapper object to which to build refers to.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested information object. This object will be 
+ * automatically freed when the wrapper object is destroyed. If an error 
+ * occurs, NULL is returned.
+ * */
+#define cl4_program_build_info(prg, dev, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) prg, param_name, dev, \
+		(cl4_wrapper_info_fp) clGetProgramBuildInfo, err)
 
 /** 
  * @brief Increase the reference count of the program object.

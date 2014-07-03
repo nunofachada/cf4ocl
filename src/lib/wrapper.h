@@ -92,9 +92,31 @@ cl_int cl4_wrapper_release_cl_object(gpointer cl_object,
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
-typedef cl_int (*cl4_wrapper_info_function)(gpointer cl_object,
+typedef cl_int (*cl4_wrapper_info_fp1)(gpointer cl_object,
 	cl_uint param_name, size_t param_value_size, void* param_value,
 	size_t* param_value_size_ret);
+
+/**
+ * @brief Generic type for OpenCL clget**Info() functions, in which two
+ * OpenCL objects are involved.
+ * 
+ * @param cl_object1 OpenCL object to be queried.
+ * @param cl_object2 OpenCL object required for query.
+ * @param param_name Parameter to query.
+ * @param param_value_size Used to specify the size in bytes of memory 
+ * pointed to by param_value.
+ * @param param_value A pointer to memory where the appropriate result 
+ * being queried is returned
+ * @param param_value_size_ret Returns the actual size in bytes of data 
+ * copied to param_value. If param_value_size_ret is NULL, it is ignored.
+ * @return Returns CL_SUCCESS if the function is executed successfully,
+ * or an error code otherwise.
+ * */
+ typedef cl_int (*cl4_wrapper_info_fp2)(gpointer cl_object1,
+	gpointer cl_object2, cl_uint param_name, size_t param_value_size, 
+	void* param_value, size_t* param_value_size_ret);
+
+typedef cl_int (*cl4_wrapper_info_fp)(void);
 
 /**
  * @brief Information about a wrapped OpenCL entity.
@@ -113,21 +135,19 @@ CL4WrapperInfo* cl4_wrapper_info_new(gsize size);
 void cl4_wrapper_info_destroy(CL4WrapperInfo* info);
 
 /** @brief Get information about any wrapped OpenCL object. */
-CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_wrapper_info_function info_fun, 
-	GError** err);
+CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1,
+	CL4Wrapper* wrapper2, cl_uint param_name, 
+	cl4_wrapper_info_fp info_fun, GError** err);
 	
 /** @brief Get pointer to information value. */
-gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_wrapper_info_function info_fun, 
-	GError** err);
+gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
+	CL4Wrapper* wrapper2, cl_uint param_name, 
+	cl4_wrapper_info_fp info_fun, GError** err);
 
 /** @brief Get information size. */
-gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_wrapper_info_function info_fun, 
-	GError** err);
-
-
+gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
+	CL4Wrapper* wrapper2, cl_uint param_name, 
+	cl4_wrapper_info_fp info_fun, GError** err);
 
 #endif
 

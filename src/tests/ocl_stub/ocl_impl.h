@@ -155,6 +155,7 @@ struct _cl_program {
 	char* source;
 	size_t* binary_sizes;
 	unsigned char** binaries;
+	cl_program_binary_type* binary_type;
 	size_t num_kernels;
 	char* kernel_names;
 	cl_build_status* build_status;

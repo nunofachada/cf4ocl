@@ -188,7 +188,8 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
  * This function should not be called directly, but using the
  * cl4_*_info() macros instead.
  * 
- * @param wrapper The wrapper object.
+ * @param wrapper1 The wrapper object to query.
+ * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get.
  * @param info_fun OpenCL clGet*Info function.
  * @param err Return location for a GError, or NULL if error reporting
@@ -197,22 +198,23 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
  * be automatically freed when the respective wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, cl_uint param_name, 
-	cl4_wrapper_info_function info_fun, GError** err) {
-	
+CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1, 
+	CL4Wrapper* wrapper2, cl_uint param_name, 
+	cl4_wrapper_info_fp info_fun, GError** err) {
+
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
 	
-	/* Make sure wrapper is not NULL. */
-	g_return_val_if_fail(wrapper != NULL, NULL);
+	/* Make sure wrapper1 is not NULL. */
+	g_return_val_if_fail(wrapper1 != NULL, NULL);
 	
 	/* Information object. */
 	CL4WrapperInfo* info = NULL;
 	
 	/* If information table is not yet initialized, then
 	 * initialize it. */
-	if (!wrapper->info) {
-		wrapper->info = g_hash_table_new_full(
+	if (!wrapper1->info) {
+		wrapper1->info = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal,
 			NULL, (GDestroyNotify) cl4_wrapper_info_destroy);
 	}
@@ -220,11 +222,11 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, cl_uint param_name,
 	/* Check if requested information is already present in the
 	 * information table. */
 	if (g_hash_table_contains(
-		wrapper->info, GUINT_TO_POINTER(param_name))) {
+		wrapper1->info, GUINT_TO_POINTER(param_name))) {
 		
 		/* If so, retrieve it from there. */
 		info = g_hash_table_lookup(
-			wrapper->info, GUINT_TO_POINTER(param_name));
+			wrapper1->info, GUINT_TO_POINTER(param_name));
 		
 	} else {
 		
@@ -234,8 +236,11 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, cl_uint param_name,
 		gsize size_ret = 0;
 		
 		/* Get size of information. */
-		ocl_status = info_fun(
-			wrapper->cl_object, param_name, 0, NULL, &size_ret);
+		ocl_status = (wrapper2 == NULL)
+			? ((cl4_wrapper_info_fp1) info_fun)(wrapper1->cl_object, 
+				param_name, 0, NULL, &size_ret)
+			: ((cl4_wrapper_info_fp2) info_fun)(wrapper1->cl_object, 
+				wrapper2->cl_object, param_name, 0, NULL, &size_ret);
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
 			"Function '%s': get info [size] (OpenCL error %d: %s).",
@@ -249,15 +254,19 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper, cl_uint param_name,
 		info = cl4_wrapper_info_new(size_ret);
 		
 		/* Get information. */
-		ocl_status = info_fun(
-			wrapper->cl_object, param_name, size_ret, info->value, NULL);
+		ocl_status = (wrapper2 == NULL)
+			? ((cl4_wrapper_info_fp1) info_fun)(wrapper1->cl_object, 
+				param_name, size_ret, info->value, NULL)
+			: ((cl4_wrapper_info_fp2) info_fun)(wrapper1->cl_object, 
+				wrapper2->cl_object, param_name, size_ret, info->value, 
+				NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
 			"Function '%s': get context info [info] (OpenCL error %d: %s).",
 			__func__, ocl_status, cl4_err(ocl_status));
 		
 		/* Keep information in information table. */
-		g_hash_table_insert(wrapper->info,
+		g_hash_table_insert(wrapper1->info,
 			GUINT_TO_POINTER(param_name),
 			info);
 		
@@ -276,13 +285,13 @@ finish:
 	
 	/* Return the requested information. */
 	return info;
-
 }
 
 /** 
  * @brief Get pointer to information value.
  * 
- * @param wrapper The wrapper object.
+ * @param wrapper1 The wrapper object to query.
+ * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get value of.
  * @param info_fun OpenCL clGet*Info function.
  * @param err Return location for a GError, or NULL if error reporting
@@ -291,17 +300,19 @@ finish:
  * value will be automatically freed when the wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_wrapper_info_function info_fun, GError** err) {
+gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1, 
+	CL4Wrapper* wrapper2, cl_uint param_name, 
+	cl4_wrapper_info_fp info_fun, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Make sure wrapper is not NULL. */
-	g_return_val_if_fail(wrapper != NULL, NULL);
+	/* Make sure wrapper1 is not NULL. */
+	g_return_val_if_fail(wrapper1 != NULL, NULL);
 	
 	/* Get information object. */
-	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper, param_name, info_fun, err);
+	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper1, wrapper2, 
+		param_name, info_fun, err);
 	
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->value : NULL;
@@ -310,7 +321,8 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper,
 /** 
  * @brief Get information size.
  * 
- * @param wrapper The wrapper object.
+ * @param wrapper1 The wrapper object to query.
+ * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get value of.
  * @param info_fun OpenCL clGet*Info function.
  * @param err Return location for a GError, or NULL if error reporting
@@ -318,17 +330,19 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper,
  * @return The requested information size. If an error occurs, 
  * a size of 0 is returned.
  * */
-gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper, 
-	cl_uint param_name, cl4_wrapper_info_function info_fun, GError** err) {
+gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1, 
+	CL4Wrapper* wrapper2, cl_uint param_name, 
+	cl4_wrapper_info_fp info_fun, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Make sure wrapper is not NULL. */
-	g_return_val_if_fail(wrapper != NULL, NULL);
+	/* Make sure wrapper1 is not NULL. */
+	g_return_val_if_fail(wrapper1 != NULL, NULL);
 	
 	/* Get information object. */
-	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper, param_name, info_fun, err);
+	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper1, wrapper2, 
+		param_name, info_fun, err);
 	
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->size : 0;
