@@ -83,9 +83,13 @@ CL4Kernel* cl4_program_get_kernel(
 CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue, 
 	const char* kernel_name, size_t gws, size_t lws, ...);
 
+unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+	GError** err);
 
 /**
- * @brief Get program information object.
+ * @brief Get program information object. To get the program binaries
+ * use the cl4_program_get_binary() function instead, as this macro will
+ * return NULL when the CL_PROGRAM_BINARIES parameter is requested.
  * 
  * @param prg The program wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -93,10 +97,13 @@ CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue,
  * is to be ignored.
  * @return The requested information object. This object will be 
  * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * occurs or if the CL_PROGRAM_BINARIES parameter is requested, NULL is 
+ * returned.
  * */
 #define cl4_program_info(prg, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) prg, NULL, param_name, \
+	(param_name == CL_PROGRAM_BINARIES) \
+	? NULL \
+	: cl4_wrapper_get_info((CL4Wrapper*) prg, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
 /**

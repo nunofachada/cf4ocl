@@ -35,6 +35,9 @@ struct cl4_program {
 	/** Parent wrapper object. */
 	CL4Wrapper base;
 	
+	/** Program binaries. */
+	unsigned char** binaries;
+	
 	/** Program kernels. */
 	GHashTable* krnls;
 	
@@ -349,3 +352,62 @@ finish:
 		
 }
 
+unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+	GError** err) {
+		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+	
+	/* Make sure dev is not NULL. */
+	g_return_val_if_fail(dev != NULL, NULL);
+	
+	GError* err_internal = NULL;
+	
+	unsigned char* binary;
+	
+	/* Check if binaries not already fetched from program. */
+	if (prg->binaries == NULL) {
+
+		/* Not fetched, fetch them. */
+		
+		cl_uint num_devices;
+		
+		cl_device_id* devices;
+		
+		CL4WrapperInfo* info;
+		
+		size_t* binary_sizes;
+		
+		info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);	
+		num_devices = *((cl_uint*) info->value);
+		
+		info = cl4_program_info(prg, CL_PROGRAM_DEVICES, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		devices = (cl_device_id*) info->value;
+			
+		info = cl4_program_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		binary_sizes = (size_t*) info->value;
+	}
+	
+	/* Find binary for given device. */
+	for ()
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+finish:
+
+	/* Return kernel wrapper. */
+	return binary;	
+}
