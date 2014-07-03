@@ -819,18 +819,27 @@ static void program_create_info_destroy_test() {
 	CL4Program* prg = NULL;
 	CL4Kernel* krnl = NULL;
 	CL4WrapperInfo* info = NULL;
+	CL4Device* d = NULL;
 	GError* err = NULL;
 	
+	/* Create a temporary kernel file. */
 	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
 		CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT, -1, &err);
 	g_assert_no_error(err);
 
+	/* Create a context with first available device. */
 	ctx = cl4_context_new_any(&err);
 	g_assert_no_error(err);
+	
+	/* Get the device being used. */
+	d = cl4_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
 
+	/* Create a new program from kernel file. */
 	prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
 	g_assert_no_error(err);
 	
+	/* Get some program info, compare it with expected info. */
 	info = cl4_program_info(prg, CL_PROGRAM_CONTEXT, &err);
 	g_assert_no_error(err);
 	g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
@@ -846,17 +855,29 @@ static void program_create_info_destroy_test() {
 	g_assert_cmpstr((char*) info->value, 
 		==, CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT);
 	
+	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	g_assert_no_error(err);
+	g_assert_cmpint(*((cl_build_status*) info->value), ==, CL_BUILD_NONE);
+	
+	/* **** BUILD PROGRAM **** */
 	cl4_program_build(prg, NULL, &err);
 	g_assert_no_error(err);
+	
+	/* Get some program build info, compare it with expected values. */
+	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	g_assert_no_error(err);
+	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
+		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
 
-	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
-		g_message("Unable to delete temporary file '"
-			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
-			
+	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
+	g_assert_no_error(err);
+
+	/* Get kernel wrapper object. */
 	krnl = cl4_program_get_kernel(
 		prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
 	g_assert_no_error(err);
 
+	/* Get some kernel info, compare it with expected info. */
 	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(
@@ -870,6 +891,12 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	g_assert(*((cl_program*) info->value) == cl4_program_unwrap(prg));
 
+	/* Remove temporary kernel file. */
+	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
+		g_message("Unable to delete temporary file '"
+			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
+	
+	/* Destroy stuff. */
 	cl4_program_destroy(prg);
 	cl4_context_destroy(ctx);
 

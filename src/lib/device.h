@@ -62,7 +62,7 @@ void cl4_device_destroy(CL4Device* device);
  * */
 #define cl4_device_info(device, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) device, NULL, param_name, \
-		(void*) clGetDeviceInfo, err)
+		(void*) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
  * @brief Get pointer to device information value.
@@ -77,7 +77,7 @@ void cl4_device_destroy(CL4Device* device);
  * */
 #define cl4_device_info_value(device, param_name, err) \
 	cl4_wrapper_get_info_value((CL4Wrapper*) device, NULL, param_name, \
-		(void*) clGetDeviceInfo, err)
+		(void*) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
  * @brief Get device information size.
@@ -91,7 +91,7 @@ void cl4_device_destroy(CL4Device* device);
  * */
 #define cl4_device_info_size(device, param_name, err) \
 	cl4_wrapper_get_info_size((CL4Wrapper*) device, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetDeviceInfo, err)
+		(cl4_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar device information value. 

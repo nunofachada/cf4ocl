@@ -232,7 +232,7 @@ void cl4_context_destroy(CL4Context* ctx);
  * */
 #define cl4_context_info(ctx, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) ctx, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetContextInfo, err)
+		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
 
 /** 
  * @brief Increase the reference count of the context wrapper object.

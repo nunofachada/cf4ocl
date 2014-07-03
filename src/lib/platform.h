@@ -57,7 +57,8 @@ void cl4_platform_destroy(CL4Platform* platform);
  * */
 #define cl4_platform_info(platform, param_name, err) \
 	((gchar*) cl4_wrapper_get_info_value((CL4Wrapper*) platform, NULL, \
-		param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, err))
+		param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, \
+		err))
 
 /** 
  * @brief Increase the reference count of the platform wrapper object.

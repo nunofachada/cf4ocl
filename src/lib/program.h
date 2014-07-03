@@ -97,7 +97,7 @@ CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue,
  * */
 #define cl4_program_info(prg, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) prg, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetProgramInfo, err)
+		(cl4_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
 /**
  * @brief Get program build information object.
@@ -112,8 +112,9 @@ CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue,
  * occurs, NULL is returned.
  * */
 #define cl4_program_build_info(prg, dev, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) prg, param_name, dev, \
-		(cl4_wrapper_info_fp) clGetProgramBuildInfo, err)
+	cl4_wrapper_get_info((CL4Wrapper*) prg, (CL4Wrapper*) dev, \
+		param_name, (cl4_wrapper_info_fp) clGetProgramBuildInfo, \
+		CL_FALSE, err)
 
 /** 
  * @brief Increase the reference count of the program object.

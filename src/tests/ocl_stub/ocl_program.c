@@ -294,11 +294,17 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 		status = CL_INVALID_VALUE;
 		goto ERROR;
 	}
+	if (num_devices == 0) {
+		num_devices = program->num_devices;
+		device_list = program->devices;
+	}
 	for (cl_uint i = 0; i < num_devices; ++i) {
 		cl_bool found = FALSE;
-		for (cl_uint j = 0; j < program->num_devices; j++) {
-			if (device_list[i] == program->devices[j])
+		for (cl_uint j = 0; j < program->num_devices; ++j) {
+			if (device_list[i] == program->devices[j]) {
 				found = TRUE;
+				break;
+			}
 		}
 		if (!found) {
 			status = CL_INVALID_DEVICE;

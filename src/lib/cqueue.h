@@ -57,7 +57,7 @@ void cl4_cqueue_destroy(CL4CQueue* cq);
  * */
 #define cl4_cqueue_info(queue, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) queue, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetCommandQueueInfo, err)
+		(cl4_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
 /** 
  * @brief Increase the reference count of the command queue object.

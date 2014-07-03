@@ -192,6 +192,8 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
  * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get.
  * @param info_fun OpenCL clGet*Info function.
+ * @param TRUE if cached information is to be used, FALSE to force a new
+ * query even if information is in cache.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return The requested information object. This object will
@@ -200,7 +202,7 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
  * */
 CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1, 
 	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, GError** err) {
+	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -217,6 +219,13 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1,
 		wrapper1->info = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal,
 			NULL, (GDestroyNotify) cl4_wrapper_info_destroy);
+	}
+	
+	/* If cache is not to be used... */
+	if (!use_cache) {
+		/* ...force removal. */
+		g_hash_table_remove(
+			wrapper1->info, GUINT_TO_POINTER(param_name));
 	}
 	
 	/* Check if requested information is already present in the
@@ -294,6 +303,8 @@ finish:
  * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get value of.
  * @param info_fun OpenCL clGet*Info function.
+ * @param TRUE if cached information is to be used, FALSE to force a new
+ * query even if information is in cache.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return A pointer to the requested information value. This 
@@ -302,7 +313,7 @@ finish:
  * */
 gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1, 
 	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, GError** err) {
+	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -312,7 +323,7 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
 	
 	/* Get information object. */
 	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper1, wrapper2, 
-		param_name, info_fun, err);
+		param_name, info_fun, use_cache, err);
 	
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->value : NULL;
@@ -325,6 +336,8 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
  * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get value of.
  * @param info_fun OpenCL clGet*Info function.
+ * @param TRUE if cached information is to be used, FALSE to force a new
+ * query even if information is in cache.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return The requested information size. If an error occurs, 
@@ -332,7 +345,7 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
  * */
 gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1, 
 	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, GError** err) {
+	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -342,7 +355,7 @@ gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
 	
 	/* Get information object. */
 	CL4WrapperInfo* diw = cl4_wrapper_get_info(wrapper1, wrapper2, 
-		param_name, info_fun, err);
+		param_name, info_fun, use_cache, err);
 	
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->size : 0;

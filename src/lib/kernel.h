@@ -61,7 +61,7 @@ void cl4_kernel_destroy(CL4Kernel* krnl);
  * */
 #define cl4_kernel_info(krnl, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) krnl, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetKernelInfo, err)
+		(cl4_wrapper_info_fp) clGetKernelInfo, CL_TRUE, err)
 
 /**
  * @brief Get kernel workgroup information object.
@@ -77,7 +77,8 @@ void cl4_kernel_destroy(CL4Kernel* krnl);
  * */
 #define cl4_kernel_workgroup_info(krnl, dev, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) krnl, (CL4Wrapper*) dev, NULL, \
-		param_name, (cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, err)
+		param_name, (cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+		CL_FALSE, err)
 
 /** 
  * @brief Increase the reference count of the kernel object.

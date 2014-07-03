@@ -137,17 +137,17 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info);
 /** @brief Get information about any wrapped OpenCL object. */
 CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1,
 	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, GError** err);
+	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
 /** @brief Get pointer to information value. */
 gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
 	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, GError** err);
+	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /** @brief Get information size. */
 gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
 	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, GError** err);
+	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 #endif
 
