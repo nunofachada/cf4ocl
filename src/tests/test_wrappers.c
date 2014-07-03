@@ -830,7 +830,22 @@ static void program_create_info_destroy_test() {
 
 	prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
 	g_assert_no_error(err);
+	
+	info = cl4_program_info(prg, CL_PROGRAM_CONTEXT, &err);
+	g_assert_no_error(err);
+	g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
 
+	info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(*((cl_uint*) info->value), 
+		==, cl4_context_num_devices(ctx, &err));
+	g_assert_no_error(err);
+
+	info = cl4_program_info(prg, CL_PROGRAM_SOURCE, &err);
+	g_assert_no_error(err);
+	g_assert_cmpstr((char*) info->value, 
+		==, CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT);
+	
 	cl4_program_build(prg, NULL, &err);
 	g_assert_no_error(err);
 
