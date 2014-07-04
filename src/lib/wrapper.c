@@ -155,12 +155,12 @@ cl_int cl4_wrapper_release_cl_object(gpointer cl_object,
  * */
 CL4WrapperInfo* cl4_wrapper_info_new(gsize size) {
 	
-	/* Make sure size is > 0. */
-	g_return_val_if_fail(size > 0, NULL);
-		
 	CL4WrapperInfo* info = g_slice_new(CL4WrapperInfo);
 	
-	info->value = g_slice_alloc0(size);
+	if (size > 0) 
+		info->value = g_slice_alloc0(size);
+	else
+		info->value = NULL;
 	info->size = size;
 	
 	return info;
@@ -177,7 +177,8 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
 	/* Make sure info is not NULL. */
 	g_return_if_fail(info != NULL);
 
-	g_slice_free1(info->size, info->value);
+	if (info->size > 0)
+		g_slice_free1(info->size, info->value);
 	g_slice_free(CL4WrapperInfo, info);
 	
 }

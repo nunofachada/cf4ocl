@@ -237,7 +237,8 @@ void cl4_program_destroy(CL4Program* prg) {
 	
 	/* Decrease reference count using the parent wrapper object unref 
 	 * function. */
-	program = (cl_program) cl4_wrapper_unref((CL4Wrapper*) prg);
+	program = (cl_program) 
+		cl4_dev_container_unref((CL4DevContainer*) prg);
 	
 	/* If an OpenCL program was returned, the reference count of 
 	 * the wrapper object reached 0, so we must destroy remaining 
@@ -246,13 +247,21 @@ void cl4_program_destroy(CL4Program* prg) {
 	if (program != NULL) {
 
 		/* If the kernels table was created...*/
-		if (prg->krnls) {
+		if (prg->krnls != NULL) {
 			
-			/* Free the kernel table and reduce reference count of 
+			/* ...free the kernel table and reduce reference count of 
 			 * kernels in table (this is done automatically by the
 			 * cl4_kernel_destroy() function passed as a destructor
 			 * parameter during table creation). */
 			g_hash_table_destroy(prg->krnls);
+			
+		}
+		
+		/* If the binaries table was created... */
+		if (prg->binaries != NULL) {
+			
+			/*...free it and the included binaries. */
+			g_hash_table_destroy(prg->binaries);
 			
 		}
 
@@ -463,7 +472,7 @@ static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 	bins_raw = g_slice_alloc0(num_devices * sizeof(unsigned char*));
 	for (guint i = 0; i < num_devices; i++) {
 		if (binary_sizes[i] > 0) {
-			bins_raw[i] = g_malloc(binary_sizes[i]);
+			bins_raw[i] = g_slice_alloc(binary_sizes[i]);
 		}
 	}
 
@@ -480,7 +489,8 @@ static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 	 * CLWrapperInfo* object containing the binary and its size. */
 	for (guint i = 0; i < num_devices; ++i) {
 		
-		CL4WrapperInfo* info = cl4_wrapper_info_new(binary_sizes[i]);
+		CL4WrapperInfo* info = cl4_wrapper_info_new(0);
+		info->size = binary_sizes[i];
 		info->value = bins_raw[i];
 		
 		g_hash_table_replace(prg->binaries, devices[i], info);

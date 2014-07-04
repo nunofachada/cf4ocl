@@ -399,7 +399,7 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 			case CL_PROGRAM_SOURCE:
 				cl4_test_char_info(program, source);
 			case CL_PROGRAM_BINARY_SIZES:
-				cl4_test_vector_info(size_t, program, binary_sizes);
+				cl4_test_predefvector_info(size_t, program->num_devices, program, binary_sizes);
 			case CL_PROGRAM_BINARIES:
 				cl4_test_predefvector2d_info(unsigned char, program->num_devices, 
 					program, binary_sizes, binaries);
