@@ -64,8 +64,8 @@ CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count,
 	const char **strings, GError** err);
 
 CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
-	cl_uint num_devices, CL4Device** devices, const size_t *lengths,
- 	const unsigned char **binaries,	cl_int *binary_status, GError** err);
+	cl_uint num_devices, CL4Device** devices, CL4WrapperInfo** binaries, 
+	cl_int *binary_status, GError** err);
 
 /* @todo Future work */	
 //~ CL4Program* cl4_program_new_with_built_in_kernels(CL4Context* ctx,
