@@ -106,7 +106,7 @@ static void platforms_create_info_destroy_test() {
 		cl4_test_wrappers_msg("==== Extens. :", "%s", platf_info);
 		
 		/* Get number of devices. */
-		num_devs = cl4_platform_num_devices(p, &err);
+		num_devs = cl4_platform_get_num_devices(p, &err);
 		
 		/* Only test for device information if device count was 
 		 * successfully obtained. */
@@ -361,7 +361,7 @@ static void platforms_create_info_destroy_test() {
 		p = cl4_platforms_get_platform(platfs, i);
 		ds = cl4_platform_get_all_devices(p, &err);
 		g_assert_no_error(err);
-		for (guint j = 0; j < cl4_platform_num_devices(p, &err); j++) {
+		for (guint j = 0; j < cl4_platform_get_num_devices(p, &err); j++) {
 			g_assert_no_error(err);
 			d = cl4_platform_get_device(p, j, &err);
 			g_assert_no_error(err);
@@ -660,7 +660,7 @@ static void context_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Get number of devices. */
-	num_devices = cl4_context_num_devices(ctx, &err);
+	num_devices = cl4_context_get_num_devices(ctx, &err);
 	g_assert_no_error(err);
 	
 	/* Check that all devices belong to the same platform. */
@@ -702,7 +702,7 @@ static void context_create_info_destroy_test() {
 	ctx = cl4_context_new_from_filters(&filters, &err);
 	g_assert_no_error(err);
 	
-	num_devices = cl4_context_num_devices(ctx, &err);
+	num_devices = cl4_context_get_num_devices(ctx, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(num_devices, >, 0);
 
@@ -847,7 +847,7 @@ static void program_create_info_destroy_test() {
 	info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(*((cl_uint*) info->value), 
-		==, cl4_context_num_devices(ctx, &err));
+		==, cl4_context_get_num_devices(ctx, &err));
 	g_assert_no_error(err);
 
 	info = cl4_program_info(prg, CL_PROGRAM_SOURCE, &err);

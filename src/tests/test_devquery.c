@@ -63,7 +63,7 @@ static void helpers_test() {
 			g_debug(">> Platform %d:", i);
 
 			/* Get number of devices. */
-			num_devs = cl4_platform_num_devices(p, &err);
+			num_devs = cl4_platform_get_num_devices(p, &err);
 			
 			/* Only test for device information if device count was 
 			 * successfully obtained. */

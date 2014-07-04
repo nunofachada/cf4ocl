@@ -33,7 +33,19 @@
 #include "device.h"
 #include "gerrorf.h"
 #include "errors.h"
+#include "abstract_dev_container_wrapper.h"
 
+/**
+ * @defgroup PLATFORM The platform wrapper module.
+ *
+ * @brief A wrapper object for OpenCL platforms and functions to manage 
+ * it.
+ * 
+ * Todo: detailed description of module.
+ * 
+ * @{
+ */
+ 
 /** @brief The platform wrapper object. */
 typedef struct cl4_platform CL4Platform;
 
@@ -85,15 +97,55 @@ void cl4_platform_destroy(CL4Platform* platform);
 #define cl4_platform_unwrap(platform) \
 	((cl_platform) cl4_wrapper_unwrap((CL4Wrapper*) platform))
  
-/** @brief Get CL4 device wrapper at given index. */
-CL4Device* cl4_platform_get_device(
-	CL4Platform* platform, guint index, GError **err);
+/** 
+ * @brief Get all device wrappers in platform. 
+ * 
+ * This function returns the internal array containing the platform
+ * device wrappers. As such, clients should not modify the returned 
+ * array (e.g. they should not free it directly).
+ * 
+ * @param platf The platform wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return An array containing the ::CL4Device wrappers which belong to
+ * this platform, or NULL if an error occurs.
+ */
+#define cl4_platform_get_all_devices(platf, err) \
+	cl4_dev_container_get_all_devices((CL4DevContainer*) platf, \
+	cl4_platform_get_cldevices, err)
+ 
+/** 
+ * @brief Get ::CL4Device wrapper at given index. 
+ * 
+ * @param platf The platform wrapper object.
+ * @param index Index of device in platform.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The ::CL4Device wrapper at given index or NULL if an error 
+ * occurs.
+ * */
+#define cl4_platform_get_device(platf, index, err) \
+	cl4_dev_container_get_device((CL4DevContainer*) platf, \
+	cl4_platform_get_cldevices, index, err)
 
-/** @brief Get all device wrappers in platform. */
-CL4Device** cl4_platform_get_all_devices(
-	CL4Platform* platform, GError **err);
+/**
+ * @brief Return number of devices in platform.
+ * 
+ * @param platf The platform wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The number of devices in platform or 0 if an error occurs or 
+ * is otherwise not possible to get any device.
+ * */
+#define cl4_platform_get_num_devices(platf, err) \
+	cl4_dev_container_get_num_devices((CL4DevContainer*) platf, \
+	cl4_platform_get_cldevices, err)
 
-/** @brief Return number of devices in platform. */
-guint cl4_platform_num_devices(CL4Platform* platform, GError **err);
+/** @} */
+
+/** @brief Implementation of cl4_dev_container_get_cldevices() for the
+ * platform wrapper. */
+CL4WrapperInfo* cl4_platform_get_cldevices(
+	CL4DevContainer* devcon, GError** err);
 
 #endif

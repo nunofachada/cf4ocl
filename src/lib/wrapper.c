@@ -117,7 +117,7 @@ gint cl4_wrapper_ref_count(CL4Wrapper* wrapper) {
  * @param wrapper The wrapper object.
  * @return The wrapped OpenCL object.
  * */
-gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper) {
+void* cl4_wrapper_unwrap(CL4Wrapper* wrapper) {
 
 	/* Make sure wrapper is not NULL. */
 	g_return_val_if_fail(wrapper != NULL, NULL);
@@ -192,8 +192,8 @@ void cl4_wrapper_info_destroy(CL4WrapperInfo* info) {
  * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get.
  * @param info_fun OpenCL clGet*Info function.
- * @param TRUE if cached information is to be used, FALSE to force a new
- * query even if information is in cache.
+ * @param use_cache TRUE if cached information is to be used, FALSE to 
+ * force a new query even if information is in cache.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return The requested information object. This object will
@@ -303,8 +303,8 @@ finish:
  * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get value of.
  * @param info_fun OpenCL clGet*Info function.
- * @param TRUE if cached information is to be used, FALSE to force a new
- * query even if information is in cache.
+ * @param use_cache TRUE if cached information is to be used, FALSE to 
+ * force a new query even if information is in cache.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return A pointer to the requested information value. This 
@@ -336,8 +336,8 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
  * @param wrapper2 A second wrapper object, required in some queries.
  * @param param_name Name of information/parameter to get value of.
  * @param info_fun OpenCL clGet*Info function.
- * @param TRUE if cached information is to be used, FALSE to force a new
- * query even if information is in cache.
+ * @param use_cache TRUE if cached information is to be used, FALSE to 
+ * force a new query even if information is in cache.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return The requested information size. If an error occurs, 

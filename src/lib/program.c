@@ -33,10 +33,10 @@
 struct cl4_program {
 
 	/** Parent wrapper object. */
-	CL4Wrapper base;
-	
+	CL4DevContainer base;
+
 	/** Program binaries. */
-	unsigned char** binaries;
+	GHashTable* binaries;
 	
 	/** Program kernels. */
 	GHashTable* krnls;
@@ -50,8 +50,9 @@ static CL4Program* cl4_program_new_internal() {
 	
 	/* Allocate memory for program wrapper object. */
 	prg = g_slice_new0(CL4Program);
-	cl4_wrapper_init(&prg->base);
+	cl4_dev_container_init(&prg->base);
 	
+	prg->binaries = NULL;
 	prg->krnls = NULL;
 	
 	/* Return new context wrapper object. */
@@ -59,6 +60,11 @@ static CL4Program* cl4_program_new_internal() {
 
 }
 
+/** 
+ * @addtogroup PROGRAM
+ * @{
+ */
+ 
 CL4Program* cl4_program_new(
 	CL4Context* ctx, const char* file, GError** err) {
 
@@ -119,7 +125,7 @@ CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count,
 		
 	prg = cl4_program_new_internal();
 	
-	prg->base.cl_object = (cl_program) clCreateProgramWithSource(
+	prg->base.base.cl_object = (cl_program) clCreateProgramWithSource(
 		cl4_context_unwrap(ctx), count, strings, NULL, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
@@ -352,62 +358,96 @@ finish:
 		
 }
 
-unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
-	GError** err) {
-		
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
-	
-	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, NULL);
-	
-	/* Make sure dev is not NULL. */
-	g_return_val_if_fail(dev != NULL, NULL);
-	
-	GError* err_internal = NULL;
-	
-	unsigned char* binary;
-	
-	/* Check if binaries not already fetched from program. */
-	if (prg->binaries == NULL) {
+//~ unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+	//~ GError** err) {
+		//~ 
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	//~ 
+	//~ /* Make sure prg is not NULL. */
+	//~ g_return_val_if_fail(prg != NULL, NULL);
+	//~ 
+	//~ /* Make sure dev is not NULL. */
+	//~ g_return_val_if_fail(dev != NULL, NULL);
+	//~ 
+	//~ GError* err_internal = NULL;
+	//~ 
+	//~ unsigned char* binary;
+	//~ 
+	//~ /* Check if binaries table is initialized. */
+	//~ if (prg->binaries == NULL) {
+		//~ 
+		//~ /* Initialize binaries table. */
+		//~ prg->binaries = g_hash_table_new_full(
+			//~ g_direct_hash, g_direct_equal, NULL, g_free);
+			//~ 
+	//~ }
+	//~ 
+	//~ /* If binary is in list and is not NULL, return it. */
+	//~ 
+	//~ /* Check if binaries not already fetched from program. */
+	//~ if (prg->binaries == NULL) {
+		//~ /* Not fetched, fetch them. */
+//~ 
+		//~ cl_uint num_devices;
+		//~ cl_device_id* devices;
+		//~ size_t* binary_sizes;
+		//~ CL4WrapperInfo* info;
+		//~ 
+		//~ /* Initialize binaries table. */
+		//~ prg->binaries = g_hash_table_new_full(
+			//~ g_direct_hash, g_direct_equal, NULL, g_free);
+		//~ 
+		//~ /* Get number of program devices. */
+		//~ info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
+		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);	
+		//~ num_devices = *((cl_uint*) info->value);
+		//~ 
+		//~ /* Get program devices. */
+		//~ info = cl4_program_info(prg, CL_PROGRAM_DEVICES, &err_internal);
+		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+		//~ devices = (cl_device_id*) info->value;
+			//~ 
+		//~ /* Get binary sizes. */
+		//~ info = cl4_program_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
+		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+		//~ binary_sizes = (size_t*) info->value;
+	//~ }
+	//~ 
+	//~ /* Find binary for given device. */
+	//~ for ()
+	//~ 
+	//~ /* If we got here, everything is OK. */
+	//~ g_assert (err == NULL || *err == NULL);
+	//~ goto finish;
+	//~ 
+//~ error_handler:
+//~ 
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert (err == NULL || *err != NULL);
+	//~ 
+//~ finish:
+//~ 
+	//~ /* Return kernel wrapper. */
+	//~ return binary;	
+//~ }
 
-		/* Not fetched, fetch them. */
-		
-		cl_uint num_devices;
-		
-		cl_device_id* devices;
-		
-		CL4WrapperInfo* info;
-		
-		size_t* binary_sizes;
-		
-		info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);	
-		num_devices = *((cl_uint*) info->value);
-		
-		info = cl4_program_info(prg, CL_PROGRAM_DEVICES, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		devices = (cl_device_id*) info->value;
-			
-		info = cl4_program_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		binary_sizes = (size_t*) info->value;
-	}
-	
-	/* Find binary for given device. */
-	for ()
-	
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-	
-finish:
+/** @}*/
 
-	/* Return kernel wrapper. */
-	return binary;	
+/** 
+ * @brief Implementation of cl4_dev_container_get_cldevices() for the
+ * program wrapper. 
+ * 
+ * @param devcon A ::CL4Program wrapper, passed as a ::CL4DevContainer .
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return A list of cl_device_id objects inside a ::CL4WrapperInfo
+ * object.
+ * */
+CL4WrapperInfo* cl4_program_get_cldevices(
+	CL4DevContainer* devcon, GError** err) {
+
+	return cl4_program_info(devcon, CL_PROGRAM_DEVICES, err);
 }
+

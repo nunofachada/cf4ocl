@@ -40,6 +40,17 @@
 #include "cqueue.h"
 #include "kernel.h"
 
+/**
+ * @defgroup Program The program wrapper module.
+ *
+ * @brief A wrapper object for OpenCL programs and functions to manage 
+ * it.
+ * 
+ * Todo: detailed description of module.
+ * 
+ * @{
+ */
+ 
 /** @brief Program wrapper object. */
 typedef struct cl4_program CL4Program;
 
@@ -147,6 +158,40 @@ unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
  * */
 #define cl4_program_unwrap(prg) \
 	((cl_program) cl4_wrapper_unwrap((CL4Wrapper*) prg))		
+
+/** 
+ * @brief Get ::CL4Device wrapper at given index. 
+ * 
+ * @param prg The program wrapper object.
+ * @param index Index of device in program.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The ::CL4Device wrapper at given index or NULL if an error 
+ * occurs.
+ * */
+#define cl4_program_get_device(prg, index, err) \
+	cl4_dev_container_get_device((CL4DevContainer*) prg, \
+	cl4_program_get_cldevices, index, err)
+
+/**
+ * @brief Return number of devices in program.
+ * 
+ * @param prg The program wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The number of devices in program or 0 if an error occurs or 
+ * is otherwise not possible to get any device.
+ * */
+#define cl4_program_get_num_devices(prg, err) \
+	cl4_dev_container_get_num_devices((CL4DevContainer*) prg, \
+	cl4_program_get_cldevices, err)
+
+/** @} */
+
+/** @brief Implementation of cl4_dev_container_get_cldevices() for the
+ * program wrapper. */
+CL4WrapperInfo* cl4_program_get_cldevices(
+	CL4DevContainer* devcon, GError** err);
 
 #endif
 

@@ -40,6 +40,7 @@
 #include "errors.h"
 #include "device.h"
 #include "platform.h"
+#include "abstract_dev_container_wrapper.h"
 
 /**
  * @defgroup CONTEXT The context wrapper module.
@@ -231,8 +232,8 @@ void cl4_context_destroy(CL4Context* ctx);
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define cl4_context_info(ctx, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) ctx, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
+	cl4_wrapper_get_info((CL4Wrapper*) (ctx), NULL, (param_name), \
+		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, (err))
 
 /** 
  * @brief Increase the reference count of the context wrapper object.
@@ -260,13 +261,38 @@ void cl4_context_destroy(CL4Context* ctx);
 #define cl4_context_unwrap(ctx) \
 	((cl_context) cl4_wrapper_unwrap((CL4Wrapper*) ctx))
  
-/** @brief Get ::CL4Device wrapper at given index. */
-CL4Device* cl4_context_get_device(
-	CL4Context* ctx, guint index, GError** err);
+/** 
+ * @brief Get ::CL4Device wrapper at given index. 
+ * 
+ * @param ctx The context wrapper object.
+ * @param index Index of device in context.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The ::CL4Device wrapper at given index or NULL if an error 
+ * occurs.
+ * */
+#define cl4_context_get_device(ctx, index, err) \
+	cl4_dev_container_get_device((CL4DevContainer*) ctx, \
+	cl4_context_get_cldevices, index, err)
 
-/** @brief Return number of devices in context. */
-guint cl4_context_num_devices(CL4Context* ctx, GError** err);
+/**
+ * @brief Return number of devices in context.
+ * 
+ * @param ctx The context wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The number of devices in context or 0 if an error occurs or 
+ * is otherwise not possible to get any device.
+ * */
+#define cl4_context_get_num_devices(ctx, err) \
+	cl4_dev_container_get_num_devices((CL4DevContainer*) ctx, \
+	cl4_context_get_cldevices, err)
 
 /** @} */
+
+/** @brief Implementation of cl4_dev_container_get_cldevices() for the
+ * context wrapper. */
+CL4WrapperInfo* cl4_context_get_cldevices(
+	CL4DevContainer* devcon, GError** err);
 
 #endif

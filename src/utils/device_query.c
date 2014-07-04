@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
 			cl4_device_query_show_platform_info(p, i);
 			
 			/* Get number of devices. */
-			num_devs = cl4_platform_num_devices(p, &err);
+			num_devs = cl4_platform_get_num_devices(p, &err);
 			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
 		
 			/* Cycle through devices. */

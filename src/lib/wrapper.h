@@ -71,7 +71,7 @@ gpointer cl4_wrapper_unref(CL4Wrapper* device);
 gint cl4_wrapper_ref_count(CL4Wrapper* wrapper);
 
 /** @brief Get the wrapped OpenCL object. */
-gpointer cl4_wrapper_unwrap(CL4Wrapper* wrapper);
+void* cl4_wrapper_unwrap(CL4Wrapper* wrapper);
 
 /** @brief Release an OpenCL object using the provided function if it's
  * safe to do so (i.e. if the object has been initialized). */
