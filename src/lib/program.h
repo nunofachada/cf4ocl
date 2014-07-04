@@ -41,7 +41,7 @@
 #include "kernel.h"
 
 /**
- * @defgroup Program The program wrapper module.
+ * @defgroup PROGRAM The program wrapper module.
  *
  * @brief A wrapper object for OpenCL programs and functions to manage 
  * it.

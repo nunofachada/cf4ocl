@@ -357,80 +357,147 @@ finish:
 	return krnl;
 		
 }
+static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 
-//~ unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
-	//~ GError** err) {
-		//~ 
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
-	//~ 
-	//~ /* Make sure prg is not NULL. */
-	//~ g_return_val_if_fail(prg != NULL, NULL);
-	//~ 
-	//~ /* Make sure dev is not NULL. */
-	//~ g_return_val_if_fail(dev != NULL, NULL);
-	//~ 
-	//~ GError* err_internal = NULL;
-	//~ 
-	//~ unsigned char* binary;
-	//~ 
-	//~ /* Check if binaries table is initialized. */
-	//~ if (prg->binaries == NULL) {
-		//~ 
-		//~ /* Initialize binaries table. */
-		//~ prg->binaries = g_hash_table_new_full(
-			//~ g_direct_hash, g_direct_equal, NULL, g_free);
-			//~ 
-	//~ }
-	//~ 
-	//~ /* If binary is in list and is not NULL, return it. */
-	//~ 
-	//~ /* Check if binaries not already fetched from program. */
-	//~ if (prg->binaries == NULL) {
-		//~ /* Not fetched, fetch them. */
-//~ 
-		//~ cl_uint num_devices;
-		//~ cl_device_id* devices;
-		//~ size_t* binary_sizes;
-		//~ CL4WrapperInfo* info;
-		//~ 
-		//~ /* Initialize binaries table. */
-		//~ prg->binaries = g_hash_table_new_full(
-			//~ g_direct_hash, g_direct_equal, NULL, g_free);
-		//~ 
-		//~ /* Get number of program devices. */
-		//~ info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
-		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);	
-		//~ num_devices = *((cl_uint*) info->value);
-		//~ 
-		//~ /* Get program devices. */
-		//~ info = cl4_program_info(prg, CL_PROGRAM_DEVICES, &err_internal);
-		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
-		//~ devices = (cl_device_id*) info->value;
-			//~ 
-		//~ /* Get binary sizes. */
-		//~ info = cl4_program_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
-		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
-		//~ binary_sizes = (size_t*) info->value;
-	//~ }
-	//~ 
-	//~ /* Find binary for given device. */
-	//~ for ()
-	//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-//~ 
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-	//~ 
-//~ finish:
-//~ 
-	//~ /* Return kernel wrapper. */
-	//~ return binary;	
-//~ }
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+
+	/* Make sure binaries table is initialized. */
+	g_return_val_if_fail(prg->binaries != NULL, NULL);
+
+	cl_uint num_devices;
+	cl_device_id* devices;
+	size_t* binary_sizes;
+	CL4WrapperInfo* info;
+	unsigned char** bins_raw;
+	GError* err_internal = NULL;
+	cl_int ocl_status;
+	
+	/* Get number of program devices. */
+	info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);	
+	num_devices = *((cl_uint*) info->value);
+	
+	/* Get program devices. */
+	info = cl4_program_info(prg, CL_PROGRAM_DEVICES, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	devices = (cl_device_id*) info->value;
+		
+	/* Get binary sizes. */
+	info = cl4_program_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	binary_sizes = (size_t*) info->value;
+
+	/* Allocate memory for binaries. */
+	bins_raw = g_slice_alloc0(num_devices * sizeof(unsigned char*));
+	for (guint i = 0; i < num_devices; i++) {
+		if (binary_sizes[i] > 0) {
+			bins_raw[i] = g_malloc(binary_sizes[i]);
+		}
+	}
+
+	/* Get binaries. */
+	ocl_status = clGetProgramInfo(cl4_program_unwrap(prg),
+		CL_PROGRAM_BINARIES, num_devices * sizeof(unsigned char*),
+		bins_raw, NULL);
+	gef_if_error_create_goto(*err, CL4_ERROR, 
+		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
+		"Function '%s': unable to get binaries from program.",
+		__func__);
+
+	/* Fill binaries table, associating each device with a binary. */
+	for (guint i = 0; i < num_devices; ++i) {
+		
+		g_hash_table_replace(
+			prg->binaries, devices[i], bins_raw[i]);
+	}
+
+	/* Free memory allocated for binary array. */
+	g_slice_free1(num_devices * sizeof(unsigned char*), bins_raw);
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	return;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	return;
+
+}
+
+unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+	GError** err) {
+		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+	
+	/* Make sure dev is not NULL. */
+	g_return_val_if_fail(dev != NULL, NULL);
+	
+	GError* err_internal = NULL;
+	
+	unsigned char* binary;
+	
+	/* Check if binaries table is initialized. */
+	if (prg->binaries == NULL) {
+		
+		/* Initialize binaries table. */
+		prg->binaries = g_hash_table_new_full(
+			g_direct_hash, g_direct_equal, NULL, g_free);
+		
+		/* Load binaries. */
+		cl4_program_load_binaries(prg, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+	}
+	
+	/* Check if given device exists in the list of program devices. */
+	if (g_hash_table_contains(prg->binaries, cl4_device_unwrap(dev))) {
+		
+		/* It exists, get it. */
+		binary = g_hash_table_lookup(
+			prg->binaries, cl4_device_unwrap(dev));
+		
+		/* If NULL, then perform a new binary fetch on the CL program 
+		 * object... */
+		cl4_program_load_binaries(prg, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* ...and get it again. If it's NULL it's because binary isn't
+		 * compiled for given device. */
+		binary = g_hash_table_lookup(
+			prg->binaries, cl4_device_unwrap(dev));
+
+	} else {
+		
+		/* Device does not exist in list of program devices. */
+		gef_if_error_create_goto(*err, CL4_ERROR, TRUE, CL4_ERROR_OCL, 
+			error_handler,
+			"Function '%s': device is not part of program devices.",
+			__func__);
+	}
+		
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+finish:
+
+	/* Return kernel wrapper. */
+	return binary;	
+}
 
 
 /** @}*/
