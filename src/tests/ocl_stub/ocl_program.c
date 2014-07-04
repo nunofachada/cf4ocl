@@ -395,7 +395,7 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 			case CL_PROGRAM_NUM_DEVICES:
 				cl4_test_basic_info(cl_uint, program, num_devices);
 			case CL_PROGRAM_DEVICES:
-				cl4_test_vector_info(cl_device_id, program, devices);
+				cl4_test_predefvector_info(cl_device_id, program->num_devices, program, devices);
 			case CL_PROGRAM_SOURCE:
 				cl4_test_char_info(program, source);
 			case CL_PROGRAM_BINARY_SIZES:
