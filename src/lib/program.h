@@ -63,10 +63,11 @@ CL4Program* cl4_program_new(
 CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count, 
 	const char **strings, GError** err);
 
+CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
+	cl_uint num_devices, CL4Device** devices, const size_t *lengths,
+ 	const unsigned char **binaries,	cl_int *binary_status, GError** err);
+
 /* @todo Future work */	
-//~ CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
-	//~ cl_uint num_devices, CL4Device** devices, const size_t *lengths,
- 	//~ const unsigned char **binaries,	cl_int *binary_status, GError** err);
 //~ CL4Program* cl4_program_new_with_built_in_kernels(CL4Context* ctx,
  	//~ cl_uint num_devices, CL4Device** devices, const char *kernel_names,
  	//~ GError** err);
@@ -94,7 +95,7 @@ CL4Kernel* cl4_program_get_kernel(
 CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue, 
 	const char* kernel_name, size_t gws, size_t lws, ...);
 
-unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+CL4WrapperInfo* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 	GError** err);
 
 /**

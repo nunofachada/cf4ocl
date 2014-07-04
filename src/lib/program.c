@@ -151,6 +151,26 @@ finish:
 	return prg;	
 }
 
+//~ CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
+	//~ cl_uint num_devices, CL4Device** devices, const size_t *lengths,
+ 	//~ const unsigned char **binaries,	cl_int *binary_status, 
+ 	//~ GError** err) {
+//~ 
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	//~ /* Make sure ctx is not NULL. */
+	//~ g_return_val_if_fail(ctx != NULL, NULL);
+	//~ /* Make sure devices is not NULL. */
+	//~ g_return_val_if_fail(devices != NULL, NULL);
+	//~ 
+	//~ /* Make sure count > 0. */
+	//~ g_return_val_if_fail(count > 0, NULL);
+	//~ /* Make sure strings is not NULL. */
+	//~ g_return_val_if_fail(strings != NULL, NULL);
+	//~ 
+	//~ 
+//~ }
+
 /** 
  * @brief Decrements the reference count of the program wrapper 
  * object. If it reaches 0, the program wrapper object is 
@@ -357,6 +377,7 @@ finish:
 	return krnl;
 		
 }
+
 static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -408,11 +429,14 @@ static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 		"Function '%s': unable to get binaries from program.",
 		__func__);
 
-	/* Fill binaries table, associating each device with a binary. */
+	/* Fill binaries table, associating each device with a 
+	 * CLWrapperInfo* object containing the binary and its size. */
 	for (guint i = 0; i < num_devices; ++i) {
 		
-		g_hash_table_replace(
-			prg->binaries, devices[i], bins_raw[i]);
+		CL4WrapperInfo* info = cl4_wrapper_info_new(binary_sizes[i]);
+		info->value = bins_raw[i];
+		
+		g_hash_table_replace(prg->binaries, devices[i], info);
 	}
 
 	/* Free memory allocated for binary array. */
@@ -430,7 +454,7 @@ error_handler:
 
 }
 
-unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+CL4WrapperInfo* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 	GError** err) {
 		
 	/* Make sure err is NULL or it is not set. */
@@ -444,14 +468,15 @@ unsigned char* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 	
 	GError* err_internal = NULL;
 	
-	unsigned char* binary;
+	CL4WrapperInfo* binary = NULL;
 	
 	/* Check if binaries table is initialized. */
 	if (prg->binaries == NULL) {
 		
 		/* Initialize binaries table. */
 		prg->binaries = g_hash_table_new_full(
-			g_direct_hash, g_direct_equal, NULL, g_free);
+			g_direct_hash, g_direct_equal, NULL, 
+			(GDestroyNotify) cl4_wrapper_info_destroy);
 		
 		/* Load binaries. */
 		cl4_program_load_binaries(prg, &err_internal);
