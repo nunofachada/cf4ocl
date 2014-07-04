@@ -267,7 +267,7 @@ void cl4_program_destroy(CL4Program* prg) {
 
 }
 
-gboolean cl4_program_build_from_devices_full(CL4Program* prg, 
+cl_bool cl4_program_build_from_devices_full(CL4Program* prg, 
 	cl_uint num_devices, CL4Device** devices, const char *options, 
 	cl4_program_callback pfn_notify, void *user_data, GError** err) {
 	
@@ -308,7 +308,7 @@ gboolean cl4_program_build_from_devices_full(CL4Program* prg,
 
 }
 
-gboolean cl4_program_build_from_cldevices_full(CL4Program* prg, 
+cl_bool cl4_program_build_from_cldevices_full(CL4Program* prg, 
 	cl_uint num_devices, cl_device_id* device_list, const char *options, 
 	cl4_program_callback pfn_notify, void *user_data, GError** err) {
 	
@@ -336,7 +336,7 @@ gboolean cl4_program_build_from_cldevices_full(CL4Program* prg,
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
-	result = TRUE;
+	result = CL_TRUE;
 	goto finish;
 	
 error_handler:
@@ -345,7 +345,7 @@ error_handler:
 	g_assert (err == NULL || *err != NULL);
 
 	/* Bad result. */
-	result = FALSE;
+	result = CL_FALSE;
 	
 finish:
 
@@ -571,6 +571,116 @@ finish:
 	return binary;	
 }
 
+cl_bool cl4_program_save_binary(CL4Program* prg, CL4Device* dev,
+	const char* filename, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+	
+	/* Make sure filename is not NULL. */
+	g_return_val_if_fail(filename != NULL, NULL);
+	
+	GError* err_internal = NULL;
+	
+	CL4WrapperInfo* binary = NULL;
+
+	binary = cl4_program_get_binary(prg, dev, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	gef_if_error_create_goto(*err, CL4_ERROR, binary->size == 0, 
+		CL4_ERROR_OCL, error_handler,
+		"Function '%s': binary for given device has size 0.",
+		__func__);
+
+	g_file_set_contents(filename, (const gchar*) binary->value,
+		binary->size, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	cl_bool status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	status = CL_FALSE;
+
+finish:
+
+	/* Return function status. */
+	return status;			
+}
+
+cl_bool cl4_program_save_all_binaries(CL4Program* prg, 
+	const char* file_prefix, const char* file_suffix, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+	
+	/* Make sure file prefix and suffix are not NULL. */
+	g_return_val_if_fail(
+		(file_prefix != NULL) && (file_suffix != NULL), NULL);
+	
+	GError* err_internal = NULL;
+	guint num_devices;
+	cl_bool status;
+	
+	/* Save binaries, one per device. */
+	num_devices = cl4_program_get_num_devices(prg, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	for (guint i = 0; i < num_devices; ++i) {
+		
+		CL4Device* dev = NULL;
+		CL4WrapperInfo* file_middle = NULL;
+		gchar* filename;
+		
+		dev = cl4_program_get_device(prg, i, &err_internal);	
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+		file_middle = cl4_device_info(dev, CL_DEVICE_NAME, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		filename = g_strdup_printf("%s%s_%2d%s", 
+			file_prefix, (gchar*) file_middle->value, i, file_suffix);
+		
+		g_strcanon(filename, CL4_COMMON_VALIDFILECHARS, '_');
+		
+		cl4_program_save_binary(prg, dev, filename, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		g_free(filename);
+	}
+
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	status = CL_FALSE;
+
+finish:
+
+	/* Return function status. */
+	return status;			
+
+
+}
 
 /** @}*/
 

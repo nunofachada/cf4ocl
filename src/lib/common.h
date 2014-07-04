@@ -34,6 +34,7 @@
 #include <glib/gprintf.h>
 #include "oclversions.h"
 
+#define CL4_COMMON_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."
 /**
  * @brief Error codes.
  * */

@@ -60,6 +60,12 @@ typedef void (CL_CALLBACK* cl4_program_callback)(
 CL4Program* cl4_program_new(
 	CL4Context* ctx, const char* file, GError** err);
 
+CL4Program* cl4_program_new_from_source_files(
+	CL4Context* ctx, GError** err, ...);
+
+CL4Program* cl4_program_new_from_binary_files(
+	CL4Context* ctx, GError** err, ...);
+
 CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count, 
 	const char **strings, GError** err);
 
@@ -81,11 +87,11 @@ void cl4_program_destroy(CL4Program* prg);
 	cl4_program_build_from_devices_full( \
 		prg, 0, NULL, options, NULL, NULL, err)
 
-gboolean cl4_program_build_from_devices_full(CL4Program* prg, 
+cl_bool cl4_program_build_from_devices_full(CL4Program* prg, 
 	cl_uint num_devices, CL4Device** devices, const char *options, 
 	cl4_program_callback pfn_notify, void *user_data, GError** err);
 
-gboolean cl4_program_build_from_cldevices_full(CL4Program* prg, 
+cl_bool cl4_program_build_from_cldevices_full(CL4Program* prg, 
 	cl_uint num_devices, cl_device_id* device_list, const char *options, 
 	cl4_program_callback pfn_notify, void *user_data, GError** err);
 
@@ -97,6 +103,12 @@ CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue,
 
 CL4WrapperInfo* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 	GError** err);
+
+cl_bool cl4_program_save_binary(CL4Program* prg, CL4Device* dev,
+	const char* filename, GError** err);
+
+cl_bool cl4_program_save_all_binaries(CL4Program* prg, 
+	const char* file_prefix, const char* file_suffix, GError** err);
 
 /**
  * @brief Get program information object. To get the program binaries
