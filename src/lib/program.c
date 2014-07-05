@@ -64,28 +64,46 @@ static CL4Program* cl4_program_new_internal() {
  * @addtogroup PROGRAM
  * @{
  */
- 
-CL4Program* cl4_program_new(
-	CL4Context* ctx, const char* file, GError** err) {
+
+CL4Program* cl4_program_new_from_source_file(CL4Context* ctx, 
+	const char* filename, GError** err) {
+
+	return cl4_program_new_from_source_files(ctx, 1, &(filename), err);
+	
+}
+
+CL4Program* cl4_program_new_from_source_files(CL4Context* ctx, 
+	cl_uint count, const char** filenames, GError** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	/* Make sure file is not NULL. */
-	g_return_val_if_fail(file != NULL, NULL);
+	/* Make sure filenames is not NULL. */
+	g_return_val_if_fail(filenames != NULL, NULL);
+	/* Make sure count > 0. */
+	g_return_val_if_fail(count > 0, NULL);
 
 	/* Error reporting object. */
 	GError* err_internal = NULL;
 	
 	CL4Program* prg = NULL;
 	
-	gchar* src = NULL;
-
-	g_file_get_contents(file, &src, NULL, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	gchar** strings = NULL;
 	
-	prg = cl4_program_new_with_source(ctx, 1, (const char**) &src, &err_internal);
+	strings = g_slice_alloc0(count * sizeof(gchar*));
+	
+	for (cl_uint i = 0; i < count; ++i) {
+
+		g_file_get_contents(
+			filenames[i], &strings[i], NULL, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	}
+	
+	prg = cl4_program_new_with_source(
+		cl4_context_unwrap(ctx), count, (const char**)strings, NULL, 
+		&err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 	/* If we got here, everything is OK. */
@@ -99,25 +117,26 @@ error_handler:
 
 finish:
 
-	if (src != NULL)
-		g_free(src);
+	if (strings != NULL) {
+		for (cl_uint i = 0; i < count; ++i) {
+			if (strings[i] != NULL) {
+				g_free(strings[i]);
+			}
+		}
+		g_slice_free1(count * sizeof(gchar*), strings);
+	}
 		
 	/* Return prg. */
 	return prg;	
 
 }
 
-CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count, 
-	const char **strings, GError** err) {
+CL4Program* cl4_program_new_with_source(cl_context context,
+	cl_uint count, const char **strings, const size_t *lengths,
+	GError** err) {
 
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	/* Make sure count > 0. */
-	g_return_val_if_fail(count > 0, NULL);
-	/* Make sure strings is not NULL. */
-	g_return_val_if_fail(strings != NULL, NULL);
 
 	cl_int ocl_status;
 	
@@ -126,10 +145,10 @@ CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count,
 	prg = cl4_program_new_internal();
 	
 	prg->base.base.cl_object = clCreateProgramWithSource(
-		cl4_context_unwrap(ctx), count, strings, NULL, &ocl_status);
+		context, count, strings, lengths, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_program from source (OpenCL error %d: %s).", 
+		"Function '%s': unable to create cl_program with source (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
 	
 	/* If we got here, everything is OK. */
@@ -149,74 +168,101 @@ finish:
 
 	/* Return prg. */
 	return prg;
+
 }
 
-CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
-	cl_uint num_devices, CL4Device** devices, CL4WrapperInfo** binaries, 
-	cl_int *binary_status, GError** err) {
-
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
-	/* Make sure devices is not NULL. */
-	g_return_val_if_fail(devices != NULL, NULL);
-	
-	cl_int ocl_status;
-	CL4Program* prg = NULL;
-	cl_device_id* device_list = NULL;
-	size_t* lengths = NULL;
-	unsigned char** bins_raw = NULL;
-		
-	/* Initialize program. */
-	prg = cl4_program_new_internal();
-	
-	/* Unwrap devices, binaries and lengths. */
-	device_list = g_slice_alloc(num_devices * sizeof(cl_device_id));
-	lengths = g_slice_alloc(num_devices * sizeof(size_t));
-	bins_raw = g_slice_alloc(num_devices * sizeof(unsigned char*));
-	for (guint i = 0; i < num_devices; ++i) {
-		device_list[i] = cl4_device_unwrap(devices[i]);
-		lengths[i] = binaries[i]->size;
-		bins_raw[i] = (unsigned char*) binaries[i]->value;
-	}
-	
-	/* Create program. */
-	prg->base.base.cl_object = clCreateProgramWithBinary(
-		cl4_context_unwrap(ctx), num_devices, 
-		(const cl_device_id*) device_list, (const size_t*) lengths,
-		(const unsigned char**) bins_raw, binary_status, &ocl_status) ;
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_program from binaries (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
-
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	cl4_program_destroy(prg);
-	prg = NULL;
-	
-finish:
-
-	/* Free stuff if necessary. */
-	if (device_list != NULL)
-		g_slice_free1(num_devices * sizeof(cl_device_id), device_list);
-	if (lengths != NULL)
-		g_slice_free1(num_devices * sizeof(size_t), lengths);
-	if (bins_raw != NULL)
-		g_slice_free1(num_devices * sizeof(unsigned char*), bins_raw);
-	
-	/* Return prg. */
-	return prg;	
-}
+//~ CL4Program* cl4_program_new_from_binary_file(CL4Context* ctx, 
+	//~ CL4Device* dev, const char* filename, GError** err) {
+	//~ 
+	//~ return cl4_program_new_from_binary_files(
+		//~ ctx, 1, &(dev), &(filename), err);
+//~ }
+//~ 
+//~ CL4Program* cl4_program_new_from_binary_files(CL4Context* ctx, 
+	//~ cl_uint count, CL4Device** devs, const char** filenames, 
+	//~ GError** err) {
+//~ 
+//~ }
+//~ 
+//~ CL4Program* cl4_program_new_with_binary(cl_context context,
+	//~ cl_uint num_devices, const cl_device_id* device_list,
+	//~ const size_t *lengths, const unsigned char **binaries,
+	//~ cl_int *binary_status, GError** err) {
+//~ 
+//~ }
+//~ 
+//~ CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
+	//~ cl_uint num_devices, const cl_device_id *device_list,
+	//~ const char *kernel_names, GError** err) {
+//~ 
+//~ }
+//~ 
+//~ CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
+	//~ cl_uint num_devices, CL4Device** devices, CL4WrapperInfo** binaries, 
+	//~ cl_int *binary_status, GError** err) {
+//~ 
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	//~ /* Make sure ctx is not NULL. */
+	//~ g_return_val_if_fail(ctx != NULL, NULL);
+	//~ /* Make sure devices is not NULL. */
+	//~ g_return_val_if_fail(devices != NULL, NULL);
+	//~ 
+	//~ cl_int ocl_status;
+	//~ CL4Program* prg = NULL;
+	//~ cl_device_id* device_list = NULL;
+	//~ size_t* lengths = NULL;
+	//~ unsigned char** bins_raw = NULL;
+		//~ 
+	//~ /* Initialize program. */
+	//~ prg = cl4_program_new_internal();
+	//~ 
+	//~ /* Unwrap devices, binaries and lengths. */
+	//~ device_list = g_slice_alloc(num_devices * sizeof(cl_device_id));
+	//~ lengths = g_slice_alloc(num_devices * sizeof(size_t));
+	//~ bins_raw = g_slice_alloc(num_devices * sizeof(unsigned char*));
+	//~ for (guint i = 0; i < num_devices; ++i) {
+		//~ device_list[i] = cl4_device_unwrap(devices[i]);
+		//~ lengths[i] = binaries[i]->size;
+		//~ bins_raw[i] = (unsigned char*) binaries[i]->value;
+	//~ }
+	//~ 
+	//~ /* Create program. */
+	//~ prg->base.base.cl_object = clCreateProgramWithBinary(
+		//~ cl4_context_unwrap(ctx), num_devices, 
+		//~ (const cl_device_id*) device_list, (const size_t*) lengths,
+		//~ (const unsigned char**) bins_raw, binary_status, &ocl_status) ;
+	//~ gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
+		//~ CL4_ERROR_OCL, error_handler, 
+		//~ "Function '%s': unable to create cl_program from binaries (OpenCL error %d: %s).", 
+		//~ __func__, ocl_status, cl4_err(ocl_status));
+//~ 
+	//~ /* If we got here, everything is OK. */
+	//~ g_assert (err == NULL || *err == NULL);
+	//~ goto finish;
+	//~ 
+//~ error_handler:
+//~ 
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert (err == NULL || *err != NULL);
+//~ 
+	//~ /* Destroy what was built for the context wrapper. */
+	//~ cl4_program_destroy(prg);
+	//~ prg = NULL;
+	//~ 
+//~ finish:
+//~ 
+	//~ /* Free stuff if necessary. */
+	//~ if (device_list != NULL)
+		//~ g_slice_free1(num_devices * sizeof(cl_device_id), device_list);
+	//~ if (lengths != NULL)
+		//~ g_slice_free1(num_devices * sizeof(size_t), lengths);
+	//~ if (bins_raw != NULL)
+		//~ g_slice_free1(num_devices * sizeof(unsigned char*), bins_raw);
+	//~ 
+	//~ /* Return prg. */
+	//~ return prg;	
+//~ }
 
 /** 
  * @brief Decrements the reference count of the program wrapper 

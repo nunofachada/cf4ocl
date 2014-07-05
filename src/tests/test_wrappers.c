@@ -836,7 +836,8 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Create a new program from kernel file. */
-	prg = cl4_program_new(ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
+	prg = cl4_program_new_from_source_file(
+		ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
 	g_assert_no_error(err);
 	
 	/* Get some program info, compare it with expected info. */
@@ -896,9 +897,22 @@ static void program_create_info_destroy_test() {
 		g_message("Unable to delete temporary file '"
 			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
 			
-	/* Save binaries. */
+	/* Save binaries for all available devices. */
 	cl4_program_save_all_binaries(prg, "test_", ".bin", &err);
 	g_assert_no_error(err);
+	
+	/* Save binary for a specific device (which we will load into a new
+	 * program later). */
+	cl4_program_save_binary(prg, d, "test_prg.bin", &err);
+	g_assert_no_error(err);
+	
+	/* Destroy program. */
+	//~ cl4_program_destroy(prg);
+
+	/* Create a new program using the saved binary. */
+	
+	
+	/* Delete all created binaries. */
 	
 	/* Destroy stuff. */
 	cl4_program_destroy(prg);

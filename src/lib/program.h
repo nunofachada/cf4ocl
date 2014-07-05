@@ -56,28 +56,42 @@ typedef struct cl4_program CL4Program;
 
 typedef void (CL_CALLBACK* cl4_program_callback)(
 	cl_program program, void* user_data);
+	
+CL4Program* cl4_program_new_from_source_file(CL4Context* ctx, 
+	const char* filename, GError** err);
 
-CL4Program* cl4_program_new(
-	CL4Context* ctx, const char* file, GError** err);
+CL4Program* cl4_program_new_from_source_files(CL4Context* ctx, 
+	cl_uint count, const char** filenames, GError** err);
 
-CL4Program* cl4_program_new_from_source_files(
-	CL4Context* ctx, GError** err, ...);
+#define cl4_program_new_from_source(ctx, src, err) \
+	cl4_program_new_with_source( \
+		cl4_context_unwrap(ctx), 1, &src, NULL, err)
 
-CL4Program* cl4_program_new_from_binary_files(
-	CL4Context* ctx, GError** err, ...);
+CL4Program* cl4_program_new_with_source(cl_context context,
+	cl_uint count, const char **strings, const size_t *lengths,
+	GError** err);
 
-CL4Program* cl4_program_new_with_source(CL4Context* ctx, cl_uint count, 
-	const char **strings, GError** err);
+CL4Program* cl4_program_new_from_binary_file(CL4Context* ctx, 
+	CL4Device* dev, const char* filename, GError** err);
 
-CL4Program* cl4_program_new_with_binary(CL4Context* ctx, 
-	cl_uint num_devices, CL4Device** devices, CL4WrapperInfo** binaries, 
+CL4Program* cl4_program_new_from_binary_files(CL4Context* ctx, 
+	cl_uint count, CL4Device** devs, const char** filenames, 
+	GError** err);
+
+#define cl4_program_new_from_binary(ctx, dev, binary, err) \
+	cl4_program_new_with_binary(cl4_context_unwrap(ctx), 1, \
+		&(cl4_device_unwrap(dev), &(binary->size), \
+		&((cl_device_id) binary->value), NULL, err) /* possible bug in binary->value cast, confirm */
+
+CL4Program* cl4_program_new_with_binary(cl_context context,
+	cl_uint num_devices, const cl_device_id* device_list,
+	const size_t *lengths, const unsigned char **binaries,
 	cl_int *binary_status, GError** err);
 
-/* @todo Future work */	
-//~ CL4Program* cl4_program_new_with_built_in_kernels(CL4Context* ctx,
- 	//~ cl_uint num_devices, CL4Device** devices, const char *kernel_names,
- 	//~ GError** err);
- 	
+CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
+	cl_uint num_devices, const cl_device_id *device_list,
+	const char *kernel_names, GError** err);
+
 /** @brief Decrements the reference count of the program wrapper 
  * object. If it reaches 0, the program wrapper object is 
  * destroyed. */
