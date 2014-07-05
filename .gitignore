@@ -7,3 +7,5 @@ doc/
 bin/
 obj/
 build/
+CMakeFiles/
+CMakeCache*
