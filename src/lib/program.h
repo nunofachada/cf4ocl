@@ -54,9 +54,13 @@
 /** @brief Program wrapper object. */
 typedef struct cl4_program CL4Program;
 
+/** @brief Represents a OpenCL binary object. */
+typedef struct cl4_program_binary CL4ProgramBinary;
+
 typedef void (CL_CALLBACK* cl4_program_callback)(
 	cl_program program, void* user_data);
-	
+
+/* SOURCES */
 CL4Program* cl4_program_new_from_source_file(CL4Context* ctx, 
 	const char* filename, GError** err);
 
@@ -67,30 +71,41 @@ CL4Program* cl4_program_new_from_source_files(CL4Context* ctx,
 	cl4_program_new_with_source( \
 		cl4_context_unwrap(ctx), 1, &src, NULL, err)
 
+#define cl4_program_new_from_sources(ctx, count, strings, err) \
+	cl4_program_new_with_source( \
+		cl4_context_unwrap(ctx), count, strings, NULL, err)
+	
 CL4Program* cl4_program_new_with_source(cl_context context,
 	cl_uint count, const char **strings, const size_t *lengths,
 	GError** err);
 
+/* BINARIES */
 CL4Program* cl4_program_new_from_binary_file(CL4Context* ctx, 
 	CL4Device* dev, const char* filename, GError** err);
 
 CL4Program* cl4_program_new_from_binary_files(CL4Context* ctx, 
-	cl_uint count, CL4Device** devs, const char** filenames, 
+	cl_uint num_devices, CL4Device** devs, const char** filenames, 
 	GError** err);
 
 #define cl4_program_new_from_binary(ctx, dev, binary, err) \
-	cl4_program_new_with_binary(cl4_context_unwrap(ctx), 1, \
-		&(cl4_device_unwrap(dev), &(binary->size), \
-		&((cl_device_id) binary->value), NULL, err) /* possible bug in binary->value cast, confirm */
+	cl4_program_new_from_binaries(ctx, 1, &dev, &binary, err)
+
+CL4Program* cl4_program_new_from_binaries(CL4Context* ctx,
+	cl_uint num_devices, CL4Device** devs, CL4ProgramBinary** bins,
+	GError** err);
 
 CL4Program* cl4_program_new_with_binary(cl_context context,
 	cl_uint num_devices, const cl_device_id* device_list,
 	const size_t *lengths, const unsigned char **binaries,
 	cl_int *binary_status, GError** err);
 
+#ifdef CL_VERSION_1_2
+
 CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
 	cl_uint num_devices, const cl_device_id *device_list,
 	const char *kernel_names, GError** err);
+
+#endif
 
 /** @brief Decrements the reference count of the program wrapper 
  * object. If it reaches 0, the program wrapper object is 
@@ -115,7 +130,7 @@ CL4Kernel* cl4_program_get_kernel(
 CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue, 
 	const char* kernel_name, size_t gws, size_t lws, ...);
 
-CL4WrapperInfo* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+CL4ProgramBinary* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 	GError** err);
 
 cl_bool cl4_program_save_binary(CL4Program* prg, CL4Device* dev,
@@ -214,6 +229,17 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
 	cl4_program_get_cldevices, err)
 
 /** @} */
+
+/** @brief Create a new ::CL4ProgramBinary object with a given value 
+ * size. */
+CL4ProgramBinary* cl4_program_binary_new(
+	unsigned char* data, size_t size);
+
+#define cl4_program_binary_new_empty() \
+	cl4_program_binary_new(NULL, 0);
+
+/** @brief Destroy a ::CL4ProgramBinary object. */
+void cl4_program_binary_destroy(CL4ProgramBinary* bin);
 
 /** @brief Implementation of cl4_dev_container_get_cldevices() for the
  * program wrapper. */

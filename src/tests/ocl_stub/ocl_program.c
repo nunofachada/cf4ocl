@@ -465,3 +465,19 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 	
 
 }
+
+
+CL_API_ENTRY cl_program CL_API_CALL
+clCreateProgramWithBuiltInKernels(cl_context context, 
+	cl_uint num_devices, const cl_device_id* device_list,
+	const char* kernel_names, cl_int* errcode_ret) 
+	CL_API_SUFFIX__VERSION_1_2 {
+	
+	context = context;
+	num_devices = num_devices;
+	device_list = device_list;
+	kernel_names = kernel_names;
+	errcode_ret = errcode_ret;
+	g_error("Unimplemented.");
+		
+}
