@@ -907,11 +907,38 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Destroy program. */
-	//~ cl4_program_destroy(prg);
+	cl4_program_destroy(prg);
 
 	/* Create a new program using the saved binary. */
+	prg = cl4_program_new_from_binary_file(ctx, d, "test_prg.bin", &err);
+	g_assert_no_error(err);
 	
+	/* **** BUILD PROGRAM **** */
+	cl4_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
 	
+	/* Get some program build info, compare it with expected values. */
+	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	g_assert_no_error(err);
+	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
+		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
+
+	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
+	g_assert_no_error(err);
+
+	/* Get kernel wrapper object. */
+	krnl = cl4_program_get_kernel(
+		prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
+	g_assert_no_error(err);
+
+	/* Get some kernel info, compare it with expected info. */
+	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
+	g_assert_no_error(err);
+	g_assert_cmpstr(
+		(gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
+
+
+
 	/* Delete all created binaries. */
 	
 	/* Destroy stuff. */
