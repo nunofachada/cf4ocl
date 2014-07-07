@@ -165,6 +165,9 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	/* Event wrapper. */
 	CL4Event* evt;
 	
+	const cl_event* event_wait_list;
+	cl_uint num_events_in_wait_list;
+	
 	/* Iterator for table of kernel arguments. */
 	GHashTableIter iter;
 	gpointer arg_index_ptr, arg_ptr;
@@ -185,11 +188,20 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 		}
 	}
 	
+	/* Determine event wait list. */
+	event_wait_list = (evt_wait_lst != NULL)
+		? (const cl_event*) evt_wait_lst->pdata
+		: NULL;
+		
+	num_events_in_wait_list = (evt_wait_lst != NULL)
+		? evt_wait_lst->len
+		: 0;
+		
 	/* Run kernel. */
 	ocl_status = clEnqueueNDRangeKernel(cl4_cqueue_unwrap(cq),
 		cl4_kernel_unwrap(krnl), work_dim, global_work_offset,
-		global_work_size, local_work_size, evt_wait_lst->len,
-		(const cl_event*) evt_wait_lst->pdata, &event);
+		global_work_size, local_work_size, num_events_in_wait_list,
+		event_wait_list, &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to enqueue kernel (OpenCL error %d: %s).",
