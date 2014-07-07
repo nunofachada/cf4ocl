@@ -60,6 +60,10 @@ CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err);
 
 void cl4_cqueue_add_event(CL4CQueue* cq, CL4Event* evt);
 
+cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err);
+
+cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
+
 /**
  * @brief Get command queue information object.
  * 

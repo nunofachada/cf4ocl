@@ -288,3 +288,38 @@ void cl4_cqueue_add_event(CL4CQueue* cq, CL4Event* evt) {
 	g_hash_table_add(cq->evts, (gpointer) evt);
 	
 }
+
+cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_if_fail(cq != NULL);
+	
+	/* OpenCL status flag. */
+	cl_int ocl_status;
+
+	ocl_status = clFlush(cl4_cqueue_unwrap(cq));
+	if (ocl_status != CL_SUCCESS)
+		g_set_error(err, CL4_ERROR, ocl_status, 
+			"Function '%s': unable to flush queue (OpenCL error %d: %s).",
+		__func__, ocl_status, cl4_err(ocl_status));
+
+	return ocl_status;
+}
+
+cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_if_fail(cq != NULL);
+	
+	/* OpenCL status flag. */
+	cl_int ocl_status;
+
+	ocl_status = clFinish(cl4_cqueue_unwrap(cq));
+	if (ocl_status != CL_SUCCESS)
+		g_set_error(err, CL4_ERROR, ocl_status, 
+			"Function '%s': unable to finish queue (OpenCL error %d: %s).",
+		__func__, ocl_status, cl4_err(ocl_status));
+
+	return ocl_status;
+
+}
