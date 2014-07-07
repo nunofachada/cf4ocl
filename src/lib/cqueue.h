@@ -37,6 +37,7 @@
 #include "wrapper.h"
 #include "device.h"
 #include "context.h"
+#include "event.h"
 
 /** @brief Command queue wrapper object. */
 typedef struct cl4_cqueue CL4CQueue;
@@ -56,6 +57,8 @@ void cl4_cqueue_destroy(CL4CQueue* cq);
 CL4Context* cl4_cqueue_get_context(CL4CQueue* cq, GError** err);
 
 CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err);
+
+void cl4_cqueue_add_event(CL4CQueue* cq, CL4Event* evt);
 
 /**
  * @brief Get command queue information object.

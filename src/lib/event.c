@@ -38,6 +38,32 @@ struct cl4_event {
 };
 
 /** 
+ * @brief Create a ::CL4Event wrapper object by wrapping a given
+ * OpenCL event. 
+ * 
+ * @param event OpenCL event object to wrap.
+ * @return ::CL4Event wrapper object.
+ * */
+CL4Event* cl4_event_new(cl_event event) {
+
+	/* The event wrapper object. */
+	CL4Event* evt;
+		
+	/* Allocate memory for the kernel wrapper object. */
+	evt = g_slice_new(CL4Event);
+	
+	/* Initialize parent object. */
+	cl4_wrapper_init(&evt->base);
+	
+	/* Set the OpenCL event object. */
+	evt->base.cl_object = event;
+	
+	/* Return the new event wrapper object. */
+	return evt;
+
+}
+
+/** 
  * @brief Decrements the reference count of the event wrapper 
  * object. If it reaches 0, the event wrapper object is 
  * destroyed.

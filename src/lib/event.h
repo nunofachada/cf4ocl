@@ -39,6 +39,10 @@
 /** @brief Event wrapper object. */
 typedef struct cl4_event CL4Event;
 
+/** @brief Create a ::CL4Event wrapper object by wrapping a given
+ * OpenCL event. */
+CL4Event* cl4_event_new(cl_event event);
+
 /** @brief Decrements the reference count of the event wrapper 
  * object. If it reaches 0, the event wrapper object is 
  * destroyed. */
@@ -83,6 +87,20 @@ void cl4_event_destroy(CL4Event* evt);
  * */
 #define cl4_event_unwrap(evt) \
 	((cl_event) cl4_wrapper_unwrap((CL4Wrapper*) evt))		
+
+typedef GPtrArray* CL4EventWaitList;
+
+#define cl4_event_wait_list_new() \
+	g_ptr_array_new()
+	
+#define cl4_event_wait_list_add(event_wait_list, evt) \
+	g_ptr_array_add(event_wait_list, (void*) cl4_event_unwrap(evt))
+	
+#define cl4_event_wait_list_clear(event_wait_list) \
+	g_ptr_array_remove_range(event_wait_list, 0, event_wait_list->len)
+	
+#define cl4_event_wait_list_destroy(event_wait_list) \
+	g_ptr_array_free(event_wait_list, TRUE)
 
 #endif
 

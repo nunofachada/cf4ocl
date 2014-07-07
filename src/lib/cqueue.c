@@ -41,6 +41,9 @@ struct cl4_cqueue {
 	/** Device wrapper to which the queue is associated with. */
 	CL4Device* dev;
 	
+	/** Events associated with the command queue. */
+	GHashTable* evts;
+	
 };
 
 CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
@@ -79,6 +82,9 @@ CL4CQueue* cl4_cqueue_new_direct(cl_context context,
 	
 	/* Set command queue object. */
 	cq->base.cl_object = (gpointer) queue;
+	
+	/* Initialize the events table. */
+	cq->evts = NULL;
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -173,6 +179,11 @@ void cl4_cqueue_destroy(CL4CQueue* cq) {
 		 if (cq->dev != NULL)
 			cl4_device_unref(cq->dev);
 
+		/* Destroy the events table. */
+		if (cq->evts != NULL) {
+			g_hash_table_destroy(cq->evts);
+		}
+	
 		/* Release cq. */
 		g_slice_free(CL4CQueue, cq);
 		
@@ -259,5 +270,21 @@ finish:
 
 	/* Return the new command queue wrapper object. */
 	return dev;	
+	
+}
+
+void cl4_cqueue_add_event(CL4CQueue* cq, CL4Event* evt) {
+
+	/* Make sure cq is not NULL. */
+	g_return_if_fail(cq != NULL);
+	/* Make sure evt is not NULL. */
+	g_return_if_fail(evt != NULL);
+
+	if (cq->evts != NULL) {
+		cq->evts = g_hash_table_new_full(g_direct_hash, g_direct_equal,
+			(GDestroyNotify) cl4_event_destroy, NULL);
+	}
+	
+	g_hash_table_add(cq->evts, (gpointer) evt);
 	
 }

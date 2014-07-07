@@ -35,6 +35,9 @@
     #include <CL/opencl.h>
 #endif
 #include "wrapper.h"
+#include "arg.h"
+#include "event.h"
+#include "cqueue.h"
 
 /** @brief Kernel wrapper object. */
 typedef struct cl4_kernel CL4Kernel;
@@ -47,6 +50,23 @@ CL4Kernel* cl4_kernel_new(cl_kernel kernel);
  * object. If it reaches 0, the kernel wrapper object is 
  * destroyed. */
 void cl4_kernel_destroy(CL4Kernel* krnl);
+
+void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
+	CL4Arg* arg);
+
+void cl4_kernel_set_args(CL4Kernel* krnl, ...);
+
+void cl4_kernel_set_args_v(CL4Kernel* krnl, va_list args);
+
+CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq, 
+	cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err);
+	
+CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq, 
+	cl_uint work_dim, size_t* global_work_offset, 
+	size_t* global_work_size, size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, ...);
 
 /**
  * @brief Get kernel information object.
