@@ -820,7 +820,9 @@ static void program_create_info_destroy_test() {
 	CL4Kernel* krnl = NULL;
 	CL4WrapperInfo* info = NULL;
 	CL4Device* d = NULL;
+	CL4CQueue* cq = NULL;
 	GError* err = NULL;
+	cl_int ocl_status;
 	
 	/* Create a temporary kernel file. */
 	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
@@ -937,9 +939,62 @@ static void program_create_info_destroy_test() {
 	g_assert_cmpstr(
 		(gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
 
+	/* Create a command queue. */
+	cq = cl4_cqueue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
+	g_assert_no_error(err);
+	
+	/* Set args and execute kernel. */
+	size_t gws = 16;
+	size_t lws = 8;
+	cl_uint a_h[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+	cl_uint b_h[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+	cl_uint c_h[16];
+	cl_mem a = clCreateBuffer(cl4_context_unwrap(ctx), 
+		CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), a_h, &ocl_status);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to create buffer a, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	cl_mem b = clCreateBuffer(cl4_context_unwrap(ctx), 
+		CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), b_h, &ocl_status);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to create buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	cl_mem c = clCreateBuffer(cl4_context_unwrap(ctx), 
+		CL_MEM_WRITE_ONLY, 16 * sizeof(cl_uint), NULL, &ocl_status);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to create buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	
+	ocl_status = clEnqueueWriteBuffer(cl4_cqueue_unwrap(cq), a, CL_TRUE, 0, 16 * sizeof(cl_uint), a_h, 0, NULL, NULL);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to create buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	ocl_status = clEnqueueWriteBuffer(cl4_cqueue_unwrap(cq), b, CL_TRUE, 0, 16 * sizeof(cl_uint), b_h, 0, NULL, NULL);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to create buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
+	cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, NULL, 
+		&err, cl4_arg_memobj(a), cl4_arg_memobj(b), cl4_arg_memobj(c), NULL);
+	g_assert_no_error(err);
+	
+	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), c, CL_TRUE, 0, 16 * sizeof(cl_uint), c, 0, NULL, NULL);
+	g_assert_no_error(err);
+
+	for (guint i = 0; i < 16; i++) {
+		g_assert_cmpuint(c_h[i], ==, a_h[i] + c_h[i]);
+	}
+	
+	ocl_status = clReleaseMemObject(a);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to release buffer a, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	ocl_status = clReleaseMemObject(b);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to release buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	ocl_status = clReleaseMemObject(c);
+	if (ocl_status != CL_SUCCESS)
+		g_error("Fail to release buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
+
+	/* Destroy the command queue. */
+	cl4_cqueue_destroy(cq);
 
 	/* Delete all created binaries. */
+	/// @todo
 	
 	/* Destroy stuff. */
 	cl4_program_destroy(prg);

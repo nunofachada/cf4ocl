@@ -97,7 +97,8 @@ void cl4_kernel_destroy(CL4Kernel* krnl) {
 	if (kernel != NULL) {
 		
 		/* Free kernel arguments. */
-		g_hash_table_destroy(krnl->args);
+		if (krnl->args != NULL)
+			g_hash_table_destroy(krnl->args);
 
 		/* Release krnl. */
 		g_slice_free(CL4Kernel, krnl);
@@ -169,17 +170,19 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	gpointer arg_index_ptr, arg_ptr;
 	
 	/* Set pending kernel arguments. */
-	g_hash_table_iter_init(&iter, krnl->args);
-	while (g_hash_table_iter_next(&iter, &arg_index_ptr, &arg_ptr)) {
-		cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
-		CL4Arg* arg = (CL4Arg*) arg_ptr;
-		ocl_status = clSetKernelArg(cl4_kernel_unwrap(krnl), arg_index, 
-			arg->size, arg->value);
-		gef_if_error_create_goto(*err, CL4_ERROR, 
-			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': unable to set kernel arg %d (OpenCL error %d: %s).",
-			__func__, arg_index, ocl_status, cl4_err(ocl_status));
-		g_hash_table_iter_remove(&iter);
+	if (krnl->args != NULL) {
+		g_hash_table_iter_init(&iter, krnl->args);
+		while (g_hash_table_iter_next(&iter, &arg_index_ptr, &arg_ptr)) {
+			cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
+			CL4Arg* arg = (CL4Arg*) arg_ptr;
+			ocl_status = clSetKernelArg(cl4_kernel_unwrap(krnl), arg_index, 
+				arg->size, arg->value);
+			gef_if_error_create_goto(*err, CL4_ERROR, 
+				CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+				"Function '%s': unable to set kernel arg %d (OpenCL error %d: %s).",
+				__func__, arg_index, ocl_status, cl4_err(ocl_status));
+			g_hash_table_iter_remove(&iter);
+		}
 	}
 	
 	/* Run kernel. */
@@ -240,7 +243,7 @@ CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq,
 	
 	/* Enqueue kernel. */
 	evt = cl4_kernel_run(krnl, cq, work_dim, global_work_offset, 
-		global_work_size, local_work_size, evt_wait_lst, err);
+		global_work_size, local_work_size, evt_wait_lst, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
