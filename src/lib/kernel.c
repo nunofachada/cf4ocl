@@ -58,7 +58,7 @@ CL4Kernel* cl4_kernel_new(cl_kernel kernel) {
 	/* Set the OpenCL kernel object. */
 	krnl->base.cl_object = kernel;
 
-	/* Return the new platform wrapper object. */
+	/* Return the new kernel wrapper object. */
 	return krnl;
 
 }

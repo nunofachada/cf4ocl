@@ -35,14 +35,27 @@
     #include <CL/opencl.h>
 #endif
 #include "wrapper.h"
+#include "device.h"
+#include "context.h"
 
 /** @brief Command queue wrapper object. */
 typedef struct cl4_cqueue CL4CQueue;
+
+CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
+	cl_device_id device, cl_command_queue_properties properties, 
+	GError** err);
+
+CL4CQueue* cl4_cqueue_new(CL4Context* ctx, CL4Device* dev, 
+	cl_command_queue_properties properties, GError** err);
 
 /** @brief Decrements the reference count of the command queue wrapper 
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed. */
 void cl4_cqueue_destroy(CL4CQueue* cq);
+
+CL4Context* cl4_cqueue_get_context(CL4CQueue* cq, GError** err);
+
+CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err);
 
 /**
  * @brief Get command queue information object.
