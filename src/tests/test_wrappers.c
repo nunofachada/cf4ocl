@@ -973,12 +973,12 @@ static void program_create_info_destroy_test() {
 		&err, cl4_arg_memobj(a), cl4_arg_memobj(b), cl4_arg_memobj(c), NULL);
 	g_assert_no_error(err);
 	
-	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), c, CL_TRUE, 0, 16 * sizeof(cl_uint), c, 0, NULL, NULL);
+	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), c, CL_TRUE, 0, 16 * sizeof(cl_uint), c_h, 0, NULL, NULL);
 	if (ocl_status != CL_SUCCESS)
 		g_error("Fail to read data from buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
 	for (guint i = 0; i < 16; i++) {
-		g_assert_cmpuint(c_h[i], ==, a_h[i] + c_h[i]);
+		g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i]);
 	}
 	
 	ocl_status = clReleaseMemObject(a);

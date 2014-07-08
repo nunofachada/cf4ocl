@@ -179,7 +179,7 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 			cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
 			CL4Arg* arg = (CL4Arg*) arg_ptr;
 			ocl_status = clSetKernelArg(cl4_kernel_unwrap(krnl), arg_index, 
-				arg->size, arg->value);
+				arg->size, &arg->value);
 			gef_if_error_create_goto(*err, CL4_ERROR, 
 				CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
 				"Function '%s': unable to set kernel arg %d (OpenCL error %d: %s).",
