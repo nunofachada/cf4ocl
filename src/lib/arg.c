@@ -31,8 +31,9 @@ CL4Arg* cl4_arg_new(void* value, size_t size) {
 
 	CL4Arg* arg = g_slice_new(CL4Arg);
 	
-	arg->size = size;
-	arg->value = g_memdup((const void*) value, size);
+	arg->cl_object = g_memdup((const void*) value, size);
+	arg->info = &arg->info;
+	arg->ref_count = (gint) size;
 	
 	return arg;
 	
@@ -45,4 +46,22 @@ void cl4_arg_destroy(CL4Arg* arg) {
 
 	g_free(arg->value);
 	g_slice_free(CL4Arg, arg);
+}
+
+size_t cl4_arg_size(CL4Arg* arg) {
+
+	/* Make sure arg is not NULL. */
+	g_return_if_fail(arg != NULL);
+
+	return arg->info == &arg->info
+		? (size_t) arg->ref_count
+		: sizeof(void*);
+}
+
+void* cl4_arg_value(CL4Arg* arg) {
+
+	/* Make sure arg is not NULL. */
+	g_return_if_fail(arg != NULL);
+
+	return arg->cl_object;
 }
