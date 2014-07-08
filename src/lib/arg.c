@@ -27,13 +27,12 @@
  
 #include "arg.h"
 
-CL4Arg* cl4_arg_new(void* value, size_t size, cl_bool dup) {
+CL4Arg* cl4_arg_new(void* value, size_t size) {
 
 	CL4Arg* arg = g_slice_new(CL4Arg);
 	
-	arg->dup = dup;
 	arg->size = size;
-	arg->value = dup ? g_memdup((const void*) value, size) : value;
+	arg->value = g_memdup((const void*) value, size);
 	
 	return arg;
 	
@@ -44,6 +43,6 @@ void cl4_arg_destroy(CL4Arg* arg) {
 	/* Make sure arg is not NULL. */
 	g_return_if_fail(arg != NULL);
 
-	if (arg->dup) g_free(arg->value);
+	g_free(arg->value);
 	g_slice_free(CL4Arg, arg);
 }

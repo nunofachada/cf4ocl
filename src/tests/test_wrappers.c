@@ -803,10 +803,10 @@ static void context_ref_unref_test() {
 	"__kernel void " CL4_TEST_WRAPPERS_PROGRAM_SUM "(" \
 	"		__global const uint *a," \
 	"		__global const uint *b," \
-	"		__global uint *c)" \
+	"		__global uint *c, uint d)" \
 	"{" \
 	"	int gid = get_global_id(0);" \
-	"	c[gid] = a[gid] + b[gid];" \
+	"	c[gid] = a[gid] + b[gid] + d;" \
 	"}"
 
 /**
@@ -949,6 +949,8 @@ static void program_create_info_destroy_test() {
 	cl_uint a_h[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 	cl_uint b_h[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 	cl_uint c_h[16];
+	cl_uint d_h = 4;
+	
 	cl_mem a = clCreateBuffer(cl4_context_unwrap(ctx), 
 		CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &ocl_status);
 	if (ocl_status != CL_SUCCESS)
@@ -970,7 +972,7 @@ static void program_create_info_destroy_test() {
 		g_error("Fail to write data to buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
 	cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, NULL, 
-		&err, cl4_arg_memobj(a), cl4_arg_memobj(b), cl4_arg_memobj(c), NULL);
+		&err, cl4_arg_memobj(a), cl4_arg_memobj(b), cl4_arg_memobj(c), cl4_arg_private(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
 	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), c, CL_TRUE, 0, 16 * sizeof(cl_uint), c_h, 0, NULL, NULL);
@@ -978,7 +980,7 @@ static void program_create_info_destroy_test() {
 		g_error("Fail to read data from buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
 	for (guint i = 0; i < 16; i++) {
-		g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i]);
+		g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i] + d_h);
 	}
 	
 	ocl_status = clReleaseMemObject(a);

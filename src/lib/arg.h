@@ -28,23 +28,23 @@
 #include "common.h"
 
 typedef struct cl4_arg {
-	cl_bool dup;
+	//~ cl_bool dup;
 	size_t size;
 	void* value;
 } CL4Arg;
 
 #define cl4_arg_private(value, type) \
-	cl4_arg_new(value, sizeof(type), CL_TRUE)
+	cl4_arg_new(&value, sizeof(type))
 
 #define cl4_arg_local(count, type) \
-	cl4_arg_new(NULL, count * sizeof(type), CL_FALSE)
+	cl4_arg_new(NULL, count * sizeof(type))
 	
 #define cl4_arg_memobj(value) \
-	cl4_arg_new(value, sizeof(cl_mem), CL_FALSE)
+	cl4_arg_new(&value, sizeof(cl_mem))
 	
 #define cl4_arg_sampler(value) \
-	cl4_arg_new(value, sizeof(cl_sampler), CL_FALSE)
+	cl4_arg_new(&value, sizeof(cl_sampler))
 	
-CL4Arg* cl4_arg_new(void* value, size_t size, cl_bool dup);
+CL4Arg* cl4_arg_new(void* value, size_t size);
 
 void cl4_arg_destroy(CL4Arg* arg);
