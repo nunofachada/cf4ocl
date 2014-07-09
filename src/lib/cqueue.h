@@ -58,7 +58,7 @@ CL4Context* cl4_cqueue_get_context(CL4CQueue* cq, GError** err);
 
 CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err);
 
-void cl4_cqueue_add_event(CL4CQueue* cq, CL4Event* evt);
+CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event);
 
 cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err);
 

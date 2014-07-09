@@ -26,11 +26,7 @@
  * */
 
 #include "common.h"
-
-//~ typedef struct cl4_arg {
-	//~ size_t size;
-	//~ void* value;
-//~ } CL4Arg;
+#include "wrapper.h"
 
 typedef CL4Wrapper CL4Arg;
 
@@ -39,12 +35,6 @@ typedef CL4Wrapper CL4Arg;
 
 #define cl4_arg_local(count, type) \
 	cl4_arg_new(NULL, count * sizeof(type))
-	
-//~ #define cl4_arg_memobj(value) \
-	//~ cl4_arg_new(&value, sizeof(cl_mem))
-	//~ 
-//~ #define cl4_arg_sampler(value) \
-	//~ cl4_arg_new(&value, sizeof(cl_sampler))
 	
 CL4Arg* cl4_arg_new(void* value, size_t size);
 

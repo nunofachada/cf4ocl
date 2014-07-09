@@ -273,13 +273,15 @@ finish:
 	
 }
 
-void cl4_cqueue_add_event(CL4CQueue* cq, CL4Event* evt) {
+CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 
 	/* Make sure cq is not NULL. */
 	g_return_if_fail(cq != NULL);
 	/* Make sure evt is not NULL. */
-	g_return_if_fail(evt != NULL);
+	g_return_if_fail(event != NULL);
 
+	CL4Event* evt = cl4_event_new(event);
+	
 	if (cq->evts == NULL) {
 		cq->evts = g_hash_table_new_full(g_direct_hash, g_direct_equal,
 			(GDestroyNotify) cl4_event_destroy, NULL);

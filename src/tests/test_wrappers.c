@@ -31,6 +31,7 @@
 #include "context.h"
 #include "common.h"
 #include "program.h"
+#include "memobj.h"
 #include <glib/gstdio.h>
 
 /* Max. length of information string. */
@@ -971,8 +972,12 @@ static void program_create_info_destroy_test() {
 	if (ocl_status != CL_SUCCESS)
 		g_error("Fail to write data to buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
+	CL4MemObj* a_w = cl4_memobj_new(a);
+	CL4MemObj* b_w = cl4_memobj_new(b);
+	CL4MemObj* c_w = cl4_memobj_new(c);
+
 	cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, NULL, 
-		&err, cl4_arg_memobj(a), cl4_arg_memobj(b), cl4_arg_memobj(c), cl4_arg_private(d_h, cl_uint), NULL);
+		&err, a_w, b_w, c_w, cl4_arg_private(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
 	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), c, CL_TRUE, 0, 16 * sizeof(cl_uint), c_h, 0, NULL, NULL);

@@ -9,7 +9,8 @@ add_library(${PROJECT_NAME}_TESTING ../lib/platforms.c ../lib/platform.c
 	../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c 
 	../lib/devsel.c ../lib/context.c ../lib/wrapper.c ../lib/profiler.c 
 	../lib/cqueue.c ../lib/event.c ../lib/kernel.c ../lib/program.c
-	../lib/abstract_dev_container_wrapper.c ../lib/arg.c)
+	../lib/abstract_dev_container_wrapper.c ../lib/arg.c ../lib/memobj.c
+	)
 
 target_link_libraries(${PROJECT_NAME}_TESTING 
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)

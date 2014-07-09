@@ -165,9 +165,6 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	/* Event wrapper. */
 	CL4Event* evt;
 	
-	const cl_event* event_wait_list;
-	cl_uint num_events_in_wait_list;
-	
 	/* Iterator for table of kernel arguments. */
 	GHashTableIter iter;
 	gpointer arg_index_ptr, arg_ptr;
@@ -179,7 +176,7 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 			cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
 			CL4Arg* arg = (CL4Arg*) arg_ptr;
 			ocl_status = clSetKernelArg(cl4_kernel_unwrap(krnl), arg_index, 
-				arg->size, arg->value);
+				cl4_arg_size(arg), cl4_arg_value(arg));
 			gef_if_error_create_goto(*err, CL4_ERROR, 
 				CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
 				"Function '%s': unable to set kernel arg %d (OpenCL error %d: %s).",
@@ -187,21 +184,13 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 			g_hash_table_iter_remove(&iter);
 		}
 	}
-	
-	/* Determine event wait list. */
-	event_wait_list = (evt_wait_lst != NULL)
-		? (const cl_event*) evt_wait_lst->pdata
-		: NULL;
-		
-	num_events_in_wait_list = (evt_wait_lst != NULL)
-		? evt_wait_lst->len
-		: 0;
 		
 	/* Run kernel. */
 	ocl_status = clEnqueueNDRangeKernel(cl4_cqueue_unwrap(cq),
 		cl4_kernel_unwrap(krnl), work_dim, global_work_offset,
-		global_work_size, local_work_size, num_events_in_wait_list,
-		event_wait_list, &event);
+		global_work_size, local_work_size, 
+		cl4_event_wait_list_get_num_events(evt_wait_lst),
+		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to enqueue kernel (OpenCL error %d: %s).",
@@ -210,8 +199,10 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_event_new(event);
-	cl4_cqueue_add_event(cq, evt);
+	evt = cl4_cqueue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -222,9 +213,12 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
 	
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
 finish:
 
-	/* Return ctx. */
+	/* Return evt. */
 	return evt;
 	
 }

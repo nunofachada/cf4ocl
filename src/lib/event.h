@@ -95,9 +95,19 @@ typedef GPtrArray* CL4EventWaitList;
 	
 #define cl4_event_wait_list_add(event_wait_list, evt) \
 	g_ptr_array_add(event_wait_list, (void*) cl4_event_unwrap(evt))
+
+#define cl4_event_wait_list_get_num_events(event_wait_list) \
+	((event_wait_list != NULL) ? event_wait_list->len : 0)
+	
+#define cl4_event_wait_list_get_clevents(event_wait_list) \
+	((event_wait_list != NULL) \
+		? (const cl_event*) event_wait_list->pdata \
+		: NULL)
 	
 #define cl4_event_wait_list_clear(event_wait_list) \
-	g_ptr_array_remove_range(event_wait_list, 0, event_wait_list->len)
+	if (event_wait_list != NULL) \
+		g_ptr_array_remove_range( \
+			event_wait_list, 0, event_wait_list->len)
 	
 #define cl4_event_wait_list_destroy(event_wait_list) \
 	g_ptr_array_free(event_wait_list, TRUE)

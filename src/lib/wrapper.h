@@ -77,7 +77,7 @@ void* cl4_wrapper_unwrap(CL4Wrapper* wrapper);
  * safe to do so (i.e. if the object has been initialized). */
 cl_int cl4_wrapper_release_cl_object(gpointer cl_object, 
 	cl4_wrapper_release_function cl_release_function);
-
+	
 /**
  * @brief Generic type for OpenCL clget*Info() functions.
  * 
