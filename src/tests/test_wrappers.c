@@ -972,9 +972,9 @@ static void program_create_info_destroy_test() {
 	if (ocl_status != CL_SUCCESS)
 		g_error("Fail to write data to buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
-	CL4MemObj* a_w = cl4_memobj_new(a);
-	CL4MemObj* b_w = cl4_memobj_new(b);
-	CL4MemObj* c_w = cl4_memobj_new(c);
+	CL4MemObj* a_w = cl4_memobj_new(ctx, a);
+	CL4MemObj* b_w = cl4_memobj_new(ctx, b);
+	CL4MemObj* c_w = cl4_memobj_new(ctx, c);
 
 	cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, NULL, 
 		&err, a_w, b_w, c_w, cl4_arg_private(d_h, cl_uint), NULL);

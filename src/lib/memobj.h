@@ -32,11 +32,11 @@
 #ifndef CL4_MEMOBJ_H
 #define CL4_MEMOBJ_H
 
-typedef CL4Wrapper CL4MemObj;
+typedef struct cl4_memobj CL4MemObj;
 
 /** @brief Create a ::CL4MemObj wrapper object by wrapping a given
  * OpenCL cl_mem object. */
-CL4MemObj* cl4_memobj_new(cl_mem mem_object);
+CL4MemObj* cl4_memobj_new(CL4Context* ctx, cl_mem mem_object);
 
 void cl4_memobj_destroy(CL4MemObj* mo);
 

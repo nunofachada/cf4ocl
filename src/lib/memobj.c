@@ -27,15 +27,40 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
+/**
+ * @brief cl_mem wrapper object.
+ */
+struct cl4_memobj {
+
+	/** Parent wrapper object. */
+	CL4Wrapper base;
+	
+	/** Context wrapper. */
+	CL4Context* ctx;
+	
+};
+
 /** 
  * @brief Create a ::CL4MemObj wrapper object by wrapping a given
- * OpenCL cl_mem object. 
+ * OpenCL cl_mem object.
  * 
+ * This function can be considered an abstract constructor, called by
+ * the constructors of concrete memory object implementations, i.e.,
+ * buffers and images. As such, it is not supposed to be called by
+ * client code.
+ * 
+ * @param ctx Context wrapper.
  * @param mem_object OpenCL cl_mem object to wrap.
  * @return ::CL4MemObj wrapper object.
  * */
-CL4MemObj* cl4_memobj_new(cl_mem mem_object) {
+CL4MemObj* cl4_memobj_new(CL4Context* ctx, cl_mem mem_object) {
 
+	/* Make sure context wrapper object is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	
+	/* Make sure the OpenCL cl_mem object is not NULL. */
+	g_return_val_if_fail(mem_object != NULL, NULL);
+	
 	/* The cl_mem wrapper object. */
 	CL4MemObj* mo;
 		
@@ -43,10 +68,14 @@ CL4MemObj* cl4_memobj_new(cl_mem mem_object) {
 	mo = g_slice_new(CL4MemObj);
 	
 	/* Initialize parent object. */
-	cl4_wrapper_init(mo);
+	cl4_wrapper_init(&mo->base);
 	
 	/* Set the OpenCL cl_mem object. */
-	mo->cl_object = mem_object;
+	mo->base.cl_object = mem_object;
+	
+	/* Set the context, update its ref. count. */
+	mo->ctx = ctx;
+	cl4_context_ref(ctx);
 	
 	/* Return the new cl_mem wrapper object. */
 	return mo;
@@ -76,6 +105,9 @@ void cl4_memobj_destroy(CL4MemObj* mo) {
 	 * the wrapper object reached 0, so we must destroy remaining 
 	 * cl_mem wrapper properties and the OpenCL mem. object itself. */
 	if (mem_object != NULL) {
+		
+		/* Unref context. */
+		cl4_context_unref(mo->ctx);
 
 		/* Release mo. */
 		g_slice_free(CL4MemObj, mo);

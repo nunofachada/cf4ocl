@@ -30,6 +30,25 @@
 
 #define CL4_WRAPPER_UNINIT() GINT_TO_POINTER(-1)
 
+static GHashTable* wrappers = NULL;
+static GMutex wrappers_mutex;
+
+CL4Wrapper* cl4_wrapper_get(void* cl_object, cl4_wrapper_wrap wrap_fun) {
+
+	CL4Wrapper* w;
+	g_mutex_lock(&wrappers_mutex);
+	if (wrappers == NULL) {
+		wrappers = g_hash_table_new_full(
+			g_direct_hash, g_direct_equal, NULL, NULL);
+	}
+	if (!(w = g_hash_table_lookup(wrappers, cl_object))) {
+		w = wrap_fun(cl_object);
+		g_hash_table_insert(wrappers, cl_object, w);
+	}
+	g_mutex_unlock(&wrappers_mutex);
+	return w;
+}
+
 /** 
  * @brief Initialize wrapper fields. 
  * 
@@ -39,6 +58,7 @@ void cl4_wrapper_init(CL4Wrapper* wrapper) {
 	
 	wrapper->cl_object = CL4_WRAPPER_UNINIT();
 	wrapper->info = NULL;
+	
 	wrapper->ref_count = 1;
 	
 }
@@ -82,10 +102,15 @@ gpointer cl4_wrapper_unref(CL4Wrapper* wrapper) {
 		 * return it to caller. */
 		cl_object = wrapper->cl_object;
 		
-		/* Destroy hash table containing device information. */
+		/* Destroy hash table containing information. */
 		if (wrapper->info) {
 			g_hash_table_destroy(wrapper->info);
 		}
+		
+		/* Remove wrapper from static table. */
+		g_mutex_lock(&wrappers_mutex);
+		g_hash_table_remove(wrappers, cl_object);
+		g_mutex_unlock(&wrappers_mutex);
 		
 	}
 	
