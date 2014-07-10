@@ -41,28 +41,20 @@ struct cl4_context {
 };
 
 /**
- * @brief Internal context wrapper build function.
+ * @brief Implementation of cl4_wrapper_release_fields() function for
+ * ::CL4Context wrapper objects.
  * 
- * To be called by the different cl4_context_new_* public functions.
- * 
- * @return A new context wrapper object with empty fields and a 
- * reference count of 1.
+ * @param ctx A ::CL4Context wrapper object.
  * */
-static CL4Context* cl4_context_new_internal() {
+static void cl4_context_release_fields(CL4Context* ctx) {
+
+	/* Make sure context wrapper object is not NULL. */
+	g_return_if_fail(ctx != NULL);
 	
-	/* The context wrapper object. */
-	CL4Context* ctx;
-	
-	/* Allocate memory for context wrapper object. */
-	ctx = g_slice_new0(CL4Context);
-	
-	/* Initialize fields. */
-	cl4_dev_container_init(&ctx->base);
-	ctx->platform = NULL;
-	
-	/* Return new context wrapper object. */
-	return ctx;
-		
+	/* Release platform. */
+	if (ctx->platform) {
+		cl4_platform_unref(ctx->platform);
+	}
 }
 
 /**
@@ -154,6 +146,28 @@ finish:
  * @addtogroup CONTEXT
  * @{
  */
+
+/**
+ * @brief Get the context wrapper for the given OpenCL context.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL context directly (using the
+ * clCreateContext() function) and then wrap the OpenCL context in a
+ * ::CL4Context wrapper object.
+ * 
+ * @param cl_object The OpenCL context to be wrapped.
+ * @return The context wrapper for the given OpenCL context.
+ * */
+CL4Context* cl4_context_new_wrap(cl_context context) {
+	
+	return (CL4Context*) cl4_wrapper_new(
+		(void*) context, sizeof(CL4Context));
+		
+}
 
 /**
  * @brief Create a new context wrapper object selecting devices using 
@@ -269,22 +283,18 @@ CL4Context* cl4_context_new_from_devices_full(
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	/* Array of unwrapped devices. */
-	cl_device_id* cl_devices = NULL;
+	cl_device_id cl_devices[num_devices];
 	
 	/* New context wrapper. */
 	CL4Context* ctx = NULL;
 	
 	/* Unwrap devices. */
-	cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
 	for (guint i = 0; i < num_devices; i++)
 		cl_devices[i] = cl4_device_unwrap(devices[i]);
 
 	/* Create context wrapper. */
 	ctx = cl4_context_new_from_cldevices_full(properties, num_devices,
 		cl_devices, pfn_notify, user_data, err);
-	
-	/* Release array of unwrapped devices. */
-	g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
 	
 	/* Return result of function call. */
 	return ctx;
@@ -332,21 +342,26 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	cl_context_properties* ctx_props = NULL;
 	/* Return status of OpenCL function calls. */
 	cl_int ocl_status;
+	/* OpenCL context. */
+	cl_context context = NULL;
 	/* Context wrapper to create. */
-	CL4Context* ctx = cl4_context_new_internal();
+	CL4Context* ctx = NULL;
 	
 	/* Get a set of default context properties, if required. */
 	ctx_props = cl4_context_properties_default(
 			properties, devices[0], &err_internal);
 	
 	/* Create OpenCL context. */
-	ctx->base.base.cl_object = clCreateContext(
+	context = clCreateContext(
 		(const cl_context_properties*) ctx_props, num_devices, devices, 
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
+		
+	/* Wrap OpenCL context. */
+	ctx = cl4_context_new_wrap(context);
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -368,62 +383,6 @@ finish:
 	/* Return ctx. */
 	return ctx;
 	
-}
-
-/** 
- * @brief Creates a context wrapper from a cl_context object.
- * 
- * This function is useful when the client wants more control 
- * over the cl_context object creation. Clients should explicitly 
- * release the passed context.
- * 
- * @param context The OpenCL cl_context object to wrap up.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return A new context wrapper object or NULL if an error occurs.
- * */
-CL4Context* cl4_context_new_from_clcontext(
-	cl_context context, GError** err) {
-
-	/* Make sure OpenCL context is not NULL. */
-	g_return_val_if_fail(context != NULL, NULL);
-
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
-	/* Return status of OpenCL function. */
-	cl_int ocl_status;
-	
-	/* Context wrapper to create. */
-	CL4Context* ctx = cl4_context_new_internal();
-	
-	/* Set OpenCL context. */
-	ctx->base.base.cl_object = context;
-	
-	/* Increase the reference count of the OpenCL context. */
-	ocl_status = clRetainContext(context);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to retain cl_context (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
-
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	cl4_context_destroy(ctx);
-	ctx = NULL;
-
-finish:	
-
-	/* Return new context wrapper. */
-	return ctx;
 }
 
 /** 
@@ -491,37 +450,9 @@ finish:
  * */
 void cl4_context_destroy(CL4Context* ctx) {
 	
-	/* Make sure context wrapper object is not NULL. */
-	g_return_if_fail(ctx != NULL);
-	
-	/* Wrapped OpenCL object (a context in this case), returned by the
-	 * parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_context context;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	context = (cl_context) 
-		cl4_dev_container_unref((CL4DevContainer*) ctx);
-	
-	/* If an OpenCL context was returned, the reference count of the
-	 * wrapper object reached 0, so we must destroy remaining context
-	 * wrapper properties and the OpenCL context itself. */
-	if (context != NULL) {
-
-		/* Release platform. */
-		if (ctx->platform) {
-			cl4_platform_unref(ctx->platform);
-		}
-		
-		/* Release ctx. */
-		g_slice_free(CL4Context, ctx);
-		
-		/* Release OpenCL context, ignore possible errors. */
-		cl4_wrapper_release_cl_object(context, 
-			(cl4_wrapper_release_function) clReleaseContext);
-		
-	}
+	cl4_wrapper_unref((CL4Wrapper*) ctx, sizeof(CL4Context),
+		(cl4_wrapper_release_fields) cl4_context_release_fields, 
+		(cl4_wrapper_release_cl_object) clReleaseContext, NULL); 
 
 }
 

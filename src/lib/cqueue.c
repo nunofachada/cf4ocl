@@ -46,6 +46,54 @@ struct cl4_cqueue {
 	
 };
 
+/**
+ * @brief Implementation of cl4_wrapper_release_fields() function for
+ * ::CL4CQueue wrapper objects.
+ * 
+ * @param cq A ::CL4CQueue wrapper object.
+ * */
+static void cl4_cqueue_release_fields(CL4Queue* cq) {
+
+	/* Make sure cq wrapper object is not NULL. */
+	g_return_if_fail(cq != NULL);
+
+	/* Decrease reference count of context and device wrappers, if
+	 * they're set. */
+	 if (cq->ctx != NULL)
+		cl4_context_unref(cq->ctx);
+	 if (cq->dev != NULL)
+		cl4_device_unref(cq->dev);
+
+	/* Destroy the events table. */
+	if (cq->evts != NULL) {
+		g_hash_table_destroy(cq->evts);
+	}
+
+}
+
+/**
+ * @brief Get the command queue wrapper for the given OpenCL command 
+ * queue.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL command queue directly (using the
+ * clCreateCommandQueue() function) and then wrap the OpenCL command 
+ * queue in a ::CL4CQueue wrapper object.
+ * 
+ * @param command_queue The OpenCL command queue to be wrapped.
+ * @return The ::CL4CQueue wrapper for the given OpenCL command queue.
+ * */
+CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue) {
+	
+	return (CL4CQueue*) cl4_wrapper_new(
+		(void*) command_queue, sizeof(CL4CQueue));
+		
+}
+
 CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
 	GError** err) {
@@ -74,17 +122,8 @@ CL4CQueue* cl4_cqueue_new_direct(cl_context context,
 		"Function '%s': unable to create queue (OpenCL error %d: %s).",
 		__func__, ocl_status, cl4_err(ocl_status));
 
-	/* Allocate memory for the queue wrapper object. */
-	cq = g_slice_new0(CL4CQueue);
-	
-	/* Initialize parent object. */
-	cl4_wrapper_init(&cq->base);
-	
-	/* Set command queue object. */
-	cq->base.cl_object = (gpointer) queue;
-	
-	/* Initialize the events table. */
-	cq->evts = NULL;
+	/* Wrap the queue. */
+	cq = cl4_cqueue_new_wrap(queue);
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -153,44 +192,9 @@ finish:
  * */
 void cl4_cqueue_destroy(CL4CQueue* cq) {
 	
-	/* Make sure command queue wrapper object is not NULL. */
-	g_return_if_fail(cq != NULL);
-	
-	/* Wrapped OpenCL object (a command queue in this case), returned by
-	 * the parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_command_queue command_queue;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	command_queue = 
-		(cl_command_queue) cl4_wrapper_unref((CL4Wrapper*) cq);
-	
-	/* If an OpenCL command queue was returned, the reference count of 
-	 * the wrapper object reached 0, so we must destroy remaining 
-	 * command queue wrapper properties and the OpenCL command queue
-	 * itself. */
-	if (command_queue != NULL) {
-		
-		/* Decrease reference count of context and device wrappers, if
-		 * they're set. */
-		 if (cq->ctx != NULL)
-			cl4_context_unref(cq->ctx);
-		 if (cq->dev != NULL)
-			cl4_device_unref(cq->dev);
-
-		/* Destroy the events table. */
-		if (cq->evts != NULL) {
-			g_hash_table_destroy(cq->evts);
-		}
-	
-		/* Release cq. */
-		g_slice_free(CL4CQueue, cq);
-		
-		/* Release OpenCL command queue. */
-		clReleaseCommandQueue(command_queue);
-		
-	}
+	cl4_wrapper_unref((CL4Wrapper*) cq, sizeof(CL4CQueue),
+		(cl4_wrapper_release_fields) cl4_cqueue_release_fields, 
+		(cl4_wrapper_release_cl_object) clReleaseCommandQueue, NULL); 
 
 }
 
@@ -213,8 +217,7 @@ CL4Context* cl4_cqueue_get_context(CL4CQueue* cq, GError** err) {
 		info = cl4_cqueue_info(
 			cq, CL_QUEUE_CONTEXT, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		ctx = cl4_context_new_from_clcontext(
-			*((cl_context*) info->value), &err_internal);
+		ctx = cl4_context_new_wrap(*((cl_context*) info->value));
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		cq->ctx = ctx;
 	}
@@ -229,7 +232,7 @@ error_handler:
 	
 finish:		
 
-	/* Return the new command queue wrapper object. */
+	/* Return the command queue context wrapper. */
 	return ctx;	
 
 }
@@ -253,7 +256,7 @@ CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err) {
 		info = cl4_cqueue_info(
 			cq, CL_QUEUE_DEVICE, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		dev = cl4_device_new(*((cl_device_id*) info->value));
+		dev = cl4_device_new_wrap(*((cl_device_id*) info->value));
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		cq->dev = dev;
 	}
@@ -268,7 +271,7 @@ error_handler:
 	
 finish:		
 
-	/* Return the new command queue wrapper object. */
+	/* Return the command queue device wrapper object. */
 	return dev;	
 	
 }

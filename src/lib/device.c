@@ -39,58 +39,36 @@ struct cl4_device {
 };
 
 /**
- * @brief Creates a new device wrapper object.
+ * @brief Get the device wrapper for the given OpenCL device.
  * 
- * @param id The OpenCL device ID object.
- * @return A new device wrapper object.
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to get the OpenCL device directly (using the
+ * clGetDeviceIDs() function) and then wrap the OpenCL device in a
+ * ::CL4Device wrapper object.
+ * 
+ * @param device_id The OpenCL device to be wrapped.
+ * @return The device wrapper for the given OpenCL device.
  * */
-CL4Device* cl4_device_new(cl_device_id id) {
+CL4Device* cl4_device_new_wrap(cl_device_id device) {
 	
-	/* The device wrapper object. */
-	CL4Device* device;
+	return (CL4Device*) cl4_wrapper_new(
+		(void*) device, sizeof(CL4Device));
 		
-	/* Allocate memory for the device wrapper object. */
-	device = g_slice_new(CL4Device);
-	
-	/* Initialize parent object. */
-	cl4_wrapper_init(&device->base);
-	
-	/* Set the device ID. */
-	device->base.cl_object = id;
-
-	/* Return the new device wrapper object. */
-	return device;
-	
 }
 
 /** 
- * @brief Decrements the reference count of the device wrapper object.
+ * @brief Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed.
  *
- * @param device The device wrapper object. 
+ * @param dev The device wrapper object.
  * */
-void cl4_device_destroy(CL4Device* device) {
+void cl4_device_destroy(CL4Device* dev) {
 	
-	/* Make sure device wrapper object is not NULL. */
-	g_return_if_fail(device != NULL);
-
-	/* Wrapped OpenCL object (a device_id in this case), returned by the
-	 * parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_device_id device_id;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	device_id = (cl_device_id) cl4_wrapper_unref((CL4Wrapper*) device);
-	
-	/* If an OpenCL device_id was returned, the reference count of the
-	 * wrapper object reached 0, so we must destroy remaining device
-	 * wrapper properties. */
-	if (device_id != NULL) {
-
-		/* Free the device wrapper object. */
-		g_slice_free(CL4Device, device);
-		
-	}
+	cl4_wrapper_unref((CL4Wrapper*) dev, sizeof(CL4Device),
+		NULL, NULL, NULL); 
 
 }

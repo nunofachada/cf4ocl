@@ -42,6 +42,10 @@
 /** @brief Command queue wrapper object. */
 typedef struct cl4_cqueue CL4CQueue;
 
+/** @brief Get the command queue wrapper for the given OpenCL command 
+ * queue. */
+CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue);
+
 CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
 	GError** err);

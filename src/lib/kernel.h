@@ -42,13 +42,11 @@
 /** @brief Kernel wrapper object. */
 typedef struct cl4_kernel CL4Kernel;
 
-/** @brief Create a ::CL4Kernel wrapper object by wrapping a given
- * OpenCL kernel. */
-CL4Kernel* cl4_kernel_new(cl_kernel kernel);
+/** @brief Get the kernel wrapper for the given OpenCL kernel. */
+CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel);
 
-/** @brief Decrements the reference count of the kernel wrapper 
- * object. If it reaches 0, the kernel wrapper object is 
- * destroyed. */
+/** @brief Decrements the reference count of the kernel wrapper object. 
+ * If it reaches 0, the kernel wrapper object is destroyed. */
 void cl4_kernel_destroy(CL4Kernel* krnl);
 
 void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 

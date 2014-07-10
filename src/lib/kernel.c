@@ -40,74 +40,57 @@ struct cl4_kernel {
 	
 };
 
-/** 
- * @brief Create a ::CL4Kernel wrapper object by wrapping a given
- * OpenCL kernel. 
+/**
+ * @brief Implementation of cl4_wrapper_release_fields() function for
+ * ::CL4Kernel wrapper objects.
  * 
- * @param kernel OpenCL kernel object to wrap.
- * @return ::CL4Kernel wrapper object.
+ * @param cq A ::CL4Kernel wrapper object.
  * */
-CL4Kernel* cl4_kernel_new(cl_kernel kernel) {
+static void cl4_kernel_release_fields(CL4Kernel* krnl) {
 
-	/* The kernel wrapper object. */
-	CL4Kernel* krnl;
-		
-	/* Allocate memory for the kernel wrapper object. */
-	krnl = g_slice_new(CL4Kernel);
-	
-	/* Initialize parent object. */
-	cl4_wrapper_init(&krnl->base);
-	
-	/* Set the OpenCL kernel object. */
-	krnl->base.cl_object = kernel;
-	
-	/* Set kernel arguments. */
-	krnl->args = NULL;
+	/* Make sure krnl wrapper object is not NULL. */
+	g_return_if_fail(krnl != NULL);
 
-	/* Return the new kernel wrapper object. */
-	return krnl;
+	/* Free kernel arguments. */
+	if (krnl->args != NULL)
+		g_hash_table_destroy(krnl->args);
+
 
 }
 
+/**
+ * @brief Get the kernel wrapper for the given OpenCL kernel.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL kernel directly (using the
+ * clCreateKernel() function) and then wrap the OpenCL kernel in a 
+ * ::CL4Kernel wrapper object.
+ * 
+ * @param kernel The OpenCL kernel to be wrapped.
+ * @return The ::CL4Kernel wrapper for the given OpenCL kernel.
+ * */
+CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel) {
+	
+	return (CL4Kernel*) cl4_wrapper_new(
+		(void*) kernel, sizeof(CL4Kernel));
+		
+}
+
 /** 
- * @brief Decrements the reference count of the kernel wrapper 
- * object. If it reaches 0, the kernel wrapper object is 
- * destroyed.
+ * @brief Decrements the reference count of the kernel wrapper object. 
+ * If it reaches 0, the kernel wrapper object is destroyed.
  *
  * @param krnl The kernel wrapper object.
  * */
 void cl4_kernel_destroy(CL4Kernel* krnl) {
 	
-	/* Make sure kernel wrapper object is not NULL. */
-	g_return_if_fail(krnl != NULL);
-	
-	/* Wrapped OpenCL object (a kernel in this case), returned by
-	 * the parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_kernel kernel;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	kernel = (cl_kernel) cl4_wrapper_unref((CL4Wrapper*) krnl);
-	
-	/* If an OpenCL kernel was returned, the reference count of 
-	 * the wrapper object reached 0, so we must destroy remaining 
-	 * kernel wrapper properties and the OpenCL kernel
-	 * itself. */
-	if (kernel != NULL) {
-		
-		/* Free kernel arguments. */
-		if (krnl->args != NULL)
-			g_hash_table_destroy(krnl->args);
-
-		/* Release krnl. */
-		g_slice_free(CL4Kernel, krnl);
-		
-		/* Release OpenCL kernel, ignore possible errors. */
-		cl4_wrapper_release_cl_object(kernel, 
-			(cl4_wrapper_release_function) clReleaseKernel);		
-		
-	}
+	cl4_wrapper_unref((CL4Wrapper*) krnl, sizeof(CL4Kernel),
+		(cl4_wrapper_release_fields) cl4_kernel_release_fields, 
+		(cl4_wrapper_release_cl_object) clReleaseKernel, NULL); 
 
 }
 

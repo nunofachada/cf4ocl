@@ -60,9 +60,6 @@ typedef struct cl4_dev_container {
 typedef CL4WrapperInfo* (*cl4_dev_container_get_cldevices)(
 	CL4DevContainer* devcon, GError** err);
 
-/** @brief Initialize device container fields. */
-void cl4_dev_container_init(CL4DevContainer* devcon);
-
 /** 
  * @brief Decrements the reference count of the device container 
  * object. If it reaches 0, the device container object is 

@@ -43,11 +43,12 @@
 /** @brief Device wrapper object. */
 typedef struct cl4_device CL4Device;
 
-/** @brief Creates a new device wrapper object. */
-CL4Device* cl4_device_new(cl_device_id id);
+/** @brief Get the device wrapper for the given OpenCL device. */
+CL4Device* cl4_device_new_wrap(cl_device_id device);
 
-/** @brief Alias for cl4_device_unref(). */
-void cl4_device_destroy(CL4Device* device);
+/** @brief Decrements the reference count of the device wrapper object. 
+ * If it reaches 0, the device wrapper object is destroyed. */
+void cl4_device_destroy(CL4Device* dev);
 
 /**
  * @brief Get device information object.

@@ -28,21 +28,6 @@
  
 #include "abstract_dev_container_wrapper.h"
 
-#define CL4_WRAPPER_UNINIT() GINT_TO_POINTER(-1)
-
-/** 
- * @brief Initialize device container fields. 
- * 
- * @param devcon Device container wrapper object.
- * */
-void cl4_dev_container_init(CL4DevContainer* devcon) {
-	
-	cl4_wrapper_init(&devcon->base);
-	devcon->num_devices = 0;
-	devcon->devices = NULL;
-	
-}
-
 static void cl4_dev_container_init_devices(CL4DevContainer* devcon, 
 	cl4_dev_container_get_cldevices get_devices, GError **err) {
 
@@ -73,7 +58,7 @@ static void cl4_dev_container_init_devices(CL4DevContainer* devcon,
 	for (guint i = 0; i < devcon->num_devices; ++i) {
 
 		/* Add device wrapper object to array of wrapper objects. */
-		devcon->devices[i] = cl4_device_new(
+		devcon->devices[i] = cl4_device_new_wrap(
 			((cl_device_id*) info_devs->value)[i]);
 	}
 

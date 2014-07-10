@@ -39,13 +39,11 @@
 /** @brief Event wrapper object. */
 typedef struct cl4_event CL4Event;
 
-/** @brief Create a ::CL4Event wrapper object by wrapping a given
- * OpenCL event. */
-CL4Event* cl4_event_new(cl_event event);
+/** @brief Get the event wrapper for the given OpenCL event. */
+CL4Event* cl4_event_new_wrap(cl_event event);
 
-/** @brief Decrements the reference count of the event wrapper 
- * object. If it reaches 0, the event wrapper object is 
- * destroyed. */
+/** @brief Decrements the reference count of the event wrapper object. 
+ * If it reaches 0, the event wrapper object is destroyed. */
 void cl4_event_destroy(CL4Event* evt);
 
 /**

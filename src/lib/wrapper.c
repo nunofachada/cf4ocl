@@ -28,39 +28,54 @@
  
 #include "wrapper.h"
 
-#define CL4_WRAPPER_UNINIT() GINT_TO_POINTER(-1)
-
+/* Table of all existing wrappers. */
 static GHashTable* wrappers = NULL;
-static GMutex wrappers_mutex;
+/* Define lock for synchronizing access to table of all existing 
+ * wrappers. */
+G_LOCK_DEFINE(wrappers);
 
-CL4Wrapper* cl4_wrapper_get(void* cl_object, cl4_wrapper_wrap wrap_fun) {
+/**
+ * @brief Create a new wrapper object. This function is called by the
+ * concrete wrapper constructors and should not be called by client
+ * code.
+ * 
+ * @param cl_object OpenCL object to wrap.
+ * @param size Size in bytes of wrapper.
+ * @return A new wrapper object.
+ * */
+CL4Wrapper* cl4_wrapper_new(void* cl_object, size_t size) {
 
+	/* The new wrapper object. */
 	CL4Wrapper* w;
-	g_mutex_lock(&wrappers_mutex);
+	
+	/* Lock access to table of all existing wrappers. */
+	G_LOCK(wrappers);
+	
+	/* If table of all existing wrappers is not yet initialized,
+	 * initialize it. */
 	if (wrappers == NULL) {
 		wrappers = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal, NULL, NULL);
 	}
+	
+	/* Check if requested wrapper already exists, and get it if so. */
 	if (!(w = g_hash_table_lookup(wrappers, cl_object))) {
-		w = wrap_fun(cl_object);
+		/* Wrapper doesn't yet exist, create it. */
+		w = (CL4Wrapper*) g_slice_alloc0(size);
+		w->cl_object = cl_object;
+		/* Insert newly created wrapper in table of all existing
+		 * wrappers. */
 		g_hash_table_insert(wrappers, cl_object, w);
 	}
-	g_mutex_unlock(&wrappers_mutex);
+	
+	/* Increase reference count of wrapper. */
+	cl4_wrapper_ref(w);
+	
+	/* Unlock access to table of all existing wrappers. */
+	G_UNLOCK(wrappers);
+	
+	/* Return requested wrapper. */
 	return w;
-}
-
-/** 
- * @brief Initialize wrapper fields. 
- * 
- * @param wrapper Wrapper object.
- * */
-void cl4_wrapper_init(CL4Wrapper* wrapper) {
-	
-	wrapper->cl_object = CL4_WRAPPER_UNINIT();
-	wrapper->info = NULL;
-	
-	wrapper->ref_count = 1;
-	
 }
 
 /** 
@@ -82,40 +97,68 @@ void cl4_wrapper_ref(CL4Wrapper* wrapper) {
  * @brief Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed.
  *
- * @param wrapper The wrapper object. 
- * @return The OpenCL wrapped object if the wrapper object was 
- * effectively destroyed due to its reference count becoming zero, or 
- * NULL otherwie.
+ * @param wrapper The wrapper object.
+ * @param size Size in bytes of wrapper object.
+ * @param wrapper_release_fun Function for releasing specific wrapper 
+ * fields.
+ * @param cl_release_fun Function for releasing OpenCL object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored. The only error which may be reported by this
+ * function is if some problem occurred when releasing the OpenCL 
+ * object.
+ * @return CL_TRUE if wrapper was destroyed (i.e. its ref. count reached
+ * zero), CL_FALSE otherwise.
  * */
-gpointer cl4_wrapper_unref(CL4Wrapper* wrapper) {
+cl_bool cl4_wrapper_unref(CL4Wrapper* wrapper, size_t size,
+	cl4_wrapper_release_fields rel_fields_fun,
+	cl4_wrapper_release_cl_object rel_cl_fun, GError** err) {
 	
 	/* Make sure wrapper object is not NULL. */
 	g_return_val_if_fail(wrapper != NULL, FALSE);
 	
-	/* OpenCL wrapped object, NULL by default. */
-	gpointer cl_object = NULL;
-
+	/* Flag which indicates if wrapper was destroyed or not. */
+	cl_bool destroyed = CL_FALSE;
+	
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&wrapper->ref_count)) {
 
-		/* Keep reference to the OpenCL wrapped object, so we can
-		 * return it to caller. */
-		cl_object = wrapper->cl_object;
+		/* Ref. count reached 0, so wrapper will be destroyed. */
+		destroyed = CL_TRUE;
+		
+		/* Release the OpenCL wrapped object. */
+		if (rel_cl_fun != NULL) {
+			ocl_status = rel_cl_fun(wrapper->cl_object);
+			if (ocl_status != CL_SUCCESS) {
+				g_set_error(err, CL4_ERROR, CL4_ERROR_OCL,
+				"Function '%s': unable to create release OpenCL object (OpenCL error %d: %s).", 
+				__func__, ocl_status, cl4_err(ocl_status));
+			}
+		}
 		
 		/* Destroy hash table containing information. */
-		if (wrapper->info) {
+		if (wrapper->info != NULL) {
 			g_hash_table_destroy(wrapper->info);
 		}
 		
-		/* Remove wrapper from static table. */
-		g_mutex_lock(&wrappers_mutex);
-		g_hash_table_remove(wrappers, cl_object);
-		g_mutex_unlock(&wrappers_mutex);
+		/* Remove wrapper from static table, release static table if
+		 * empty. */
+		G_LOCK(wrappers);
+		g_hash_table_remove(wrappers, wrapper->cl_object);
+		if (g_hash_table_size(wrappers) == 0)
+			g_hash_table_destroy(wrappers);
+		G_UNLOCK(wrappers);
 		
+		/* Destroy remaining wrapper fields. */
+		if (rel_fields_fun != NULL)
+			rel_fields_fun(wrapper);
+		
+		/* Destroy wrapper. */
+		g_slice_free1(size, wrapper);
+
 	}
 	
-	/* Return OpenCL wrapped object if wrapper was destroyed. */
-	return cl_object;
+	/* Return flag indicating if wrapper was destroyed. */
+	return destroyed;
 
 }
 
@@ -149,27 +192,6 @@ void* cl4_wrapper_unwrap(CL4Wrapper* wrapper) {
 	
 	/* Return the OpenCL wrapped object. */
 	return wrapper->cl_object;
-}
-
-/** 
- * @brief Release an OpenCL object using the provided function if it's
- * safe to do so (i.e. if the object has been initialized). 
- * 
- * @param cl_object OpenCL object to be released.
- * @param cl_release_function Function to release OpenCL object.
- * @return CL_SUCCESS if (i) object was successfully released, or 
- * (ii) if the object wasn't initialized; or an OpenCL error code 
- * provided by the release function if there was an error releasing the 
- * object.
- * */
-cl_int cl4_wrapper_release_cl_object(gpointer cl_object, 
-	cl4_wrapper_release_function cl_release_function) {
-
-	if ((cl_object != CL4_WRAPPER_UNINIT()) && (cl_object != NULL))
-		return cl_release_function(cl_object);
-	else
-		return CL_SUCCESS;
-
 }
 
 /**

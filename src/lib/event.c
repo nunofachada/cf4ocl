@@ -37,66 +37,35 @@ struct cl4_event {
 	
 };
 
-/** 
- * @brief Create a ::CL4Event wrapper object by wrapping a given
- * OpenCL event. 
+/**
+ * @brief Get the event wrapper for the given OpenCL event.
  * 
- * @param event OpenCL event object to wrap.
- * @return ::CL4Event wrapper object.
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to wrap the OpenCL event directly.
+ * 
+ * @param event The OpenCL event to be wrapped.
+ * @return The event wrapper for the given OpenCL event.
  * */
-CL4Event* cl4_event_new(cl_event event) {
-
-	/* The event wrapper object. */
-	CL4Event* evt;
+CL4Event* cl4_event_new_wrap(cl_event event) {
+	
+	return (CL4Event*) cl4_wrapper_new(
+		(void*) event, sizeof(CL4Event));
 		
-	/* Allocate memory for the kernel wrapper object. */
-	evt = g_slice_new(CL4Event);
-	
-	/* Initialize parent object. */
-	cl4_wrapper_init(&evt->base);
-	
-	/* Set the OpenCL event object. */
-	evt->base.cl_object = event;
-	
-	/* Return the new event wrapper object. */
-	return evt;
-
 }
 
 /** 
- * @brief Decrements the reference count of the event wrapper 
- * object. If it reaches 0, the event wrapper object is 
- * destroyed.
+ * @brief Decrements the reference count of the event wrapper object. 
+ * If it reaches 0, the event wrapper object is destroyed.
  *
  * @param evt The event wrapper object.
  * */
 void cl4_event_destroy(CL4Event* evt) {
 	
-	/* Make sure event wrapper object is not NULL. */
-	g_return_if_fail(evt != NULL);
-	
-	/* Wrapped OpenCL object (a event in this case), returned by
-	 * the parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_event event;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	event = (cl_event) cl4_wrapper_unref((CL4Wrapper*) evt);
-	
-	/* If an OpenCL event was returned, the reference count of 
-	 * the wrapper object reached 0, so we must destroy remaining 
-	 * event wrapper properties and the OpenCL event
-	 * itself. */
-	if (event != NULL) {
-
-		/* Release evt. */
-		g_slice_free(CL4Event, evt);
-		
-		/* Release OpenCL event, ignore possible errors. */
-		cl4_wrapper_release_cl_object(event, 
-			(cl4_wrapper_release_function) clReleaseEvent);
-		
-	}
+	cl4_wrapper_unref((CL4Wrapper*) evt, sizeof(CL4Event),
+		NULL, (cl4_wrapper_release_cl_object) clReleaseEvent, NULL); 
 
 }

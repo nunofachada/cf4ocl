@@ -52,6 +52,9 @@
  * 
  * @{
  */
+
+/** @brief Get the context wrapper for the given OpenCL context. */
+CL4Context* cl4_context_new_wrap(cl_context context);
  
 /**
  * @brief The context wrapper object wraps the OpenCL context and 
@@ -75,7 +78,7 @@ typedef struct cl4_context CL4Context;
 typedef void (CL_CALLBACK* cl4_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
-  
+ 
 /** 
  * @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. 
@@ -206,10 +209,6 @@ CL4Context* cl4_context_new_from_cldevices_full(
 	cl4_context_callback pfn_notify,
     void* user_data,
     GError** err);
-
-/** @brief Creates a context wrapper from a cl_context object. */
-CL4Context* cl4_context_new_from_clcontext(
-	cl_context context, GError** err);
 
 /** @brief Creates a context wrapper using one independent device filter 
  * specified in the function parameters. */

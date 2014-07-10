@@ -54,17 +54,23 @@ typedef struct cl4_wrapper {
 	
 } CL4Wrapper;
 
-typedef cl_int (*cl4_wrapper_release_function)(gpointer cl_object);
+typedef void (*cl4_wrapper_release_fields)(CL4Wrapper* wrapper);
 
-/** @brief Initialize wrapper fields. */
-void cl4_wrapper_init(CL4Wrapper* wrapper);
+typedef cl_int (*cl4_wrapper_release_cl_object)(gpointer cl_object);
+
+/** @brief Create a new wrapper object. This function is called by the
+ * concrete wrapper constructors and should not be called by client
+ * code. */
+CL4Wrapper* cl4_wrapper_new(void* cl_object, size_t size);
 
 /** @brief Increase the reference count of the wrapper object. */
 void cl4_wrapper_ref(CL4Wrapper* wrapper);
 
-/** @brief Decrements the reference count of the wrapper object. If it 
- * reaches 0, the wrapper object is destroyed. */
-gpointer cl4_wrapper_unref(CL4Wrapper* device);
+/** @brief Decrements the reference count of the wrapper object.
+ * If it reaches 0, the wrapper object is destroyed. */
+cl_bool cl4_wrapper_unref(CL4Wrapper* wrapper, size_t size,
+	cl4_wrapper_release_fields rel_fields_fun,
+	cl4_wrapper_release_cl_object rel_cl_fun, GError** err);
 
 /** @brief Returns the wrapper object reference count. For debugging and 
  * testing purposes only. */
