@@ -40,83 +40,55 @@ struct cl4_memobj {
 	
 };
 
-/** 
- * @brief Create a ::CL4MemObj wrapper object by wrapping a given
- * OpenCL cl_mem object.
+/**
+ * @brief Implementation of cl4_wrapper_release_fields() function for
+ * ::CL4MemObj wrapper objects.
  * 
- * This function can be considered an abstract constructor, called by
- * the constructors of concrete memory object implementations, i.e.,
- * buffers and images. As such, it is not supposed to be called by
- * client code.
- * 
- * @param ctx Context wrapper.
- * @param mem_object OpenCL cl_mem object to wrap.
- * @return ::CL4MemObj wrapper object.
+ * @param mo A ::CL4MemObj wrapper object.
  * */
-CL4MemObj* cl4_memobj_new(CL4Context* ctx, cl_mem mem_object) {
+static void cl4_memobj_release_fields(CL4MemObj* mo) {
 
-	/* Make sure context wrapper object is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
-	
-	/* Make sure the OpenCL cl_mem object is not NULL. */
-	g_return_val_if_fail(mem_object != NULL, NULL);
-	
-	/* The cl_mem wrapper object. */
-	CL4MemObj* mo;
-		
-	/* Allocate memory for the kernel wrapper object. */
-	mo = g_slice_new(CL4MemObj);
-	
-	/* Initialize parent object. */
-	cl4_wrapper_init(&mo->base);
-	
-	/* Set the OpenCL cl_mem object. */
-	mo->base.cl_object = mem_object;
-	
-	/* Set the context, update its ref. count. */
-	mo->ctx = ctx;
-	cl4_context_ref(ctx);
-	
-	/* Return the new cl_mem wrapper object. */
-	return mo;
+	/* Make sure mo wrapper object is not NULL. */
+	g_return_if_fail(mo != NULL);
+
+	/* Reduce reference count of memory object context wrapper. */
+	if (mo->ctx != NULL)
+		cl4_context_unref(mo->ctx);
 
 }
 
+/**
+ * @brief Get the cl_mem wrapper for the given OpenCL memory object.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to directly wrap an OpenCL memory object in a 
+ * ::CL4MemObj wrapper object.
+ * 
+ * @param mem_object The OpenCL memory object to be wrapped.
+ * @return The ::CL4MemObj wrapper for the given OpenCL memory object.
+ * */
+CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object) {
+	
+	return (CL4MemObj*) cl4_wrapper_new(
+		(void*) mem_object, sizeof(CL4MemObj));
+		
+}
+
 /** 
- * @brief Decrements the reference count of the cl_mem wrapper 
- * object. If it reaches 0, the cl_mem wrapper object is destroyed.
+ * @brief Decrements the reference count of the wrapper object. If it 
+ * reaches 0, the wrapper object is destroyed.
  *
  * @param mo The cl_mem wrapper object.
  * */
 void cl4_memobj_destroy(CL4MemObj* mo) {
 	
-	/* Make sure cl_mem wrapper object is not NULL. */
-	g_return_if_fail(mo != NULL);
-	
-	/* Wrapped OpenCL memory object, returned by the parent wrapper 
-	 * unref function in case its reference count reaches 0. */
-	cl_mem mem_object;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	mem_object = (cl_mem) cl4_wrapper_unref((CL4Wrapper*) mo);
-	
-	/* If an OpenCL mem. object was returned, the reference count of 
-	 * the wrapper object reached 0, so we must destroy remaining 
-	 * cl_mem wrapper properties and the OpenCL mem. object itself. */
-	if (mem_object != NULL) {
-		
-		/* Unref context. */
-		cl4_context_unref(mo->ctx);
-
-		/* Release mo. */
-		g_slice_free(CL4MemObj, mo);
-		
-		/* Release OpenCL memory object, ignore possible errors. */
-		cl4_wrapper_release_cl_object(mem_object, 
-			(cl4_wrapper_release_function) clReleaseMemObject);
-		
-	}
+	cl4_wrapper_unref((CL4Wrapper*) mo, sizeof(CL4MemObj),
+		(cl4_wrapper_release_fields) cl4_memobj_release_fields, 
+		(cl4_wrapper_release_cl_object) clReleaseMemObject, NULL); 
 
 }
 

@@ -44,7 +44,7 @@ struct cl4_kernel {
  * @brief Implementation of cl4_wrapper_release_fields() function for
  * ::CL4Kernel wrapper objects.
  * 
- * @param cq A ::CL4Kernel wrapper object.
+ * @param krnl A ::CL4Kernel wrapper object.
  * */
 static void cl4_kernel_release_fields(CL4Kernel* krnl) {
 

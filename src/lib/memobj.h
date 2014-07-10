@@ -34,10 +34,11 @@
 
 typedef struct cl4_memobj CL4MemObj;
 
-/** @brief Create a ::CL4MemObj wrapper object by wrapping a given
- * OpenCL cl_mem object. */
-CL4MemObj* cl4_memobj_new(CL4Context* ctx, cl_mem mem_object);
+/** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
+CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object);
 
+/** @brief Decrements the reference count of the wrapper object. If it 
+ * reaches 0, the wrapper object is destroyed. */
 void cl4_memobj_destroy(CL4MemObj* mo);
 
 CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4CQueue* cq, 
