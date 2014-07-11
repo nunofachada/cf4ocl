@@ -42,64 +42,41 @@ struct cl4_platform {
  * @addtogroup PLATFORM
  * @{
  */
- 
-/**
- * @brief Creates a new platform wrapper object.
- * 
- * @param id The OpenCL platform ID object.
- * @return A new platform wrapper object.
- * */
-CL4Platform* cl4_platform_new(cl_platform_id id) {
-	
-	/* The platform wrapper object. */
-	CL4Platform* platform;
-		
-	/* Allocate memory for the platform wrapper object. */
-	platform = g_slice_new(CL4Platform);
-	
-	/* Initialize parent object. */
-	cl4_dev_container_init(&platform->base);
-	
-	/* Set the platform ID. */
-	platform->base.base.cl_object = id;
 
-	/* Return the new platform wrapper object. */
-	return platform;
+/**
+ * @brief Get the platform wrapper for the given OpenCL platform.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL platform directly (using the
+ * clGetPlatformIDs() function) and then wrap the OpenCL platform in a 
+ * ::CL4Platform wrapper object.
+ * 
+ * @param platform The OpenCL platform to be wrapped.
+ * @return The ::CL4Platform wrapper for the given OpenCL platform.
+ * */
+CL4Platform* cl4_platform_new_wrap(cl_platform_id platform) {
 	
+	return (CL4Platform*) cl4_wrapper_new(
+		(void*) platform, sizeof(CL4Platform));
+		
 }
 
 /** 
- * @brief Decrements the reference count of the platform wrapper object.
+ * @brief Decrements the reference count of the platform wrapper object. 
  * If it reaches 0, the platform wrapper object is destroyed.
  *
- * @param platform The platform wrapper object. 
+ * @param platf The platform wrapper object.
  * */
- void cl4_platform_destroy(CL4Platform* platform) {
+void cl4_platform_destroy(CL4Platform* platf) {
 	
-	/* Make sure platform wrapper object is not NULL. */
-	g_return_if_fail(platform != NULL);
-	
-	/* Wrapped OpenCL object (a platform_id in this case), returned by 
-	 * the parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_platform_id platform_id;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	platform_id = 
-		(cl_platform_id) cl4_dev_container_unref(
-			(CL4DevContainer*) platform);
-	
-	/* If an OpenCL platform was returned, the reference count of the
-	 * wrapper object reached 0, so we must destroy remaining platform
-	 * wrapper properties. */
-	if (platform_id != NULL) {
+	cl4_wrapper_unref((CL4Wrapper*) platf, sizeof(CL4Platform),
+		(cl4_wrapper_release_fields) cl4_dev_container_release_devices, 
+		NULL, NULL); 
 
-		/* Free the platform wrapper object. */
-		g_slice_free(CL4Platform, platform);
-		
-	}
-	
 }
 
 /** @}*/

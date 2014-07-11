@@ -49,12 +49,12 @@
 /** @brief The platform wrapper object. */
 typedef struct cl4_platform CL4Platform;
 
-/** @brief Creates a new platform wrapper object. */
-CL4Platform* cl4_platform_new(cl_platform_id id);
+/** @brief Get the platform wrapper for the given OpenCL platform. */
+CL4Platform* cl4_platform_new_wrap(cl_platform_id platform);
 
 /** @brief Decrements the reference count of the platform wrapper 
  * object. If it reaches 0, the platform wrapper object is destroyed. */
-void cl4_platform_destroy(CL4Platform* platform);
+void cl4_platform_destroy(CL4Platform* platf);
 
 /**
  * @brief Get platform information.

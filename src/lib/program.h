@@ -60,6 +60,14 @@ typedef struct cl4_program_binary CL4ProgramBinary;
 typedef void (CL_CALLBACK* cl4_program_callback)(
 	cl_program program, void* user_data);
 
+/* WRAPPER API */
+/** @brief Get the program wrapper for the given OpenCL program. */
+CL4Program* cl4_program_new_wrap(cl_program program);
+
+/** @brief Decrements the reference count of the program wrapper object. 
+ * If it reaches 0, the program wrapper object is destroyed. */
+void cl4_program_destroy(CL4Program* prg);
+
 /* SOURCES */
 CL4Program* cl4_program_new_from_source_file(CL4Context* ctx, 
 	const char* filename, GError** err);
@@ -106,11 +114,6 @@ CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
 	const char *kernel_names, GError** err);
 
 #endif
-
-/** @brief Decrements the reference count of the program wrapper 
- * object. If it reaches 0, the program wrapper object is 
- * destroyed. */
-void cl4_program_destroy(CL4Program* prg); 	
  
 #define cl4_program_build(prg, options, err) \
 	cl4_program_build_from_devices_full( \

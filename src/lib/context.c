@@ -51,6 +51,9 @@ static void cl4_context_release_fields(CL4Context* ctx) {
 	/* Make sure context wrapper object is not NULL. */
 	g_return_if_fail(ctx != NULL);
 	
+	/* Release devices. */
+	cl4_dev_container_release_devices((CL4DevContainer*) ctx);
+
 	/* Release platform. */
 	if (ctx->platform) {
 		cl4_platform_unref(ctx->platform);

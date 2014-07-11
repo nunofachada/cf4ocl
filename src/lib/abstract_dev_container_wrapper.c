@@ -77,51 +77,30 @@ finish:
 
 }
 
-/** 
- * @brief Decrements the reference count of the device container 
- * object. If it reaches 0, the device container object is 
- * destroyed.
- *
- * @param devcon The device container object. 
- * @return The OpenCL wrapped object if the wrapper object was 
- * effectively destroyed due to its reference count becoming zero, or 
- * NULL otherwie.
+/**
+ * @brief Release the devices held by the given #CL4DevContainer object.
+ * 
+ * @param devcon A ::CL4DevContainer wrapper object.
  * */
-void* cl4_dev_container_unref(CL4DevContainer* devcon) {
-	
-	/* Make sure devcon object is not NULL. */
-	g_return_val_if_fail(devcon != NULL, FALSE);
-	
-	/* OpenCL wrapped object, NULL by default. */
-	gpointer cl_object = NULL;
+void cl4_dev_container_release_devices(CL4DevContainer* devcon) {
 
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	cl_object = cl4_wrapper_unref((CL4Wrapper*) devcon);
-	
-	/* If an OpenCL object was returned, the reference count of the
-	 * wrapper object reached 0, so we must destroy remaining device
-	 * container properties, namely the device list. */
-	if (cl_object != NULL) {
+	/* Make sure devcon wrapper object is not NULL. */
+	g_return_if_fail(devcon != NULL);
 
-		/* Check if any devices are associated with this device 
-		 * container. */
-		if (devcon->devices != NULL) {
+	/* Check if any devices are associated with this device 
+	 * container. */
+	if (devcon->devices != NULL) {
 
-			/* Release devices in device container. */
-			for (guint i = 0; i < devcon->num_devices; ++i) {
-				if (devcon->devices[i])
-					cl4_device_unref(devcon->devices[i]);
-			}
-			
-			/* Free device wrapper array. */
-			g_slice_free1(devcon->num_devices * sizeof(CL4Device*), 
-				devcon->devices);
+		/* Release devices in device container. */
+		for (guint i = 0; i < devcon->num_devices; ++i) {
+			if (devcon->devices[i])
+				cl4_device_unref(devcon->devices[i]);
 		}
+		
+		/* Free device wrapper array. */
+		g_slice_free1(devcon->num_devices * sizeof(CL4Device*), 
+			devcon->devices);
 	}
-	
-	/* Return OpenCL wrapped object if wrapper was destroyed. */
-	return cl_object;
 
 }
 

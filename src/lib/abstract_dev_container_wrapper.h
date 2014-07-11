@@ -60,12 +60,9 @@ typedef struct cl4_dev_container {
 typedef CL4WrapperInfo* (*cl4_dev_container_get_cldevices)(
 	CL4DevContainer* devcon, GError** err);
 
-/** 
- * @brief Decrements the reference count of the device container 
- * object. If it reaches 0, the device container object is 
- * destroyed. */
-void* cl4_dev_container_unref(
-	CL4DevContainer* devcon);
+/** @brief Release the devices held by the given #CL4DevContainer 
+ * object. */
+void cl4_dev_container_release_devices(CL4DevContainer* devcon);
 
 /** @brief Get all ::CL4Device wrappers in device container. */
 CL4Device** cl4_dev_container_get_all_devices(CL4DevContainer* devcon,

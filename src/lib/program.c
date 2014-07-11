@@ -52,20 +52,38 @@ struct cl4_program_binary {
 	size_t size;
 };
 
-static CL4Program* cl4_program_new_internal() {
+/**
+ * @brief Implementation of cl4_wrapper_release_fields() function for
+ * ::CL4Program wrapper objects.
+ * 
+ * @param prg A ::CL4Program wrapper object.
+ * */
+static void cl4_program_release_fields(CL4Program* prg) {
 
-	/* The program wrapper object. */
-	CL4Program* prg;
+	/* Make sure prg wrapper object is not NULL. */
+	g_return_if_fail(prg != NULL);
 	
-	/* Allocate memory for program wrapper object. */
-	prg = g_slice_new0(CL4Program);
-	cl4_dev_container_init(&prg->base);
-	
-	prg->binaries = NULL;
-	prg->krnls = NULL;
-	
-	/* Return new context wrapper object. */
-	return prg;
+	/* Release devices. */
+	cl4_dev_container_release_devices((CL4DevContainer*) prg);
+
+	/* If the kernels table was created...*/
+	if (prg->krnls != NULL) {
+		
+		/* ...free the kernel table and reduce reference count of 
+		 * kernels in table (this is done automatically by the
+		 * cl4_kernel_destroy() function passed as a destructor
+		 * parameter during table creation). */
+		g_hash_table_destroy(prg->krnls);
+		
+	}
+		
+	/* If the binaries table was created... */
+	if (prg->binaries != NULL) {
+		
+		/*...free it and the included binaries. */
+		g_hash_table_destroy(prg->binaries);
+		
+	}
 
 }
 
@@ -73,6 +91,42 @@ static CL4Program* cl4_program_new_internal() {
  * @addtogroup PROGRAM
  * @{
  */
+
+/**
+ * @brief Get the program wrapper for the given OpenCL program.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL program directly (using the
+ * clCreateProgramWith*() functions) and then wrap the OpenCL program
+ * in a ::CL4Program wrapper object.
+ * 
+ * @param program The OpenCL program to be wrapped.
+ * @return The ::CL4Program wrapper for the given OpenCL program.
+ * */
+CL4Program* cl4_program_new_wrap(cl_program program) {
+	
+	return (CL4Program*) cl4_wrapper_new(
+		(void*) program, sizeof(CL4Program));
+		
+}
+
+/** 
+ * @brief Decrements the reference count of the program wrapper object. 
+ * If it reaches 0, the program wrapper object is destroyed.
+ *
+ * @param prg The program wrapper object.
+ * */
+void cl4_program_destroy(CL4Program* prg) {
+	
+	cl4_wrapper_unref((CL4Wrapper*) prg, sizeof(CL4Program),
+		(cl4_wrapper_release_fields) cl4_program_release_fields, 
+		(cl4_wrapper_release_cl_object) clReleaseProgram, NULL); 
+
+}
 
 CL4Program* cl4_program_new_from_source_file(CL4Context* ctx, 
 	const char* filename, GError** err) {
@@ -149,16 +203,18 @@ CL4Program* cl4_program_new_with_source(cl_context context,
 
 	cl_int ocl_status;
 	
+	cl_program program = NULL;
+	
 	CL4Program* prg = NULL;
 		
-	prg = cl4_program_new_internal();
-	
-	prg->base.base.cl_object = clCreateProgramWithSource(
+	program = clCreateProgramWithSource(
 		context, count, strings, lengths, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_program with source (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
+	
+	prg = cl4_program_new_wrap(program);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -168,10 +224,6 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	cl4_program_destroy(prg);
-	prg = NULL;
 	
 finish:
 
@@ -243,8 +295,7 @@ finish:
 	
 	/* Return prg. */
 	return prg;
-
-
+	
 }
 
 CL4Program* cl4_program_new_from_binaries(CL4Context* ctx,
@@ -315,19 +366,19 @@ CL4Program* cl4_program_new_with_binary(cl_context context,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	cl_int ocl_status;
+	cl_program program = NULL;
 	CL4Program* prg = NULL;
 		
-	/* Initialize program. */
-	prg = cl4_program_new_internal();
-	
 	/* Create program. */
-	prg->base.base.cl_object = clCreateProgramWithBinary(context, 
+	program = clCreateProgramWithBinary(context, 
 		num_devices, device_list, lengths, binaries, binary_status, 
 		&ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_program from binaries (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
+
+	prg = cl4_program_new_wrap(program);
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -337,10 +388,6 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	cl4_program_destroy(prg);
-	prg = NULL;
 	
 finish:
 	
@@ -360,19 +407,19 @@ CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	cl_int ocl_status;
+	cl_program program = NULL;
 	CL4Program* prg = NULL;
-		
-	/* Initialize program. */
-	prg = cl4_program_new_internal();
-	
+
 	/* Create program. */
-	prg->base.base.cl_object = clCreateProgramWithBuiltInKernels(
+	program = clCreateProgramWithBuiltInKernels(
 		context, num_devices, device_list, kernel_names, &ocl_status);
 
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
 		"Function '%s': unable to create cl_program from built-in kernels (OpenCL error %d: %s).", 
 		__func__, ocl_status, cl4_err(ocl_status));
+
+	prg = cl4_program_new_wrap(program);
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -382,10 +429,6 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	cl4_program_destroy(prg);
-	prg = NULL;
 	
 finish:
 	
@@ -395,64 +438,6 @@ finish:
 }
 
 #endif
-
-/** 
- * @brief Decrements the reference count of the program wrapper 
- * object. If it reaches 0, the program wrapper object is 
- * destroyed.
- *
- * @param prg The program wrapper object.
- * */
-void cl4_program_destroy(CL4Program* prg) {
-	
-	/* Make sure program wrapper object is not NULL. */
-	g_return_if_fail(prg != NULL);
-	
-	/* Wrapped OpenCL object (a program in this case), returned by
-	 * the parent wrapper unref function in case its reference count 
-	 * reaches 0. */
-	cl_program program;
-	
-	/* Decrease reference count using the parent wrapper object unref 
-	 * function. */
-	program = (cl_program) 
-		cl4_dev_container_unref((CL4DevContainer*) prg);
-	
-	/* If an OpenCL program was returned, the reference count of 
-	 * the wrapper object reached 0, so we must destroy remaining 
-	 * program wrapper properties and the OpenCL program
-	 * itself. */
-	if (program != NULL) {
-
-		/* If the kernels table was created...*/
-		if (prg->krnls != NULL) {
-			
-			/* ...free the kernel table and reduce reference count of 
-			 * kernels in table (this is done automatically by the
-			 * cl4_kernel_destroy() function passed as a destructor
-			 * parameter during table creation). */
-			g_hash_table_destroy(prg->krnls);
-			
-		}
-		
-		/* If the binaries table was created... */
-		if (prg->binaries != NULL) {
-			
-			/*...free it and the included binaries. */
-			g_hash_table_destroy(prg->binaries);
-			
-		}
-
-		/* Release prg. */
-		g_slice_free(CL4Program, prg);
-		
-		/* Release OpenCL program, ignore possible errors. */
-		cl4_wrapper_release_cl_object(program, 
-			(cl4_wrapper_release_function) clReleaseProgram);		
-		
-	}
-
-}
 
 cl_bool cl4_program_build_from_devices_full(CL4Program* prg, 
 	cl_uint num_devices, CL4Device** devices, const char *options, 
