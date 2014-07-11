@@ -77,6 +77,27 @@ cl_int clGetEventInfo(cl_event event, cl_event_info param_name,
 }
 
 
+CL_API_ENTRY cl_int CL_API_CALL
+clRetainEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
+	
+	g_atomic_int_inc(&event->ref_count);
+	return CL_SUCCESS;
+	
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clReleaseEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
+	
+	/* Decrement reference count and check if it reaches 0. */
+	if (g_atomic_int_dec_and_test(&event->ref_count)) {
+
+		g_slice_free(struct _cl_event, event);
+		
+	}
+	
+	return CL_SUCCESS;
+	
+}
 
 
 

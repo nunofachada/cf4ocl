@@ -25,13 +25,7 @@
  * */
 
 #include "profiler.h"
-
-/** @brief Stub for cl_event objects. */ 
-struct _cl_event {
-	cl_ulong start;
-	cl_ulong end;
-	cl_command_queue queue;
-};
+#include "ocl_stub/ocl_impl.h"
 
 /**
  * @brief Tests the OpenCL profiling framework.

@@ -46,6 +46,19 @@ clCreateKernel(cl_program program, const char* kernel_name,
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
+clSetKernelArg(cl_kernel kernel, cl_uint arg_index, size_t arg_size,
+	const void* arg_value) CL_API_SUFFIX__VERSION_1_0 {
+
+	kernel = kernel;
+	arg_index = arg_index;
+	arg_size = arg_size;
+	arg_value = arg_value;
+	
+	return CL_SUCCESS;
+}
+
+
+CL_API_ENTRY cl_int CL_API_CALL
 clRetainKernel(cl_kernel kernel) CL_API_SUFFIX__VERSION_1_0 {
 	
 	g_atomic_int_inc(&kernel->ref_count);

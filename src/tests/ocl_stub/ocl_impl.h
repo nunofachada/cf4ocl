@@ -45,11 +45,15 @@ struct _cl_event {
 	cl_ulong start;
 	cl_ulong end;
 	cl_command_queue queue;
+	cl_uint ref_count;
 };
 
 /** @brief Stub for cl_command_queue objects. */ 
 struct _cl_command_queue {
-	int filler;
+	cl_context context;
+	cl_device_id device;
+	cl_uint ref_count;
+	cl_command_queue_properties properties;
 };
 
 struct _cl_device_id {
@@ -170,6 +174,24 @@ struct _cl_kernel {
 	const char* function_name;
 	cl_uint num_args;
 	const char* attributes;
+};
+
+struct _cl_mem {
+	cl_uint ref_count;
+	void (*release)(cl_mem);
+	cl_mem_object_type type;
+	cl_mem_flags flags;
+	size_t size;
+	void* host_ptr;
+	cl_uint map_count;
+	cl_context context;
+	cl_mem associated_object;
+	size_t offset;
+};
+
+struct _cl_image {
+	struct _cl_mem buffer;
+	struct _cl_image_desc desc;
 };
 
 #endif
