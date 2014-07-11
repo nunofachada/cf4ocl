@@ -79,11 +79,6 @@ gint cl4_wrapper_ref_count(CL4Wrapper* wrapper);
 /** @brief Get the wrapped OpenCL object. */
 void* cl4_wrapper_unwrap(CL4Wrapper* wrapper);
 
-/** @brief Release an OpenCL object using the provided function if it's
- * safe to do so (i.e. if the object has been initialized). */
-cl_int cl4_wrapper_release_cl_object(gpointer cl_object, 
-	cl4_wrapper_release_function cl_release_function);
-	
 /**
  * @brief Generic type for OpenCL clget*Info() functions.
  * 

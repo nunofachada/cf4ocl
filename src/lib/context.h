@@ -52,9 +52,6 @@
  * 
  * @{
  */
-
-/** @brief Get the context wrapper for the given OpenCL context. */
-CL4Context* cl4_context_new_wrap(cl_context context);
  
 /**
  * @brief The context wrapper object wraps the OpenCL context and 
@@ -62,6 +59,9 @@ CL4Context* cl4_context_new_wrap(cl_context context);
  * group of functions and macros.
  * */
 typedef struct cl4_context CL4Context;
+
+/** @brief Get the context wrapper for the given OpenCL context. */
+CL4Context* cl4_context_new_wrap(cl_context context);
 
 /** 
  * @brief A callback function used by the OpenCL implementation to 

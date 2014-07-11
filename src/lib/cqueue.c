@@ -52,7 +52,7 @@ struct cl4_cqueue {
  * 
  * @param cq A ::CL4CQueue wrapper object.
  * */
-static void cl4_cqueue_release_fields(CL4Queue* cq) {
+static void cl4_cqueue_release_fields(CL4CQueue* cq) {
 
 	/* Make sure cq wrapper object is not NULL. */
 	g_return_if_fail(cq != NULL);
@@ -283,7 +283,7 @@ CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 	/* Make sure evt is not NULL. */
 	g_return_if_fail(event != NULL);
 
-	CL4Event* evt = cl4_event_new(event);
+	CL4Event* evt = cl4_event_new_wrap(event);
 	
 	if (cq->evts == NULL) {
 		cq->evts = g_hash_table_new_full(g_direct_hash, g_direct_equal,

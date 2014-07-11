@@ -574,7 +574,7 @@ CL4Kernel* cl4_program_get_kernel(
 			__func__, ocl_status, cl4_err(ocl_status));
 		
 		/* Create kernel wrapper. */
-		krnl = cl4_kernel_new(kernel);
+		krnl = cl4_kernel_new_wrap(kernel);
 		
 		/* Keep new kernel wrapper in table. */
 		g_hash_table_insert(prg->krnls, (gpointer) kernel_name, krnl);

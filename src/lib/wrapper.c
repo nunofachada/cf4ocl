@@ -119,6 +119,9 @@ cl_bool cl4_wrapper_unref(CL4Wrapper* wrapper, size_t size,
 	/* Flag which indicates if wrapper was destroyed or not. */
 	cl_bool destroyed = CL_FALSE;
 	
+	/* OpenCL status flag. */
+	cl_int ocl_status;
+	
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&wrapper->ref_count)) {
 

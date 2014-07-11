@@ -96,7 +96,7 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 	/* Wrap platform IDs in platform wrapper objects. */
 	for (guint i = 0; i < platforms->num_platfs; i++) {
 		/* Add platform wrapper object to array of wrapper objects. */
-		platforms->platfs[i] = cl4_platform_new(platf_ids[i]);
+		platforms->platfs[i] = cl4_platform_new_wrap(platf_ids[i]);
 	}
 
 	/* Free array of platform ids. */
