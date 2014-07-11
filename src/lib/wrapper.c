@@ -59,7 +59,8 @@ CL4Wrapper* cl4_wrapper_new(void* cl_object, size_t size) {
 	}
 	
 	/* Check if requested wrapper already exists, and get it if so. */
-	if (!(w = g_hash_table_lookup(wrappers, cl_object))) {
+	w = g_hash_table_lookup(wrappers, cl_object);
+	if (w == NULL) {
 		/* Wrapper doesn't yet exist, create it. */
 		w = (CL4Wrapper*) g_slice_alloc0(size);
 		w->cl_object = cl_object;
@@ -147,8 +148,10 @@ cl_bool cl4_wrapper_unref(CL4Wrapper* wrapper, size_t size,
 		 * empty. */
 		G_LOCK(wrappers);
 		g_hash_table_remove(wrappers, wrapper->cl_object);
-		if (g_hash_table_size(wrappers) == 0)
+		if (g_hash_table_size(wrappers) == 0) {
 			g_hash_table_destroy(wrappers);
+			wrappers = NULL;
+		}
 		G_UNLOCK(wrappers);
 		
 		/* Destroy remaining wrapper fields. */
