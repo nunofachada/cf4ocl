@@ -524,8 +524,7 @@ static void context_create_info_destroy_test() {
 	/* Create a context wrapper using the cl_context, check that the
 	 * unwrapped cl_context corresponds to the cl_context with which
 	 * the context wrapper was created.*/
-	ctx = cl4_context_new_from_clcontext(context, &err);
-	g_assert_no_error(err);
+	ctx = cl4_context_new_wrap(context);
 	g_assert(cl4_context_unwrap(ctx) == context);
 	
 	/* Get the first device wrapper from the context wrapper, check that 
@@ -972,9 +971,9 @@ static void program_create_info_destroy_test() {
 	if (ocl_status != CL_SUCCESS)
 		g_error("Fail to write data to buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
-	CL4MemObj* a_w = cl4_memobj_new(ctx, a);
-	CL4MemObj* b_w = cl4_memobj_new(ctx, b);
-	CL4MemObj* c_w = cl4_memobj_new(ctx, c);
+	CL4MemObj* a_w = cl4_memobj_new_wrap(a);
+	CL4MemObj* b_w = cl4_memobj_new_wrap(b);
+	CL4MemObj* c_w = cl4_memobj_new_wrap(c);
 
 	cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, NULL, 
 		&err, a_w, b_w, c_w, cl4_arg_private(d_h, cl_uint), NULL);
