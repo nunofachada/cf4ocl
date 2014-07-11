@@ -39,6 +39,7 @@ clCreateCommandQueue(cl_context context, cl_device_id device,
 	queue->context = context;
 	queue->device = device; 
 	queue->properties = properties;
+	queue->ref_count = 1;
 	
 	return queue;
 		

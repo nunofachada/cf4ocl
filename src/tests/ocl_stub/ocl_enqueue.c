@@ -41,7 +41,10 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 	local_work_size = local_work_size;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	event = event;
+	if (event != NULL) {
+		*event = g_slice_new(struct _cl_event);
+		(*event)->ref_count = 1;
+	}
 	
 	return CL_SUCCESS;
 }

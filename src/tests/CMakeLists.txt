@@ -20,6 +20,7 @@ option(USE_OPENCL_STUB "Use OpenCL stub when possible?" ON)
 
 if (USE_OPENCL_STUB)
 	set(LIB_OPT ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
+	add_definitions(-DOPENCL_STUB)
 else()
 	set(LIB_OPT ${PROJECT_NAME} ${OPENCL_LIBRARIES})
 endif()

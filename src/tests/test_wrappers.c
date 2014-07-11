@@ -548,11 +548,6 @@ static void context_create_info_destroy_test() {
 	cl4_context_destroy(ctx);
 	cl4_platforms_destroy(ps);
 	g_free(ctx_props);
-
-	/* Explicitly destroy cl_context because it was created outside
-	 * the context wrapper. */
-	ocl_status = clReleaseContext(context);
-	g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
 	
 	/* 
 	 * 3. Test context creation by device filtering 
@@ -983,10 +978,12 @@ static void program_create_info_destroy_test() {
 	if (ocl_status != CL_SUCCESS)
 		g_error("Fail to read data from buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
 
+#ifndef OPENCL_STUB
 	for (guint i = 0; i < 16; i++) {
 		g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i] + d_h);
 	}
-	
+#endif
+
 	ocl_status = clReleaseMemObject(a);
 	if (ocl_status != CL_SUCCESS)
 		g_error("Fail to release buffer a, code %d (%s)", ocl_status, cl4_err(ocl_status));
