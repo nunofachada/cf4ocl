@@ -49,10 +49,10 @@ void cl4_arg_destroy(CL4Arg* arg) {
 	/* Make sure arg is not NULL. */
 	g_return_if_fail(arg != NULL);
 
-	if cl4_arg_is_local(arg)
+	if cl4_arg_is_local(arg) {
 		g_free(arg->cl_object);
-		
-	g_slice_free(CL4Arg, arg);
+		g_slice_free(CL4Arg, arg);
+	}
 }
 
 size_t cl4_arg_size(CL4Arg* arg) {

@@ -984,16 +984,10 @@ static void program_create_info_destroy_test() {
 	}
 #endif
 
-	ocl_status = clReleaseMemObject(a);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to release buffer a, code %d (%s)", ocl_status, cl4_err(ocl_status));
-	ocl_status = clReleaseMemObject(b);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to release buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
-	ocl_status = clReleaseMemObject(c);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to release buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
-
+	cl4_memobj_destroy(a_w);
+	cl4_memobj_destroy(b_w);
+	cl4_memobj_destroy(c_w);
+	
 	/* Destroy the command queue. */
 	cl4_cqueue_destroy(cq);
 
