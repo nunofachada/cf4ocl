@@ -45,6 +45,19 @@ CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CL4EventWaitList evt_wait_lst, GError** err);
 
+void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
+	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
+	size_t size, CL4EventWaitList evt_wait_lst, CL4Event** evt,
+	GError** err);
+
+CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
+	CL4Buffer* dst_buf, size_t src_offset, size_t dst_offset, 
+	size_t size, CL4EventWaitList evt_wait_lst, GError** err);
+	
+CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
+	CL4Buffer* dst_img, size_t src_offset, const size_t *dst_origin,
+	const size_t *region, CL4EventWaitList evt_wait_lst, GError** err);
+
 #ifdef CL_VERSION_1_1
 
 CL4Buffer* cl4_buffer_new_from_region(CL4Buffer* buf, 
@@ -63,6 +76,12 @@ CL4Event* cl4_buffer_write_rect(CL4CQueue* cq, CL4Buffer* buf,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch, 
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
 	CL4EventWaitList evt_wait_lst, GError** err);
+
+CL4Event* cl4_buffer_copy_rect(CL4CQueue* cq, CL4Buffer* src_buf,
+	CL4Buffer* dst_buf, const size_t *src_origin, 
+	const size_t *dst_origin, const size_t *region, 
+	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
+	size_t dst_slice_pitch, CL4EventWaitList evt_wait_lst, GError** err);
 
 #endif
 
