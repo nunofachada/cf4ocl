@@ -53,7 +53,7 @@ struct cl4_device {
  * clGetDeviceIDs() function) and then wrap the OpenCL device in a
  * ::CL4Device wrapper object.
  * 
- * @param device_id The OpenCL device to be wrapped.
+ * @param device The OpenCL device to be wrapped.
  * @return The device wrapper for the given OpenCL device.
  * */
 CL4Device* cl4_device_new_wrap(cl_device_id device) {

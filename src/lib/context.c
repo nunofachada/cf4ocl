@@ -162,7 +162,7 @@ finish:
  * clCreateContext() function) and then wrap the OpenCL context in a
  * ::CL4Context wrapper object.
  * 
- * @param cl_object The OpenCL context to be wrapped.
+ * @param context The OpenCL context to be wrapped.
  * @return The context wrapper for the given OpenCL context.
  * */
 CL4Context* cl4_context_new_wrap(cl_context context) {

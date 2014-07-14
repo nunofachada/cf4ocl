@@ -100,9 +100,9 @@ void cl4_wrapper_ref(CL4Wrapper* wrapper) {
  *
  * @param wrapper The wrapper object.
  * @param size Size in bytes of wrapper object.
- * @param wrapper_release_fun Function for releasing specific wrapper 
+ * @param rel_fields_fun Function for releasing specific wrapper 
  * fields.
- * @param cl_release_fun Function for releasing OpenCL object.
+ * @param rel_cl_fun Function for releasing OpenCL object.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored. The only error which may be reported by this
  * function is if some problem occurred when releasing the OpenCL 

@@ -280,7 +280,7 @@ finish:
  * This function is used by the cl4_devsel_indep_type_*() group of
  * functions. Using these is simpler than using this function directly.
  * 
- * @param device OpenCL device to filter depending on type.
+ * @param dev OpenCL device to filter depending on type.
  * @param data Filter data, must point to a cl_device_type value.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
@@ -374,7 +374,7 @@ gboolean cl4_devsel_indep_type_cpu(
  * @brief Independent filter function which only accepts accelerator 
  * devices.
  * 
- * @param device OpenCL device to check for accelerator type.
+ * @param dev OpenCL device to check for accelerator type.
  * @param data Filter data, ignored.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
