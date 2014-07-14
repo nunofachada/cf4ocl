@@ -967,7 +967,12 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	cl4_event_wait_list_add(ewl, evt_kr);
-	CL4Event* er1 = cl4_buffer_read(cq, c_w, CL_TRUE, 0, 16 * sizeof(cl_uint), c_h, ewl, &err);
+	CL4Event* evt_r1 = cl4_buffer_read(cq, c_w, CL_FALSE, 0, 16 * sizeof(cl_uint), c_h, ewl, &err);
+	g_assert_no_error(err);
+	
+	cl4_event_wait_list_add(ewl, evt_r1);
+	
+	cl4_event_wait(ewl, &err);
 	g_assert_no_error(err);
 	
 #ifndef OPENCL_STUB

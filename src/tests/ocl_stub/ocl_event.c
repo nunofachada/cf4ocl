@@ -99,5 +99,14 @@ clReleaseEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
 	
 }
 
+CL_API_ENTRY cl_int CL_API_CALL
+clWaitForEvents(cl_uint num_events, const cl_event* event_list) 
+	CL_API_SUFFIX__VERSION_1_0 {
+	
+	num_events = num_events;
+	event_list = event_list;
+	
+	return CL_SUCCESS;
+}
 
 

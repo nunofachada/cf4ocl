@@ -84,31 +84,33 @@ void cl4_event_destroy(CL4Event* evt);
  * @return The OpenCL event object.
  * */
 #define cl4_event_unwrap(evt) \
-	((cl_event) cl4_wrapper_unwrap((CL4Wrapper*) evt))		
+	((cl_event) cl4_wrapper_unwrap((CL4Wrapper*) evt))
 
 typedef GPtrArray* CL4EventWaitList;
+
+cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err);
 
 #define cl4_event_wait_list_new() \
 	g_ptr_array_new()
 	
-#define cl4_event_wait_list_add(event_wait_list, evt) \
-	g_ptr_array_add(event_wait_list, (void*) cl4_event_unwrap(evt))
+#define cl4_event_wait_list_add(evt_wait_lst, evt) \
+	g_ptr_array_add(evt_wait_lst, (void*) cl4_event_unwrap(evt))
 
-#define cl4_event_wait_list_get_num_events(event_wait_list) \
-	((event_wait_list != NULL) ? event_wait_list->len : 0)
+#define cl4_event_wait_list_get_num_events(evt_wait_lst) \
+	((evt_wait_lst != NULL) ? evt_wait_lst->len : 0)
 	
-#define cl4_event_wait_list_get_clevents(event_wait_list) \
-	((event_wait_list != NULL) \
-		? (const cl_event*) event_wait_list->pdata \
+#define cl4_event_wait_list_get_clevents(evt_wait_lst) \
+	((evt_wait_lst != NULL) \
+		? (const cl_event*) evt_wait_lst->pdata \
 		: NULL)
 	
-#define cl4_event_wait_list_clear(event_wait_list) \
-	if (event_wait_list != NULL) \
+#define cl4_event_wait_list_clear(evt_wait_lst) \
+	if (evt_wait_lst != NULL) \
 		g_ptr_array_remove_range( \
-			event_wait_list, 0, event_wait_list->len)
+			evt_wait_lst, 0, evt_wait_lst->len)
 	
-#define cl4_event_wait_list_destroy(event_wait_list) \
-	g_ptr_array_free(event_wait_list, TRUE)
+#define cl4_event_wait_list_destroy(evt_wait_lst) \
+	g_ptr_array_free(evt_wait_lst, TRUE)
 
 #endif
 

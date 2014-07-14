@@ -69,3 +69,36 @@ void cl4_event_destroy(CL4Event* evt) {
 		NULL, (cl4_wrapper_release_cl_object) clReleaseEvent, NULL); 
 
 }
+
+cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	cl_int ocl_status;
+	
+	ocl_status = clWaitForEvents(
+		cl4_event_wait_list_get_num_events(evt_wait_lst),
+		cl4_event_wait_list_get_clevents(evt_wait_lst));
+	gef_if_error_create_goto(*err, CL4_ERROR, 
+		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+		"Function '%s': error while waiting for events (OpenCL error %d: %s).",
+		__func__, ocl_status, cl4_err(ocl_status));
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:
+	
+	/* Return event. */
+	return ocl_status;
+
+}
