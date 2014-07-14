@@ -63,7 +63,10 @@ clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ptr = ptr;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	event = event;
+	if (event != NULL) {
+		*event = g_slice_new(struct _cl_event);
+		(*event)->ref_count = 1;
+	}
 	return CL_SUCCESS;
 }
                             
@@ -81,6 +84,80 @@ clEnqueueWriteBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ptr = ptr;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	event = event;
+	if (event != NULL) {
+		*event = g_slice_new(struct _cl_event);
+		(*event)->ref_count = 1;
+	}
+	return CL_SUCCESS;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueCopyBufferToImage(cl_command_queue command_queue, 
+	cl_mem src_buffer, cl_mem dst_image, size_t src_offset,
+	const size_t* dst_origin, const size_t* region, 
+	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
+	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+		
+	command_queue = command_queue;
+	src_buffer = src_buffer;
+	dst_image = dst_image;
+	src_offset = src_offset;
+	dst_origin = dst_origin;
+	region = region;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+	if (event != NULL) {
+		*event = g_slice_new(struct _cl_event);
+		(*event)->ref_count = 1;
+	}
 	return CL_SUCCESS;		
+
+}
+
+CL_API_ENTRY void* CL_API_CALL
+clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
+	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
+	size_t size, cl_uint num_events_in_wait_list, 
+	const cl_event* event_wait_list, cl_event* event,
+	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+		
+	command_queue = command_queue;
+	buffer = buffer;
+	blocking_map = blocking_map;
+	map_flags = map_flags;
+	offset = offset;
+	size = size;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+	if (event != NULL) {
+		*event = g_slice_new(struct _cl_event);
+		(*event)->ref_count = 1;
+	}
+	errcode_ret = errcode_ret;
+	return NULL;		
+
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
+	cl_mem dst_buffer, size_t src_offset, size_t dst_offset, 
+	size_t size, cl_uint num_events_in_wait_list, 
+	const cl_event* event_wait_list, cl_event* event) 
+	CL_API_SUFFIX__VERSION_1_0 {
+
+	command_queue = command_queue;
+	src_buffer = src_buffer;
+	dst_buffer = dst_buffer;
+	src_offset = src_offset;
+	dst_offset = dst_offset;
+	size = size;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+	if (event != NULL) {
+		*event = g_slice_new(struct _cl_event);
+		(*event)->ref_count = 1;
+	}
+	return CL_SUCCESS;		
+
+
 }

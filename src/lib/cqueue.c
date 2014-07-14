@@ -279,9 +279,9 @@ finish:
 CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 
 	/* Make sure cq is not NULL. */
-	g_return_if_fail(cq != NULL);
+	g_return_val_if_fail(cq != NULL, NULL);
 	/* Make sure evt is not NULL. */
-	g_return_if_fail(event != NULL);
+	g_return_val_if_fail(event != NULL, NULL);
 
 	CL4Event* evt = cl4_event_new_wrap(event);
 	
@@ -292,12 +292,14 @@ CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 	
 	g_hash_table_add(cq->evts, (gpointer) evt);
 	
+	return evt;
+	
 }
 
 cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err) {
 
 	/* Make sure cq is not NULL. */
-	g_return_if_fail(cq != NULL);
+	g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
 	
 	/* OpenCL status flag. */
 	cl_int ocl_status;
@@ -314,7 +316,7 @@ cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err) {
 cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err) {
 
 	/* Make sure cq is not NULL. */
-	g_return_if_fail(cq != NULL);
+	g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
 	
 	/* OpenCL status flag. */
 	cl_int ocl_status;

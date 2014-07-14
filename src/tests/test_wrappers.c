@@ -32,6 +32,7 @@
 #include "common.h"
 #include "program.h"
 #include "memobj.h"
+#include "buffer.h"
 #include <glib/gstdio.h>
 
 /* Max. length of information string. */
@@ -817,7 +818,6 @@ static void program_create_info_destroy_test() {
 	CL4Device* d = NULL;
 	CL4CQueue* cq = NULL;
 	GError* err = NULL;
-	cl_int ocl_status;
 	
 	/* Create a temporary kernel file. */
 	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
@@ -946,43 +946,38 @@ static void program_create_info_destroy_test() {
 	cl_uint c_h[16];
 	cl_uint d_h = 4;
 	
-	cl_mem a = clCreateBuffer(cl4_context_unwrap(ctx), 
-		CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &ocl_status);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to create buffer a, code %d (%s)", ocl_status, cl4_err(ocl_status));
-	cl_mem b = clCreateBuffer(cl4_context_unwrap(ctx), 
-		CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &ocl_status);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to create buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
-	cl_mem c = clCreateBuffer(cl4_context_unwrap(ctx), 
-		CL_MEM_WRITE_ONLY, 16 * sizeof(cl_uint), NULL, &ocl_status);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to create buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	CL4MemObj* a_w = cl4_buffer_new(ctx, CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &err);
+	g_assert_no_error(err);
+	CL4MemObj* b_w = cl4_buffer_new(ctx, CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &err);
+	g_assert_no_error(err);
+	CL4MemObj* c_w = cl4_buffer_new(ctx, CL_MEM_WRITE_ONLY, 16 * sizeof(cl_uint), NULL, &err);
+	g_assert_no_error(err);
 	
-	ocl_status = clEnqueueWriteBuffer(cl4_cqueue_unwrap(cq), a, CL_TRUE, 0, 16 * sizeof(cl_uint), a_h, 0, NULL, NULL);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to write data to buffer a, code %d (%s)", ocl_status, cl4_err(ocl_status));
-	ocl_status = clEnqueueWriteBuffer(cl4_cqueue_unwrap(cq), b, CL_TRUE, 0, 16 * sizeof(cl_uint), b_h, 0, NULL, NULL);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to write data to buffer b, code %d (%s)", ocl_status, cl4_err(ocl_status));
+	CL4Event* evt_w1 = cl4_buffer_write(cq, a_w, CL_FALSE, 0, 16 * sizeof(cl_uint), a_h, NULL, &err);
+	g_assert_no_error(err);
+	CL4Event* evt_w2 = cl4_buffer_write(cq, b_w, CL_FALSE, 0, 16 * sizeof(cl_uint), b_h, NULL, &err);
+	g_assert_no_error(err);
 
-	CL4MemObj* a_w = cl4_memobj_new_wrap(a);
-	CL4MemObj* b_w = cl4_memobj_new_wrap(b);
-	CL4MemObj* c_w = cl4_memobj_new_wrap(c);
-
-	cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, NULL, 
+	CL4EventWaitList ewl = cl4_event_wait_list_new();
+	cl4_event_wait_list_add(ewl, evt_w1);
+	cl4_event_wait_list_add(ewl, evt_w2);
+	
+	CL4Event* evt_kr = cl4_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, ewl, 
 		&err, a_w, b_w, c_w, cl4_arg_private(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
-	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), c, CL_TRUE, 0, 16 * sizeof(cl_uint), c_h, 0, NULL, NULL);
-	if (ocl_status != CL_SUCCESS)
-		g_error("Fail to read data from buffer c, code %d (%s)", ocl_status, cl4_err(ocl_status));
-
+	cl4_event_wait_list_add(ewl, evt_kr);
+	CL4Event* er1 = cl4_buffer_read(cq, c_w, CL_TRUE, 0, 16 * sizeof(cl_uint), c_h, ewl, &err);
+	g_assert_no_error(err);
+	
 #ifndef OPENCL_STUB
 	for (guint i = 0; i < 16; i++) {
 		g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i] + d_h);
+		//printf("c_h[%d] = %d\n", i, c_h[i]);
 	}
 #endif
+
+	cl4_event_wait_list_destroy(ewl);
 
 	cl4_memobj_destroy(a_w);
 	cl4_memobj_destroy(b_w);

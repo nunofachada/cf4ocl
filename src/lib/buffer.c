@@ -77,7 +77,7 @@ CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	cl_int ocl_status;
-	cl_event event;
+	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
 	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), 
@@ -93,6 +93,9 @@ CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
 	 * The event object will be released automatically when the command
 	 * queue is released. */
 	evt = cl4_cqueue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -124,7 +127,7 @@ CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	cl_int ocl_status;
-	cl_event event;
+	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
 	ocl_status = clEnqueueWriteBuffer(cl4_cqueue_unwrap(cq), 
@@ -140,6 +143,9 @@ CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
 	 * The event object will be released automatically when the command
 	 * queue is released. */
 	evt = cl4_cqueue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -172,7 +178,7 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	cl_int ocl_status;
-	cl_event event;
+	cl_event event = NULL;
 	void* ptr = NULL;
 	
 	ptr = clEnqueueMapBuffer(cl4_cqueue_unwrap(cq), 
@@ -189,6 +195,9 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 	 * The event object will be released automatically when the command
 	 * queue is released. */
 	*evt = cl4_cqueue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -223,7 +232,7 @@ CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	cl_int ocl_status;
-	cl_event event;
+	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
 	ocl_status = clEnqueueCopyBuffer(cl4_cqueue_unwrap(cq), 
@@ -240,6 +249,9 @@ CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
 	 * The event object will be released automatically when the command
 	 * queue is released. */
 	evt = cl4_cqueue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -273,7 +285,7 @@ CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	cl_int ocl_status;
-	cl_event event;
+	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
 	ocl_status = clEnqueueCopyBufferToImage(cl4_cqueue_unwrap(cq), 
@@ -290,6 +302,9 @@ CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
 	 * The event object will be released automatically when the command
 	 * queue is released. */
 	evt = cl4_cqueue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	cl4_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
