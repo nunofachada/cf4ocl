@@ -25,8 +25,8 @@
  * 
  */
 
-#include "manager.h"
-#include "kernelquery.h"
+#include "program.h"
+#include "kernel.h"
 
 /** 
  * @brief Kernel info main function.
@@ -42,44 +42,94 @@ int main(int argc, char *argv[])
 	/* Program variables */
 	/* ***************** */	
 	
-	int status;                  /* Function and program return status. */
-	GError *err = NULL;          /* Error management. */
-	cl_kernel kernel = NULL;     /* Kernel. */
-	CL4ManZone* zone = NULL;        /* OpenCL zone. */
-	CL4QueryKernelWorkgroup kwgi; /* Information about kernel. */
+	/* Function and program return status. */
+	int status;
+	/* Error management. */
+	GError *err = NULL;
+	/* Context wrapper. */
+	CL4Context* ctx = NULL;
+	/* Program wrapper. */
+	CL4Program* prg = NULL;
+	/* Kernel wrapper. */
+	CL4Kernel* krnl = NULL;
+	/* Device wrapper. */
+	CL4Device* dev = NULL;
+	/* Kernel information. */
+	CL4WrapperInfo* info = NULL;
+	/* Default device index. */
 	int dev_idx = -1;
 	
 	/* ************************** */
 	/* Parse command line options */
 	/* ************************** */
 
-	gef_if_error_create_goto(err, CL4_ERROR, (argc < 3) || (argc > 4), CL4_ERROR_ARGS, error_handler, "Usage: %s <program_file> <kernel_name> [device_index]\n", argv[0]);
+	gef_if_error_create_goto(err, CL4_ERROR, (argc < 3) || (argc > 4), 
+		CL4_ERROR_ARGS, error_handler, 
+		"Usage: %s <program_file> <kernel_name> [device_index]\n", 
+		argv[0]);
 	if (argc == 4) dev_idx = atoi(argv[3]);
 	
 	/* ********************************************* */
 	/* Initialize OpenCL variables and build program */
 	/* ********************************************* */
 	
-	/* Get the required CL zone. */
-	zone = cl4_man_zone_new(CL_DEVICE_TYPE_ALL, 1, CL_QUEUE_PROFILING_ENABLE, cl4_man_menu_device_selector, (dev_idx != -1 ? &dev_idx : NULL), &err);
-	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+	/* Get some context. */
+	ctx = cl4_context_new_any(&err);
+	gef_if_err_goto(err, error_handler);
+	
+	/* Get program which contains kernel. */
+	prg = cl4_program_new_from_source_file(ctx, argv[1], &err);
+	gef_if_err_goto(err, error_handler);
 	
 	/* Build program. */
-	status = cl4_man_program_create(zone, &argv[1], 1, NULL, &err);
-	gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+	cl4_program_build(prg, NULL, &err);
+	gef_if_err_goto(err, error_handler);
 
-	/* Kernel */
-	kernel = clCreateKernel(zone->program, argv[2], &status);
-	gef_if_error_create_goto(err, CL4_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to create '%s' kernel.", status, argv[2]);
+	/* Get kernel */
+	krnl = cl4_program_get_kernel(prg, argv[2], &err);
+	gef_if_err_goto(err, error_handler);
+	
+	/* Get the device. */
+	dev = cl4_context_get_device(ctx, 0, &err);
+	gef_if_err_goto(err, error_handler);
 
 	/* *************************** */
 	/*  Get and print kernel info  */
 	/* *************************** */
 	
-	status = cl4_query_workgroup_get(kernel, zone->device_info.device_id, &kwgi, &err);
-	gef_if_error_create_goto(err, CL4_ERROR, CL_SUCCESS != status, status, error_handler, "OpenCL error %d: unable to get kernel information.", status);
+	printf("\n   ======================== Static Kernel Information =======================\n\n");
 	
-	cl4_query_workgroup_print(&kwgi);	
+	info = cl4_kernel_workgroup_info(
+		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, &err);
+	gef_if_err_goto(err, error_handler);
+	printf("     Maximum workgroup size                  : %lu\n", 
+		(unsigned long) cl4_info_scalar(info, size_t));
+
+	info = cl4_kernel_workgroup_info(
+		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
+	gef_if_err_goto(err, error_handler);
+	printf("     Preferred multiple of workgroup size    : %lu\n", 
+		(unsigned long) cl4_info_scalar(info, size_t));
+		
+	info = cl4_kernel_workgroup_info(
+		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
+	gef_if_err_goto(err, error_handler);
+	printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", 
+		(unsigned long) cl4_info_array(info, size_t*)[0], 
+		(unsigned long) cl4_info_array(info, size_t*)[1], 
+		(unsigned long) cl4_info_array(info, size_t*)[2]);
+		
+	info = cl4_kernel_workgroup_info(
+		krnl, dev, CL_KERNEL_LOCAL_MEM_SIZE, &err);
+	gef_if_err_goto(err, error_handler);
+	printf("     Local memory used by kernel             : %lu bytes\n", 
+		(unsigned long) cl4_info_scalar(info, cl_ulong));
+		
+	info = cl4_kernel_workgroup_info(
+		krnl, dev, CL_KERNEL_PRIVATE_MEM_SIZE, &err);
+	gef_if_err_goto(err, error_handler);
+	printf("     Min. private mem. used by each workitem : %lu bytes\n", 
+		(unsigned long) cl4_info_scalar(info, cl_ulong));
 	
 	/* ************** */
 	/* Error handling */
@@ -103,11 +153,8 @@ cleanup:
 	/* Free stuff! */
 	/* *********** */
 	
-	/* Release OpenCL kernels */
-	if (kernel) clReleaseKernel(kernel);
-
-	/* Free OpenCL zone */
-	if (zone) cl4_man_zone_free(zone);
+	if (prg != NULL) cl4_program_destroy(prg);
+	if (ctx != NULL) cl4_context_destroy(ctx);
 	
 	/* Return status. */
 	return status;

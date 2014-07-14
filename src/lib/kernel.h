@@ -94,7 +94,7 @@ CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq,
  * occurs, NULL is returned.
  * */
 #define cl4_kernel_workgroup_info(krnl, dev, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) krnl, (CL4Wrapper*) dev, NULL, \
+	cl4_wrapper_get_info((CL4Wrapper*) krnl, (CL4Wrapper*) dev, \
 		param_name, (cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, err)
 

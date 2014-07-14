@@ -122,7 +122,7 @@ typedef cl_int (*cl4_wrapper_info_fp)(void);
 /**
  * @brief Information about a wrapped OpenCL entity.
  * */
-typedef struct cl4_info {
+typedef struct cl4_wrapper_info {
 	/** Device information. */
 	gpointer value;
 	/** Size in bytes of device information. */
@@ -149,6 +149,11 @@ gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
 gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
 	CL4Wrapper* wrapper2, cl_uint param_name, 
 	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
+	
+#define cl4_info_scalar(info, type) *((type*) (info)->value)
+
+#define cl4_info_array(info, type) ((type) (info)->value)
+
 
 #endif
 
