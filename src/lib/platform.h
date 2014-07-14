@@ -112,7 +112,7 @@ void cl4_platform_destroy(CL4Platform* platf);
  */
 #define cl4_platform_get_all_devices(platf, err) \
 	cl4_dev_container_get_all_devices((CL4DevContainer*) platf, \
-	cl4_platform_get_cldevices, err)
+		cl4_platform_get_cldevices, err)
  
 /** 
  * @brief Get ::CL4Device wrapper at given index. 
@@ -126,7 +126,7 @@ void cl4_platform_destroy(CL4Platform* platf);
  * */
 #define cl4_platform_get_device(platf, index, err) \
 	cl4_dev_container_get_device((CL4DevContainer*) platf, \
-	cl4_platform_get_cldevices, index, err)
+		cl4_platform_get_cldevices, index, err)
 
 /**
  * @brief Return number of devices in platform.
@@ -139,7 +139,7 @@ void cl4_platform_destroy(CL4Platform* platf);
  * */
 #define cl4_platform_get_num_devices(platf, err) \
 	cl4_dev_container_get_num_devices((CL4DevContainer*) platf, \
-	cl4_platform_get_cldevices, err)
+		cl4_platform_get_cldevices, err)
 
 /** @} */
 

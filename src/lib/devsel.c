@@ -287,10 +287,10 @@ finish:
  * @return TRUE if device is of the given type, FALSE otherwise.
  * */
 gboolean cl4_devsel_indep_type(
-	CL4Device* device, void* data, GError **err) {
+	CL4Device* dev, void* data, GError **err) {
 	
-	/* Make sure device is not NULL. */ 
-	g_return_val_if_fail(device != NULL, FALSE);
+	/* Make sure dev is not NULL. */ 
+	g_return_val_if_fail(dev != NULL, FALSE);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
 	
@@ -307,7 +307,7 @@ gboolean cl4_devsel_indep_type(
 	
 	/* Get device type. */
 	cl_device_type type = cl4_device_info_value_scalar(
-		device, CL_DEVICE_TYPE, cl_device_type, &err_internal);
+		dev, CL_DEVICE_TYPE, cl_device_type, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
@@ -327,14 +327,14 @@ finish:
 /**
  * @brief Independent filter function which only accepts GPU devices.
  * 
- * @param device OpenCL device to check for GPU type.
+ * @param dev OpenCL device to check for GPU type.
  * @param data Filter data, ignored.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return TRUE if device is a GPU, FALSE otherwise.
  * */
 gboolean cl4_devsel_indep_type_gpu(
-	CL4Device* device, void *data, GError **err) {
+	CL4Device* dev, void *data, GError **err) {
 
 	/* Set device type to GPU. */
 	cl_device_type type_to_check = CL_DEVICE_TYPE_GPU;
@@ -343,21 +343,21 @@ gboolean cl4_devsel_indep_type_gpu(
 	data = data;
 	
 	/* Return result. */
-	return cl4_devsel_indep_type(device, (void*) &type_to_check, err);
+	return cl4_devsel_indep_type(dev, (void*) &type_to_check, err);
 	
 }
 
 /**
  * @brief Independent filter function which only accepts CPU devices.
  * 
- * @param device OpenCL device to check for CPU type.
+ * @param dev OpenCL device to check for CPU type.
  * @param data Filter data, ignored.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return TRUE if device is a CPU, FALSE otherwise.
  * */
 gboolean cl4_devsel_indep_type_cpu(
-	CL4Device* device, void *data, GError **err) {
+	CL4Device* dev, void *data, GError **err) {
 
 	/* Set device type to CPU. */
 	cl_device_type type_to_check = CL_DEVICE_TYPE_CPU;
@@ -366,7 +366,7 @@ gboolean cl4_devsel_indep_type_cpu(
 	data = data;
 	
 	/* Return result. */
-	return cl4_devsel_indep_type(device, (void*) &type_to_check, err);
+	return cl4_devsel_indep_type(dev, (void*) &type_to_check, err);
 
 }
 
@@ -381,7 +381,7 @@ gboolean cl4_devsel_indep_type_cpu(
  * @return TRUE if device is a accelerator, FALSE otherwise.
  * */
 gboolean cl4_devsel_indep_type_accel(
-	CL4Device* device, void *data, GError **err) {
+	CL4Device* dev, void *data, GError **err) {
 
 	/* Set device type to Accelerator. */
 	cl_device_type type_to_check = CL_DEVICE_TYPE_ACCELERATOR;
@@ -390,9 +390,120 @@ gboolean cl4_devsel_indep_type_accel(
 	data = data;
 	
 	/* Return result. */
-	return cl4_devsel_indep_type(device, (void*) &type_to_check, err);
+	return cl4_devsel_indep_type(dev, (void*) &type_to_check, err);
 
 }
+
+//~ /**
+ //~ * @brief Independent filter which selects devices based on device name, 
+ //~ * device vendor and/or platform name.
+ //~ * 
+ //~ * @param dev OpenCL device to filter by platform.
+ //~ * @param data Filter data, must be a string.
+ //~ * @param err Return location for a GError, or NULL if error reporting
+ //~ * is to be ignored.
+ //~ * @return TRUE if device is accepted by filter, FALSE otherwise.
+ //~ * */
+//~ gboolean cl4_devsel_indep_string(
+	//~ CL4Device* dev, void *data, GError **err) {
+	//~ 
+	//~ /* Make sure device is not NULL. */ 
+	//~ g_return_val_if_fail(dev != NULL, FALSE);
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	//~ 
+	//~ /* Internal error object. */
+	//~ GError* err_internal = NULL;
+	//~ 
+	//~ /* Return value, i.e., flag indicating if device belongs to the 
+	 //~ * specified platform. */
+	//~ gboolean pass = FALSE;
+	//~ 
+	//~ /* Partial name must be a substring of complete name. */
+	//~ gchar *completeInfo, *completeInfoLower, *partialInfoLower;
+	//~ 
+	//~ /* Make sure data is not NULL. */
+	//~ gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
+		//~ CL4_ERROR_INVALID_DATA, error_handler,
+		//~ "Function '%s': invalid filter data", __func__); 
+	//~ 
+	//~ /* Lower-case partial name for comparison. */
+	//~ partialInfoLower = g_ascii_strdown((gchar*) data, -1);
+//~ 
+	//~ /* Compare with device name. */
+	//~ completeInfo = cl4_device_info_value_array(
+		//~ dev, CL_DEVICE_NAME, char*, &err_internal);
+	//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+	//~ 
+	//~ completeInfoLower = g_ascii_strdown(completeInfo, -1);
+//~ 
+	//~ if (!g_strrstr(completeInfoLower, partialInfoLower)) {
+		//~ /* Device name does not match, check device vendor. */
+		//~ 
+		//~ /* Free string allocated for previous comparison. */
+		//~ g_free(completeInfoLower);
+		//~ 
+		//~ /* Compare with device vendor. */
+		//~ completeInfo = cl4_device_info_value_array(
+			//~ dev, CL_DEVICE_VENDOR, char*, &err_internal);
+		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+//~ 
+		//~ completeInfoLower = g_ascii_strdown(completeInfo, -1);
+//~ 
+		//~ if (!g_strrstr(completeInfoLower, partialInfoLower)) {
+			//~ /* Device vendor does not match, check platform name. */
+//~ 
+			//~ /* Free string allocated for previous comparison. */
+			//~ g_free(completeInfoLower);
+			//~ 
+			//~ /* Compare with platform name. */
+			//~ CL4Platform* platf;
+			//~ CL4WrapperInfo* info;
+			//~ 
+			//~ /* Get device platform. */
+			//~ platf = cl4_device_get_platform(dev, &err_internal);
+			//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+			//~ 
+			//~ /* Get platform name. */
+			//~ info = cl4_platform_info(
+				//~ platf, CL_PLATFORM_NAME, &err_internal);
+			//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+			//~ 
+			//~ completeInfoLower = g_ascii_strdown((char*) info->value, -1);
+			//~ 
+			//~ /* Compare. */
+			//~ if (g_strrstr(completeInfoLower, partialInfoLower)) {
+				//~ pass = TRUE;
+			//~ }
+			//~ 
+		//~ } else {
+			//~ pass = TRUE;
+		//~ }
+		//~ 
+	//~ } else {
+		//~ pass = TRUE;
+	//~ }
+//~ 
+	//~ g_free(completeInfoLower);
+	//~ g_free(partialInfoLower);
+	//~ 
+	//~ /* If we got here, everything is OK. */
+	//~ g_assert (err == NULL || *err == NULL);
+	//~ goto finish;
+	//~ 
+//~ error_handler:
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert (err == NULL || *err != NULL);
+	//~ 
+	//~ /* Filter will not accept device in case an error occurs. */
+	//~ pass = FALSE;
+	//~ 
+//~ finish:
+//~ 
+	//~ /* Return filtering result. */
+	//~ return pass;
+//~ 
+//~ }
 
 /**
  * @brief Independent filter function which only accepts devices of a
@@ -537,21 +648,25 @@ finish:
 }
 
 /** 
- * @brief Private helper function, prints a list of available devices. 
+ * @brief Private helper function, prints a list of the devices 
+ * specified in the given list.
  * 
  * @param devices List of devices.
- * @param selected
- * @param err
+ * @param selected Index of selected device (a message will appear near
+ * the device name indicating the device is selected). Pass -1 to 
+ * ignore it.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
  * */
 static void cl4_devsel_dep_menu_list(CL4DevSelDevices devices, 
-	cl_uint selected, GError** err) {
+	cl_int selected, GError** err) {
 	
 	char* sel_str;
 	g_print("\n   " \
 		"=========================== Device Selection" \
 		"============================\n\n");
 		
-	for (cl_uint i = 0; i < devices->len; i++) {
+	for (cl_int i = 0; i < (cl_int) devices->len; i++) {
 		
 		char* name = cl4_device_info_value_array(
 				devices->pdata[i], CL_DEVICE_NAME, char*, err);
@@ -632,7 +747,7 @@ finish:
  * @brief Dependent filter function which presents a menu to the user
  * allowing him to select the desired device.
  * 
- * @param devices Currently available OpenCL devices.
+ * @param devices List of devices.
  * @param data If not NULL, can contain a device index, such that the
  * device is automatically selected by this filter.
  * @param err Return location for a GError, or NULL if error reporting
@@ -699,3 +814,5 @@ finish:
 	/* Return filtered devices. */
 	return devices;
 }
+
+

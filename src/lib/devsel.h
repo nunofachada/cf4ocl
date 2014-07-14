@@ -122,6 +122,11 @@ gboolean cl4_devsel_indep_type_cpu(
  * devices. */
 gboolean cl4_devsel_indep_type_accel(
 	CL4Device* device, void *data, GError **err);
+	
+/** @brief Independent filter which selects devices based on device 
+ * name, device vendor and/or platform name. */
+gboolean cl4_devsel_indep_string(
+	CL4Device* dev, void *data, GError **err);
 
 /** @brief Independent filter function which only accepts devices of a
  * specified platform. */

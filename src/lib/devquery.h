@@ -82,7 +82,7 @@ extern const CL4DevQueryMap cl4_devquery_info_map[];
  * kept in the cl4_devquery_info_map. */
 gchar* cl4_devquery_get_prefix_final(gchar* prefix);
 
-/** @brief Return a cl_device_info object given its name. */	
+/** @brief Return a cl_device_info object given its name. */
 cl_device_info cl4_devquery_name(gchar* name);
 
 /** @brief Get a list of device information parameters which have the 

@@ -36,6 +36,9 @@ struct cl4_device {
 	/** Parent wrapper object. */
 	CL4Wrapper base;
 	
+	/** Device platform. */
+	//~ CL4Platform* platf;
+	
 };
 
 /**
@@ -72,3 +75,42 @@ void cl4_device_destroy(CL4Device* dev) {
 		NULL, NULL, NULL); 
 
 }
+
+//~ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err) {
+	//~ 
+	//~ /* Make sure dev is not NULL. */
+	//~ g_return_val_if_fail(cq != NULL, NULL);
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	//~ 
+	//~ CL4Platform* platf = NULL;
+	//~ 
+	//~ /* Internal error object. */
+	//~ GError* err_internal = NULL;
+	//~ 
+	//~ if (dev->platf != NULL) {
+		//~ platf = dev->platf;
+	//~ } else {
+		//~ CL4WrapperInfo* info = NULL;
+		//~ info = cl4_device_info(
+			//~ dev, CL_DEVICE_PLATFORM, &err_internal);
+		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+		//~ platf = cl4_platform_new_wrap(*((cl_platform_id*) info->value));
+		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+		//~ dev->platf = platf;
+	//~ }
+//~ 
+	//~ /* If we got here, everything is OK. */
+	//~ g_assert (err == NULL || *err == NULL);
+	//~ goto finish;
+//~ 
+//~ error_handler:
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert(err == NULL || *err != NULL);
+	//~ 
+//~ finish:		
+//~ 
+	//~ /* Return the device platform wrapper. */
+	//~ return platf;	
+	//~ 
+//~ }

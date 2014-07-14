@@ -33,12 +33,13 @@
 #include "gerrorf.h"
 #include "wrapper.h"
 #include "errors.h"
-#include "string.h"
+#include "platform.h"
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/opencl.h>
 #else
     #include <CL/opencl.h>
 #endif
+#include <string.h>
 
 /** @brief Device wrapper object. */
 typedef struct cl4_device CL4Device;
@@ -49,6 +50,8 @@ CL4Device* cl4_device_new_wrap(cl_device_id device);
 /** @brief Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed. */
 void cl4_device_destroy(CL4Device* dev);
+
+//~ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
 
 /**
  * @brief Get device information object.

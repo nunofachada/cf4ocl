@@ -25,6 +25,9 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
+#ifndef CL4_ARG_H
+#define CL4_ARG_H 
+
 #include "common.h"
 #include "wrapper.h"
 
@@ -43,3 +46,5 @@ void cl4_arg_destroy(CL4Arg* arg);
 size_t cl4_arg_size(CL4Arg* arg);
 
 void* cl4_arg_value(CL4Arg* arg);
+
+#endif
