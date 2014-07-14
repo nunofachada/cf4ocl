@@ -140,6 +140,11 @@ gboolean cl4_devsel_indep_platform(
  * same platform (the platform to which the first device belong to). */
 CL4DevSelDevices cl4_devsel_dep_platform(
 	CL4DevSelDevices devices, void *data, GError **err);
+	
+/** @brief Dependent filter function which presents a menu to the user
+ * allowing him to select the desired device. */
+CL4DevSelDevices cl4_devsel_dep_menu(
+	CL4DevSelDevices devices, void *data, GError **err);
 
 /** @} */
 

@@ -56,8 +56,10 @@ int main(int argc, char *argv[])
 	CL4Device* dev = NULL;
 	/* Kernel information. */
 	CL4WrapperInfo* info = NULL;
+	/* Device filters. */
+	CL4DevSelFilters filters = NULL;
 	/* Default device index. */
-	int dev_idx = -1;
+	cl_int dev_idx = -1;
 	
 	/* ************************** */
 	/* Parse command line options */
@@ -73,8 +75,11 @@ int main(int argc, char *argv[])
 	/* Initialize OpenCL variables and build program */
 	/* ********************************************* */
 	
-	/* Get some context. */
-	ctx = cl4_context_new_any(&err);
+	/* Select a context/device. */
+	cl4_devsel_add_dep_filter(
+		&filters, cl4_devsel_dep_menu, 
+		(dev_idx == -1) ? NULL : (void*) &dev_idx);
+	ctx = cl4_context_new_from_filters(&filters, &err);
 	gef_if_err_goto(err, error_handler);
 	
 	/* Get program which contains kernel. */
@@ -97,24 +102,24 @@ int main(int argc, char *argv[])
 	/*  Get and print kernel info  */
 	/* *************************** */
 	
-	printf("\n   ======================== Static Kernel Information =======================\n\n");
+	g_printf("\n   ======================== Static Kernel Information =======================\n\n");
 	
 	info = cl4_kernel_workgroup_info(
 		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
-	printf("     Maximum workgroup size                  : %lu\n", 
+	g_printf("     Maximum workgroup size                  : %lu\n", 
 		(unsigned long) cl4_info_scalar(info, size_t));
 
 	info = cl4_kernel_workgroup_info(
 		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
 	gef_if_err_goto(err, error_handler);
-	printf("     Preferred multiple of workgroup size    : %lu\n", 
+	g_printf("     Preferred multiple of workgroup size    : %lu\n", 
 		(unsigned long) cl4_info_scalar(info, size_t));
 		
 	info = cl4_kernel_workgroup_info(
 		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
-	printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", 
+	g_printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", 
 		(unsigned long) cl4_info_array(info, size_t*)[0], 
 		(unsigned long) cl4_info_array(info, size_t*)[1], 
 		(unsigned long) cl4_info_array(info, size_t*)[2]);
@@ -122,14 +127,16 @@ int main(int argc, char *argv[])
 	info = cl4_kernel_workgroup_info(
 		krnl, dev, CL_KERNEL_LOCAL_MEM_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
-	printf("     Local memory used by kernel             : %lu bytes\n", 
+	g_printf("     Local memory used by kernel             : %lu bytes\n", 
 		(unsigned long) cl4_info_scalar(info, cl_ulong));
 		
 	info = cl4_kernel_workgroup_info(
 		krnl, dev, CL_KERNEL_PRIVATE_MEM_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
-	printf("     Min. private mem. used by each workitem : %lu bytes\n", 
+	g_printf("     Min. private mem. used by each workitem : %lu bytes\n", 
 		(unsigned long) cl4_info_scalar(info, cl_ulong));
+	
+	g_printf("\n");
 	
 	/* ************** */
 	/* Error handling */
@@ -143,7 +150,7 @@ int main(int argc, char *argv[])
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err != NULL);
-	fprintf(stderr, "%s", err->message);
+	g_fprintf(stderr, "%s\n", err->message);
 	status = err->code;
 	g_error_free(err);
 
