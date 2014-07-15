@@ -383,7 +383,7 @@ cleanup:
 	if (rng != NULL) g_rand_free(rng);
 	
 	/* Free profile */
-	if (profile) cl4_prof_free(profile);
+	if (profile) cl4_prof_destroy(profile);
 	
 	/* Release events */
 	if (events[0]) clReleaseEvent(events[0]);

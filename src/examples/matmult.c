@@ -855,8 +855,8 @@ cleanup:
 	/* *********** */
 	
 	/* Free profile and cpu timer */
-	if (profile_dev) cl4_prof_free(profile_dev);
-	if (profile_cpu) cl4_prof_free(profile_cpu);
+	if (profile_dev) cl4_prof_destroy(profile_dev);
+	if (profile_cpu) cl4_prof_destroy(profile_cpu);
 	
 	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);

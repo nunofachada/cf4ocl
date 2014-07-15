@@ -39,7 +39,7 @@
 #include "gerrorf.h"
 #include "errors.h"
 #include "common.h"
-
+#include "cqueue.h"
 
 /** @brief Profile class, contains profiling information of OpenCL 
  * queues and events. */
@@ -87,71 +87,78 @@ typedef enum {
 	CL4_PROF_AGGEVDATA_SORT_TIME
 }  CL4ProfEvAggDataSort;
 
-/** @brief Create a new OpenCL events profile. */
+/** @brief Create a new profile object. */
 CL4Prof* cl4_prof_new();
 
-/** @brief Free an OpenCL events profile. */
-void cl4_prof_free(CL4Prof* profile);
+/** @brief Destroy a profile object. */
+void cl4_prof_destroy(CL4Prof* profile);
 
-/** @brief Indication that profiling sessions has started. */
+/** @brief Starts the global profiler timer. Only required if client
+* wishes to compare the effectively ellapsed time with the OpenCL
+* kernels time. */
 void cl4_prof_start(CL4Prof* profile);
 
-/** @brief Indication that profiling sessions has ended. */
+/** @brief Stops the global profiler timer. Only required if 
+ * cl4_prof_start() was called. */
 void cl4_prof_stop(CL4Prof* profile);
 
 /** @brief If profiling has started but not stopped, returns the time
  * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
-gdouble cl4_prof_time_elapsed(CL4Prof* profile);
+double cl4_prof_time_elapsed(CL4Prof* profile);
 
-/** @brief Add OpenCL event to events profile, more specifically adds
- * the start and end instants of the given event to the profile. */
-int cl4_prof_add(CL4Prof* profile, const char* event_name, cl_event ev, GError** err);
+/** @brief Add a command queue wrapper for profiling. */
+void cl4_prof_add_queue(
+	CL4Prof* prof, const char* cq_name, CL4CQueue* cq);
 
-/** @brief Add OpenCL event to events profile. Receives a CL4ProfEvName
- * instead of a separate event and name like cl4_prof_add(). */
-int cl4_prof_add_evname(CL4Prof* profile, CL4ProfEvName event_with_name, GError** err);
-
-/** @brief Add OpenCL events to events profile, more specifically adds
- * the start of ev1 and end of ev2 to the profile. */
-int cl4_prof_add_composite(CL4Prof* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err);
-
-/** @brief Create new event instant. */
-CL4ProfEvInst* cl4_prof_evinst_new(const char* eventName, guint id, cl_ulong instant, CL4ProfEvInstType type, cl_command_queue queue);
-
-/** @brief Free an event instant. */
-void cl4_prof_evinst_free(gpointer event_instant);
-
-/** @brief Compares two event instants for sorting purposes. */
-gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata);
-
-/** @brief Determine overlap matrix for the given OpenCL events profile. */
-int cl4_prof_overmat(CL4Prof* profile, GError** err);
-
-/** @brief Determine aggregate statistics for the given OpenCL events profile. */
-int cl4_prof_aggregate(CL4Prof* profile, GError** err);
-
-/** @brief Create a new aggregate statistic for events of a given type. */
-CL4ProfEvAggregate* cl4_prof_aggregate_new(const char* eventName);
-
-/** @brief Free an aggregate statistic. */
-void cl4_prof_aggregate_free(gpointer agg);
-
-/** @brief Print profiling info. */
-int cl4_prof_print_info(CL4Prof* profile, CL4ProfEvAggDataSort evAggSortType, GError** err);
-
-/** @brief Export profiling info to a given stream. */
-int cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
-
-/** @brief Helper function which exports profiling info to a given file,
- * automatically opening and closing the file. Check the
- * cl4_prof_export_info() for more information. */
-int cl4_prof_export_info_file(CL4Prof* profile, const char* filename, GError** err);
-
-/** @brief Set export options using a ::CL4ProfExportOptions struct. */
-void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts);
-
-/** @brief Get current export options. */
- CL4ProfExportOptions cl4_prof_export_opts_get();
+//~ /** @brief Add OpenCL event to events profile, more specifically adds
+ //~ * the start and end instants of the given event to the profile. */
+//~ int cl4_prof_add(CL4Prof* profile, const char* event_name, cl_event ev, GError** err);
+//~ 
+//~ /** @brief Add OpenCL event to events profile. Receives a CL4ProfEvName
+ //~ * instead of a separate event and name like cl4_prof_add(). */
+//~ int cl4_prof_add_evname(CL4Prof* profile, CL4ProfEvName event_with_name, GError** err);
+//~ 
+//~ /** @brief Add OpenCL events to events profile, more specifically adds
+ //~ * the start of ev1 and end of ev2 to the profile. */
+//~ int cl4_prof_add_composite(CL4Prof* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err);
+//~ 
+//~ /** @brief Create new event instant. */
+//~ CL4ProfEvInst* cl4_prof_evinst_new(const char* eventName, guint id, cl_ulong instant, CL4ProfEvInstType type, cl_command_queue queue);
+//~ 
+//~ /** @brief Free an event instant. */
+//~ void cl4_prof_evinst_free(gpointer event_instant);
+//~ 
+//~ /** @brief Compares two event instants for sorting purposes. */
+//~ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata);
+//~ 
+//~ /** @brief Determine overlap matrix for the given OpenCL events profile. */
+//~ int cl4_prof_overmat(CL4Prof* profile, GError** err);
+//~ 
+//~ /** @brief Determine aggregate statistics for the given OpenCL events profile. */
+//~ int cl4_prof_aggregate(CL4Prof* profile, GError** err);
+//~ 
+//~ /** @brief Create a new aggregate statistic for events of a given type. */
+//~ CL4ProfEvAggregate* cl4_prof_aggregate_new(const char* eventName);
+//~ 
+//~ /** @brief Free an aggregate statistic. */
+//~ void cl4_prof_aggregate_free(gpointer agg);
+//~ 
+//~ /** @brief Print profiling info. */
+//~ int cl4_prof_print_info(CL4Prof* profile, CL4ProfEvAggDataSort evAggSortType, GError** err);
+//~ 
+//~ /** @brief Export profiling info to a given stream. */
+//~ int cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
+//~ 
+//~ /** @brief Helper function which exports profiling info to a given file,
+ //~ * automatically opening and closing the file. Check the
+ //~ * cl4_prof_export_info() for more information. */
+//~ int cl4_prof_export_info_file(CL4Prof* profile, const char* filename, GError** err);
+//~ 
+//~ /** @brief Set export options using a ::CL4ProfExportOptions struct. */
+//~ void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts);
+//~ 
+//~ /** @brief Get current export options. */
+//~ CL4ProfExportOptions cl4_prof_export_opts_get();
 
 #endif
