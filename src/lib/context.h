@@ -28,12 +28,7 @@
 #ifndef CL4_CONTEXT_H
 #define CL4_CONTEXT_H
 
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
-
+#include "oclversions.h"
 #include "devsel.h"
 #include "gerrorf.h"
 #include "common.h"

@@ -28,12 +28,8 @@
 #ifndef CL4_DEVSEL_H
 #define CL4_DEVSEL_H
 
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
 #include <glib.h>
+#include "oclversions.h"
 #include "device.h"
 #include "platforms.h"
 

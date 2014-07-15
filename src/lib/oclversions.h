@@ -30,9 +30,24 @@
 
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/opencl.h>
+    #include <OpenCL/cl_d3d10.h>
+	#ifdef CL_VERSION_1_2
+		#include <OpenCL/cl_d3d10.h>
+		#include <OpenCL/cl_d3d11.h>
+		#include <OpenCL/cl_dx9_media_sharing.h>
+		#include <OpenCL/cl_egl.h>
+	#endif
 #else
     #include <CL/opencl.h>
+    #include <CL/cl_d3d10.h>
+	#ifdef CL_VERSION_1_2
+		#include <CL/cl_d3d10.h>
+		#include <CL/cl_d3d11.h>
+		#include <CL/cl_dx9_media_sharing.h>
+		#include <CL/cl_egl.h>
+	#endif
 #endif
+
 
 /* Define stuff for OpenCL implementations lower than 1.1 */
 #ifndef CL_VERSION_1_1
@@ -60,6 +75,13 @@
 	#define CL_DEVICE_INTEGRATED_MEMORY_NV              0x4006
 	/* cl_device_fp_config - bitfield */
 	#define CL_FP_SOFT_FLOAT                            (1 << 6)
+	/* cl_command_type */
+	#define CL_COMMAND_READ_BUFFER_RECT                 0x1201
+	#define CL_COMMAND_WRITE_BUFFER_RECT                0x1202
+	#define CL_COMMAND_COPY_BUFFER_RECT                 0x1203
+	#define CL_COMMAND_USER                             0x1204
+	#define CL_COMMAND_BARRIER                          0x1205
+	
 #endif
 
 /* Define stuff for OpenCL implementations lower than 1.2 */
@@ -95,7 +117,28 @@
 	#define CL_DEVICE_PRINTF_BUFFER_SIZE                0x1049
 	//#define CL_DEVICE_IMAGE_PITCH_ALIGNMENT             0x104A
 	//#define CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT      0x104B
+	/* cl_command_type */
+	#define CL_COMMAND_MIGRATE_MEM_OBJECTS              0x1206
+	#define CL_COMMAND_FILL_BUFFER                      0x1207
+	#define CL_COMMAND_FILL_IMAGE                       0x1208
+	#define CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR        0x202B
+	#define CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR        0x202C	
+	
 #endif	
+
+/* Define stuff for OpenCL implementations lower than 2.0 */
+#ifndef CL_VERSION_2_0
+
+	/* cl_command_type */
+	#define CL_COMMAND_SVM_FREE                         0x1209
+	#define CL_COMMAND_SVM_MEMCPY                       0x120A
+	#define CL_COMMAND_SVM_MEMFILL                      0x120B
+	#define CL_COMMAND_SVM_MAP                          0x120C
+	#define CL_COMMAND_SVM_UNMAP                        0x120D
+
+#endif	
+
+
 
 /* Some of these query constants may not be defined in standard 
  * OpenCL headers, so we defined them here if necessary. */

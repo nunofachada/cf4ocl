@@ -29,11 +29,7 @@
 #define CL4_PROGRAM_H 
 
 #include <glib.h>
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
+#include "oclversions.h"
 #include "context.h"
 #include "wrapper.h"
 #include "event.h"

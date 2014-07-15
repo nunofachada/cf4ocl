@@ -33,11 +33,7 @@
 #include "device.h"
 #include "errors.h"
 #include "string.h"
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
+#include "oclversions.h"
 
 /** 
  * @brief Output formatting function.

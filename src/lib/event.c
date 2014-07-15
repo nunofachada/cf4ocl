@@ -35,6 +35,14 @@ struct cl4_event {
 	/** Parent wrapper object. */
 	CL4Wrapper base;
 	
+	/** Event name, for profiling purposes only. */
+	const char* name;
+	
+	/** Final event name, for profiling purposes only. It is 
+	 * automatically determined based on event type when event name is 
+	 * not set. */
+	const char* final_name;
+	
 };
 
 /**
@@ -52,8 +60,13 @@ struct cl4_event {
  * */
 CL4Event* cl4_event_new_wrap(cl_event event) {
 	
-	return (CL4Event*) cl4_wrapper_new(
+	CL4Event* evt = (CL4Event*) cl4_wrapper_new(
 		(void*) event, sizeof(CL4Event));
+	
+	evt->name = NULL;
+	evt->final_name = NULL;
+	
+	return evt;
 		
 }
 
@@ -70,6 +83,204 @@ void cl4_event_destroy(CL4Event* evt) {
 
 }
 
+void cl4_event_set_name(CL4Event* evt, const char* name) {
+
+	/* Make sure evt wrapper object is not NULL. */
+	g_return_if_fail(evt != NULL);
+
+	/* Set event name. */
+	evt->name = name;
+
+}
+
+const char* cl4_event_get_name(CL4Event* evt) {
+
+	/* Make sure evt wrapper object is not NULL. */
+	g_return_if_fail(evt != NULL);
+
+	/* Return event name. */
+	return evt->name;
+	
+}
+
+const char* cl4_event_get_final_name(CL4Event* evt) {
+
+	/* Make sure evt wrapper object is not NULL. */
+	g_return_if_fail(evt != NULL);
+
+	/* Check if final name is NULL... */
+	if (evt->final_name == NULL) {
+		/* ...if so, check if name is also NULL. */
+		if (evt->name == NULL) {
+			/* Name is NULL, determine a final name based on type of
+			 * command which produced the event. */
+			
+			GError* err_internal = NULL;
+			
+			cl_command_type ct = 
+				cl4_event_get_command_type(evt, &err_internal);
+			
+			if (err_internal != NULL) {
+				g_warning("Unable to determine final event name due to" \
+					"the following error: %s", err_internal->message);
+				g_error_free(err_internal);
+				return NULL;
+			}
+			
+			switch (ct) {
+				case CL_COMMAND_NDRANGE_KERNEL:
+					evt->final_name = "NDRANGE_KERNEL"; 
+					break;
+				case CL_COMMAND_NATIVE_KERNEL:
+					evt->final_name = "NATIVE_KERNEL"; 
+					break;
+				case CL_COMMAND_READ_BUFFER:
+					evt->final_name = "READ_BUFFER"; 
+					break;
+				case CL_COMMAND_WRITE_BUFFER:
+					evt->final_name = "WRITE_BUFFER"; 
+					break;
+				case CL_COMMAND_COPY_BUFFER:
+					evt->final_name = "COPY_BUFFER";
+					break;
+				case CL_COMMAND_READ_IMAGE:
+					evt->final_name = "READ_IMAGE";
+					break;
+				case CL_COMMAND_WRITE_IMAGE:
+					evt->final_name = "WRITE_IMAGE";
+					break;
+				case CL_COMMAND_COPY_IMAGE:
+					evt->final_name = "COPY_IMAGE";
+					break;
+				case CL_COMMAND_COPY_BUFFER_TO_IMAGE:
+					evt->final_name = "COPY_BUFFER_TO_IMAGE"; 
+					break;
+				case CL_COMMAND_COPY_IMAGE_TO_BUFFER:
+					evt->final_name = "COPY_IMAGE_TO_BUFFER"; 
+					break;
+				case CL_COMMAND_MAP_BUFFER:
+					evt->final_name = "MAP_BUFFER"; 
+					break;
+				case CL_COMMAND_MAP_IMAGE:
+					evt->final_name = "MAP_IMAGE"; 
+					break;
+				case CL_COMMAND_UNMAP_MEM_OBJECT:
+					evt->final_name = "UNMAP_MEM_OBJECT"; 
+					break;
+				case CL_COMMAND_MARKER:
+					evt->final_name = "MARKER"; 
+					break;
+				case CL_COMMAND_ACQUIRE_GL_OBJECTS:
+					evt->final_name = "ACQUIRE_GL_OBJECTS"; 
+					break;
+				case CL_COMMAND_RELEASE_GL_OBJECTS:
+					evt->final_name = "RELEASE_GL_OBJECTS"; 
+					break;
+				case CL_COMMAND_READ_BUFFER_RECT:
+					evt->final_name = "READ_BUFFER_RECT"; 
+					break;
+				case CL_COMMAND_WRITE_BUFFER_RECT:
+					evt->final_name = "WRITE_BUFFER_RECT"; 
+					break;
+				case CL_COMMAND_COPY_BUFFER_RECT:
+					evt->final_name = "COPY_BUFFER_RECT"; 
+					break;
+				case CL_COMMAND_USER:
+					/* This is here just for completeness, as a user
+					 * event can't be profiled. */
+					evt->final_name = "USER"; 
+					break;
+				case CL_COMMAND_BARRIER:
+					evt->final_name = "BARRIER"; 
+					break;
+				case CL_COMMAND_MIGRATE_MEM_OBJECTS:
+					evt->final_name = "MIGRATE_MEM_OBJECTS"; 
+					break;
+				case CL_COMMAND_FILL_BUFFER:
+					evt->final_name = "FILL_BUFFER"; 
+					break;
+				case CL_COMMAND_FILL_IMAGE:
+					evt->final_name = "FILL_IMAGE"; 
+					break;
+				case CL_COMMAND_SVM_FREE:
+					evt->final_name = "SVM_FREE"; 
+					break;
+				case CL_COMMAND_SVM_MEMCPY:
+					evt->final_name = "SVM_MEMCPY"; 
+					break;
+				case CL_COMMAND_SVM_MEMFILL:
+					evt->final_name = "SVM_MEMFILL"; 
+					break;
+				case CL_COMMAND_SVM_MAP:
+					evt->final_name = "SVM_MAP"; 
+					break;
+				case CL_COMMAND_SVM_UNMAP:
+					evt->final_name = "SVM_UNMAP"; 
+					break;
+				case CL_COMMAND_GL_FENCE_SYNC_OBJECT_KHR:
+					evt->final_name = "GL_FENCE_SYNC_OBJECT_KHR"; 
+					break;
+				case CL_COMMAND_ACQUIRE_D3D10_OBJECTS_KHR:
+					evt->final_name = "ACQUIRE_D3D10_OBJECTS_KHR"; 
+					break;
+				case CL_COMMAND_RELEASE_D3D10_OBJECTS_KHR:
+					evt->final_name = "RELEASE_D3D10_OBJECTS_KHR"; 
+					break;
+				case CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR:
+					evt->final_name = "ACQUIRE_DX9_MEDIA_SURFACES_KHR"; 
+					break;
+				case CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR:
+					evt->final_name = "RELEASE_DX9_MEDIA_SURFACES_KHR"; 
+					break;
+				case CL_COMMAND_ACQUIRE_D3D11_OBJECTS_KHR:
+					evt->final_name = "ACQUIRE_D3D11_OBJECTS_KHR"; 
+					break;
+				case CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR:
+					evt->final_name = "RELEASE_D3D11_OBJECTS_KHR"; 
+					break;
+				case CL_COMMAND_EGL_FENCE_SYNC_OBJECT_KHR:
+					evt->final_name = "EGL_FENCE_SYNC_OBJECT_KHR"; 
+					break;
+				default:
+					evt->final_name = NULL;
+					g_warning("Unknown event command type"); 
+					break;
+			}
+			 
+		} else {
+			/* Name is not NULL, use it as final name. */
+			evt->final_name = evt->name;
+		}
+	}
+	
+	/* Return final name. */
+	return evt->final_name;
+}
+
+cl_command_type cl4_event_get_command_type(
+	CL4Event* evt, GError** err) {
+	
+	/* The command type to return. */
+	cl_command_type ct;
+	
+	/* Make sure evt wrapper object is not NULL. */
+	g_return_if_fail(evt != NULL);
+
+	/* Determine the command type. */
+	CL4Info* info = cl4_event_info(evt, CL_EVENT_COMMAND_TYPE, err);
+	
+	if (info == NULL) {
+		/* Some error ocurred, return 0. */
+		ct = 0;
+	} else {
+		/* Get the command type. */
+		ct = *((cl_command_type*) info->value);
+	} 
+	
+	/* Return the command type. */
+	return ct;
+}
+			
 cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */

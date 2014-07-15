@@ -33,11 +33,7 @@
 #include "gerrorf.h"
 #include "wrapper.h"
 #include "errors.h"
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
+#include "oclversions.h"
 #include <string.h>
 
 /** @brief Device wrapper object. */

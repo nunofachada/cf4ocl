@@ -32,11 +32,7 @@
 #include <stdlib.h>
 #include <glib.h>
 #include <glib/gprintf.h>
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
+#include "oclversions.h"
 #include "gerrorf.h"
 #include "common.h"
 #include "errors.h"

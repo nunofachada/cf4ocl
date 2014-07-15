@@ -28,14 +28,9 @@
 #ifndef CL4_PROF_H
 #define CL4_PROF_H
 
-#if defined(__APPLE__) || defined(__MACOSX)
-	#include <OpenCL/opencl.h>
-#else
-	#include <CL/opencl.h>
-#endif
-
 #include <glib.h>
 #include <string.h>
+#include "oclversions.h"
 #include "gerrorf.h"
 #include "errors.h"
 #include "common.h"

@@ -29,11 +29,7 @@
 #define CL4_EVENT_H 
 
 #include <glib.h>
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
+#include "oclversions.h"
 #include "wrapper.h"
 
 /** @brief Event wrapper object. */
@@ -45,6 +41,15 @@ CL4Event* cl4_event_new_wrap(cl_event event);
 /** @brief Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed. */
 void cl4_event_destroy(CL4Event* evt);
+
+void cl4_event_set_name(CL4Event* evt, const char* name);
+
+const char* cl4_event_get_name(CL4Event* evt);
+
+const char* cl4_event_get_final_name(CL4Event* evt);
+
+cl_command_type cl4_event_get_command_type(
+	CL4Event* evt, GError** err);
 
 /**
  * @brief Get event information object.
