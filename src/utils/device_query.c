@@ -270,28 +270,28 @@ void cl4_device_query_show_platform_info(CL4Platform* p, guint idx) {
 	GError* err = NULL;
 	
 	/* Get platform profile. */
-	profile = cl4_platform_info(p, CL_PLATFORM_PROFILE, &err);
+	profile = cl4_platform_get_info_string(p, CL_PLATFORM_PROFILE, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
 		profile = "Unknown profile";
 	}
 
 	/* Get platform version. */
-	version = cl4_platform_info(p, CL_PLATFORM_VERSION, &err);
+	version = cl4_platform_get_info_string(p, CL_PLATFORM_VERSION, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
 		profile = "Unknown version";
 	}
 			
 	/* Get platform name. */
-	name = cl4_platform_info(p, CL_PLATFORM_NAME, &err);
+	name = cl4_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
 		profile = "Unknown name";
 	}
 
 	/* Get platform vendor. */
-	vendor = cl4_platform_info(p, CL_PLATFORM_VENDOR, &err);
+	vendor = cl4_platform_get_info_string(p, CL_PLATFORM_VENDOR, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
 		profile = "Unknown vendor";

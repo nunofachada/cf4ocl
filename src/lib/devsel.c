@@ -394,116 +394,115 @@ gboolean cl4_devsel_indep_type_accel(
 
 }
 
-//~ /**
- //~ * @brief Independent filter which selects devices based on device name, 
- //~ * device vendor and/or platform name.
- //~ * 
- //~ * @param dev OpenCL device to filter by platform.
- //~ * @param data Filter data, must be a string.
- //~ * @param err Return location for a GError, or NULL if error reporting
- //~ * is to be ignored.
- //~ * @return TRUE if device is accepted by filter, FALSE otherwise.
- //~ * */
-//~ gboolean cl4_devsel_indep_string(
-	//~ CL4Device* dev, void *data, GError **err) {
-	//~ 
-	//~ /* Make sure device is not NULL. */ 
-	//~ g_return_val_if_fail(dev != NULL, FALSE);
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
-	//~ 
-	//~ /* Internal error object. */
-	//~ GError* err_internal = NULL;
-	//~ 
-	//~ /* Return value, i.e., flag indicating if device belongs to the 
-	 //~ * specified platform. */
-	//~ gboolean pass = FALSE;
-	//~ 
-	//~ /* Partial name must be a substring of complete name. */
-	//~ gchar *completeInfo, *completeInfoLower, *partialInfoLower;
-	//~ 
-	//~ /* Make sure data is not NULL. */
-	//~ gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
-		//~ CL4_ERROR_INVALID_DATA, error_handler,
-		//~ "Function '%s': invalid filter data", __func__); 
-	//~ 
-	//~ /* Lower-case partial name for comparison. */
-	//~ partialInfoLower = g_ascii_strdown((gchar*) data, -1);
-//~ 
-	//~ /* Compare with device name. */
-	//~ completeInfo = cl4_device_info_value_array(
-		//~ dev, CL_DEVICE_NAME, char*, &err_internal);
-	//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
-	//~ 
-	//~ completeInfoLower = g_ascii_strdown(completeInfo, -1);
-//~ 
-	//~ if (!g_strrstr(completeInfoLower, partialInfoLower)) {
-		//~ /* Device name does not match, check device vendor. */
-		//~ 
-		//~ /* Free string allocated for previous comparison. */
-		//~ g_free(completeInfoLower);
-		//~ 
-		//~ /* Compare with device vendor. */
-		//~ completeInfo = cl4_device_info_value_array(
-			//~ dev, CL_DEVICE_VENDOR, char*, &err_internal);
-		//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
-//~ 
-		//~ completeInfoLower = g_ascii_strdown(completeInfo, -1);
-//~ 
-		//~ if (!g_strrstr(completeInfoLower, partialInfoLower)) {
-			//~ /* Device vendor does not match, check platform name. */
-//~ 
-			//~ /* Free string allocated for previous comparison. */
-			//~ g_free(completeInfoLower);
-			//~ 
-			//~ /* Compare with platform name. */
-			//~ CL4Platform* platf;
-			//~ CL4WrapperInfo* info;
-			//~ 
-			//~ /* Get device platform. */
-			//~ platf = cl4_device_get_platform(dev, &err_internal);
-			//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
-			//~ 
-			//~ /* Get platform name. */
-			//~ info = cl4_platform_info(
-				//~ platf, CL_PLATFORM_NAME, &err_internal);
-			//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
-			//~ 
-			//~ completeInfoLower = g_ascii_strdown((char*) info->value, -1);
-			//~ 
-			//~ /* Compare. */
-			//~ if (g_strrstr(completeInfoLower, partialInfoLower)) {
-				//~ pass = TRUE;
-			//~ }
-			//~ 
-		//~ } else {
-			//~ pass = TRUE;
-		//~ }
-		//~ 
-	//~ } else {
-		//~ pass = TRUE;
-	//~ }
-//~ 
-	//~ g_free(completeInfoLower);
-	//~ g_free(partialInfoLower);
-	//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-	//~ 
-	//~ /* Filter will not accept device in case an error occurs. */
-	//~ pass = FALSE;
-	//~ 
-//~ finish:
-//~ 
-	//~ /* Return filtering result. */
-	//~ return pass;
-//~ 
-//~ }
+/**
+ * @brief Independent filter which selects devices based on device name, 
+ * device vendor and/or platform name.
+ * 
+ * @param dev OpenCL device to filter by platform.
+ * @param data Filter data, must be a string.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return TRUE if device is accepted by filter, FALSE otherwise.
+ * */
+gboolean cl4_devsel_indep_string(
+	CL4Device* dev, void *data, GError **err) {
+	
+	/* Make sure device is not NULL. */ 
+	g_return_val_if_fail(dev != NULL, FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	
+	/* Internal error object. */
+	GError* err_internal = NULL;
+	
+	/* Return value, i.e., flag indicating if device belongs to the 
+	 * specified platform. */
+	gboolean pass = FALSE;
+	
+	/* Partial name must be a substring of complete name. */
+	gchar *complt_info, *complt_info_lowr, *part_info;
+	
+	/* Make sure data is not NULL. */
+	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
+		CL4_ERROR_INVALID_DATA, error_handler,
+		"Function '%s': invalid filter data", __func__); 
+	
+	/* Lower-case partial name for comparison. */
+	part_info = g_ascii_strdown((gchar*) data, -1);
+
+	/* Compare with device name. */
+	complt_info = cl4_device_info_value_array(
+		dev, CL_DEVICE_NAME, char*, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	complt_info_lowr = g_ascii_strdown(complt_info, -1);
+
+	if (!g_strrstr(complt_info_lowr, part_info)) {
+		/* Device name does not match, check device vendor. */
+		
+		/* Free string allocated for previous comparison. */
+		g_free(complt_info_lowr);
+		
+		/* Compare with device vendor. */
+		complt_info = cl4_device_info_value_array(
+			dev, CL_DEVICE_VENDOR, char*, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+		complt_info_lowr = g_ascii_strdown(complt_info, -1);
+
+		if (!g_strrstr(complt_info_lowr, part_info)) {
+			/* Device vendor does not match, check platform name. */
+
+			/* Free string allocated for previous comparison. */
+			g_free(complt_info_lowr);
+			
+			/* Compare with platform name. */
+			CL4Platform* platf;
+			
+			/* Get device platform. */
+			platf = cl4_device_get_platform(dev, &err_internal);
+			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			
+			/* Get platform name. */
+			complt_info = cl4_platform_get_info_string(
+				platf, CL_PLATFORM_NAME, &err_internal);
+			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			
+			complt_info_lowr = g_ascii_strdown(complt_info, -1);
+			
+			/* Compare. */
+			if (g_strrstr(complt_info_lowr, part_info)) {
+				pass = TRUE;
+			}
+			
+		} else {
+			pass = TRUE;
+		}
+		
+	} else {
+		pass = TRUE;
+	}
+
+	g_free(complt_info_lowr);
+	g_free(part_info);
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	/* Filter will not accept device in case an error occurs. */
+	pass = FALSE;
+	
+finish:
+
+	/* Return filtering result. */
+	return pass;
+
+}
 
 /**
  * @brief Independent filter function which only accepts devices of a

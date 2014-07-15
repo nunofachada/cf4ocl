@@ -130,7 +130,7 @@ CL4WrapperInfo* cl4_platform_get_cldevices(
 	 * when platform object is destroyed. */
 	 
 	/* 1 - Make sure info table is initialized by requesting some info. */
-	cl4_platform_info(devcon, CL_PLATFORM_NAME, &err_internal);
+	cl4_platform_get_info_string(devcon, CL_PLATFORM_NAME, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	/* 2 - Insert device list in info table, so that it will be 
 	 * automatically released. */

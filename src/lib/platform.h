@@ -57,17 +57,17 @@ CL4Platform* cl4_platform_new_wrap(cl_platform_id platform);
 void cl4_platform_destroy(CL4Platform* platf);
 
 /**
- * @brief Get platform information.
+ * @brief Get platform information value.
  * 
  * @param platform The platform wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested platform information. This information will
- * be automatically freed when the platform wrapper object is 
+ * @return The requested platform information value. This information 
+ * will be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_platform_info(platform, param_name, err) \
+#define cl4_platform_get_info_string(platform, param_name, err) \
 	((gchar*) cl4_wrapper_get_info_value((CL4Wrapper*) platform, NULL, \
 		param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, \
 		err))
