@@ -42,61 +42,61 @@ static void profilerTest() {
 	queue3 = clCreateCommandQueue(NULL, NULL, 0, NULL);
 	
 	/* Profiling object. */
-	CL4ProfProfile* profile = cl4_prof_profile_new();
+	CL4Prof* profile = cl4_prof_new();
 	g_assert(profile != NULL);
 
 	/* Test with 5 unique events */
 	ev1.start = 10;
 	ev1.end = 15;
 	ev1.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event1", &ev1, NULL);
+	status = cl4_prof_add(profile, "Event1", &ev1, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev2.start = 16;
 	ev2.end = 20;
 	ev2.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event2", &ev2, NULL);
+	status = cl4_prof_add(profile, "Event2", &ev2, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev3.start = 17;
 	ev3.end = 30;
 	ev3.queue = queue2;
-	status = cl4_prof_profile_add(profile, "Event3", &ev3, NULL);
+	status = cl4_prof_add(profile, "Event3", &ev3, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev4.start = 19;
 	ev4.end = 25;
 	ev4.queue = queue3;
-	status = cl4_prof_profile_add(profile, "Event4", &ev4, NULL);
+	status = cl4_prof_add(profile, "Event4", &ev4, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev5.start = 29;
 	ev5.end = 40;
 	ev5.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event5", &ev5, NULL);
+	status = cl4_prof_add(profile, "Event5", &ev5, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev6.start = 35;
 	ev6.end = 45;
 	ev6.queue = queue2;
-	status = cl4_prof_profile_add(profile, "Event1", &ev6, NULL);
+	status = cl4_prof_add(profile, "Event1", &ev6, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev7.start = 68;
 	ev7.end = 69;
 	ev7.queue = queue1;
-	status = cl4_prof_profile_add(profile, "Event1", &ev7, NULL);
+	status = cl4_prof_add(profile, "Event1", &ev7, NULL);
 	g_assert(status == CL4_SUCCESS);
 
 	ev8.start = 50;
 	ev8.end = 70;
 	ev8.queue = queue3;
-	status = cl4_prof_profile_add(profile, "Event1", &ev8, NULL);
+	status = cl4_prof_add(profile, "Event1", &ev8, NULL);
 	g_assert(status == CL4_SUCCESS);
 
-	status = cl4_prof_profile_aggregate(profile, NULL);
+	status = cl4_prof_aggregate(profile, NULL);
 	g_assert(status == CL4_SUCCESS);
-	status = cl4_prof_profile_overmat(profile, NULL);
+	status = cl4_prof_overmat(profile, NULL);
 	g_assert(status == CL4_SUCCESS);
 	
 	/* ************************* */
@@ -179,7 +179,7 @@ static void profilerTest() {
 	g_free(name_used);
 	
 	/** @todo Change profcl so that it prints to a stream, then test  */
-	//cl4_prof_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME);
+	//cl4_prof_print_info(profile, CL4_PROF_AGGEVDATA_SORT_TIME);
 
 	/* Free queue. */
 	clReleaseCommandQueue(queue1);
@@ -187,7 +187,7 @@ static void profilerTest() {
 	clReleaseCommandQueue(queue3);
 	
 	/* Free profile. */
-	cl4_prof_profile_free(profile);
+	cl4_prof_free(profile);
 	
 }
 

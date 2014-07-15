@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 	CL4ManDeviceInfo deviceInfo;                      /* Select device by returned information strings. */
 	GError *err = NULL;                            /* Error management */
 	GRand* rng = NULL;	                           /* Random number generator. */
-	CL4ProfProfile *profile_dev = NULL,             /* Profiler for OpenCL device implementation */
+	CL4Prof *profile_dev = NULL,             /* Profiler for OpenCL device implementation */
 		*profile_cpu = NULL;                       /* Profiler for OpenMP CPU implementation */
 	CL4ManZone* zone = NULL;                          /* OpenCL zone (context, platform, program, queues, etc.) */
 	cl_event events[4] = {NULL, NULL, NULL, NULL}; /* OpenCL events */
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 	rng = g_rand_new_with_seed(seed);
 		
 	/* Profiling / Timmings */
-	profile_dev = cl4_prof_profile_new();
+	profile_dev = cl4_prof_new();
 	gef_if_error_create_goto(
 		err, 
 		CLEXP_ERROR, 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 		CLEXP_FAIL, 
 		error_handler, 
 		"Unable to create device profiler object.");
-	profile_cpu = cl4_prof_profile_new();
+	profile_cpu = cl4_prof_new();
 	gef_if_error_create_goto(
 		err, 
 		CLEXP_ERROR, 
@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 	/* ************************* */
 	
 	/* Start basic timming / profiling. */
-	cl4_prof_profile_start(profile_dev);
+	cl4_prof_start(profile_dev);
 	
 	/* Copy matrix A to device. */
 	status = clEnqueueWriteBuffer (	
@@ -674,31 +674,31 @@ int main(int argc, char *argv[])
 	/* ************************************** */
 	
 	/* Stop profiler. */
-	cl4_prof_profile_stop(profile_dev); 
+	cl4_prof_stop(profile_dev); 
 
-	cl4_prof_profile_add(
+	cl4_prof_add(
 		profile_dev, "Transfer matrix A to device", events[0], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	if (!IS_AAT(kernel_id)) {
-		cl4_prof_profile_add(
+		cl4_prof_add(
 			profile_dev, "Transfer matrix B to device", events[1], &err);
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	}
 
-	cl4_prof_profile_add(
+	cl4_prof_add(
 		profile_dev, "Kernel execution (Matmult)", events[2], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_profile_add(
+	cl4_prof_add(
 		profile_dev, "Transfer matrix C to host", events[3], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_profile_aggregate(profile_dev, &err);
+	cl4_prof_aggregate(profile_dev, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Show profiling info. */
-	cl4_prof_print_info(profile_dev, PROFCL_AGGEVDATA_SORT_TIME, &err);
+	cl4_prof_print_info(profile_dev, CL4_PROF_AGGEVDATA_SORT_TIME, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Export profiling info if a filename was given. */
@@ -724,7 +724,7 @@ int main(int argc, char *argv[])
 	/* Get number of processors available to OpenMP. */
 
 	/* Start basic timming / profiling. */
-	cl4_prof_profile_start(profile_cpu);
+	cl4_prof_start(profile_cpu);
 
 	if (!IS_AAT(kernel_id)) {
 		/* C=AB */
@@ -762,7 +762,7 @@ int main(int argc, char *argv[])
 		}	
 	}
 	/* Get finishing time */
-	cl4_prof_profile_stop(profile_cpu);
+	cl4_prof_stop(profile_cpu);
 	
 	/* ******************************************************** */
 	/* Determine and print OpenCL/OpenMP comparison information */
@@ -855,8 +855,8 @@ cleanup:
 	/* *********** */
 	
 	/* Free profile and cpu timer */
-	if (profile_dev) cl4_prof_profile_free(profile_dev);
-	if (profile_cpu) cl4_prof_profile_free(profile_cpu);
+	if (profile_dev) cl4_prof_free(profile_dev);
+	if (profile_cpu) cl4_prof_free(profile_cpu);
 	
 	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);

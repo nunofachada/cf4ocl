@@ -21,11 +21,104 @@
  * @brief Function implementations of a profiling tool for OpenCL.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
 #include "profiler.h"
+
+/**
+ * @brief Profile class, contains profiling information of OpenCL 
+ * queues and events.
+ */
+struct cl4_prof {
+	/** Hash table with keys equal to the unique events name, and values
+	 * equal to a unique event id. */
+	GHashTable* unique_events;
+	/** Table of existing OpenCL command queues. */
+	GHashTable* command_queues;
+	/** Instants (start and end) of all events occuring in an OpenCL
+	 * application. */
+	GList* event_instants;
+	/** Total number of event instants in CL4Prof#event_instants. */
+	guint num_event_instants;
+	/** Aggregate statistics for all events in 
+	 * CL4Prof#event_instants. */
+	GHashTable* aggregate;
+	/** Overlap matrix for all events in event_instants. */
+	cl_ulong* overmat;
+	/** Total time taken by all events. */
+	cl_ulong totalEventsTime;
+	/** Total time taken by all events except intervals where events overlaped. */
+	cl_ulong totalEventsEffTime;
+	/** Time at which the first (oldest) event started. */
+	cl_ulong startTime;
+	/** Keeps track of time during the complete profiling session. */
+	GTimer* timer;
+};
+
+/**
+ * @brief Event instant.
+ */
+struct cl4_prof_evinst {
+	 /** Name of event which the instant refers to 
+	  * (CL4ProfEvInfo#eventName). */
+	const char* eventName;
+	/** Event instant ID. */
+	guint id;
+	/** Event instant in nanoseconds from current device time counter. */
+	cl_ulong instant;
+	/** Type of event instant (CL4ProfEvInstType#CL4_PROF_EV_START or 
+	 * CL4ProfEvInstType#CL4_PROF_EV_END). */
+	CL4ProfEvInstType type;
+	/** The command queue where the event took place. */
+	cl_command_queue queue;
+};
+
+/**
+ * @brief Aggregate event info.
+ */
+struct cl4_prof_ev_aggregate {
+	/** Name of event which the instant refers to 
+	 * (CL4ProfEvInfo#eventName). */
+	const char* eventName;
+	/** Total time of events with name equal to 
+	 * CL4ProfEvAggregate#eventName. */
+	cl_ulong totalTime;
+	/** Relative time of events with name equal to 
+	 * CL4ProfEvAggregate#eventName. */
+	double relativeTime;
+};
+
+/**
+ * @brief Export options.
+ * */
+struct cl4_prof_export_options {
+	/** Field separator, defaults to tab (\\t). */
+	const char* separator;
+	/** Newline character, Defaults to Unix newline (\\n). */
+	const char* newline;
+	/** Queue name delimiter, defaults to empty string. */
+	const char* queue_delim;
+	/** Event name delimiter, defaults to empty string. */
+	const char* evname_delim;
+	/** Use simple queue IDs (0,1...n) instead of using the queue memory 
+	 * location as ID (defaults to TRUE). */
+	gboolean simple_queue_id;
+	/** Start at instant 0 (TRUE, default), or start at oldest instant 
+	 * returned by OpenCL (FALSE). */
+	gboolean zero_start;
+};
+
+/**
+ * @brief Associates an OpenCL event with a name.
+ * */
+struct cl4_prof_evname {
+	 /** Event name. */
+	const char* eventName;
+	/** OpenCL event. */
+	cl_event event;
+};
 
 /* Default export options. */
 static CL4ProfExportOptions export_options = {
@@ -42,10 +135,10 @@ static CL4ProfExportOptions export_options = {
  * 
  * @return A new profile or NULL if operation failed. 
  */
-CL4ProfProfile* cl4_prof_profile_new() {
+CL4Prof* cl4_prof_new() {
 	
 	/* Allocate memory for new profile data structure. */
-	CL4ProfProfile* profile = (CL4ProfProfile*) malloc(sizeof(CL4ProfProfile));
+	CL4Prof* profile = (CL4Prof*) malloc(sizeof(CL4Prof));
 
 	/* If allocation successful... */
 	if (profile != NULL) {
@@ -88,7 +181,7 @@ CL4ProfProfile* cl4_prof_profile_new() {
  * 
  * @param profile OpenCL events profile to destroy. 
  */
-void cl4_prof_profile_free(CL4ProfProfile* profile) {
+void cl4_prof_free(CL4Prof* profile) {
 	/* Profile to free cannot be NULL. */
 	g_assert(profile != NULL);
 	/* Destroy table of unique events. */
@@ -121,14 +214,14 @@ void cl4_prof_profile_free(CL4ProfProfile* profile) {
  * successfully added, or another value of #cl4_error_codes if an 
  * error occurs.
  */ 
-int cl4_prof_profile_add(CL4ProfProfile* profile, const char* event_name, cl_event ev, GError** err) {
-	/* Just call cl4_prof_profile_add_composite sending the same event as start and end event. */
-	return cl4_prof_profile_add_composite(profile, event_name, ev, ev, err);
+int cl4_prof_add(CL4Prof* profile, const char* event_name, cl_event ev, GError** err) {
+	/* Just call cl4_prof_add_composite sending the same event as start and end event. */
+	return cl4_prof_add_composite(profile, event_name, ev, ev, err);
 }
 
 /** 
  * @brief Add OpenCL event to events profile. Receives a CL4ProfEvName
- * instead of a separate event and name like cl4_prof_profile_add(). 
+ * instead of a separate event and name like cl4_prof_add(). 
  * 
  * @param profile OpenCL events profile.
  * @param event_with_name OpenCL event associated with a name.
@@ -137,9 +230,9 @@ int cl4_prof_profile_add(CL4ProfProfile* profile, const char* event_name, cl_eve
  * successfully added, or another value of #cl4_error_codes if an 
  * error occurs.
  * */
-int cl4_prof_profile_add_evname(CL4ProfProfile* profile, CL4ProfEvName event_with_name, GError** err) {
-	/* Just call cl4_prof_profile_add_composite sending the same event as start and end event. */
-	return cl4_prof_profile_add_composite(
+int cl4_prof_add_evname(CL4Prof* profile, CL4ProfEvName event_with_name, GError** err) {
+	/* Just call cl4_prof_add_composite sending the same event as start and end event. */
+	return cl4_prof_add_composite(
 		profile, 
 		event_with_name.eventName, 
 		event_with_name.event,
@@ -160,7 +253,7 @@ int cl4_prof_profile_add_evname(CL4ProfProfile* profile, CL4ProfEvName event_wit
  * successfully added, or another value of #cl4_error_codes if an 
  * error occurs.
  */ 
-int cl4_prof_profile_add_composite(CL4ProfProfile* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
+int cl4_prof_add_composite(CL4Prof* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
 	
 	/* OpenCL return status. */
 	cl_int ocl_status;
@@ -240,7 +333,7 @@ int cl4_prof_profile_add_composite(CL4ProfProfile* profile, const char* event_na
 		event_name, 
 		event_id, 
 		instant, 
-		PROFCL_EV_START, 
+		CL4_PROF_EV_START, 
 		q1);
 	gef_if_error_create_goto(
 		*err, 
@@ -292,7 +385,7 @@ int cl4_prof_profile_add_composite(CL4ProfProfile* profile, const char* event_na
 		event_name, 
 		event_id, 
 		instant, 
-		PROFCL_EV_END, 
+		CL4_PROF_EV_END, 
 		q2);
 	gef_if_error_create_goto(
 		*err, CL4_ERROR, 
@@ -345,7 +438,7 @@ finish:
  * @param eventName Name of event.
  * @param id Id of event.
  * @param instant Even instant in nanoseconds.
- * @param type Type of event instant: PROFCL_EV_START or PROFCL_EV_END
+ * @param type Type of event instant: CL4_PROF_EV_START or CL4_PROF_EV_END
  * @param queue Command queue associated with event.
  * @return A new event instant or NULL if operation failed.
  */
@@ -392,23 +485,23 @@ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 	CL4ProfEvInst* evInst2 = (CL4ProfEvInst*) b;
 	CL4ProfEvSort* sortType = (CL4ProfEvSort*) userdata;
 	/* Perform comparison. */
-	if (*sortType == PROFCL_EV_SORT_INSTANT) {
+	if (*sortType == CL4_PROF_EV_SORT_INSTANT) {
 		/* Sort by instant */
 		if (evInst1->instant > evInst2->instant) return  1;
 		if (evInst1->instant < evInst2->instant) return -1;
-	} else if (*sortType == PROFCL_EV_SORT_ID) {
+	} else if (*sortType == CL4_PROF_EV_SORT_ID) {
 		/* Sort by ID */
 		if (evInst1->id > evInst2->id) return 1;
 		if (evInst1->id < evInst2->id) return -1;
-		if (evInst1->type == PROFCL_EV_END) return 1;
-		if (evInst1->type == PROFCL_EV_START) return -1;
+		if (evInst1->type == CL4_PROF_EV_END) return 1;
+		if (evInst1->type == CL4_PROF_EV_START) return -1;
 	}
 	return 0;
 }
 
 /**
  * @brief Determine overlap matrix for the given OpenCL events profile.
- *         Must be called after cl4_prof_profile_aggregate.
+ *         Must be called after cl4_prof_aggregate.
  * 
  * @param profile An OpenCL events profile.
  * @param err Error structure, to be populated if an error occurs.
@@ -416,7 +509,7 @@ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
  * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  */ 
-int cl4_prof_profile_overmat(CL4ProfProfile* profile, GError** err) {
+int cl4_prof_overmat(CL4Prof* profile, GError** err) {
 	
 	/* Return status. */
 	int status;
@@ -475,7 +568,7 @@ int cl4_prof_profile_overmat(CL4ProfProfile* profile, GError** err) {
 		"Unable to allocate memory for occurring events table: g_hash_table_new function returned NULL.");
 		
 	/* Sort all event instants. */
-	sortType = PROFCL_EV_SORT_INSTANT;
+	sortType = CL4_PROF_EV_SORT_INSTANT;
 	profile->event_instants = g_list_sort_with_data(
 		profile->event_instants, 
 		cl4_prof_evinst_comp, 
@@ -497,7 +590,7 @@ int cl4_prof_profile_overmat(CL4ProfProfile* profile, GError** err) {
 		currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
 		
 		/* Check if event time is START or END time */
-		if (currEvInst->type == PROFCL_EV_START) { 
+		if (currEvInst->type == CL4_PROF_EV_START) { 
 			/* Event START instant. */
 			
 			/* 1 - Check for overlaps with ocurring events */
@@ -627,7 +720,7 @@ finish:
  * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */
-int cl4_prof_profile_aggregate(CL4ProfProfile* profile, GError** err) {
+int cl4_prof_aggregate(CL4Prof* profile, GError** err) {
 	
 	/* Return status. */
 	int status;
@@ -665,7 +758,7 @@ int cl4_prof_profile_aggregate(CL4ProfProfile* profile, GError** err) {
 	}
 	
 	/* Sort event instants by eid, and then by START, END order. */
-	sortType = PROFCL_EV_SORT_ID;
+	sortType = CL4_PROF_EV_SORT_ID;
 	profile->event_instants = g_list_sort_with_data(
 		profile->event_instants, cl4_prof_evinst_comp, (gpointer) &sortType);
 
@@ -760,10 +853,10 @@ gint cl4_prof_evagg_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 	CL4ProfEvAggregate* evAgg2 = (CL4ProfEvAggregate*) b;
 	CL4ProfEvAggDataSort* sortType = (CL4ProfEvAggDataSort*) userdata;
 	/* Perform comparison. */
-	if (*sortType == PROFCL_AGGEVDATA_SORT_NAME) {
+	if (*sortType == CL4_PROF_AGGEVDATA_SORT_NAME) {
 		/* Sort by event name */
 		return strcmp(evAgg1->eventName, evAgg2->eventName);
-	} else if (*sortType == PROFCL_AGGEVDATA_SORT_TIME) {
+	} else if (*sortType == CL4_PROF_AGGEVDATA_SORT_TIME) {
 		/* Sort by event time period */
 		if (evAgg1->totalTime < evAgg2->totalTime) return 1;
 		if (evAgg1->totalTime > evAgg2->totalTime) return -1;
@@ -777,7 +870,7 @@ gint cl4_prof_evagg_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
 * 
 * @param profile An OpenCL events profile.
 * */
-void cl4_prof_profile_start(CL4ProfProfile* profile) {
+void cl4_prof_start(CL4Prof* profile) {
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
 	/* Start timer. */
@@ -790,7 +883,7 @@ void cl4_prof_profile_start(CL4ProfProfile* profile) {
  * 
  * @param profile An OpenCL events profile. 
  * */
-void cl4_prof_profile_stop(CL4ProfProfile* profile) {
+void cl4_prof_stop(CL4Prof* profile) {
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
 	/* Stop timer. */
@@ -805,7 +898,7 @@ void cl4_prof_profile_stop(CL4ProfProfile* profile) {
  * @param profile An OpenCL events profile. 
  * @return number of seconds elapsed, including any fractional part.
  * */
-gdouble cl4_prof_time_elapsed(CL4ProfProfile* profile) {
+gdouble cl4_prof_time_elapsed(CL4Prof* profile) {
 	/* Make sure profile is not NULL. */
 	g_assert(profile != NULL);
 	/* Stop timer. */
@@ -822,7 +915,7 @@ gdouble cl4_prof_time_elapsed(CL4ProfProfile* profile) {
  * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */ 
-int cl4_prof_print_info(CL4ProfProfile* profile, CL4ProfEvAggDataSort evAggSortType, GError** err) {
+int cl4_prof_print_info(CL4Prof* profile, CL4ProfEvAggDataSort evAggSortType, GError** err) {
 	
 	/* Function return status. */
 	int status;
@@ -993,7 +1086,7 @@ finish:
  * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */ 
-int cl4_prof_export_info(CL4ProfProfile* profile, FILE* stream, GError** err) {
+int cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err) {
 	
 	/* Return status. */
 	int ret_status, write_status;
@@ -1006,7 +1099,7 @@ int cl4_prof_export_info(CL4ProfProfile* profile, FILE* stream, GError** err) {
 	g_assert(profile != NULL);
 	
 	/* Sort event instants by eid, and then by START, END order. */
-	sortType = PROFCL_EV_SORT_ID;
+	sortType = CL4_PROF_EV_SORT_ID;
 	profile->event_instants = g_list_sort_with_data(
 		profile->event_instants, cl4_prof_evinst_comp, (gpointer) &sortType);
 	
@@ -1111,7 +1204,7 @@ finish:
  * terminates successfully, or another value of #cl4_error_codes if 
  * an error occurs.
  * */ 
-int cl4_prof_export_info_file(CL4ProfProfile* profile, const char* filename, GError** err) {
+int cl4_prof_export_info_file(CL4Prof* profile, const char* filename, GError** err) {
 
 	/* Aux. var. */
 	int status;

@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 	/* Error management. */
 	GError *err = NULL;
 	/* Profiling / Timmings. */
-	CL4ProfProfile* profile = NULL;
+	CL4Prof* profile = NULL;
 	/* Kernel. */
 	cl_kernel kernel_bankconf = NULL;
 	/* Events. */
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 	rng = g_rand_new_with_seed(0);
 		
 	/* Initialize profiling object. */
-	profile = cl4_prof_profile_new();
+	profile = cl4_prof_new();
 	gef_if_error_create_goto(
 		err, 
 		CLEXP_ERROR, 
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 		cl4_err(status));
 
 	/* Start basic timming / profiling. */
-	cl4_prof_profile_start(profile);
+	cl4_prof_start(profile);
 
 	/* ********************************** */	
 	/* Create and initialize host buffers */
@@ -334,18 +334,18 @@ int main(int argc, char *argv[]) {
 	/*  Show profiling info */
 	/* ******************** */
 	
-	cl4_prof_profile_stop(profile); 
+	cl4_prof_stop(profile); 
 
-	cl4_prof_profile_add(profile, "Transfer matrix A to device", events[0], &err);
+	cl4_prof_add(profile, "Transfer matrix A to device", events[0], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_profile_add(profile, "Kernel execution (bankconf)", events[1], &err);
+	cl4_prof_add(profile, "Kernel execution (bankconf)", events[1], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_profile_aggregate(profile, &err);
+	cl4_prof_aggregate(profile, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_print_info(profile, PROFCL_AGGEVDATA_SORT_TIME, &err);
+	cl4_prof_print_info(profile, CL4_PROF_AGGEVDATA_SORT_TIME, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
@@ -383,7 +383,7 @@ cleanup:
 	if (rng != NULL) g_rand_free(rng);
 	
 	/* Free profile */
-	if (profile) cl4_prof_profile_free(profile);
+	if (profile) cl4_prof_free(profile);
 	
 	/* Release events */
 	if (events[0]) clReleaseEvent(events[0]);
