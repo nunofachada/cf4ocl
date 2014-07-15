@@ -1,8 +1,8 @@
 # Sources required for building library
-set(SRC errors.c profiler.c manager.c types.c common.c
-	devquery.c platform.c platforms.c device.c context.c devsel.c 
-	wrapper.c cqueue.c event.c kernel.c program.c arg.c
-	abstract_dev_container_wrapper.c memobj.c buffer.c image.c)
+set(SRC errors.c profiler.c types.c common.c devquery.c platform.c 
+	platforms.c device.c context.c devsel.c wrapper.c cqueue.c event.c 
+	kernel.c program.c arg.c abstract_dev_container_wrapper.c memobj.c 
+	buffer.c image.c)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})

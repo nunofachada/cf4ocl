@@ -9,7 +9,7 @@ set(matmult_EXTRALIBS m)
 find_package(OpenMP)
 
 # Add common examples library
-add_library(exp_common exp_common.c)
+add_library(examples_common examples_common.c)
 
 # Add a target for each example
 foreach(EXAMPLE ${EXAMPLES})

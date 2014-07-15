@@ -24,14 +24,14 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#ifndef MATMULT_H
-#define MATMULT_H
+#ifndef CL4_EXAMPLES_MATMULT_H
+#define CL4_EXAMPLES_MATMULT_H
 
 #ifdef CF4OCL_USE_OPENMP
 #include <omp.h>
 #endif
 
-#include "exp_common.h"
+#include "examples_common.h"
 
 /**
  * @brief Check if the multiplication is @f$C=AA^T@f$ (matrix A and its 

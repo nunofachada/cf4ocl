@@ -87,37 +87,49 @@ static char* kernelFiles[] = {"bank_conflicts.cl"};
  * @return #CLEXP_SUCCESS if program returns with no error, or 
  * #CLEXP_FAIL otherwise.
  * */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
 	/* ***************** */	
 	/* Program variables */
 	/* ***************** */	
 	
-	int status;                        /* Function and program return status. */
-	GError *err = NULL;                /* Error management. */
-	CL4ProfProfile* profile = NULL;     /* Profiling / Timmings. */
-	cl_kernel kernel_bankconf = NULL;  /* Kernel. */
-	cl_event events[2] = {NULL, NULL}; /* Events. */
-	cl_mem data_device = NULL;         /* Data in device. */
-	gchar* kernelPath = NULL;          /* Full kernel path. */
-	cl_int *data_host = NULL;          /* Data in host. */
-	CL4ManZone* zone = NULL;              /* OpenCL zone. */
-	size_t sizeDataInBytes;            /* Size of data to be transfered to device. */
-	size_t localMemSizeInBytes;        /* Size of local memory required. */
-	GOptionContext* context = NULL;    /* Command line options context. */
-	GRand* rng = NULL;	               /* Random number generator. */
+	/* Function and program return status. */
+	int status;
+	/* Error management. */
+	GError *err = NULL;
+	/* Profiling / Timmings. */
+	CL4ProfProfile* profile = NULL;
+	/* Kernel. */
+	cl_kernel kernel_bankconf = NULL;
+	/* Events. */
+	cl_event events[2] = {NULL, NULL};
+	/* Data in device. */
+	cl_mem data_device = NULL;
+	/* Full kernel path. */
+	gchar* kernelPath = NULL;
+	/* Data in host. */
+	cl_int *data_host = NULL;
+	/* OpenCL zone. */
+	CL4ManZone* zone = NULL;
+	/* Size of data to be transfered to device. */
+	size_t sizeDataInBytes;
+	/* Size of local memory required. */
+	size_t localMemSizeInBytes;
+	/* Command line options context. */
+	GOptionContext* opt_ctx = NULL;
+	/* Random number generator. */
+	GRand* rng = NULL;
 	
 	/* ************************** */
 	/* Parse command line options */
 	/* ************************** */
 
 	/* Create parsing context. */
-	context = g_option_context_new (" - " PROG_DESCRIPTION);
+	opt_ctx = g_option_context_new (" - " PROG_DESCRIPTION);
 	/* Add acceptable command line options to context. */ 
-	g_option_context_add_main_entries(context, entries, NULL);
+	g_option_context_add_main_entries(opt_ctx, entries, NULL);
 	/* Use context to parse command line options. */
-	g_option_context_parse(context, &argc, &argv, &err);
+	g_option_context_parse(opt_ctx, &argc, &argv, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	/* Check if global worksize is multiple of local worksize. */
 	gef_if_error_create_goto(
@@ -364,7 +376,7 @@ cleanup:
 	/* *********** */
 	
 	/* Free command line variables. */
-	if (context) g_option_context_free(context);
+	if (opt_ctx) g_option_context_free(opt_ctx);
 	if (compiler_opts) g_free(compiler_opts);
 	
 	/* Free RNG */

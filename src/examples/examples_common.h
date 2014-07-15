@@ -20,19 +20,18 @@
  * @brief Common includes and definitions for examples.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#ifndef CLEXP_COMMON_H
-#define CLEXP_COMMON_H
+#ifndef CL4_EXAMPLES_COMMON_H
+#define CL4_EXAMPLES_COMMON_H
 
 #include <math.h>
 #include <glib.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "profiler.h"
-#include "manager.h"
 #include "gerrorf.h"
 #include "errors.h"
 
@@ -60,9 +59,11 @@
 		return TRUE; \
 	} else { \
 		/* Bad argument. */ \
-		g_set_error(err, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE, "The option '%s' does not accept the argument '%s'", option_name, value); \
+		g_set_error(err, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE, \
+			"The option '%s' does not accept the argument '%s'", \
+			option_name, value); \
 		return FALSE; \
-	} \
+	}
 
 /** @brief Code for operation successful. */
 #define CLEXP_SUCCESS 0
@@ -74,11 +75,5 @@ void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
 
 /** @brief Get full kernel path name. */
 gchar* clexp_kernelpath_get(gchar* kernel_filename, char* exec_name);
-
-/** @brief Resolves to error category identifying string. Required by glib error reporting system. */
-#define CLEXP_ERROR clexp_error_quark()
-
-/** @brief Resolves to error category identifying string, in this case an error related to the OpenCL examples. */
-GQuark clexp_error_quark();
 
 #endif

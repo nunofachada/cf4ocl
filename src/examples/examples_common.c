@@ -20,11 +20,11 @@
  * @brief Common implementations for examples.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "exp_common.h"
+#include "examples_common.h"
 
 /**
  * @brief Print device requirements for program.
@@ -36,11 +36,15 @@
  * */
 void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 	
-	printf("\n   ========================= Execution requirements ========================\n\n");
-	printf("     Global work size       : (%lu, %lu)\n", (unsigned long) gws[0], (unsigned long) gws[1]);
-	printf("     Local work size        : (%lu, %lu)\n", (unsigned long) lws[0], (unsigned long) lws[1]);
-	printf("     Global memory required : %lu bytes (%lu Kb = %lu Mb)\n", (unsigned long) gmem, (unsigned long) (gmem / 1024), (unsigned long) (gmem / 1024 / 1024));
-	printf("     Local memory required  : %lu bytes (%lu Kb)\n", (unsigned long) lmem, (unsigned long) (lmem / 1024));
+	g_printf("\n   ========================= Execution requirements ========================\n\n");
+	g_printf("     Global work size       : (%lu, %lu)\n", 
+		(unsigned long) gws[0], (unsigned long) gws[1]);
+	g_printf("     Local work size        : (%lu, %lu)\n", 
+		(unsigned long) lws[0], (unsigned long) lws[1]);
+	g_printf("     Global memory required : %lu bytes (%lu Kb = %lu Mb)\n", 
+		(unsigned long) gmem, (unsigned long) (gmem / 1024), (unsigned long) (gmem / 1024 / 1024));
+	g_printf("     Local memory required  : %lu bytes (%lu Kb)\n", 
+		(unsigned long) lmem, (unsigned long) (lmem / 1024));
 }
 
 /** 
@@ -52,7 +56,8 @@ void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
  * 
  * @param kernel_filename Name of file containing kernels.
  * @param exec_name Name of executable (argv[0]).
- * @return The full path of the kernel file, should be freed with g_free().
+ * @return The full path of the kernel file, should be freed with 
+ * g_free().
  * */
 gchar* clexp_kernelpath_get(gchar* kernel_filename, char* exec_name) {
 	
@@ -82,14 +87,4 @@ gchar* clexp_kernelpath_get(gchar* kernel_filename, char* exec_name) {
 	/* Return full kernel file path. */
 	return kernelPath;
 
-}
-
-
-/** 
- * @brief Resolves to error category identifying string, in this case an error related to the OpenCL examples.
- * 
- * @return A GQuark structure defined by category identifying string, which identifies the error as OpenCL examples generated error.
- */
-GQuark clexp_error_quark() {
-	return g_quark_from_static_string("clexp-error-quark");
 }
