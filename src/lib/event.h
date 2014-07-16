@@ -79,7 +79,7 @@ cl_command_type cl4_event_get_command_type(
  * */
 #define cl4_event_get_profiling_info(evt, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) evt, NULL, param_name, \
-	(cl4_wrapper_info_fp) clGetEventProfilingInfoInfo, CL_FALSE, err)
+	(cl4_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err)
 
 /** 
  * @brief Increase the reference count of the event object.

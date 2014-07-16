@@ -62,7 +62,7 @@ CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event);
 
 CL4Iterator cl4_cqueue_get_event_iterator(CL4CQueue* cq);
 
-CL4Event* cl4_cqueue_get_next_event(CL4CQueue* cq, CL4Iterator iter);
+CL4Event* cl4_cqueue_get_next_event(CL4Iterator iter);
 
 
 cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err);

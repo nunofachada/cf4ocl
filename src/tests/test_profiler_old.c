@@ -103,25 +103,25 @@ static void profilerTest() {
 	/* Test aggregate statistics */
 	/* ************************* */
 	
-	CL4ProfEvAggregate* agg;
+	CL4ProfEvAgg* agg;
 	
-	agg = (CL4ProfEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event1");
+	agg = (CL4ProfEvAgg*) g_hash_table_lookup(profile->aggregate, "Event1");
 	g_assert_cmpuint(agg->totalTime, ==, 36);
 	g_assert_cmpfloat(agg->relativeTime - 0.51728, <, 0.0001);
 	
-	agg = (CL4ProfEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event2");
+	agg = (CL4ProfEvAgg*) g_hash_table_lookup(profile->aggregate, "Event2");
 	g_assert_cmpuint(agg->totalTime, ==, 4);
 	g_assert_cmpfloat(agg->relativeTime - 0.05714, <, 0.0001);
 
-	agg = (CL4ProfEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event3");
+	agg = (CL4ProfEvAgg*) g_hash_table_lookup(profile->aggregate, "Event3");
 	g_assert_cmpuint(agg->totalTime, ==, 13);
 	g_assert_cmpfloat(agg->relativeTime - 0.18571, <, 0.0001);
 
-	agg = (CL4ProfEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event4");
+	agg = (CL4ProfEvAgg*) g_hash_table_lookup(profile->aggregate, "Event4");
 	g_assert_cmpuint(agg->totalTime, ==, 6);
 	g_assert_cmpfloat(agg->relativeTime - 0.08571, <, 0.0001);
 
-	agg = (CL4ProfEvAggregate*) g_hash_table_lookup(profile->aggregate, "Event5");
+	agg = (CL4ProfEvAgg*) g_hash_table_lookup(profile->aggregate, "Event5");
 	g_assert_cmpuint(agg->totalTime, ==, 11);
 	g_assert_cmpfloat(agg->relativeTime - 0.15714, <, 0.0001);
 

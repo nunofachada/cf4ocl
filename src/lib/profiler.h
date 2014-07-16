@@ -92,7 +92,7 @@ void cl4_prof_add_queue(
 	CL4Prof* prof, const char* cq_name, CL4CQueue* cq);
 
 /** @brief Determine aggregate statistics for the given profile object. */
-cl_bool cl4_prof_aggregate(CL4Prof* profile, GError** err);
+cl_bool cl4_prof_calc(CL4Prof* profile, GError** err);
 
 //~ /** @brief Add OpenCL event to events profile, more specifically adds
  //~ * the start and end instants of the given event to the profile. */
@@ -110,7 +110,7 @@ cl_bool cl4_prof_aggregate(CL4Prof* profile, GError** err);
 //~ CL4ProfEvInst* cl4_prof_evinst_new(const char* eventName, guint id, cl_ulong instant, CL4ProfEvInstType type, cl_command_queue queue);
 //~ 
 //~ /** @brief Free an event instant. */
-//~ void cl4_prof_evinst_free(gpointer event_instant);
+//~ void cl4_prof_evinst_destroy(gpointer event_instant);
 //~ 
 //~ /** @brief Compares two event instants for sorting purposes. */
 //~ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata);
@@ -119,10 +119,10 @@ cl_bool cl4_prof_aggregate(CL4Prof* profile, GError** err);
 //~ int cl4_prof_overmat(CL4Prof* profile, GError** err);
 //~ 
 //~ /** @brief Create a new aggregate statistic for events of a given type. */
-//~ CL4ProfEvAggregate* cl4_prof_aggregate_new(const char* eventName);
+//~ CL4ProfEvAgg* cl4_prof_agg_new(const char* eventName);
 //~ 
 //~ /** @brief Free an aggregate statistic. */
-//~ void cl4_prof_aggregate_free(gpointer agg);
+//~ void cl4_prof_agg_destroy(gpointer agg);
 //~ 
 //~ /** @brief Print profiling info. */
 //~ int cl4_prof_print_info(CL4Prof* profile, CL4ProfEvAggDataSort evAggSortType, GError** err);

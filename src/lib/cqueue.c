@@ -302,10 +302,10 @@ CL4Iterator cl4_cqueue_get_event_iterator(CL4CQueue* cq) {
 	return iter;
 }
 
-CL4Event* cl4_cqueue_get_next_event(CL4CQueue* cq, CL4Iterator iter) {
-	CL4Event* evt;
+CL4Event* cl4_cqueue_get_next_event(CL4Iterator iter) {
+	gpointer evt;
 	gboolean exists = g_hash_table_iter_next(&iter, &evt, NULL);
-	return exists ? evt : NULL; 
+	return exists ? (CL4Event*) evt : NULL; 
 }
 
 cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err) {
