@@ -30,21 +30,13 @@
 
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/opencl.h>
-    #include <OpenCL/cl_d3d10.h>
 	#ifdef CL_VERSION_1_2
-		#include <OpenCL/cl_d3d10.h>
-		#include <OpenCL/cl_d3d11.h>
 		#include <OpenCL/cl_dx9_media_sharing.h>
-		#include <OpenCL/cl_egl.h>
 	#endif
 #else
     #include <CL/opencl.h>
-    #include <CL/cl_d3d10.h>
 	#ifdef CL_VERSION_1_2
-		#include <CL/cl_d3d10.h>
-		#include <CL/cl_d3d11.h>
 		#include <CL/cl_dx9_media_sharing.h>
-		#include <CL/cl_egl.h>
 	#endif
 #endif
 
@@ -138,10 +130,36 @@
 
 #endif	
 
-
-
 /* Some of these query constants may not be defined in standard 
  * OpenCL headers, so we defined them here if necessary. */
+#ifndef CL_COMMAND_EGL_FENCE_SYNC_OBJECT_KHR
+	#define CL_COMMAND_EGL_FENCE_SYNC_OBJECT_KHR  0x202F
+
+#endif
+#ifndef CL_COMMAND_ACQUIRE_EGL_OBJECTS_KHR
+	#define CL_COMMAND_ACQUIRE_EGL_OBJECTS_KHR    0x202D
+
+#endif
+#ifndef CL_COMMAND_RELEASE_EGL_OBJECTS_KHR
+	#define CL_COMMAND_RELEASE_EGL_OBJECTS_KHR    0x202E
+
+#endif
+#ifndef CL_COMMAND_ACQUIRE_D3D10_OBJECTS_KHR
+	#define CL_COMMAND_ACQUIRE_D3D10_OBJECTS_KHR         0x4017
+
+#endif
+#ifndef CL_COMMAND_RELEASE_D3D10_OBJECTS_KHR
+	#define CL_COMMAND_RELEASE_D3D10_OBJECTS_KHR         0x4018
+
+#endif
+#ifndef CL_COMMAND_ACQUIRE_D3D11_OBJECTS_KHR
+	#define CL_COMMAND_ACQUIRE_D3D11_OBJECTS_KHR         0x4020
+
+#endif
+#ifndef CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR
+	#define CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR         0x4021
+
+#endif 
 #ifndef CL_DEVICE_MAX_ATOMIC_COUNTERS_EXT
 	#define CL_DEVICE_MAX_ATOMIC_COUNTERS_EXT           0x4032
 #endif

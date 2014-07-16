@@ -23,8 +23,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 find_package(PkgConfig REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package(Doxygen 1.8.3 QUIET)
-find_package(DirectX QUIET)
-find_package(EGL QUIET)
 pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Use provided OpenCL headers or system OpenCL headers?
@@ -40,8 +38,7 @@ ENDIF()
 
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/src/lib ${DirectX_D3D10_INCLUDE_DIRS}
-	${DirectX_D3D11_INCLUDE_DIRS} ${EGL_INCLUDE_DIR})
+	${CMAKE_SOURCE_DIR}/src/lib)
 
 # Add src folder
 add_subdirectory(src)
