@@ -296,6 +296,18 @@ CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 	
 }
 
+CL4Iterator cl4_cqueue_get_event_iterator(CL4CQueue* cq) {
+	GHashTableIter iter;
+	g_hash_table_iter_init(&iter, cq->evts);
+	return iter;
+}
+
+CL4Event* cl4_cqueue_get_next_event(CL4CQueue* cq, CL4Iterator iter) {
+	CL4Event* evt;
+	gboolean exists = g_hash_table_iter_next(&iter, &evt, NULL);
+	return exists ? evt : NULL; 
+}
+
 cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err) {
 
 	/* Make sure cq is not NULL. */

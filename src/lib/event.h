@@ -66,6 +66,21 @@ cl_command_type cl4_event_get_command_type(
 	cl4_wrapper_get_info((CL4Wrapper*) evt, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetEventInfo, CL_FALSE, err)
 
+/**
+ * @brief Get event profiling information object.
+ * 
+ * @param evt The event wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested information object. This object will be 
+ * automatically freed when the wrapper object is destroyed. If an error 
+ * occurs, NULL is returned.
+ * */
+#define cl4_event_get_profiling_info(evt, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) evt, NULL, param_name, \
+	(cl4_wrapper_info_fp) clGetEventProfilingInfoInfo, CL_FALSE, err)
+
 /** 
  * @brief Increase the reference count of the event object.
  * 

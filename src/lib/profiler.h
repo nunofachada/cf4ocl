@@ -40,47 +40,32 @@
  * queues and events. */
 typedef struct cl4_prof CL4Prof;
 
-/** @brief Event instant. */
-typedef struct cl4_prof_evinst CL4ProfEvInst;
-
-/** @brief Aggregate event info. */
-typedef struct cl4_prof_ev_aggregate CL4ProfEvAggregate;
-
-/** @brief Export options. */
-typedef struct cl4_prof_export_options CL4ProfExportOptions;
-
-/** @brief Associates an OpenCL event with a name.  */
-typedef struct cl4_prof_evname CL4ProfEvName;
-
 /**
- * @brief Type of event instant (CL4ProfEvInst).
- */
-typedef enum {
-	/** CL4ProfEvInst is a start event instant. */
-	CL4_PROF_EV_START,
-	/** CL4ProfEvInst is an end event instant. */
-	CL4_PROF_EV_END
-} CL4ProfEvInstType;
+ * @brief Export options.
+ * */
+typedef struct cl4_prof_export_options {
 
-/**
- * @brief Sorting strategy for event instants (CL4ProfEvInst).
- */
-typedef enum {
-	/** Sort event instants by instant. */
-	CL4_PROF_EV_SORT_INSTANT,
-	/** Sort event instants by event id. */
-	CL4_PROF_EV_SORT_ID
-} CL4ProfEvSort;
+	/** Field separator, defaults to tab (\\t). */
+	const char* separator;
 
-/**
- * @brief Sorting strategy for aggregate event data instances.
- */
-typedef enum {
-	 /** Sort aggregate event data instances by name. */
-	CL4_PROF_AGGEVDATA_SORT_NAME,
-	/** Sort aggregate event data instances by time. */
-	CL4_PROF_AGGEVDATA_SORT_TIME
-}  CL4ProfEvAggDataSort;
+	/** Newline character, Defaults to Unix newline (\\n). */
+	const char* newline;
+
+	/** Queue name delimiter, defaults to empty string. */
+	const char* queue_delim;
+
+	/** Event name delimiter, defaults to empty string. */
+	const char* evname_delim;
+
+	/** Use simple queue IDs (0,1...n) instead of using the queue memory 
+	 * location as ID (defaults to TRUE). */
+	gboolean simple_queue_id;
+
+	/** Start at instant 0 (TRUE, default), or start at oldest instant 
+	 * returned by OpenCL (FALSE). */
+	gboolean zero_start;
+	
+}  CL4ProfExportOptions;
 
 /** @brief Create a new profile object. */
 CL4Prof* cl4_prof_new();
@@ -106,6 +91,9 @@ double cl4_prof_time_elapsed(CL4Prof* profile);
 void cl4_prof_add_queue(
 	CL4Prof* prof, const char* cq_name, CL4CQueue* cq);
 
+/** @brief Determine aggregate statistics for the given profile object. */
+cl_bool cl4_prof_aggregate(CL4Prof* profile, GError** err);
+
 //~ /** @brief Add OpenCL event to events profile, more specifically adds
  //~ * the start and end instants of the given event to the profile. */
 //~ int cl4_prof_add(CL4Prof* profile, const char* event_name, cl_event ev, GError** err);
@@ -129,9 +117,6 @@ void cl4_prof_add_queue(
 //~ 
 //~ /** @brief Determine overlap matrix for the given OpenCL events profile. */
 //~ int cl4_prof_overmat(CL4Prof* profile, GError** err);
-//~ 
-//~ /** @brief Determine aggregate statistics for the given OpenCL events profile. */
-//~ int cl4_prof_aggregate(CL4Prof* profile, GError** err);
 //~ 
 //~ /** @brief Create a new aggregate statistic for events of a given type. */
 //~ CL4ProfEvAggregate* cl4_prof_aggregate_new(const char* eventName);

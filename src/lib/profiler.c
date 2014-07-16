@@ -33,112 +33,278 @@
  */
 struct cl4_prof {
 	
-	//~ /** Hash table with keys equal to the unique events name, and values
-	 //~ * equal to a unique event id. */
-	//~ GHashTable* unique_events;
+	/** Hash table with keys equal to the events name, and values
+	 * equal to a unique id for each event name. */
+	GHashTable* event_names;
 	
 	/** Table of command queue wrappers. */
 	GHashTable* cqueues;
 	
-	//~ /** Instants (start and end) of all events occuring in an OpenCL
-	 //~ * application. */
-	//~ GList* event_instants;
+	/** Instants (start and end) of all events occuring in an OpenCL
+	 * application. */
+	GList* event_instants;
 	
-	//~ /** Total number of event instants in CL4Prof#event_instants. */
-	//~ guint num_event_instants;
+	/** Total number of event instants in CL4Prof#event_instants. */
+	guint num_event_instants;
 	
-	//~ /** Aggregate statistics for all events in 
-	 //~ * CL4Prof#event_instants. */
-	//~ GHashTable* aggregate;
+	/** Aggregate statistics for all events in 
+	 * CL4Prof#event_instants. */
+	GHashTable* aggregate;
 	
-	//~ /** Overlap matrix for all events in event_instants. */
-	//~ cl_ulong* overmat;
+	/** Overlap matrix for all events in event_instants. */
+	cl_ulong* overmat;
 	
-	//~ /** Total time taken by all events. */
-	//~ cl_ulong totalEventsTime;
+	/** Total time taken by all events. */
+	cl_ulong total_events_time;
 	
-	//~ /** Total time taken by all events except intervals where events overlaped. */
-	//~ cl_ulong totalEventsEffTime;
+	/** Total time taken by all events except intervals where events overlaped. */
+	cl_ulong total_events_eff_time;
 	
-	//~ /** Time at which the first (oldest) event started. */
-	//~ cl_ulong startTime;
+	/** Time at which the first (oldest) event started. */
+	cl_ulong start_time;
 	
 	/** Keeps track of time during the complete profiling session. */
 	GTimer* timer;
+
 };
 
-//~ /**
- //~ * @brief Event instant.
- //~ */
-//~ struct cl4_prof_evinst {
-	 //~ /** Name of event which the instant refers to 
-	  //~ * (CL4ProfEvInfo#eventName). */
-	//~ const char* eventName;
-	//~ /** Event instant ID. */
-	//~ guint id;
-	//~ /** Event instant in nanoseconds from current device time counter. */
-	//~ cl_ulong instant;
-	//~ /** Type of event instant (CL4ProfEvInstType#CL4_PROF_EV_START or 
-	 //~ * CL4ProfEvInstType#CL4_PROF_EV_END). */
-	//~ CL4ProfEvInstType type;
-	//~ /** The command queue where the event took place. */
-	//~ cl_command_queue queue;
-//~ };
-//~ 
-//~ /**
- //~ * @brief Aggregate event info.
- //~ */
-//~ struct cl4_prof_ev_aggregate {
-	//~ /** Name of event which the instant refers to 
-	 //~ * (CL4ProfEvInfo#eventName). */
-	//~ const char* eventName;
-	//~ /** Total time of events with name equal to 
-	 //~ * CL4ProfEvAggregate#eventName. */
-	//~ cl_ulong totalTime;
-	//~ /** Relative time of events with name equal to 
-	 //~ * CL4ProfEvAggregate#eventName. */
-	//~ double relativeTime;
-//~ };
-//~ 
-//~ /**
- //~ * @brief Export options.
- //~ * */
-//~ struct cl4_prof_export_options {
-	//~ /** Field separator, defaults to tab (\\t). */
-	//~ const char* separator;
-	//~ /** Newline character, Defaults to Unix newline (\\n). */
-	//~ const char* newline;
-	//~ /** Queue name delimiter, defaults to empty string. */
-	//~ const char* queue_delim;
-	//~ /** Event name delimiter, defaults to empty string. */
-	//~ const char* evname_delim;
-	//~ /** Use simple queue IDs (0,1...n) instead of using the queue memory 
-	 //~ * location as ID (defaults to TRUE). */
-	//~ gboolean simple_queue_id;
-	//~ /** Start at instant 0 (TRUE, default), or start at oldest instant 
-	 //~ * returned by OpenCL (FALSE). */
-	//~ gboolean zero_start;
-//~ };
-//~ 
-//~ /**
- //~ * @brief Associates an OpenCL event with a name.
- //~ * */
-//~ struct cl4_prof_evname {
-	 //~ /** Event name. */
-	//~ const char* eventName;
-	//~ /** OpenCL event. */
-	//~ cl_event event;
-//~ };
-//~ 
-//~ /* Default export options. */
-//~ static CL4ProfExportOptions export_options = {
-	//~ .separator = "\t",
-	//~ .newline = "\n",
-	//~ .queue_delim = "",
-	//~ .evname_delim = "",
-	//~ .simple_queue_id = TRUE,
-	//~ .zero_start = TRUE
-//~ };
+/**
+ * @brief Type of event instant (::CL4ProfEvInst).
+ */
+typedef enum {
+	
+	/** CL4ProfEvInst is a start event instant. */
+	CL4_PROF_EV_START,
+	/** CL4ProfEvInst is an end event instant. */
+	CL4_PROF_EV_END
+	
+} CL4ProfEvInstType;
+
+/**
+ * @brief Event instant.
+ */
+typedef struct cl4_prof_evinst {
+
+	 /** Name of event which the instant refers to. */
+	const char* event_name;
+	/** Name of command queue associated with event. */
+	const char* queue_name;
+	/** Event instant ID. */
+	guint id;
+	/** Event instant in nanoseconds from current device time counter. */
+	cl_ulong instant;
+	/** Type of event instant (::CL4ProfEvInstType#CL4_PROF_EV_START or 
+	 * ::CL4ProfEvInstType#CL4_PROF_EV_END). */
+	CL4ProfEvInstType type;
+
+} CL4ProfEvInst;
+
+/**
+ * @brief Aggregate event info.
+ */
+typedef struct cl4_prof_ev_aggregate {
+
+	/** Name of event which the instant refers to. */
+	const char* event_name;
+	/** Total (absolute) time of events with name equal to 
+	 * ::CL4ProfEvAggregate#event_name. */
+	cl_ulong absolute_time;
+	/** Relative time of events with name equal to 
+	 * ::CL4ProfEvAggregate#event_name. */
+	double relative_time;
+	
+} CL4ProfEvAggregate;
+
+/**
+ * @brief Sorting strategy for event instants (CL4ProfEvInst).
+ */
+typedef enum {
+	
+	/** Sort event instants by instant. */
+	CL4_PROF_EV_SORT_INSTANT,
+	/** Sort event instants by event id. */
+	CL4_PROF_EV_SORT_ID
+
+} CL4ProfEvSort;
+
+/**
+ * @brief Sorting strategy for aggregate event data instances.
+ */
+typedef enum {
+
+	 /** Sort aggregate event data instances by name. */
+	CL4_PROF_AGGEVDATA_SORT_NAME,
+	/** Sort aggregate event data instances by time. */
+	CL4_PROF_AGGEVDATA_SORT_TIME
+
+}  CL4ProfEvAggDataSort;
+
+/* Default export options. */
+static CL4ProfExportOptions export_options = {
+
+	.separator = "\t",
+	.newline = "\n",
+	.queue_delim = "",
+	.evname_delim = "",
+	.simple_queue_id = TRUE,
+	.zero_start = TRUE
+
+};
+
+/** 
+ * @brief Create new event instant.
+ * 
+ * @param event_name Name of event.
+ * @param queue_name Name of command queue associated with event.
+ * @param id Id of event.
+ * @param instant Even instant in nanoseconds.
+ * @param type Type of event instant: CL4_PROF_EV_START or 
+ * CL4_PROF_EV_END.
+ * @return A new event instant.
+ */
+static CL4ProfEvInst* cl4_prof_evinst_new(const char* event_name,
+	const char* queue_name, guint id, cl_ulong instant, 
+	CL4ProfEvInstType type) {
+	
+	/* Allocate memory for event instant data structure. */
+	CL4ProfEvInst* event_instant = g_slice_new(CL4ProfEvInst);
+
+	/* Initialize structure fields. */
+	event_instant->event_name = event_name;
+	event_instant->queue_name = queue_name;
+	event_instant->id = id;
+	event_instant->instant = instant;
+	event_instant->type = type;
+
+	/* Return event instant data structure. */
+	return event_instant;	
+}
+
+/**
+ * @brief Free an event instant.
+ * 
+ * @param event_instant Event instant to destroy. 
+ */
+static void cl4_prof_evinst_free(gpointer event_instant) {
+	
+	g_return_if_fail(event_instant != NULL);
+	
+	g_slice_free(CL4ProfEvInst, event_instant);
+}
+
+/**
+ * @brief Add event for profiling.
+ * 
+ * @param prof Profile object.
+ * @param cq_name Command queue name.
+ * @param evt Event wrapper object.
+ * */
+static void cl4_prof_add_event(CL4Prof* prof, const char* cq_name, 
+	CL4Event* evt, GError** err) {
+
+	/* Event name ID. */
+	guint* event_name_id;
+	/* Command queues ID. */
+	guint* queue_id;
+	/* Specific event ID. */
+	guint event_id;
+	/* Event instant. */
+	cl_ulong instant;
+	/* Event instant objects. */
+	CL4ProfEvInst* evinst_start;
+	CL4ProfEvInst* evinst_end;
+	
+	/* Info object. */
+	CL4WrapperInfo* info;
+	
+	/* Event name. */
+	const char* event_name;
+	
+	/* Get event name. */
+	event_name = cl4_event_get_final_name(evt);
+	
+	/* Check if event name is already registered in the table of event
+	 * names... */
+	if (!g_hash_table_contains(prof->event_names, event_name)) {
+		/* ...if not, register it. */
+		event_name_id = 
+			GUINT_TO_POINTER(g_hash_table_size(prof->event_names));
+		g_hash_table_insert(
+			prof->event_names, 
+			(gpointer) event_name, 
+			(gpointer) event_name_id);
+	}
+	
+	/* Update number of event instants, and get an ID for the given event. */
+	event_id = ++prof->num_event_instants;
+	
+	/* Get event start instant. */
+	info = cl4_event_get_profiling_info(
+		evt, CL_PROFILING_COMMAND_START, err); 
+	if (*err != NULL)
+		return;
+	instant = *((cl_ulong*) info->value);
+	
+	/* Check if start instant is the oldest instant. If so, keep it. */
+	if (instant < prof->start_time)
+		prof->start_time = instant;
+		
+	/* Add event start instant to list of event instants. */
+	evinst_start = cl4_prof_evinst_new(event_name, cq_name, event_id, 
+		instant, CL4_PROF_EV_START);
+	profile->event_instants = g_list_prepend(
+		profile->event_instants, (gpointer) evinst_start);
+
+	/* Get event end instant. */
+	info = cl4_event_get_profiling_info(
+		evt, CL_PROFILING_COMMAND_END, err); 
+	if (*err != NULL)
+		return;
+	instant = *((cl_ulong*) info->value);
+
+	/* Add event end instant to list of event instants. */
+	evinst_end = cl4_prof_evinst_new(event_name, cq_name, event_id, 
+		instant, CL4_PROF_EV_END);
+	profile->event_instants = g_list_prepend(
+		profile->event_instants, (gpointer) evinst_end);
+
+}
+
+/**
+ * @brief Process command queues, i.e., add the respective events for 
+ * profiling.
+ * 
+ * @param prof Profile object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ */ 
+static void cl4_prof_process_queues(CL4Prof* prof, GError** err) {
+
+	/* Hash table iterator. */
+	GHashTableIter iter_qs, iter_evs;
+	/* Command queue name and wrapper. */
+	gpointer cq_name;
+	gpointer cq;
+
+	/* Iterate over the command queues. */
+	g_hash_table_iter_init(&iter_qs, prof->cqueues);
+	while (g_hash_table_iter_next(&iter_qs, &cq_name, &cq)) {
+		
+		/* Iterate over the events in current command queue. */
+		CL4Event* evt;
+		CL4Iterator iter = 
+			cl4_cqueue_get_event_iterator((CL4CQueue*) cq);
+		while (evt = cl4_cqueue_get_next_event((CL4CQueue*) cq, iter)) {
+
+			/* Add event for profiling. */
+			cl4_prof_add_event(prof, (CL4CQueue*) cq, 
+				(const char*) cq_name, evt, err);
+			if (*err != NULL) return;
+
+		}
+		
+	}
+}
 
 /** 
  * @brief Create a new profile object.
@@ -150,41 +316,39 @@ CL4Prof* cl4_prof_new() {
 	/* Allocate memory for new profile data structure. */
 	CL4Prof* prof = g_slice_new(CL4Prof);
 
-	//~ /* Create table of unique events. */
-	//~ profile->unique_events = g_hash_table_new(
-		//~ g_str_hash, 
-		//~ g_str_equal);
+	/* Create table of event names. */
+	prof->event_names = g_hash_table_new(g_str_hash, g_str_equal);
 		
 	/* Create table of command queue wrappers. */
 	prof->cqueues = g_hash_table_new_full(
 		g_str_hash, g_direct_equal, NULL, 
 		(GDestroyNotify) cl4_cqueue_destroy);
 		
-	//~ /* Create list of all event instants... */
-	//~ profile->event_instants = NULL;
-	//~ 
-	//~ /* ...and set number of event instants to zero. */
-	//~ profile->num_event_instants = 0;
-	//~ 
-	//~ /* Create table of aggregate statistics. */
-	//~ profile->aggregate = g_hash_table_new_full(
-		//~ g_str_hash, 
-		//~ g_str_equal, 
-		//~ NULL, 
-		//~ cl4_prof_aggregate_free);
-	//~ 
-	//~ /* Set overlap matrix to NULL. */
-	//~ profile->overmat = NULL;
+	/* Create list of all event instants... */
+	prof->event_instants = NULL;
+	
+	/* ...and set number of event instants to zero. */
+	prof->num_event_instants = 0;
+	
+	/* Create table of aggregate statistics. */
+	prof->aggregate = g_hash_table_new_full(
+		g_str_hash, 
+		g_str_equal, 
+		NULL, 
+		cl4_prof_aggregate_free);
+	
+	/* Set overlap matrix to NULL. */
+	prof->overmat = NULL;
 	
 	/* Set timer structure to NULL. */
 	prof->timer = NULL;
 	
-	//~ /* Set total times to 0. */
-	//~ profile->totalEventsTime = 0;
-	//~ profile->totalEventsEffTime = 0;
-//~ 
-	//~ /* Set absolute start time to maximum possible. */
-	//~ profile->startTime = CL_ULONG_MAX;
+	/* Set total times to 0. */
+	prof->total_events_time = 0;
+	prof->total_events_eff_time = 0;
+
+	/* Set absolute start time to maximum possible. */
+	prof->start_time = CL_ULONG_MAX;
 
 	/* Return new profile data structure */
 	return prof;
@@ -201,21 +365,21 @@ void cl4_prof_destroy(CL4Prof* prof) {
 	/* Profile to destroy cannot be NULL. */
 	g_return_if_fail(prof != NULL);
 	
-	//~ /* Destroy table of unique events. */
-	//~ g_hash_table_destroy(profile->unique_events);
+	/* Destroy table of event names. */
+	g_hash_table_destroy(prof->event_names);
 	
 	/* Destroy table of command queue wrappers. */
 	g_hash_table_destroy(prof->cqueues);
 	
-	//~ /* Destroy list of all event instants. */
-	//~ g_list_free_full(profile->event_instants, cl4_prof_evinst_free);
-	//~ 
-	//~ /* Destroy table of aggregate statistics. */
-	//~ g_hash_table_destroy(profile->aggregate);
-	//~ 
-	//~ /* Free the overlap matrix. */
-	//~ if (profile->overmat != NULL)
-		//~ free(profile->overmat);
+	/* Destroy list of all event instants. */
+	g_list_free_full(prof->event_instants, cl4_prof_evinst_free);
+	
+	/* Destroy table of aggregate statistics. */
+	g_hash_table_destroy(prof->aggregate);
+	
+	/* Free the overlap matrix. */
+	if (prof->overmat != NULL)
+		g_free(prof->overmat);
 	
 	/* Destroy timer. */
 	if (prof->timer != NULL)
@@ -303,274 +467,108 @@ void cl4_prof_add_queue(
 
 }
 
-//~ /**
- //~ * @brief Add OpenCL event to events profile, more specifically adds 
- //~ * the start and end instants of the given event to the profile.
- //~ * 
- //~ * @param profile OpenCL events profile.
- //~ * @param event_name Event name.
- //~ * @param ev Event to get information of.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if event 
- //~ * successfully added, or another value of #cl4_error_codes if an 
- //~ * error occurs.
- //~ */ 
-//~ int cl4_prof_add(CL4Prof* profile, const char* event_name, cl_event ev, GError** err) {
-	//~ /* Just call cl4_prof_add_composite sending the same event as start and end event. */
-	//~ return cl4_prof_add_composite(profile, event_name, ev, ev, err);
-//~ }
-//~ 
-//~ /** 
- //~ * @brief Add OpenCL event to events profile. Receives a CL4ProfEvName
- //~ * instead of a separate event and name like cl4_prof_add(). 
- //~ * 
- //~ * @param profile OpenCL events profile.
- //~ * @param event_with_name OpenCL event associated with a name.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if event 
- //~ * successfully added, or another value of #cl4_error_codes if an 
- //~ * error occurs.
- //~ * */
-//~ int cl4_prof_add_evname(CL4Prof* profile, CL4ProfEvName event_with_name, GError** err) {
-	//~ /* Just call cl4_prof_add_composite sending the same event as start and end event. */
-	//~ return cl4_prof_add_composite(
-		//~ profile, 
-		//~ event_with_name.eventName, 
-		//~ event_with_name.event,
-		//~ event_with_name.event,
-		//~ err);
-//~ }
-//~ 
-//~ /**
- //~ * @brief Add OpenCL events to events profile, more specifically adds 
- //~ * the start of ev1 and end of ev2 to the profile.
- //~ * 
- //~ * @param profile OpenCL events profile.
- //~ * @param event_name Event name.
- //~ * @param ev1 Event to get start information of.
- //~ * @param ev2 Event to get end information of.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if event 
- //~ * successfully added, or another value of #cl4_error_codes if an 
- //~ * error occurs.
- //~ */ 
-//~ int cl4_prof_add_composite(CL4Prof* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err) {
-	//~ 
-	//~ /* OpenCL return status. */
-	//~ cl_int ocl_status;
-	//~ /* Function return status. */
-	//~ int ret_status; 
-	//~ /* Unique event ID. */
-	//~ guint* unique_event_id;
-	//~ /* Command queues ID. */
-	//~ guint* queue_id;
-	//~ /* Specific event ID. */
-	//~ guint event_id;
-	//~ /* Event instant. */
-	//~ cl_ulong instant;
-	//~ /* Event instant objects. */
-	//~ CL4ProfEvInst* evinst_start;
-	//~ CL4ProfEvInst* evinst_end;
-	//~ /* Command queues to which the events are associated to. */
-	//~ cl_command_queue q1, q2;
-	//~ 
-	//~ /* Make sure profile is not NULL. */
-	//~ g_assert(profile != NULL);
-	//~ 
-	//~ /* Check if event is already registered in the unique events table... */
-	//~ if (!g_hash_table_contains(profile->unique_events, event_name)) {
-		//~ /* ...if not, register it. */
-		//~ unique_event_id = 
-			//~ GUINT_TO_POINTER(g_hash_table_size(profile->unique_events));
-		//~ g_hash_table_insert(
-			//~ profile->unique_events, 
-			//~ (gpointer) event_name, 
-			//~ (gpointer) unique_event_id);
-	//~ }
-	//~ 
-	//~ /* Update number of event instants, and get an ID for the given event. */
-	//~ event_id = ++profile->num_event_instants;
-	//~ 
-	//~ /* Get command queue associated with start event. */
-	//~ ocl_status = clGetEventInfo(
-		//~ ev1, 
-		//~ CL_EVENT_COMMAND_QUEUE, 
-		//~ sizeof(cl_command_queue), 
-		//~ &q1, 
-		//~ NULL);
-	//~ gef_if_error_create_goto(
-		//~ *err, 
-		//~ CL4_ERROR, 
-		//~ CL_SUCCESS != ocl_status, 
-		//~ ret_status = CL4_ERROR_OCL, 
-		//~ error_handler, 
-		//~ "Get start event command queue: OpenCL error %d (%s).", 
-		//~ ocl_status,
-		//~ cl4_err(ocl_status));
-	//~ 
-	//~ /* Get event start instant. */
-	//~ ocl_status = clGetEventProfilingInfo(
-		//~ ev1, 
-		//~ CL_PROFILING_COMMAND_START, 
-		//~ sizeof(cl_ulong), 
-		//~ &instant, 
-		//~ NULL);
-	//~ gef_if_error_create_goto(
-		//~ *err, 
-		//~ CL4_ERROR, 
-		//~ CL_SUCCESS != ocl_status, 
-		//~ ret_status = CL4_ERROR_OCL, 
-		//~ error_handler, 
-		//~ "Get event start instant: OpenCL error %d (%s).", 
-		//~ ocl_status,
-		//~ cl4_err(ocl_status));
-	//~ 
-	//~ /* Check if start instant is the oldest instant. If so, keep it. */
-	//~ if (instant < profile->startTime)
-		//~ profile->startTime = instant;
-		//~ 
-	//~ /* Add event start instant to list of event instants. */
-	//~ evinst_start = cl4_prof_evinst_new(
-		//~ event_name, 
-		//~ event_id, 
-		//~ instant, 
-		//~ CL4_PROF_EV_START, 
-		//~ q1);
-	//~ gef_if_error_create_goto(
-		//~ *err, 
-		//~ CL4_ERROR, 
-		//~ evinst_start == NULL, 
-		//~ ret_status = CL4_ERROR_NOALLOC, 
-		//~ error_handler, 
-		//~ "Unable to allocate memory for CL4ProfEvInst object for start of event '%s' with ID %d.", 
-		//~ event_name, 
-		//~ event_id);
-	//~ profile->event_instants = g_list_prepend(
-		//~ profile->event_instants, 
-		//~ (gpointer) evinst_start);
-//~ 
-	//~ /* Get command queue associated with end event. */
-	//~ ocl_status = clGetEventInfo(
-		//~ ev2, 
-		//~ CL_EVENT_COMMAND_QUEUE, 
-		//~ sizeof(cl_command_queue), 
-		//~ &q2, 
-		//~ NULL);
-	//~ gef_if_error_create_goto(
-		//~ *err, CL4_ERROR, 
-		//~ CL_SUCCESS != ocl_status, 
-		//~ ret_status = CL4_ERROR_OCL, 
-		//~ error_handler, 
-		//~ "Get end event command queue: OpenCL error %d (%s).", 
-		//~ ocl_status,
-		//~ cl4_err(ocl_status));
-//~ 
-	//~ /* Get event end instant. */
-	//~ ocl_status = clGetEventProfilingInfo(
-		//~ ev2, 
-		//~ CL_PROFILING_COMMAND_END, 
-		//~ sizeof(cl_ulong), 
-		//~ &instant, 
-		//~ NULL);
-	//~ gef_if_error_create_goto(
-		//~ *err, CL4_ERROR, 
-		//~ CL_SUCCESS != ocl_status, 
-		//~ ret_status = CL4_ERROR_OCL, 
-		//~ error_handler, 
-		//~ "Get event end instant: OpenCL error %d (%s).", 
-		//~ ocl_status,
-		//~ cl4_err(ocl_status))
-//~ 
-	//~ /* Add event end instant to list of event instants. */
-	//~ evinst_end = cl4_prof_evinst_new(
-		//~ event_name, 
-		//~ event_id, 
-		//~ instant, 
-		//~ CL4_PROF_EV_END, 
-		//~ q2);
-	//~ gef_if_error_create_goto(
-		//~ *err, CL4_ERROR, 
-		//~ evinst_end == NULL, 
-		//~ ret_status = CL4_ERROR_NOALLOC, 
-		//~ error_handler, 
-		//~ "Unable to allocate memory for CL4ProfEvInst object for end of event '%s' with ID %d.", 
-		//~ event_name, 
-		//~ event_id);
-	//~ profile->event_instants = g_list_prepend(
-		//~ profile->event_instants, 
-		//~ (gpointer) evinst_end);
-	//~ 
-	//~ /* Check if command queue of start event is already registered in the command queues table... */
-	//~ if (!g_hash_table_contains(profile->command_queues, q1)) {
-		//~ /* ...if not, register it. */
-		//~ queue_id = GUINT_TO_POINTER(
-			//~ g_hash_table_size(profile->command_queues));
-		//~ g_hash_table_insert(
-			//~ profile->command_queues, (gpointer) q1, (gpointer) queue_id);
-	//~ }
-//~ 
-	//~ /* Check if command queue of end event is already registered in the command queues table... */
-	//~ if (!g_hash_table_contains(profile->command_queues, q2)) {
-		//~ /* ...if not, register it. */
-		//~ queue_id = GUINT_TO_POINTER(
-			//~ g_hash_table_size(profile->command_queues));
-		//~ g_hash_table_insert(
-			//~ profile->command_queues, (gpointer) q2, (gpointer) queue_id);
-	//~ }
-//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ ret_status = CL4_SUCCESS;
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-//~ 
-//~ finish:	
-	//~ /* Return status. */
-	//~ return ret_status;
-	//~ 
-//~ }
-//~ 
-//~ /** 
- //~ * @brief Create new event instant.
- //~ * 
- //~ * @param eventName Name of event.
- //~ * @param id Id of event.
- //~ * @param instant Even instant in nanoseconds.
- //~ * @param type Type of event instant: CL4_PROF_EV_START or CL4_PROF_EV_END
- //~ * @param queue Command queue associated with event.
- //~ * @return A new event instant or NULL if operation failed.
- //~ */
-//~ CL4ProfEvInst* cl4_prof_evinst_new(const char* eventName, guint id, cl_ulong instant, CL4ProfEvInstType type, cl_command_queue queue) {
-	//~ 
-	//~ /* Allocate memory for event instant data structure. */
-	//~ CL4ProfEvInst* event_instant = 
-		//~ (CL4ProfEvInst*) malloc(sizeof(CL4ProfEvInst));
-	//~ /* If allocation successful... */
-	//~ if (event_instant != NULL) {
-		//~ /* ...initialize structure fields. */
-		//~ event_instant->eventName = eventName;
-		//~ event_instant->id = id;
-		//~ event_instant->instant = instant;
-		//~ event_instant->type = type;
-		//~ event_instant->queue = queue;
-	//~ }
-	//~ /* Return event instant data structure. */
-	//~ return event_instant;	
-//~ }
-//~ 
-//~ 
-//~ /**
- //~ * @brief Free an event instant.
- //~ * 
- //~ * @param event_instant Event instant to destroy. 
- //~ */
-//~ void cl4_prof_evinst_free(gpointer event_instant) {
-	//~ free(event_instant);
-//~ }
-//~ 
+/** 
+ * @brief Determine aggregate statistics for the given profile object. 
+ * 
+ * @param prof A profile object.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return CL_TRUE if function terminates successfully, or CL_FALSE
+ * otherwise.
+ * */
+cl_bool cl4_prof_aggregate(CL4Prof* prof, GError** err) {
+	
+	/* Make sure prof is not NULL. */
+	g_return_val_if_fail(prof != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+	
+	/* Process queues and respective events. */
+	cl4_prof_process_queues(CL4Prof* prof, GError** err);
+	
+	/* Return flag. */
+	cl_bool status;
+	/* Hash table iterator. */
+	GHashTableIter iter;
+	/* A pointer for a event name. */
+	gpointer eventName;
+	/* Aggregate event info. */
+	CL4ProfEvAggregate* evagg = NULL;
+	/* Type of sorting to perform on event list. */
+	CL4ProfEvSort sortType;
+	/* Aux. pointer for event data structure kept in a GList. */
+	GList* currEvInstContainer = NULL;
+	/* A pointer to a CL4ProfEvAggregate (agg. event info) variable. */
+	gpointer valueAgg;
+	/* Auxiliary aggregate event info variable.*/
+	CL4ProfEvAggregate* currAgg = NULL;
+	
+	/* Initalize table, and set aggregate values to zero. */
+	g_hash_table_iter_init(&iter, profile->unique_events);
+	while (g_hash_table_iter_next(&iter, &eventName, NULL)) {
+		evagg = cl4_prof_aggregate_new(eventName);
+		evagg->absolute_time = 0;
+		g_hash_table_insert(profile->aggregate, eventName, (gpointer) evagg);
+	}
+	
+	/* Sort event instants by eid, and then by START, END order. */
+	sortType = CL4_PROF_EV_SORT_ID;
+	profile->event_instants = g_list_sort_with_data(
+		profile->event_instants, cl4_prof_evinst_comp, (gpointer) &sortType);
+
+	/* Iterate through all event instants and determine total times. */
+	currEvInstContainer = profile->event_instants;
+	while (currEvInstContainer) {
+		
+		/* Loop aux. variables. */
+		CL4ProfEvInst* currEvInst = NULL;
+		cl_ulong startInst, endInst;
+		
+		/* Get START event instant. */
+		currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
+		startInst = currEvInst->instant;
+		
+		/* Get END event instant */
+		currEvInstContainer = currEvInstContainer->next;
+		currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
+		endInst = currEvInst->instant;
+		
+		/* Add new interval to respective aggregate value. */
+		currAgg = (CL4ProfEvAggregate*) g_hash_table_lookup(
+			profile->aggregate, currEvInst->event_name);
+		currAgg->absolute_time += endInst - startInst;
+		profile->total_events_time += endInst - startInst;
+		
+		/* Get next START event instant. */
+		currEvInstContainer = currEvInstContainer->next;
+	}
+	
+	/* Determine relative times. */
+	g_hash_table_iter_init(&iter, profile->aggregate);
+	while (g_hash_table_iter_next(&iter, &eventName, &valueAgg)) {
+		currAgg = (CL4ProfEvAggregate*) valueAgg;
+		currAgg->relative_time = 
+			((double) currAgg->absolute_time) 
+			/ 
+			((double) profile->total_events_time);
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	status = CL4_SUCCESS;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+	
+	/* Return status. */
+	return status;		
+	
+}
+
 //~ /**
  //~ * @brief Compares two event instants for sorting within a GList. It is
  //~ * an implementation of GCompareDataFunc from GLib.
@@ -739,7 +737,7 @@ void cl4_prof_add_queue(
 			//~ g_hash_table_insert(
 				//~ eventsOccurring, 
 				//~ &(currEvInst->id), /* eid */
-				//~ g_hash_table_lookup(profile->unique_events, currEvInst->eventName) /* ueid */
+				//~ g_hash_table_lookup(profile->unique_events, currEvInst->event_name) /* ueid */
 			//~ ); 
 			//~ 
 		//~ } else {
@@ -769,7 +767,7 @@ void cl4_prof_add_queue(
 						//~ innerTable, GUINT_TO_POINTER(eid_key2)));
 				//~ /* Add overlap to overlap matrix. */
 				//~ ueid_curr_ev = g_hash_table_lookup(
-					//~ profile->unique_events, currEvInst->eventName);
+					//~ profile->unique_events, currEvInst->event_name);
 				//~ guint ueid_min = GPOINTER_TO_UINT(ueid_curr_ev) <= GPOINTER_TO_UINT(ueid_occu_ev) 
 					//~ ? GPOINTER_TO_UINT(ueid_curr_ev) 
 					//~ : GPOINTER_TO_UINT(ueid_occu_ev);
@@ -789,7 +787,7 @@ void cl4_prof_add_queue(
 	//~ profile->overmat = overlapMatrix;
 	//~ 
 	//~ /* Determine and save effective events time. */
-	//~ profile->totalEventsEffTime = profile->totalEventsTime - totalOverlap;
+	//~ profile->total_events_eff_time = profile->total_events_time - totalOverlap;
 	//~ 
 	//~ /* If we got here, everything is OK. */
 	//~ g_assert (err == NULL || *err == NULL);
@@ -813,110 +811,6 @@ void cl4_prof_add_queue(
 //~ }
 //~ 
 //~ /** 
- //~ * @brief Determine aggregate statistics for the given OpenCL events profile. 
- //~ * 
- //~ * @param profile An OpenCL events profile.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
- //~ * terminates successfully, or another value of #cl4_error_codes if 
- //~ * an error occurs.
- //~ * */
-//~ int cl4_prof_aggregate(CL4Prof* profile, GError** err) {
-	//~ 
-	//~ /* Return status. */
-	//~ int status;
-	//~ /* Hash table iterator. */
-	//~ GHashTableIter iter;
-	//~ /* A pointer for a event name. */
-	//~ gpointer eventName;
-	//~ /* Aggregate event info. */
-	//~ CL4ProfEvAggregate* evagg = NULL;
-	//~ /* Type of sorting to perform on event list. */
-	//~ CL4ProfEvSort sortType;
-	//~ /* Aux. pointer for event data structure kept in a GList. */
-	//~ GList* currEvInstContainer = NULL;
-	//~ /* A pointer to a CL4ProfEvAggregate (agg. event info) variable. */
-	//~ gpointer valueAgg;
-	//~ /* Auxiliary aggregate event info variable.*/
-	//~ CL4ProfEvAggregate* currAgg = NULL;
-	//~ 
-	//~ /* Make sure profile is not NULL. */
-	//~ g_assert(profile != NULL);
-//~ 
-	//~ /* Initalize table, and set aggregate values to zero. */
-	//~ g_hash_table_iter_init(&iter, profile->unique_events);
-	//~ while (g_hash_table_iter_next(&iter, &eventName, NULL)) {
-		//~ evagg = cl4_prof_aggregate_new(eventName);
-		//~ gef_if_error_create_goto(
-			//~ *err, 
-			//~ CL4_ERROR, 
-			//~ evagg == NULL, 
-			//~ status = CL4_ERROR_NOALLOC, 
-			//~ error_handler, 
-			//~ "Unable to allocate memory for CL4ProfEvAggregate object.");
-		//~ evagg->totalTime = 0;
-		//~ g_hash_table_insert(profile->aggregate, eventName, (gpointer) evagg);
-	//~ }
-	//~ 
-	//~ /* Sort event instants by eid, and then by START, END order. */
-	//~ sortType = CL4_PROF_EV_SORT_ID;
-	//~ profile->event_instants = g_list_sort_with_data(
-		//~ profile->event_instants, cl4_prof_evinst_comp, (gpointer) &sortType);
-//~ 
-	//~ /* Iterate through all event instants and determine total times. */
-	//~ currEvInstContainer = profile->event_instants;
-	//~ while (currEvInstContainer) {
-		//~ 
-		//~ /* Loop aux. variables. */
-		//~ CL4ProfEvInst* currEvInst = NULL;
-		//~ cl_ulong startInst, endInst;
-		//~ 
-		//~ /* Get START event instant. */
-		//~ currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
-		//~ startInst = currEvInst->instant;
-		//~ 
-		//~ /* Get END event instant */
-		//~ currEvInstContainer = currEvInstContainer->next;
-		//~ currEvInst = (CL4ProfEvInst*) currEvInstContainer->data;
-		//~ endInst = currEvInst->instant;
-		//~ 
-		//~ /* Add new interval to respective aggregate value. */
-		//~ currAgg = (CL4ProfEvAggregate*) g_hash_table_lookup(
-			//~ profile->aggregate, currEvInst->eventName);
-		//~ currAgg->totalTime += endInst - startInst;
-		//~ profile->totalEventsTime += endInst - startInst;
-		//~ 
-		//~ /* Get next START event instant. */
-		//~ currEvInstContainer = currEvInstContainer->next;
-	//~ }
-	//~ 
-	//~ /* Determine relative times. */
-	//~ g_hash_table_iter_init(&iter, profile->aggregate);
-	//~ while (g_hash_table_iter_next(&iter, &eventName, &valueAgg)) {
-		//~ currAgg = (CL4ProfEvAggregate*) valueAgg;
-		//~ currAgg->relativeTime = 
-			//~ ((double) currAgg->totalTime) 
-			//~ / 
-			//~ ((double) profile->totalEventsTime);
-	//~ }
-//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ status = CL4_SUCCESS;
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-//~ 
-//~ finish:	
-	//~ 
-	//~ /* Return status. */
-	//~ return status;		
-	//~ 
-//~ }
-//~ 
-//~ /** 
  //~ * @brief Create a new aggregate statistic for events of a given type.
  //~ * 
  //~ * @param eventName Name of event.
@@ -925,7 +819,7 @@ void cl4_prof_add_queue(
 //~ CL4ProfEvAggregate* cl4_prof_aggregate_new(const char* eventName) {
 	//~ CL4ProfEvAggregate* agg = (CL4ProfEvAggregate*) malloc(sizeof(CL4ProfEvAggregate));
 	//~ if (agg != NULL) {
-		//~ agg->eventName = eventName;
+		//~ agg->event_name = eventName;
 	//~ }
 	//~ return agg;
 //~ }
@@ -956,11 +850,11 @@ void cl4_prof_add_queue(
 	//~ /* Perform comparison. */
 	//~ if (*sortType == CL4_PROF_AGGEVDATA_SORT_NAME) {
 		//~ /* Sort by event name */
-		//~ return strcmp(evAgg1->eventName, evAgg2->eventName);
+		//~ return strcmp(evAgg1->event_name, evAgg2->event_name);
 	//~ } else if (*sortType == CL4_PROF_AGGEVDATA_SORT_TIME) {
 		//~ /* Sort by event time period */
-		//~ if (evAgg1->totalTime < evAgg2->totalTime) return 1;
-		//~ if (evAgg1->totalTime > evAgg2->totalTime) return -1;
+		//~ if (evAgg1->absolute_time < evAgg2->absolute_time) return 1;
+		//~ if (evAgg1->absolute_time > evAgg2->absolute_time) return -1;
 	//~ }
 	//~ return 0;
 //~ }
@@ -1009,10 +903,10 @@ void cl4_prof_add_queue(
 	//~ }
 	//~ 
 	//~ /* Show total events time */
-	//~ if (profile->totalEventsTime > 0) {
+	//~ if (profile->total_events_time > 0) {
 		//~ printf(
 			//~ "     Total of all events       : %fs\n", 
-			//~ profile->totalEventsTime * 1e-9);
+			//~ profile->total_events_time * 1e-9);
 	//~ }
 	//~ 
 	//~ /* Show aggregate event times */
@@ -1037,9 +931,9 @@ void cl4_prof_add_queue(
 			//~ g_assert(evAgg != NULL);
 			//~ printf(
 				//~ "       | %-30.30s | %13.4f | %13.4e |\n", 
-				//~ evAgg->eventName, 
-				//~ evAgg->relativeTime * 100.0, 
-				//~ evAgg->totalTime * 1e-9);
+				//~ evAgg->event_name, 
+				//~ evAgg->relative_time * 100.0, 
+				//~ evAgg->absolute_time * 1e-9);
 			//~ evAggContainer = evAggContainer->next;
 		//~ }
 		//~ printf("       ------------------------------------------------------------------\n");
@@ -1084,9 +978,9 @@ void cl4_prof_add_queue(
 		//~ if (strlen(overlapString->str) > 0) {
 			//~ /* Show total events effective time (discount overlaps) */
 			//~ printf("     Tot. of all events (eff.) : %es\n", 
-				//~ profile->totalEventsEffTime * 1e-9);
+				//~ profile->total_events_eff_time * 1e-9);
 			//~ printf("                                 %es saved with overlaps\n", 
-				//~ (profile->totalEventsTime - profile->totalEventsEffTime) * 1e-9);
+				//~ (profile->total_events_time - profile->total_events_eff_time) * 1e-9);
 			//~ /* Title the several overlaps. */
 			//~ printf("     Event overlap times       :\n");
 			//~ printf("       ------------------------------------------------------------------\n");
@@ -1178,27 +1072,27 @@ void cl4_prof_add_queue(
 		//~ /* Get information from start instant. */
 		//~ currEvInst = (CL4ProfEvInst*) evInstContainer->data;
 		//~ startInst = export_options.zero_start 
-			//~ ? currEvInst->instant - profile->startTime 
+			//~ ? currEvInst->instant - profile->start_time 
 			//~ : currEvInst->instant;
 		//~ q1 = export_options.simple_queue_id 
 			//~ ? (gulong) GPOINTER_TO_UINT(
 				//~ g_hash_table_lookup(
 					//~ profile->command_queues, currEvInst->queue)) 
 			//~ : (gulong) currEvInst->queue;
-		//~ ev1Name = currEvInst->eventName;
+		//~ ev1Name = currEvInst->event_name;
 		//~ 
 		//~ /* Get information from end instant. */
 		//~ evInstContainer = evInstContainer->next;
 		//~ currEvInst = (CL4ProfEvInst*) evInstContainer->data;
 		//~ endInst = export_options.zero_start 
-			//~ ? currEvInst->instant - profile->startTime 
+			//~ ? currEvInst->instant - profile->start_time 
 			//~ : currEvInst->instant;
 		//~ q2 = export_options.simple_queue_id 
 			//~ ? (gulong) GPOINTER_TO_UINT(
 				//~ g_hash_table_lookup(
 					//~ profile->command_queues, currEvInst->queue)) 
 			//~ : (gulong) currEvInst->queue;
-		//~ ev2Name = currEvInst->eventName;
+		//~ ev2Name = currEvInst->event_name;
 		//~ 
 		//~ /* Make sure both event instants correspond to the same event. */
 		//~ g_assert_cmpstr(ev1Name, ==, ev2Name);
