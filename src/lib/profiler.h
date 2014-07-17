@@ -41,6 +41,18 @@
 typedef struct cl4_prof CL4Prof;
 
 /**
+ * @brief Sorting strategy for aggregate event data instances.
+ */
+typedef enum {
+
+	 /** Sort aggregate event data instances by name. */
+	CL4_PROF_AGGEVDATA_SORT_NAME,
+	/** Sort aggregate event data instances by time. */
+	CL4_PROF_AGGEVDATA_SORT_TIME
+
+}  CL4ProfEvAggDataSort;
+
+/**
  * @brief Export options.
  * */
 typedef struct cl4_prof_export_options {
@@ -71,62 +83,33 @@ typedef struct cl4_prof_export_options {
 CL4Prof* cl4_prof_new();
 
 /** @brief Destroy a profile object. */
-void cl4_prof_destroy(CL4Prof* profile);
+void cl4_prof_destroy(CL4Prof* prof);
 
 /** @brief Starts the global profiler timer. Only required if client
 * wishes to compare the effectively ellapsed time with the OpenCL
 * kernels time. */
-void cl4_prof_start(CL4Prof* profile);
+void cl4_prof_start(CL4Prof* prof);
 
 /** @brief Stops the global profiler timer. Only required if 
  * cl4_prof_start() was called. */
-void cl4_prof_stop(CL4Prof* profile);
+void cl4_prof_stop(CL4Prof* prof);
 
 /** @brief If profiling has started but not stopped, returns the time
  * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
-double cl4_prof_time_elapsed(CL4Prof* profile);
+double cl4_prof_time_elapsed(CL4Prof* prof);
 
 /** @brief Add a command queue wrapper for profiling. */
 void cl4_prof_add_queue(
 	CL4Prof* prof, const char* cq_name, CL4CQueue* cq);
 
 /** @brief Determine aggregate statistics for the given profile object. */
-cl_bool cl4_prof_calc(CL4Prof* profile, GError** err);
+cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
 
-//~ /** @brief Add OpenCL event to events profile, more specifically adds
- //~ * the start and end instants of the given event to the profile. */
-//~ int cl4_prof_add(CL4Prof* profile, const char* event_name, cl_event ev, GError** err);
-//~ 
-//~ /** @brief Add OpenCL event to events profile. Receives a CL4ProfEvName
- //~ * instead of a separate event and name like cl4_prof_add(). */
-//~ int cl4_prof_add_evname(CL4Prof* profile, CL4ProfEvName event_with_name, GError** err);
-//~ 
-//~ /** @brief Add OpenCL events to events profile, more specifically adds
- //~ * the start of ev1 and end of ev2 to the profile. */
-//~ int cl4_prof_add_composite(CL4Prof* profile, const char* event_name, cl_event ev1, cl_event ev2, GError** err);
-//~ 
-//~ /** @brief Create new event instant. */
-//~ CL4ProfEvInst* cl4_prof_evinst_new(const char* eventName, guint id, cl_ulong instant, CL4ProfEvInstType type, cl_command_queue queue);
-//~ 
-//~ /** @brief Free an event instant. */
-//~ void cl4_prof_evinst_destroy(gpointer event_instant);
-//~ 
-//~ /** @brief Compares two event instants for sorting purposes. */
-//~ gint cl4_prof_evinst_comp(gconstpointer a, gconstpointer b, gpointer userdata);
-//~ 
-//~ /** @brief Determine overlap matrix for the given OpenCL events profile. */
-//~ int cl4_prof_overmat(CL4Prof* profile, GError** err);
-//~ 
-//~ /** @brief Create a new aggregate statistic for events of a given type. */
-//~ CL4ProfEvAgg* cl4_prof_agg_new(const char* eventName);
-//~ 
-//~ /** @brief Free an aggregate statistic. */
-//~ void cl4_prof_agg_destroy(gpointer agg);
-//~ 
-//~ /** @brief Print profiling info. */
-//~ int cl4_prof_print_info(CL4Prof* profile, CL4ProfEvAggDataSort evAggSortType, GError** err);
-//~ 
+/** @brief Print profiling info. */
+void cl4_prof_print_info(CL4Prof* prof, 
+	CL4ProfEvAggDataSort evAggSortType);
+
 //~ /** @brief Export profiling info to a given stream. */
 //~ int cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
 //~ 

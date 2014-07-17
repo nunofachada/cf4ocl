@@ -127,18 +127,6 @@ typedef enum {
 
 } CL4ProfEvSort;
 
-/**
- * @brief Sorting strategy for aggregate event data instances.
- */
-typedef enum {
-
-	 /** Sort aggregate event data instances by name. */
-	CL4_PROF_AGGEVDATA_SORT_NAME,
-	/** Sort aggregate event data instances by time. */
-	CL4_PROF_AGGEVDATA_SORT_TIME
-
-}  CL4ProfEvAggDataSort;
-
 /* Default export options. */
 static CL4ProfExportOptions export_options = {
 
@@ -222,6 +210,37 @@ static gint cl4_prof_evinst_comp(
 	}
 	return 0;
 }
+
+/**
+ * @brief Compares two aggregate event data instances for sorting 
+ * within a GList. It is an implementation of GCompareDataFunc from GLib.
+ * 
+ * @param a First aggregate event data instance to compare.
+ * @param b Second aggregate event data instance to compare.
+ * @param userdata Defines what type of sorting to do.
+ * @return Negative value if a < b; zero if a = b; positive value if a > b.
+ */
+static gint cl4_prof_evagg_comp(
+	gconstpointer a, gconstpointer b, gpointer userdata) {
+	
+	/* Cast input parameters to event instant data structures. */
+	CL4ProfEvAgg* ev_agg1 = (CL4ProfEvAgg*) a;
+	CL4ProfEvAgg* ev_agg2 = (CL4ProfEvAgg*) b;
+	CL4ProfEvAggDataSort* sort_type = (CL4ProfEvAggDataSort*) userdata;
+	/* Perform comparison. */
+	if (*sort_type == CL4_PROF_AGGEVDATA_SORT_NAME) {
+		/* Sort by event name */
+		return strcmp(ev_agg1->event_name, ev_agg2->event_name);
+	} else if (*sort_type == CL4_PROF_AGGEVDATA_SORT_TIME) {
+		/* Sort by event time period */
+		if (ev_agg1->absolute_time < ev_agg2->absolute_time) return 1;
+		if (ev_agg1->absolute_time > ev_agg2->absolute_time) return -1;
+	}
+	return 0;
+	
+}
+
+
 
 /** 
  * @brief Create a new aggregate statistic for events of a given type.
@@ -596,7 +615,6 @@ static void cl4_prof_calc_overmat(CL4Prof* prof) {
 
 }
 
-
 /** 
  * @brief Create a new profile object.
  * 
@@ -807,187 +825,131 @@ finish:
 
 }
 
-//~ /**
- //~ * @brief Compares two aggregate event data instances for sorting 
- //~ * within a GList. It is an implementation of GCompareDataFunc from GLib.
- //~ * 
- //~ * @param a First aggregate event data instance to compare.
- //~ * @param b Second aggregate event data instance to compare.
- //~ * @param userdata Defines what type of sorting to do.
- //~ * @return Negative value if a < b; zero if a = b; positive value if a > b.
- //~ */
-//~ gint cl4_prof_evagg_comp(gconstpointer a, gconstpointer b, gpointer userdata) {
-	//~ /* Cast input parameters to event instant data structures. */
-	//~ CL4ProfEvAgg* evAgg1 = (CL4ProfEvAgg*) a;
-	//~ CL4ProfEvAgg* evAgg2 = (CL4ProfEvAgg*) b;
-	//~ CL4ProfEvAggDataSort* sort_type = (CL4ProfEvAggDataSort*) userdata;
-	//~ /* Perform comparison. */
-	//~ if (*sort_type == CL4_PROF_AGGEVDATA_SORT_NAME) {
-		//~ /* Sort by event name */
-		//~ return strcmp(evAgg1->event_name, evAgg2->event_name);
-	//~ } else if (*sort_type == CL4_PROF_AGGEVDATA_SORT_TIME) {
-		//~ /* Sort by event time period */
-		//~ if (evAgg1->absolute_time < evAgg2->absolute_time) return 1;
-		//~ if (evAgg1->absolute_time > evAgg2->absolute_time) return -1;
-	//~ }
-	//~ return 0;
-//~ }
-//~ 
-//~ /**
- //~ * @brief Print profiling info.
- //~ * 
- //~ * @param profile An OpenCL events profile.
- //~ * @param evAggSortType Sorting strategy for aggregate event data instances.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
- //~ * terminates successfully, or another value of #cl4_error_codes if 
- //~ * an error occurs.
- //~ * */ 
-//~ int cl4_prof_print_info(CL4Prof* profile, CL4ProfEvAggDataSort evAggSortType, GError** err) {
-	//~ 
-	//~ /* Function return status. */
-	//~ int status;
-	//~ /* Auxiliary hash table. */
-	//~ GHashTable* tmp = NULL;
-	//~ /* Auxiliary hash table iterator. */
-	//~ GHashTableIter iter;
-	//~ /* Auxiliary pointers for data within hash tables and lists. */
-	//~ gpointer pEventName, pId;
-	//~ /* List of aggregate events. */
-	//~ GList* evAggList = NULL;
-	//~ /* List of aggregate events (traversing pointer). */
-	//~ GList* evAggContainer = NULL;
-	//~ /* Aggregate event info. */
-	//~ CL4ProfEvAgg* evAgg = NULL;
-	//~ /* Number of unique event names. */
-	//~ guint num_event_names;
-	//~ /* String containing description of overlapping events. */
-	//~ GString* overlapString = NULL;
-	//~ 
-	//~ /* Make sure profile is not NULL. */
-	//~ g_assert(profile != NULL);
-	//~ 
-	//~ printf("\n   =========================== Timming/Profiling ===========================\n\n");
-	//~ 
-	//~ /* Show total ellapsed time */
-	//~ if (prof->timer) {
-		//~ printf(
-			//~ "     Total ellapsed time       : %fs\n", 
-			//~ g_timer_elapsed(prof->timer, NULL));
-	//~ }
-	//~ 
-	//~ /* Show total events time */
-	//~ if (prof->total_events_time > 0) {
-		//~ printf(
-			//~ "     Total of all events       : %fs\n", 
-			//~ prof->total_events_time * 1e-9);
-	//~ }
-	//~ 
-	//~ /* Show aggregate event times */
-	//~ if (g_hash_table_size(prof->aggregate) > 0) {
-		//~ printf("     Aggregate times by event  :\n");
-		//~ evAggList = g_hash_table_get_values(prof->aggregate);
-		//~ gef_if_error_create_goto(
-			//~ *err, 
-			//~ CL4_ERROR, 
-			//~ evAggList == NULL, 
-			//~ status = CL4_ERROR_NOALLOC, 
-			//~ error_handler, 
-			//~ "Unable to allocate memory for GList object 'evAggList'.");
-		//~ evAggList = g_list_sort_with_data(
-			//~ evAggList, cl4_prof_evagg_comp, &evAggSortType);
-		//~ evAggContainer = evAggList;
-		//~ printf("       ------------------------------------------------------------------\n");
-		//~ printf("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
-		//~ printf("       ------------------------------------------------------------------\n");
-		//~ while (evAggContainer) {
-			//~ evAgg = (CL4ProfEvAgg*) evAggContainer->data;
-			//~ g_assert(evAgg != NULL);
-			//~ printf(
-				//~ "       | %-30.30s | %13.4f | %13.4e |\n", 
-				//~ evAgg->event_name, 
-				//~ evAgg->relative_time * 100.0, 
-				//~ evAgg->absolute_time * 1e-9);
-			//~ evAggContainer = evAggContainer->next;
-		//~ }
-		//~ printf("       ------------------------------------------------------------------\n");
-	//~ }
-	//~ 
-	//~ /* Show overlaps */
-	//~ if (prof->overmat) {
-		//~ /* Create new temporary hash table which is the reverse in 
-		 //~ * terms of key-values of prof->event_names. */
-		//~ tmp = g_hash_table_new(g_direct_hash, g_direct_equal);
-		//~ gef_if_error_create_goto(
-			//~ *err, 
-			//~ CL4_ERROR, 
-			//~ tmp == NULL, 
-			//~ status = CL4_ERROR_NOALLOC, 
-			//~ error_handler, 
-			//~ "Unable to allocate memory for 'tmp' table: g_hash_table_new function returned NULL.");
-		//~ /* Populate temporary hash table. */
-		//~ g_hash_table_iter_init(&iter, prof->event_names);
-		//~ while (g_hash_table_iter_next(&iter, &pEventName, &pId)) {
-			//~ g_hash_table_insert(tmp, pId, pEventName);
-		//~ }
-		//~ /* Get number of unique events. */
-		//~ num_event_names = g_hash_table_size(prof->event_names);
-		//~ /* Show overlaps. */
-		//~ overlapString = g_string_new("");
-		//~ for (guint i = 0; i < num_event_names; i++) {
-			//~ for (guint j = 0; j < num_event_names; j++) {
-				//~ if (prof->overmat[i * num_event_names + j] > 0) {
-					//~ g_string_append_printf(
-						//~ overlapString,
-						//~ "       | %-22.22s | %-22.22s | %12.4e |\n", 
-						//~ (const char*) g_hash_table_lookup(
-							//~ tmp, GUINT_TO_POINTER(i)),
-						//~ (const char*) g_hash_table_lookup(
-							//~ tmp, GUINT_TO_POINTER(j)),
-						//~ prof->overmat[i * num_event_names + j] * 1e-9
-					//~ );
-				//~ }
-			//~ }
-		//~ }
-		//~ if (strlen(overlapString->str) > 0) {
-			//~ /* Show total events effective time (discount overlaps) */
-			//~ printf("     Tot. of all events (eff.) : %es\n", 
-				//~ prof->total_events_eff_time * 1e-9);
-			//~ printf("                                 %es saved with overlaps\n", 
-				//~ (prof->total_events_time - prof->total_events_eff_time) * 1e-9);
-			//~ /* Title the several overlaps. */
-			//~ printf("     Event overlap times       :\n");
-			//~ printf("       ------------------------------------------------------------------\n");
-			//~ printf("       | Event 1                | Event2                 | Overlap (s)  |\n");
-			//~ printf("       ------------------------------------------------------------------\n");
-			//~ /* Show overlaps table. */
-			//~ printf("%s", overlapString->str);
-			//~ printf("       ------------------------------------------------------------------\n");
-		//~ }
-	//~ }
-	//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ status = CL4_SUCCESS;
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-//~ 
-//~ finish:	
-	//~ 
-	//~ /* Free stuff. */
-	//~ if (evAggList) g_list_free(evAggList);
-	//~ if (overlapString) g_string_free(overlapString, TRUE);
-	//~ if (tmp) g_hash_table_destroy(tmp);
-//~ 
-	//~ /* Return status. */
-	//~ return status;			
-//~ 
-//~ }
-//~ 
-//~ 
+/**
+ * @brief Print profiling info.
+ * 
+ * Client code can redirect the output using the g_set_print_handler()
+ * function from GLib.
+ * 
+ * @param prof Profile object.
+ * @param ev_aggSortType Sorting strategy for aggregate event data 
+ * instances.
+ * */ 
+void cl4_prof_print_info(CL4Prof* prof,
+	CL4ProfEvAggDataSort ev_aggSortType) {
+	
+	/* Make sure prof is not NULL. */
+	g_return_if_fail(prof != NULL);
+
+	/* Auxiliary hash table. */
+	GHashTable* tmp = NULL;
+	/* Auxiliary hash table iterator. */
+	GHashTableIter iter;
+	/* Auxiliary pointers for data within hash tables and lists. */
+	gpointer p_evt_name, p_id;
+	/* List of aggregate events. */
+	GList* ev_agg_list = NULL;
+	/* List of aggregate events (traversing pointer). */
+	GList* ev_agg_container = NULL;
+	/* Aggregate event info. */
+	CL4ProfEvAgg* ev_agg = NULL;
+	/* Number of unique event names. */
+	guint num_event_names;
+	/* String containing description of overlapping events. */
+	GString* overlap_string = NULL;
+	
+	g_print("\n   =========================== Timming/Profiling ===========================\n\n");
+	
+	/* Show total ellapsed time */
+	if (prof->timer) {
+		g_print(
+			"     Total ellapsed time       : %fs\n", 
+			g_timer_elapsed(prof->timer, NULL));
+	}
+	
+	/* Show total events time */
+	if (prof->total_events_time > 0) {
+		g_print(
+			"     Total of all events       : %fs\n", 
+			prof->total_events_time * 1e-9);
+	}
+	
+	/* Show aggregate event times */
+	if (g_hash_table_size(prof->aggregate) > 0) {
+		g_print("     Aggregate times by event  :\n");
+		ev_agg_list = g_hash_table_get_values(prof->aggregate);
+		ev_agg_list = g_list_sort_with_data(
+			ev_agg_list, cl4_prof_evagg_comp, &ev_aggSortType);
+		ev_agg_container = ev_agg_list;
+		g_print("       ------------------------------------------------------------------\n");
+		g_print("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
+		g_print("       ------------------------------------------------------------------\n");
+		while (ev_agg_container) {
+			ev_agg = (CL4ProfEvAgg*) ev_agg_container->data;
+			g_assert(ev_agg != NULL);
+			g_print(
+				"       | %-30.30s | %13.4f | %13.4e |\n", 
+				ev_agg->event_name, 
+				ev_agg->relative_time * 100.0, 
+				ev_agg->absolute_time * 1e-9);
+			ev_agg_container = ev_agg_container->next;
+		}
+		g_print("       ------------------------------------------------------------------\n");
+	}
+	
+	/* Show overlaps */
+	if (prof->overmat) {
+		/* Create new temporary hash table which is the reverse in 
+		 * terms of key-values of prof->event_names. */
+		tmp = g_hash_table_new(g_direct_hash, g_direct_equal);
+		/* Populate temporary hash table. */
+		g_hash_table_iter_init(&iter, prof->event_names);
+		while (g_hash_table_iter_next(&iter, &p_evt_name, &p_id)) {
+			g_hash_table_insert(tmp, p_id, p_evt_name);
+		}
+		/* Get number of unique events. */
+		num_event_names = g_hash_table_size(prof->event_names);
+		/* Show overlaps. */
+		overlap_string = g_string_new("");
+		for (guint i = 0; i < num_event_names; i++) {
+			for (guint j = 0; j < num_event_names; j++) {
+				if (prof->overmat[i * num_event_names + j] > 0) {
+					g_string_append_printf(
+						overlap_string,
+						"       | %-22.22s | %-22.22s | %12.4e |\n", 
+						(const char*) g_hash_table_lookup(
+							tmp, GUINT_TO_POINTER(i)),
+						(const char*) g_hash_table_lookup(
+							tmp, GUINT_TO_POINTER(j)),
+						prof->overmat[i * num_event_names + j] * 1e-9
+					);
+				}
+			}
+		}
+		if (strlen(overlap_string->str) > 0) {
+			/* Show total events effective time (discount overlaps) */
+			g_print("     Tot. of all events (eff.) : %es\n", 
+				prof->total_events_eff_time * 1e-9);
+			g_print("                                 %es saved with overlaps\n", 
+				(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
+			/* Title the several overlaps. */
+			g_print("     Event overlap times       :\n");
+			g_print("       ------------------------------------------------------------------\n");
+			g_print("       | Event 1                | Event2                 | Overlap (s)  |\n");
+			g_print("       ------------------------------------------------------------------\n");
+			/* Show overlaps table. */
+			g_print("%s", overlap_string->str);
+			g_print("       ------------------------------------------------------------------\n");
+		}
+	}
+	
+	/* Free stuff. */
+	if (ev_agg_list) g_list_free(ev_agg_list);
+	if (overlap_string) g_string_free(overlap_string, TRUE);
+	if (tmp) g_hash_table_destroy(tmp);
+
+}
+
 //~ /** 
  //~ * @brief Export profiling info to a given stream.
  //~ * 
