@@ -134,8 +134,8 @@ cl_bool cl4_wrapper_unref(CL4Wrapper* wrapper, size_t size,
 			ocl_status = rel_cl_fun(wrapper->cl_object);
 			if (ocl_status != CL_SUCCESS) {
 				g_set_error(err, CL4_ERROR, CL4_ERROR_OCL,
-				"Function '%s': unable to create release OpenCL object (OpenCL error %d: %s).", 
-				__func__, ocl_status, cl4_err(ocl_status));
+				"%s: unable to create release OpenCL object (OpenCL error %d: %s).", 
+				G_STRLOC, ocl_status, cl4_err(ocl_status));
 			}
 		}
 		
@@ -306,12 +306,12 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1,
 				wrapper2->cl_object, param_name, 0, NULL, &size_ret);
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
-			"Function '%s': get info [size] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
+			"%s: get info [size] (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, cl4_err(ocl_status));
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			size_ret == 0, CL4_ERROR_OCL, error_handler,
-			"Function '%s': get info [size] (size is 0).",
-			__func__);
+			"%s: get info [size] (size is 0).",
+			G_STRLOC);
 		
 		/* Allocate memory for information. */
 		info = cl4_wrapper_info_new(size_ret);
@@ -325,8 +325,8 @@ CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1,
 				NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
-			"Function '%s': get context info [info] (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
+			"%s: get context info [info] (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 		/* Keep information in information table. */
 		g_hash_table_insert(wrapper1->info,

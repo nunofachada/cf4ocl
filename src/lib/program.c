@@ -211,8 +211,8 @@ CL4Program* cl4_program_new_with_source(cl_context context,
 		context, count, strings, lengths, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_program with source (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to create cl_program with source (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	prg = cl4_program_new_wrap(program);
 	
@@ -375,8 +375,8 @@ CL4Program* cl4_program_new_with_binary(cl_context context,
 		&ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_program from binaries (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to create cl_program from binaries (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 
 	prg = cl4_program_new_wrap(program);
 
@@ -416,8 +416,8 @@ CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
 
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_program from built-in kernels (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to create cl_program from built-in kernels (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 
 	prg = cl4_program_new_wrap(program);
 
@@ -503,8 +503,8 @@ cl_bool cl4_program_build_from_cldevices_full(CL4Program* prg,
 		num_devices, device_list, options, pfn_notify, user_data);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to build program (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to build program (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -570,8 +570,8 @@ CL4Kernel* cl4_program_get_kernel(
 			cl4_program_unwrap(prg), kernel_name, &ocl_status);
 		gef_if_error_create_goto(*err, CL4_ERROR,
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
-			"Function '%s': unable to create kernel (OpenCL error %d: %s).",
-			__func__, ocl_status, cl4_err(ocl_status));
+			"%s: unable to create kernel (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 		/* Create kernel wrapper. */
 		krnl = cl4_kernel_new_wrap(kernel);
@@ -645,8 +645,8 @@ static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 		bins_raw, NULL);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
-		"Function '%s': unable to get binaries from program.",
-		__func__);
+		"%s: unable to get binaries from program.",
+		G_STRLOC);
 
 	/* Fill binaries table, associating each device with a 
 	 * CL4ProgramBinary* object containing the binary and its size. */
@@ -725,8 +725,8 @@ CL4ProgramBinary* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 		/* Device does not exist in list of program devices. */
 		gef_if_error_create_goto(*err, CL4_ERROR, TRUE, CL4_ERROR_OCL, 
 			error_handler,
-			"Function '%s': device is not part of program devices.",
-			__func__);
+			"%s: device is not part of program devices.",
+			G_STRLOC);
 	}
 		
 	/* If we got here, everything is OK. */
@@ -765,8 +765,8 @@ cl_bool cl4_program_save_binary(CL4Program* prg, CL4Device* dev,
 	
 	gef_if_error_create_goto(*err, CL4_ERROR, binary->size == 0, 
 		CL4_ERROR_OCL, error_handler,
-		"Function '%s': binary for given device has size 0.",
-		__func__);
+		"%s: binary for given device has size 0.",
+		G_STRLOC);
 
 	g_file_set_contents(filename, (const gchar*) binary->data,
 		binary->size, &err_internal);

@@ -119,8 +119,8 @@ CL4CQueue* cl4_cqueue_new_direct(cl_context context,
 		properties, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create queue (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to create queue (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 
 	/* Wrap the queue. */
 	cq = cl4_cqueue_new_wrap(queue);
@@ -319,8 +319,8 @@ cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err) {
 	ocl_status = clFlush(cl4_cqueue_unwrap(cq));
 	if (ocl_status != CL_SUCCESS)
 		g_set_error(err, CL4_ERROR, ocl_status, 
-			"Function '%s': unable to flush queue (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+			"%s: unable to flush queue (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 
 	return ocl_status;
 }
@@ -336,8 +336,8 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err) {
 	ocl_status = clFinish(cl4_cqueue_unwrap(cq));
 	if (ocl_status != CL_SUCCESS)
 		g_set_error(err, CL4_ERROR, ocl_status, 
-			"Function '%s': unable to finish queue (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+			"%s: unable to finish queue (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 
 	return ocl_status;
 

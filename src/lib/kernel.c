@@ -162,8 +162,8 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 				cl4_arg_size(arg), cl4_arg_value(arg));
 			gef_if_error_create_goto(*err, CL4_ERROR, 
 				CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-				"Function '%s': unable to set kernel arg %d (OpenCL error %d: %s).",
-				__func__, arg_index, ocl_status, cl4_err(ocl_status));
+				"%s: unable to set kernel arg %d (OpenCL error %d: %s).",
+				G_STRLOC, arg_index, ocl_status, cl4_err(ocl_status));
 			g_hash_table_iter_remove(&iter);
 		}
 	}
@@ -176,8 +176,8 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to enqueue kernel (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to enqueue kernel (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command

@@ -300,7 +300,7 @@ gboolean cl4_devsel_indep_type(
 	/* Make sure data is not NULL. */
 	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
 		CL4_ERROR_INVALID_DATA, error_handler,
-		"Function '%s': invalid filter data", __func__); 
+		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get type to check for. */
 	cl_device_type type_to_check = *((cl_device_type*) data);
@@ -425,7 +425,7 @@ gboolean cl4_devsel_indep_string(
 	/* Make sure data is not NULL. */
 	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
 		CL4_ERROR_INVALID_DATA, error_handler,
-		"Function '%s': invalid filter data", __func__); 
+		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Lower-case partial name for comparison. */
 	part_info = g_ascii_strdown((gchar*) data, -1);
@@ -536,7 +536,7 @@ gboolean cl4_devsel_indep_platform(
 	/* Check if data is NULL, throw error if so. */
 	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
 		CL4_ERROR_INVALID_DATA, error_handler,
-		"Function '%s': invalid filter data", __func__); 
+		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get device platform. */
 	platf = cl4_device_info_value_scalar(device, CL_DEVICE_PLATFORM,

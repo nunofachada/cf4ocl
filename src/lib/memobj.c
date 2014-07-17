@@ -115,8 +115,8 @@ CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4CQueue* cq,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to unmap memory object (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to unmap memory object (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
@@ -179,8 +179,8 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);		
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to migrate memory objects (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to migrate memory objects (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command

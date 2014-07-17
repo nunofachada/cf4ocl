@@ -111,8 +111,8 @@ CL4WrapperInfo* cl4_platform_get_cldevices(
 		CL_DEVICE_TYPE_ALL, 0, NULL, &devcon->num_devices);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': get number of devices (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: get number of devices (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 	/* Create info object with size in bytes of array of device IDs. */
 	info = cl4_wrapper_info_new(
@@ -123,8 +123,8 @@ CL4WrapperInfo* cl4_platform_get_cldevices(
 		CL_DEVICE_TYPE_ALL, devcon->num_devices, info->value, NULL);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': get device IDs (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: get device IDs (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 	/* Dirty trick to allow for automatic memory release of this info 
 	 * when platform object is destroyed. */

@@ -116,8 +116,8 @@ static cl_context_properties* cl4_context_properties_default(
 			sizeof(cl_platform_id), &platform, NULL);
 		gef_if_error_create_goto(*err, CL4_ERROR, 
 			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-			"Function '%s': unable to get platform from device (OpenCL error %d: %s).", 
-			__func__, ocl_status, cl4_err(ocl_status));
+			"%s: unable to get platform from device (OpenCL error %d: %s).", 
+			G_STRLOC, ocl_status, cl4_err(ocl_status));
 
 		/* Set context properties using discovered platform. */
 		ctx_props[0] = CL_CONTEXT_PLATFORM;
@@ -224,8 +224,8 @@ CL4Context* cl4_context_new_from_filters_full(
 	/* Check if any device was found. */
 	gef_if_error_create_goto(*err, CL4_ERROR, devices->len == 0, 
 		CL4_ERROR_DEVICE_NOT_FOUND, error_handler, 
-		"Function '%s': no device found for selected filters.", 
-		__func__);
+		"%s: no device found for selected filters.", 
+		G_STRLOC);
 
 	/* Create context wrapper. */
 	ctx = cl4_context_new_from_devices_full(properties, devices->len,
@@ -360,8 +360,8 @@ CL4Context* cl4_context_new_from_cldevices_full(
 		pfn_notify, user_data, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create cl_context (OpenCL error %d: %s).", 
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to create cl_context (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 	/* Wrap OpenCL context. */
 	ctx = cl4_context_new_wrap(context);

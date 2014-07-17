@@ -48,7 +48,7 @@ void cl4_kernel_destroy(CL4Kernel* krnl);
 void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
 	CL4Arg* arg);
 
-void cl4_kernel_set_args(CL4Kernel* krnl, ...);
+void cl4_kernel_set_args(CL4Kernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
 void cl4_kernel_set_args_v(CL4Kernel* krnl, va_list args);
 
@@ -60,7 +60,8 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq, 
 	cl_uint work_dim, size_t* global_work_offset, 
 	size_t* global_work_size, size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, ...);
+	CL4EventWaitList evt_wait_lst, GError** err, ...) 
+	G_GNUC_NULL_TERMINATED;
 
 /**
  * @brief Get kernel information object.

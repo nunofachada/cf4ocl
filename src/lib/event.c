@@ -294,8 +294,8 @@ cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err) {
 		cl4_event_wait_list_get_clevents(evt_wait_lst));
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': error while waiting for events (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: error while waiting for events (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);

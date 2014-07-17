@@ -72,8 +72,8 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 	ocl_status = clGetPlatformIDs(0, NULL, &platforms->num_platfs);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': get number of platforms (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: get number of platforms (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 	/* Determine size in bytes of array of platform IDs. */
 	platf_ids_size = sizeof(cl_platform_id) * platforms->num_platfs;
@@ -86,8 +86,8 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 		platforms->num_platfs, platf_ids, NULL);
 	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
 		CL4_ERROR_OCL, error_handler, 
-		"Function '%s': get platforms IDs (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: get platforms IDs (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 		
 	/* Allocate memory for array of platform wrapper objects. */
 	platforms->platfs = 

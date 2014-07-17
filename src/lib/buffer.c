@@ -45,8 +45,8 @@ CL4Buffer* cl4_buffer_new(CL4Context* ctx, cl_mem_flags flags,
 		host_ptr, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to create buffer (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to create buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	buf = cl4_memobj_new_wrap(buffer);
 	
@@ -86,8 +86,8 @@ CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to read buffer (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to read buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
@@ -136,8 +136,8 @@ CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to write buffer (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to write buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
@@ -188,8 +188,8 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 		&event, &ocl_status);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to map buffer (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to map buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
@@ -242,8 +242,8 @@ CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to write buffer (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to write buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
@@ -295,8 +295,8 @@ CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
 	gef_if_error_create_goto(*err, CL4_ERROR, 
 		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
-		"Function '%s': unable to copy buffer to image (OpenCL error %d: %s).",
-		__func__, ocl_status, cl4_err(ocl_status));
+		"%s: unable to copy buffer to image (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, cl4_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
