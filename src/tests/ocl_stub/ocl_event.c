@@ -25,54 +25,63 @@
  * */
  
 #include "ocl_env.h"
+#include "utils.h"
 
-/** 
- * @brief Stub for clGetEventProfilingInfo function. 
- * 
- * @param event Stub event.
- * @param param_name Specifies the profiling data to query.
- * @param param_value_size Ignored.
- * @param param_value A pointer to memory where the appropriate result being queried is returned.
- * @param param_value_size_ret Ignored.
- * @return Always returns CL_SUCCESS.
- * */ 
-cl_int clGetEventProfilingInfo(cl_event event, 
-	cl_profiling_info param_name, size_t param_value_size, 
-	void* param_value, size_t* param_value_size_ret) {
+CL_API_ENTRY cl_int CL_API_CALL
+clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
+	size_t param_value_size, void* param_value, 
+	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
 		
-	/* Ignore compiler warnings. */
-	param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
-	
-	/* Return start or end instants in given memory location. */
-	if (param_name == CL_PROFILING_COMMAND_START)
-		*((cl_ulong*) param_value) = event->start;
-	else
-		*((cl_ulong*) param_value) = event->end;
-	
-	/* Always return success. */
-	return CL_SUCCESS;
+	cl_int status = CL_SUCCESS;
+
+	if (event == NULL) {
+		status = CL_INVALID_EVENT;
+	} else {
+		switch (param_name) {
+			case CL_PROFILING_COMMAND_QUEUED:
+				cl4_test_basic_info(cl_ulong, event, t_queued);
+			case CL_PROFILING_COMMAND_SUBMIT:
+				cl4_test_basic_info(cl_ulong, event, t_submit);
+			case CL_PROFILING_COMMAND_START:
+				cl4_test_basic_info(cl_ulong, event, t_start);
+			case CL_PROFILING_COMMAND_END:
+				cl4_test_basic_info(cl_ulong, event, t_end);
+			default:
+				status = CL_INVALID_VALUE;
+		}
+	}
+		
+	return status;
+
 }
 
-/** 
- * @brief Stub for clGetEventInfo function. 
- * 
- * @param event Stub event.
- * @param param_name Ignored (assumes CL_EVENT_COMMAND_QUEUE).
- * @param param_value_size Ignored.
- * @param param_value Memory location where to place fake queue.
- * @param param_value_size_ret Ignored.
- * @return Always returns CL_SUCCESS.
- * */ 
-cl_int clGetEventInfo(cl_event event, cl_event_info param_name, 
-	size_t param_value_size, void *param_value, 
-	size_t *param_value_size_ret) {
+CL_API_ENTRY cl_int CL_API_CALL
+clGetEventInfo(cl_event event, cl_event_info param_name, 
+	size_t param_value_size, void* param_value, 
+	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
+
+	cl_int status = CL_SUCCESS;
+
+	if (event == NULL) {
+		status = CL_INVALID_EVENT;
+	} else {
+		switch (param_name) {
+			case CL_EVENT_COMMAND_QUEUE:
+				cl4_test_basic_info(cl_command_queue, event, command_queue);
+			case CL_EVENT_CONTEXT:
+				cl4_test_basic_info(cl_context, event, context);
+			case CL_EVENT_COMMAND_TYPE:
+				cl4_test_basic_info(cl_command_type, event, command_type);
+			case CL_EVENT_COMMAND_EXECUTION_STATUS:
+				cl4_test_basic_info(cl_int, event, exec_status);
+			case CL_EVENT_REFERENCE_COUNT:
+				cl4_test_basic_info(cl_uint, event, ref_count);
+			default:
+				status = CL_INVALID_VALUE;
+		}
+	}
 		
-	/* Ignore compiler warnings. */
-	param_name = param_name; param_value_size = param_value_size; param_value_size_ret = param_value_size_ret;
-	/* Return the event command queue in given memor location. */
-	*((cl_command_queue*) param_value) = event->queue;
-	/* Always return success. */
-	return CL_SUCCESS;
+	return status;
 
 }
 

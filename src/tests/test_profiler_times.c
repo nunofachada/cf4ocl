@@ -17,10 +17,11 @@
 
 /** 
  * @file
- * @brief Tests for profiling framework.
+ * @brief Timming and correctness tests for the profiling module. Can
+ * only be performed using the OpenCL stub.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -28,9 +29,9 @@
 #include "ocl_stub/ocl_impl.h"
 
 /**
- * @brief Tests the OpenCL profiling framework.
+ * @brief Tests the profiling module.
  * */
-static void profilerTest() {
+static void timesTest() {
 	
 	/* Aux vars. */
 	guint numEvents = 5;
@@ -199,7 +200,7 @@ static void profilerTest() {
  * */
 int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
-	g_test_add_func("/profiler/profiler", profilerTest);
+	g_test_add_func("/profiler/times", timesTest);
 	return g_test_run();
 }
 

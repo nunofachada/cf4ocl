@@ -41,10 +41,7 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 	local_work_size = local_work_size;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	if (event != NULL) {
-		*event = g_slice_new(struct _cl_event);
-		(*event)->ref_count = 1;
-	}
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_NDRANGE_KERNEL);
 	
 	return CL_SUCCESS;
 }
@@ -63,10 +60,8 @@ clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ptr = ptr;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	if (event != NULL) {
-		*event = g_slice_new(struct _cl_event);
-		(*event)->ref_count = 1;
-	}
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER);
+
 	return CL_SUCCESS;
 }
                             
@@ -84,10 +79,8 @@ clEnqueueWriteBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ptr = ptr;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	if (event != NULL) {
-		*event = g_slice_new(struct _cl_event);
-		(*event)->ref_count = 1;
-	}
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER);
+
 	return CL_SUCCESS;
 }
 
@@ -106,10 +99,8 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
 	region = region;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	if (event != NULL) {
-		*event = g_slice_new(struct _cl_event);
-		(*event)->ref_count = 1;
-	}
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_TO_IMAGE);
+
 	return CL_SUCCESS;		
 
 }
@@ -129,10 +120,7 @@ clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
 	size = size;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	if (event != NULL) {
-		*event = g_slice_new(struct _cl_event);
-		(*event)->ref_count = 1;
-	}
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_BUFFER);
 	errcode_ret = errcode_ret;
 	return NULL;		
 
@@ -153,11 +141,7 @@ clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 	size = size;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	if (event != NULL) {
-		*event = g_slice_new(struct _cl_event);
-		(*event)->ref_count = 1;
-	}
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER);
 	return CL_SUCCESS;		
-
 
 }

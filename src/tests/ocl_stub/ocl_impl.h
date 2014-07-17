@@ -42,9 +42,14 @@
 
 /** @brief Stub for cl_event objects. */ 
 struct _cl_event {
-	cl_ulong start;
-	cl_ulong end;
-	cl_command_queue queue;
+	cl_ulong t_queued;
+	cl_ulong t_submit;
+	cl_ulong t_start;
+	cl_ulong t_end;
+	cl_command_queue command_queue;
+	cl_context context;
+	cl_command_type command_type;
+	cl_int exec_status;
 	cl_uint ref_count;
 };
 
@@ -55,6 +60,16 @@ struct _cl_command_queue {
 	cl_uint ref_count;
 	cl_command_queue_properties properties;
 };
+
+#define ocl_stub_create_event(event, cqueue, ctype) \
+	if (event != NULL) { \
+		*event = g_slice_new(struct _cl_event); \
+		(*event)->command_queue = cqueue; \
+		(*event)->context = cqueue->context; \
+		(*event)->command_type = ctype; \
+		(*event)->exec_status = CL_COMPLETE; \
+		(*event)->ref_count = 1; \
+	}
 
 struct _cl_device_id {
 	const cl_uint address_bits;
