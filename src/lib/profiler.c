@@ -134,10 +134,11 @@ static CL4ProfExportOptions export_options = {
 	.newline = "\n",
 	.queue_delim = "",
 	.evname_delim = "",
-	.simple_queue_id = TRUE,
-	.zero_start = TRUE
+	.zero_start = CL_TRUE
 
 };
+/* Access to export_options should be thread-safe. */
+G_LOCK_DEFINE_STATIC(export_options);
 
 /** 
  * @brief Create new event instant.
@@ -239,8 +240,6 @@ static gint cl4_prof_evagg_comp(
 	return 0;
 	
 }
-
-
 
 /** 
  * @brief Create a new aggregate statistic for events of a given type.
@@ -950,209 +949,197 @@ void cl4_prof_print_info(CL4Prof* prof,
 
 }
 
-//~ /** 
- //~ * @brief Export profiling info to a given stream.
- //~ * 
- //~ * Each line of the exported data will have the following format:
- //~ * 
- //~ *     queue start-time end-time event-name
- //~ * 
- //~ * For example:
- //~ * 
- //~ *     0    100    120    load_data1
- //~ *     1    100    132    load_data2
- //~ *     0    121    159    process_data1
- //~ *     1    133    145    process_data2
- //~ *     0    146    157    read_result
- //~ * 
- //~ * Several export parameters can be configured with the 
- //~ * cl4_prof_export_opts_get() and cl4_prof_export_opts_set() functions, by
- //~ * manipulating a ::CL4ProfExportOptions struct.
- //~ * 
- //~ * @param profile An OpenCL events profile.
- //~ * @param stream Stream where export info to.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
- //~ * terminates successfully, or another value of #cl4_error_codes if 
- //~ * an error occurs.
- //~ * */ 
-//~ int cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err) {
-	//~ 
-	//~ /* Return status. */
-	//~ int ret_status, write_status;
-	//~ /* Type of sorting to perform on event list. */
-	//~ CL4ProfEvSort sort_type;
-	//~ /* List of event instants (traversing pointer). */
-	//~ GList* ev_instContainer = NULL;
-	//~ 
-	//~ /* Make sure profile is not NULL. */
-	//~ g_assert(profile != NULL);
-	//~ 
-	//~ /* Sort event instants by eid, and then by START, END order. */
-	//~ sort_type = CL4_PROF_EV_SORT_ID;
-	//~ prof->event_instants = g_list_sort_with_data(
-		//~ prof->event_instants, cl4_prof_evinst_comp, (gpointer) &sort_type);
-	//~ 
-	//~ /* Iterate through all event instants, determine complete event
-	 //~ * information and export it to stream. */
-	//~ ev_instContainer = prof->event_instants;
-	//~ while (ev_instContainer) {
-//~ 
-		//~ /* Loop aux. variables. */
-		//~ CL4ProfEvInst* curr_evinst = NULL;
-		//~ gulong q1, q2;
-		//~ gulong qId;
-		//~ cl_ulong start_inst, end_inst;
-		//~ const char *ev1Name, *ev2Name;
-		//~ 
-		//~ /* Get information from start instant. */
-		//~ curr_evinst = (CL4ProfEvInst*) ev_instContainer->data;
-		//~ start_inst = export_options.zero_start 
-			//~ ? curr_evinst->instant - prof->start_time 
-			//~ : curr_evinst->instant;
-		//~ q1 = export_options.simple_queue_id 
-			//~ ? (gulong) GPOINTER_TO_UINT(
-				//~ g_hash_table_lookup(
-					//~ prof->command_queues, curr_evinst->queue)) 
-			//~ : (gulong) curr_evinst->queue;
-		//~ ev1Name = curr_evinst->event_name;
-		//~ 
-		//~ /* Get information from end instant. */
-		//~ ev_instContainer = ev_instContainer->next;
-		//~ curr_evinst = (CL4ProfEvInst*) ev_instContainer->data;
-		//~ end_inst = export_options.zero_start 
-			//~ ? curr_evinst->instant - prof->start_time 
-			//~ : curr_evinst->instant;
-		//~ q2 = export_options.simple_queue_id 
-			//~ ? (gulong) GPOINTER_TO_UINT(
-				//~ g_hash_table_lookup(
-					//~ prof->command_queues, curr_evinst->queue)) 
-			//~ : (gulong) curr_evinst->queue;
-		//~ ev2Name = curr_evinst->event_name;
-		//~ 
-		//~ /* Make sure both event instants correspond to the same event. */
-		//~ g_assert_cmpstr(ev1Name, ==, ev2Name);
-		//~ /* Make sure start instant occurs before end instant. */
-		//~ g_assert_cmpint(start_inst, <, end_inst);
-		//~ 
-		//~ /* Determine queue Id. */
-		//~ qId = (q1 == q2) ? q1 : (q1 + q2);
-		//~ 
-		//~ /* Write to stream. */
-		//~ write_status = fprintf(stream, "%s%lu%s%s%lu%s%lu%s%s%s%s%s", 
-			//~ export_options.queue_delim, 
-			//~ qId, 
-			//~ export_options.queue_delim, 
-			//~ export_options.separator, 
-			//~ (unsigned long) start_inst, 
-			//~ export_options.separator, 
-			//~ (unsigned long) end_inst, 
-			//~ export_options.separator, 
-			//~ export_options.evname_delim, 
-			//~ ev1Name, 
-			//~ export_options.evname_delim,
-			//~ export_options.newline);
-			//~ 
-		//~ gef_if_error_create_goto(
-			//~ *err, 
-			//~ CL4_ERROR, 
-			//~ write_status < 0, 
-			//~ ret_status = CL4_ERROR_STREAM_WRITE, 
-			//~ error_handler, 
-			//~ "Error while exporting profiling information (writing to stream).");
-		//~ 
-		//~ /* Get next START event instant. */
-		//~ ev_instContainer = ev_instContainer->next;
-		//~ 
-	//~ }
-	//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ ret_status = CL4_SUCCESS;
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-//~ 
-//~ finish:	
-	//~ 
-	//~ /* Return status. */
-	//~ return ret_status;		
-	//~ 
-//~ }
-//~ 
-//~ /** 
- //~ * @brief Helper function which exports profiling info to a given file, 
- //~ * automatically opening and closing the file. Check the 
- //~ * cl4_prof_export_info() for more information.
- //~ * 
- //~ * @param profile An OpenCL events profile.
- //~ * @param filename Name of file where information will be saved to.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
- //~ * terminates successfully, or another value of #cl4_error_codes if 
- //~ * an error occurs.
- //~ * */ 
-//~ int cl4_prof_export_info_file(CL4Prof* profile, const char* filename, GError** err) {
-//~ 
-	//~ /* Aux. var. */
-	//~ int status;
-	//~ 
-	//~ /* Internal GError object. */
-	//~ GError* errInt = NULL;
-	//~ 
-	//~ /* Open file. */
-	//~ FILE* fp = fopen(filename, "w");
-	//~ gef_if_error_create_goto(
-		//~ *err, 
-		//~ CL4_ERROR, 
-		//~ fp == NULL, 
-		//~ status = CL4_ERROR_OPENFILE, 
-		//~ error_handler, 
-		//~ "Unable to open file '%s' for exporting.", 
-		//~ filename);
-	//~ 
-	//~ /* Export data. */
-	//~ status = cl4_prof_export_info(profile, fp, &errInt);
-	//~ gef_if_error_propagate_goto(
-		//~ err, errInt, GEF_USE_GERROR, status, error_handler);
-	//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (errInt == NULL);
-	//~ status = CL4_SUCCESS;
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-	//~ /* Free internal GError object. */
-	//~ g_error_free(errInt);
-//~ 
-//~ finish:	
-//~ 
-	//~ /* Close file. */
-	//~ if (fp) fclose(fp);
-//~ 
-	//~ /* Return file contents in string form. */
-	//~ return status;
-//~ 
-//~ }
-//~ 
-//~ /**
- //~ * @brief Set export options using a ::CL4ProfExportOptions struct.
- //~ * 
- //~ * @param export_opts Export options to set.
- //~ * */
-//~ void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts) {
-	//~ export_options = export_opts;
-//~ }
-//~ 
-//~ /**
- //~ * @brief Get current export options.
- //~ * 
- //~ * @return Current export options.
- //~ * */
- //~ CL4ProfExportOptions cl4_prof_export_opts_get() {
-	//~ return export_options;
-//~ }
+/** 
+ * @brief Export profiling info to a given stream.
+ * 
+ * Each line of the exported data will have the following format:
+ * 
+ *     queue start-time end-time event-name
+ * 
+ * For example:
+ * 
+ *     q0    100    120    load_data1
+ *     q1    100    132    load_data2
+ *     q0    121    159    process_data1
+ *     q1    133    145    process_data2
+ *     q0    146    157    read_result
+ * 
+ * Several export parameters can be configured with the 
+ * cl4_prof_export_opts_get() and cl4_prof_export_opts_set() functions, by
+ * manipulating a ::CL4ProfExportOptions struct.
+ * 
+ * @param prof Profile object.
+ * @param stream Stream where export info to.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return CL_TRUE if function terminates successfully, CL_FALSE
+ * otherwise.
+ * */ 
+cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
+	
+	/* Make sure prof is not NULL. */
+	g_return_val_if_fail(prof != NULL, CL_FALSE);
+	/* Make sure stream is not NULL. */
+	g_return_val_if_fail(stream != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+
+	/* Return status. */
+	int ret_status, write_status;
+	/* Type of sorting to perform on event list. */
+	CL4ProfEvSort sort_type;
+	/* List of event instants (traversing pointer). */
+	GList* ev_inst_container = NULL;
+	
+	/* Sort event instants by eid, and then by START, END order. */
+	sort_type = CL4_PROF_EV_SORT_ID;
+	prof->event_instants = g_list_sort_with_data(prof->event_instants, 
+		cl4_prof_evinst_comp, (gpointer) &sort_type);
+	
+	/* Iterate through all event instants, determine complete event
+	 * information and export it to stream. */
+	ev_inst_container = prof->event_instants;
+	while (ev_inst_container) {
+
+		/* Loop aux. variables. */
+		CL4ProfEvInst* curr_evinst = NULL;
+		const char* cq_name;
+		cl_ulong start_inst, end_inst;
+		const char *ev1_name, *ev2_name;
+		
+		/* Get information from start instant. */
+		curr_evinst = (CL4ProfEvInst*) ev_inst_container->data;
+		start_inst = export_options.zero_start 
+			? curr_evinst->instant - prof->start_time 
+			: curr_evinst->instant;
+		cq_name = curr_evinst->queue_name;
+		ev1_name = curr_evinst->event_name;
+		
+		/* Get information from end instant. */
+		ev_inst_container = ev_inst_container->next;
+		curr_evinst = (CL4ProfEvInst*) ev_inst_container->data;
+		end_inst = export_options.zero_start 
+			? curr_evinst->instant - prof->start_time 
+			: curr_evinst->instant;
+		ev2_name = curr_evinst->event_name;
+		
+		/* Make sure both event instants correspond to the same event. */
+		g_assert_cmpstr(ev1_name, ==, ev2_name);
+		/* Make sure start instant occurs before end instant. */
+		g_assert_cmpint(start_inst, <, end_inst);
+		
+		/* Write to stream. */
+		write_status = fprintf(stream, "%s%s%s%s%lu%s%lu%s%s%s%s%s", 
+			export_options.queue_delim, 
+			cq_name, 
+			export_options.queue_delim, 
+			export_options.separator, 
+			(unsigned long) start_inst, 
+			export_options.separator, 
+			(unsigned long) end_inst, 
+			export_options.separator, 
+			export_options.evname_delim, 
+			ev1_name, 
+			export_options.evname_delim,
+			export_options.newline);
+			
+		gef_if_error_create_goto(
+			*err, 
+			CL4_ERROR, 
+			write_status < 0, 
+			ret_status = CL4_ERROR_STREAM_WRITE, 
+			error_handler, 
+			"Error while exporting profiling information (writing to stream).");
+		
+		/* Get next START event instant. */
+		ev_inst_container = ev_inst_container->next;
+		
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	ret_status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	ret_status = CL_FALSE;
+	
+finish:	
+	
+	/* Return status. */
+	return ret_status;
+	
+}
+
+/** 
+ * @brief Helper function which exports profiling info to a given file, 
+ * automatically opening and closing the file. See the 
+ * cl4_prof_export_info() for more information.
+ * 
+ * @param prof Profile object.
+ * @param filename Name of file where information will be saved to.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return CL_TRUE if function terminates successfully, CL_FALSE
+ * otherwise.
+ * */ 
+cl_bool cl4_prof_export_info_file(
+	CL4Prof* prof, const char* filename, GError** err) {
+
+	/* Aux. var. */
+	cl_bool status;
+	
+	/* Internal GError object. */
+	GError* err_internal = NULL;
+	
+	/* Open file. */
+	FILE* fp = fopen(filename, "w");
+	gef_if_error_create_goto(*err, CL4_ERROR, fp == NULL, 
+		status = CL4_ERROR_OPENFILE, error_handler, 
+		"Unable to open file '%s' for exporting.", filename);
+	
+	/* Export data. */
+	status = cl4_prof_export_info(prof, fp, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	status = CL_FALSE;
+
+finish:	
+
+	/* Close file. */
+	if (fp) fclose(fp);
+
+	/* Return file contents in string form. */
+	return status;
+
+}
+
+/**
+ * @brief Set export options using a ::CL4ProfExportOptions struct.
+ * 
+ * @param export_opts Export options to set.
+ * */
+void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts) {
+	G_LOCK(export_options);
+	export_options = export_opts;
+	G_UNLOCK(export_options);
+}
+
+/**
+ * @brief Get current export options.
+ * 
+ * @return Current export options.
+ * */
+ CL4ProfExportOptions cl4_prof_export_opts_get() {
+	return export_options;
+}

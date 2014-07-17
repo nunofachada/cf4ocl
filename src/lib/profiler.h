@@ -69,13 +69,9 @@ typedef struct cl4_prof_export_options {
 	/** Event name delimiter, defaults to empty string. */
 	const char* evname_delim;
 
-	/** Use simple queue IDs (0,1...n) instead of using the queue memory 
-	 * location as ID (defaults to TRUE). */
-	gboolean simple_queue_id;
-
 	/** Start at instant 0 (TRUE, default), or start at oldest instant 
 	 * returned by OpenCL (FALSE). */
-	gboolean zero_start;
+	cl_bool zero_start;
 	
 }  CL4ProfExportOptions;
 
@@ -110,18 +106,19 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
 void cl4_prof_print_info(CL4Prof* prof, 
 	CL4ProfEvAggDataSort evAggSortType);
 
-//~ /** @brief Export profiling info to a given stream. */
-//~ int cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
-//~ 
-//~ /** @brief Helper function which exports profiling info to a given file,
- //~ * automatically opening and closing the file. Check the
- //~ * cl4_prof_export_info() for more information. */
-//~ int cl4_prof_export_info_file(CL4Prof* profile, const char* filename, GError** err);
-//~ 
-//~ /** @brief Set export options using a ::CL4ProfExportOptions struct. */
-//~ void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts);
-//~ 
-//~ /** @brief Get current export options. */
-//~ CL4ProfExportOptions cl4_prof_export_opts_get();
+/** @brief Export profiling info to a given stream. */
+cl_bool cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
+
+/** @brief Helper function which exports profiling info to a given file,
+ * automatically opening and closing the file. Check the
+ * cl4_prof_export_info() for more information. */
+cl_bool cl4_prof_export_info_file(
+	CL4Prof* profile, const char* filename, GError** err);
+
+/** @brief Set export options using a ::CL4ProfExportOptions struct. */
+void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts);
+
+/** @brief Get current export options. */
+CL4ProfExportOptions cl4_prof_export_opts_get();
 
 #endif
