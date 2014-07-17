@@ -427,6 +427,176 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 
 }
 
+/**
+ * @brief Determine overlap matrix for the given profile object.
+ * 
+ * @param profile An OpenCL events profile.
+ */ 
+static void cl4_prof_calc_overmat(CL4Prof* prof) {
+	
+	/* Total overlap time. */
+	cl_ulong total_overlap = 0;
+	/* Overlap matrix. */
+	cl_ulong* overlap_matrix = NULL;
+	/* Number of event names. */
+	guint num_event_names;
+	/* Helper table to account for all overlapping events. */
+	GHashTable* overlaps = NULL;
+	/* Occurring events table. */
+	GHashTable* occurring_events = NULL;
+	/* Type of sorting to perform. */
+	CL4ProfEvSort sort_type;
+	/* Container for current event instants. */
+	GList* curr_evinst_container;
+	
+	/* Determine number of event names. */
+	num_event_names = g_hash_table_size(prof->event_names);
+	
+	/* Initialize overlap matrix. */
+	overlap_matrix = g_new0(cl_ulong, num_event_names * num_event_names);
+		
+	/* Initialize helper table to account for all overlapping events. */
+	overlaps = g_hash_table_new_full(g_direct_hash, g_direct_equal, 
+		NULL, (GDestroyNotify) g_hash_table_destroy);
+	
+	/* Setup ocurring events table (key: eventID, value: uniqueEventID) */
+	occurring_events = g_hash_table_new(g_int_hash, g_int_equal);
+		
+	/* Sort all event instants. */
+	sort_type = CL4_PROF_EV_SORT_INSTANT;
+	prof->event_instants = g_list_sort_with_data(prof->event_instants, 
+		cl4_prof_evinst_comp, (gpointer) &sort_type);
+	
+	/* Iterate through all event instants */
+	curr_evinst_container = prof->event_instants;
+	while (curr_evinst_container) {
+		
+		/* ** Loop aux. variables. ** */
+		
+		/* Current event instant. */
+		CL4ProfEvInst* curr_evinst = NULL;
+		/* Inner hash table (is value for overlap hash table). */
+		GHashTable* inner_table = NULL;
+		/* Hash table iterator. */
+		GHashTableIter iter;
+		/* Hashtable key, unique event ID for current event, unique 
+		 * event ID for occurring event. */
+		gpointer key_eid, ueid_curr_ev, ueid_occu_ev;
+		/* Keys for start and end event instants. */
+		guint eid_key1, eid_key2;
+		/* Event overlap in nanoseconds. */
+		cl_ulong eff_overlap;
+		
+		/* Get current event instant. */
+		curr_evinst = (CL4ProfEvInst*) curr_evinst_container->data;
+		
+		/* Check if event time is START or END time */
+		if (curr_evinst->type == CL4_PROF_EV_START) { 
+			/* Event START instant. */
+			
+			/* 1 - Check for overlaps with ocurring events */
+
+			g_hash_table_iter_init(&iter, occurring_events);
+			while (g_hash_table_iter_next (&iter, &key_eid, NULL)) {
+
+				/* The first hash table key will be the smaller event id. */
+				eid_key1 = curr_evinst->id <= *((guint*) key_eid) 
+					? curr_evinst->id 
+					: *((guint*) key_eid);
+				/* The second hash table key will be the larger event id. */
+				eid_key2 = curr_evinst->id > *((guint*) key_eid) 
+					? curr_evinst->id 
+					: *((guint*) key_eid);
+				/* Check if the first key (smaller id) is already in the 
+				 * hash table... */
+				if (!g_hash_table_lookup_extended(overlaps, 
+					GUINT_TO_POINTER(eid_key1), NULL, 
+					(gpointer) &inner_table)) {
+					/* ...if not in table, add it to table, creating a new 
+					 * inner table as value. Inner table will be initalized 
+					 * with second key (larger id) as key and event start 
+					 * instant as value. */
+					inner_table = g_hash_table_new(
+						g_direct_hash, g_direct_equal);
+					g_hash_table_insert(
+						overlaps, GUINT_TO_POINTER(eid_key1), inner_table);
+				}
+				/* Add second key (larger id) to inner tabler, setting the 
+				 * start instant as the value. */
+				g_hash_table_insert(
+					inner_table, 
+					GUINT_TO_POINTER(eid_key2), 
+					&(curr_evinst->instant));
+			}
+
+			/* 2 - Add event to occurring events. */
+			g_hash_table_insert(
+				occurring_events, 
+				&(curr_evinst->id), /* eid */
+				g_hash_table_lookup(prof->event_names, 
+					curr_evinst->event_name) /* ueid */
+			); 
+			
+		} else {
+			/* Event END instant. */
+			
+			/* 1 - Remove event from ocurring events */
+			g_hash_table_remove(occurring_events, &(curr_evinst->id));
+			
+			/* 2 - Check for overlap termination with current events */
+			g_hash_table_iter_init(&iter, occurring_events);
+			while (g_hash_table_iter_next(&iter, &key_eid, &ueid_occu_ev)) {
+				/* The first hash table key will be the smaller event id. */
+				eid_key1 = curr_evinst->id <= *((guint*) key_eid) 
+					? curr_evinst->id 
+					: *((guint*) key_eid);
+				/* The second hash table key will be the larger event id. */
+				eid_key2 = curr_evinst->id > *((guint*) key_eid) 
+					? curr_evinst->id 
+					: *((guint*) key_eid);
+				/* Get effective overlap in nanoseconds. */
+				inner_table = g_hash_table_lookup(
+					overlaps, GUINT_TO_POINTER(eid_key1));
+				eff_overlap = 
+					curr_evinst->instant 
+					- 
+					*((cl_ulong*) g_hash_table_lookup(
+						inner_table, GUINT_TO_POINTER(eid_key2)));
+				/* Add overlap to overlap matrix. */
+				ueid_curr_ev = g_hash_table_lookup(
+					prof->event_names, curr_evinst->event_name);
+				guint ueid_min = 
+					GPOINTER_TO_UINT(ueid_curr_ev) <= GPOINTER_TO_UINT(ueid_occu_ev) 
+					? GPOINTER_TO_UINT(ueid_curr_ev) 
+					: GPOINTER_TO_UINT(ueid_occu_ev);
+				guint ueid_max = 
+					GPOINTER_TO_UINT(ueid_curr_ev) > GPOINTER_TO_UINT(ueid_occu_ev) 
+					? GPOINTER_TO_UINT(ueid_curr_ev) 
+					: GPOINTER_TO_UINT(ueid_occu_ev);
+				overlap_matrix[ueid_min * num_event_names + ueid_max] += eff_overlap;
+				total_overlap += eff_overlap;
+			}	
+		}
+		
+		/* Get next event instant. */
+		curr_evinst_container = curr_evinst_container->next;
+	}
+
+	/* Add a pointer to overlap matrix to the profile. */
+	prof->overmat = overlap_matrix;
+	
+	/* Determine and save effective events time. */
+	prof->total_events_eff_time = prof->total_events_time - total_overlap;
+	
+	/* Free overlaps hash table. */
+	if (overlaps) g_hash_table_destroy(overlaps);
+	
+	/* Free occurring_events hash table. */
+	if (occurring_events) g_hash_table_destroy(occurring_events);
+
+}
+
+
 /** 
  * @brief Create a new profile object.
  * 
@@ -617,9 +787,8 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	/* Calculate aggregate statistics. */
 	cl4_prof_calc_agg(prof);
 	
-	//~ /* Calculate overlap matrix. */
-	//~ cl4_prof_calc_overmat(prof, &err_internal);
-	//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+	/* Calculate overlap matrix. */
+	cl4_prof_calc_overmat(prof);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -638,217 +807,6 @@ finish:
 
 }
 
-//~ /**
- //~ * @brief Determine overlap matrix for the given OpenCL events profile.
- //~ *         Must be called after cl4_prof_aggregate.
- //~ * 
- //~ * @param profile An OpenCL events profile.
- //~ * @param err Error structure, to be populated if an error occurs.
- //~ * @return @link cl4_error_codes::CL4_SUCCESS @endlink if function
- //~ * terminates successfully, or another value of #cl4_error_codes if 
- //~ * an error occurs.
- //~ */ 
-//~ int cl4_prof_overmat(CL4Prof* profile, GError** err) {
-	//~ 
-	//~ /* Return status. */
-	//~ int status;
-	//~ /* Total overlap time. */
-	//~ cl_ulong totalOverlap = 0;
-	//~ /* Overlap matrix. */
-	//~ cl_ulong* overlapMatrix = NULL;
-	//~ /* Number of unique events. */
-	//~ guint numUniqEvts;
-	//~ /* Helper table to account for all overlapping events. */
-	//~ GHashTable* overlaps = NULL;
-	//~ /* Occurring events table. */
-	//~ GHashTable* eventsOccurring = NULL;
-	//~ /* Type of sorting to perform. */
-	//~ CL4ProfEvSort sort_type;
-	//~ /* Container for current event instants. */
-	//~ GList* curr_evinst_container;
-	//~ 
-	//~ /* Make sure profile is not NULL. */
-	//~ g_assert(profile != NULL);
-	//~ 
-	//~ /* Determine number of unique events. */
-	//~ numUniqEvts = g_hash_table_size(prof->unique_events);
-	//~ 
-	//~ /* Initialize overlap matrix. */
-	//~ overlapMatrix = 
-		//~ (cl_ulong*) malloc(numUniqEvts * numUniqEvts * sizeof(cl_ulong));
-	//~ gef_if_error_create_goto(
-		//~ *err, 
-		//~ CL4_ERROR, 
-		//~ overlapMatrix == NULL, 
-		//~ status = CL4_ERROR_NOALLOC, 
-		//~ error_handler, 
-		//~ "Unable to allocate memory for overlapMatrix.");
-	//~ for (guint i = 0; i < numUniqEvts * numUniqEvts; i++)
-		//~ overlapMatrix[i] = 0;
-		//~ 
-	//~ /* Initialize helper table to account for all overlapping events. */
-	//~ overlaps = g_hash_table_new_full(g_direct_hash, g_direct_equal, 
-		//~ NULL, (GDestroyNotify) g_hash_table_destroy);
-	//~ gef_if_error_create_goto(
-		//~ *err, 
-		//~ CL4_ERROR, 
-		//~ overlaps == NULL, 
-		//~ status = CL4_ERROR_NOALLOC, 
-		//~ error_handler, 
-		//~ "Unable to allocate memory for overlaps helper table: g_hash_table_new function returned NULL.");
-	//~ 
-	//~ /* Setup ocurring events table (key: eventID, value: uniqueEventID) */
-	//~ eventsOccurring = g_hash_table_new(g_int_hash, g_int_equal);
-	//~ gef_if_error_create_goto(
-		//~ *err, CL4_ERROR, 
-		//~ eventsOccurring == NULL, 
-		//~ status = CL4_ERROR_NOALLOC, 
-		//~ error_handler, 
-		//~ "Unable to allocate memory for occurring events table: g_hash_table_new function returned NULL.");
-		//~ 
-	//~ /* Sort all event instants. */
-	//~ sort_type = CL4_PROF_EV_SORT_INSTANT;
-	//~ prof->event_instants = g_list_sort_with_data(
-		//~ prof->event_instants, 
-		//~ cl4_prof_evinst_comp, 
-		//~ (gpointer) &sort_type);
-	//~ 
-	//~ /* Iterate through all event instants */
-	//~ curr_evinst_container = prof->event_instants;
-	//~ while (curr_evinst_container) {
-		//~ 
-		//~ /* Loop aux. variables. */
-		//~ CL4ProfEvInst* curr_evinst = NULL;            /* Current event instant. */
-		//~ GHashTable* innerTable = NULL;                /* Inner hash table (is value for overlap hash table). */
-		//~ GHashTableIter iter;                          /* Hash table iterator. */
-		//~ gpointer key_eid, ueid_curr_ev, ueid_occu_ev; /* Hashtable key, unique event ID for current event, unique event ID for occurring event. */
-		//~ guint eid_key1, eid_key2;                     /* Keys for start and end event instants. */
-		//~ cl_ulong effOverlap;                          /* Event overlap in nanoseconds. */
-		//~ 
-		//~ /* Get current event instant. */
-		//~ curr_evinst = (CL4ProfEvInst*) curr_evinst_container->data;
-		//~ 
-		//~ /* Check if event time is START or END time */
-		//~ if (curr_evinst->type == CL4_PROF_EV_START) { 
-			//~ /* Event START instant. */
-			//~ 
-			//~ /* 1 - Check for overlaps with ocurring events */
-//~ 
-			//~ g_hash_table_iter_init(&iter, eventsOccurring);
-			//~ while (g_hash_table_iter_next (&iter, &key_eid, NULL)) {
-//~ 
-				//~ /* The first hash table key will be the smaller event id. */
-				//~ eid_key1 = curr_evinst->id <= *((guint*) key_eid) 
-					//~ ? curr_evinst->id 
-					//~ : *((guint*) key_eid);
-				//~ /* The second hash table key will be the larger event id. */
-				//~ eid_key2 = curr_evinst->id > *((guint*) key_eid) 
-					//~ ? curr_evinst->id 
-					//~ : *((guint*) key_eid);
-				//~ /* Check if the first key (smaller id) is already in the hash table... */
-				//~ if (!g_hash_table_lookup_extended(overlaps, 
-					//~ GUINT_TO_POINTER(eid_key1), NULL, 
-					//~ (gpointer) &innerTable)) {
-					//~ /* ...if not in table, add it to table, creating a new 
-					 //~ * inner table as value. Inner table will be initalized 
-					 //~ * with second key (larger id) as key and event start 
-					 //~ * instant as value. */
-					//~ innerTable = g_hash_table_new(
-						//~ g_direct_hash, g_direct_equal);
-					//~ gef_if_error_create_goto(
-						//~ *err, 
-						//~ CL4_ERROR, 
-						//~ innerTable == NULL, 
-						//~ status = CL4_ERROR_NOALLOC, 
-						//~ error_handler, 
-						//~ "Unable to allocate memory for events inner table: g_hash_table_new_full function returned NULL.");
-					//~ g_hash_table_insert(
-						//~ overlaps, GUINT_TO_POINTER(eid_key1), innerTable);
-				//~ }
-				//~ /* Add second key (larger id) to inner tabler, setting the 
-				 //~ * start instant as the value. */
-				//~ g_hash_table_insert(
-					//~ innerTable, 
-					//~ GUINT_TO_POINTER(eid_key2), 
-					//~ &(curr_evinst->instant));
-			//~ }
-//~ 
-			//~ /* 2 - Add event to occurring events. */
-			//~ g_hash_table_insert(
-				//~ eventsOccurring, 
-				//~ &(curr_evinst->id), /* eid */
-				//~ g_hash_table_lookup(prof->unique_events, curr_evinst->event_name) /* ueid */
-			//~ ); 
-			//~ 
-		//~ } else {
-			//~ /* Event END instant. */
-			//~ 
-			//~ /* 1 - Remove event from ocurring events */
-			//~ g_hash_table_remove(eventsOccurring, &(curr_evinst->id));
-			//~ 
-			//~ /* 2 - Check for overlap termination with current events */
-			//~ g_hash_table_iter_init(&iter, eventsOccurring);
-			//~ while (g_hash_table_iter_next(&iter, &key_eid, &ueid_occu_ev)) {
-				//~ /* The first hash table key will be the smaller event id. */
-				//~ eid_key1 = curr_evinst->id <= *((guint*) key_eid) 
-					//~ ? curr_evinst->id 
-					//~ : *((guint*) key_eid);
-				//~ /* The second hash table key will be the larger event id. */
-				//~ eid_key2 = curr_evinst->id > *((guint*) key_eid) 
-					//~ ? curr_evinst->id 
-					//~ : *((guint*) key_eid);
-				//~ /* Get effective overlap in nanoseconds. */
-				//~ innerTable = g_hash_table_lookup(
-					//~ overlaps, GUINT_TO_POINTER(eid_key1));
-				//~ effOverlap = 
-					//~ curr_evinst->instant 
-					//~ - 
-					//~ *((cl_ulong*) g_hash_table_lookup(
-						//~ innerTable, GUINT_TO_POINTER(eid_key2)));
-				//~ /* Add overlap to overlap matrix. */
-				//~ ueid_curr_ev = g_hash_table_lookup(
-					//~ prof->unique_events, curr_evinst->event_name);
-				//~ guint ueid_min = GPOINTER_TO_UINT(ueid_curr_ev) <= GPOINTER_TO_UINT(ueid_occu_ev) 
-					//~ ? GPOINTER_TO_UINT(ueid_curr_ev) 
-					//~ : GPOINTER_TO_UINT(ueid_occu_ev);
-				//~ guint ueid_max = GPOINTER_TO_UINT(ueid_curr_ev) > GPOINTER_TO_UINT(ueid_occu_ev) 
-					//~ ? GPOINTER_TO_UINT(ueid_curr_ev) 
-					//~ : GPOINTER_TO_UINT(ueid_occu_ev);
-				//~ overlapMatrix[ueid_min * numUniqEvts + ueid_max] += effOverlap;
-				//~ totalOverlap += effOverlap;
-			//~ }	
-		//~ }
-		//~ 
-		//~ /* Get next event instant. */
-		//~ curr_evinst_container = curr_evinst_container->next;
-	//~ }
-//~ 
-	//~ /* Add a pointer to overlap matrix to the profile. */
-	//~ prof->overmat = overlapMatrix;
-	//~ 
-	//~ /* Determine and save effective events time. */
-	//~ prof->total_events_eff_time = prof->total_events_time - totalOverlap;
-	//~ 
-	//~ /* If we got here, everything is OK. */
-	//~ g_assert (err == NULL || *err == NULL);
-	//~ status = CL4_SUCCESS;
-	//~ goto finish;
-	//~ 
-//~ error_handler:
-	//~ /* If we got here there was an error, verify that it is so. */
-	//~ g_assert (err == NULL || *err != NULL);
-//~ 
-//~ finish:	
-	//~ 
-	//~ /* Free overlaps hash table. */
-	//~ if (overlaps) g_hash_table_destroy(overlaps);
-	//~ 
-	//~ /* Free eventsOccurring hash table. */
-	//~ if (eventsOccurring) g_hash_table_destroy(eventsOccurring);
-	//~ 
-	//~ /* Return status. */
-	//~ return status;	
-//~ }
 //~ /**
  //~ * @brief Compares two aggregate event data instances for sorting 
  //~ * within a GList. It is an implementation of GCompareDataFunc from GLib.
@@ -902,7 +860,7 @@ finish:
 	//~ /* Aggregate event info. */
 	//~ CL4ProfEvAgg* evAgg = NULL;
 	//~ /* Number of unique event names. */
-	//~ guint numUniqEvts;
+	//~ guint num_event_names;
 	//~ /* String containing description of overlapping events. */
 	//~ GString* overlapString = NULL;
 	//~ 
@@ -958,7 +916,7 @@ finish:
 	//~ /* Show overlaps */
 	//~ if (prof->overmat) {
 		//~ /* Create new temporary hash table which is the reverse in 
-		 //~ * terms of key-values of prof->unique_events. */
+		 //~ * terms of key-values of prof->event_names. */
 		//~ tmp = g_hash_table_new(g_direct_hash, g_direct_equal);
 		//~ gef_if_error_create_goto(
 			//~ *err, 
@@ -968,17 +926,17 @@ finish:
 			//~ error_handler, 
 			//~ "Unable to allocate memory for 'tmp' table: g_hash_table_new function returned NULL.");
 		//~ /* Populate temporary hash table. */
-		//~ g_hash_table_iter_init(&iter, prof->unique_events);
+		//~ g_hash_table_iter_init(&iter, prof->event_names);
 		//~ while (g_hash_table_iter_next(&iter, &pEventName, &pId)) {
 			//~ g_hash_table_insert(tmp, pId, pEventName);
 		//~ }
 		//~ /* Get number of unique events. */
-		//~ numUniqEvts = g_hash_table_size(prof->unique_events);
+		//~ num_event_names = g_hash_table_size(prof->event_names);
 		//~ /* Show overlaps. */
 		//~ overlapString = g_string_new("");
-		//~ for (guint i = 0; i < numUniqEvts; i++) {
-			//~ for (guint j = 0; j < numUniqEvts; j++) {
-				//~ if (prof->overmat[i * numUniqEvts + j] > 0) {
+		//~ for (guint i = 0; i < num_event_names; i++) {
+			//~ for (guint j = 0; j < num_event_names; j++) {
+				//~ if (prof->overmat[i * num_event_names + j] > 0) {
 					//~ g_string_append_printf(
 						//~ overlapString,
 						//~ "       | %-22.22s | %-22.22s | %12.4e |\n", 
@@ -986,7 +944,7 @@ finish:
 							//~ tmp, GUINT_TO_POINTER(i)),
 						//~ (const char*) g_hash_table_lookup(
 							//~ tmp, GUINT_TO_POINTER(j)),
-						//~ prof->overmat[i * numUniqEvts + j] * 1e-9
+						//~ prof->overmat[i * num_event_names + j] * 1e-9
 					//~ );
 				//~ }
 			//~ }
