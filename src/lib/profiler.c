@@ -36,33 +36,26 @@ struct cl4_prof {
 	/** Hash table with keys equal to the events name, and values
 	 * equal to a unique id for each event name. */
 	GHashTable* event_names;
-	
+	/** Reverse of event_names in terms of key-values. */ 
+	GHashTable* event_ids;
 	/** Table of command queue wrappers. */
 	GHashTable* cqueues;
-	
 	/** Instants (start and end) of all events occuring in an OpenCL
 	 * application. */
 	GList* event_instants;
-	
 	/** Total number of event instants in CL4Prof#event_instants. */
 	guint num_event_instants;
-	
 	/** Aggregate statistics for all events in 
 	 * CL4Prof#event_instants. */
 	GHashTable* aggregate;
-	
 	/** Overlap matrix for all events in event_instants. */
 	cl_ulong* overmat;
-	
 	/** Total time taken by all events. */
 	cl_ulong total_events_time;
-	
 	/** Total time taken by all events except intervals where events overlaped. */
 	cl_ulong total_events_eff_time;
-	
 	/** Time at which the first (oldest) event started. */
 	cl_ulong start_time;
-	
 	/** Keeps track of time during the complete profiling session. */
 	GTimer* timer;
 
@@ -98,22 +91,6 @@ typedef struct cl4_prof_evinst {
 	CL4ProfEvInstType type;
 
 } CL4ProfEvInst;
-
-/**
- * @brief Aggregate event info.
- */
-typedef struct cl4_prof_ev_aggregate {
-
-	/** Name of event which the instant refers to. */
-	const char* event_name;
-	/** Total (absolute) time of events with name equal to 
-	 * ::CL4ProfEvAgg#event_name. */
-	cl_ulong absolute_time;
-	/** Relative time of events with name equal to 
-	 * ::CL4ProfEvAgg#event_name. */
-	double relative_time;
-	
-} CL4ProfEvAgg;
 
 /**
  * @brief Sorting strategy for event instants (CL4ProfEvInst).
@@ -350,20 +327,25 @@ static void cl4_prof_add_event(CL4Prof* prof, const char* cq_name,
 static void cl4_prof_process_queues(CL4Prof* prof, GError** err) {
 
 	/* Hash table iterator. */
-	GHashTableIter iter_qs;
+	GHashTableIter iter;
 	/* Command queue name and wrapper. */
 	gpointer cq_name;
 	gpointer cq;
+	/* Auxiliary pointers for determining the table of event_ids. */
+	gpointer p_evt_name, p_id;
+	
+	/* Create table of event names. */
+	prof->event_names = g_hash_table_new(g_str_hash, g_str_equal);
 
 	/* Iterate over the command queues. */
-	g_hash_table_iter_init(&iter_qs, prof->cqueues);
-	while (g_hash_table_iter_next(&iter_qs, &cq_name, &cq)) {
+	g_hash_table_iter_init(&iter, prof->cqueues);
+	while (g_hash_table_iter_next(&iter, &cq_name, &cq)) {
 		
 		/* Iterate over the events in current command queue. */
 		CL4Event* evt;
-		CL4Iterator iter = 
+		CL4Iterator iter_ev = 
 			cl4_cqueue_get_event_iterator((CL4CQueue*) cq);
-		while ((evt = cl4_cqueue_get_next_event(iter))) {
+		while ((evt = cl4_cqueue_get_next_event(iter_ev))) {
 
 			/* Add event for profiling. */
 			cl4_prof_add_event(prof, (const char*) cq_name, evt, err);
@@ -372,6 +354,15 @@ static void cl4_prof_process_queues(CL4Prof* prof, GError** err) {
 		}
 		
 	}
+	
+	/* Obtain the event_ids table (by reversing the event_names table) */
+	prof->event_ids = g_hash_table_new(g_direct_hash, g_direct_equal);
+	/* Populate table. */
+	g_hash_table_iter_init(&iter, prof->event_names);
+	while (g_hash_table_iter_next(&iter, &p_evt_name, &p_id)) {
+		g_hash_table_insert(prof->event_ids, p_id, p_evt_name);
+	}	
+	
 }
 
 static void cl4_prof_calc_agg(CL4Prof* prof) {
@@ -622,38 +613,7 @@ static void cl4_prof_calc_overmat(CL4Prof* prof) {
 CL4Prof* cl4_prof_new() {
 	
 	/* Allocate memory for new profile data structure. */
-	CL4Prof* prof = g_slice_new(CL4Prof);
-
-	/* Create table of event names. */
-	prof->event_names = g_hash_table_new(g_str_hash, g_str_equal);
-		
-	/* Create table of command queue wrappers. */
-	prof->cqueues = g_hash_table_new_full(
-		g_str_hash, g_direct_equal, NULL, 
-		(GDestroyNotify) cl4_cqueue_destroy);
-		
-	/* Create list of all event instants... */
-	prof->event_instants = NULL;
-	
-	/* ...and set number of event instants to zero. */
-	prof->num_event_instants = 0;
-	
-	/* Create table of aggregate statistics. */
-	prof->aggregate = g_hash_table_new_full(
-		g_str_hash, 
-		g_str_equal, 
-		NULL, 
-		cl4_prof_agg_destroy);
-	
-	/* Set overlap matrix to NULL. */
-	prof->overmat = NULL;
-	
-	/* Set timer structure to NULL. */
-	prof->timer = NULL;
-	
-	/* Set total times to 0. */
-	prof->total_events_time = 0;
-	prof->total_events_eff_time = 0;
+	CL4Prof* prof = g_slice_new0(CL4Prof);
 
 	/* Set absolute start time to maximum possible. */
 	prof->start_time = CL_ULONG_MAX;
@@ -674,16 +634,25 @@ void cl4_prof_destroy(CL4Prof* prof) {
 	g_return_if_fail(prof != NULL);
 	
 	/* Destroy table of event names. */
-	g_hash_table_destroy(prof->event_names);
+	if (prof->event_names != NULL)
+		g_hash_table_destroy(prof->event_names);
 	
 	/* Destroy table of command queue wrappers. */
-	g_hash_table_destroy(prof->cqueues);
+	if (prof->cqueues != NULL)
+		g_hash_table_destroy(prof->cqueues);
 	
 	/* Destroy list of all event instants. */
-	g_list_free_full(prof->event_instants, cl4_prof_evinst_destroy);
+	if (prof->event_instants != NULL)
+		g_list_free_full(
+			prof->event_instants, cl4_prof_evinst_destroy);
 	
+	/* Destroy table of event IDs. */
+	if (prof->event_ids != NULL)
+		g_hash_table_destroy(prof->event_ids);
+		
 	/* Destroy table of aggregate statistics. */
-	g_hash_table_destroy(prof->aggregate);
+	if (prof->aggregate != NULL)
+		g_hash_table_destroy(prof->aggregate);
 	
 	/* Free the overlap matrix. */
 	if (prof->overmat != NULL)
@@ -760,7 +729,15 @@ void cl4_prof_add_queue(
 	g_return_if_fail(prof != NULL);
 	/* Make sure cq is not NULL. */
 	g_return_if_fail(cq != NULL);
+	/* Must be added before calculations. */
+	g_return_if_fail(prof->aggregate == NULL);
 	
+	/* Check if table needs to be created first. */
+	if (prof->cqueues == NULL) {
+		prof->cqueues = g_hash_table_new_full(
+			g_str_hash, g_direct_equal, NULL, 
+			(GDestroyNotify) cl4_cqueue_destroy);
+	}
 	/* Warn if table already contains a queue with the specified 
 	 * name. */
 	if (g_hash_table_contains(prof->cqueues, cq_name))
@@ -790,12 +767,18 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	g_return_val_if_fail(prof != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+	/* Calculations can only be performed once. */
+	g_return_val_if_fail(prof->aggregate == NULL, CL_FALSE);
 
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 	
 	/* Function return status flag. */
 	cl_bool status;
+	
+	/* Create table of aggregate statistics. */
+	prof->aggregate = g_hash_table_new_full(g_str_hash, g_str_equal, 
+		NULL, cl4_prof_agg_destroy);
 	
 	/* Process queues and respective events. */
 	cl4_prof_process_queues(prof, &err_internal);
@@ -825,6 +808,24 @@ finish:
 }
 
 /**
+ * @brief Return aggregate statistics for events with the given name.
+ * 
+ * @param prof Profile object.
+ * @param event_name Event name.
+ * @return Aggregate statistics for events with the given name.
+ */
+CL4ProfEvAgg* cl4_prof_get_agg(CL4Prof* prof, const char* event_name) {
+
+	/* Make sure prof is not NULL. */
+	g_return_val_if_fail(prof != NULL, NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_val_if_fail(prof->aggregate != NULL, NULL);
+	
+	return (CL4ProfEvAgg*) g_hash_table_lookup(
+		prof->aggregate, event_name);
+}
+
+/**
  * @brief Print profiling info.
  * 
  * Client code can redirect the output using the g_set_print_handler()
@@ -840,12 +841,6 @@ void cl4_prof_print_info(CL4Prof* prof,
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 
-	/* Auxiliary hash table. */
-	GHashTable* tmp = NULL;
-	/* Auxiliary hash table iterator. */
-	GHashTableIter iter;
-	/* Auxiliary pointers for data within hash tables and lists. */
-	gpointer p_evt_name, p_id;
 	/* List of aggregate events. */
 	GList* ev_agg_list = NULL;
 	/* List of aggregate events (traversing pointer). */
@@ -898,15 +893,8 @@ void cl4_prof_print_info(CL4Prof* prof,
 	
 	/* Show overlaps */
 	if (prof->overmat) {
-		/* Create new temporary hash table which is the reverse in 
-		 * terms of key-values of prof->event_names. */
-		tmp = g_hash_table_new(g_direct_hash, g_direct_equal);
-		/* Populate temporary hash table. */
-		g_hash_table_iter_init(&iter, prof->event_names);
-		while (g_hash_table_iter_next(&iter, &p_evt_name, &p_id)) {
-			g_hash_table_insert(tmp, p_id, p_evt_name);
-		}
-		/* Get number of unique events. */
+
+		/* Get number of event names. */
 		num_event_names = g_hash_table_size(prof->event_names);
 		/* Show overlaps. */
 		overlap_string = g_string_new("");
@@ -917,9 +905,9 @@ void cl4_prof_print_info(CL4Prof* prof,
 						overlap_string,
 						"       | %-22.22s | %-22.22s | %12.4e |\n", 
 						(const char*) g_hash_table_lookup(
-							tmp, GUINT_TO_POINTER(i)),
+							prof->event_ids, GUINT_TO_POINTER(i)),
 						(const char*) g_hash_table_lookup(
-							tmp, GUINT_TO_POINTER(j)),
+							prof->event_ids, GUINT_TO_POINTER(j)),
 						prof->overmat[i * num_event_names + j] * 1e-9
 					);
 				}
@@ -945,7 +933,6 @@ void cl4_prof_print_info(CL4Prof* prof,
 	/* Free stuff. */
 	if (ev_agg_list) g_list_free(ev_agg_list);
 	if (overlap_string) g_string_free(overlap_string, TRUE);
-	if (tmp) g_hash_table_destroy(tmp);
 
 }
 

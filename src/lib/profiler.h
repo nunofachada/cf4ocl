@@ -53,22 +53,34 @@ typedef enum {
 }  CL4ProfEvAggDataSort;
 
 /**
+ * @brief Aggregate event info.
+ */
+typedef struct cl4_prof_ev_aggregate {
+
+	/** Name of event which the instant refers to. */
+	const char* event_name;
+	/** Total (absolute) time of events with name equal to 
+	 * ::CL4ProfEvAgg#event_name. */
+	cl_ulong absolute_time;
+	/** Relative time of events with name equal to 
+	 * ::CL4ProfEvAgg#event_name. */
+	double relative_time;
+	
+} CL4ProfEvAgg;
+
+/**
  * @brief Export options.
  * */
 typedef struct cl4_prof_export_options {
 
 	/** Field separator, defaults to tab (\\t). */
 	const char* separator;
-
 	/** Newline character, Defaults to Unix newline (\\n). */
 	const char* newline;
-
 	/** Queue name delimiter, defaults to empty string. */
 	const char* queue_delim;
-
 	/** Event name delimiter, defaults to empty string. */
 	const char* evname_delim;
-
 	/** Start at instant 0 (TRUE, default), or start at oldest instant 
 	 * returned by OpenCL (FALSE). */
 	cl_bool zero_start;
@@ -101,6 +113,9 @@ void cl4_prof_add_queue(
 
 /** @brief Determine aggregate statistics for the given profile object. */
 cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
+
+/** @brief Return aggregate statistics for events with the given name. */
+CL4ProfEvAgg* cl4_prof_get_agg(CL4Prof* prof, const char* event_name);
 
 /** @brief Print profiling info. */
 void cl4_prof_print_info(CL4Prof* prof, 
