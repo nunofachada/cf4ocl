@@ -41,32 +41,79 @@
 typedef struct cl4_prof CL4Prof;
 
 /**
- * @brief Sorting strategy for aggregate event data instances.
- */
-typedef enum {
-
-	 /** Sort aggregate event data instances by name. */
-	CL4_PROF_AGGEVDATA_SORT_NAME,
-	/** Sort aggregate event data instances by time. */
-	CL4_PROF_AGGEVDATA_SORT_TIME
-
-}  CL4ProfEvAggDataSort;
-
-/**
  * @brief Aggregate event info.
  */
-typedef struct cl4_prof_ev_aggregate {
+typedef struct cl4_prof_event_aggregate {
 
 	/** Name of event which the instant refers to. */
 	const char* event_name;
 	/** Total (absolute) time of events with name equal to 
-	 * ::CL4ProfEvAgg#event_name. */
+	 * ::CL4ProfEventAgg#event_name. */
 	cl_ulong absolute_time;
 	/** Relative time of events with name equal to 
-	 * ::CL4ProfEvAgg#event_name. */
+	 * ::CL4ProfEventAgg#event_name. */
 	double relative_time;
 	
-} CL4ProfEvAgg;
+} CL4ProfEventAgg;
+
+
+/**
+ * @brief Sorting strategy for aggregate event info instances.
+ */
+typedef enum {
+
+	 /** Sort aggregate event data instances by name. */
+	CL4_PROF_EVENTAGG_SORT_NAME,
+	/** Sort aggregate event data instances by time. */
+	CL4_PROF_EVENTAGG_SORT_TIME
+
+} CL4ProfEventAggSort;
+
+/**
+ * @brief Event info. 
+ * */
+typedef struct cl4_prof_event {
+
+	/** Name of event. */
+	const char* event_name;
+	/** Name of command queue which generated this event. */
+	const char* queue_name;
+	/** Device time in nanoseconds when the command identified by event 
+	 * is enqueued in a command-queue by the host. */
+	cl_ulong t_queued;
+	/** Device time counter in nanoseconds when the command identified 
+	 * by event that has been enqueued is submitted by the host to the 
+	 * device associated with the command-queue. */
+	cl_ulong t_submit;
+	/** Device time in nanoseconds when the command identified by event
+	 * starts execution on the device. */
+	cl_ulong t_start;
+	/** Device time in nanoseconds when the command identified by event
+	 * has finished execution on the device. */
+	cl_ulong t_end;
+
+} CL4ProfEvent;
+
+/**
+ * @brief Sorting strategy for event info instances.
+ */
+typedef enum {
+
+	 /** Sort aggregate event data instances by event name. */
+	CL4_PROF_EVENT_SORT_NAME_EVENT,
+	 /** Sort aggregate event data instances by queue name. */
+	CL4_PROF_EVENT_SORT_NAME_QUEUE,
+	 /** Sort aggregate event data instances by queued time. */
+	CL4_PROF_EVENT_SORT_T_QUEUED,
+	 /** Sort aggregate event data instances by submit time. */
+	CL4_PROF_EVENT_SORT_T_SUBMIT,
+	 /** Sort aggregate event data instances by start time. */
+	CL4_PROF_EVENT_SORT_T_START,
+	 /** Sort aggregate event data instances by end time. */
+	CL4_PROF_EVENT_SORT_T_END
+
+} CL4ProfEventSort;
+
 
 /**
  * @brief Export options.
@@ -115,11 +162,11 @@ void cl4_prof_add_queue(
 cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
 
 /** @brief Return aggregate statistics for events with the given name. */
-CL4ProfEvAgg* cl4_prof_get_agg(CL4Prof* prof, const char* event_name);
+CL4ProfEventAgg* cl4_prof_get_agg(CL4Prof* prof, const char* event_name);
 
 /** @brief Print profiling info. */
 void cl4_prof_print_info(CL4Prof* prof, 
-	CL4ProfEvAggDataSort evAggSortType);
+	CL4ProfEventAggSort evAggSortType);
 
 /** @brief Export profiling info to a given stream. */
 cl_bool cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
