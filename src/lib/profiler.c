@@ -64,49 +64,6 @@ struct cl4_prof {
 
 };
 
-/**
- * @brief Type of event instant (::CL4ProfEventInst).
- */
-typedef enum {
-	
-	/** CL4ProfEventInst is a start event instant. */
-	CL4_PROF_EV_START,
-	/** CL4ProfEventInst is an end event instant. */
-	CL4_PROF_EV_END
-	
-} CL4ProfEventInstType;
-
-/**
- * @brief Event instant.
- */
-typedef struct cl4_prof_eventinst {
-
-	 /** Name of event which the instant refers to. */
-	const char* event_name;
-	/** Name of command queue associated with event. */
-	const char* queue_name;
-	/** Event instant ID. */
-	guint id;
-	/** Event instant in nanoseconds from current device time counter. */
-	cl_ulong instant;
-	/** Type of event instant (::CL4ProfEventInstType#CL4_PROF_EV_START or 
-	 * ::CL4ProfEventInstType#CL4_PROF_EV_END). */
-	CL4ProfEventInstType type;
-
-} CL4ProfEventInst;
-
-/**
- * @brief Sorting strategy for event instants (::CL4ProfEventInst).
- */
-typedef enum {
-	
-	/** Sort event instants by instant. */
-	CL4_PROF_EVENTINST_SORT_INSTANT,
-	/** Sort event instants by event id. */
-	CL4_PROF_EVENTINST_SORT_ID
-
-} CL4ProfEventInstSort;
-
 /* Default export options. */
 static CL4ProfExportOptions export_options = {
 
@@ -127,11 +84,11 @@ G_LOCK_DEFINE_STATIC(export_options);
  * @param queue_name Name of command queue associated with event.
  * @param id Id of event.
  * @param instant Even instant in nanoseconds.
- * @param type Type of event instant: CL4_PROF_EV_START or 
- * CL4_PROF_EV_END.
+ * @param type Type of event instant: CL4_PROF_EVENT_INST_TYPE_START or 
+ * CL4_PROF_EVENT_INST_TYPE_END.
  * @return A new event instant.
  */
-static CL4ProfEventInst* cl4_prof_eventinst_new(const char* event_name,
+static CL4ProfEventInst* cl4_prof_event_inst_new(const char* event_name,
 	const char* queue_name, guint id, cl_ulong instant, 
 	CL4ProfEventInstType type) {
 	
@@ -154,7 +111,7 @@ static CL4ProfEventInst* cl4_prof_eventinst_new(const char* event_name,
  * 
  * @param event_instant Event instant to destroy. 
  */
-static void cl4_prof_eventinst_destroy(gpointer event_instant) {
+static void cl4_prof_event_inst_destroy(gpointer event_instant) {
 	
 	g_return_if_fail(event_instant != NULL);
 	
@@ -170,7 +127,7 @@ static void cl4_prof_eventinst_destroy(gpointer event_instant) {
  * @param userdata Defines what type of sorting to do.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
-static gint cl4_prof_eventinst_comp(
+static gint cl4_prof_event_inst_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
 	
 	/* Cast input parameters to event instant data structures. */
@@ -178,15 +135,15 @@ static gint cl4_prof_eventinst_comp(
 	CL4ProfEventInst* ev_inst2 = (CL4ProfEventInst*) b;
 	CL4ProfEventInstSort sort_type = *((CL4ProfEventInstSort*) userdata);
 	/* Perform comparison. */
-	if (sort_type == CL4_PROF_EVENTINST_SORT_INSTANT) {
+	if (sort_type == CL4_PROF_EVENT_INST_SORT_INSTANT) {
 		/* Sort by instant */
 		return CL4_PROF_CMP(ev_inst1->instant, ev_inst2->instant);
-	} else if (sort_type == CL4_PROF_EVENTINST_SORT_ID) {
+	} else if (sort_type == CL4_PROF_EVENT_INST_SORT_ID) {
 		/* Sort by ID */
 		if (ev_inst1->id > ev_inst2->id) return 1;
 		if (ev_inst1->id < ev_inst2->id) return -1;
-		if (ev_inst1->type == CL4_PROF_EV_END) return 1;
-		if (ev_inst1->type == CL4_PROF_EV_START) return -1;
+		if (ev_inst1->type == CL4_PROF_EVENT_INST_TYPE_END) return 1;
+		if (ev_inst1->type == CL4_PROF_EVENT_INST_TYPE_START) return -1;
 	}
 	/* We shouldn't get here. */
 	g_return_val_if_reached(0);
@@ -198,7 +155,7 @@ static gint cl4_prof_eventinst_comp(
  * @param event_name Name of event.
  * @return New aggregate statistic.
  * */
-static CL4ProfEventAgg* cl4_prof_eventagg_new(const char* event_name) {
+static CL4ProfEventAgg* cl4_prof_event_agg_new(const char* event_name) {
 	CL4ProfEventAgg* agg = g_slice_new(CL4ProfEventAgg);
 	agg->event_name = event_name;
 	return agg;
@@ -209,7 +166,7 @@ static CL4ProfEventAgg* cl4_prof_eventagg_new(const char* event_name) {
  * 
  * @param agg Aggregate statistic to free.
  * */
-static void cl4_prof_eventagg_destroy(gpointer agg) {
+static void cl4_prof_event_agg_destroy(gpointer agg) {
 	g_return_if_fail(agg != NULL);
 	g_slice_free(CL4ProfEventAgg, agg);
 }
@@ -223,7 +180,7 @@ static void cl4_prof_eventagg_destroy(gpointer agg) {
  * @param userdata Defines what type of sorting to do.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
-static gint cl4_prof_eventagg_comp(
+static gint cl4_prof_event_agg_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
 	
 	/* Cast input parameters to event instant data structures. */
@@ -233,9 +190,9 @@ static gint cl4_prof_eventagg_comp(
 	
 	/* Perform comparison. */
 	switch (sort_type) {
-		case CL4_PROF_EVENTAGG_SORT_NAME:
+		case CL4_PROF_EVENT_AGG_SORT_NAME:
 			return g_strcmp0(ev_agg1->event_name, ev_agg2->event_name);
-		case CL4_PROF_EVENTAGG_SORT_TIME:
+		case CL4_PROF_EVENT_AGG_SORT_TIME:
 			return CL4_PROF_CMP(
 				ev_agg1->absolute_time, ev_agg2->absolute_time);
 	}
@@ -260,11 +217,11 @@ static gint cl4_prof_eventagg_comp(
  * by event has finished execution on the device. 
  * @return A new event profiling information object.
  * */
-static CL4ProfEvent* cl4_prof_event_new(const char* event_name, 
+static CL4ProfEventInfo* cl4_prof_event_new(const char* event_name, 
 	const char* queue_name, cl_ulong t_queued, cl_ulong t_submit, 
 	cl_ulong t_start, cl_ulong t_end) {
 
-	CL4ProfEvent* event_info = g_slice_new(CL4ProfEvent);
+	CL4ProfEventInfo* event_info = g_slice_new(CL4ProfEventInfo);
 	
 	event_info->event_name = event_name;
 	event_info->queue_name = queue_name;
@@ -281,9 +238,9 @@ static CL4ProfEvent* cl4_prof_event_new(const char* event_name,
  * 
  * @param event_info Event profiling information object to free.
  * */
-static void cl4_prof_event_destroy(CL4ProfEvent* event_info) {
+static void cl4_prof_event_destroy(CL4ProfEventInfo* event_info) {
 	g_return_if_fail(event_info != NULL);
-	g_slice_free(CL4ProfEvent, event_info);	
+	g_slice_free(CL4ProfEventInfo, event_info);	
 }
 
 /**
@@ -299,34 +256,34 @@ static gint cl4_prof_event_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
 	
 	/* Cast input parameters to event instant data structures. */
-	CL4ProfEvent* ev1 = (CL4ProfEvent*) a;
-	CL4ProfEvent* ev2 = (CL4ProfEvent*) b;
-	CL4ProfEventSort sort_type = *((CL4ProfEventSort*) userdata);
+	CL4ProfEventInfo* ev1 = (CL4ProfEventInfo*) a;
+	CL4ProfEventInfo* ev2 = (CL4ProfEventInfo*) b;
+	CL4ProfEventInfoSort sort_type = *((CL4ProfEventInfoSort*) userdata);
 	/* Perform comparison. */
 	switch (sort_type) {
 		
 		 /* Sort aggregate event data instances by event name. */
-		case CL4_PROF_EVENT_SORT_NAME_EVENT:
+		case CL4_PROF_EVENT_INFO_SORT_NAME_EVENT:
 			return g_strcmp0(ev1->event_name, ev2->event_name);
 		
 		 /* Sort aggregate event data instances by queue name. */
-		case CL4_PROF_EVENT_SORT_NAME_QUEUE:
+		case CL4_PROF_EVENT_INFO_SORT_NAME_QUEUE:
 			return g_strcmp0(ev1->queue_name, ev2->queue_name);
 		
 		 /* Sort aggregate event data instances by queued time. */
-		case CL4_PROF_EVENT_SORT_T_QUEUED:
+		case CL4_PROF_EVENT_INFO_SORT_T_QUEUED:
 			return CL4_PROF_CMP(ev1->t_queued, ev2->t_queued);
 
 		 /* Sort aggregate event data instances by submit time. */
-		case CL4_PROF_EVENT_SORT_T_SUBMIT:
+		case CL4_PROF_EVENT_INFO_SORT_T_SUBMIT:
 			return CL4_PROF_CMP(ev1->t_submit, ev2->t_submit);
 		
 		 /* Sort aggregate event data instances by start time. */
-		case CL4_PROF_EVENT_SORT_T_START:
+		case CL4_PROF_EVENT_INFO_SORT_T_START:
 			return CL4_PROF_CMP(ev1->t_start, ev2->t_start);
 		
 		 /* Sort aggregate event data instances by end time. */
-		case CL4_PROF_EVENT_SORT_T_END:
+		case CL4_PROF_EVENT_INFO_SORT_T_END:
 			return CL4_PROF_CMP(ev1->t_end, ev2->t_end);
 		
 	}
@@ -399,8 +356,8 @@ static void cl4_prof_add_event(CL4Prof* prof, const char* cq_name,
 		prof->start_time = instant;
 		
 	/* Add event start instant to list of event instants. */
-	evinst_start = cl4_prof_eventinst_new(event_name, cq_name, event_id, 
-		instant, CL4_PROF_EV_START);
+	evinst_start = cl4_prof_event_inst_new(event_name, cq_name, event_id, 
+		instant, CL4_PROF_EVENT_INST_TYPE_START);
 	prof->event_instants = g_list_prepend(
 		prof->event_instants, (gpointer) evinst_start);
 
@@ -412,8 +369,8 @@ static void cl4_prof_add_event(CL4Prof* prof, const char* cq_name,
 	instant = *((cl_ulong*) info->value);
 
 	/* Add event end instant to list of event instants. */
-	evinst_end = cl4_prof_eventinst_new(event_name, cq_name, event_id, 
-		instant, CL4_PROF_EV_END);
+	evinst_end = cl4_prof_event_inst_new(event_name, cq_name, event_id, 
+		instant, CL4_PROF_EVENT_INST_TYPE_END);
 	prof->event_instants = g_list_prepend(
 		prof->event_instants, (gpointer) evinst_end);
 
@@ -509,16 +466,16 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 	/* Initalize table, and set aggregate values to zero. */
 	g_hash_table_iter_init(&iter, prof->event_names);
 	while (g_hash_table_iter_next(&iter, &event_name, NULL)) {
-		evagg = cl4_prof_eventagg_new(event_name);
+		evagg = cl4_prof_event_agg_new(event_name);
 		evagg->absolute_time = 0;
 		g_hash_table_insert(
 			prof->aggregate, event_name, (gpointer) evagg);
 	}
 	
 	/* Sort event instants by eid, and then by START, END order. */
-	sort_type = CL4_PROF_EVENTINST_SORT_ID;
+	sort_type = CL4_PROF_EVENT_INST_SORT_ID;
 	prof->event_instants = g_list_sort_with_data(
-		prof->event_instants, cl4_prof_eventinst_comp, 
+		prof->event_instants, cl4_prof_event_inst_comp, 
 		(gpointer) &sort_type);
 
 	/* Iterate through all event instants and determine total times. */
@@ -596,9 +553,9 @@ static void cl4_prof_calc_overmat(CL4Prof* prof) {
 	occurring_events = g_hash_table_new(g_int_hash, g_int_equal);
 		
 	/* Sort all event instants. */
-	sort_type = CL4_PROF_EVENTINST_SORT_INSTANT;
+	sort_type = CL4_PROF_EVENT_INST_SORT_INSTANT;
 	prof->event_instants = g_list_sort_with_data(prof->event_instants, 
-		cl4_prof_eventinst_comp, (gpointer) &sort_type);
+		cl4_prof_event_inst_comp, (gpointer) &sort_type);
 	
 	/* Iterate through all event instants */
 	curr_evinst_container = prof->event_instants;
@@ -624,7 +581,7 @@ static void cl4_prof_calc_overmat(CL4Prof* prof) {
 		curr_evinst = (CL4ProfEventInst*) curr_evinst_container->data;
 		
 		/* Check if event time is START or END time */
-		if (curr_evinst->type == CL4_PROF_EV_START) { 
+		if (curr_evinst->type == CL4_PROF_EVENT_INST_TYPE_START) { 
 			/* Event START instant. */
 			
 			/* 1 - Check for overlaps with ocurring events */
@@ -768,7 +725,7 @@ void cl4_prof_destroy(CL4Prof* prof) {
 	/* Destroy list of all event instants. */
 	if (prof->event_instants != NULL)
 		g_list_free_full(
-			prof->event_instants, cl4_prof_eventinst_destroy);
+			prof->event_instants, cl4_prof_event_inst_destroy);
 	
 	/* Destroy table of event IDs. */
 	if (prof->event_name_ids != NULL)
@@ -902,7 +859,7 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	
 	/* Create table of aggregate statistics. */
 	prof->aggregate = g_hash_table_new_full(g_str_hash, g_str_equal, 
-		NULL, cl4_prof_eventagg_destroy);
+		NULL, cl4_prof_event_agg_destroy);
 
 	/* Create table of event names. */
 	prof->event_names = g_hash_table_new(g_str_hash, g_str_equal);
@@ -941,7 +898,7 @@ finish:
  * @param event_name Event name.
  * @return Aggregate statistics for events with the given name.
  */
-CL4ProfEventAgg* cl4_prof_get_eventagg(CL4Prof* prof, const char* event_name) {
+CL4ProfEventAgg* cl4_prof_get_event_agg(CL4Prof* prof, const char* event_name) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
@@ -1000,7 +957,7 @@ void cl4_prof_print_info(CL4Prof* prof,
 		g_print("     Aggregate times by event  :\n");
 		ev_agg_list = g_hash_table_get_values(prof->aggregate);
 		ev_agg_list = g_list_sort_with_data(
-			ev_agg_list, cl4_prof_eventagg_comp, &ev_aggSortType);
+			ev_agg_list, cl4_prof_event_agg_comp, &ev_aggSortType);
 		ev_agg_container = ev_agg_list;
 		g_print("       ------------------------------------------------------------------\n");
 		g_print("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
@@ -1099,12 +1056,12 @@ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
 	/* Return status. */
 	int ret_status, write_status;
 	/* Type of sorting to perform on event list. */
-	CL4ProfEventSort sort_type;
+	CL4ProfEventInfoSort sort_type;
 	/* List of event (traversing pointer). */
 	GList* ev_container = NULL;
 	
 	/* Sort events by START order. */
-	sort_type = CL4_PROF_EVENT_SORT_T_START;
+	sort_type = CL4_PROF_EVENT_INFO_SORT_T_START;
 	prof->events = g_list_sort_with_data(prof->events, 
 		cl4_prof_event_comp, (gpointer) &sort_type);
 	
@@ -1113,10 +1070,10 @@ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
 	while (ev_container) {
 
 		/* Loop aux. variables. */
-		CL4ProfEvent* curr_ev = NULL;
+		CL4ProfEventInfo* curr_ev = NULL;
 		
 		/* Get event information. */
-		curr_ev = (CL4ProfEvent*) ev_container->data;
+		curr_ev = (CL4ProfEventInfo*) ev_container->data;
 		
 		/* Write to stream. */
 		write_status = fprintf(stream, "%s%s%s%s%lu%s%lu%s%s%s%s%s", 

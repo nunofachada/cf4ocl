@@ -345,7 +345,7 @@ int main(int argc, char *argv[]) {
 	cl4_prof_aggregate(profile, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_print_info(profile, CL4_PROF_EVENTAGG_SORT_TIME, &err);
+	cl4_prof_print_info(profile, CL4_PROF_EVENT_AGG_SORT_TIME, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* If we get here, no need for error checking, jump to cleanup. */

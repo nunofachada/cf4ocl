@@ -43,7 +43,7 @@ typedef struct cl4_prof CL4Prof;
 /**
  * @brief Aggregate event info.
  */
-typedef struct cl4_prof_event_aggregate {
+typedef struct cl4_prof_event_agg {
 
 	/** Name of event which the instant refers to. */
 	const char* event_name;
@@ -63,16 +63,16 @@ typedef struct cl4_prof_event_aggregate {
 typedef enum {
 
 	 /** Sort aggregate event data instances by name. */
-	CL4_PROF_EVENTAGG_SORT_NAME,
+	CL4_PROF_EVENT_AGG_SORT_NAME,
 	/** Sort aggregate event data instances by time. */
-	CL4_PROF_EVENTAGG_SORT_TIME
+	CL4_PROF_EVENT_AGG_SORT_TIME
 
 } CL4ProfEventAggSort;
 
 /**
- * @brief Event info. 
+ * @brief Event profiling info. 
  * */
-typedef struct cl4_prof_event {
+typedef struct cl4_prof_event_info {
 
 	/** Name of event. */
 	const char* event_name;
@@ -92,28 +92,98 @@ typedef struct cl4_prof_event {
 	 * has finished execution on the device. */
 	cl_ulong t_end;
 
-} CL4ProfEvent;
+} CL4ProfEventInfo;
 
 /**
- * @brief Sorting strategy for event info instances.
+ * @brief Sorting strategy for event profiling info instances.
  */
 typedef enum {
 
 	 /** Sort aggregate event data instances by event name. */
-	CL4_PROF_EVENT_SORT_NAME_EVENT,
+	CL4_PROF_EVENT_INFO_SORT_NAME_EVENT,
 	 /** Sort aggregate event data instances by queue name. */
-	CL4_PROF_EVENT_SORT_NAME_QUEUE,
+	CL4_PROF_EVENT_INFO_SORT_NAME_QUEUE,
 	 /** Sort aggregate event data instances by queued time. */
-	CL4_PROF_EVENT_SORT_T_QUEUED,
+	CL4_PROF_EVENT_INFO_SORT_T_QUEUED,
 	 /** Sort aggregate event data instances by submit time. */
-	CL4_PROF_EVENT_SORT_T_SUBMIT,
+	CL4_PROF_EVENT_INFO_SORT_T_SUBMIT,
 	 /** Sort aggregate event data instances by start time. */
-	CL4_PROF_EVENT_SORT_T_START,
+	CL4_PROF_EVENT_INFO_SORT_T_START,
 	 /** Sort aggregate event data instances by end time. */
-	CL4_PROF_EVENT_SORT_T_END
+	CL4_PROF_EVENT_INFO_SORT_T_END
 
-} CL4ProfEventSort;
+} CL4ProfEventInfoSort;
 
+
+/**
+ * @brief Type of event instant (::CL4ProfEventInst).
+ */
+typedef enum {
+	
+	/** Start event instant. */
+	CL4_PROF_EVENT_INST_TYPE_START,
+	/** End event instant. */
+	CL4_PROF_EVENT_INST_TYPE_END
+	
+} CL4ProfEventInstType;
+
+/**
+ * @brief Event instant.
+ */
+typedef struct cl4_prof_event_inst {
+
+	 /** Name of event which the instant refers to. */
+	const char* event_name;
+	/** Name of command queue associated with event. */
+	const char* queue_name;
+	/** Event instant ID. */
+	guint id;
+	/** Event instant in nanoseconds from current device time counter. */
+	cl_ulong instant;
+	/** Type of event instant 
+	 * (::CL4ProfEventInstType#CL4_PROF_EVENT_INST_TYPE_START or 
+	 * ::CL4ProfEventInstType#CL4_PROF_EVENT_INST_TYPE_END). */
+	CL4ProfEventInstType type;
+
+} CL4ProfEventInst;
+
+/**
+ * @brief Sorting strategy for event instants (::CL4ProfEventInst).
+ */
+typedef enum {
+	
+	/** Sort event instants by instant. */
+	CL4_PROF_EVENT_INST_SORT_INSTANT,
+	/** Sort event instants by event id. */
+	CL4_PROF_EVENT_INST_SORT_ID
+
+} CL4ProfEventInstSort;
+
+/**
+ * @brief Representation of an overlap of events.
+ */
+typedef struct cl4_prof_overlap {
+
+	 /** Name of first overlapping event. */
+	const char* event1_name;
+	 /** Name of second overlapping event. */
+	const char* event2_name;
+	/** Overlap duration in nanoseconds. */
+	cl_ulong duration;
+
+} CL4ProfOverlap;
+
+/**
+ * @brief Sorting strategy for overlaps (::CL4ProfOverlaps).
+ */
+typedef enum {
+	
+	/** Sort overlaps by event name. */
+	CL4_PROF_OVERLAP_SORT_NAME,
+	/** Sort overlaps by overlap duration. */
+	CL4_PROF_OVERLAP_SORT_DURATION
+
+} CL4ProfOverlapSort;
 
 /**
  * @brief Export options.
@@ -162,7 +232,28 @@ void cl4_prof_add_queue(
 cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
 
 /** @brief Return aggregate statistics for events with the given name. */
-CL4ProfEventAgg* cl4_prof_get_agg(CL4Prof* prof, const char* event_name);
+CL4ProfEventAgg* cl4_prof_get_event_agg(CL4Prof* prof, const char* event_name);
+
+/** @brief Return an iterator for profiled aggregate event instances. */
+CL4Iterator cl4_prof_get_event_agg_iterator(
+	CL4Prof* prof, CL4ProfEventAggSort sort_type);
+
+/** @brief Return the next profiled aggregate event instance. */
+const CL4ProfEventAgg const* cl4_prof_get_next_event_agg(CL4Iterator iter);
+
+/** @brief Return an iterator for event profiling info instances. */
+CL4Iterator cl4_prof_get_event_info_iterator(
+	CL4Prof* prof, CL4ProfEventInfoSort sort_type);
+
+/** @brief Return the next event profiling info instance. */
+const CL4ProfEventInfo const* cl4_prof_get_next_event(CL4Iterator iter);
+
+/** @brief Return an iterator for overlap instances. */
+CL4Iterator cl4_prof_get_overlap_iterator(
+	CL4Prof* prof, CL4ProfOverlapSort sort_type);
+
+/** @brief Return the next overlap instance. */
+const CL4ProfOverlap const* cl4_prof_get_next_overlap(CL4Iterator iter);
 
 /** @brief Print profiling info. */
 void cl4_prof_print_info(CL4Prof* prof, 
