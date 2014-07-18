@@ -35,6 +35,10 @@
  */
 struct cl4_prof {
 	
+	/** Flag indicating if the profiling information has already been 
+	 * determined. */
+	gboolean calc;
+
 	/** Hash table with keys equal to the events name, and values
 	 * equal to a unique id for each event name. */
 	GHashTable* event_names;
@@ -42,38 +46,36 @@ struct cl4_prof {
 	GHashTable* event_name_ids;
 	/** Table of command queue wrappers. */
 	GHashTable* cqueues;
+
 	/** Total number of events. */
 	guint num_events;
+
 	/** Instants (start and end) of all events. */
 	GList* instants;
 	/** List of all events profiling information. */
 	GList* infos;
 	/** Aggregate statistics for all events in 
 	 * CL4Prof#instants. */
-	GHashTable* aggregate;
-	/** Sorted list of aggregate statistics. */
-	GList* agg_sorted;
-	//~ /** Overlap matrix for all events in instants. */
-	//~ cl_ulong* overmat;
+	GList* aggs;
 	/** List of event overlaps. */
 	GList* overlaps;
-	/** Total time taken by all events. */
-	cl_ulong total_events_time;
-	/** Total time taken by all events except intervals where events overlaped. */
-	cl_ulong total_events_eff_time;
-	/** Time at which the first (oldest) event started. */
-	cl_ulong start_time;
-	/** Keeps track of time during the complete profiling session. */
-	GTimer* timer;
-	/** Flag indicating if the profiling information has already been 
-	 * determined. */
-	gboolean calc;
+
 	/** Event info iterator. */
 	GList* info_iter;
 	/** Aggregate event statistics iterator. */
 	GList* agg_iter;
 	/** Overlaps iterator. */
 	GList* overlap_iter;
+
+	/** Total time taken by all events. */
+	cl_ulong total_events_time;
+	/** Total time taken by all events except intervals where events overlaped. */
+	cl_ulong total_events_eff_time;
+	/** Time at which the first (oldest) event started. */
+	cl_ulong start_time;
+
+	/** Keeps track of time during the complete profiling session. */
+	GTimer* timer;
 
 };
 
@@ -347,7 +349,7 @@ static void cl4_prof_overlap_destroy(CL4ProfOverlap* ovlp) {
  * @param userdata Defines what type of sorting to do.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
-static gint cl4_prof_info_comp(
+static gint cl4_prof_overlap_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
 		
 	/* Cast input parameters to event instant data structures. */
@@ -532,6 +534,8 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 	
 	/* Hash table iterator. */
 	GHashTableIter iter;
+	/* Aux. hash table for aggregate statistics. */
+	GHashTable* agg_table;
 	/* A pointer for a event name. */
 	gpointer event_name;
 	/* Aggregate event info. */
@@ -544,6 +548,9 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 	gpointer value_agg;
 	/* Auxiliary aggregate event info variable.*/
 	CL4ProfAgg* curr_agg = NULL;
+
+	/* Create table of aggregate statistics. */
+	agg_table = g_hash_table_new(g_str_hash, g_str_equal);
 	
 	/* Initalize table, and set aggregate values to zero. */
 	g_hash_table_iter_init(&iter, prof->event_names);
@@ -551,7 +558,7 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 		evagg = cl4_prof_agg_new(event_name);
 		evagg->absolute_time = 0;
 		g_hash_table_insert(
-			prof->aggregate, event_name, (gpointer) evagg);
+			agg_table, event_name, (gpointer) evagg);
 	}
 	
 	/* Sort event instants by eid, and then by START, END order. */
@@ -579,7 +586,7 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 		
 		/* Add new interval to respective aggregate value. */
 		curr_agg = (CL4ProfAgg*) g_hash_table_lookup(
-			prof->aggregate, curr_evinst->event_name);
+			agg_table, curr_evinst->event_name);
 		curr_agg->absolute_time += end_inst - start_inst;
 		prof->total_events_time += end_inst - start_inst;
 		
@@ -588,7 +595,7 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 	}
 	
 	/* Determine relative times. */
-	g_hash_table_iter_init(&iter, prof->aggregate);
+	g_hash_table_iter_init(&iter, agg_table);
 	while (g_hash_table_iter_next(&iter, &event_name, &value_agg)) {
 		curr_agg = (CL4ProfAgg*) value_agg;
 		curr_agg->relative_time = 
@@ -596,6 +603,12 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 			/ 
 			((double) prof->total_events_time);
 	}
+	
+	/* Keep a list of aggregates. */
+	prof->aggs = g_hash_table_get_values(agg_table);
+	
+	/* Release aux. hash table. */
+	g_hash_table_destroy(agg_table);
 
 }
 
@@ -824,6 +837,10 @@ void cl4_prof_destroy(CL4Prof* prof) {
 	if (prof->event_names != NULL)
 		g_hash_table_destroy(prof->event_names);
 	
+	/* Destroy table of event IDs. */
+	if (prof->event_name_ids != NULL)
+		g_hash_table_destroy(prof->event_name_ids);
+		
 	/* Destroy table of command queue wrappers. */
 	if (prof->cqueues != NULL)
 		g_hash_table_destroy(prof->cqueues);
@@ -833,13 +850,10 @@ void cl4_prof_destroy(CL4Prof* prof) {
 		g_list_free_full(
 			prof->instants, cl4_prof_inst_destroy);
 	
-	/* Destroy table of event IDs. */
-	if (prof->event_name_ids != NULL)
-		g_hash_table_destroy(prof->event_name_ids);
-		
-	/* Destroy table of aggregate statistics. */
+	/* Destroy list of aggregate statistics. */
 	if (prof->aggregate != NULL)
-		g_hash_table_destroy(prof->aggregate);
+		g_list_free_full(
+			prof->aggs, cl4_prof_agg_destroy);
 	
 	/* Free the overlap matrix. */
 	if (prof->overlaps != NULL)
@@ -966,10 +980,6 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	
 	/* Hash table iterator. */
 	GHashTableIter iter;
-	
-	/* Create table of aggregate statistics. */
-	prof->aggregate = g_hash_table_new_full(g_str_hash, g_str_equal, 
-		NULL, cl4_prof_agg_destroy);
 
 	/* Create table of event names. */
 	prof->event_names = g_hash_table_new(g_str_hash, g_str_equal);
@@ -1017,23 +1027,33 @@ finish:
  * @param event_name Event name.
  * @return Aggregate statistics for events with the given name.
  */
-CL4ProfAgg* cl4_prof_get_agg(CL4Prof* prof, const char* event_name) {
+const CL4ProfAgg const* cl4_prof_get_agg(CL4Prof* prof, const char* event_name) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_val_if_fail(prof->calc == TRUE, NULL);
 	
-	return (CL4ProfAgg*) g_hash_table_lookup(
-		prof->aggregate, event_name);
+	/* Find the aggregate statistic for the given event. Use the fact
+	 * that the event name is the first member of the cl4_prof_agg 
+	 * struct. */
+	GList* agg_container = g_list_find_custom(
+		prof->aggs, NULL, (GCompareFunc) g_strcmp0);
+	
+	/* Return result. */
+	if (agg_container != NULL)
+		return (const CL4ProfAgg const*) agg_container->data;
+	else
+		return NULL;
 }
 
-
-
-
-
-/** @brief Initialize an iterator for profiled aggregate event 
- * instances. */
+/** 
+ * @brief Initialize an iterator for profiled aggregate event 
+ * instances. 
+ * 
+ * @param prof Profile object.
+ * @param sort_type Sort type.
+ * */
 void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_type) {
 
 	/* Make sure prof is not NULL. */
@@ -1041,10 +1061,20 @@ void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_type) {
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
-	/// @todo
+	/* Sort list of aggregate statistics as requested by client. */
+	g_list_sort_with_data(prof->aggs, cl4_prof_agg_comp, &sort_type);
+	
+	/* Set the iterator as the first element in list. */
+	prof->agg_iter = prof->aggs;
+
 }
 
-/** @brief Return the next profiled aggregate event instance. */
+/** 
+ * @brief Return the next aggregate statistic instance.
+ * 
+ * @param prof Profile object.
+ * @return The next aggregate statistic instance. 
+ * */
 const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1052,10 +1082,29 @@ const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof) {
 	/* This function can only be called after calculations are made. */
 	g_return_val_if_fail(prof->calc == TRUE, NULL);
 	
-	/// @todo
+	/* The aggregate statistic to return. */
+	CL4ProfAgg* agg;
+	
+	/* Check if there are any more left. */
+	if (prof->agg_iter != NULL) {
+		/* Yes, send current one, pass to the next. */
+		agg = (CL4ProfAgg*) prof->agg_iter->data;
+		prof->agg_iter = prof->agg_iter->next;
+	} else {
+		/* Nothing left. */
+		agg = NULL;
+	}
+	
+	/* Return the aggregate statistic. */
+	return (const CL4ProfAgg const*) agg;
 }
 
-/** @brief Initialize an iterator for event profiling info instances. */
+/** 
+ * @brief Initialize an iterator for event profiling info instances. 
+ * 
+ * @param prof Profile object.
+ * @param sort_type Sort type.
+ * */
 void cl4_prof_iter_info_init(CL4Prof* prof, CL4ProfInfoSort sort_type) {
 
 	/* Make sure prof is not NULL. */
@@ -1063,10 +1112,19 @@ void cl4_prof_iter_info_init(CL4Prof* prof, CL4ProfInfoSort sort_type) {
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
-	/// @todo
+	/* Sort list of event prof. infos as requested by client. */
+	g_list_sort_with_data(prof->infos, cl4_prof_infos_comp, &sort_type);
+	
+	/* Set the iterator as the first element in list. */
+	prof->info_iter = prof->infos;
 }
 
-/** @brief Return the next event profiling info instance. */
+/** 
+ * @brief Return the next event profiling info instance. 
+ * 
+ * @param prof Profile object.
+ * @return The next event profiling info instance. 
+ * */
 const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1074,10 +1132,29 @@ const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof) {
 	/* This function can only be called after calculations are made. */
 	g_return_val_if_fail(prof->calc == TRUE, NULL);
 	
-	/// @todo
+	/* The event profiling info instance to return. */
+	CL4ProfInfo* info;
+	
+	/* Check if there are any more left. */
+	if (prof->info_iter != NULL) {
+		/* Yes, send current one, pass to the next. */
+		info = (CL4ProfInfo*) prof->info_iter->data;
+		prof->info_iter = prof->info_iter->next;
+	} else {
+		/* Nothing left. */
+		info = NULL;
+	}
+	
+	/* Return the profiling info instance. */
+	return (const CL4ProfInfo const*) info;
 }
 
-/** @brief Initialize an iterator for overlap instances. */
+/** 
+ * @brief Initialize an iterator for overlap instances. 
+ * 
+ * @param prof Profile object.
+ * @param sort_type Sort type.
+ * */
 void cl4_prof_iter_overlap_init(
 	CL4Prof* prof, CL4ProfOverlapSort sort_type) {
 
@@ -1086,10 +1163,20 @@ void cl4_prof_iter_overlap_init(
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
-	/// @todo
+	/* Sort list of overlaps as requested by client. */
+	g_list_sort_with_data(
+		prof->overlaps, cl4_prof_overlap_comp, &sort_type);
+	
+	/* Set the iterator as the first element in list. */
+	prof->overlap_iter = prof->overlaps;
 }
 
-/** @brief Return the next overlap instance. */
+/** 
+ * @brief Return the next overlap instance. 
+ * 
+ * @param prof Profile object.
+ * @return The next overlap instance. 
+ * */
 const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1097,18 +1184,22 @@ const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof) {
 	/* This function can only be called after calculations are made. */
 	g_return_val_if_fail(prof->calc == TRUE, NULL);
 	
-	/// @todo
+	/* The overlap instance to return. */
+	CL4ProfOverlap* ovlp;
+	
+	/* Check if there are any more left. */
+	if (prof->overlap_iter != NULL) {
+		/* Yes, send current one, pass to the next. */
+		ovlp = (CL4ProfOverlap*) prof->overlap_iter->data;
+		prof->overlap_iter = prof->overlap_iter->next;
+	} else {
+		/* Nothing left. */
+		ovlp = NULL;
+	}
+	
+	/* Return the overlap instance. */
+	return (const CL4ProfOverlap const*) ovlp;
 }
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @brief Print profiling info.
