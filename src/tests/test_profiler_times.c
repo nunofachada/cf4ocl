@@ -147,29 +147,29 @@ static void timesTest() {
 	/* Test aggregate statistics */
 	/* ************************* */
 	
-	CL4ProfEventAgg* agg;
+	CL4ProfAgg* agg;
 	
-	agg = cl4_prof_get_event_agg(profile, "Event1");
+	agg = cl4_prof_get_agg(profile, "Event1");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->totalTime, ==, 36);
 	g_assert_cmpfloat(agg->relativeTime - 0.51728, <, 0.0001);
 	
-	agg = cl4_prof_get_event_agg(profile, "Event2");
+	agg = cl4_prof_get_agg(profile, "Event2");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->totalTime, ==, 4);
 	g_assert_cmpfloat(agg->relativeTime - 0.05714, <, 0.0001);
 
-	agg = (CL4ProfEventAgg*) cl4_prof_get_event_agg(profile, "Event3");
+	agg = (CL4ProfAgg*) cl4_prof_get_agg(profile, "Event3");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->totalTime, ==, 13);
 	g_assert_cmpfloat(agg->relativeTime - 0.18571, <, 0.0001);
 
-	agg = (CL4ProfEventAgg*) cl4_prof_get_event_agg(profile, "Event4");
+	agg = (CL4ProfAgg*) cl4_prof_get_agg(profile, "Event4");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->totalTime, ==, 6);
 	g_assert_cmpfloat(agg->relativeTime - 0.08571, <, 0.0001);
 
-	agg = (CL4ProfEventAgg*) cl4_prof_get_event_agg(profile, "Event5");
+	agg = (CL4ProfAgg*) cl4_prof_get_agg(profile, "Event5");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->totalTime, ==, 11);
 	g_assert_cmpfloat(agg->relativeTime - 0.15714, <, 0.0001);
@@ -228,7 +228,7 @@ static void timesTest() {
 	g_free(name_used);
 	
 	/** @todo Change profcl so that it prints to a stream, then test  */
-	//cl4_prof_print_info(profile, CL4_PROF_EVENT_AGG_SORT_TIME);
+	//cl4_prof_print_summary(profile, CL4_PROF_AGG_SORT_TIME);
 
 	
 	/* Free profile. */

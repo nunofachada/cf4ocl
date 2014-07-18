@@ -62,8 +62,6 @@ enum cl4_error_codes {
  * in the OpenCL utilities library. */
 #define CL4_ERROR cl4_error_quark()
 
-typedef GHashTableIter CL4Iterator;
-
 /** @brief Resolves to error category identifying string, in this case
  * an error in the OpenCL utilities library. */
 GQuark cl4_error_quark(void);

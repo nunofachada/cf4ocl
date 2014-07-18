@@ -44,6 +44,9 @@ struct cl4_cqueue {
 	/** Events associated with the command queue. */
 	GHashTable* evts;
 	
+	/** Event iterator. */
+	GHashTableIter evt_iter;
+	
 };
 
 /**
@@ -296,15 +299,24 @@ CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 	
 }
 
-CL4Iterator cl4_cqueue_get_event_iterator(CL4CQueue* cq) {
-	GHashTableIter iter;
-	g_hash_table_iter_init(&iter, cq->evts);
-	return iter;
+void cl4_cqueue_iter_event_init(CL4CQueue* cq) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL);
+
+	g_hash_table_iter_init(cq->evt_iter, cq->evts);
+
 }
 
-CL4Event* cl4_cqueue_get_next_event(CL4Iterator iter) {
+/* Calling this before the previous function is undefined behavior. 
+ * Also warn this is not thread-safe. */
+CL4Event* cl4_cqueue_iter_event_next(CL4CQueue* cq) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL);
+
 	gpointer evt;
-	gboolean exists = g_hash_table_iter_next(&iter, &evt, NULL);
+	gboolean exists = g_hash_table_iter_next(&cq->evt_iter, &evt, NULL);
 	return exists ? (CL4Event*) evt : NULL; 
 }
 

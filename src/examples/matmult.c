@@ -698,7 +698,7 @@ int main(int argc, char *argv[])
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Show profiling info. */
-	cl4_prof_print_info(profile_dev, CL4_PROF_EVENT_AGG_SORT_TIME, &err);
+	cl4_prof_print_summary(profile_dev, CL4_PROF_AGG_SORT_TIME, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Export profiling info if a filename was given. */
