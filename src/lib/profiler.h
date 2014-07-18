@@ -243,7 +243,8 @@ void cl4_prof_add_queue(
 cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
 
 /** @brief Return aggregate statistics for events with the given name. */
-const CL4ProfAgg const* cl4_prof_get_agg(CL4Prof* prof, const char* event_name);
+const CL4ProfAgg const* cl4_prof_get_agg(
+	CL4Prof* prof, const char* event_name);
 
 /** @brief Initialize an iterator for profiled aggregate event 
  * instances. */

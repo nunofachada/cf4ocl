@@ -108,17 +108,17 @@ static CL4ProfInst* cl4_prof_inst_new(const char* event_name,
 	CL4ProfInstType type) {
 	
 	/* Allocate memory for event instant data structure. */
-	CL4ProfInst* instant = g_slice_new(CL4ProfInst);
+	CL4ProfInst* inst = g_slice_new(CL4ProfInst);
 
 	/* Initialize structure fields. */
-	instant->event_name = event_name;
-	instant->queue_name = queue_name;
-	instant->id = id;
-	instant->instant = instant;
-	instant->type = type;
+	inst->event_name = event_name;
+	inst->queue_name = queue_name;
+	inst->id = id;
+	inst->instant = instant;
+	inst->type = type;
 
 	/* Return event instant data structure. */
-	return instant;	
+	return inst;	
 }
 
 /**
@@ -352,6 +352,8 @@ static void cl4_prof_overlap_destroy(CL4ProfOverlap* ovlp) {
 static gint cl4_prof_overlap_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
 		
+	gint result;
+
 	/* Cast input parameters to event instant data structures. */
 	CL4ProfOverlap* ovlp1 = (CL4ProfOverlap*) a;
 	CL4ProfOverlap* ovlp2 = (CL4ProfOverlap*) b;
@@ -361,7 +363,6 @@ static gint cl4_prof_overlap_comp(
 		
 		 /* Sort overlap instances by event name. */
 		case CL4_PROF_OVERLAP_SORT_NAME:
-			gint result;
 			result = g_strcmp0(ovlp1->event1_name, ovlp2->event1_name);
 			if (result != 0)
 				return result;
@@ -480,7 +481,7 @@ static void cl4_prof_add_event(CL4Prof* prof, const char* cq_name,
 	instant_aux = *((cl_ulong*) info->value);
 
 	/* Add event information to list of events.*/
-	prof->event_info = g_list_prepend(prof->event_info, 
+	prof->infos = g_list_prepend(prof->infos, 
 		(gpointer) cl4_prof_info_new(event_name, cq_name,
 			instant, instant_aux, evinst_start->instant, 
 			evinst_end->instant));
@@ -502,8 +503,6 @@ static void cl4_prof_process_queues(CL4Prof* prof, GError** err) {
 	/* Command queue name and wrapper. */
 	gpointer cq_name;
 	gpointer cq;
-	/* Auxiliary pointers for determining the table of event_ids. */
-	gpointer p_evt_name, p_id;
 	
 	/* Iterate over the command queues. */
 	g_hash_table_iter_init(&iter, prof->cqueues);
@@ -511,9 +510,8 @@ static void cl4_prof_process_queues(CL4Prof* prof, GError** err) {
 		
 		/* Iterate over the events in current command queue. */
 		CL4Event* evt;
-		CL4Iterator iter_ev = 
-			cl4_cqueue_get_event_iterator((CL4CQueue*) cq);
-		while ((evt = cl4_cqueue_get_next_event(iter_ev))) {
+		cl4_cqueue_iter_event_init((CL4CQueue*) cq);
+		while ((evt = cl4_cqueue_iter_event_next((CL4CQueue*) cq))) {
 
 			/* Add event for profiling. */
 			cl4_prof_add_event(prof, (const char*) cq_name, evt, err);
@@ -780,7 +778,8 @@ static void cl4_prof_calc_overlaps(CL4Prof* prof) {
 						prof->event_name_ids, GUINT_TO_POINTER(j)),
 					overlap_matrix[i * num_event_names + j]);
 				/*  ...and add it to list of overlaps. */
-				g_list_prepend(prof->overlaps, (gpointer) ovlp);
+				prof->overlaps = g_list_prepend(
+					prof->overlaps, (gpointer) ovlp);
 			}
 		}
 	} 
@@ -848,17 +847,22 @@ void cl4_prof_destroy(CL4Prof* prof) {
 	/* Destroy list of all event instants. */
 	if (prof->instants != NULL)
 		g_list_free_full(
-			prof->instants, cl4_prof_inst_destroy);
+			prof->instants, (GDestroyNotify) cl4_prof_inst_destroy);
+			
+	/* Destroy list of event profiling information. */
+	if (prof->infos != NULL)
+		g_list_free_full(
+			prof->infos, (GDestroyNotify) cl4_prof_info_destroy);
 	
 	/* Destroy list of aggregate statistics. */
-	if (prof->aggregate != NULL)
+	if (prof->aggs != NULL)
 		g_list_free_full(
-			prof->aggs, cl4_prof_agg_destroy);
+			prof->aggs, (GDestroyNotify) cl4_prof_agg_destroy);
 	
 	/* Free the overlap matrix. */
 	if (prof->overlaps != NULL)
 		g_list_free_full(
-			prof->overlaps, cl4_prof_overlap_destroy);
+			prof->overlaps, (GDestroyNotify) cl4_prof_overlap_destroy);
 	
 	/* Destroy timer. */
 	if (prof->timer != NULL)
@@ -980,6 +984,9 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	
 	/* Hash table iterator. */
 	GHashTableIter iter;
+	
+	/* Auxiliary pointers for determining the table of event_ids. */
+	gpointer p_evt_name, p_id;
 
 	/* Create table of event names. */
 	prof->event_names = g_hash_table_new(g_str_hash, g_str_equal);
@@ -1027,7 +1034,8 @@ finish:
  * @param event_name Event name.
  * @return Aggregate statistics for events with the given name.
  */
-const CL4ProfAgg const* cl4_prof_get_agg(CL4Prof* prof, const char* event_name) {
+const CL4ProfAgg const* cl4_prof_get_agg(
+	CL4Prof* prof, const char* event_name) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
@@ -1038,7 +1046,8 @@ const CL4ProfAgg const* cl4_prof_get_agg(CL4Prof* prof, const char* event_name) 
 	 * that the event name is the first member of the cl4_prof_agg 
 	 * struct. */
 	GList* agg_container = g_list_find_custom(
-		prof->aggs, NULL, (GCompareFunc) g_strcmp0);
+		prof->aggs, (gconstpointer) event_name, 
+		(GCompareFunc) g_strcmp0);
 	
 	/* Return result. */
 	if (agg_container != NULL)
@@ -1062,7 +1071,8 @@ void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_type) {
 	g_return_if_fail(prof->calc == TRUE);
 
 	/* Sort list of aggregate statistics as requested by client. */
-	g_list_sort_with_data(prof->aggs, cl4_prof_agg_comp, &sort_type);
+	prof->aggs = g_list_sort_with_data(
+		prof->aggs, cl4_prof_agg_comp, &sort_type);
 	
 	/* Set the iterator as the first element in list. */
 	prof->agg_iter = prof->aggs;
@@ -1113,7 +1123,8 @@ void cl4_prof_iter_info_init(CL4Prof* prof, CL4ProfInfoSort sort_type) {
 	g_return_if_fail(prof->calc == TRUE);
 
 	/* Sort list of event prof. infos as requested by client. */
-	g_list_sort_with_data(prof->infos, cl4_prof_infos_comp, &sort_type);
+	prof->infos = g_list_sort_with_data(
+		prof->infos, cl4_prof_info_comp, &sort_type);
 	
 	/* Set the iterator as the first element in list. */
 	prof->info_iter = prof->infos;
@@ -1164,7 +1175,7 @@ void cl4_prof_iter_overlap_init(
 	g_return_if_fail(prof->calc == TRUE);
 
 	/* Sort list of overlaps as requested by client. */
-	g_list_sort_with_data(
+	prof->overlaps = g_list_sort_with_data(
 		prof->overlaps, cl4_prof_overlap_comp, &sort_type);
 	
 	/* Set the iterator as the first element in list. */
@@ -1201,267 +1212,267 @@ const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof) {
 	return (const CL4ProfOverlap const*) ovlp;
 }
 
-/**
- * @brief Print profiling info.
- * 
- * Client code can redirect the output using the g_set_print_handler()
- * function from GLib.
- * 
- * @param prof Profile object.
- * @param ev_aggSortType Sorting strategy for aggregate event data 
- * instances.
- * */ 
-void cl4_prof_print_summary(CL4Prof* prof,
-	CL4ProfAggSort ev_aggSortType) {
-	
-	/* Make sure prof is not NULL. */
-	g_return_if_fail(prof != NULL);
-
-	/* List of aggregate events. */
-	GList* ev_agg_list = NULL;
-	/* List of aggregate events (traversing pointer). */
-	GList* ev_agg_container = NULL;
-	/* Aggregate event info. */
-	CL4ProfAgg* ev_agg = NULL;
-	/* Number of unique event names. */
-	guint num_event_names;
-	/* String containing description of overlapping events. */
-	GString* overlap_string = NULL;
-	
-	g_print("\n   =========================== Timming/Profiling ===========================\n\n");
-	
-	/* Show total ellapsed time */
-	if (prof->timer) {
-		g_print(
-			"     Total ellapsed time       : %fs\n", 
-			g_timer_elapsed(prof->timer, NULL));
-	}
-	
-	/* Show total events time */
-	if (prof->total_events_time > 0) {
-		g_print(
-			"     Total of all events       : %fs\n", 
-			prof->total_events_time * 1e-9);
-	}
-	
-	/* Show aggregate event times */
-	if (g_hash_table_size(prof->aggregate) > 0) {
-		g_print("     Aggregate times by event  :\n");
-		ev_agg_list = g_hash_table_get_values(prof->aggregate);
-		ev_agg_list = g_list_sort_with_data(
-			ev_agg_list, cl4_prof_agg_comp, &ev_aggSortType);
-		ev_agg_container = ev_agg_list;
-		g_print("       ------------------------------------------------------------------\n");
-		g_print("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
-		g_print("       ------------------------------------------------------------------\n");
-		while (ev_agg_container) {
-			ev_agg = (CL4ProfAgg*) ev_agg_container->data;
-			g_assert(ev_agg != NULL);
-			g_print(
-				"       | %-30.30s | %13.4f | %13.4e |\n", 
-				ev_agg->event_name, 
-				ev_agg->relative_time * 100.0, 
-				ev_agg->absolute_time * 1e-9);
-			ev_agg_container = ev_agg_container->next;
-		}
-		g_print("       ------------------------------------------------------------------\n");
-	}
-	
-	/* *** Show overlaps *** */
-
-	/* Get number of event names. */
-	num_event_names = g_hash_table_size(prof->event_names);
-	/* Show overlaps. */
-	overlap_string = g_string_new("");
-	for (guint i = 0; i < num_event_names; i++) {
-		for (guint j = 0; j < num_event_names; j++) {
-			if (prof->overmat[i * num_event_names + j] > 0) {
-				g_string_append_printf(
-					overlap_string,
-					"       | %-22.22s | %-22.22s | %12.4e |\n", 
-					(const char*) g_hash_table_lookup(
-						prof->event_name_ids, GUINT_TO_POINTER(i)),
-					(const char*) g_hash_table_lookup(
-						prof->event_name_ids, GUINT_TO_POINTER(j)),
-					prof->overmat[i * num_event_names + j] * 1e-9
-				);
-			}
-		}
-	}
-	if (strlen(overlap_string->str) > 0) {
-		/* Show total events effective time (discount overlaps) */
-		g_print("     Tot. of all events (eff.) : %es\n", 
-			prof->total_events_eff_time * 1e-9);
-		g_print("                                 %es saved with overlaps\n", 
-			(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
-		/* Title the several overlaps. */
-		g_print("     Event overlap times       :\n");
-		g_print("       ------------------------------------------------------------------\n");
-		g_print("       | Event 1                | Event2                 | Overlap (s)  |\n");
-		g_print("       ------------------------------------------------------------------\n");
-		/* Show overlaps table. */
-		g_print("%s", overlap_string->str);
-		g_print("       ------------------------------------------------------------------\n");
-	}
-	
-	/* Free stuff. */
-	if (ev_agg_list) g_list_free(ev_agg_list);
-	if (overlap_string) g_string_free(overlap_string, TRUE);
-
-}
-
-/** 
- * @brief Export profiling info to a given stream.
- * 
- * Each line of the exported data will have the following format:
- * 
- *     queue start-time end-time event-name
- * 
- * For example:
- * 
- *     q0    100    120    load_data1
- *     q1    100    132    load_data2
- *     q0    121    159    process_data1
- *     q1    133    145    process_data2
- *     q0    146    157    read_result
- * 
- * Several export parameters can be configured with the 
- * cl4_prof_get_export_opts() and cl4_prof_set_export_opts() functions, by
- * manipulating a ::CL4ProfExportOptions struct.
- * 
- * @param prof Profile object.
- * @param stream Stream where export info to.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return CL_TRUE if function terminates successfully, CL_FALSE
- * otherwise.
- * */ 
-cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
-	
-	/* Make sure prof is not NULL. */
-	g_return_val_if_fail(prof != NULL, CL_FALSE);
-	/* Make sure stream is not NULL. */
-	g_return_val_if_fail(stream != NULL, CL_FALSE);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
-
-	/* Return status. */
-	int ret_status, write_status;
-	/* Type of sorting to perform on event list. */
-	CL4ProfInfoSort sort_type;
-	/* List of event (traversing pointer). */
-	GList* ev_container = NULL;
-	
-	/* Sort events by START order. */
-	sort_type = CL4_PROF_INFO_SORT_T_START;
-	prof->event_info = g_list_sort_with_data(prof->event_info, 
-		cl4_prof_info_comp, (gpointer) &sort_type);
-	
-	/* Iterate through all events and export info to stream. */
-	ev_container = prof->event_info;
-	while (ev_container) {
-
-		/* Loop aux. variables. */
-		CL4ProfInfo* curr_ev = NULL;
-		
-		/* Get event information. */
-		curr_ev = (CL4ProfInfo*) ev_container->data;
-		
-		/* Write to stream. */
-		write_status = fprintf(stream, "%s%s%s%s%lu%s%lu%s%s%s%s%s", 
-			export_options.queue_delim, 
-			curr_ev->queue_name, 
-			export_options.queue_delim, 
-			export_options.separator, 
-			(unsigned long) curr_ev->t_start, 
-			export_options.separator, 
-			(unsigned long) curr_ev->t_end, 
-			export_options.separator, 
-			export_options.evname_delim, 
-			curr_ev->event_name, 
-			export_options.evname_delim,
-			export_options.newline);
-			
-		gef_if_error_create_goto(
-			*err, 
-			CL4_ERROR, 
-			write_status < 0, 
-			ret_status = CL4_ERROR_STREAM_WRITE, 
-			error_handler, 
-			"Error while exporting profiling information (writing to stream).");
-		
-		/* Get next event. */
-		ev_container = ev_container->next;
-		
-	}
-	
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	ret_status = CL_TRUE;
-	goto finish;
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-	ret_status = CL_FALSE;
-	
-finish:	
-	
-	/* Return status. */
-	return ret_status;
-	
-}
-
-/** 
- * @brief Helper function which exports profiling info to a given file, 
- * automatically opening and closing the file. See the 
- * cl4_prof_export_info() for more information.
- * 
- * @param prof Profile object.
- * @param filename Name of file where information will be saved to.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return CL_TRUE if function terminates successfully, CL_FALSE
- * otherwise.
- * */ 
-cl_bool cl4_prof_export_info_file(
-	CL4Prof* prof, const char* filename, GError** err) {
-
-	/* Aux. var. */
-	cl_bool status;
-	
-	/* Internal GError object. */
-	GError* err_internal = NULL;
-	
-	/* Open file. */
-	FILE* fp = fopen(filename, "w");
-	gef_if_error_create_goto(*err, CL4_ERROR, fp == NULL, 
-		status = CL4_ERROR_OPENFILE, error_handler, 
-		"Unable to open file '%s' for exporting.", filename);
-	
-	/* Export data. */
-	status = cl4_prof_export_info(prof, fp, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
-	
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	status = CL_TRUE;
-	goto finish;
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-	status = CL_FALSE;
-
-finish:	
-
-	/* Close file. */
-	if (fp) fclose(fp);
-
-	/* Return file contents in string form. */
-	return status;
-
-}
+//~ /**
+ //~ * @brief Print profiling info.
+ //~ * 
+ //~ * Client code can redirect the output using the g_set_print_handler()
+ //~ * function from GLib.
+ //~ * 
+ //~ * @param prof Profile object.
+ //~ * @param ev_aggSortType Sorting strategy for aggregate event data 
+ //~ * instances.
+ //~ * */ 
+//~ void cl4_prof_print_summary(CL4Prof* prof,
+	//~ CL4ProfAggSort ev_aggSortType) {
+	//~ 
+	//~ /* Make sure prof is not NULL. */
+	//~ g_return_if_fail(prof != NULL);
+//~ 
+	//~ /* List of aggregate events. */
+	//~ GList* ev_agg_list = NULL;
+	//~ /* List of aggregate events (traversing pointer). */
+	//~ GList* ev_agg_container = NULL;
+	//~ /* Aggregate event info. */
+	//~ CL4ProfAgg* ev_agg = NULL;
+	//~ /* Number of unique event names. */
+	//~ guint num_event_names;
+	//~ /* String containing description of overlapping events. */
+	//~ GString* overlap_string = NULL;
+	//~ 
+	//~ g_print("\n   =========================== Timming/Profiling ===========================\n\n");
+	//~ 
+	//~ /* Show total ellapsed time */
+	//~ if (prof->timer) {
+		//~ g_print(
+			//~ "     Total ellapsed time       : %fs\n", 
+			//~ g_timer_elapsed(prof->timer, NULL));
+	//~ }
+	//~ 
+	//~ /* Show total events time */
+	//~ if (prof->total_events_time > 0) {
+		//~ g_print(
+			//~ "     Total of all events       : %fs\n", 
+			//~ prof->total_events_time * 1e-9);
+	//~ }
+	//~ 
+	//~ /* Show aggregate event times */
+	//~ if (g_hash_table_size(prof->aggregate) > 0) {
+		//~ g_print("     Aggregate times by event  :\n");
+		//~ ev_agg_list = g_hash_table_get_values(prof->aggregate);
+		//~ ev_agg_list = g_list_sort_with_data(
+			//~ ev_agg_list, cl4_prof_agg_comp, &ev_aggSortType);
+		//~ ev_agg_container = ev_agg_list;
+		//~ g_print("       ------------------------------------------------------------------\n");
+		//~ g_print("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
+		//~ g_print("       ------------------------------------------------------------------\n");
+		//~ while (ev_agg_container) {
+			//~ ev_agg = (CL4ProfAgg*) ev_agg_container->data;
+			//~ g_assert(ev_agg != NULL);
+			//~ g_print(
+				//~ "       | %-30.30s | %13.4f | %13.4e |\n", 
+				//~ ev_agg->event_name, 
+				//~ ev_agg->relative_time * 100.0, 
+				//~ ev_agg->absolute_time * 1e-9);
+			//~ ev_agg_container = ev_agg_container->next;
+		//~ }
+		//~ g_print("       ------------------------------------------------------------------\n");
+	//~ }
+	//~ 
+	//~ /* *** Show overlaps *** */
+//~ 
+	//~ /* Get number of event names. */
+	//~ num_event_names = g_hash_table_size(prof->event_names);
+	//~ /* Show overlaps. */
+	//~ overlap_string = g_string_new("");
+	//~ for (guint i = 0; i < num_event_names; i++) {
+		//~ for (guint j = 0; j < num_event_names; j++) {
+			//~ if (prof->overmat[i * num_event_names + j] > 0) {
+				//~ g_string_append_printf(
+					//~ overlap_string,
+					//~ "       | %-22.22s | %-22.22s | %12.4e |\n", 
+					//~ (const char*) g_hash_table_lookup(
+						//~ prof->event_name_ids, GUINT_TO_POINTER(i)),
+					//~ (const char*) g_hash_table_lookup(
+						//~ prof->event_name_ids, GUINT_TO_POINTER(j)),
+					//~ prof->overmat[i * num_event_names + j] * 1e-9
+				//~ );
+			//~ }
+		//~ }
+	//~ }
+	//~ if (strlen(overlap_string->str) > 0) {
+		//~ /* Show total events effective time (discount overlaps) */
+		//~ g_print("     Tot. of all events (eff.) : %es\n", 
+			//~ prof->total_events_eff_time * 1e-9);
+		//~ g_print("                                 %es saved with overlaps\n", 
+			//~ (prof->total_events_time - prof->total_events_eff_time) * 1e-9);
+		//~ /* Title the several overlaps. */
+		//~ g_print("     Event overlap times       :\n");
+		//~ g_print("       ------------------------------------------------------------------\n");
+		//~ g_print("       | Event 1                | Event2                 | Overlap (s)  |\n");
+		//~ g_print("       ------------------------------------------------------------------\n");
+		//~ /* Show overlaps table. */
+		//~ g_print("%s", overlap_string->str);
+		//~ g_print("       ------------------------------------------------------------------\n");
+	//~ }
+	//~ 
+	//~ /* Free stuff. */
+	//~ if (ev_agg_list) g_list_free(ev_agg_list);
+	//~ if (overlap_string) g_string_free(overlap_string, TRUE);
+//~ 
+//~ }
+//~ 
+//~ /** 
+ //~ * @brief Export profiling info to a given stream.
+ //~ * 
+ //~ * Each line of the exported data will have the following format:
+ //~ * 
+ //~ *     queue start-time end-time event-name
+ //~ * 
+ //~ * For example:
+ //~ * 
+ //~ *     q0    100    120    load_data1
+ //~ *     q1    100    132    load_data2
+ //~ *     q0    121    159    process_data1
+ //~ *     q1    133    145    process_data2
+ //~ *     q0    146    157    read_result
+ //~ * 
+ //~ * Several export parameters can be configured with the 
+ //~ * cl4_prof_get_export_opts() and cl4_prof_set_export_opts() functions, by
+ //~ * manipulating a ::CL4ProfExportOptions struct.
+ //~ * 
+ //~ * @param prof Profile object.
+ //~ * @param stream Stream where export info to.
+ //~ * @param err Return location for a GError, or NULL if error reporting 
+ //~ * is to be ignored.
+ //~ * @return CL_TRUE if function terminates successfully, CL_FALSE
+ //~ * otherwise.
+ //~ * */ 
+//~ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
+	//~ 
+	//~ /* Make sure prof is not NULL. */
+	//~ g_return_val_if_fail(prof != NULL, CL_FALSE);
+	//~ /* Make sure stream is not NULL. */
+	//~ g_return_val_if_fail(stream != NULL, CL_FALSE);
+	//~ /* Make sure err is NULL or it is not set. */
+	//~ g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+//~ 
+	//~ /* Return status. */
+	//~ int ret_status, write_status;
+	//~ /* Type of sorting to perform on event list. */
+	//~ CL4ProfInfoSort sort_type;
+	//~ /* List of event (traversing pointer). */
+	//~ GList* ev_container = NULL;
+	//~ 
+	//~ /* Sort events by START order. */
+	//~ sort_type = CL4_PROF_INFO_SORT_T_START;
+	//~ prof->infos = g_list_sort_with_data(prof->infos, 
+		//~ cl4_prof_info_comp, (gpointer) &sort_type);
+	//~ 
+	//~ /* Iterate through all events and export info to stream. */
+	//~ ev_container = prof->infos;
+	//~ while (ev_container) {
+//~ 
+		//~ /* Loop aux. variables. */
+		//~ CL4ProfInfo* curr_ev = NULL;
+		//~ 
+		//~ /* Get event information. */
+		//~ curr_ev = (CL4ProfInfo*) ev_container->data;
+		//~ 
+		//~ /* Write to stream. */
+		//~ write_status = fprintf(stream, "%s%s%s%s%lu%s%lu%s%s%s%s%s", 
+			//~ export_options.queue_delim, 
+			//~ curr_ev->queue_name, 
+			//~ export_options.queue_delim, 
+			//~ export_options.separator, 
+			//~ (unsigned long) curr_ev->t_start, 
+			//~ export_options.separator, 
+			//~ (unsigned long) curr_ev->t_end, 
+			//~ export_options.separator, 
+			//~ export_options.evname_delim, 
+			//~ curr_ev->event_name, 
+			//~ export_options.evname_delim,
+			//~ export_options.newline);
+			//~ 
+		//~ gef_if_error_create_goto(
+			//~ *err, 
+			//~ CL4_ERROR, 
+			//~ write_status < 0, 
+			//~ ret_status = CL4_ERROR_STREAM_WRITE, 
+			//~ error_handler, 
+			//~ "Error while exporting profiling information (writing to stream).");
+		//~ 
+		//~ /* Get next event. */
+		//~ ev_container = ev_container->next;
+		//~ 
+	//~ }
+	//~ 
+	//~ /* If we got here, everything is OK. */
+	//~ g_assert (err == NULL || *err == NULL);
+	//~ ret_status = CL_TRUE;
+	//~ goto finish;
+	//~ 
+//~ error_handler:
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert (err == NULL || *err != NULL);
+	//~ ret_status = CL_FALSE;
+	//~ 
+//~ finish:	
+	//~ 
+	//~ /* Return status. */
+	//~ return ret_status;
+	//~ 
+//~ }
+//~ 
+//~ /** 
+ //~ * @brief Helper function which exports profiling info to a given file, 
+ //~ * automatically opening and closing the file. See the 
+ //~ * cl4_prof_export_info() for more information.
+ //~ * 
+ //~ * @param prof Profile object.
+ //~ * @param filename Name of file where information will be saved to.
+ //~ * @param err Return location for a GError, or NULL if error reporting 
+ //~ * is to be ignored.
+ //~ * @return CL_TRUE if function terminates successfully, CL_FALSE
+ //~ * otherwise.
+ //~ * */ 
+//~ cl_bool cl4_prof_export_info_file(
+	//~ CL4Prof* prof, const char* filename, GError** err) {
+//~ 
+	//~ /* Aux. var. */
+	//~ cl_bool status;
+	//~ 
+	//~ /* Internal GError object. */
+	//~ GError* err_internal = NULL;
+	//~ 
+	//~ /* Open file. */
+	//~ FILE* fp = fopen(filename, "w");
+	//~ gef_if_error_create_goto(*err, CL4_ERROR, fp == NULL, 
+		//~ status = CL4_ERROR_OPENFILE, error_handler, 
+		//~ "Unable to open file '%s' for exporting.", filename);
+	//~ 
+	//~ /* Export data. */
+	//~ status = cl4_prof_export_info(prof, fp, &err_internal);
+	//~ gef_if_err_propagate_goto(err, err_internal, error_handler);
+	//~ 
+	//~ /* If we got here, everything is OK. */
+	//~ g_assert (err == NULL || *err == NULL);
+	//~ status = CL_TRUE;
+	//~ goto finish;
+	//~ 
+//~ error_handler:
+	//~ /* If we got here there was an error, verify that it is so. */
+	//~ g_assert (err == NULL || *err != NULL);
+	//~ status = CL_FALSE;
+//~ 
+//~ finish:	
+//~ 
+	//~ /* Close file. */
+	//~ if (fp) fclose(fp);
+//~ 
+	//~ /* Return file contents in string form. */
+	//~ return status;
+//~ 
+//~ }
 
 /**
  * @brief Set export options using a ::CL4ProfExportOptions struct.

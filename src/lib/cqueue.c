@@ -302,9 +302,9 @@ CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event) {
 void cl4_cqueue_iter_event_init(CL4CQueue* cq) {
 
 	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL);
+	g_return_if_fail(cq != NULL);
 
-	g_hash_table_iter_init(cq->evt_iter, cq->evts);
+	g_hash_table_iter_init(&cq->evt_iter, cq->evts);
 
 }
 
@@ -313,7 +313,7 @@ void cl4_cqueue_iter_event_init(CL4CQueue* cq) {
 CL4Event* cl4_cqueue_iter_event_next(CL4CQueue* cq) {
 
 	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL);
+	g_return_val_if_fail(cq != NULL, NULL);
 
 	gpointer evt;
 	gboolean exists = g_hash_table_iter_next(&cq->evt_iter, &evt, NULL);
