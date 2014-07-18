@@ -1,5 +1,6 @@
 # List of tests
-set(TESTS test_gerrorf test_profiler test_wrappers test_devquery)
+set(TESTS test_gerrorf test_profiler test_wrappers test_devquery 
+	test_profiler_times)
 
 # Add subdir to build OpenCL stub lib
 add_subdirectory(ocl_stub)
@@ -27,6 +28,7 @@ endif()
 
 # Specific specific libraries for tests
 set(test_profiler_LIBS ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
+set(test_profiler_times_LIBS ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
 set(test_wrappers_LIBS ${LIB_OPT})
 set(test_devquery_LIBS ${LIB_OPT})
 

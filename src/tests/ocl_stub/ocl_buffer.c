@@ -73,20 +73,3 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 
 	return memobj;
 }
-
-CL_API_ENTRY void * CL_API_CALL
-clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
-	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
-	size_t size, cl_uint num_events_in_wait_list, 
-	const cl_event* event_wait_list, cl_event* event, 
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
-
-	command_queue = command_queue;
-	buffer = buffer;
-	blocking_map = blocking_map;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
-	event = event;
-	errcode_ret = errcode_ret;
-	return NULL;
-}
