@@ -178,6 +178,13 @@ static void timesTest() {
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 11);
 	g_assert_cmpfloat(agg->relative_time - 0.15714, <, 0.0001);
+	
+	printf("\n** Info **\n");
+	const CL4ProfInfo const* ei;
+	cl4_prof_iter_info_init(prof, CL4_PROF_INFO_SORT_NAME_EVENT);
+	while ((ei = cl4_prof_iter_info_next(prof)) != NULL) {
+		printf("%s: start: %lu, end: %lu\n", ei->event_name, ei->t_start, ei->t_end);
+	}
 
 	/* ******************* */
 	/* Test overlap matrix */

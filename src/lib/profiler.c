@@ -677,7 +677,7 @@ static void cl4_prof_calc_overlaps(CL4Prof* prof) {
 		/* Check if event time is START or END time */
 		if (curr_evinst->type == CL4_PROF_INST_TYPE_START) { 
 			/* Event START instant. */
-			
+			//printf("Event '%s' start instant %ul\n", curr_evinst->event_name, curr_evinst->instant);
 			/* 1 - Check for overlaps with ocurring events */
 
 			g_hash_table_iter_init(&iter, occurring_events);
@@ -1006,8 +1006,8 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	/* Calculate aggregate statistics. */
 	cl4_prof_calc_agg(prof);
 	
-	//~ /* Determine event overlaps. */
-	//~ cl4_prof_calc_overlaps(prof);
+	/* Determine event overlaps. */
+	cl4_prof_calc_overlaps(prof);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
