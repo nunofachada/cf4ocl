@@ -179,6 +179,7 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 
 	cl_int ocl_status;
 	cl_event event = NULL;
+	CL4Event* evt_inner = NULL;
 	void* ptr = NULL;
 	
 	ptr = clEnqueueMapBuffer(cl4_cqueue_unwrap(cq), 
@@ -194,7 +195,9 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	*evt = cl4_cqueue_produce_event(cq, event);
+	evt_inner = cl4_cqueue_produce_event(cq, event);
+	if (evt != NULL)
+		*evt = evt_inner;
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
