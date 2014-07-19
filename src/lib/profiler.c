@@ -1006,8 +1006,8 @@ cl_bool cl4_prof_calc(CL4Prof* prof, GError** err) {
 	/* Calculate aggregate statistics. */
 	cl4_prof_calc_agg(prof);
 	
-	/* Determine event overlaps. */
-	cl4_prof_calc_overlaps(prof);
+	//~ /* Determine event overlaps. */
+	//~ cl4_prof_calc_overlaps(prof);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -1042,18 +1042,21 @@ const CL4ProfAgg const* cl4_prof_get_agg(
 	/* This function can only be called after calculations are made. */
 	g_return_val_if_fail(prof->calc == TRUE, NULL);
 	
-	/* Find the aggregate statistic for the given event. Use the fact
-	 * that the event name is the first member of the cl4_prof_agg 
-	 * struct. */
-	GList* agg_container = g_list_find_custom(
-		prof->aggs, (gconstpointer) event_name, 
-		(GCompareFunc) g_strcmp0);
+	/* Find the aggregate statistic for the given event. */
+	CL4ProfAgg* agg = NULL;
+	GList* agg_container = prof->aggs;
+	while (agg_container != NULL) {
+		const char* curr_event_name = 
+			((CL4ProfAgg*) agg_container->data)->event_name;
+		if (g_strcmp0(event_name, curr_event_name) == 0) {
+			agg = (CL4ProfAgg*) agg_container->data;
+			break;
+		}
+		agg_container = agg_container->next;
+	}
 	
 	/* Return result. */
-	if (agg_container != NULL)
-		return (const CL4ProfAgg const*) agg_container->data;
-	else
-		return NULL;
+	return agg;
 }
 
 /** 
