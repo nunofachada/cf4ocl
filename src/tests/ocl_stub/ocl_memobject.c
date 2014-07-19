@@ -92,37 +92,3 @@ clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
 
 	return status;
 }
-
-CL_API_ENTRY cl_int CL_API_CALL
-clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
-	void* mapped_ptr, cl_uint num_events_in_wait_list, 
-	const cl_event* event_wait_list, cl_event* event) 
-	CL_API_SUFFIX__VERSION_1_0 {
-		
-	command_queue = command_queue;
-	memobj = memobj;
-	mapped_ptr = mapped_ptr;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
-	event = event;
-	
-	return CL_SUCCESS;
-}
-
-CL_API_ENTRY cl_int CL_API_CALL
-clEnqueueMigrateMemObjects(cl_command_queue command_queue,
-	cl_uint num_mem_objects, const cl_mem* mem_objects, 
-	cl_mem_migration_flags flags, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event) 
-	CL_API_SUFFIX__VERSION_1_2 {
-
-	command_queue = command_queue;
-	num_mem_objects = num_mem_objects;
-	mem_objects = mem_objects;
-	flags = flags;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
-	event = event;
-	
-	return CL_SUCCESS;
-}
