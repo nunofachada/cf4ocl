@@ -33,6 +33,17 @@
 #include "profiler.h"
 #include "ocl_stub/ocl_impl.h"
 
+#define cl4_test_prof_is_overlap(ev1, ev2) \
+	( \
+		(g_strcmp0(o->event1_name, ev1) == 0) \
+		&& \
+		(g_strcmp0(o->event2_name, ev2) == 0) \
+	) || ( \
+		(g_strcmp0(o->event1_name, ev2) == 0) \
+		&& \
+		(g_strcmp0(o->event2_name, ev1) == 0) \
+	)
+	
 /**
  * @brief Tests the profiling module.
  * */
@@ -179,16 +190,32 @@ static void timesTest() {
 	g_assert_cmpuint(agg->absolute_time, ==, 11);
 	g_assert_cmpfloat(agg->relative_time - 0.15714, <, 0.0001);
 	
-	printf("\n** Info **\n");
-	const CL4ProfInfo const* ei;
-	cl4_prof_iter_info_init(prof, CL4_PROF_INFO_SORT_NAME_EVENT);
-	while ((ei = cl4_prof_iter_info_next(prof)) != NULL) {
-		printf("%s: start: %lu, end: %lu\n", ei->event_name, ei->t_start, ei->t_end);
+	/* ************* */
+	/* Test overlaps */
+	/* ************* */
+	
+	const CL4ProfOverlap const* o;
+	cl4_prof_iter_overlap_init(prof, CL4_PROF_OVERLAP_SORT_DURATION, 
+		CL4_PROF_SORT_DESC);
+	while ((o = cl4_prof_iter_overlap_next(prof)) != NULL) {
+		if (cl4_test_prof_is_overlap("Event3", "Event4")) {
+			g_assert_cmpuint(o->duration, ==, 6);
+		} else if (cl4_test_prof_is_overlap("Event1", "Event5")) {
+			g_assert_cmpuint(o->duration, ==, 5);
+		} else if (cl4_test_prof_is_overlap("Event2", "Event3")) {
+			g_assert_cmpuint(o->duration, ==, 3);
+		} else if (cl4_test_prof_is_overlap("Event3", "Event5")) {
+			g_assert_cmpuint(o->duration, ==, 1);
+		} else if (cl4_test_prof_is_overlap("Event2", "Event4")) {
+			g_assert_cmpuint(o->duration, ==, 1);
+		} else if (cl4_test_prof_is_overlap("Event1", "Event1")) {
+			g_assert_cmpuint(o->duration, ==, 1);
+		} else {
+			g_assert_not_reached();
+		} 
+			
+			
 	}
-
-	/* ******************* */
-	/* Test overlap matrix */
-	/* ******************* */
 	
 	//~ /* Expected overlap matrix */
 	//~ cl_ulong expectedOvermat[5][5] = 

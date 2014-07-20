@@ -27,7 +27,20 @@
 
 #include "profiler.h"
 
-#define CL4_PROF_CMP(x, y) (((x) < (y)) ? 1 : (((x) > (y)) ? -1 : 0))
+#define CL4_PROF_CMP_INT(x, y, ord) (((ord) == CL4_PROF_SORT_ASC) \
+	? (((x) > (y)) ? 1 : (((x) < (y)) ? -1 : 0)) \
+	: (((x) < (y)) ? 1 : (((x) > (y)) ? -1 : 0)))
+
+#define CL4_PROF_CMP_STR(s1, s2, ord) (((ord) == CL4_PROF_SORT_ASC) \
+	? g_strcmp0(s1, s2) : g_strcmp0(s2, s1))
+
+#define cl4_prof_get_sort(userdata) \
+	{0x0F & *((int*) userdata), 0xF0 & *((int*) userdata)}
+	
+typedef struct cl4_prof_sort_data {
+	CL4ProfSortOrder order;
+	int criteria;
+} CL4ProfSort;
 
 /**
  * @brief Profile class, contains profiling information of OpenCL 
@@ -139,7 +152,7 @@ static void cl4_prof_inst_destroy(gpointer instant) {
  * 
  * @param a First event instant to compare.
  * @param b Second event instant to compare.
- * @param userdata Defines what type of sorting to do.
+ * @param userdata Defines the sort criteria and order.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
 static gint cl4_prof_inst_comp(
@@ -148,20 +161,27 @@ static gint cl4_prof_inst_comp(
 	/* Cast input parameters to event instant data structures. */
 	CL4ProfInst* ev_inst1 = (CL4ProfInst*) a;
 	CL4ProfInst* ev_inst2 = (CL4ProfInst*) b;
-	CL4ProfInstSort sort_type = *((CL4ProfInstSort*) userdata);
+	CL4ProfSort sort = cl4_prof_get_sort(userdata);
 	/* Perform comparison. */
-	if (sort_type == CL4_PROF_INST_SORT_INSTANT) {
-		/* Sort by instant */
-		return CL4_PROF_CMP(ev_inst1->instant, ev_inst2->instant);
-	} else if (sort_type == CL4_PROF_INST_SORT_ID) {
-		/* Sort by ID */
-		if (ev_inst1->id > ev_inst2->id) return 1;
-		if (ev_inst1->id < ev_inst2->id) return -1;
-		if (ev_inst1->type == CL4_PROF_INST_TYPE_END) return 1;
-		if (ev_inst1->type == CL4_PROF_INST_TYPE_START) return -1;
+	switch ((CL4ProfInstSort) sort.criteria) {
+		gint result;
+		case CL4_PROF_INST_SORT_INSTANT:
+			/* Sort by instant */
+			return CL4_PROF_CMP_INT(ev_inst1->instant, ev_inst2->instant, 
+				sort.order);
+		case CL4_PROF_INST_SORT_ID:
+			/* Sort by ID */
+			result = CL4_PROF_CMP_INT(ev_inst1->id, ev_inst2->id, 
+				sort.order);
+			if (result != 0) return result;
+			if (ev_inst1->type == CL4_PROF_INST_TYPE_START) 
+				return sort.order ? 1 : -1;
+			if (ev_inst1->type == CL4_PROF_INST_TYPE_END) 
+				return sort.order ? -1 : 1;
+		/* We shouldn't get here. */
+		default:
+			g_return_val_if_reached(0);
 	}
-	/* We shouldn't get here. */
-	g_return_val_if_reached(0);
 }
 
 /** 
@@ -192,7 +212,7 @@ static void cl4_prof_agg_destroy(gpointer agg) {
  * 
  * @param a First aggregate event data instance to compare.
  * @param b Second aggregate event data instance to compare.
- * @param userdata Defines what type of sorting to do.
+ * @param userdata Defines the sort criteria and order.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
 static gint cl4_prof_agg_comp(
@@ -201,19 +221,26 @@ static gint cl4_prof_agg_comp(
 	/* Cast input parameters to event instant data structures. */
 	CL4ProfAgg* ev_agg1 = (CL4ProfAgg*) a;
 	CL4ProfAgg* ev_agg2 = (CL4ProfAgg*) b;
-	CL4ProfAggSort sort_type = *((CL4ProfAggSort*) userdata);
+	CL4ProfSort sort = cl4_prof_get_sort(userdata);
 	
 	/* Perform comparison. */
-	switch (sort_type) {
+	switch ((CL4ProfAggSort) sort.criteria) {
+
+		/* Sort by event name. */
 		case CL4_PROF_AGG_SORT_NAME:
-			return g_strcmp0(ev_agg1->event_name, ev_agg2->event_name);
+			return CL4_PROF_CMP_STR(ev_agg1->event_name, 
+				ev_agg2->event_name, sort.order);
+
+		/* Sort by absolute time. */
 		case CL4_PROF_AGG_SORT_TIME:
-			return CL4_PROF_CMP(
-				ev_agg1->absolute_time, ev_agg2->absolute_time);
+			return CL4_PROF_CMP_INT(ev_agg1->absolute_time, 
+				ev_agg2->absolute_time, sort.order);
+
+		/* We shouldn't get here. */
+		default:
+			g_return_val_if_reached(0);
 	}
 	
-	/* We shouldn't get here. */
-	g_return_val_if_reached(0);
 }
 
 /**
@@ -264,7 +291,7 @@ static void cl4_prof_info_destroy(CL4ProfInfo* info) {
  * 
  * @param a First event profiling information instance to compare.
  * @param b Second event profiling information instance to compare.
- * @param userdata Defines what type of sorting to do.
+ * @param userdata Defines the sort criteria and order.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
 static gint cl4_prof_info_comp(
@@ -273,38 +300,44 @@ static gint cl4_prof_info_comp(
 	/* Cast input parameters to event instant data structures. */
 	CL4ProfInfo* ev1 = (CL4ProfInfo*) a;
 	CL4ProfInfo* ev2 = (CL4ProfInfo*) b;
-	CL4ProfInfoSort sort_type = *((CL4ProfInfoSort*) userdata);
+	CL4ProfSort sort = cl4_prof_get_sort(userdata);
 	/* Perform comparison. */
-	switch (sort_type) {
+	switch ((CL4ProfInfoSort) sort.criteria) {
 		
 		 /* Sort aggregate event data instances by event name. */
 		case CL4_PROF_INFO_SORT_NAME_EVENT:
-			return g_strcmp0(ev1->event_name, ev2->event_name);
+			return CL4_PROF_CMP_STR(ev1->event_name, ev2->event_name,
+				sort.order);
 		
 		 /* Sort aggregate event data instances by queue name. */
 		case CL4_PROF_INFO_SORT_NAME_QUEUE:
-			return g_strcmp0(ev1->queue_name, ev2->queue_name);
+			return CL4_PROF_CMP_STR(ev1->queue_name, ev2->queue_name,
+				sort.order);
 		
 		 /* Sort aggregate event data instances by queued time. */
 		case CL4_PROF_INFO_SORT_T_QUEUED:
-			return CL4_PROF_CMP(ev1->t_queued, ev2->t_queued);
+			return CL4_PROF_CMP_INT(ev1->t_queued, ev2->t_queued, 
+				sort.order);
 
 		 /* Sort aggregate event data instances by submit time. */
 		case CL4_PROF_INFO_SORT_T_SUBMIT:
-			return CL4_PROF_CMP(ev1->t_submit, ev2->t_submit);
+			return CL4_PROF_CMP_INT(ev1->t_submit, ev2->t_submit,
+				sort.order);
 		
 		 /* Sort aggregate event data instances by start time. */
 		case CL4_PROF_INFO_SORT_T_START:
-			return CL4_PROF_CMP(ev1->t_start, ev2->t_start);
+			return CL4_PROF_CMP_INT(ev1->t_start, ev2->t_start, 
+				sort.order);
 		
 		 /* Sort aggregate event data instances by end time. */
 		case CL4_PROF_INFO_SORT_T_END:
-			return CL4_PROF_CMP(ev1->t_end, ev2->t_end);
+			return CL4_PROF_CMP_INT(ev1->t_end, ev2->t_end, sort.order);
 		
+		/* We shouldn't get here. */
+		default:
+			g_return_val_if_reached(0);
 	}
 	
-	/* We shouldn't get here. */
-	g_return_val_if_reached(0);
 }
 
 /**
@@ -346,7 +379,7 @@ static void cl4_prof_overlap_destroy(CL4ProfOverlap* ovlp) {
  * 
  * @param a First event overlap instance to compare.
  * @param b Second event overlap instance to compare.
- * @param userdata Defines what type of sorting to do.
+ * @param userdata Defines the sort criteria and order.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
 static gint cl4_prof_overlap_comp(
@@ -357,26 +390,29 @@ static gint cl4_prof_overlap_comp(
 	/* Cast input parameters to event instant data structures. */
 	CL4ProfOverlap* ovlp1 = (CL4ProfOverlap*) a;
 	CL4ProfOverlap* ovlp2 = (CL4ProfOverlap*) b;
-	CL4ProfOverlapSort sort_type = *((CL4ProfOverlapSort*) userdata);
+	CL4ProfSort sort = cl4_prof_get_sort(userdata);
 	/* Perform comparison. */
-	switch (sort_type) {
+	switch ((CL4ProfOverlapSort) sort.criteria) {
 		
 		 /* Sort overlap instances by event name. */
 		case CL4_PROF_OVERLAP_SORT_NAME:
-			result = g_strcmp0(ovlp1->event1_name, ovlp2->event1_name);
+			result = CL4_PROF_CMP_STR(ovlp1->event1_name, 
+				ovlp2->event1_name, sort.order);
 			if (result != 0)
 				return result;
 			else 
-				return g_strcmp0(ovlp1->event2_name, ovlp2->event2_name);
+				return CL4_PROF_CMP_STR(ovlp1->event2_name, 
+					ovlp2->event2_name, sort.order);
 		
 		 /* Sort overlap instances by overlap duration. */
 		case CL4_PROF_OVERLAP_SORT_DURATION:
-			return CL4_PROF_CMP(ovlp1->duration, ovlp2->duration);
+			return CL4_PROF_CMP_INT(ovlp1->duration, ovlp2->duration, 
+				sort.order);
 		
+		/* We shouldn't get here. */
+		default:
+			g_return_val_if_reached(0);
 	}
-	
-	/* We shouldn't get here. */
-	g_return_val_if_reached(0);
 	
 }
 
@@ -539,7 +575,7 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 	/* Aggregate event info. */
 	CL4ProfAgg* evagg = NULL;
 	/* Type of sorting to perform on event list. */
-	CL4ProfInstSort sort_type;
+	int sort_type;
 	/* Aux. pointer for event data structure kept in a GList. */
 	GList* curr_evinst_container = NULL;
 	/* A pointer to a CL4ProfAgg (agg. event info) variable. */
@@ -560,7 +596,7 @@ static void cl4_prof_calc_agg(CL4Prof* prof) {
 	}
 	
 	/* Sort event instants by eid, and then by START, END order. */
-	sort_type = CL4_PROF_INST_SORT_ID;
+	sort_type = CL4_PROF_INST_SORT_ID | CL4_PROF_SORT_ASC;
 	prof->instants = g_list_sort_with_data(
 		prof->instants, cl4_prof_inst_comp, 
 		(gpointer) &sort_type);
@@ -647,10 +683,10 @@ static void cl4_prof_calc_overlaps(CL4Prof* prof) {
 	occurring_events = g_hash_table_new(g_int_hash, g_int_equal);
 		
 	/* Sort all event instants. */
-	sort_type = CL4_PROF_INST_SORT_INSTANT;
+	sort_type = CL4_PROF_INST_SORT_INSTANT | CL4_PROF_SORT_ASC;
 	prof->instants = g_list_sort_with_data(prof->instants, 
 		cl4_prof_inst_comp, (gpointer) &sort_type);
-	
+		
 	/* Iterate through all event instants */
 	curr_evinst_container = prof->instants;
 	while (curr_evinst_container) {
@@ -677,7 +713,7 @@ static void cl4_prof_calc_overlaps(CL4Prof* prof) {
 		/* Check if event time is START or END time */
 		if (curr_evinst->type == CL4_PROF_INST_TYPE_START) { 
 			/* Event START instant. */
-			//printf("Event '%s' start instant %ul\n", curr_evinst->event_name, curr_evinst->instant);
+
 			/* 1 - Check for overlaps with ocurring events */
 
 			g_hash_table_iter_init(&iter, occurring_events);
@@ -1064,18 +1100,23 @@ const CL4ProfAgg const* cl4_prof_get_agg(
  * instances. 
  * 
  * @param prof Profile object.
- * @param sort_type Sort type.
+ * @param sort_criteria Sort criteria.
+ * @param sort_order Sort order.
  * */
-void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_type) {
+void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_criteria, 
+	CL4ProfSortOrder sort_order) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
+	/* Define the sort. */
+	int sort = sort_criteria | sort_order;
+	
 	/* Sort list of aggregate statistics as requested by client. */
 	prof->aggs = g_list_sort_with_data(
-		prof->aggs, cl4_prof_agg_comp, &sort_type);
+		prof->aggs, cl4_prof_agg_comp, &sort);
 	
 	/* Set the iterator as the first element in list. */
 	prof->agg_iter = prof->aggs;
@@ -1116,18 +1157,23 @@ const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof) {
  * @brief Initialize an iterator for event profiling info instances. 
  * 
  * @param prof Profile object.
- * @param sort_type Sort type.
+ * @param sort_criteria Sort criteria.
+ * @param sort_order Sort order.
  * */
-void cl4_prof_iter_info_init(CL4Prof* prof, CL4ProfInfoSort sort_type) {
+void cl4_prof_iter_info_init(CL4Prof* prof, 
+	CL4ProfInfoSort sort_criteria, CL4ProfSortOrder sort_order) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
+	/* Define the sort. */
+	int sort = sort_criteria | sort_order;
+	
 	/* Sort list of event prof. infos as requested by client. */
 	prof->infos = g_list_sort_with_data(
-		prof->infos, cl4_prof_info_comp, &sort_type);
+		prof->infos, cl4_prof_info_comp, &sort);
 	
 	/* Set the iterator as the first element in list. */
 	prof->info_iter = prof->infos;
@@ -1167,19 +1213,23 @@ const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof) {
  * @brief Initialize an iterator for overlap instances. 
  * 
  * @param prof Profile object.
- * @param sort_type Sort type.
+ * @param sort_criteria Sort criteria.
+ * @param sort_order Sort order.
  * */
-void cl4_prof_iter_overlap_init(
-	CL4Prof* prof, CL4ProfOverlapSort sort_type) {
+void cl4_prof_iter_overlap_init(CL4Prof* prof, 
+	CL4ProfOverlapSort sort_criteria, CL4ProfSortOrder sort_order) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
+	/* Define the sort. */
+	int sort = sort_criteria | sort_order;
+	
 	/* Sort list of overlaps as requested by client. */
 	prof->overlaps = g_list_sort_with_data(
-		prof->overlaps, cl4_prof_overlap_comp, &sort_type);
+		prof->overlaps, cl4_prof_overlap_comp, &sort);
 	
 	/* Set the iterator as the first element in list. */
 	prof->overlap_iter = prof->overlaps;

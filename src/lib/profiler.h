@@ -52,6 +52,17 @@
 typedef struct cl4_prof CL4Prof;
 
 /**
+ * @brief Sort order for the profile module iterators.
+ * */
+typedef enum {
+	/** Sort ascending (default). */
+	CL4_PROF_SORT_ASC  = 0x0,
+	/** Sort descending. */
+	CL4_PROF_SORT_DESC = 0x1
+} CL4ProfSortOrder;
+
+
+/**
  * @brief Aggregate event info.
  */
 typedef struct cl4_prof_agg {
@@ -69,14 +80,14 @@ typedef struct cl4_prof_agg {
 
 
 /**
- * @brief Sorting strategy for aggregate event info instances.
+ * @brief Sort criteria for aggregate event info instances.
  */
 typedef enum {
 
 	 /** Sort aggregate event data instances by name. */
-	CL4_PROF_AGG_SORT_NAME,
+	CL4_PROF_AGG_SORT_NAME = 0x00,
 	/** Sort aggregate event data instances by time. */
-	CL4_PROF_AGG_SORT_TIME
+	CL4_PROF_AGG_SORT_TIME = 0x10
 
 } CL4ProfAggSort;
 
@@ -106,22 +117,22 @@ typedef struct cl4_prof_info {
 } CL4ProfInfo;
 
 /**
- * @brief Sorting strategy for event profiling info instances.
+ * @brief Sort criteria for event profiling info instances.
  */
 typedef enum {
 
-	 /** Sort aggregate event data instances by event name. */
-	CL4_PROF_INFO_SORT_NAME_EVENT,
-	 /** Sort aggregate event data instances by queue name. */
-	CL4_PROF_INFO_SORT_NAME_QUEUE,
-	 /** Sort aggregate event data instances by queued time. */
-	CL4_PROF_INFO_SORT_T_QUEUED,
-	 /** Sort aggregate event data instances by submit time. */
-	CL4_PROF_INFO_SORT_T_SUBMIT,
-	 /** Sort aggregate event data instances by start time. */
-	CL4_PROF_INFO_SORT_T_START,
-	 /** Sort aggregate event data instances by end time. */
-	CL4_PROF_INFO_SORT_T_END
+	 /** Sort event profiling info instances by event name. */
+	CL4_PROF_INFO_SORT_NAME_EVENT = 0x00,
+	 /** Sort event profiling info instances by queue name. */
+	CL4_PROF_INFO_SORT_NAME_QUEUE = 0x10,
+	 /** Sort event profiling info instances by queued time. */
+	CL4_PROF_INFO_SORT_T_QUEUED   = 0x20,
+	 /** Sort event profiling info instances by submit time. */
+	CL4_PROF_INFO_SORT_T_SUBMIT   = 0x30,
+	 /** Sort event profiling info instances by start time. */
+	CL4_PROF_INFO_SORT_T_START    = 0x40,
+	 /** Sort event profiling info instances by end time. */
+	CL4_PROF_INFO_SORT_T_END      = 0x50
 
 } CL4ProfInfoSort;
 
@@ -159,14 +170,14 @@ typedef struct cl4_prof_inst {
 } CL4ProfInst;
 
 /**
- * @brief Sorting strategy for event instants (::CL4ProfInst).
+ * @brief Sort criteria for event instants (::CL4ProfInst).
  */
 typedef enum {
 	
 	/** Sort event instants by instant. */
-	CL4_PROF_INST_SORT_INSTANT,
+	CL4_PROF_INST_SORT_INSTANT = 0x00,
 	/** Sort event instants by event id. */
-	CL4_PROF_INST_SORT_ID
+	CL4_PROF_INST_SORT_ID      = 0x10
 
 } CL4ProfInstSort;
 
@@ -185,14 +196,14 @@ typedef struct cl4_prof_overlap {
 } CL4ProfOverlap;
 
 /**
- * @brief Sorting strategy for overlaps (::CL4ProfOverlaps).
+ * @brief Sort criteria for overlaps (::CL4ProfOverlaps).
  */
 typedef enum {
 	
 	/** Sort overlaps by event name. */
-	CL4_PROF_OVERLAP_SORT_NAME,
+	CL4_PROF_OVERLAP_SORT_NAME     = 0x00,
 	/** Sort overlaps by overlap duration. */
-	CL4_PROF_OVERLAP_SORT_DURATION
+	CL4_PROF_OVERLAP_SORT_DURATION = 0x10
 
 } CL4ProfOverlapSort;
 
@@ -248,20 +259,22 @@ const CL4ProfAgg const* cl4_prof_get_agg(
 
 /** @brief Initialize an iterator for profiled aggregate event 
  * instances. */
-void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_type);
+void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_criteria, 
+	CL4ProfSortOrder sort_order);
 
 /** @brief Return the next profiled aggregate event instance. */
 const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof);
 
 /** @brief Initialize an iterator for event profiling info instances. */
-void cl4_prof_iter_info_init(CL4Prof* prof, CL4ProfInfoSort sort_type);
+void cl4_prof_iter_info_init(CL4Prof* prof, 
+	CL4ProfInfoSort sort_criteria, CL4ProfSortOrder sort_order);
 
 /** @brief Return the next event profiling info instance. */
 const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof);
 
 /** @brief Initialize an iterator for overlap instances. */
-void cl4_prof_iter_overlap_init(
-	CL4Prof* prof, CL4ProfOverlapSort sort_type);
+void cl4_prof_iter_overlap_init(CL4Prof* prof, 
+	CL4ProfOverlapSort sort_criteria, CL4ProfSortOrder sort_order);
 
 /** @brief Return the next overlap instance. */
 const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof);
