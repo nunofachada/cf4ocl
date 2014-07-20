@@ -272,6 +272,13 @@ void cl4_prof_iter_info_init(CL4Prof* prof,
 /** @brief Return the next event profiling info instance. */
 const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof);
 
+/** @brief Initialize an iterator for event instant instances. */
+void cl4_prof_iter_inst_init(CL4Prof* prof, 
+	CL4ProfInstSort sort_criteria, CL4ProfSortOrder sort_order);
+
+/** @brief Return the next event instant instance. */
+const CL4ProfInst const* cl4_prof_inst_info_next(CL4Prof* prof);
+
 /** @brief Initialize an iterator for overlap instances. */
 void cl4_prof_iter_overlap_init(CL4Prof* prof, 
 	CL4ProfOverlapSort sort_criteria, CL4ProfSortOrder sort_order);

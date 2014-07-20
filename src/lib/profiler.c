@@ -73,10 +73,12 @@ struct cl4_prof {
 	/** List of event overlaps. */
 	GList* overlaps;
 
-	/** Event info iterator. */
-	GList* info_iter;
 	/** Aggregate event statistics iterator. */
 	GList* agg_iter;
+	/** Event info iterator. */
+	GList* info_iter;
+	/** Event instant iterator. */
+	GList* inst_iter;
 	/** Overlaps iterator. */
 	GList* overlap_iter;
 
@@ -1207,6 +1209,63 @@ const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof) {
 	
 	/* Return the profiling info instance. */
 	return (const CL4ProfInfo const*) info;
+}
+
+/** 
+ * @brief Initialize an iterator for event instant instances. 
+ * 
+ * @param prof Profile object.
+ * @param sort_criteria Sort criteria.
+ * @param sort_order Sort order.
+ * */
+void cl4_prof_iter_inst_init(CL4Prof* prof, 
+	CL4ProfInstSort sort_criteria, CL4ProfSortOrder sort_order) {
+
+	/* Make sure prof is not NULL. */
+	g_return_if_fail(prof != NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_if_fail(prof->calc == TRUE);
+
+	/* Define the sort. */
+	int sort = sort_criteria | sort_order;
+	
+	/* Sort list of event instants as requested by client. */
+	prof->instants = g_list_sort_with_data(
+		prof->instants, cl4_prof_inst_comp, &sort);
+	
+	/* Set the iterator as the first element in list. */
+	prof->inst_iter = prof->instants;
+
+}
+
+/** 
+ * @brief Return the next event instant instance. 
+ * 
+ * @param prof Profile object.
+ * @return The next event instant instance. 
+ * */
+const CL4ProfInst const* cl4_prof_iter_inst_next(CL4Prof* prof) {
+
+	/* Make sure prof is not NULL. */
+	g_return_val_if_fail(prof != NULL, NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_val_if_fail(prof->calc == TRUE, NULL);
+	
+	/* The event profiling info instance to return. */
+	CL4ProfInst* inst;
+	
+	/* Check if there are any more left. */
+	if (prof->inst_iter != NULL) {
+		/* Yes, send current one, pass to the next. */
+		inst = (CL4ProfInst*) prof->inst_iter->data;
+		prof->inst_iter = prof->inst_iter->next;
+	} else {
+		/* Nothing left. */
+		inst = NULL;
+	}
+	
+	/* Return the profiling info instance. */
+	return (const CL4ProfInst const*) inst;
 }
 
 /** 
