@@ -217,23 +217,6 @@ static void timesTest() {
 			
 	}
 	
-	//~ /* Expected overlap matrix */
-	//~ cl_ulong expectedOvermat[5][5] = 
-	//~ {
-		//~ {1, 0, 0, 0, 5},
-		//~ {0, 0, 3, 1, 0},
-		//~ {0, 0, 0, 6, 1},
-		//~ {0, 0, 0, 0, 0},
-		//~ {0, 0, 0, 0, 0}
-	//~ };
-	//~ 
-	//~ /* Test if currentOverlapMatrix is as expected */
-	//~ for (guint i = 0; i < numEvents; i++) {
-		//~ for (guint j = 0; j < numEvents; j++) {
-			//~ g_assert_cmpuint(profile->overmat[i * numEvents + j], ==, expectedOvermat[i][j]);
-		//~ }
-	//~ }
-	//~ 
 	//~ /* ******************* */
 	//~ /* Test export options */
 	//~ /* ******************* */
