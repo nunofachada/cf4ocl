@@ -193,6 +193,8 @@ int main(int argc, char *argv[]) {
 	CL4Program* prg = NULL;
 	/* Command queue wrapper. */
 	CL4CQueue* cq = NULL;
+	/* Kernel wrapper. */
+	CL4Kernel* krnl = NULL;
 	/* Kernel name */
 	gchar* kernel_name = NULL;
 	/* Full kernel path. */
@@ -278,9 +280,13 @@ int main(int argc, char *argv[]) {
 	cl4_program_build(prg, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
-	/* Kernel name. */
+	/* Determine kernel name. */
 	kernel_name = g_strdup_printf("matmult%d", kernel_id);
 
+	/* Get kernel. */
+	krnl = cl4_program_get_kernel(prg, kernel_name, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	
 	/* ********************************** */	
 	/* Create and initialize host buffers */
 	/* ********************************** */	
@@ -320,7 +326,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Matrix C */
-	matrixC_device = cl4_buffer_new(ctx, CL_MEM_WRITE_ONLY, 
+	matrixC_dev = cl4_buffer_new(ctx, CL_MEM_WRITE_ONLY, 
 			size_matC_in_bytes, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
@@ -332,50 +338,16 @@ int main(int argc, char *argv[]) {
 	cl4_prof_start(prof_dev);
 	
 	/* Copy matrix A to device. */
-	status = clEnqueueWriteBuffer (	
-		zone->queues[0], 
-		matrixA_device, 
-		CL_TRUE, 
-		0, 
-		size_matA_in_bytes, 
-		matrixA_host, 
-		0, 
-		NULL, 
-		&(events[0]) 
-	);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to write matrix A on device (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
+	cl4_buffer_write(cq, matrixA_dev, CL_TRUE, 0, size_matA_in_bytes, 
+		matrixA_host, NULL, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Copy matrix B to device. */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		status = clEnqueueWriteBuffer (	
-			zone->queues[0], 
-			matrixB_device, 
-			CL_TRUE, 
-			0, 
-			size_matB_in_bytes, 
-			matrixB_host, 
-			0, 
-			NULL, 
-			&(events[1]) 
-		);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable to write matrix B on device (OpenCL error %d: %s).", 
-			status,
-			cl4_err(status));
+		cl4_buffer_write(cq, matrixB_dev, CL_TRUE, 0, 
+			size_matB_in_bytes, matrixB_host, NULL, &err); 
+		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	}
 	
 	/* ******************** */
@@ -419,221 +391,58 @@ int main(int argc, char *argv[]) {
 	/*  Set fixed kernel arguments */
 	/* *************************** */
 
-	/* Generic arguments */
-	status = clSetKernelArg(
-		kernel_matmult, 0, sizeof(cl_mem), (void *) &matrixA_device);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable set arg 0 of '%s' kernel (OpenCL error %d: %s).", 
-		kernel_name,
-		status,
-		cl4_err(status));
-
 	if (!IS_AAT(kernel_id)) {
-		/* Arguments only for C=AB */
-		status = clSetKernelArg(
-			kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixB_device);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
-			kernel_name, 
-			status,
-			cl4_err(status));
 
-		status = clSetKernelArg(
-			kernel_matmult, 2, sizeof(cl_mem), (void *) &matrixC_device);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
-			kernel_name, 
-			status,
-			cl4_err(status));
-		
-		status = clSetKernelArg(
-			kernel_matmult, 3, sizeof(cl_int2), (void *) &a_dim);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
-			kernel_name,
-			status, 
-			cl4_err(status));
-		
-		status = clSetKernelArg(
-			kernel_matmult, 4, sizeof(cl_int2), (void *) &b_dim);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).",
-			kernel_name,
-			status,
-			cl4_err(status));
-		
-		if (kernel_id >= 1) {
-			status = clSetKernelArg(
-				kernel_matmult, 5, l_mem_sizeA_in_bytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 5 of '%s' kernel (OpenCL error %d: %s).", 
-				kernel_name,
-				status, 
-				cl4_err(status));
+		/* Arguments for C=AB */
+		if (kernel_id == 0) {
+			cl4_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, cl4_arg_private(a_dim, cl_int2), 
+				cl4_arg_private(b_dim, cl_int2), NULL);
+		} else if (kernel_id == 1) {
+			cl4_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, cl4_arg_private(a_dim, cl_int2), 
+				cl4_arg_private(b_dim, cl_int2), 
+				cl4_arg_new(NULL, l_mem_sizeA_in_bytes), NULL);
+		} else if (kernel_id == 2) {
+			cl4_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, cl4_arg_private(a_dim, cl_int2), 
+				cl4_arg_private(b_dim, cl_int2), 
+				cl4_arg_new(NULL, l_mem_sizeA_in_bytes),
+				cl4_arg_new(NULL, l_mem_sizeB_in_bytes), NULL);
 		}
-		if (kernel_id == 2) {
-			status = clSetKernelArg(
-				kernel_matmult, 6, l_mem_sizeB_in_bytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 6 of '%s' kernel (OpenCL error %d: %s).",
-				kernel_name,
-				status, 
-				cl4_err(status));
-		}
+
 	} else {
-		/* Arguments only for C=AA^T */
-		status = clSetKernelArg(
-			kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixC_device);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
-			kernel_name, 
-			status,
-			cl4_err(status));
-		
-		status = clSetKernelArg(
-			kernel_matmult, 2, sizeof(cl_int2), (void *) &a_dim);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
-			kernel_name,
-			status,
-			cl4_err(status));
-		
-		if (kernel_id == 4) {
-			status = clSetKernelArg(
-				kernel_matmult, 3, l_mem_sizeA_in_bytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
-				kernel_name, 
-				status,
-				cl4_err(status));
-			status = clSetKernelArg(
-				kernel_matmult, 4, l_mem_sizeB_in_bytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).", 
-				kernel_name, 
-				status,
-				cl4_err(status));
-		}
 
+		/* Arguments only for C=AA^T */
+		if (kernel_id < 4) {
+			cl4_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
+				cl4_arg_private(a_dim, cl_int2), NULL);
+		} else if (kernel_id == 4) {
+			cl4_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
+				cl4_arg_private(a_dim, cl_int2),
+				cl4_arg_new(NULL, l_mem_sizeA_in_bytes),
+				cl4_arg_new(NULL, l_mem_sizeB_in_bytes), NULL);
+		}
 	}
 	
 	/* ************ */
 	/*  Run kernel! */
 	/* ************ */
 	
-	status = clEnqueueNDRangeKernel(
-		zone->queues[0], 
-		kernel_matmult, 
-		2, 
-		NULL, 
-		gws, 
-		lws, 
-		0, 
-		NULL, 
-		&(events[2]) 
-	);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Error while executing kernel '%s' (OpenCL error %d: %s).", 
-		kernel_name,
-		status, 
-		cl4_err(status));
+	cl4_kernel_run(krnl, cq, 2, NULL, gws, lws, NULL, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* *********************** */
 	/*  Get result from device */
 	/* *********************** */
 
-	status = clEnqueueReadBuffer(
-		zone->queues[0], 
-		matrixC_device, 
-		CL_TRUE, 
-		0, 
-		size_matC_in_bytes, 
-		matrixC_host, 
-		0, 
-		NULL, 
-		&(events[3]) 
-	);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to read matrix C from device (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
+	cl4_buffer_read(cq, matrixC_dev, CL_TRUE, 0, size_matC_in_bytes, 
+		matrixC_host, NULL, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Finish execution. */
-	status = clFinish(zone->queues[0]); 
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Error on clFinish() function (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
+	cl4_cqueue_finish(cq, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ************************************** */
 	/*  Manage profiling of OpenCL operations */
@@ -642,36 +451,21 @@ int main(int argc, char *argv[]) {
 	/* Stop profiler. */
 	cl4_prof_stop(prof_dev); 
 
-	cl4_prof_add(
-		prof_dev, "Transfer matrix A to device", events[0], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	/* Add queue for profiling. */
+	cl4_prof_add_queue(prof_dev, "Queue1", cq);
 
-	if (!IS_AAT(kernel_id)) {
-		cl4_prof_add(
-			prof_dev, "Transfer matrix B to device", events[1], &err);
-		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-	}
-
-	cl4_prof_add(
-		prof_dev, "Kernel execution (Matmult)", events[2], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-
-	cl4_prof_add(
-		prof_dev, "Transfer matrix C to host", events[3], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-
-	cl4_prof_aggregate(prof_dev, &err);
+	/* Process profiling data. */
+	cl4_prof_calc(prof_dev, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Show profiling info. */
-	cl4_prof_print_summary(prof_dev, CL4_PROF_AGG_SORT_TIME, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	cl4_prof_print_summary(prof_dev);
 	
 	/* Export profiling info if a filename was given. */
-	if (output_export) {
-		cl4_prof_export_info_file(prof_dev, output_export, &err);
-		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-	}
+	//~ if (output_export) {
+		//~ cl4_prof_export_info_file(prof_dev, output_export, &err);
+		//~ gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	//~ }
 		
 	/* ********************************************************* */
 	/* Perform multiplication on the CPU with the help of OpenMP */
@@ -679,22 +473,14 @@ int main(int argc, char *argv[]) {
 
 	/* Allocate memory for a new results matrix. */
 	matrixC_test = matmult_matrix_new(b_dim[0], a_dim[1], NULL, NULL);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		matrixC_test == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create host matrix C (OpenMP test).");
 		
-	/* Get number of processors available to OpenMP. */
-
 	/* Start basic timming / profiling. */
 	cl4_prof_start(prof_cpu);
 
 	if (!IS_AAT(kernel_id)) {
 		/* C=AB */
-		/* The pragma below makes the loop parallel with threads = number of cores */
+		/* The pragma below makes the loop parallel with 
+		 * threads = number of cores */
 #ifdef CF4OCL_USE_OPENMP		
 		#pragma omp parallel for
 #endif
@@ -826,10 +612,7 @@ cleanup:
 	
 	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);
-	if (dev_name) g_free(dev_name);
-	if (dev_vendor) g_free(dev_vendor);
-	if (platf_name) g_free(platf_name);
-	if (output_export) g_free(output_export);
+	//~ if (output_export) g_free(output_export);
 		
 	/* Free miscelaneous objects. */
 	if (kernel_name) g_free(kernel_name);
@@ -838,21 +621,13 @@ cleanup:
 	/* Free RNG */
 	if (rng) g_rand_free(rng);
 		
-	/* Release events */
-	for (unsigned int i = 0; i < 4; i++) {
-		if (events[i]) status = clReleaseEvent(events[i]);
-	}
-
-	/* Release OpenCL kernels */
-	if (kernel_matmult) clReleaseKernel(kernel_matmult);
-	
-	/* Release OpenCL memory objects */
-	if (matrixA_device) clReleaseMemObject(matrixA_device);
-	if (matrixB_device) clReleaseMemObject(matrixB_device);
-	if (matrixC_device) clReleaseMemObject(matrixC_device);
-
-	/* Free OpenCL zone */
-	if (zone) cl4_man_zone_free(zone);
+	/* Release wrappers. */
+	if (matrixC_dev) cl4_buffer_destroy(matrixC_dev);
+	if (matrixB_dev) cl4_buffer_destroy(matrixB_dev);
+	if (matrixA_dev) cl4_buffer_destroy(matrixA_dev);
+	if (prg) cl4_program_destroy(prg);
+	if (cq) cl4_cqueue_destroy(cq);
+	if (ctx) cl4_context_destroy(ctx);
 
 	/* Free host resources */
 	if (matrixA_host) matmult_matrix_free(matrixA_host);
@@ -913,7 +688,7 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Create parsing context. */
 	context = g_option_context_new (" - " PROG_DESCRIPTION);
-	gef_if_error_create_goto(*err, CLEXP_ERROR,  context == NULL, 
+	gef_if_error_create_goto(*err, CL4_ERROR,  context == NULL, 
 		CLEXP_FAIL, error_handler, 
 		"Unable to create command line parsing context.");
 	
@@ -929,7 +704,7 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	if (!IS_AAT(kernel_id)) {
 		/* Check if number of rows in B is the same as the number of 
 		 * columns in A. */
-		gef_if_error_create_goto(*err, CLEXP_ERROR, 
+		gef_if_error_create_goto(*err, CL4_ERROR, 
 			(b_dim[1] != a_dim[0]), CLEXP_FAIL, error_handler, 
 			"Number of rows in B must the same as the number of columns in A.");
 	} else {
@@ -940,7 +715,7 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	}
 
 	/* Check if kernel ID is within 0 to 4. */
-	gef_if_error_create_goto(*err, CLEXP_ERROR, 
+	gef_if_error_create_goto(*err, CL4_ERROR, 
 		((kernel_id < 0) || (kernel_id > 4)), CLEXP_FAIL, error_handler, 
 		"Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 \
 		(for C=AA^T kernels).");
