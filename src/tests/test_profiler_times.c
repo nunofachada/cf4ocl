@@ -195,7 +195,7 @@ static void timesTest() {
 	/* ************* */
 	
 	const CL4ProfOverlap const* o;
-	cl4_prof_iter_overlap_init(prof, CL4_PROF_OVERLAP_SORT_DURATION, 
+	cl4_prof_iter_overlap_init(prof, CL4_PROF_OVERLAP_SORT_DURATION |
 		CL4_PROF_SORT_DESC);
 	while ((o = cl4_prof_iter_overlap_next(prof)) != NULL) {
 		if (cl4_test_prof_is_overlap("Event3", "Event4")) {
@@ -248,10 +248,8 @@ static void timesTest() {
 	//~ g_assert_cmpstr(file_contents, ==, expected_contents);
 	//~ g_free(file_contents);
 	//~ g_free(name_used);
-	//~ 
-	//~ /** @todo Change profcl so that it prints to a stream, then test  */
-	//~ //cl4_prof_print_summary(profile, CL4_PROF_AGG_SORT_TIME);
-
+	
+	cl4_prof_print_summary(prof);
 	
 	/* Free profile. */
 	cl4_prof_destroy(prof);

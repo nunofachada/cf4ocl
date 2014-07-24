@@ -42,6 +42,8 @@
  * @brief The profiler module provides classes and methods for
  * profiling wrapped OpenCL events and queues.
  * 
+ * @warning The functions in this module are not thread-safe.
+ * 
  * Todo: detailed description of module.
  * 
  * @{
@@ -122,17 +124,17 @@ typedef struct cl4_prof_info {
 typedef enum {
 
 	 /** Sort event profiling info instances by event name. */
-	CL4_PROF_INFO_SORT_NAME_EVENT = 0x00,
+	CL4_PROF_INFO_SORT_NAME_EVENT = 0x20,
 	 /** Sort event profiling info instances by queue name. */
-	CL4_PROF_INFO_SORT_NAME_QUEUE = 0x10,
+	CL4_PROF_INFO_SORT_NAME_QUEUE = 0x30,
 	 /** Sort event profiling info instances by queued time. */
-	CL4_PROF_INFO_SORT_T_QUEUED   = 0x20,
+	CL4_PROF_INFO_SORT_T_QUEUED   = 0x40,
 	 /** Sort event profiling info instances by submit time. */
-	CL4_PROF_INFO_SORT_T_SUBMIT   = 0x30,
+	CL4_PROF_INFO_SORT_T_SUBMIT   = 0x50,
 	 /** Sort event profiling info instances by start time. */
-	CL4_PROF_INFO_SORT_T_START    = 0x40,
+	CL4_PROF_INFO_SORT_T_START    = 0x60,
 	 /** Sort event profiling info instances by end time. */
-	CL4_PROF_INFO_SORT_T_END      = 0x50
+	CL4_PROF_INFO_SORT_T_END      = 0x70
 
 } CL4ProfInfoSort;
 
@@ -175,9 +177,9 @@ typedef struct cl4_prof_inst {
 typedef enum {
 	
 	/** Sort event instants by instant. */
-	CL4_PROF_INST_SORT_INSTANT = 0x00,
+	CL4_PROF_INST_SORT_INSTANT = 0x80,
 	/** Sort event instants by event id. */
-	CL4_PROF_INST_SORT_ID      = 0x10
+	CL4_PROF_INST_SORT_ID      = 0x90
 
 } CL4ProfInstSort;
 
@@ -201,9 +203,9 @@ typedef struct cl4_prof_overlap {
 typedef enum {
 	
 	/** Sort overlaps by event name. */
-	CL4_PROF_OVERLAP_SORT_NAME     = 0x00,
+	CL4_PROF_OVERLAP_SORT_NAME     = 0xa0,
 	/** Sort overlaps by overlap duration. */
-	CL4_PROF_OVERLAP_SORT_DURATION = 0x10
+	CL4_PROF_OVERLAP_SORT_DURATION = 0xb0
 
 } CL4ProfOverlapSort;
 
@@ -259,36 +261,42 @@ const CL4ProfAgg const* cl4_prof_get_agg(
 
 /** @brief Initialize an iterator for profiled aggregate event 
  * instances. */
-void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_criteria, 
-	CL4ProfSortOrder sort_order);
+void cl4_prof_iter_agg_init(CL4Prof* prof, int sort);
 
 /** @brief Return the next profiled aggregate event instance. */
 const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof);
 
 /** @brief Initialize an iterator for event profiling info instances. */
-void cl4_prof_iter_info_init(CL4Prof* prof, 
-	CL4ProfInfoSort sort_criteria, CL4ProfSortOrder sort_order);
+void cl4_prof_iter_info_init(CL4Prof* prof, int sort);
 
 /** @brief Return the next event profiling info instance. */
 const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof);
 
 /** @brief Initialize an iterator for event instant instances. */
-void cl4_prof_iter_inst_init(CL4Prof* prof, 
-	CL4ProfInstSort sort_criteria, CL4ProfSortOrder sort_order);
+void cl4_prof_iter_inst_init(CL4Prof* prof, int sort);
 
 /** @brief Return the next event instant instance. */
 const CL4ProfInst const* cl4_prof_inst_info_next(CL4Prof* prof);
 
 /** @brief Initialize an iterator for overlap instances. */
-void cl4_prof_iter_overlap_init(CL4Prof* prof, 
-	CL4ProfOverlapSort sort_criteria, CL4ProfSortOrder sort_order);
+void cl4_prof_iter_overlap_init(CL4Prof* prof, int sort);
 
 /** @brief Return the next overlap instance. */
 const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof);
 
-/** @brief Print profiling info. */
-void cl4_prof_print_summary(CL4Prof* prof, 
-	CL4ProfAggSort evAggSortType);
+/** @brief Print a summary of the profiling info. More specifically,
+ * this function prints a table of aggregate event statistics (sorted
+ * by absolute time), and a table of event overlaps (sorted by overlap
+ * duration). */ 
+void cl4_prof_print_summary(CL4Prof* prof);
+
+/** @brief Print a summary of the profiling info. More specifically,
+ * this function prints a table of aggregate event statistics and a 
+ * table of event overlaps. The stream where this information is written
+ * to, as well as the order of the printed information, can be specified
+ * in the function arguments. */ 
+void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream, 
+	int agg_sort, int ovlp_sort);
 
 /** @brief Export profiling info to a given stream. */
 cl_bool cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);

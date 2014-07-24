@@ -1102,20 +1102,16 @@ const CL4ProfAgg const* cl4_prof_get_agg(
  * instances. 
  * 
  * @param prof Profile object.
- * @param sort_criteria Sort criteria.
- * @param sort_order Sort order.
+ * @param sort Bitfield of ::CL4ProfAggSort OR ::CL4ProfSortOrder, for
+ * example `CL4_PROF_AGG_SORT_NAME | CL4_PROF_SORT_DESC`.
  * */
-void cl4_prof_iter_agg_init(CL4Prof* prof, CL4ProfAggSort sort_criteria, 
-	CL4ProfSortOrder sort_order) {
+void cl4_prof_iter_agg_init(CL4Prof* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
-	/* Define the sort. */
-	int sort = sort_criteria | sort_order;
-	
 	/* Sort list of aggregate statistics as requested by client. */
 	prof->aggs = g_list_sort_with_data(
 		prof->aggs, cl4_prof_agg_comp, &sort);
@@ -1159,20 +1155,16 @@ const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof) {
  * @brief Initialize an iterator for event profiling info instances. 
  * 
  * @param prof Profile object.
- * @param sort_criteria Sort criteria.
- * @param sort_order Sort order.
+ * @param sort Bitfield of ::CL4ProfInfoSort OR ::CL4ProfSortOrder, for
+ * example `CL4_PROF_INFO_SORT_T_START | CL4_PROF_SORT_ASC`.
  * */
-void cl4_prof_iter_info_init(CL4Prof* prof, 
-	CL4ProfInfoSort sort_criteria, CL4ProfSortOrder sort_order) {
+void cl4_prof_iter_info_init(CL4Prof* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
-	/* Define the sort. */
-	int sort = sort_criteria | sort_order;
-	
 	/* Sort list of event prof. infos as requested by client. */
 	prof->infos = g_list_sort_with_data(
 		prof->infos, cl4_prof_info_comp, &sort);
@@ -1215,19 +1207,15 @@ const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof) {
  * @brief Initialize an iterator for event instant instances. 
  * 
  * @param prof Profile object.
- * @param sort_criteria Sort criteria.
- * @param sort_order Sort order.
+ * @param sort Bitfield of ::CL4ProfInstSort OR ::CL4ProfSortOrder, for
+ * example `CL4_PROF_INST_SORT_INSTANT | CL4_PROF_SORT_ASC`.
  * */
-void cl4_prof_iter_inst_init(CL4Prof* prof, 
-	CL4ProfInstSort sort_criteria, CL4ProfSortOrder sort_order) {
+void cl4_prof_iter_inst_init(CL4Prof* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
-
-	/* Define the sort. */
-	int sort = sort_criteria | sort_order;
 	
 	/* Sort list of event instants as requested by client. */
 	prof->instants = g_list_sort_with_data(
@@ -1272,19 +1260,15 @@ const CL4ProfInst const* cl4_prof_iter_inst_next(CL4Prof* prof) {
  * @brief Initialize an iterator for overlap instances. 
  * 
  * @param prof Profile object.
- * @param sort_criteria Sort criteria.
- * @param sort_order Sort order.
+ * @param sort Bitfield of ::CL4ProfOverlapSort OR ::CL4ProfSortOrder, for
+ * example `CL4_PROF_OVERLAP_SORT_DURATION | CL4_PROF_SORT_DESC`.
  * */
-void cl4_prof_iter_overlap_init(CL4Prof* prof, 
-	CL4ProfOverlapSort sort_criteria, CL4ProfSortOrder sort_order) {
+void cl4_prof_iter_overlap_init(CL4Prof* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
-
-	/* Define the sort. */
-	int sort = sort_criteria | sort_order;
 	
 	/* Sort list of overlaps as requested by client. */
 	prof->overlaps = g_list_sort_with_data(
@@ -1324,115 +1308,117 @@ const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof) {
 	return (const CL4ProfOverlap const*) ovlp;
 }
 
-//~ /**
- //~ * @brief Print profiling info.
- //~ * 
- //~ * Client code can redirect the output using the g_set_print_handler()
- //~ * function from GLib.
- //~ * 
- //~ * @param prof Profile object.
- //~ * @param ev_aggSortType Sorting strategy for aggregate event data 
- //~ * instances.
- //~ * */ 
-//~ void cl4_prof_print_summary(CL4Prof* prof,
-	//~ CL4ProfAggSort ev_aggSortType) {
-	//~ 
-	//~ /* Make sure prof is not NULL. */
-	//~ g_return_if_fail(prof != NULL);
-//~ 
-	//~ /* List of aggregate events. */
-	//~ GList* ev_agg_list = NULL;
-	//~ /* List of aggregate events (traversing pointer). */
-	//~ GList* ev_agg_container = NULL;
-	//~ /* Aggregate event info. */
-	//~ CL4ProfAgg* ev_agg = NULL;
-	//~ /* Number of unique event names. */
-	//~ guint num_event_names;
-	//~ /* String containing description of overlapping events. */
-	//~ GString* overlap_string = NULL;
-	//~ 
-	//~ g_print("\n   =========================== Timming/Profiling ===========================\n\n");
-	//~ 
-	//~ /* Show total ellapsed time */
-	//~ if (prof->timer) {
-		//~ g_print(
-			//~ "     Total ellapsed time       : %fs\n", 
-			//~ g_timer_elapsed(prof->timer, NULL));
-	//~ }
-	//~ 
-	//~ /* Show total events time */
-	//~ if (prof->total_events_time > 0) {
-		//~ g_print(
-			//~ "     Total of all events       : %fs\n", 
-			//~ prof->total_events_time * 1e-9);
-	//~ }
-	//~ 
-	//~ /* Show aggregate event times */
-	//~ if (g_hash_table_size(prof->aggregate) > 0) {
-		//~ g_print("     Aggregate times by event  :\n");
-		//~ ev_agg_list = g_hash_table_get_values(prof->aggregate);
-		//~ ev_agg_list = g_list_sort_with_data(
-			//~ ev_agg_list, cl4_prof_agg_comp, &ev_aggSortType);
-		//~ ev_agg_container = ev_agg_list;
-		//~ g_print("       ------------------------------------------------------------------\n");
-		//~ g_print("       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
-		//~ g_print("       ------------------------------------------------------------------\n");
-		//~ while (ev_agg_container) {
-			//~ ev_agg = (CL4ProfAgg*) ev_agg_container->data;
-			//~ g_assert(ev_agg != NULL);
-			//~ g_print(
-				//~ "       | %-30.30s | %13.4f | %13.4e |\n", 
-				//~ ev_agg->event_name, 
-				//~ ev_agg->relative_time * 100.0, 
-				//~ ev_agg->absolute_time * 1e-9);
-			//~ ev_agg_container = ev_agg_container->next;
-		//~ }
-		//~ g_print("       ------------------------------------------------------------------\n");
-	//~ }
-	//~ 
-	//~ /* *** Show overlaps *** */
-//~ 
-	//~ /* Get number of event names. */
-	//~ num_event_names = g_hash_table_size(prof->event_names);
-	//~ /* Show overlaps. */
-	//~ overlap_string = g_string_new("");
-	//~ for (guint i = 0; i < num_event_names; i++) {
-		//~ for (guint j = 0; j < num_event_names; j++) {
-			//~ if (prof->overmat[i * num_event_names + j] > 0) {
-				//~ g_string_append_printf(
-					//~ overlap_string,
-					//~ "       | %-22.22s | %-22.22s | %12.4e |\n", 
-					//~ (const char*) g_hash_table_lookup(
-						//~ prof->event_name_ids, GUINT_TO_POINTER(i)),
-					//~ (const char*) g_hash_table_lookup(
-						//~ prof->event_name_ids, GUINT_TO_POINTER(j)),
-					//~ prof->overmat[i * num_event_names + j] * 1e-9
-				//~ );
-			//~ }
-		//~ }
-	//~ }
-	//~ if (strlen(overlap_string->str) > 0) {
-		//~ /* Show total events effective time (discount overlaps) */
-		//~ g_print("     Tot. of all events (eff.) : %es\n", 
-			//~ prof->total_events_eff_time * 1e-9);
-		//~ g_print("                                 %es saved with overlaps\n", 
-			//~ (prof->total_events_time - prof->total_events_eff_time) * 1e-9);
-		//~ /* Title the several overlaps. */
-		//~ g_print("     Event overlap times       :\n");
-		//~ g_print("       ------------------------------------------------------------------\n");
-		//~ g_print("       | Event 1                | Event2                 | Overlap (s)  |\n");
-		//~ g_print("       ------------------------------------------------------------------\n");
-		//~ /* Show overlaps table. */
-		//~ g_print("%s", overlap_string->str);
-		//~ g_print("       ------------------------------------------------------------------\n");
-	//~ }
-	//~ 
-	//~ /* Free stuff. */
-	//~ if (ev_agg_list) g_list_free(ev_agg_list);
-	//~ if (overlap_string) g_string_free(overlap_string, TRUE);
-//~ 
-//~ }
-//~ 
+/**
+ * @brief Print a summary of the profiling info. More specifically,
+ * this function prints a table of aggregate event statistics (sorted
+ * by absolute time), and a table of event overlaps (sorted by overlap
+ * duration).
+ * 
+ * For more control of where and how this summary is printed, use the
+ * cl4_prof_print_summary_full() function.
+ * 
+ * @param prof Profile object.
+ * */ 
+void cl4_prof_print_summary(CL4Prof* prof) {
+
+	/* Make sure prof is not NULL. */
+	g_return_if_fail(prof != NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_if_fail(prof->calc == TRUE);
+
+	/* Use the full version of this function with default parameters. */
+	cl4_prof_print_summary_full(prof, stdout, 
+		CL4_PROF_AGG_SORT_TIME | CL4_PROF_SORT_DESC,
+		CL4_PROF_OVERLAP_SORT_DURATION | CL4_PROF_SORT_DESC);
+	
+}
+
+/**
+ * @brief Print a summary of the profiling info. More specifically,
+ * this function prints a table of aggregate event statistics and a 
+ * table of event overlaps. The stream where this information is written
+ * to, as well as the order of the printed information, can be specified
+ * in the function arguments.
+ * 
+ * @param prof Profile object.
+ * @param stream Stream where to output summary.
+ * @param agg_sort Sorting performed on aggregate statistics (bitfield
+ * of ::CL4ProfAggSort OR ::CL4ProfSortOrder).
+ * @param ovlp_sort Sorting performed on event overlaps (bitfield of 
+ * ::CL4ProfOverlapSort OR ::CL4ProfSortOrder).
+ * */ 
+void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream, 
+	int agg_sort, int ovlp_sort) {
+	
+	/* Make sure prof is not NULL. */
+	g_return_if_fail(prof != NULL);
+	/* Make sure stream is not NULL. */
+	g_return_if_fail(stream != NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_if_fail(prof->calc == TRUE);
+
+	/* Current aggregate statistic to print. */
+	const CL4ProfAgg const* agg = NULL;
+	/* Current overlap to print. */
+	const CL4ProfOverlap const* ovlp = NULL;
+
+	g_fprintf(stream, "\n   =========================== Timming/Profiling ===========================\n\n");
+	
+	/* Show total ellapsed time */
+	if (prof->timer) {
+		g_fprintf(stream, 
+			"     Total ellapsed time       : %fs\n", 
+			g_timer_elapsed(prof->timer, NULL));
+	}
+	
+	/* Show total events time */
+	if (prof->total_events_time > 0) {
+		g_fprintf(stream, 
+			"     Total of all events       : %fs\n", 
+			prof->total_events_time * 1e-9);
+	}
+	
+	/* Show aggregate event times */
+	g_fprintf(stream, "     Aggregate times by event  :\n");
+	g_fprintf(stream, "       ------------------------------------------------------------------\n");
+	g_fprintf(stream, "       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
+	g_fprintf(stream, "       ------------------------------------------------------------------\n");
+	cl4_prof_iter_agg_init(prof, agg_sort);
+	while ((agg = cl4_prof_iter_agg_next(prof)) != NULL) {
+		g_fprintf(stream, 
+			"       | %-30.30s | %13.4f | %13.4e |\n", 
+			agg->event_name, 
+			agg->relative_time * 100.0, 
+			agg->absolute_time * 1e-9);
+	}
+	g_fprintf(stream, "       ------------------------------------------------------------------\n");
+	
+	/* *** Show overlaps *** */
+
+	if (g_list_length(prof->overlaps) > 0) {
+		/* Show total events effective time (discount overlaps) */
+		g_fprintf(stream, "     Tot. of all events (eff.) : %es\n", 
+			prof->total_events_eff_time * 1e-9);
+		g_fprintf(stream, "                                 %es saved with overlaps\n", 
+			(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
+		/* Title the several overlaps. */
+		g_fprintf(stream, "     Event overlap times       :\n");
+		g_fprintf(stream, "       ------------------------------------------------------------------\n");
+		g_fprintf(stream, "       | Event 1                | Event2                 | Overlap (s)  |\n");
+		g_fprintf(stream, "       ------------------------------------------------------------------\n");
+		/* Show overlaps table. */
+		cl4_prof_iter_overlap_init(prof, ovlp_sort);
+		while ((ovlp = cl4_prof_iter_overlap_next(prof)) != NULL) {
+			g_fprintf(stream, "       | %-22.22s | %-22.22s | %12.4e |\n",
+				ovlp->event1_name, ovlp->event2_name, ovlp->duration * 1e-9);
+		}
+		g_fprintf(stream, "       ------------------------------------------------------------------\n");
+	} else {
+		g_fprintf(stream, "     No overlapping events.\n");
+	}
+
+}
+
 //~ /** 
  //~ * @brief Export profiling info to a given stream.
  //~ * 
