@@ -54,25 +54,40 @@ static int dev_idx = -1;
 static int stride = STRIDE;
 
 /* Callback functions to parse gws and lws. */
-static gboolean bct_parse_gws(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
+static gboolean bct_parse_gws(const gchar *option_name, 
+	const gchar *value, gpointer data, GError **err) {
 	clexp_parse_pairs(value, gws, option_name, data, err);
 }
-static gboolean bct_parse_lws(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
+static gboolean bct_parse_lws(const gchar *option_name, 
+	const gchar *value, gpointer data, GError **err) {
 	clexp_parse_pairs(value, lws, option_name, data, err);
 }
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"compiler",   'c', 0, G_OPTION_ARG_STRING,   &compiler_opts, "Extra OpenCL compiler options",                                                             "OPTS"},
-	{"globalsize", 'g', 0, G_OPTION_ARG_CALLBACK, bct_parse_gws,  "Work size (default is " STR(GWS_X) "," STR(GWS_Y) ")",                                      "SIZE,SIZE"},
-	{"localsize",  'l', 0, G_OPTION_ARG_CALLBACK, bct_parse_lws,  "Local work size (default is " STR(LWS_X) "," STR(LWS_Y) ")",                                "SIZE,SIZE"},
-	{"stride",     's', 0, G_OPTION_ARG_INT,      &stride,        "Stride (default is " STR(STRIDE) ")",                                                       "STRIDE"},
-	{"device",     'd', 0, G_OPTION_ARG_INT,      &dev_idx,       "Device index (if not given and more than one device is available, chose device from menu)", "INDEX"},
+	{"compiler",   'c', 0, G_OPTION_ARG_STRING,   &compiler_opts,
+		"Extra OpenCL compiler options", 
+		"OPTS"},
+	{"globalsize", 'g', 0, G_OPTION_ARG_CALLBACK, bct_parse_gws,
+		"Work size (default is " \
+		G_STRINGIFY(GWS_X) "," G_STRINGIFY(GWS_Y) ")", 
+		"SIZE,SIZE"},
+	{"localsize",  'l', 0, G_OPTION_ARG_CALLBACK, bct_parse_lws,
+		"Local work size (default is " \
+		G_STRINGIFY(LWS_X) "," G_STRINGIFY(LWS_Y) ")", 
+		"SIZE,SIZE"},
+	{"stride",     's', 0, G_OPTION_ARG_INT,      &stride,
+		"Stride (default is " G_STRINGIFY(STRIDE) ")", 
+		"STRIDE"},
+	{"device",     'd', 0, G_OPTION_ARG_INT,      &dev_idx,
+		"Device index (if not given and more than one device is \
+		available, chose device from menu)", 
+		"INDEX"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
 /* Kernel file. */
-static char* kernelFiles[] = {"bank_conflicts.cl"};
+static char* kernel_files[] = {"bank_conflicts.cl"};
 
 /** 
  * @brief Bank conflicts example main function.
@@ -98,23 +113,23 @@ int main(int argc, char *argv[]) {
 	/* Error management. */
 	GError *err = NULL;
 	/* Profiling / Timmings. */
-	CL4Prof* profile = NULL;
-	/* Kernel. */
-	cl_kernel kernel_bankconf = NULL;
-	/* Events. */
-	cl_event events[2] = {NULL, NULL};
+	CL4Prof* prof = NULL;
+	/* Context wrapper. */
+	CL4Context* ctx = NULL;
+	/* Program wrapper. */
+	CL4Program* prg = NULL;
+	/* Command queue wrapper. */
+	CL4CQueue* cq = NULL;
 	/* Data in device. */
-	cl_mem data_device = NULL;
+	CL4Buffer* buf_data_dev = NULL;
 	/* Full kernel path. */
-	gchar* kernelPath = NULL;
+	gchar* kernel_path = NULL;
 	/* Data in host. */
 	cl_int *data_host = NULL;
-	/* OpenCL zone. */
-	CL4ManZone* zone = NULL;
 	/* Size of data to be transfered to device. */
-	size_t sizeDataInBytes;
+	size_t size_data_in_bytes;
 	/* Size of local memory required. */
-	size_t localMemSizeInBytes;
+	size_t local_mem_size_in_bytes;
 	/* Command line options context. */
 	GOptionContext* opt_ctx = NULL;
 	/* Random number generator. */
@@ -132,12 +147,9 @@ int main(int argc, char *argv[]) {
 	g_option_context_parse(opt_ctx, &argc, &argv, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	/* Check if global worksize is multiple of local worksize. */
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
+	gef_if_error_create_goto(err, CL4_ERROR, 
 		(gws[0] % lws[0] != 0) || (gws[1] % lws[1] != 0), 
-		CLEXP_FAIL, 
-		error_handler, 
+		CLEXP_FAIL, error_handler, 
 		"Global worksize is not multiple of local worksize.");
 	
 	/* ******************************************************* */
@@ -148,205 +160,77 @@ int main(int argc, char *argv[]) {
 	rng = g_rand_new_with_seed(0);
 		
 	/* Initialize profiling object. */
-	profile = cl4_prof_new();
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		profile == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create profiler object.");
-	
-	/* Get the required CL zone. */
-	zone = cl4_man_zone_new(
-		CL_DEVICE_TYPE_GPU, 
-		1, 
-		CL_QUEUE_PROFILING_ENABLE, 
-		cl4_man_menu_device_selector, 
-		(dev_idx != -1 ? &dev_idx : NULL), 
-		&err);
+	prof = cl4_prof_new();
+
+	/* Create a GPU context. */
+	ctx = cl4_context_new_gpu(&err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	/* Get location of kernel file, which should be in the same location 
-	 * has the bank_conflicts executable. */
-	kernelPath = clexp_kernelpath_get(kernelFiles[0], argv[0]);
+	/* Get location of kernel file, which should be in the same 
+	 * of the bank_conflicts executable. */
+	kernel_path = clexp_kernelpath_get(kernel_files[0], argv[0]);
+	
+	/* Create program. */
+	prg = cl4_program_new_from_source_file(ctx, kernel_files[0], &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Build program. */
-	status = cl4_man_program_create(zone, &kernelPath, 1, compiler_opts, &err);
+	status = cl4_program_build(prg, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	/* Kernel */
-	kernel_bankconf = clCreateKernel(zone->program, "bankconf", &status);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		CL_SUCCESS != status, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create bankconf kernel (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
-
+	/* Create a command queue. */
+	cq = cl4_cqueue_new(ctx, NULL, CL_QUEUE_PROFILING_ENABLE, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	
 	/* Start basic timming / profiling. */
-	cl4_prof_start(profile);
+	cl4_prof_start(prof);
 
-	/* ********************************** */	
-	/* Create and initialize host buffers */
-	/* ********************************** */	
+	/* Allocate data in host */
+	size_data_in_bytes = gws[0] * gws[1] * sizeof(cl_int);
+	data_host = (cl_int*) g_malloc(size_data_in_bytes);
 	
-	/* Data in host */
-	sizeDataInBytes = gws[0] * gws[1] * sizeof(cl_int);
-	data_host = (cl_int*) malloc(sizeDataInBytes);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		data_host == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to allocate memory for host data.");
-	for (unsigned int i = 0; i < gws[0] * gws[1]; i++)
-			data_host[i] = g_rand_int_range(rng, 0, 25);
-
-	/* ********************* */
-	/* Create device buffers */
-	/* ********************* */
-
-	/* Data in device */
-	data_device = clCreateBuffer(
-		zone->context, CL_MEM_READ_WRITE, sizeDataInBytes, NULL, &status);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create device buffer (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
+	/* Allocate data in device */
+	buf_data_dev = cl4_buffer_new(ctx, CL_MEM_READ_WRITE, 
+		size_data_in_bytes, NULL, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
-	/* ************************* */
-	/* Initialize device buffers */
-	/* ************************* */
-	
-	status = clEnqueueWriteBuffer(
-		zone->queues[0], 
-		data_device, 
-		CL_TRUE, 
-		0, 
-		sizeDataInBytes, 
-		data_host, 
-		0, 
-		NULL, 
-		&(events[0]));
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to write data to device (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
+	/* Copy data from host to device. */
+	cl4_buffer_write(cq, buf_data_dev, CL_TRUE, 0, size_data_in_bytes,
+		data_host, NULL, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ************************************************** */
 	/* Determine and print required memory and work sizes */
 	/* ************************************************** */
 
-	localMemSizeInBytes = lws[1] * lws[0] * sizeof(cl_int);
-	clexp_reqs_print(gws, lws, sizeDataInBytes, localMemSizeInBytes);
+	local_mem_size_in_bytes = lws[1] * lws[0] * sizeof(cl_int);
+	clexp_reqs_print(gws, lws, size_data_in_bytes, local_mem_size_in_bytes);
 
-	/* *************************** */
-	/*  Set fixed kernel arguments */
-	/* *************************** */
-
-	status = clSetKernelArg(
-		kernel_bankconf, 0, sizeof(cl_mem), (void *) &data_device);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable set arg. 0 of bankconf kernel (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
-
-	status = clSetKernelArg(
-		kernel_bankconf, 1, localMemSizeInBytes, NULL);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable set arg. 1 of bankconf kernel (OpenCL error %d: %s).",
-		status,
-		cl4_err(status));
+	/* ************************************ */
+	/*  Set kernel arguments and run kernel */
+	/* ************************************ */
 	
-	status = clSetKernelArg(
-		kernel_bankconf, 2, sizeof(cl_uint), (void *) &stride);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable set arg. 2 of bankconf kernel (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
-
-	/* ************ */
-	/*  Run kernel! */
-	/* ************ */
+	cl4_program_run(prg, "bankconf", cq, 2, NULL, gws, lws, NULL, &err,
+		buf_data_dev, cl4_arg_local(lws[1] * lws[0], cl_int),
+		cl4_arg_private(stride, cl_uint), NULL);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
-	status = clEnqueueNDRangeKernel(
-		zone->queues[0], 
-		kernel_bankconf, 
-		2, 
-		NULL, 
-		gws, 
-		lws, 
-		1, 
-		events, 
-		&(events[1]));
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to execute bankconf kernel (OpenCL error %d: %s).", 
-		status,
-		cl4_err(status));
-
-	status = clFinish(zone->queues[0]);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"OpenCL error %d (%s) in clFinish", 
-		status,
-		cl4_err(status));
+	/* Wait... */
+	cl4_cqueue_finish(cq, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ******************** */
 	/*  Show profiling info */
 	/* ******************** */
 	
-	cl4_prof_stop(profile); 
+	cl4_prof_stop(prof); 
 
-	cl4_prof_add(profile, "Transfer matrix A to device", events[0], &err);
+	cl4_prof_add_queue(prof, "Q1", cq);
+	
+	cl4_prof_calc(prof, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_add(profile, "Kernel execution (bankconf)", events[1], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-
-	cl4_prof_aggregate(profile, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-
-	cl4_prof_print_summary(profile, CL4_PROF_AGG_SORT_TIME, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	cl4_prof_print_summary(prof);
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
 	g_assert (err == NULL);
@@ -360,12 +244,8 @@ int main(int argc, char *argv[]) {
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err != NULL);
-	fprintf(
-		stderr, 
-		"Error %d from domain '%s' with message: \"%s\"\n", 
-		err->code, 
-		g_quark_to_string(err->domain), 
-		err->message);
+	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", 
+		err->code, g_quark_to_string(err->domain), err->message);
 	g_error_free(err);
 	status = CLEXP_FAIL;
 
@@ -383,26 +263,19 @@ cleanup:
 	if (rng != NULL) g_rand_free(rng);
 	
 	/* Free profile */
-	if (profile) cl4_prof_destroy(profile);
+	if (prof) cl4_prof_destroy(prof);
 	
-	/* Release events */
-	if (events[0]) clReleaseEvent(events[0]);
-	if (events[1]) clReleaseEvent(events[1]);
+	/* Free wrappers. */
+	if (buf_data_dev) cl4_buffer_destroy(buf_data_dev);
+	if (cq) cl4_cqueue_destroy(cq);
+	if (prg) cl4_program_destroy(prg);
+	if (ctx) cl4_context_destroy(ctx);
 	
-	/* Release OpenCL kernels */
-	if (kernel_bankconf) clReleaseKernel(kernel_bankconf);
-	
-	/* Release OpenCL memory objects */
-	if (data_device) clReleaseMemObject(data_device);
-
-	/* Free OpenCL zone */
-	if (zone) cl4_man_zone_free(zone);
-
 	/* Free host resources */
-	if (data_host) free(data_host);
+	if (data_host) g_free(data_host);
 
 	/* Free kernel path. */
-	if (kernelPath) g_free(kernelPath);
+	if (kernel_path) g_free(kernel_path);
 	
 	/* Return status. */
 	return status;

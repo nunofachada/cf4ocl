@@ -34,11 +34,10 @@
 #include "profiler.h"
 #include "gerrorf.h"
 #include "errors.h"
-
-/** Helper macro to convert int to string at compile time. */
-#define STR_HELPER(x) #x
-/** Macro to convert int to string at compile time. */
-#define STR(x) STR_HELPER(x)
+#include "program.h"
+#include "kernel.h"
+#include "context.h"
+#include "buffer.h"
 
 /**
  * @brief Parse a pair of positive integers from a string separated by a comma.
