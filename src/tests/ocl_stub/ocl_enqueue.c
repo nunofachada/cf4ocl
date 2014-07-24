@@ -25,6 +25,7 @@
  * */
  
 #include "ocl_env.h"
+#include "utils.h"
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
@@ -121,7 +122,7 @@ clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_BUFFER);
-	errcode_ret = errcode_ret;
+	seterrcode(errcode_ret, CL_SUCCESS);
 	return NULL;		
 
 }
