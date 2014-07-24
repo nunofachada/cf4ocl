@@ -36,8 +36,9 @@
  * @param dimsA Dimensions of matrix A.
  * @param dimsB Dimensions of matrix B.
  */
-__kernel void matmult0(__global int * A, __global int * B, __global int * C, __private int2 dimsA, __private int2 dimsB)
-{
+__kernel void matmult0(__global int * A, __global int * B, 
+	__global int * C, __private int2 dimsA, __private int2 dimsB) {
+		
 	/* Matrix position for this work-item */
 	uint col = get_global_id(0);
 	uint row = get_global_id(1); 
@@ -109,7 +110,8 @@ __kernel void matmult1(__global int * A, __global int * B, __global int * C, __p
  * @param dimsA Dimensions of matrix A.
  * @param dimsB Dimensions of matrix B.
  * @param tileOfA Local memory used to improve matrix multiplication.
- * @param tileOfB Additional local memory used to improve matrix multiplication.
+ * @param tileOfB Additional local memory used to improve matrix 
+ * multiplication.
  */
 __kernel void matmult2(__global int * A, __global int * B, __global int * C, __private int2 dimsA, __private int2 dimsB, __local int * tileOfA, __local int * tileOfB)
 {
@@ -194,7 +196,8 @@ __kernel void matmult3(__global int * A, __global int * C, __private int2 dimsA)
  * @param C Result matrix.
  * @param dimsA Dimensions of matrix A.
  * @param tileOfA Local memory used to improve matrix multiplication.
- * @param tileOfAT Additional local memory used to improve matrix multiplication.
+ * @param tileOfAT Additional local memory used to improve matrix 
+ * multiplication.
  */
 __kernel void matmult4(__global int * A, __global int * C, __private int2 dimsA, __local int * tileOfA, __local int * tileOfAT)
 {

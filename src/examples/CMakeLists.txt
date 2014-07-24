@@ -1,8 +1,9 @@
 # List of examples
-SET(EXAMPLES bank_conflicts)
+SET(EXAMPLES matmult bank_conflicts)
 
 # Common libraries for examples
-set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} examples_common)
+set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} 
+	examples_common)
 set(matmult_EXTRALIBS m)
 
 # Use OpenMP in matmult example?
@@ -31,9 +32,9 @@ endforeach(EXAMPLE)
 set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
 
 # Set specific matmult properties
-#if (OPENMP_FOUND)
-#	set_target_properties(matmult PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DCF4OCL_USE_OPENMP" LINK_FLAGS ${OpenMP_C_FLAGS})
-#endif()
+if (OPENMP_FOUND)
+	set_target_properties(matmult PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DCF4OCL_USE_OPENMP" LINK_FLAGS ${OpenMP_C_FLAGS})
+endif()
 
 # Add a target which builds all examples
 add_custom_target(examples DEPENDS ${EXAMPLES})
