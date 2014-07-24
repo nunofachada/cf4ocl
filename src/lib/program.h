@@ -125,10 +125,18 @@ cl_bool cl4_program_build_from_cldevices_full(CL4Program* prg,
 
 CL4Kernel* cl4_program_get_kernel(
 	CL4Program* prg, const char* kernel_name, GError** err);
+	
+CL4Event* cl4_program_run(CL4Program* prg, const char* kernel_name,
+	CL4CQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, ...)
+	G_GNUC_NULL_TERMINATED;
 
-CL4Event* cl4_program_run(CL4Program* prg, CL4CQueue* queue, 
-	const char* kernel_name, size_t gws, size_t lws, ...);
-
+CL4Event* cl4_program_run_v(CL4Program* prg, const char* kernel_name,
+	CL4CQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, va_list args);
+	
 CL4ProgramBinary* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
 	GError** err);
 

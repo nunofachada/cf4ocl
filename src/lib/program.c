@@ -538,6 +538,9 @@ CL4Kernel* cl4_program_get_kernel(
 	/* Make sure kernel_name is not NULL. */
 	g_return_val_if_fail(kernel_name != NULL, NULL);
 
+	/* Internal error reporting object. */
+	GError* err_internal = NULL;
+	
 	/* Kernel wrapper object. */
 	CL4Kernel* krnl = NULL;
 
@@ -560,21 +563,8 @@ CL4Kernel* cl4_program_get_kernel(
 	} else {
 		
 		/* Otherwise, get it from OpenCL program object.*/
-		cl_int ocl_status;
-		
-		/* The OpenCL kernel object to get. */
-		cl_kernel kernel = NULL;
-		
-		/* Get kernel. */
-		kernel = clCreateKernel(
-			cl4_program_unwrap(prg), kernel_name, &ocl_status);
-		gef_if_error_create_goto(*err, CL4_ERROR,
-			CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
-			"%s: unable to create kernel (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, cl4_err(ocl_status));
-		
-		/* Create kernel wrapper. */
-		krnl = cl4_kernel_new_wrap(kernel);
+		krnl = cl4_kernel_new(prg, kernel_name, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);	
 		
 		/* Keep new kernel wrapper in table. */
 		g_hash_table_insert(prg->krnls, (gpointer) kernel_name, krnl);
@@ -595,6 +585,42 @@ finish:
 	/* Return kernel wrapper. */
 	return krnl;
 		
+}
+
+CL4Event* cl4_program_run(CL4Program* prg, const char* kernel_name,
+	CL4CQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, ...) {
+
+	CL4Event* evt;
+	va_list args;
+	va_start(args, err);
+	evt = cl4_program_run_v(prg, kernel_name, cq, work_dim, 
+		global_work_offset, global_work_size, local_work_size, 
+		evt_wait_lst, err, args);
+	va_end(args);
+	return evt;
+
+}
+
+CL4Event* cl4_program_run_v(CL4Program* prg, const char* kernel_name,
+	CL4CQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, va_list args) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+
+	CL4Event* evt;
+	CL4Kernel* krnl;
+	
+	krnl = cl4_program_get_kernel(prg, kernel_name, err);
+	if (krnl == NULL) return NULL;
+	
+	evt = cl4_kernel_set_args_and_run_v(krnl, cq, work_dim, 
+		global_work_offset, global_work_size, local_work_size, 
+		evt_wait_lst, err, args);
+	return evt;
 }
 
 static void cl4_program_load_binaries(CL4Program* prg, GError** err) {

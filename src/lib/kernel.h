@@ -35,6 +35,9 @@
 #include "event.h"
 #include "cqueue.h"
 
+/* Forward declaration of CL4Program. */
+typedef struct cl4_program CL4Program;
+
 /** @brief Kernel wrapper object. */
 typedef struct cl4_kernel CL4Kernel;
 
@@ -44,6 +47,9 @@ CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel);
 /** @brief Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed. */
 void cl4_kernel_destroy(CL4Kernel* krnl);
+
+CL4Kernel* cl4_kernel_new(
+	CL4Program* prg, const char* kernel_name, GError** err);
 
 void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
 	CL4Arg* arg);
@@ -56,12 +62,18 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err);
-	
+
+/** @brief Set kernel arguments and run it. */
 CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq, 
-	cl_uint work_dim, size_t* global_work_offset, 
-	size_t* global_work_size, size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, ...) 
+	cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
+
+CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4CQueue* cq, 
+	cl_uint work_dim, const size_t* global_work_offset, 
+	const size_t* global_work_size, const size_t* local_work_size, 
+	CL4EventWaitList evt_wait_lst, GError** err, va_list args);
 
 /**
  * @brief Get kernel information object.
