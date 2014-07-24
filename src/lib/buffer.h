@@ -36,6 +36,8 @@ typedef CL4MemObj CL4Buffer;
 /** @brief Create a ::CL4Buffer wrapper object. */
 CL4Buffer* cl4_buffer_new(CL4Context* ctx, cl_mem_flags flags,
 	size_t size, void *host_ptr, GError** err);
+	
+#define cl4_buffer_destroy(buf) cl4_memobj_destroy((CL4MemObj*) buf)
 
 CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,

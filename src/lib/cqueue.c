@@ -148,8 +148,6 @@ CL4CQueue* cl4_cqueue_new(CL4Context* ctx, CL4Device* dev,
 		
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
-	/* Make sure dev is not NULL. */
-	g_return_val_if_fail(dev != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
@@ -158,6 +156,12 @@ CL4CQueue* cl4_cqueue_new(CL4Context* ctx, CL4Device* dev,
 	
 	/* Internal error object. */
 	GError* err_internal = NULL;
+	
+	/* If dev is NULL, get first device in context. */
+	if (dev == NULL) {
+		dev = cl4_context_get_device(ctx, 0, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+	}
 	
 	/* Create the command queue. */
 	cq = cl4_cqueue_new_direct(cl4_context_unwrap(ctx), 
