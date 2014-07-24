@@ -173,7 +173,7 @@ typedef void (CL_CALLBACK* cl4_context_callback)(
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define cl4_context_new_any(err) \
-	cl4_context_new_from_indep_filter(NULL, NULL, err)	
+	cl4_context_new_from_indep_filter(NULL, NULL, err)
 
 /** @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. */
@@ -209,6 +209,13 @@ CL4Context* cl4_context_new_from_cldevices_full(
  * specified in the function parameters. */
 CL4Context* cl4_context_new_from_indep_filter(
 	cl4_devsel_indep filter, void* data, GError** err);
+	
+/** @brief Creates a context wrapper using a device which the user 
+ * selects from a menu. */
+CL4Context* cl4_context_new_from_menu_full(void* data, GError** err);
+
+#define cl4_context_new_from_menu(err) \
+	cl4_context_new_from_menu_full(NULL, err)
 
 /** @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed. */

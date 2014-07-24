@@ -446,6 +446,53 @@ finish:
 }
 
 /** 
+ * @brief Creates a context wrapper using a device which the user 
+ * selects from a menu.
+ * 
+ * @param data If not NULL, can point to a device index, such that the
+ * device is automatically selected.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return A new context wrapper object or NULL if an error occurs.
+ * */
+CL4Context* cl4_context_new_from_menu_full(void* data, GError** err) {
+		
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+	
+	/* Context wrapper to create. */
+	CL4Context* ctx;
+	
+	/* Set of device selection filters. */
+	CL4DevSelFilters filters = NULL;
+
+	/* Add menu dependent filter. */
+	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_menu, data);
+	
+	/* Create a context with selected device. */
+	ctx = cl4_context_new_from_filters(&filters, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:	
+
+	/* Return new context wrapper. */
+	return ctx;
+		
+}
+
+/** 
  * @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed.
  *
