@@ -6,12 +6,16 @@ set(TESTS test_gerrorf test_cad_profiler test_cad_platforms
 add_subdirectory(ocl_stub)
 
 # CF4OCL library for tests
-add_library(${PROJECT_NAME}_TESTING ../lib/platforms.c ../lib/platform.c 
-	../lib/device.c ../lib/errors.c ../lib/common.c ../lib/devquery.c 
-	../lib/devsel.c ../lib/context.c ../lib/wrapper.c ../lib/profiler.c 
-	../lib/cqueue.c ../lib/event.c ../lib/kernel.c ../lib/program.c
-	../lib/abstract_dev_container_wrapper.c ../lib/arg.c ../lib/memobj.c
-	../lib/buffer.c ../lib/image.c)
+add_library(${PROJECT_NAME}_TESTING ../lib/errors.c ../lib/profiler.c 
+	../lib/types.c ../lib/common.c ../lib/platforms.c
+	../lib/kernel_arg.c ../lib/device_query.c ../lib/device_selector.c
+	../lib/platform_wrapper.c ../lib/device_wrapper.c 
+	../lib/context_wrapper.c ../lib/kernel_wrapper.c 
+	../lib/program_wrapper.c ../lib/queue_wrapper.c 
+	../lib/event_wrapper.c
+	../lib/abstract_wrapper.c ../lib/abstract_dev_container_wrapper.c 
+	../lib/memobj_wrapper.c ../lib/buffer_wrapper.c 
+	../lib/image_wrapper.c)
 
 target_link_libraries(${PROJECT_NAME}_TESTING 
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)

@@ -28,9 +28,9 @@
 #define CL4_DEVICE_QUERY_H
 
 #include "platforms.h"
-#include "platform.h"
-#include "device.h"
-#include "devquery.h"
+#include "platform_wrapper.h"
+#include "device_wrapper.h"
+#include "device_query.h"
 #include "common.h"
 
 #ifndef CL4_DEVICE_QUERY_OUT

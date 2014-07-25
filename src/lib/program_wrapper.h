@@ -30,11 +30,11 @@
 
 #include <glib.h>
 #include "oclversions.h"
-#include "context.h"
-#include "wrapper.h"
-#include "event.h"
-#include "cqueue.h"
-#include "kernel.h"
+#include "context_wrapper.h"
+#include "abstract_wrapper.h"
+#include "event_wrapper.h"
+#include "queue_wrapper.h"
+#include "kernel_wrapper.h"
 
 /**
  * @defgroup PROGRAM The program wrapper module.

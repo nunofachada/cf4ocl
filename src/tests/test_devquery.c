@@ -25,9 +25,9 @@
  * */
 
 #include "platforms.h"
-#include "platform.h"
-#include "device.h"
-#include "devquery.h"
+#include "platform_wrapper.h"
+#include "device_wrapper.h"
+#include "device_query.h"
 #include "common.h"
 
 #define CL4_TEST_DEVQUERY_MAXINFOLEN 500

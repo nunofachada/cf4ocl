@@ -25,11 +25,11 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "buffer.h"
-#include "program.h"
-#include "context.h"
-#include "device.h"
-#include "kernel.h"
+#include "buffer_wrapper.h"
+#include "program_wrapper.h"
+#include "context_wrapper.h"
+#include "device_wrapper.h"
+#include "kernel_wrapper.h"
 #include "profiler.h"
 #include "ocl_stub/ocl_impl.h"
 

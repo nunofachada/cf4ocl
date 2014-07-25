@@ -26,32 +26,15 @@
  * */
 
 #include "platforms.h"
-#include "platform.h"
-#include "device.h"
-#include "devquery.h"
-#include "context.h"
+#include "platform_wrapper.h"
+#include "device_wrapper.h"
+#include "device_query.h"
+#include "context_wrapper.h"
 #include "common.h"
-#include "program.h"
-#include "memobj.h"
-#include "buffer.h"
+#include "program_wrapper.h"
+#include "memobj_wrapper.h"
+#include "buffer_wrapper.h"
 #include <glib/gstdio.h>
-
-/* Max. length of information string. */
-#define CL4_TEST_WRAPPERS_MAXINFOSTR 200
-
-/* Test utility macro. Presents either the required information, or 
- * the error message, if it occurred. Also frees the error object if 
- * an error occurred. */
-#define cl4_test_wrappers_msg(base_msg, format, ...) \
-	if (err == NULL) { \
-		g_snprintf(info_str, CL4_TEST_WRAPPERS_MAXINFOSTR, \
-			format, ##__VA_ARGS__); \
-	} else { \
-		g_snprintf(info_str, CL4_TEST_WRAPPERS_MAXINFOSTR, \
-			"%s", err->message); \
-		g_clear_error(&err); \
-	} \
-	g_debug("%s %s", base_msg, info_str);
 
 /*
  * Independent pass-all filter for testing.

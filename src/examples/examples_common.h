@@ -34,10 +34,10 @@
 #include "profiler.h"
 #include "gerrorf.h"
 #include "errors.h"
-#include "program.h"
-#include "kernel.h"
-#include "context.h"
-#include "buffer.h"
+#include "program_wrapper.h"
+#include "kernel_wrapper.h"
+#include "context_wrapper.h"
+#include "buffer_wrapper.h"
 
 /**
  * @brief Parse a pair of positive integers from a string separated by a comma.

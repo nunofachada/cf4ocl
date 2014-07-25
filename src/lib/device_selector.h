@@ -30,7 +30,7 @@
 
 #include <glib.h>
 #include "oclversions.h"
-#include "device.h"
+#include "device_wrapper.h"
 #include "platforms.h"
 
 /** @brief A set of device wrappers, used between filtering steps. */

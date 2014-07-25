@@ -24,6 +24,34 @@
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
+ 
+#ifndef CL4_IMAGE_H
+#define CL4_IMAGE_H 
 
-#include "image.h"
+#include "memobj_wrapper.h"
+
+/** @brief Image wrapper object. */
+typedef CL4MemObj CL4Image;
+
+/// @todo
+
+#ifdef CL_VERSION_1_1
+
+/// @todo
+
+#endif
+
+#ifdef CL_VERSION_1_2
+
+/// @todo
+
+#endif
+
+/// @todo We can emulate the OpenCL>1.0 functions if not available in
+/// OpenCL
+
+#endif
+
+
+
 

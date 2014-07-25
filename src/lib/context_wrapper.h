@@ -29,12 +29,12 @@
 #define CL4_CONTEXT_H
 
 #include "oclversions.h"
-#include "devsel.h"
+#include "device_selector.h"
 #include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
-#include "device.h"
-#include "platform.h"
+#include "device_wrapper.h"
+#include "platform_wrapper.h"
 #include "abstract_dev_container_wrapper.h"
 
 /**

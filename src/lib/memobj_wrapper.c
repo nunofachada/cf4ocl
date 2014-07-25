@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  * */
  
- #include "memobj.h"
+ #include "memobj_wrapper.h"
  
  /** 
  * @file

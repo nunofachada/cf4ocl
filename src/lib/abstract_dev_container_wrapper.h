@@ -41,8 +41,8 @@
 #include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
-#include "device.h"
-#include "wrapper.h"
+#include "device_wrapper.h"
+#include "abstract_wrapper.h"
 
 typedef struct cl4_dev_container {
 

@@ -24,7 +24,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
-#include "device_query.h"
+#include "devinfo.h"
 
 /* Command line arguments and respective default values. */
 static gboolean opt_all = FALSE;

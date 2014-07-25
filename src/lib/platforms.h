@@ -30,7 +30,7 @@
 #define CL4_PLATFORMS_H
 
 #include "common.h"
-#include "platform.h"
+#include "platform_wrapper.h"
 #include "gerrorf.h"
 #include "errors.h"
 

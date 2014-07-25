@@ -30,10 +30,10 @@
 
 #include <glib.h>
 #include "oclversions.h"
-#include "wrapper.h"
-#include "arg.h"
-#include "event.h"
-#include "cqueue.h"
+#include "abstract_wrapper.h"
+#include "kernel_arg.h"
+#include "event_wrapper.h"
+#include "queue_wrapper.h"
 
 /* Forward declaration of CL4Program. */
 typedef struct cl4_program CL4Program;

@@ -30,7 +30,7 @@
 
 #include <glib.h>
 #include "oclversions.h"
-#include "wrapper.h"
+#include "abstract_wrapper.h"
 
 /** @brief Event wrapper object. */
 typedef struct cl4_event CL4Event;

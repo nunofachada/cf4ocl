@@ -18,33 +18,12 @@
  
  /** 
  * @file
- * @brief Kernel argument wrapper.
+ * @brief OpenCL image wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_ARG_H
-#define CL4_ARG_H 
+#include "image_wrapper.h"
 
-#include "common.h"
-#include "wrapper.h"
-
-typedef CL4Wrapper CL4Arg;
-
-#define cl4_arg_private(value, type) \
-	cl4_arg_new(&value, sizeof(type))
-
-#define cl4_arg_local(count, type) \
-	cl4_arg_new(NULL, count * sizeof(type))
-	
-CL4Arg* cl4_arg_new(void* value, size_t size);
-
-void cl4_arg_destroy(CL4Arg* arg);
-
-size_t cl4_arg_size(CL4Arg* arg);
-
-void* cl4_arg_value(CL4Arg* arg);
-
-#endif

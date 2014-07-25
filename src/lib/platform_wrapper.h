@@ -30,7 +30,7 @@
 #define CL4_PLATFORM_H
 
 #include "common.h"
-#include "device.h"
+#include "device_wrapper.h"
 #include "gerrorf.h"
 #include "errors.h"
 #include "abstract_dev_container_wrapper.h"

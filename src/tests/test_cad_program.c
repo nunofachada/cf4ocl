@@ -26,40 +26,22 @@
  * */
 
 #include "platforms.h"
-#include "platform.h"
-#include "device.h"
-#include "devquery.h"
-#include "context.h"
+#include "platform_wrapper.h"
+#include "device_wrapper.h"
+#include "device_query.h"
+#include "context_wrapper.h"
 #include "common.h"
-#include "program.h"
-#include "memobj.h"
-#include "buffer.h"
+#include "program_wrapper.h"
+#include "memobj_wrapper.h"
+#include "buffer_wrapper.h"
 #include <glib/gstdio.h>
 
-/* Max. length of information string. */
-#define CL4_TEST_WRAPPERS_MAXINFOSTR 200
+#define CL4_TEST_PROGRAM_SUM "sum"
 
-/* Test utility macro. Presents either the required information, or 
- * the error message, if it occurred. Also frees the error object if 
- * an error occurred. */
-#define cl4_test_wrappers_msg(base_msg, format, ...) \
-	if (err == NULL) { \
-		g_snprintf(info_str, CL4_TEST_WRAPPERS_MAXINFOSTR, \
-			format, ##__VA_ARGS__); \
-	} else { \
-		g_snprintf(info_str, CL4_TEST_WRAPPERS_MAXINFOSTR, \
-			"%s", err->message); \
-		g_clear_error(&err); \
-	} \
-	g_debug("%s %s", base_msg, info_str);
+#define CL4_TEST_PROGRAM_SUM_NAME CL4_TEST_PROGRAM_SUM ".cl"
 
-
-#define CL4_TEST_WRAPPERS_PROGRAM_SUM "sum"
-
-#define CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME CL4_TEST_WRAPPERS_PROGRAM_SUM ".cl"
-
-#define CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT \
-	"__kernel void " CL4_TEST_WRAPPERS_PROGRAM_SUM "(" \
+#define CL4_TEST_PROGRAM_SUM_CONTENT \
+	"__kernel void " CL4_TEST_PROGRAM_SUM "(" \
 	"		__global const uint *a," \
 	"		__global const uint *b," \
 	"		__global uint *c, uint d)" \
@@ -83,8 +65,8 @@ static void program_create_info_destroy_test() {
 	GError* err = NULL;
 	
 	/* Create a temporary kernel file. */
-	g_file_set_contents(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, 
-		CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT, -1, &err);
+	g_file_set_contents(CL4_TEST_PROGRAM_SUM_NAME, 
+		CL4_TEST_PROGRAM_SUM_CONTENT, -1, &err);
 	g_assert_no_error(err);
 
 	/* Create a context with first available device. */
@@ -97,7 +79,7 @@ static void program_create_info_destroy_test() {
 
 	/* Create a new program from kernel file. */
 	prg = cl4_program_new_from_source_file(
-		ctx, CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME, &err);
+		ctx, CL4_TEST_PROGRAM_SUM_NAME, &err);
 	g_assert_no_error(err);
 	
 	/* Get some program info, compare it with expected info. */
@@ -114,7 +96,7 @@ static void program_create_info_destroy_test() {
 	info = cl4_program_info(prg, CL_PROGRAM_SOURCE, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr((char*) info->value, 
-		==, CL4_TEST_WRAPPERS_PROGRAM_SUM_CONTENT);
+		==, CL4_TEST_PROGRAM_SUM_CONTENT);
 	
 	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
@@ -135,14 +117,14 @@ static void program_create_info_destroy_test() {
 
 	/* Get kernel wrapper object. */
 	krnl = cl4_program_get_kernel(
-		prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
+		prg, CL4_TEST_PROGRAM_SUM, &err);
 	g_assert_no_error(err);
 
 	/* Get some kernel info, compare it with expected info. */
 	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(
-		(gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
+		(gchar*) info->value, ==, CL4_TEST_PROGRAM_SUM);
 
 	info = cl4_kernel_info(krnl, CL_KERNEL_CONTEXT, &err);
 	g_assert_no_error(err);
@@ -153,9 +135,9 @@ static void program_create_info_destroy_test() {
 	g_assert(*((cl_program*) info->value) == cl4_program_unwrap(prg));
 
 	/* Remove temporary kernel file. */
-	if (g_unlink(CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME) < 0)
+	if (g_unlink(CL4_TEST_PROGRAM_SUM_NAME) < 0)
 		g_message("Unable to delete temporary file '"
-			CL4_TEST_WRAPPERS_PROGRAM_SUM_NAME "'");
+			CL4_TEST_PROGRAM_SUM_NAME "'");
 			
 	/* Save binaries for all available devices. */
 	cl4_program_save_all_binaries(prg, "test_", ".bin", &err);
@@ -188,14 +170,14 @@ static void program_create_info_destroy_test() {
 
 	/* Get kernel wrapper object. */
 	krnl = cl4_program_get_kernel(
-		prg, CL4_TEST_WRAPPERS_PROGRAM_SUM, &err);
+		prg, CL4_TEST_PROGRAM_SUM, &err);
 	g_assert_no_error(err);
 
 	/* Get some kernel info, compare it with expected info. */
 	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(
-		(gchar*) info->value, ==, CL4_TEST_WRAPPERS_PROGRAM_SUM);
+		(gchar*) info->value, ==, CL4_TEST_PROGRAM_SUM);
 
 	/* Create a command queue. */
 	cq = cl4_cqueue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);

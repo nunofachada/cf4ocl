@@ -31,7 +31,7 @@
 
 #include "common.h"
 #include "gerrorf.h"
-#include "wrapper.h"
+#include "abstract_wrapper.h"
 #include "errors.h"
 #include "oclversions.h"
 #include <string.h>

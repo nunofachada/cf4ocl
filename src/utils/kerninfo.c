@@ -25,8 +25,8 @@
  * 
  */
 
-#include "program.h"
-#include "kernel.h"
+#include "program_wrapper.h"
+#include "kernel_wrapper.h"
 
 /** 
  * @brief Kernel info main function.

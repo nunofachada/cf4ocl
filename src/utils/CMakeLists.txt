@@ -1,5 +1,5 @@
 # List of utilities
-set(UTILS device_query kernel_info)
+set(UTILS devinfo kerninfo)
 
 # Common libs for utilities
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})

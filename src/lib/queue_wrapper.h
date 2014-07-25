@@ -30,10 +30,10 @@
 
 #include <glib.h>
 #include "oclversions.h"
-#include "wrapper.h"
-#include "device.h"
-#include "context.h"
-#include "event.h"
+#include "abstract_wrapper.h"
+#include "device_wrapper.h"
+#include "context_wrapper.h"
+#include "event_wrapper.h"
 
 /** @brief Command queue wrapper object. */
 typedef struct cl4_cqueue CL4CQueue;

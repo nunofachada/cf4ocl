@@ -18,40 +18,33 @@
  
  /** 
  * @file
- * @brief OpenCL image wrapper.
+ * @brief Kernel argument wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
-#ifndef CL4_IMAGE_H
-#define CL4_IMAGE_H 
 
-#include "memobj.h"
+#ifndef CL4_ARG_H
+#define CL4_ARG_H 
 
-/** @brief Image wrapper object. */
-typedef CL4MemObj CL4Image;
+#include "common.h"
+#include "abstract_wrapper.h"
 
-/// @todo
+typedef CL4Wrapper CL4Arg;
 
-#ifdef CL_VERSION_1_1
+#define cl4_arg_private(value, type) \
+	cl4_arg_new(&value, sizeof(type))
 
-/// @todo
+#define cl4_arg_local(count, type) \
+	cl4_arg_new(NULL, count * sizeof(type))
+	
+CL4Arg* cl4_arg_new(void* value, size_t size);
 
-#endif
+void cl4_arg_destroy(CL4Arg* arg);
 
-#ifdef CL_VERSION_1_2
+size_t cl4_arg_size(CL4Arg* arg);
 
-/// @todo
-
-#endif
-
-/// @todo We can emulate the OpenCL>1.0 functions if not available in
-/// OpenCL
+void* cl4_arg_value(CL4Arg* arg);
 
 #endif
-
-
-
-

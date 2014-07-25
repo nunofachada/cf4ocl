@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#include "buffer.h"
+#include "buffer_wrapper.h"
 
 
 /** @brief Create a ::CL4Buffer wrapper object. */

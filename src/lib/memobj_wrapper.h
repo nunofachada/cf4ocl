@@ -25,9 +25,9 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "wrapper.h"
-#include "event.h"
-#include "cqueue.h"
+#include "abstract_wrapper.h"
+#include "event_wrapper.h"
+#include "queue_wrapper.h"
 
 #ifndef CL4_MEMOBJ_H
 #define CL4_MEMOBJ_H

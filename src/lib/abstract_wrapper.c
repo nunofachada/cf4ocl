@@ -26,7 +26,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "wrapper.h"
+#include "abstract_wrapper.h"
 
 /* Table of all existing wrappers. */
 static GHashTable* wrappers = NULL;

@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#include "kernel.h"
-#include "program.h"
+#include "kernel_wrapper.h"
+#include "program_wrapper.h"
 
 /**
  * @brief Kernel wrapper object.

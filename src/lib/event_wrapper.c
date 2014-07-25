@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#include "event.h"
+#include "event_wrapper.h"
 
 /**
  * @brief Event wrapper object.

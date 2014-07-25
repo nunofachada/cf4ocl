@@ -28,7 +28,7 @@
 #ifndef CL4_BUFFER_H
 #define CL4_BUFFER_H 
 
-#include "memobj.h"
+#include "memobj_wrapper.h"
 
 /** @brief Buffer wrapper object. */
 typedef CL4MemObj CL4Buffer;

@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "arg.h"
+#include "kernel_arg.h"
 
 #define cl4_arg_is_local(arg) \
 	 (arg->info == (void*) &arg_local_marker)

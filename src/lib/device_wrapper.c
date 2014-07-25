@@ -26,8 +26,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "device.h"
-#include "platform.h"
+#include "device_wrapper.h"
+#include "platform_wrapper.h"
 
 /**
  * @brief Device wrapper object.

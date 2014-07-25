@@ -34,7 +34,7 @@
 #include "gerrorf.h"
 #include "errors.h"
 #include "common.h"
-#include "cqueue.h"
+#include "queue_wrapper.h"
 
 /**
  * @defgroup PROFILER The profiler module.

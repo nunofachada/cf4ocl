@@ -25,7 +25,7 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#include "devquery.h"
+#include "device_query.h"
 
 /* Implementation of cl4_devquery_format() function for outputting
  * unsigned integers. */
