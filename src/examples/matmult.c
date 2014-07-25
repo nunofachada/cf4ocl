@@ -287,6 +287,10 @@ int main(int argc, char *argv[]) {
 	krnl = cl4_program_get_kernel(prg, kernel_name, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
+	/* Create command queue wrapper. */
+	cq = cl4_cqueue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	
 	/* ********************************** */	
 	/* Create and initialize host buffers */
 	/* ********************************** */	
