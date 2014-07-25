@@ -17,7 +17,8 @@
 
 /** 
  * @file
- * @brief Tests for profiling framework.
+ * @brief Tests creation, addition, destruction (CAD) for profiling 
+ * framework objects.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -25,7 +26,6 @@
  * */
 
 #include "profiler.h"
-#include "ocl_stub/ocl_impl.h"
 
 /**
  * @brief Tests .

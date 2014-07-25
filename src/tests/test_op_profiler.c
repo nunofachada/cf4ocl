@@ -17,8 +17,8 @@
 
 /** 
  * @file
- * @brief Timming and correctness tests for the profiling module. Can
- * only be performed using the OpenCL stub.
+ * @brief Operation (timming and correctness) tests for the profiling 
+ * module. Can only be performed using the OpenCL stub.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -47,7 +47,7 @@
 /**
  * @brief Tests the profiling module.
  * */
-static void timesTest() {
+static void operationTest() {
 	
 	/* Aux vars. */
 	CL4Context* ctx;
@@ -255,6 +255,7 @@ static void timesTest() {
 	g_free(file_contents);
 	g_free(name_used);
 	
+	/* Print summary to debug output. */
 	gchar* summary = cl4_prof_get_summary(prof, 
 		CL4_PROF_AGG_SORT_TIME | CL4_PROF_SORT_DESC,
 		CL4_PROF_OVERLAP_SORT_DURATION | CL4_PROF_SORT_DESC);
@@ -290,7 +291,7 @@ static void timesTest() {
  * */
 int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
-	g_test_add_func("/profiler/times", timesTest);
+	g_test_add_func("/profiler/operation", operationTest);
 	return g_test_run();
 }
 
