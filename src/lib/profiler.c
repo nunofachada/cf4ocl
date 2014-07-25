@@ -104,8 +104,6 @@ static CL4ProfExportOptions export_options = {
 	.zero_start = CL_TRUE
 
 };
-/* Access to export_options should be thread-safe. */
-G_LOCK_DEFINE_STATIC(export_options);
 
 /** 
  * @brief Create new event instant.
@@ -1462,11 +1460,18 @@ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
 	cl_bool ret_status;
 	/* Current event information. */
 	const CL4ProfInfo const* curr_ev;
+	/* Start time. */
+	cl_ulong t_start = 0;
 	
 	/* Sort event information by START order, ascending. */
 	cl4_prof_iter_info_init(
 		prof, CL4_PROF_INFO_SORT_T_START | CL4_PROF_SORT_ASC);
 	
+	/* If zero start is set, use the start time of the first event
+	 * as zero time. */
+	if ((export_options.zero_start) || (prof->info_iter != NULL))
+		t_start = ((CL4ProfInfo*) (prof->info_iter->data))->t_start;
+		
 	/* Iterate through all event information and export it to stream. */
 	while ((curr_ev = cl4_prof_iter_info_next(prof)) != NULL) {
 
@@ -1476,9 +1481,9 @@ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
 			curr_ev->queue_name, 
 			export_options.queue_delim, 
 			export_options.separator, 
-			(unsigned long) curr_ev->t_start, 
+			(unsigned long) (curr_ev->t_start - t_start), 
 			export_options.separator, 
-			(unsigned long) curr_ev->t_end, 
+			(unsigned long) (curr_ev->t_end - t_start), 
 			export_options.separator, 
 			export_options.evname_delim, 
 			curr_ev->event_name, 
@@ -1566,9 +1571,7 @@ finish:
  * @param export_opts Export options to set.
  * */
 void cl4_prof_set_export_opts(CL4ProfExportOptions export_opts) {
-	G_LOCK(export_options);
 	export_options = export_opts;
-	G_UNLOCK(export_options);
 }
 
 /**
