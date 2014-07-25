@@ -790,11 +790,10 @@ CL4DevSelDevices cl4_devsel_dep_menu(
 	}
 	
 	/* Remove all devices except the selected device. */
-	cl_int num_devs = devices->len;
-	for (cl_int i = 0; i < num_devs; ++i) {
-		if (i != index)
-			g_ptr_array_remove_index(devices, 0);
-	}
+	gpointer sel_dev = g_ptr_array_index(devices, index);
+	cl4_device_ref((CL4Device*) sel_dev);
+	g_ptr_array_remove_range(devices, 0, devices->len);
+	g_ptr_array_add(devices, sel_dev);
 	g_assert_cmpint(1, ==, devices->len);
 	
 	/* If we got here, everything is OK. */
