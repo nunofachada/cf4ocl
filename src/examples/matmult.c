@@ -466,10 +466,10 @@ int main(int argc, char *argv[]) {
 	cl4_prof_print_summary(prof_dev);
 	
 	/* Export profiling info if a filename was given. */
-	//~ if (output_export) {
-		//~ cl4_prof_export_info_file(prof_dev, output_export, &err);
-		//~ gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-	//~ }
+	if (output_export) {
+		cl4_prof_export_info_file(prof_dev, output_export, &err);
+		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	}
 		
 	/* ********************************************************* */
 	/* Perform multiplication on the CPU with the help of OpenMP */
