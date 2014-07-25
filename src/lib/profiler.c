@@ -1313,7 +1313,7 @@ const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof) {
  * duration).
  * 
  * For more control of where and how this summary is printed, use the
- * cl4_prof_print_summary_full() function.
+ * cl4_prof_get_summary() function.
  * 
  * @param prof Profile object.
  * */ 
@@ -1324,34 +1324,42 @@ void cl4_prof_print_summary(CL4Prof* prof) {
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
-	/* Use the full version of this function with default parameters. */
-	cl4_prof_print_summary_full(prof, stdout, 
+	/* Summary to print. */
+	gchar* summary;
+	
+	/* Get the summary. */
+	summary = cl4_prof_get_summary(prof, 
 		CL4_PROF_AGG_SORT_TIME | CL4_PROF_SORT_DESC,
 		CL4_PROF_OVERLAP_SORT_DURATION | CL4_PROF_SORT_DESC);
+	
+	/* Print summary. */
+	g_printf("%s", summary);
+	
+	/* Free summary string. */
+	g_free(summary);
 	
 }
 
 /**
- * @brief Print a summary of the profiling info. More specifically,
- * this function prints a table of aggregate event statistics and a 
- * table of event overlaps. The stream where this information is written
- * to, as well as the order of the printed information, can be specified
- * in the function arguments.
+ * @brief Get a summary with the profiling info. More specifically,
+ * this function returns a string containing a table of aggregate event 
+ * statistics and a table of event overlaps. The order of the returned
+ * information can be specified in the function arguments. The returned
+ * string must be freed with the `g_free()` function from GLib.
  * 
  * @param prof Profile object.
- * @param stream Stream where to output summary.
  * @param agg_sort Sorting performed on aggregate statistics (bitfield
- * of ::CL4ProfAggSort OR ::CL4ProfSortOrder).
+ * of ::CL4ProfAggSort ORed with ::CL4ProfSortOrder).
  * @param ovlp_sort Sorting performed on event overlaps (bitfield of 
- * ::CL4ProfOverlapSort OR ::CL4ProfSortOrder).
+ * ::CL4ProfOverlapSort ORed with ::CL4ProfSortOrder).
+ * @return A string containing the summary, which must be freed with
+ * the `g_free()` function from GLib.
  * */ 
-void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream, 
-	int agg_sort, int ovlp_sort) {
+gchar* cl4_prof_get_summary(
+	CL4Prof* prof, int agg_sort, int ovlp_sort) {
 	
 	/* Make sure prof is not NULL. */
 	g_return_if_fail(prof != NULL);
-	/* Make sure stream is not NULL. */
-	g_return_if_fail(stream != NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_if_fail(prof->calc == TRUE);
 
@@ -1359,30 +1367,32 @@ void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream,
 	const CL4ProfAgg const* agg = NULL;
 	/* Current overlap to print. */
 	const CL4ProfOverlap const* ovlp = NULL;
+	/* The summary string. */
+	GString* str_obj = g_string_new("");
 
-	g_fprintf(stream, "\n   =========================== Timming/Profiling ===========================\n\n");
+	g_string_append_printf(str_obj, "\n   =========================== Timming/Profiling ===========================\n\n");
 	
 	/* Show aggregate event times */
-	g_fprintf(stream, "     Aggregate times by event  :\n");
-	g_fprintf(stream, "       ------------------------------------------------------------------\n");
-	g_fprintf(stream, "       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
-	g_fprintf(stream, "       ------------------------------------------------------------------\n");
+	g_string_append_printf(str_obj, "     Aggregate times by event  :\n");
+	g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
+	g_string_append_printf(str_obj, "       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
+	g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
 	cl4_prof_iter_agg_init(prof, agg_sort);
 	while ((agg = cl4_prof_iter_agg_next(prof)) != NULL) {
-		g_fprintf(stream, 
+		g_string_append_printf(str_obj, 
 			"       | %-30.30s | %13.4f | %13.4e |\n", 
 			agg->event_name, 
 			agg->relative_time * 100.0, 
 			agg->absolute_time * 1e-9);
 	}
-	g_fprintf(stream, "       ------------------------------------------------------------------\n");
+	g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
 	
 	/* Show total events time */
 	if (prof->total_events_time > 0) {
-		g_fprintf(stream, 
+		g_string_append_printf(str_obj, 
 			"                                        |         Total | %13.4e |\n", 
 			prof->total_events_time * 1e-9);
-		g_fprintf(stream, 
+		g_string_append_printf(str_obj, 
 			"                                        ---------------------------------\n");
 	}
 	
@@ -1390,39 +1400,42 @@ void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream,
 
 	if (g_list_length(prof->overlaps) > 0) {
 		/* Title the several overlaps. */
-		g_fprintf(stream, "     Event overlaps            :\n");
-		g_fprintf(stream, "       ------------------------------------------------------------------\n");
-		g_fprintf(stream, "       | Event 1                | Event2                 | Overlap (s)  |\n");
-		g_fprintf(stream, "       ------------------------------------------------------------------\n");
+		g_string_append_printf(str_obj, "     Event overlaps            :\n");
+		g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
+		g_string_append_printf(str_obj, "       | Event 1                | Event2                 | Overlap (s)  |\n");
+		g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
 		/* Show overlaps table. */
 		cl4_prof_iter_overlap_init(prof, ovlp_sort);
 		while ((ovlp = cl4_prof_iter_overlap_next(prof)) != NULL) {
-			g_fprintf(stream, "       | %-22.22s | %-22.22s | %12.4e |\n",
+			g_string_append_printf(str_obj, "       | %-22.22s | %-22.22s | %12.4e |\n",
 				ovlp->event1_name, ovlp->event2_name, ovlp->duration * 1e-9);
 		}
-		g_fprintf(stream, "       ------------------------------------------------------------------\n");
+		g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
 		/* Show total events effective time (discount overlaps) */
-		g_fprintf(stream, "                                |                  Total | %12.4e |\n", 
+		g_string_append_printf(str_obj, "                                |                  Total | %12.4e |\n", 
 			(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
-		g_fprintf(stream, "                                -----------------------------------------\n");
-		g_fprintf(stream, "     Tot. of all events (eff.) : %es\n", 
+		g_string_append_printf(str_obj, "                                -----------------------------------------\n");
+		g_string_append_printf(str_obj, "     Tot. of all events (eff.) : %es\n", 
 			prof->total_events_eff_time * 1e-9);
 	} else {
-		g_fprintf(stream, "     Event overlaps            : None\n");
+		g_string_append_printf(str_obj, "     Event overlaps            : None\n");
 	}
 	
 	/* Show total ellapsed time */
 	if (prof->timer) {
 		double t_ellapsed = g_timer_elapsed(prof->timer, NULL);
-		g_fprintf(stream, 
+		g_string_append_printf(str_obj, 
 			"     Total ellapsed time       : %es\n", t_ellapsed);
-		g_fprintf(stream, 
+		g_string_append_printf(str_obj, 
 			"     Time spent in device      : %f%%\n", 
 			prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
-		g_fprintf(stream, 
+		g_string_append_printf(str_obj, 
 			"     Time spent in host        : %f%%\n", 
 			100 - prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 	}
+	
+	/* Return summary string. */
+	return g_string_free(str_obj, FALSE);
 
 }
 

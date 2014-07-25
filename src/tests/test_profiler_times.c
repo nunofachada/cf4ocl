@@ -255,7 +255,13 @@ static void timesTest() {
 	g_free(file_contents);
 	g_free(name_used);
 	
-	cl4_prof_print_summary(prof);
+	gchar* summary = cl4_prof_get_summary(prof, 
+		CL4_PROF_AGG_SORT_TIME | CL4_PROF_SORT_DESC,
+		CL4_PROF_OVERLAP_SORT_DURATION | CL4_PROF_SORT_DESC);
+	
+	g_debug("\n%s", summary);
+	
+	g_free(summary); 
 	
 	/* Free profile. */
 	cl4_prof_destroy(prof);

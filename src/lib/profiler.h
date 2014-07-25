@@ -290,13 +290,13 @@ const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof);
  * duration). */ 
 void cl4_prof_print_summary(CL4Prof* prof);
 
-/** @brief Print a summary of the profiling info. More specifically,
- * this function prints a table of aggregate event statistics and a 
- * table of event overlaps. The stream where this information is written
- * to, as well as the order of the printed information, can be specified
- * in the function arguments. */ 
-void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream, 
-	int agg_sort, int ovlp_sort);
+/** @brief Get a summary with the profiling info. More specifically,
+ * this function returns a string containing a table of aggregate event 
+ * statistics and a table of event overlaps. The order of the returned
+ * information can be specified in the function arguments. The returned
+ * string must be freed with the `g_free()` function from GLib. */ 
+gchar* cl4_prof_get_summary(
+	CL4Prof* prof, int agg_sort, int ovlp_sort);
 
 /** @brief Export profiling info to a given stream. */
 cl_bool cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
