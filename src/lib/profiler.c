@@ -87,7 +87,7 @@ struct cl4_prof {
 	/** Total time taken by all events except intervals where events overlaped. */
 	cl_ulong total_events_eff_time;
 	/** Time at which the first (oldest) event started. */
-	cl_ulong start_time;
+	cl_ulong t_start;
 
 	/** Keeps track of time during the complete profiling session. */
 	GTimer* timer;
@@ -476,8 +476,8 @@ static void cl4_prof_add_event(CL4Prof* prof, const char* cq_name,
 	instant = *((cl_ulong*) info->value);
 	
 	/* Check if start instant is the oldest instant. If so, keep it. */
-	if (instant < prof->start_time)
-		prof->start_time = instant;
+	if (instant < prof->t_start)
+		prof->t_start = instant;
 		
 	/* Add event start instant to list of event instants. */
 	evinst_start = cl4_prof_inst_new(event_name, cq_name, event_id, 
@@ -851,7 +851,7 @@ CL4Prof* cl4_prof_new() {
 	CL4Prof* prof = g_slice_new0(CL4Prof);
 
 	/* Set absolute start time to maximum possible. */
-	prof->start_time = CL_ULONG_MAX;
+	prof->t_start = CL_ULONG_MAX;
 
 	/* Return new profile data structure */
 	return prof;
@@ -1362,20 +1362,6 @@ void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream,
 
 	g_fprintf(stream, "\n   =========================== Timming/Profiling ===========================\n\n");
 	
-	/* Show total ellapsed time */
-	if (prof->timer) {
-		g_fprintf(stream, 
-			"     Total ellapsed time       : %fs\n", 
-			g_timer_elapsed(prof->timer, NULL));
-	}
-	
-	/* Show total events time */
-	if (prof->total_events_time > 0) {
-		g_fprintf(stream, 
-			"     Total of all events       : %fs\n", 
-			prof->total_events_time * 1e-9);
-	}
-	
 	/* Show aggregate event times */
 	g_fprintf(stream, "     Aggregate times by event  :\n");
 	g_fprintf(stream, "       ------------------------------------------------------------------\n");
@@ -1391,16 +1377,20 @@ void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream,
 	}
 	g_fprintf(stream, "       ------------------------------------------------------------------\n");
 	
+	/* Show total events time */
+	if (prof->total_events_time > 0) {
+		g_fprintf(stream, 
+			"                                        |         Total | %13.4e |\n", 
+			prof->total_events_time * 1e-9);
+		g_fprintf(stream, 
+			"                                        ---------------------------------\n");
+	}
+	
 	/* *** Show overlaps *** */
 
 	if (g_list_length(prof->overlaps) > 0) {
-		/* Show total events effective time (discount overlaps) */
-		g_fprintf(stream, "     Tot. of all events (eff.) : %es\n", 
-			prof->total_events_eff_time * 1e-9);
-		g_fprintf(stream, "                                 %es saved with overlaps\n", 
-			(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
 		/* Title the several overlaps. */
-		g_fprintf(stream, "     Event overlap times       :\n");
+		g_fprintf(stream, "     Event overlaps            :\n");
 		g_fprintf(stream, "       ------------------------------------------------------------------\n");
 		g_fprintf(stream, "       | Event 1                | Event2                 | Overlap (s)  |\n");
 		g_fprintf(stream, "       ------------------------------------------------------------------\n");
@@ -1411,8 +1401,27 @@ void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream,
 				ovlp->event1_name, ovlp->event2_name, ovlp->duration * 1e-9);
 		}
 		g_fprintf(stream, "       ------------------------------------------------------------------\n");
+		/* Show total events effective time (discount overlaps) */
+		g_fprintf(stream, "                                |                  Total | %12.4e |\n", 
+			(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
+		g_fprintf(stream, "                                -----------------------------------------\n");
+		g_fprintf(stream, "     Tot. of all events (eff.) : %es\n", 
+			prof->total_events_eff_time * 1e-9);
 	} else {
-		g_fprintf(stream, "     No overlapping events.\n");
+		g_fprintf(stream, "     Event overlaps            : None\n");
+	}
+	
+	/* Show total ellapsed time */
+	if (prof->timer) {
+		double t_ellapsed = g_timer_elapsed(prof->timer, NULL);
+		g_fprintf(stream, 
+			"     Total ellapsed time       : %es\n", t_ellapsed);
+		g_fprintf(stream, 
+			"     Time spent in device      : %f%%\n", 
+			prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
+		g_fprintf(stream, 
+			"     Time spent in host        : %f%%\n", 
+			100 - prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 	}
 
 }
@@ -1470,7 +1479,7 @@ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
 	/* If zero start is set, use the start time of the first event
 	 * as zero time. */
 	if ((export_options.zero_start) || (prof->info_iter != NULL))
-		t_start = ((CL4ProfInfo*) (prof->info_iter->data))->t_start;
+		t_start = prof->t_start;
 		
 	/* Iterate through all event information and export it to stream. */
 	while ((curr_ev = cl4_prof_iter_info_next(prof)) != NULL) {
