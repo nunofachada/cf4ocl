@@ -213,41 +213,47 @@ static void timesTest() {
 		} else {
 			g_assert_not_reached();
 		} 
-			
-			
 	}
 	
-	//~ /* ******************* */
-	//~ /* Test export options */
-	//~ /* ******************* */
-	//~ 
-	//~ /* Set some export options. */
-	//~ CL4ProfExportOptions export_options = cl4_prof_export_opts_get();
-	//~ export_options.separator = "\t"; /* Default */
-	//~ export_options.queue_delim = ""; /* Default */
-	//~ export_options.evname_delim = ""; /* Default */
-	//~ export_options.simple_queue_id = TRUE; /* Default */
-	//~ export_options.zero_start = FALSE; /* Not default */
-	//~ cl4_prof_export_opts_set(export_options);
-	//~ 
-	//~ /* Export options. */
-	//~ gchar *name_used;
-	//~ FILE* fp = fdopen(
-		//~ g_file_open_tmp("test_profiler_XXXXXX.txt", &name_used, NULL),
-		//~ "wb"
-	//~ );
-	//~ status = cl4_prof_export_info(profile, fp, NULL);
-	//~ g_assert(status == CL4_SUCCESS);
-	//~ fclose(fp);
-//~ 
-	//~ /* Test if output file was correctly written. */
-	//~ gchar* file_contents;
-	//~ gchar* expected_contents = "0\t10\t15\tEvent1\n0\t16\t20\tEvent2\n1\t17\t30\tEvent3\n2\t19\t25\tEvent4\n0\t29\t40\tEvent5\n1\t35\t45\tEvent1\n0\t68\t69\tEvent1\n2\t50\t70\tEvent1\n";
-	//~ gboolean read_flag = g_file_get_contents(name_used, &file_contents, NULL, NULL);
-	//~ g_assert(read_flag);
-	//~ g_assert_cmpstr(file_contents, ==, expected_contents);
-	//~ g_free(file_contents);
-	//~ g_free(name_used);
+	/* ******************* */
+	/* Test export options */
+	/* ******************* */
+	
+	/* Set some export options. */
+	CL4ProfExportOptions export_options = cl4_prof_get_export_opts();
+	export_options.separator = "\t"; /* Default */
+	export_options.queue_delim = ""; /* Default */
+	export_options.evname_delim = ""; /* Default */
+	export_options.zero_start = FALSE; /* Not default */
+	cl4_prof_set_export_opts(export_options);
+	
+	/* Export options. */
+	gchar *name_used;
+	FILE* fp = fdopen(
+		g_file_open_tmp("test_profiler_XXXXXX.txt", &name_used, NULL),
+		"wb"
+	);
+	cl_bool export_status = cl4_prof_export_info(prof, fp, NULL);
+	g_assert(export_status);
+	fclose(fp);
+
+	/* Test if output file was correctly written. */
+	gchar* file_contents;
+	gchar* expected_contents = 
+		"Q1\t10\t15\tEvent1\n" \
+		"Q1\t16\t20\tEvent2\n" \
+		"Q1\t17\t30\tEvent3\n" \
+		"Q3\t19\t25\tEvent4\n" \
+		"Q1\t29\t40\tEvent5\n" \
+		"Q2\t35\t45\tEvent1\n" \
+		"Q3\t50\t70\tEvent1\n" \
+		"Q1\t68\t69\tEvent1\n";
+	gboolean read_flag = g_file_get_contents(
+		name_used, &file_contents, NULL, NULL);
+	g_assert(read_flag);
+	g_assert_cmpstr(file_contents, ==, expected_contents);
+	g_free(file_contents);
+	g_free(name_used);
 	
 	cl4_prof_print_summary(prof);
 	

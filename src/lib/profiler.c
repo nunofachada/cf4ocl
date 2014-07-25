@@ -1429,7 +1429,8 @@ void cl4_prof_print_summary_full(CL4Prof* prof, FILE* stream,
 /** 
  * @brief Export event profiling information to a given stream.
  * 
- * Each line of the exported data will have the following format:
+ * Each line of the exported data will have the following format, 
+ * ordered by event start time:
  * 
  *     queue start-time end-time event-name
  * 
@@ -1478,7 +1479,7 @@ cl_bool cl4_prof_export_info(CL4Prof* prof, FILE* stream, GError** err) {
 	
 	/* If zero start is set, use the start time of the first event
 	 * as zero time. */
-	if ((export_options.zero_start) || (prof->info_iter != NULL))
+	if (export_options.zero_start)
 		t_start = prof->t_start;
 		
 	/* Iterate through all event information and export it to stream. */

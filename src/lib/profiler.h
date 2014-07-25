@@ -308,10 +308,10 @@ cl_bool cl4_prof_export_info_file(
 	CL4Prof* profile, const char* filename, GError** err);
 
 /** @brief Set export options using a ::CL4ProfExportOptions struct. */
-void cl4_prof_export_opts_set(CL4ProfExportOptions export_opts);
+void cl4_prof_set_export_opts(CL4ProfExportOptions export_opts);
 
 /** @brief Get current export options. */
-CL4ProfExportOptions cl4_prof_export_opts_get();
+CL4ProfExportOptions cl4_prof_get_export_opts();
 
 /** @} */
 
