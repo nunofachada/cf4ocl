@@ -1427,10 +1427,10 @@ gchar* cl4_prof_get_summary(
 		g_string_append_printf(str_obj, 
 			"     Total ellapsed time       : %es\n", t_ellapsed);
 		g_string_append_printf(str_obj, 
-			"     Time spent in device      : %f%%\n", 
+			"     Time spent in device      : %.2f%%\n", 
 			prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 		g_string_append_printf(str_obj, 
-			"     Time spent in host        : %f%%\n", 
+			"     Time spent in host        : %.2f%%\n", 
 			100 - prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 	}
 	
