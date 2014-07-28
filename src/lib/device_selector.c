@@ -87,6 +87,99 @@ static void cl4_devsel_add_filter(CL4DevSelFilters* filters,
 	
 }
 
+/** 
+ * @brief Populate array of device wrapper objects with all OpenCL
+ * devices present in the system
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return One or more OpenCL devices selected based on the provided
+ * filters.
+ *  */
+static CL4DevSelDevices cl4_devsel_get_devices(GError **err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Platforms wrapper object. */
+	CL4Platforms* platforms = NULL;
+	
+	/* Platform wrapper object. */
+	CL4Platform* platform = NULL;
+	
+	/* Device wrapper object. */
+	CL4Device* device = NULL;
+	
+	/* Array of device wrapper objects. Devices will be selected from
+	 * this array.  */
+	GPtrArray* devices = NULL;
+
+	/* Number of platforms. */
+	guint num_platfs;
+	
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Get all OpenCL platforms in system wrapped in a CL4Platforms
+	 * object. */
+	platforms = cl4_platforms_new(&err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Determine number of platforms. */
+	num_platfs = cl4_platforms_count(platforms);
+	
+	/* Create array of device wrapper objects. */
+	devices = g_ptr_array_new_with_free_func(
+		(GDestroyNotify) cl4_device_destroy);
+	
+	/* Cycle through OpenCL platforms. */
+	for (guint i = 0; i < num_platfs; i++) {
+		
+		/* Get next platform wrapper. */
+		platform = cl4_platforms_get_platform(platforms, i);
+		
+		/* Get number of devices in current platform.*/
+		guint num_devices = cl4_platform_get_num_devices(
+			platform, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* Cycle through devices in current platform. */
+		for (guint j = 0; j < num_devices; j++) {
+			
+			/* Get current device wrapper. */
+			device = cl4_platform_get_device(platform, j, &err_internal);
+			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			
+			/* Add device wrapper to array of device wrapper objects. */
+			g_ptr_array_add(devices, (gpointer) device);
+			
+			/* Update device reference (because it is kept also in
+			 * the array of device wrapper objects). */
+			cl4_device_ref(device);
+			
+		} 
+		
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:
+
+	/* Free platforms wrapper object. */
+	cl4_platforms_destroy(platforms);
+
+	/* Return the selected devices. */
+	return devices;
+
+}
+
+
 /**
  * @brief Add an independent filter to the filter set.
  * 
@@ -136,68 +229,15 @@ CL4DevSelDevices cl4_devsel_select(
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
-	/* Platforms wrapper object. */
-	CL4Platforms* platforms = NULL;
-	
-	/* Platform wrapper object. */
-	CL4Platform* platform = NULL;
-	
-	/* Device wrapper object. */
-	CL4Device* device = NULL;
-	
-	/* Array of device wrapper objects. Devices will be selected from
-	 * this array.  */
-	GPtrArray* devices = NULL;
-
-	/* Number of platforms. */
-	guint num_platfs;
-	
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 	
-	/* Get all OpenCL platforms in system wrapped in a CL4Platforms
-	 * object. */
-	platforms = cl4_platforms_new(&err_internal);
+	/* Array of devices. */
+	CL4DevSelDevices devices;
+	
+	/* Get all devices present in the system. */
+	devices = cl4_devsel_get_devices(&err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
-	
-	/* Determine number of platforms. */
-	num_platfs = cl4_platforms_count(platforms);
-	
-	/* Create array of device wrapper objects. */
-	devices = g_ptr_array_new_with_free_func(
-		(GDestroyNotify) cl4_device_destroy);
-	
-	/* *** Populate array of device wrapper objects with all OpenCL ***
-	 * *** devices present in the system. *** */
-	 
-	/* Cycle through OpenCL platforms. */
-	for (guint i = 0; i < num_platfs; i++) {
-		
-		/* Get next platform wrapper. */
-		platform = cl4_platforms_get_platform(platforms, i);
-		
-		/* Get number of devices in current platform.*/
-		guint num_devices = cl4_platform_get_num_devices(
-			platform, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		
-		/* Cycle through devices in current platform. */
-		for (guint j = 0; j < num_devices; j++) {
-			
-			/* Get current device wrapper. */
-			device = cl4_platform_get_device(platform, j, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
-			
-			/* Add device wrapper to array of device wrapper objects. */
-			g_ptr_array_add(devices, (gpointer) device);
-			
-			/* Update device reference (because it is kept also in
-			 * the array of device wrapper objects). */
-			cl4_device_ref(device);
-			
-		} 
-		
-	}
 	
 	/* *** Filter devices. *** */
 
@@ -244,7 +284,7 @@ CL4DevSelDevices cl4_devsel_select(
 					j--;
 					
 				}
-			}			
+			}
 		}
 	}
 
@@ -258,9 +298,6 @@ error_handler:
 
 finish:
 
-	/* Free platforms wrapper object. */
-	cl4_platforms_destroy(platforms);
-	
 	/* Free individual filters. */
 	for (guint i = 0; i < (*filters)->len; i++)
 		g_slice_free(CL4DevSelFilter, g_ptr_array_index(*filters, i));
