@@ -396,6 +396,7 @@ static void context_ref_unref_test() {
 	filters = NULL;
 
 	/// @todo Test context from CL4Platform, check that devices have ref=2 (kept by CL4Platform and CL4Context)
+	/// @todo Add test for device selection using menu filter
 	/// @todo Test ref/unref program
 	/// @todo Test ref/unref queue
 	/// @todo Test ref/unref kernels
@@ -422,5 +423,3 @@ int main(int argc, char** argv) {
 		
 	return g_test_run();
 }
-
-

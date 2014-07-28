@@ -88,6 +88,7 @@ static int b_dim[] = {B_COLS, B_ROWS};
 static size_t lws[] = {LWS_X, LWS_Y};
 static int matrix_range[] = {RANGE_MATRIX_FROM, RANGE_MATRIX_TO};
 static gchar* compiler_opts = NULL;
+static gboolean dev_list = FALSE;
 static int dev_idx = -1;
 static gchar* name = NULL;
 static int kernel_id = KERNEL_ID;
@@ -138,9 +139,12 @@ static GOptionEntry entries[] = {
 	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,
 		"Print input and output matrices to stderr",
 		NULL},
+	{"list",      'i', 0, G_OPTION_ARG_NONE,      &dev_list,
+		"List available devices (selectable with -d) and exit",
+		NULL},
 	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,
-		"Device index, auto-selects device from menu (takes priority \
-		on -n and -p options)",
+		"Device index, auto-selects device from menu (takes priority " \
+		"over -n option)",
 		"INDEX"},
 	{"name",     'n', 0, G_OPTION_ARG_STRING,   &name,
 		"Selects device by device, platform or vendor name",
@@ -234,6 +238,16 @@ int main(int argc, char *argv[]) {
 
 	matmult_args_parse(argc, argv, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	
+	/* If device list was required, present list of devices and
+	 * exit. */
+	if (dev_list) {
+		g_printf("\n");
+		cl4_devsel_print_device_strings(&err);
+		g_printf("\n");
+		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+		exit(0);
+	}
 
 	/* ******************************************************* */
 	/* Initialize profiler, OpenCL variables and build program */

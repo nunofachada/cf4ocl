@@ -50,6 +50,7 @@
 static size_t gws[] = {GWS_X, GWS_Y};
 static size_t lws[] = {LWS_X, LWS_Y};
 static gchar* compiler_opts = NULL;
+static gboolean dev_list = FALSE;
 static int dev_idx = -1;
 static int stride = STRIDE;
 
@@ -79,9 +80,12 @@ static GOptionEntry entries[] = {
 	{"stride",     's', 0, G_OPTION_ARG_INT,      &stride,
 		"Stride (default is " G_STRINGIFY(STRIDE) ")", 
 		"STRIDE"},
+	{"list",      'i', 0, G_OPTION_ARG_NONE,      &dev_list,
+		"List available devices (selectable with -d) and exit",
+		NULL},
 	{"device",     'd', 0, G_OPTION_ARG_INT,      &dev_idx,
-		"Device index (if not given and more than one device is \
-		available, chose device from menu)", 
+		"Device index (if not given and more than one device is "\
+		"available, chose device from menu)", 
 		"INDEX"},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
@@ -151,6 +155,16 @@ int main(int argc, char *argv[]) {
 		(gws[0] % lws[0] != 0) || (gws[1] % lws[1] != 0), 
 		CLEXP_FAIL, error_handler, 
 		"Global worksize is not multiple of local worksize.");
+	
+	/* If device list was required, present list of devices and
+	 * exit. */
+	if (dev_list) {
+		g_printf("\n");
+		cl4_devsel_print_device_strings(&err);
+		g_printf("\n");
+		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+		exit(0);
+	}
 	
 	/* ******************************************************* */
 	/* Initialize profiler, OpenCL variables and build program */
