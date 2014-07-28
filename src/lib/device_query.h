@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_DEVQUERY_H
-#define CL4_DEVQUERY_H
+#ifndef CL4_DEVICE_QUERY_H
+#define CL4_DEVICE_QUERY_H
 
 #include "common.h"
 #include "gerrorf.h"

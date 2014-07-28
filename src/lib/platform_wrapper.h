@@ -26,8 +26,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_PLATFORM_H
-#define CL4_PLATFORM_H
+#ifndef CL4_PLATFORM_WRAPPER_H
+#define CL4_PLATFORM_WRAPPER_H
 
 #include "common.h"
 #include "device_wrapper.h"

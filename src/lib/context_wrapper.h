@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_CONTEXT_H
-#define CL4_CONTEXT_H
+#ifndef CL4_CONTEXT_WRAPPER_H
+#define CL4_CONTEXT_WRAPPER_H
 
 #include "oclversions.h"
 #include "device_selector.h"

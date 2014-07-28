@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_PROF_H
-#define CL4_PROF_H
+#ifndef CL4_PROFILER_H
+#define CL4_PROFILER_H
 
 #include <glib.h>
 #include <string.h>

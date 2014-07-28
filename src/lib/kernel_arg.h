@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_ARG_H
-#define CL4_ARG_H 
+#ifndef CL4_KERNEL_ARG_H
+#define CL4_KERNEL_ARG_H 
 
 #include "common.h"
 #include "abstract_wrapper.h"

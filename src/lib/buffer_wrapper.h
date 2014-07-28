@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_BUFFER_H
-#define CL4_BUFFER_H 
+#ifndef CL4_BUFFER_WRAPPER_H
+#define CL4_BUFFER_WRAPPER_H 
 
 #include "memobj_wrapper.h"
 

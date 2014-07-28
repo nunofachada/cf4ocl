@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_DEVSEL_H
-#define CL4_DEVSEL_H
+#ifndef CL4_DEVICE_SELECTOR_H
+#define CL4_DEVICE_SELECTOR_H
 
 #include <glib.h>
 #include "oclversions.h"

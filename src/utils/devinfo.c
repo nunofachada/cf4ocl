@@ -112,20 +112,20 @@ int main(int argc, char* argv[]) {
 		
 		/*Yes, user requested list, present it. */
 		
-		g_fprintf(CL4_DEVICE_QUERY_OUT, "\nKnown information parameters:\n\n");
+		g_fprintf(CL4_DEVINFO_OUT, "\nKnown information parameters:\n\n");
 		for (gint i = 0; i < cl4_devquery_info_map_size; i++) {
 			if (opt_verb) {
-				g_fprintf(CL4_DEVICE_QUERY_OUT,	
+				g_fprintf(CL4_DEVINFO_OUT,	
 					"\t%s\n\t\t%s.\n\n", 
 					cl4_devquery_info_map[i].param_name,
 					cl4_devquery_info_map[i].description);
 			} else {
-				g_fprintf(CL4_DEVICE_QUERY_OUT,	
+				g_fprintf(CL4_DEVINFO_OUT,	
 					"\t%s\n", 
 					cl4_devquery_info_map[i].param_name);
 			}
 		}
-		g_fprintf(CL4_DEVICE_QUERY_OUT, "\n");
+		g_fprintf(CL4_DEVINFO_OUT, "\n");
 
 	} else {
 	
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
 				dev_name = (gchar*) info_value->value;
 				
 				/* Show device information. */
-				g_fprintf(CL4_DEVICE_QUERY_OUT, 
+				g_fprintf(CL4_DEVINFO_OUT, 
 					"\n\t[ Device #%d: %s ]\n\n", 
 					j, dev_name);
 				if (opt_all)
@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
 					cl4_device_query_show_device_info_basic(d);
 				
 			}
-			g_fprintf(CL4_DEVICE_QUERY_OUT,	"\n");
+			g_fprintf(CL4_DEVINFO_OUT,	"\n");
 		}
 	}
 	/* If we got here, everything is OK. */	
@@ -224,7 +224,7 @@ void cl4_device_query_args_parse(int argc, char* argv[], GError** err) {
 	GOptionContext* context = NULL;
 
 	/* Create parsing context. */
-	context = g_option_context_new(" - " CL4_DEVICE_QUERY_DESCRIPTION);
+	context = g_option_context_new(" - " CL4_DEVINFO_DESCRIPTION);
 	gef_if_error_create_goto(*err, CL4_ERROR, context == NULL, 
 		CL4_ERROR_ARGS, error_handler, 
 		"Unable to create command line parsing context.");
@@ -298,7 +298,7 @@ void cl4_device_query_show_platform_info(CL4Platform* p, guint idx) {
 	}
 
 	/*  Send info to defined stream. */
-	g_fprintf(CL4_DEVICE_QUERY_OUT, "\n* Platform #%d: %s (%s)\n               %s, %s\n",
+	g_fprintf(CL4_DEVINFO_OUT, "\n* Platform #%d: %s (%s)\n               %s, %s\n",
 		idx, name, vendor, version, profile);
 	
 	/* Bye. */
@@ -307,13 +307,13 @@ void cl4_device_query_show_platform_info(CL4Platform* p, guint idx) {
 
 #define cl4_device_query_output_device_info(key, value, desc) \
 	if (opt_verb) { \
-		g_fprintf(CL4_DEVICE_QUERY_OUT, \
+		g_fprintf(CL4_DEVINFO_OUT, \
 			"\t\t   Parameter : %s\n" \
 			"\t\t Description : %s\n" \
 			"\t\t       Value : %s\n\n", \
 			key, desc, value); \
 	} else { \
-		g_fprintf(CL4_DEVICE_QUERY_OUT, \
+		g_fprintf(CL4_DEVINFO_OUT, \
 			"\t\t %-40.40s | %s\n", \
 			key, value); \
 	}
@@ -330,7 +330,7 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 	CL4WrapperInfo* param_value;
 	
 	/* Parameter value string. */
-	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	gchar param_value_str[CL4_DEVINFO_MAXINFOLEN];
 	
 	/* Error reporting object. */
 	GError* err = NULL;
@@ -350,7 +350,7 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 				cl4_devquery_info_map[k].param_name, 
 				cl4_devquery_info_map[k].format(
 					param_value, param_value_str, 
-					CL4_DEVICE_QUERY_MAXINFOLEN,
+					CL4_DEVINFO_MAXINFOLEN,
 					cl4_devquery_info_map[k].units),
 				cl4_devquery_info_map[k].description);
 				
@@ -363,7 +363,7 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 				 * requested so. */
 				cl4_device_query_output_device_info(
 					cl4_devquery_info_map[k].param_name,
-					CL4_DEVICE_QUERY_DEVINFO_NA,
+					CL4_DEVINFO_NA,
 					cl4_devquery_info_map[k].description);
 			}
 		}
@@ -385,7 +385,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 	CL4WrapperInfo* param_value;
 
 	/* Parameter value string. */
-	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	gchar param_value_str[CL4_DEVINFO_MAXINFOLEN];
 
 	/* Error reporting object. */
 	GError* err = NULL;
@@ -423,7 +423,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 					info_row->param_name,
 					info_row->format(
 						param_value, param_value_str, 
-						CL4_DEVICE_QUERY_MAXINFOLEN,
+						CL4_DEVINFO_MAXINFOLEN,
 						info_row->units),
 					info_row->description);
 
@@ -438,7 +438,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 					* requested so. */
 					cl4_device_query_output_device_info(
 						info_row->param_name,
-						CL4_DEVICE_QUERY_DEVINFO_NA,
+						CL4_DEVINFO_NA,
 						info_row->description);
 				}
 			}
@@ -469,7 +469,7 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 	CL4WrapperInfo* param_value;
 
 	/* Parameter value string. */
-	gchar param_value_str[CL4_DEVICE_QUERY_MAXINFOLEN];
+	gchar param_value_str[CL4_DEVINFO_MAXINFOLEN];
 
 	/* Error reporting object. */
 	GError* err = NULL;
@@ -495,7 +495,7 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 				info_row->param_name,
 				info_row->format(
 					param_value, param_value_str, 
-					CL4_DEVICE_QUERY_MAXINFOLEN,
+					CL4_DEVINFO_MAXINFOLEN,
 					info_row->units),
 				info_row->description);
 
@@ -508,7 +508,7 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 				 * requested so. */
 				cl4_device_query_output_device_info(
 					info_row->param_name,
-					CL4_DEVICE_QUERY_DEVINFO_NA,
+					CL4_DEVINFO_NA,
 					info_row->description);
 			}
 		}

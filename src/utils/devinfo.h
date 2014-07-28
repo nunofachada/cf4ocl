@@ -24,8 +24,8 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
-#ifndef CL4_DEVICE_QUERY_H
-#define CL4_DEVICE_QUERY_H
+#ifndef CL4_DEVINFO_H
+#define CL4_DEVINFO_H
 
 #include "platforms.h"
 #include "platform_wrapper.h"
@@ -33,21 +33,21 @@
 #include "device_query.h"
 #include "common.h"
 
-#ifndef CL4_DEVICE_QUERY_OUT
+#ifndef CL4_DEVINFO_OUT
 	/** Default device information output stream. */
-	#define CL4_DEVICE_QUERY_OUT stdout
+	#define CL4_DEVINFO_OUT stdout
 #endif
 
-#ifndef CL4_DEVICE_QUERY_DEVINFO_NA
-	#define CL4_DEVICE_QUERY_DEVINFO_NA "N/A"
+#ifndef CL4_DEVINFO_NA
+	#define CL4_DEVINFO_NA "N/A"
 #endif
 
 /** Program description. */
-#define CL4_DEVICE_QUERY_DESCRIPTION "Utility for querying OpenCL \
+#define CL4_DEVINFO_DESCRIPTION "Utility for querying OpenCL \
 platforms and devices"
 
 /** Maximum length of device information output, per parameter. */
-#define CL4_DEVICE_QUERY_MAXINFOLEN 500
+#define CL4_DEVINFO_MAXINFOLEN 500
 
 /** @brief Parse and verify command line arguments. */
 void cl4_device_query_args_parse(int argc, char* argv[], GError** err);

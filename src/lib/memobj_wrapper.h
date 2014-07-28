@@ -29,8 +29,8 @@
 #include "event_wrapper.h"
 #include "queue_wrapper.h"
 
-#ifndef CL4_MEMOBJ_H
-#define CL4_MEMOBJ_H
+#ifndef CL4_MEMOBJ_WRAPPER_H
+#define CL4_MEMOBJ_WRAPPER_H
 
 typedef struct cl4_memobj CL4MemObj;
 
