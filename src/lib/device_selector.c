@@ -179,6 +179,302 @@ finish:
 
 }
 
+/** 
+ * @brief Returns a NULL-terminated array of strings, each one
+ * containing the name and vendor of each device in the given device 
+ * array.
+ * 
+ * @param devices Array of devices.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A NULL-terminated array of strings, each one containing the
+ * name and vendor of each device in the device array. If an error
+ * occurs, NULL is returned.
+ *  */
+static gchar** cl4_get_device_strings_from_array(
+	CL4DevSelDevices devices, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Make sure devices array is not null. */
+	g_return_val_if_fail(devices != NULL, NULL);
+	
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Array of strings. */
+	gchar** dev_strings;
+	
+	/* Initialize array of strings. */
+	dev_strings = g_new0(gchar*, devices->len + 1);
+
+	/* Create array of strings describing devices. */
+	for (guint i = 0; i < devices->len; i++) {
+	
+		/* Get device name. */
+		gchar* name = cl4_device_info_value_array(
+				devices->pdata[i], CL_DEVICE_NAME, char*, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* Get device vendor. */
+		gchar* vendor = cl4_device_info_value_array(
+				devices->pdata[i], CL_DEVICE_VENDOR, char*, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		
+		/* Put info in string. */
+		dev_strings[i] = g_strdup_printf("%d. %s [%s]", i, name, vendor);
+		
+	}	
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	/* Free what was built of the array of strings. */
+	g_strfreev(dev_strings);
+	dev_strings = NULL;
+
+finish:
+
+	/* Return array of strings describing devices. */
+	return dev_strings;
+}
+
+/** 
+ * @brief Private helper function, prints a list of the devices 
+ * specified in the given list.
+ * 
+ * @param devices List of devices.
+ * @param selected Index of selected device (a message will appear near
+ * the device name indicating the device is selected). Pass -1 to 
+ * ignore it.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * */
+static void cl4_devsel_dep_menu_list(CL4DevSelDevices devices, 
+	cl_int selected, GError** err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Make sure devices array is not null. */
+	g_return_val_if_fail(devices != NULL, NULL);
+	
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Array of device description strings. */
+	gchar** dev_strings;
+	
+	/* Get device description strings. */
+	dev_strings = cl4_get_device_strings_from_array(devices, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	
+	/* Print menu. */
+	g_printf("\n   " \
+		"=========================== Device Selection" \
+		"============================\n\n");
+	
+	/* Print each device description string. */
+	for (cl_int i = 0; i < (cl_int) devices->len; i++) {
+		
+		/* Current device string. */
+		gchar* sel_str;
+		
+		/* If a device is pre-selected, show it. */
+		sel_str = "            ";
+		if (i == selected) {
+			sel_str = "  [SELECTED]";
+		}
+		
+		/* Print string. */
+		g_printf(" %s %s\n", 
+			sel_str, dev_strings[i]);
+		
+	}
+	
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:
+
+	/* Free what the array of device description strings. */
+	g_strfreev(dev_strings);
+
+}
+
+/** 
+ * @brief Private helper function, asks the user to select a device 
+ * from a list. 
+ * 
+ * @param devices Array of devices.
+ * @return The list index of the selected device.
+ * */
+static cl_int cl4_devsel_dep_menu_query(CL4DevSelDevices devices,
+	GError** err) {
+	
+	/* Index of selected device. */
+	cl_int index = -1;
+	/* Number of results read from user input. */
+	int result;
+	/* Internal error handler. */
+	GError* err_internal = NULL;
+	
+	/* Print available devices */
+	cl4_devsel_dep_menu_list(devices, -1, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If only one device exists, return that one. */
+	if (devices->len == 1) {
+		index = 0;
+	} else {
+		/* Otherwise, query the user. */
+		do {
+			g_printf("\n   (?) Select device (0-%d) > ", devices->len - 1);
+			result = scanf("%u", &index);
+			/* Clean keyboard buffer */
+			int c;
+			do { c = getchar(); } while (c != '\n' && c != EOF);
+			/* Check if result is Ok and break the loop if so */
+			if (1 == result) {
+				if ((index >= 0) && (index < (cl_int) devices->len))
+					break;
+			}
+			/* Result not Ok, print error message */
+			g_printf("   (!) Invalid choice, please insert a value " \
+				"between 0 and %u.\n", devices->len - 1);
+		} while (1);
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	index = -1;
+	
+finish:
+	
+	/* Return device index. */
+	return index;
+
+}
+
+/** 
+ * @brief Returns a NULL-terminated array of strings, each one
+ * containing the name and vendor of each device in the system.
+ * 
+ * The array of strings should be freed with the g_strfreev() function
+ * from GLib.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return A NULL-terminated array of strings, each one containing the 
+ * name and vendor of each device in the system. The array of strings 
+ * should be freed with the g_strfreev() function from GLib. If an error
+ * occurs, NULL is returned.
+ * */
+gchar** cl4_devsel_get_device_strings(GError** err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Array of devices. */
+	CL4DevSelDevices devices = NULL;
+	
+	/* Array of strings. */
+	gchar** dev_strings = NULL;
+	
+	/* Get all devices present in the system. */
+	devices = cl4_devsel_get_devices(&err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Get the array of strings describing the devices. */
+	dev_strings = cl4_get_device_strings_from_array(
+		devices, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+	
+	/* Free what was built of the array of strings. */
+	g_strfreev(dev_strings);
+	dev_strings = NULL;
+
+finish:
+
+	/* Destroy array of devices. */
+	g_ptr_array_free(devices, TRUE);
+	
+	/* Return array of strings describing devices. */
+	return dev_strings;
+
+}
+
+/** 
+ * @brief Print to stdout a device description string for each device in
+ * the system.
+ * 
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * */
+void cl4_devsel_print_device_strings(GError** err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Array of strings. */
+	gchar** dev_strings = NULL;
+	
+	/* Get the array of strings describing the devices. */
+	dev_strings = cl4_devsel_get_device_strings(&err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Print device list to stdout. */
+	for (guint i = 0; dev_strings[i] != NULL; ++i) {
+		g_printf("%s\n", dev_strings[i]);
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert (err == NULL || *err != NULL);
+
+finish:
+
+	/* Free array of strings. */
+	g_strfreev(dev_strings);
+
+}
 
 /**
  * @brief Add an independent filter to the filter set.
@@ -681,102 +977,6 @@ finish:
 
 	/* Return filtered devices. */
 	return devices;
-}
-
-/** 
- * @brief Private helper function, prints a list of the devices 
- * specified in the given list.
- * 
- * @param devices List of devices.
- * @param selected Index of selected device (a message will appear near
- * the device name indicating the device is selected). Pass -1 to 
- * ignore it.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * */
-static void cl4_devsel_dep_menu_list(CL4DevSelDevices devices, 
-	cl_int selected, GError** err) {
-	
-	char* sel_str;
-	g_print("\n   " \
-		"=========================== Device Selection" \
-		"============================\n\n");
-		
-	for (cl_int i = 0; i < (cl_int) devices->len; i++) {
-		
-		char* name = cl4_device_info_value_array(
-				devices->pdata[i], CL_DEVICE_NAME, char*, err);
-		if ((err != NULL) && (*err != NULL)) return;
-		char* vendor = cl4_device_info_value_array(
-				devices->pdata[i], CL_DEVICE_VENDOR, char*, err);
-		if ((err != NULL) && (*err != NULL)) return;
-		sel_str = "            ";
-		if (i == selected) {
-			sel_str = "  [SELECTED]";
-		}
-		g_print(" %s %d. %s\n                 %s\n", 
-			sel_str, i, name, vendor);
-		
-	}
-}
-
-/** 
- * @brief Private helper function, asks the user to select a device 
- * from a list. 
- * 
- * @param devices List of devices.
- * @return The list index of the selected device.
- * */
-static cl_int cl4_devsel_dep_menu_query(CL4DevSelDevices devices,
-	GError** err) {
-	
-	/* Index of selected device. */
-	cl_int index = -1;
-	/* Number of results read from user input. */
-	int result;
-	/* Internal error handler. */
-	GError* err_internal = NULL;
-	
-	/* Print available devices */
-	cl4_devsel_dep_menu_list(devices, -1, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
-	
-	/* If only one device exists, return that one. */
-	if (devices->len == 1) {
-		index = 0;
-	} else {
-		/* Otherwise, query the user. */
-		do {
-			g_print("   (?) Select device (0-%d) > ", devices->len - 1);
-			result = scanf("%u", &index);
-			/* Clean keyboard buffer */
-			int c;
-			do { c = getchar(); } while (c != '\n' && c != EOF);
-			/* Check if result is Ok and break the loop if so */
-			if (1 == result) {
-				if ((index >= 0) && (index < (cl_int) devices->len))
-					break;
-			}
-			/* Result not Ok, print error message */
-			g_print("   (!) Invalid choice, please insert a value " \
-				"between 0 and %u.\n", devices->len - 1);
-		} while (1);
-	}
-	
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-	index = -1;
-	
-finish:
-	
-	/* Return device index. */
-	return index;
-
 }
 
 /**

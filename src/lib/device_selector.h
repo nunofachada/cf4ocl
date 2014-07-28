@@ -82,6 +82,14 @@ typedef CL4DevSelDevices (*cl4_devsel_dep)(
  * */
 typedef GPtrArray* CL4DevSelFilters;
 
+/** @brief Returns a NULL-terminated array of strings, each one
+ * containing the name and vendor of each device in the system. */
+gchar** cl4_devsel_get_device_strings(GError** err);
+
+/** @brief Print to stdout a device description string for each device 
+ * in the system. */
+void cl4_devsel_print_device_strings(GError** err);
+
 /** @brief Add a independent device filter to the filter set. */
 void cl4_devsel_add_indep_filter(
 	CL4DevSelFilters* filters, cl4_devsel_indep filter, gpointer data);
