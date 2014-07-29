@@ -68,23 +68,23 @@ clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
 	} else {
 		switch (param_name) {
 			case CL_MEM_TYPE:
-				cl4_test_basic_info(cl_mem_object_type, memobj, type);
+				ccl_test_basic_info(cl_mem_object_type, memobj, type);
 			case CL_MEM_FLAGS:
-				cl4_test_basic_info(cl_mem_flags, memobj, flags);
+				ccl_test_basic_info(cl_mem_flags, memobj, flags);
 			case CL_MEM_SIZE:
-				cl4_test_basic_info(size_t, memobj, size);
+				ccl_test_basic_info(size_t, memobj, size);
 			case CL_MEM_HOST_PTR:
-				cl4_test_basic_info(void*, memobj, host_ptr);
+				ccl_test_basic_info(void*, memobj, host_ptr);
 			case CL_MEM_MAP_COUNT:
-				cl4_test_basic_info(cl_uint, memobj, map_count);
+				ccl_test_basic_info(cl_uint, memobj, map_count);
 			case CL_MEM_REFERENCE_COUNT:
-				cl4_test_basic_info(cl_uint, memobj, ref_count);
+				ccl_test_basic_info(cl_uint, memobj, ref_count);
 			case CL_MEM_CONTEXT:
-				cl4_test_basic_info(cl_context, memobj, context);
+				ccl_test_basic_info(cl_context, memobj, context);
 			case CL_MEM_ASSOCIATED_MEMOBJECT:
-				cl4_test_basic_info(cl_mem, memobj, associated_object);
+				ccl_test_basic_info(cl_mem, memobj, associated_object);
 			case CL_MEM_OFFSET:
-				cl4_test_basic_info(size_t, memobj, offset);
+				ccl_test_basic_info(size_t, memobj, offset);
 			default:
 				status = CL_INVALID_VALUE;
 		}

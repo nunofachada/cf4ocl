@@ -83,13 +83,13 @@ clGetCommandQueueInfo(cl_command_queue command_queue,
 		switch (param_name) {
 			
 			case CL_QUEUE_CONTEXT:
-				cl4_test_basic_info(cl_context, command_queue, context);
+				ccl_test_basic_info(cl_context, command_queue, context);
 			case CL_QUEUE_DEVICE:	
-				cl4_test_basic_info(cl_device_id, command_queue, device);
+				ccl_test_basic_info(cl_device_id, command_queue, device);
 			case CL_QUEUE_REFERENCE_COUNT:
-				cl4_test_basic_info(cl_uint, command_queue, ref_count);
+				ccl_test_basic_info(cl_uint, command_queue, ref_count);
 			case CL_CONTEXT_PROPERTIES:
-				cl4_test_basic_info(cl_command_queue_properties, command_queue, properties);
+				ccl_test_basic_info(cl_command_queue_properties, command_queue, properties);
 			default:
 				status = CL_INVALID_VALUE;
 		}

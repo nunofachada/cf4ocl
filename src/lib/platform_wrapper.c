@@ -31,10 +31,10 @@
 /**
  * @brief Platform wrapper object.
  */
-struct cl4_platform {
+struct ccl_platform {
 
 	/** Parent wrapper object. */
-	CL4DevContainer base;
+	CCLDevContainer base;
 
 };
 
@@ -53,15 +53,15 @@ struct cl4_platform {
  * This function will rarely be called from client code, except when
  * clients wish to create the OpenCL platform directly (using the
  * clGetPlatformIDs() function) and then wrap the OpenCL platform in a 
- * ::CL4Platform wrapper object.
+ * ::CCLPlatform wrapper object.
  * 
  * @param platform The OpenCL platform to be wrapped.
- * @return The ::CL4Platform wrapper for the given OpenCL platform.
+ * @return The ::CCLPlatform wrapper for the given OpenCL platform.
  * */
-CL4Platform* cl4_platform_new_wrap(cl_platform_id platform) {
+CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
 	
-	return (CL4Platform*) cl4_wrapper_new(
-		(void*) platform, sizeof(CL4Platform));
+	return (CCLPlatform*) ccl_wrapper_new(
+		(void*) platform, sizeof(CCLPlatform));
 		
 }
 
@@ -71,10 +71,10 @@ CL4Platform* cl4_platform_new_wrap(cl_platform_id platform) {
  *
  * @param platf The platform wrapper object.
  * */
-void cl4_platform_destroy(CL4Platform* platf) {
+void ccl_platform_destroy(CCLPlatform* platf) {
 	
-	cl4_wrapper_unref((CL4Wrapper*) platf, sizeof(CL4Platform),
-		(cl4_wrapper_release_fields) cl4_dev_container_release_devices, 
+	ccl_wrapper_unref((CCLWrapper*) platf, sizeof(CCLPlatform),
+		(ccl_wrapper_release_fields) ccl_dev_container_release_devices, 
 		NULL, NULL); 
 
 }
@@ -82,17 +82,17 @@ void cl4_platform_destroy(CL4Platform* platf) {
 /** @}*/
 
 /** 
- * @brief Implementation of cl4_dev_container_get_cldevices() for the
+ * @brief Implementation of ccl_dev_container_get_cldevices() for the
  * platform wrapper. 
  * 
- * @param devcon A ::CL4Platform wrapper, passed as a ::CL4DevContainer .
+ * @param devcon A ::CCLPlatform wrapper, passed as a ::CCLDevContainer .
  * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return A list of cl_device_id objects inside a ::CL4WrapperInfo
+ * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
  * */
-CL4WrapperInfo* cl4_platform_get_cldevices(
-	CL4DevContainer* devcon, GError** err) {
+CCLWrapperInfo* ccl_platform_get_cldevices(
+	CCLDevContainer* devcon, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -100,7 +100,7 @@ CL4WrapperInfo* cl4_platform_get_cldevices(
 	/* Make sure devcon is not NULL. */
 	g_return_val_if_fail(devcon != NULL, NULL);
 	
-	CL4WrapperInfo* info = NULL;
+	CCLWrapperInfo* info = NULL;
 	
 	cl_int ocl_status;
 	
@@ -109,28 +109,28 @@ CL4WrapperInfo* cl4_platform_get_cldevices(
 	/* Determine number of devices. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object, 
 		CL_DEVICE_TYPE_ALL, 0, NULL, &devcon->num_devices);
-	gef_if_error_create_goto(*err, CL4_ERROR, 
-		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+	gef_if_error_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: get number of devices (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
 	/* Create info object with size in bytes of array of device IDs. */
-	info = cl4_wrapper_info_new(
+	info = ccl_wrapper_info_new(
 		sizeof(cl_device_id) * devcon->num_devices);
 		
 	/* Get existing device IDs. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object, 
 		CL_DEVICE_TYPE_ALL, devcon->num_devices, info->value, NULL);
-	gef_if_error_create_goto(*err, CL4_ERROR, 
-		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+	gef_if_error_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: get device IDs (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
 	/* Dirty trick to allow for automatic memory release of this info 
 	 * when platform object is destroyed. */
 	 
 	/* 1 - Make sure info table is initialized by requesting some info. */
-	cl4_platform_get_info_string(devcon, CL_PLATFORM_NAME, &err_internal);
+	ccl_platform_get_info_string(devcon, CL_PLATFORM_NAME, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	/* 2 - Insert device list in info table, so that it will be 
 	 * automatically released. */
@@ -145,7 +145,7 @@ error_handler:
 	g_assert(err == NULL || *err != NULL);
 	
 	/* Free info if it was created. */
-	if (info != NULL) cl4_wrapper_info_destroy(info);
+	if (info != NULL) ccl_wrapper_info_destroy(info);
 	
 finish:		
 	

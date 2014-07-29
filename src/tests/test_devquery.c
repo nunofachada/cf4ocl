@@ -30,40 +30,40 @@
 #include "device_query.h"
 #include "common.h"
 
-#define CL4_TEST_DEVQUERY_MAXINFOLEN 500
+#define CCL_TEST_DEVQUERY_MAXINFOLEN 500
 
 /**
  * @brief Tests devquery module helper functions.
  * */
 static void helpers_test() {
 	
-	CL4Platforms* platfs = NULL;
-	CL4Platform* p = NULL;
-	CL4Device* d = NULL;
+	CCLPlatforms* platfs = NULL;
+	CCLPlatform* p = NULL;
+	CCLDevice* d = NULL;
 	GError* err = NULL;
 	guint num_devs;
 	guint num_platfs;
-	CL4WrapperInfo* info;
-	gchar param_value_str[CL4_TEST_DEVQUERY_MAXINFOLEN];
+	CCLWrapperInfo* info;
+	gchar param_value_str[CCL_TEST_DEVQUERY_MAXINFOLEN];
 
 
 	/* Get platforms. */
-	platfs = cl4_platforms_new(&err);
+	platfs = ccl_platforms_new(&err);
 	if (err == NULL) {
 		
 		/* Number of platforms. */
-		num_platfs = cl4_platforms_count(platfs);
+		num_platfs = ccl_platforms_count(platfs);
 		g_debug("* Found %d OpenCL platforms", num_platfs);
 		
 		/* Cycle through platforms. */
 		for (guint i = 0; i < num_platfs; i++) {
 		
 			/* Get current platform. */
-			p = cl4_platforms_get_platform(platfs, i);
+			p = ccl_platforms_get_platform(platfs, i);
 			g_debug(">> Platform %d:", i);
 
 			/* Get number of devices. */
-			num_devs = cl4_platform_get_num_devices(p, &err);
+			num_devs = ccl_platform_get_num_devices(p, &err);
 			
 			/* Only test for device information if device count was 
 			 * successfully obtained. */
@@ -79,23 +79,23 @@ static void helpers_test() {
 				for (guint j = 0; j < num_devs; j++) {
 					
 					/* Get current device. */
-					d = cl4_platform_get_device(p, j, &err);
+					d = ccl_platform_get_device(p, j, &err);
 					g_assert_no_error(err);
 					g_debug("====== Device #%d", j);
 
-					for (gint k = 0; k < cl4_devquery_info_map_size; k++) {
-						info = cl4_device_get_info(d, cl4_devquery_info_map[k].device_info, &err);
+					for (gint k = 0; k < ccl_devquery_info_map_size; k++) {
+						info = ccl_device_get_info(d, ccl_devquery_info_map[k].device_info, &err);
 						if (err == NULL) {
 							g_debug("\t%s : %s", 
-								cl4_devquery_info_map[k].param_name, 
-								cl4_devquery_info_map[k].format(
+								ccl_devquery_info_map[k].param_name, 
+								ccl_devquery_info_map[k].format(
 									info, param_value_str, 
-									CL4_TEST_DEVQUERY_MAXINFOLEN,
-									cl4_devquery_info_map[k].units));
+									CCL_TEST_DEVQUERY_MAXINFOLEN,
+									ccl_devquery_info_map[k].units));
 						} else {
 							g_clear_error(&err);
 							g_debug("\t%s : %s", 
-								cl4_devquery_info_map[k].param_name, "N/A");
+								ccl_devquery_info_map[k].param_name, "N/A");
 							
 						}
 					}
@@ -105,7 +105,7 @@ static void helpers_test() {
 		}
 
 		/* Destroy list of platforms. */
-		cl4_platforms_destroy(platfs);
+		ccl_platforms_destroy(platfs);
 		
 	} else {
 		
@@ -118,7 +118,7 @@ static void helpers_test() {
 }
 
 /**
- * @brief Test the cl4_devquery_name function of the device module.
+ * @brief Test the ccl_devquery_name function of the device module.
  * */
 static void name_test() {
 
@@ -126,44 +126,44 @@ static void name_test() {
 	cl_device_info info;
 
 	/* Test exact parameter name. */
-	info = cl4_devquery_name("CL_DEVICE_ENDIAN_LITTLE");
+	info = ccl_devquery_name("CL_DEVICE_ENDIAN_LITTLE");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_devquery_name("CL_DEVICE_EXTENSIONS");
+	info = ccl_devquery_name("CL_DEVICE_EXTENSIONS");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_devquery_name("CL_DRIVER_VERSION");
+	info = ccl_devquery_name("CL_DRIVER_VERSION");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 
 	/* Test mixed parameter name. */
-	info = cl4_devquery_name("cl_Device_Endian_Little");
+	info = ccl_devquery_name("cl_Device_Endian_Little");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_devquery_name("CL_device_Extensions");
+	info = ccl_devquery_name("CL_device_Extensions");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_devquery_name("cl_DRIVer_version");
+	info = ccl_devquery_name("cl_DRIVer_version");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 
 	/* Test lowercase parameter name without cl_device_ or cl_ prefix. */
-	info = cl4_devquery_name("endian_little");
+	info = ccl_devquery_name("endian_little");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_devquery_name("extensions");
+	info = ccl_devquery_name("extensions");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_devquery_name("driver_version");
+	info = ccl_devquery_name("driver_version");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 	
 	/* Test parameter name without CL_DEVICE_ or CL_ prefix. */
-	info = cl4_devquery_name("ENDIAN_LITTLE");
+	info = ccl_devquery_name("ENDIAN_LITTLE");
 	g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-	info = cl4_devquery_name("EXTENSIONS");
+	info = ccl_devquery_name("EXTENSIONS");
 	g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-	info = cl4_devquery_name("DRIVER_VERSION");
+	info = ccl_devquery_name("DRIVER_VERSION");
 	g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
 
 }
 
 /**
- * @brief Tests if the cl4_devquery_info_map array is well built,
+ * @brief Tests if the ccl_devquery_info_map array is well built,
  * namely (i) if the param_name fields are alphabetically ordered, and 
  * (ii) if the size of the array corresponds to the 
- * cl4_devquery_info_map_size variable.
+ * ccl_devquery_info_map_size variable.
  * */
 static void infomap_test() {
 	
@@ -172,23 +172,23 @@ static void infomap_test() {
 	
 	/* Cycle through info map. */
 	for (imsize = 0; 
-		cl4_devquery_info_map[imsize].param_name != NULL; 
+		ccl_devquery_info_map[imsize].param_name != NULL; 
 		imsize++) {
 			
 		if ((imsize > 0) 
 			&& 
-			(cl4_devquery_info_map[imsize].param_name != NULL)) {
+			(ccl_devquery_info_map[imsize].param_name != NULL)) {
 			
 			/* Test if parameter names are alphabetically ordered. */
 			g_assert_cmpstr(
-				cl4_devquery_info_map[imsize - 1].param_name,
+				ccl_devquery_info_map[imsize - 1].param_name,
 				<, 
-				cl4_devquery_info_map[imsize].param_name);
+				ccl_devquery_info_map[imsize].param_name);
 		}
 	}
 	
 	/* Test if size corresponds. */
-	g_assert_cmpint(imsize, ==, cl4_devquery_info_map_size);
+	g_assert_cmpint(imsize, ==, ccl_devquery_info_map_size);
 		
 	 
 }

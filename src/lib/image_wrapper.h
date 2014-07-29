@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_IMAGE_WRAPPER_H
-#define CL4_IMAGE_WRAPPER_H 
+#ifndef _CCL_IMAGE_WRAPPER_H_
+#define _CCL_IMAGE_WRAPPER_H_
 
 #include "memobj_wrapper.h"
 
@@ -41,7 +41,7 @@
  */
 
 /** @brief Image wrapper object. */
-typedef CL4MemObj CL4Image;
+typedef CCLMemObj CCLImage;
 
 /// @todo
 

@@ -24,14 +24,14 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
  
-#ifndef CL4_OCL_ENV_H
-#define CL4_OCL_ENV_H 
+#ifndef CCL_OCL_ENV_H
+#define CCL_OCL_ENV_H 
 
 #include "ocl_impl.h"
 
-extern const cl_uint cl4_test_num_platforms;
+extern const cl_uint ccl_test_num_platforms;
 
-extern const struct _cl_platform_id cl4_test_platforms[];
+extern const struct _cl_platform_id ccl_test_platforms[];
 
 #endif
 

@@ -26,8 +26,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_PLATFORM_WRAPPER_H
-#define CL4_PLATFORM_WRAPPER_H
+#ifndef _CCL_PLATFORM_WRAPPER_H_
+#define _CCL_PLATFORM_WRAPPER_H_
 
 #include "common.h"
 #include "device_wrapper.h"
@@ -47,17 +47,17 @@
  */
  
 /** @brief The platform wrapper object. */
-typedef struct cl4_platform CL4Platform;
+typedef struct ccl_platform CCLPlatform;
 
 /** @brief Get the platform wrapper for the given OpenCL platform. */
-CL4Platform* cl4_platform_new_wrap(cl_platform_id platform);
+CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 
 /** @brief Decrements the reference count of the platform wrapper 
  * object. If it reaches 0, the platform wrapper object is destroyed. */
-void cl4_platform_destroy(CL4Platform* platf);
+void ccl_platform_destroy(CCLPlatform* platf);
 
 /**
- * @brief Get a ::CL4WrapperInfo platform information object.
+ * @brief Get a ::CCLWrapperInfo platform information object.
  * 
  * @param platf The platform wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -67,9 +67,9 @@ void cl4_platform_destroy(CL4Platform* platf);
  * be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_platform_get_info(platf, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) platf, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
+#define ccl_platform_get_info(platf, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) platf, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar platform information value. 
@@ -87,9 +87,9 @@ void cl4_platform_destroy(CL4Platform* platf);
  * automatically freed when the platform wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define cl4_platform_get_scalar_info(platf, param_name, param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) platf, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, \
+#define ccl_platform_get_scalar_info(platf, param_name, param_type, err) \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetPlatformInfo, \
 		CL_TRUE, err))
 
 /** 
@@ -108,14 +108,14 @@ void cl4_platform_destroy(CL4Platform* platf);
  * automatically freed when the platform wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_platform_get_array_info(platf, param_name, param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) platf, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, \
+#define ccl_platform_get_array_info(platf, param_name, param_type, err) \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetPlatformInfo, \
 		CL_TRUE, err)
 
 /**
  * @brief Helper macro which gets a platform information string. This 
- * macro simply wraps the cl4_platform_get_array_info() macro, because
+ * macro simply wraps the ccl_platform_get_array_info() macro, because
  * (as of OpenCL 2.0) all platform information return types are char*.
  * 
  * @param platf The platform wrapper object.
@@ -126,24 +126,24 @@ void cl4_platform_destroy(CL4Platform* platf);
  * will be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_platform_get_info_string(platf, param_name, err) \
-	cl4_platform_get_array_info(platf, param_name, char*, err)
+#define ccl_platform_get_info_string(platf, param_name, err) \
+	ccl_platform_get_array_info(platf, param_name, char*, err)
 
 /** 
  * @brief Increase the reference count of the platform wrapper object.
  * 
  * @param platform The platform wrapper object.
  * */
-#define cl4_platform_ref(platform) \
-	cl4_wrapper_ref((CL4Wrapper*) platform)
+#define ccl_platform_ref(platform) \
+	ccl_wrapper_ref((CCLWrapper*) platform)
 
 /**
- * @brief Alias to cl4_platform_destroy().
+ * @brief Alias to ccl_platform_destroy().
  * 
  * @param platform Platform wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_platform_unref(platform) cl4_platform_destroy(platform)
+#define ccl_platform_unref(platform) ccl_platform_destroy(platform)
 
 /**
  * @brief Get the OpenCL platform object.
@@ -151,8 +151,8 @@ void cl4_platform_destroy(CL4Platform* platf);
  * @param platform The platform wrapper object.
  * @return The OpenCL platform object.
  * */
-#define cl4_platform_unwrap(platform) \
-	((cl_platform) cl4_wrapper_unwrap((CL4Wrapper*) platform))
+#define ccl_platform_unwrap(platform) \
+	((cl_platform) ccl_wrapper_unwrap((CCLWrapper*) platform))
  
 /** 
  * @brief Get all device wrappers in platform. 
@@ -164,26 +164,26 @@ void cl4_platform_destroy(CL4Platform* platf);
  * @param platf The platform wrapper object.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return An array containing the ::CL4Device wrappers which belong to
+ * @return An array containing the ::CCLDevice wrappers which belong to
  * this platform, or NULL if an error occurs.
  */
-#define cl4_platform_get_all_devices(platf, err) \
-	cl4_dev_container_get_all_devices((CL4DevContainer*) platf, \
-		cl4_platform_get_cldevices, err)
+#define ccl_platform_get_all_devices(platf, err) \
+	ccl_dev_container_get_all_devices((CCLDevContainer*) platf, \
+		ccl_platform_get_cldevices, err)
  
 /** 
- * @brief Get ::CL4Device wrapper at given index. 
+ * @brief Get ::CCLDevice wrapper at given index. 
  * 
  * @param platf The platform wrapper object.
  * @param index Index of device in platform.
  * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return The ::CL4Device wrapper at given index or NULL if an error 
+ * @return The ::CCLDevice wrapper at given index or NULL if an error 
  * occurs.
  * */
-#define cl4_platform_get_device(platf, index, err) \
-	cl4_dev_container_get_device((CL4DevContainer*) platf, \
-		cl4_platform_get_cldevices, index, err)
+#define ccl_platform_get_device(platf, index, err) \
+	ccl_dev_container_get_device((CCLDevContainer*) platf, \
+		ccl_platform_get_cldevices, index, err)
 
 /**
  * @brief Return number of devices in platform.
@@ -194,15 +194,15 @@ void cl4_platform_destroy(CL4Platform* platf);
  * @return The number of devices in platform or 0 if an error occurs or 
  * is otherwise not possible to get any device.
  * */
-#define cl4_platform_get_num_devices(platf, err) \
-	cl4_dev_container_get_num_devices((CL4DevContainer*) platf, \
-		cl4_platform_get_cldevices, err)
+#define ccl_platform_get_num_devices(platf, err) \
+	ccl_dev_container_get_num_devices((CCLDevContainer*) platf, \
+		ccl_platform_get_cldevices, err)
 
 /** @} */
 
-/** @brief Implementation of cl4_dev_container_get_cldevices() for the
+/** @brief Implementation of ccl_dev_container_get_cldevices() for the
  * platform wrapper. */
-CL4WrapperInfo* cl4_platform_get_cldevices(
-	CL4DevContainer* devcon, GError** err);
+CCLWrapperInfo* ccl_platform_get_cldevices(
+	CCLDevContainer* devcon, GError** err);
 
 #endif

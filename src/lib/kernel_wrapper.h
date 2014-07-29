@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_KERNEL_WRAPPER_H
-#define CL4_KERNEL_WRAPPER_H 
+#ifndef _CCL_KERNEL_WRAPPER_H_
+#define _CCL_KERNEL_WRAPPER_H_
 
 #include <glib.h>
 #include "oclversions.h"
@@ -35,8 +35,8 @@
 #include "event_wrapper.h"
 #include "queue_wrapper.h"
 
-/* Forward declaration of CL4Program. */
-typedef struct cl4_program CL4Program;
+/* Forward declaration of CCLProgram. */
+typedef struct ccl_program CCLProgram;
 
 /**
  * @defgroup KERNEL_WRAPPER Kernel wrapper
@@ -50,41 +50,41 @@ typedef struct cl4_program CL4Program;
  */
 
 /** @brief Kernel wrapper object. */
-typedef struct cl4_kernel CL4Kernel;
+typedef struct ccl_kernel CCLKernel;
 
-CL4Kernel* cl4_kernel_new(
-	CL4Program* prg, const char* kernel_name, GError** err);
+CCLKernel* ccl_kernel_new(
+	CCLProgram* prg, const char* kernel_name, GError** err);
 
 /** @brief Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed. */
-void cl4_kernel_destroy(CL4Kernel* krnl);
+void ccl_kernel_destroy(CCLKernel* krnl);
 
-void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
-	CL4Arg* arg);
+void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, 
+	CCLArg* arg);
 
-void cl4_kernel_set_args(CL4Kernel* krnl, ...) G_GNUC_NULL_TERMINATED;
+void ccl_kernel_set_args(CCLKernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
-void cl4_kernel_set_args_v(CL4Kernel* krnl, va_list args);
+void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args);
 
-CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4Queue* cq, 
+CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err);
+	CCLEventWaitList evt_wait_lst, GError** err);
 
 /** @brief Set kernel arguments and run it. */
-CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4Queue* cq, 
+CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, ...)
+	CCLEventWaitList evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
-CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq, 
+CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, va_list args);
+	CCLEventWaitList evt_wait_lst, GError** err, va_list args);
 
 /**
- * @brief Get a ::CL4WrapperInfo kernel information object.
+ * @brief Get a ::CCLWrapperInfo kernel information object.
  * 
  * @param krnl The kernel wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -94,9 +94,9 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_kernel_get_info(krnl, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) krnl, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetKernelInfo, CL_TRUE, err)
+#define ccl_kernel_get_info(krnl, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) krnl, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar kernel information value. 
@@ -114,9 +114,9 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * automatically freed when the kernel wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define cl4_kernel_get_scalar_info(krnl, param_name, param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetKernelInfo, \
+#define ccl_kernel_get_scalar_info(krnl, param_name, param_type, err) \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetKernelInfo, \
 		CL_TRUE, err))
 
 /** 
@@ -135,13 +135,13 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * automatically freed when the kernel wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_kernel_get_array_info(krnl, param_name, param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetKernelInfo, \
+#define ccl_kernel_get_array_info(krnl, param_name, param_type, err) \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetKernelInfo, \
 		CL_TRUE, err)
 
 /**
- * @brief Get a ::CL4WrapperInfo kernel workgroup information object.
+ * @brief Get a ::CCLWrapperInfo kernel workgroup information object.
  * 
  * @param krnl The kernel wrapper object.
  * @param dev The device wrapper object.
@@ -152,9 +152,9 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * object will be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_kernel_get_workgroup_info(krnl, dev, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) krnl, (CL4Wrapper*) dev, \
-		param_name, (cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+#define ccl_kernel_get_workgroup_info(krnl, dev, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) krnl, (CCLWrapper*) dev, \
+		param_name, (ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, err)
 
 /** 
@@ -175,11 +175,11 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * will be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, zero is returned.
  * */
-#define cl4_kernel_get_scalar_workgroup_info(krnl, dev, param_name, \
+#define ccl_kernel_get_scalar_workgroup_info(krnl, dev, param_name, \
 	param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
-		(CL4Wrapper*) dev, param_name, \
-		(cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
+		(CCLWrapper*) dev, param_name, \
+		(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, err))
 
 /** 
@@ -200,11 +200,11 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * will be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_kernel_get_array_workgroup_info(krnl, dev, param_name, \
+#define ccl_kernel_get_array_workgroup_info(krnl, dev, param_name, \
 	param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
-		(CL4Wrapper*) dev, param_name, \
-		(cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
+		(CCLWrapper*) dev, param_name, \
+		(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, err)
 
 /** 
@@ -212,16 +212,16 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * 
  * @param krnl The kernel wrapper object. 
  * */
-#define cl4_kernel_ref(krnl) \
-	cl4_wrapper_ref((CL4Wrapper*) krnl)
+#define ccl_kernel_ref(krnl) \
+	ccl_wrapper_ref((CCLWrapper*) krnl)
 
 /**
- * @brief Alias to cl4_kernel_destroy().
+ * @brief Alias to ccl_kernel_destroy().
  * 
  * @param krnl Kernel wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_kernel_unref(krnl) cl4_kernel_destroy(krnl)
+#define ccl_kernel_unref(krnl) ccl_kernel_destroy(krnl)
 
 /**
  * @brief Get the OpenCL kernel object.
@@ -229,14 +229,14 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
  * @param krnl The kernel wrapper object.
  * @return The OpenCL kernel object.
  * */
-#define cl4_kernel_unwrap(krnl) \
-	((cl_kernel) cl4_wrapper_unwrap((CL4Wrapper*) krnl))
+#define ccl_kernel_unwrap(krnl) \
+	((cl_kernel) ccl_wrapper_unwrap((CCLWrapper*) krnl))
 
 
 /** @} */
 
 /** @brief Get the kernel wrapper for the given OpenCL kernel. */
-CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel);
+CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
 #endif
 

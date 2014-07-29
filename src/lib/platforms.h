@@ -26,8 +26,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_PLATFORMS_H
-#define CL4_PLATFORMS_H
+#ifndef _CCL_PLATFORMS_H_
+#define _CCL_PLATFORMS_H_
 
 #include "common.h"
 #include "platform_wrapper.h"
@@ -48,22 +48,22 @@
  * @brief Object which contains the list of OpenCL platforms available
  * in the system.
  */
-typedef struct cl4_platforms CL4Platforms;
+typedef struct ccl_platforms CCLPlatforms;
 
-/** @brief Creates a new CL4Platforms* object, which contains the list 
+/** @brief Creates a new CCLPlatforms* object, which contains the list 
  * of OpenCL platforms available in the system. */
-CL4Platforms* cl4_platforms_new(GError **err);
+CCLPlatforms* ccl_platforms_new(GError **err);
 
-/** @brief Destroy a CL4Platforms* object, including all underlying
+/** @brief Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data. */
-void cl4_platforms_destroy(CL4Platforms* platforms);
+void ccl_platforms_destroy(CCLPlatforms* platforms);
 
-/** @brief Return number of OpenCL platforms found in CL4Platforms* 
+/** @brief Return number of OpenCL platforms found in CCLPlatforms* 
  * object. */
-guint cl4_platforms_count(CL4Platforms* platforms);
+guint ccl_platforms_count(CCLPlatforms* platforms);
 
-/** @brief Get CL4 platform wrapper object at given index. */
-CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index);
+/** @brief Get CCL platform wrapper object at given index. */
+CCLPlatform* ccl_platforms_get_platform(CCLPlatforms* platforms, guint index);
 
 /** @} */
 

@@ -28,8 +28,8 @@
  
 #include "abstract_dev_container_wrapper.h"
 
-static void cl4_dev_container_init_devices(CL4DevContainer* devcon, 
-	cl4_dev_container_get_cldevices get_devices, GError **err) {
+static void ccl_dev_container_init_devices(CCLDevContainer* devcon, 
+	ccl_dev_container_get_cldevices get_devices, GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -40,7 +40,7 @@ static void cl4_dev_container_init_devices(CL4DevContainer* devcon,
 	/* Make sure device list is not initialized. */
 	g_return_val_if_fail(devcon->devices == NULL, NULL);
 
-	CL4WrapperInfo* info_devs;
+	CCLWrapperInfo* info_devs;
 	GError* err_internal = NULL;
 
 	/* Get device IDs. */
@@ -52,13 +52,13 @@ static void cl4_dev_container_init_devices(CL4DevContainer* devcon,
 
 	/* Allocate memory for array of device wrapper objects. */
 	devcon->devices = g_slice_alloc(
-		devcon->num_devices * sizeof(CL4Device*));
+		devcon->num_devices * sizeof(CCLDevice*));
 
 	/* Wrap device IDs in device wrapper objects. */
 	for (guint i = 0; i < devcon->num_devices; ++i) {
 
 		/* Add device wrapper object to array of wrapper objects. */
-		devcon->devices[i] = cl4_device_new_wrap(
+		devcon->devices[i] = ccl_device_new_wrap(
 			((cl_device_id*) info_devs->value)[i]);
 	}
 
@@ -78,11 +78,11 @@ finish:
 }
 
 /**
- * @brief Release the devices held by the given #CL4DevContainer object.
+ * @brief Release the devices held by the given #CCLDevContainer object.
  * 
- * @param devcon A ::CL4DevContainer wrapper object.
+ * @param devcon A ::CCLDevContainer wrapper object.
  * */
-void cl4_dev_container_release_devices(CL4DevContainer* devcon) {
+void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 
 	/* Make sure devcon wrapper object is not NULL. */
 	g_return_if_fail(devcon != NULL);
@@ -94,29 +94,29 @@ void cl4_dev_container_release_devices(CL4DevContainer* devcon) {
 		/* Release devices in device container. */
 		for (guint i = 0; i < devcon->num_devices; ++i) {
 			if (devcon->devices[i])
-				cl4_device_unref(devcon->devices[i]);
+				ccl_device_unref(devcon->devices[i]);
 		}
 		
 		/* Free device wrapper array. */
-		g_slice_free1(devcon->num_devices * sizeof(CL4Device*), 
+		g_slice_free1(devcon->num_devices * sizeof(CCLDevice*), 
 			devcon->devices);
 	}
 
 }
 
 /** 
- * @brief Get all ::CL4Device wrappers in device container. 
+ * @brief Get all ::CCLDevice wrappers in device container. 
  * 
  * @param devcon The device container object.
  * @param get_devices Function to get cl_device_id's from wrapped
  * object.
  * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return All ::CL4Device wrappers in device container or NULL if an 
+ * @return All ::CCLDevice wrappers in device container or NULL if an 
  * error occurs.
  * */
-CL4Device** cl4_dev_container_get_all_devices(CL4DevContainer* devcon,
-	cl4_dev_container_get_cldevices get_devices, GError** err) {
+CCLDevice** ccl_dev_container_get_all_devices(CCLDevContainer* devcon,
+	ccl_dev_container_get_cldevices get_devices, GError** err) {
 		
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -128,7 +128,7 @@ CL4Device** cl4_dev_container_get_all_devices(CL4DevContainer* devcon,
 	if (devcon->devices == NULL) {
 		
 		/* Not initialized, initialize it. */
-		cl4_dev_container_init_devices(devcon, get_devices, err);
+		ccl_dev_container_init_devices(devcon, get_devices, err);
 		
 	}
 	
@@ -139,7 +139,7 @@ CL4Device** cl4_dev_container_get_all_devices(CL4DevContainer* devcon,
 
 
 /** 
- * @brief Get ::CL4Device wrapper at given index. 
+ * @brief Get ::CCLDevice wrapper at given index. 
  * 
  * @param devcon The device container object.
  * @param get_devices Function to get cl_device_id's from wrapped
@@ -147,12 +147,12 @@ CL4Device** cl4_dev_container_get_all_devices(CL4DevContainer* devcon,
  * @param index Index of device in device container.
  * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return The ::CL4Device wrapper at given index or NULL if an error 
+ * @return The ::CCLDevice wrapper at given index or NULL if an error 
  * occurs.
  * */
-CL4Device* cl4_dev_container_get_device(
-	CL4DevContainer* devcon, 
-	cl4_dev_container_get_cldevices get_devices, unsigned int index, 
+CCLDevice* ccl_dev_container_get_device(
+	CCLDevContainer* devcon, 
+	ccl_dev_container_get_cldevices get_devices, unsigned int index, 
 	GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -162,7 +162,7 @@ CL4Device* cl4_dev_container_get_device(
 	g_return_val_if_fail(devcon != NULL, NULL);
 	
 	/* The return value. */
-	CL4Device* device_ret;
+	CCLDevice* device_ret;
 	
 	/* Internal error object. */
 	GError* err_internal = NULL;
@@ -171,7 +171,7 @@ CL4Device* cl4_dev_container_get_device(
 	if (devcon->devices == NULL) {
 		
 		/* Not initialized, initialize it. */
-		cl4_dev_container_init_devices(
+		ccl_dev_container_init_devices(
 			devcon, get_devices, &err_internal);
 		
 		/* Check for errors. */
@@ -180,8 +180,8 @@ CL4Device* cl4_dev_container_get_device(
 	}
 	
 	/* Make sure device index is less than the number of devices. */
-	gef_if_error_create_goto(*err, CL4_ERROR, index >= devcon->num_devices, 
-		CL4_ERROR_DEVICE_NOT_FOUND, error_handler, 
+	gef_if_error_create_goto(*err, CCL_ERROR, index >= devcon->num_devices, 
+		CCL_ERROR_DEVICE_NOT_FOUND, error_handler, 
 		"%s: device index (%d) out of bounds (%d devices in list).",
 		 G_STRLOC, index, devcon->num_devices);
 
@@ -214,9 +214,9 @@ finish:
  * @return The number of devices in device container or 0 if an error 
  * occurs or is otherwise not possible to get any device.
  * */
-unsigned int cl4_dev_container_get_num_devices(
-	CL4DevContainer* devcon, 
-	cl4_dev_container_get_cldevices get_devices, GError** err) {
+unsigned int ccl_dev_container_get_num_devices(
+	CCLDevContainer* devcon, 
+	ccl_dev_container_get_cldevices get_devices, GError** err) {
 	
 	/* Make sure devcon is not NULL. */
 	g_return_val_if_fail(devcon != NULL, 0);
@@ -228,7 +228,7 @@ unsigned int cl4_dev_container_get_num_devices(
 	if (devcon->devices == NULL) {
 		
 		/* Not initialized, initialize it. */
-		cl4_dev_container_init_devices(devcon, get_devices, err);
+		ccl_dev_container_init_devices(devcon, get_devices, err);
 
 	}
 	

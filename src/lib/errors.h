@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_ERRORS_H
-#define CL4_ERRORS_H
+#ifndef _CCL_ERRORS_H_
+#define _CCL_ERRORS_H_
 
 /**
  * @defgroup ERRORS Errors
@@ -39,7 +39,7 @@
  */
 
 /** @brief Convert OpenCL error code to a readable string. */
-const char* cl4_err(int code);
+const char* ccl_err(int code);
 
 /** @} */
 

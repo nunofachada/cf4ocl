@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_COMMON_H
-#define CL4_COMMON_H 
+#ifndef _CCL_COMMON_H_
+#define _CCL_COMMON_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,36 +34,36 @@
 #include <glib/gprintf.h>
 #include "oclversions.h"
 
-#define CL4_COMMON_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."
+#define CCL_COMMON_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."
 /**
  * @brief Error codes.
  * */
-enum cl4_error_codes {
+enum ccl_error_codes {
 	/** Successful operation. */
-	CL4_SUCCESS = 0,
+	CCL_SUCCESS = 0,
 	/** Error code thrown when no memory allocation is possible. */
-	CL4_ERROR_NOALLOC = 1,
+	CCL_ERROR_NOALLOC = 1,
 	/** Error code thrown when it's not possible to open file. */
-	CL4_ERROR_OPENFILE = 2,
+	CCL_ERROR_OPENFILE = 2,
 	/** Error code thrown when passed arguments are invalid. */
-	CL4_ERROR_ARGS = 3,
+	CCL_ERROR_ARGS = 3,
 	/** Error code thrown when invalid data is passed to a function. */
-	CL4_ERROR_INVALID_DATA = 4,
+	CCL_ERROR_INVALID_DATA = 4,
 	/** Error code thrown when an error occurs while writing to a 
 	 * stream. */
-	CL4_ERROR_STREAM_WRITE = 5,
+	CCL_ERROR_STREAM_WRITE = 5,
 	/** The requested OpenCL device was not found. */
-	CL4_ERROR_DEVICE_NOT_FOUND = 6,
+	CCL_ERROR_DEVICE_NOT_FOUND = 6,
 	/** An OpenCL error ocurred. */
-	CL4_ERROR_OCL = 10
+	CCL_ERROR_OCL = 10
 };
 
 /** Resolves to error category identifying string, in this case an error 
  * in the OpenCL utilities library. */
-#define CL4_ERROR cl4_error_quark()
+#define CCL_ERROR ccl_error_quark()
 
 /** @brief Resolves to error category identifying string, in this case
  * an error in the OpenCL utilities library. */
-GQuark cl4_error_quark(void);
+GQuark ccl_error_quark(void);
 
 #endif

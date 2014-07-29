@@ -182,23 +182,23 @@ int main(int argc, char *argv[]) {
 	/* Random number generator. */
 	GRand* rng = NULL;
 	/* Profiler for OpenCL device implementation */
-	CL4Prof* prof_dev = NULL;
+	CCLProf* prof_dev = NULL;
 	/* Profiler for OpenMP CPU implementation */
-	CL4Prof* prof_cpu = NULL;
+	CCLProf* prof_cpu = NULL;
 	/* Device name */
 	char* dev_name;
 	/* Device vendor. */
 	char* dev_vendor;
 	/* Context wrapper. */
-	CL4Context* ctx = NULL;
+	CCLContext* ctx = NULL;
 	/* Device wrapper. */
-	CL4Device* dev = NULL;
+	CCLDevice* dev = NULL;
 	/* Program wrapper. */
-	CL4Program* prg = NULL;
+	CCLProgram* prg = NULL;
 	/* Command queue wrapper. */
-	CL4Queue* cq = NULL;
+	CCLQueue* cq = NULL;
 	/* Kernel wrapper. */
-	CL4Kernel* krnl = NULL;
+	CCLKernel* krnl = NULL;
 	/* Kernel name */
 	gchar* kernel_name = NULL;
 	/* Full kernel path. */
@@ -212,11 +212,11 @@ int main(int argc, char *argv[]) {
 	/* Host matrix C (calculated on the CPU). */
 	int *matrixC_test = NULL;
 	/* Device matrix A. */
-	CL4Buffer* matrixA_dev = NULL;
+	CCLBuffer* matrixA_dev = NULL;
 	/* Device matrix B. */
-	CL4Buffer* matrixB_dev = NULL;
+	CCLBuffer* matrixB_dev = NULL;
 	/* Device matrix C. */
-	CL4Buffer* matrixC_dev = NULL;
+	CCLBuffer* matrixC_dev = NULL;
 	/* Global work sizes */
 	size_t gws[2];
 	/* Size of matrix A in bytes. */
@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
 	 * exit. */
 	if (dev_list) {
 		g_printf("\n");
-		cl4_devsel_print_device_strings(&err);
+		ccl_devsel_print_device_strings(&err);
 		g_printf("\n");
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 		exit(0);
@@ -257,28 +257,28 @@ int main(int argc, char *argv[]) {
 	rng = g_rand_new_with_seed(seed);
 		
 	/* Profiling / Timmings */
-	prof_dev = cl4_prof_new();
-	prof_cpu = cl4_prof_new();
+	prof_dev = ccl_prof_new();
+	prof_cpu = ccl_prof_new();
 
 	/* Create the context wrapper. */
 	if ((dev_idx != -1) || (name == NULL)) {
 		/* Select device by index or user choice. */
-		ctx = cl4_context_new_from_menu_full(
+		ctx = ccl_context_new_from_menu_full(
 			dev_idx != -1 ? &dev_idx : NULL, &err);
 	} else {
 		/* Select device by device name, platform name or vendor name. */
-		ctx = cl4_context_new_from_indep_filter(cl4_devsel_indep_string, name, &err);
+		ctx = ccl_context_new_from_indep_filter(ccl_devsel_indep_string, name, &err);
 	}
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Print information about selected device. */
-	dev = cl4_context_get_device(ctx, 0, &err);
+	dev = ccl_context_get_device(ctx, 0, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	dev_name = cl4_device_get_array_info(dev, CL_DEVICE_NAME, char*, &err);
+	dev_name = ccl_device_get_array_info(dev, CL_DEVICE_NAME, char*, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	dev_vendor = cl4_device_get_array_info(dev, CL_DEVICE_VENDOR, char*, &err);
+	dev_vendor = ccl_device_get_array_info(dev, CL_DEVICE_VENDOR, char*, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	g_printf("\n   == Using device '%s' from '%s'\n", dev_name, dev_vendor);
@@ -288,21 +288,21 @@ int main(int argc, char *argv[]) {
 	kernel_path = clexp_kernelpath_get(kernel_files[0], argv[0]);
 	
 	/* Create and build program. */
-	prg = cl4_program_new_from_source_file(ctx, kernel_path, &err);
+	prg = ccl_program_new_from_source_file(ctx, kernel_path, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
-	cl4_program_build(prg, compiler_opts, &err);
+	ccl_program_build(prg, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Determine kernel name. */
 	kernel_name = g_strdup_printf("matmult%d", kernel_id);
 
 	/* Get kernel. */
-	krnl = cl4_program_get_kernel(prg, kernel_name, &err);
+	krnl = ccl_program_get_kernel(prg, kernel_name, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Create command queue wrapper. */
-	cq = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	cq = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* ********************************** */	
@@ -331,20 +331,20 @@ int main(int argc, char *argv[]) {
 	/* ********************* */
 
 	/* Matrix A */
-	matrixA_dev = cl4_buffer_new(ctx, CL_MEM_READ_ONLY, 
+	matrixA_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
 		size_matA_in_bytes, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 		
 	/* Matrix B */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		matrixB_dev = cl4_buffer_new(ctx, CL_MEM_READ_ONLY, 
+		matrixB_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
 			size_matB_in_bytes, NULL, &err);
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	}
 
 	/* Matrix C */
-	matrixC_dev = cl4_buffer_new(ctx, CL_MEM_WRITE_ONLY, 
+	matrixC_dev = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY, 
 			size_matC_in_bytes, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
@@ -353,17 +353,17 @@ int main(int argc, char *argv[]) {
 	/* ************************* */
 	
 	/* Start basic timming / profiling. */
-	cl4_prof_start(prof_dev);
+	ccl_prof_start(prof_dev);
 	
 	/* Copy matrix A to device. */
-	cl4_buffer_write(cq, matrixA_dev, CL_TRUE, 0, size_matA_in_bytes, 
+	ccl_buffer_write(cq, matrixA_dev, CL_TRUE, 0, size_matA_in_bytes, 
 		matrixA_host, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Copy matrix B to device. */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		cl4_buffer_write(cq, matrixB_dev, CL_TRUE, 0, 
+		ccl_buffer_write(cq, matrixB_dev, CL_TRUE, 0, 
 			size_matB_in_bytes, matrixB_host, NULL, &err); 
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	}
@@ -413,33 +413,33 @@ int main(int argc, char *argv[]) {
 
 		/* Arguments for C=AB */
 		if (kernel_id == 0) {
-			cl4_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
-				matrixC_dev, cl4_arg_private(a_dim, cl_int2), 
-				cl4_arg_private(b_dim, cl_int2), NULL);
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, ccl_arg_private(a_dim, cl_int2), 
+				ccl_arg_private(b_dim, cl_int2), NULL);
 		} else if (kernel_id == 1) {
-			cl4_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
-				matrixC_dev, cl4_arg_private(a_dim, cl_int2), 
-				cl4_arg_private(b_dim, cl_int2), 
-				cl4_arg_new(NULL, l_mem_sizeA_in_bytes), NULL);
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, ccl_arg_private(a_dim, cl_int2), 
+				ccl_arg_private(b_dim, cl_int2), 
+				ccl_arg_new(NULL, l_mem_sizeA_in_bytes), NULL);
 		} else if (kernel_id == 2) {
-			cl4_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
-				matrixC_dev, cl4_arg_private(a_dim, cl_int2), 
-				cl4_arg_private(b_dim, cl_int2), 
-				cl4_arg_new(NULL, l_mem_sizeA_in_bytes),
-				cl4_arg_new(NULL, l_mem_sizeB_in_bytes), NULL);
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, ccl_arg_private(a_dim, cl_int2), 
+				ccl_arg_private(b_dim, cl_int2), 
+				ccl_arg_new(NULL, l_mem_sizeA_in_bytes),
+				ccl_arg_new(NULL, l_mem_sizeB_in_bytes), NULL);
 		}
 
 	} else {
 
 		/* Arguments only for C=AA^T */
 		if (kernel_id < 4) {
-			cl4_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
-				cl4_arg_private(a_dim, cl_int2), NULL);
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
+				ccl_arg_private(a_dim, cl_int2), NULL);
 		} else if (kernel_id == 4) {
-			cl4_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
-				cl4_arg_private(a_dim, cl_int2),
-				cl4_arg_new(NULL, l_mem_sizeA_in_bytes),
-				cl4_arg_new(NULL, l_mem_sizeB_in_bytes), NULL);
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
+				ccl_arg_private(a_dim, cl_int2),
+				ccl_arg_new(NULL, l_mem_sizeA_in_bytes),
+				ccl_arg_new(NULL, l_mem_sizeB_in_bytes), NULL);
 		}
 	}
 	
@@ -447,19 +447,19 @@ int main(int argc, char *argv[]) {
 	/*  Run kernel! */
 	/* ************ */
 	
-	cl4_kernel_run(krnl, cq, 2, NULL, gws, lws, NULL, &err);
+	ccl_kernel_run(krnl, cq, 2, NULL, gws, lws, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* *********************** */
 	/*  Get result from device */
 	/* *********************** */
 
-	cl4_buffer_read(cq, matrixC_dev, CL_TRUE, 0, size_matC_in_bytes, 
+	ccl_buffer_read(cq, matrixC_dev, CL_TRUE, 0, size_matC_in_bytes, 
 		matrixC_host, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Finish execution. */
-	cl4_queue_finish(cq, &err);
+	ccl_queue_finish(cq, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ************************************** */
@@ -467,21 +467,21 @@ int main(int argc, char *argv[]) {
 	/* ************************************** */
 	
 	/* Stop profiler. */
-	cl4_prof_stop(prof_dev); 
+	ccl_prof_stop(prof_dev); 
 
 	/* Add queue for profiling. */
-	cl4_prof_add_queue(prof_dev, "Queue1", cq);
+	ccl_prof_add_queue(prof_dev, "Queue1", cq);
 
 	/* Process profiling data. */
-	cl4_prof_calc(prof_dev, &err);
+	ccl_prof_calc(prof_dev, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Show profiling info. */
-	cl4_prof_print_summary(prof_dev);
+	ccl_prof_print_summary(prof_dev);
 	
 	/* Export profiling info if a filename was given. */
 	if (output_export) {
-		cl4_prof_export_info_file(prof_dev, output_export, &err);
+		ccl_prof_export_info_file(prof_dev, output_export, &err);
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	}
 		
@@ -493,7 +493,7 @@ int main(int argc, char *argv[]) {
 	matrixC_test = matmult_matrix_new(b_dim[0], a_dim[1], NULL, NULL);
 		
 	/* Start basic timming / profiling. */
-	cl4_prof_start(prof_cpu);
+	ccl_prof_start(prof_cpu);
 
 	if (!IS_AAT(kernel_id)) {
 		/* C=AB */
@@ -532,7 +532,7 @@ int main(int argc, char *argv[]) {
 		}	
 	}
 	/* Get finishing time */
-	cl4_prof_stop(prof_cpu);
+	ccl_prof_stop(prof_cpu);
 	
 	/* ******************************************************** */
 	/* Determine and print OpenCL/OpenMP comparison information */
@@ -552,14 +552,14 @@ int main(int argc, char *argv[]) {
 #else
 		"(Serial)     ",
 #endif
-		cl4_prof_time_elapsed(prof_cpu));
+		ccl_prof_time_elapsed(prof_cpu));
 	printf("     SpeedUp (OpenCL vs. %s) : %fx\n",
 #ifdef CF4OCL_USE_OPENMP	
 		"OpenMP",
 #else
 		"1x CPU",
 #endif
-		cl4_prof_time_elapsed(prof_cpu) / cl4_prof_time_elapsed(prof_dev));
+		ccl_prof_time_elapsed(prof_cpu) / ccl_prof_time_elapsed(prof_dev));
 	printf("     Error (Device-CPU)          : %d\n", error);
 	printf("\n");
 	
@@ -625,8 +625,8 @@ cleanup:
 	/* *********** */
 	
 	/* Free profile and cpu timer */
-	if (prof_dev) cl4_prof_destroy(prof_dev);
-	if (prof_cpu) cl4_prof_destroy(prof_cpu);
+	if (prof_dev) ccl_prof_destroy(prof_dev);
+	if (prof_cpu) ccl_prof_destroy(prof_cpu);
 	
 	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);
@@ -640,12 +640,12 @@ cleanup:
 	if (rng) g_rand_free(rng);
 		
 	/* Release wrappers. */
-	if (matrixC_dev) cl4_buffer_destroy(matrixC_dev);
-	if (matrixB_dev) cl4_buffer_destroy(matrixB_dev);
-	if (matrixA_dev) cl4_buffer_destroy(matrixA_dev);
-	if (prg) cl4_program_destroy(prg);
-	if (cq) cl4_queue_destroy(cq);
-	if (ctx) cl4_context_destroy(ctx);
+	if (matrixC_dev) ccl_buffer_destroy(matrixC_dev);
+	if (matrixB_dev) ccl_buffer_destroy(matrixB_dev);
+	if (matrixA_dev) ccl_buffer_destroy(matrixA_dev);
+	if (prg) ccl_program_destroy(prg);
+	if (cq) ccl_queue_destroy(cq);
+	if (ctx) ccl_context_destroy(ctx);
 
 	/* Free host resources */
 	if (matrixA_host) matmult_matrix_free(matrixA_host);
@@ -706,7 +706,7 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Create parsing context. */
 	context = g_option_context_new (" - " PROG_DESCRIPTION);
-	gef_if_error_create_goto(*err, CL4_ERROR,  context == NULL, 
+	gef_if_error_create_goto(*err, CCL_ERROR,  context == NULL, 
 		CLEXP_FAIL, error_handler, 
 		"Unable to create command line parsing context.");
 	
@@ -722,7 +722,7 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	if (!IS_AAT(kernel_id)) {
 		/* Check if number of rows in B is the same as the number of 
 		 * columns in A. */
-		gef_if_error_create_goto(*err, CL4_ERROR, 
+		gef_if_error_create_goto(*err, CCL_ERROR, 
 			(b_dim[1] != a_dim[0]), CLEXP_FAIL, error_handler, 
 			"Number of rows in B must the same as the number of columns in A.");
 	} else {
@@ -733,7 +733,7 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	}
 
 	/* Check if kernel ID is within 0 to 4. */
-	gef_if_error_create_goto(*err, CL4_ERROR, 
+	gef_if_error_create_goto(*err, CCL_ERROR, 
 		((kernel_id < 0) || (kernel_id > 4)), CLEXP_FAIL, error_handler, 
 		"Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 \
 		(for C=AA^T kernels).");

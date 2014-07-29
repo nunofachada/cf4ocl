@@ -30,30 +30,30 @@
 /**
  * @brief cl_mem wrapper object.
  */
-struct cl4_memobj {
+struct ccl_memobj {
 
 	/** Parent wrapper object. */
-	CL4Wrapper base;
+	CCLWrapper base;
 	
 	/** Context wrapper. */
-	CL4Context* ctx;
+	CCLContext* ctx;
 	
 };
 
 /**
- * @brief Implementation of cl4_wrapper_release_fields() function for
- * ::CL4MemObj wrapper objects.
+ * @brief Implementation of ccl_wrapper_release_fields() function for
+ * ::CCLMemObj wrapper objects.
  * 
- * @param mo A ::CL4MemObj wrapper object.
+ * @param mo A ::CCLMemObj wrapper object.
  * */
-static void cl4_memobj_release_fields(CL4MemObj* mo) {
+static void ccl_memobj_release_fields(CCLMemObj* mo) {
 
 	/* Make sure mo wrapper object is not NULL. */
 	g_return_if_fail(mo != NULL);
 
 	/* Reduce reference count of memory object context wrapper. */
 	if (mo->ctx != NULL)
-		cl4_context_unref(mo->ctx);
+		ccl_context_unref(mo->ctx);
 
 }
 
@@ -68,16 +68,16 @@ static void cl4_memobj_release_fields(CL4MemObj* mo) {
  *
  * @param mo The cl_mem wrapper object.
  * */
-void cl4_memobj_destroy(CL4MemObj* mo) {
+void ccl_memobj_destroy(CCLMemObj* mo) {
 	
-	cl4_wrapper_unref((CL4Wrapper*) mo, sizeof(CL4MemObj),
-		(cl4_wrapper_release_fields) cl4_memobj_release_fields, 
-		(cl4_wrapper_release_cl_object) clReleaseMemObject, NULL); 
+	ccl_wrapper_unref((CCLWrapper*) mo, sizeof(CCLMemObj),
+		(ccl_wrapper_release_fields) ccl_memobj_release_fields, 
+		(ccl_wrapper_release_cl_object) clReleaseMemObject, NULL); 
 
 }
 
-CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4Queue* cq, 
-	void* mapped_ptr, CL4EventWaitList evt_wait_lst, GError** err) {
+CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq, 
+	void* mapped_ptr, CCLEventWaitList evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -91,24 +91,24 @@ CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4Queue* cq,
 	/* OpenCL event. */
 	cl_event event;
 	/* Event wrapper. */
-	CL4Event* evt;
+	CCLEvent* evt;
 	
-	ocl_status = clEnqueueUnmapMemObject (cl4_queue_unwrap(cq),
-		cl4_memobj_unwrap(mo), mapped_ptr, 
-		cl4_event_wait_list_get_num_events(evt_wait_lst),
-		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
+	ocl_status = clEnqueueUnmapMemObject (ccl_queue_unwrap(cq),
+		ccl_memobj_unwrap(mo), mapped_ptr, 
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to unmap memory object (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_queue_produce_event(cq, event);
+	evt = ccl_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
-	cl4_event_wait_list_clear(evt_wait_lst);
+	ccl_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -132,9 +132,9 @@ finish:
 	
 #ifdef CL_VERSION_1_2
 
-CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
- 	CL4Queue* cq, cl_mem_migration_flags flags, 
- 	CL4EventWaitList evt_wait_lst, GError** err) {
+CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
+ 	CCLQueue* cq, cl_mem_migration_flags flags, 
+ 	CCLEventWaitList evt_wait_lst, GError** err) {
 		
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -150,29 +150,29 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
 	/* OpenCL event. */
 	cl_event event;
 	/* Event wrapper. */
-	CL4Event* evt;
+	CCLEvent* evt;
 	
 	cl_mem mem_objects[num_mos];
 	for (cl_uint i = 0; i < num_mos; ++i) {
-		mem_objects[i] = cl4_memobj_unwrap(mos[i]);
+		mem_objects[i] = ccl_memobj_unwrap(mos[i]);
 	}
 	
-	ocl_status = clEnqueueMigrateMemObjects(cl4_queue_unwrap(cq),
+	ocl_status = clEnqueueMigrateMemObjects(ccl_queue_unwrap(cq),
 		num_mos, (const cl_mem*) mem_objects, flags,
-		cl4_event_wait_list_get_num_events(evt_wait_lst),
-		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);		
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);		
+	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to migrate memory objects (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_queue_produce_event(cq, event);
+	evt = ccl_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
-	cl4_event_wait_list_clear(evt_wait_lst);
+	ccl_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -193,6 +193,9 @@ finish:
 
 }
 
+#endif
+
+
 /** @} */
 
 /**
@@ -204,17 +207,15 @@ finish:
  * 
  * This function will rarely be called from client code, except when
  * clients wish to directly wrap an OpenCL memory object in a 
- * ::CL4MemObj wrapper object.
+ * ::CCLMemObj wrapper object.
  * 
  * @param mem_object The OpenCL memory object to be wrapped.
- * @return The ::CL4MemObj wrapper for the given OpenCL memory object.
+ * @return The ::CCLMemObj wrapper for the given OpenCL memory object.
  * */
-CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object) {
+CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object) {
 	
-	return (CL4MemObj*) cl4_wrapper_new(
-		(void*) mem_object, sizeof(CL4MemObj));
+	return (CCLMemObj*) ccl_wrapper_new(
+		(void*) mem_object, sizeof(CCLMemObj));
 		
 }
-
-#endif
 

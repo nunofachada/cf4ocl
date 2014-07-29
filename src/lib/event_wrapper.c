@@ -30,10 +30,10 @@
 /**
  * @brief Event wrapper object.
  */
-struct cl4_event {
+struct ccl_event {
 
 	/** Parent wrapper object. */
-	CL4Wrapper base;
+	CCLWrapper base;
 	
 	/** Event name, for profiling purposes only. */
 	const char* name;
@@ -56,14 +56,14 @@ struct cl4_event {
  *
  * @param evt The event wrapper object.
  * */
-void cl4_event_destroy(CL4Event* evt) {
+void ccl_event_destroy(CCLEvent* evt) {
 	
-	cl4_wrapper_unref((CL4Wrapper*) evt, sizeof(CL4Event),
-		NULL, (cl4_wrapper_release_cl_object) clReleaseEvent, NULL); 
+	ccl_wrapper_unref((CCLWrapper*) evt, sizeof(CCLEvent),
+		NULL, (ccl_wrapper_release_cl_object) clReleaseEvent, NULL); 
 
 }
 
-void cl4_event_set_name(CL4Event* evt, const char* name) {
+void ccl_event_set_name(CCLEvent* evt, const char* name) {
 
 	/* Make sure evt wrapper object is not NULL. */
 	g_return_if_fail(evt != NULL);
@@ -73,7 +73,7 @@ void cl4_event_set_name(CL4Event* evt, const char* name) {
 
 }
 
-const char* cl4_event_get_name(CL4Event* evt) {
+const char* ccl_event_get_name(CCLEvent* evt) {
 
 	/* Make sure evt wrapper object is not NULL. */
 	g_return_if_fail(evt != NULL);
@@ -83,7 +83,7 @@ const char* cl4_event_get_name(CL4Event* evt) {
 	
 }
 
-const char* cl4_event_get_final_name(CL4Event* evt) {
+const char* ccl_event_get_final_name(CCLEvent* evt) {
 
 	/* Make sure evt wrapper object is not NULL. */
 	g_return_if_fail(evt != NULL);
@@ -98,7 +98,7 @@ const char* cl4_event_get_final_name(CL4Event* evt) {
 			GError* err_internal = NULL;
 			
 			cl_command_type ct = 
-				cl4_event_get_command_type(evt, &err_internal);
+				ccl_event_get_command_type(evt, &err_internal);
 			
 			if (err_internal != NULL) {
 				g_warning("Unable to determine final event name due to" \
@@ -237,8 +237,8 @@ const char* cl4_event_get_final_name(CL4Event* evt) {
 	return evt->final_name;
 }
 
-cl_command_type cl4_event_get_command_type(
-	CL4Event* evt, GError** err) {
+cl_command_type ccl_event_get_command_type(
+	CCLEvent* evt, GError** err) {
 	
 	/* The command type to return. */
 	cl_command_type ct;
@@ -247,8 +247,8 @@ cl_command_type cl4_event_get_command_type(
 	g_return_if_fail(evt != NULL);
 
 	/* Determine the command type. */
-	CL4WrapperInfo* info = 
-		cl4_event_get_info(evt, CL_EVENT_COMMAND_TYPE, err);
+	CCLWrapperInfo* info = 
+		ccl_event_get_info(evt, CL_EVENT_COMMAND_TYPE, err);
 	
 	if (info == NULL) {
 		/* Some error ocurred, return 0. */
@@ -267,7 +267,7 @@ cl_command_type cl4_event_get_command_type(
  * @{
  */
  
-cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err) {
+cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -275,15 +275,15 @@ cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err) {
 	cl_int ocl_status;
 	
 	ocl_status = clWaitForEvents(
-		cl4_event_wait_list_get_num_events(evt_wait_lst),
-		cl4_event_wait_list_get_clevents(evt_wait_lst));
-	gef_if_error_create_goto(*err, CL4_ERROR, 
-		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst));
+	gef_if_error_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: error while waiting for events (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
 	/* Clear event wait list. */
-	cl4_event_wait_list_clear(evt_wait_lst);
+	ccl_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -317,10 +317,10 @@ finish:
  * @param event The OpenCL event to be wrapped.
  * @return The event wrapper for the given OpenCL event.
  * */
-CL4Event* cl4_event_new_wrap(cl_event event) {
+CCLEvent* ccl_event_new_wrap(cl_event event) {
 	
-	CL4Event* evt = (CL4Event*) cl4_wrapper_new(
-		(void*) event, sizeof(CL4Event));
+	CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
+		(void*) event, sizeof(CCLEvent));
 	
 	evt->name = NULL;
 	evt->final_name = NULL;

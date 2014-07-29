@@ -26,9 +26,9 @@
  
 #include "ocl_env.h"
 
-const cl_uint cl4_test_num_platforms = 3;
+const cl_uint ccl_test_num_platforms = 3;
 
-const struct _cl_platform_id cl4_test_platforms[] = {
+const struct _cl_platform_id ccl_test_platforms[] = {
 	{ 
 		.profile = "FULL_PROFILE", 
 		.version = "OpenCL 1.2",
@@ -92,7 +92,7 @@ const struct _cl_platform_id cl4_test_platforms[] = {
 				.partition_properties = (const cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, 0},
 				.partition_affinity_domain = 0,
 				.partition_type = (const cl_device_partition_property const[]) {0},
-				.platform_id = (const cl_platform_id) &cl4_test_platforms[0],
+				.platform_id = (const cl_platform_id) &ccl_test_platforms[0],
 				.preferred_vector_width_char = 16,
 				.preferred_vector_width_short = 8,
 				.preferred_vector_width_int = 4,
@@ -167,7 +167,7 @@ const struct _cl_platform_id cl4_test_platforms[] = {
 				.partition_properties = (const cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
 				.partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
 				.partition_type = (const cl_device_partition_property const[]) {0},
-				.platform_id = (const cl_platform_id) &cl4_test_platforms[0],
+				.platform_id = (const cl_platform_id) &ccl_test_platforms[0],
 				.preferred_vector_width_char = 8,
 				.preferred_vector_width_short = 4,
 				.preferred_vector_width_int = 2,
@@ -252,7 +252,7 @@ const struct _cl_platform_id cl4_test_platforms[] = {
 				.partition_properties = (const cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
 				.partition_affinity_domain = 0, /* Not available in OpenCL 1.1 */
 				.partition_type = (const cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
-				.platform_id = (const cl_platform_id) &cl4_test_platforms[1],
+				.platform_id = (const cl_platform_id) &ccl_test_platforms[1],
 				.preferred_vector_width_char = 4,
 				.preferred_vector_width_short = 2,
 				.preferred_vector_width_int = 1,
@@ -337,7 +337,7 @@ const struct _cl_platform_id cl4_test_platforms[] = {
 				.partition_properties = (const cl_device_partition_property const[]) {CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
 				.partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
 				.partition_type = (const cl_device_partition_property const[]) {0},
-				.platform_id = (const cl_platform_id) &cl4_test_platforms[2],
+				.platform_id = (const cl_platform_id) &ccl_test_platforms[2],
 				.preferred_vector_width_char = 8,
 				.preferred_vector_width_short = 4,
 				.preferred_vector_width_int = 2,

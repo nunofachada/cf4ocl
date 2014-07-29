@@ -32,13 +32,13 @@
 /**
  * @brief Device wrapper object.
  */
-struct cl4_device {
+struct ccl_device {
 
 	/** Parent wrapper object. */
-	CL4Wrapper base;
+	CCLWrapper base;
 	
 	/** Device platform. */
-	CL4Platform* platf;
+	CCLPlatform* platf;
 	
 };
 
@@ -53,21 +53,21 @@ struct cl4_device {
  *
  * @param dev The device wrapper object.
  * */
-void cl4_device_destroy(CL4Device* dev) {
+void ccl_device_destroy(CCLDevice* dev) {
 	
-	cl4_wrapper_unref((CL4Wrapper*) dev, sizeof(CL4Device),
+	ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
 		NULL, NULL, NULL); 
 
 }
 
-CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err) {
+CCLPlatform* ccl_device_get_platform(CCLDevice* dev, GError** err) {
 	
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
-	CL4Platform* platf = NULL;
+	CCLPlatform* platf = NULL;
 	
 	/* Internal error object. */
 	GError* err_internal = NULL;
@@ -75,11 +75,11 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err) {
 	if (dev->platf != NULL) {
 		platf = dev->platf;
 	} else {
-		CL4WrapperInfo* info = NULL;
-		info = cl4_device_get_info(
+		CCLWrapperInfo* info = NULL;
+		info = ccl_device_get_info(
 			dev, CL_DEVICE_PLATFORM, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		platf = cl4_platform_new_wrap(*((cl_platform_id*) info->value));
+		platf = ccl_platform_new_wrap(*((cl_platform_id*) info->value));
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		dev->platf = platf;
 	}
@@ -111,14 +111,14 @@ finish:
  * This function will rarely be called from client code, except when
  * clients wish to get the OpenCL device directly (using the
  * clGetDeviceIDs() function) and then wrap the OpenCL device in a
- * ::CL4Device wrapper object.
+ * ::CCLDevice wrapper object.
  * 
  * @param device The OpenCL device to be wrapped.
  * @return The device wrapper for the given OpenCL device.
  * */
-CL4Device* cl4_device_new_wrap(cl_device_id device) {
+CCLDevice* ccl_device_new_wrap(cl_device_id device) {
 	
-	return (CL4Device*) cl4_wrapper_new(
-		(void*) device, sizeof(CL4Device));
+	return (CCLDevice*) ccl_wrapper_new(
+		(void*) device, sizeof(CCLDevice));
 		
 }

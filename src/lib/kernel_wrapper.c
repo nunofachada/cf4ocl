@@ -31,10 +31,10 @@
 /**
  * @brief Kernel wrapper object.
  */
-struct cl4_kernel {
+struct ccl_kernel {
 
 	/** Parent wrapper object. */
-	CL4Wrapper base;
+	CCLWrapper base;
 	
 	/** Kernel arguments. */
 	GHashTable* args;
@@ -42,12 +42,12 @@ struct cl4_kernel {
 };
 
 /**
- * @brief Implementation of cl4_wrapper_release_fields() function for
- * ::CL4Kernel wrapper objects.
+ * @brief Implementation of ccl_wrapper_release_fields() function for
+ * ::CCLKernel wrapper objects.
  * 
- * @param krnl A ::CL4Kernel wrapper object.
+ * @param krnl A ::CCLKernel wrapper object.
  * */
-static void cl4_kernel_release_fields(CL4Kernel* krnl) {
+static void ccl_kernel_release_fields(CCLKernel* krnl) {
 
 	/* Make sure krnl wrapper object is not NULL. */
 	g_return_if_fail(krnl != NULL);
@@ -64,8 +64,8 @@ static void cl4_kernel_release_fields(CL4Kernel* krnl) {
  * @{
  */
 
-CL4Kernel* cl4_kernel_new(
-	CL4Program* prg, const char* kernel_name, GError** err) {
+CCLKernel* ccl_kernel_new(
+	CCLProgram* prg, const char* kernel_name, GError** err) {
 		
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -77,7 +77,7 @@ CL4Kernel* cl4_kernel_new(
 	g_return_val_if_fail(kernel_name != NULL, NULL);
 
 	/* Kernel wrapper object. */
-	CL4Kernel* krnl = NULL;
+	CCLKernel* krnl = NULL;
 
 	/* OpenCL return status. */
 	cl_int ocl_status;
@@ -86,15 +86,15 @@ CL4Kernel* cl4_kernel_new(
 	cl_kernel kernel = NULL;
 		
 	/* Create kernel. */
-	kernel = clCreateKernel(cl4_program_unwrap(prg), 
+	kernel = clCreateKernel(ccl_program_unwrap(prg), 
 		kernel_name, &ocl_status);
-	gef_if_error_create_goto(*err, CL4_ERROR, 
-		CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler,
+	gef_if_error_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler,
 		"%s: unable to create kernel (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
 	/* Create kernel wrapper. */
-	krnl = cl4_kernel_new_wrap(kernel);
+	krnl = ccl_kernel_new_wrap(kernel);
 		
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -120,22 +120,22 @@ finish:
  *
  * @param krnl The kernel wrapper object.
  * */
-void cl4_kernel_destroy(CL4Kernel* krnl) {
+void ccl_kernel_destroy(CCLKernel* krnl) {
 	
-	cl4_wrapper_unref((CL4Wrapper*) krnl, sizeof(CL4Kernel),
-		(cl4_wrapper_release_fields) cl4_kernel_release_fields, 
-		(cl4_wrapper_release_cl_object) clReleaseKernel, NULL); 
+	ccl_wrapper_unref((CCLWrapper*) krnl, sizeof(CCLKernel),
+		(ccl_wrapper_release_fields) ccl_kernel_release_fields, 
+		(ccl_wrapper_release_cl_object) clReleaseKernel, NULL); 
 
 }
 
-void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
-	CL4Arg* arg) {
+void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, 
+	CCLArg* arg) {
 		
 	g_return_if_fail(krnl != NULL);
 	
 	if (krnl->args == NULL) {
 		krnl->args = g_hash_table_new_full(g_direct_hash,
-			g_direct_equal, NULL, (GDestroyNotify) cl4_arg_destroy);
+			g_direct_equal, NULL, (GDestroyNotify) ccl_arg_destroy);
 	}
 	
 	g_hash_table_replace(krnl->args, GUINT_TO_POINTER(arg_index),
@@ -143,29 +143,29 @@ void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index,
 
 }
 
-void cl4_kernel_set_args(CL4Kernel* krnl, ...) {
+void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 	
 	va_list args;
 	va_start(args, krnl);
-	cl4_kernel_set_args_v(krnl, args);
+	ccl_kernel_set_args_v(krnl, args);
 	va_end(args);
 
 }
 
-void cl4_kernel_set_args_v(CL4Kernel* krnl, va_list args) {
+void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
 		
 	for (cl_uint i = 0; ; i++) {
-		CL4Arg* arg = va_arg(args, CL4Arg*);
+		CCLArg* arg = va_arg(args, CCLArg*);
 		if (arg == NULL)
 			break;
-		cl4_kernel_set_arg(krnl, i, arg);
+		ccl_kernel_set_arg(krnl, i, arg);
 	}
 
 }
-CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4Queue* cq, 
+CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err) {
+	CCLEventWaitList evt_wait_lst, GError** err) {
 		
 	/* Make sure number krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -180,7 +180,7 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4Queue* cq,
 	/* OpenCL event. */
 	cl_event event;
 	/* Event wrapper. */
-	CL4Event* evt;
+	CCLEvent* evt;
 	
 	/* Iterator for table of kernel arguments. */
 	GHashTableIter iter;
@@ -191,35 +191,35 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4Queue* cq,
 		g_hash_table_iter_init(&iter, krnl->args);
 		while (g_hash_table_iter_next(&iter, &arg_index_ptr, &arg_ptr)) {
 			cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
-			CL4Arg* arg = (CL4Arg*) arg_ptr;
-			ocl_status = clSetKernelArg(cl4_kernel_unwrap(krnl), arg_index, 
-				cl4_arg_size(arg), cl4_arg_value(arg));
-			gef_if_error_create_goto(*err, CL4_ERROR, 
-				CL_SUCCESS != ocl_status, CL4_ERROR_OCL, error_handler, 
+			CCLArg* arg = (CCLArg*) arg_ptr;
+			ocl_status = clSetKernelArg(ccl_kernel_unwrap(krnl), arg_index, 
+				ccl_arg_size(arg), ccl_arg_value(arg));
+			gef_if_error_create_goto(*err, CCL_ERROR, 
+				CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 				"%s: unable to set kernel arg %d (OpenCL error %d: %s).",
-				G_STRLOC, arg_index, ocl_status, cl4_err(ocl_status));
+				G_STRLOC, arg_index, ocl_status, ccl_err(ocl_status));
 			g_hash_table_iter_remove(&iter);
 		}
 	}
 		
 	/* Run kernel. */
-	ocl_status = clEnqueueNDRangeKernel(cl4_queue_unwrap(cq),
-		cl4_kernel_unwrap(krnl), work_dim, global_work_offset,
+	ocl_status = clEnqueueNDRangeKernel(ccl_queue_unwrap(cq),
+		ccl_kernel_unwrap(krnl), work_dim, global_work_offset,
 		global_work_size, local_work_size, 
-		cl4_event_wait_list_get_num_events(evt_wait_lst),
-		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to enqueue kernel (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_queue_produce_event(cq, event);
+	evt = ccl_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
-	cl4_event_wait_list_clear(evt_wait_lst);
+	ccl_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -245,7 +245,7 @@ finish:
  * 
  * @warning This function is not thread-safe. For multi-threaded 
  * execution of the same kernel function, create multiple instances of 
- * a kernel wrapper for the given kernel function with cl4_kernel_new(),
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
  * one for each thread.
  * 
  * @param krnl
@@ -259,20 +259,20 @@ finish:
  * @param ...
  * @return
  * */
-CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4Queue* cq, 
+CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, ...) {
+	CCLEventWaitList evt_wait_lst, GError** err, ...) {
 
 	/* Event wrapper. */
-	CL4Event* evt;
+	CCLEvent* evt;
 	
 	/* Variable argument list. */
 	va_list args;
 	
 	/* Set kernel arguments and run it. */
 	va_start(args, err);
-	evt = cl4_kernel_set_args_and_run_v(krnl, cq, work_dim, 
+	evt = ccl_kernel_set_args_and_run_v(krnl, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
 		evt_wait_lst, err, args);
 	va_end(args);
@@ -282,10 +282,10 @@ CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4Queue* cq,
 	
 }
 
-CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq, 
+CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, va_list args) {
+	CCLEventWaitList evt_wait_lst, GError** err, va_list args) {
 
 	/* Make sure number krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -296,13 +296,13 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq,
 	
 	GError* err_internal = NULL;
 	
-	CL4Event* evt = NULL;
+	CCLEvent* evt = NULL;
 	
 	/* Set kernel arguments. */
-	cl4_kernel_set_args_v(krnl, args);
+	ccl_kernel_set_args_v(krnl, args);
 	
 	/* Enqueue kernel. */
-	evt = cl4_kernel_run(krnl, cq, work_dim, global_work_offset, 
+	evt = ccl_kernel_run(krnl, cq, work_dim, global_work_offset, 
 		global_work_size, local_work_size, evt_wait_lst, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -334,14 +334,14 @@ finish:
  * This function will rarely be called from client code, except when
  * clients wish to create the OpenCL kernel directly (using the
  * clCreateKernel() function) and then wrap the OpenCL kernel in a 
- * ::CL4Kernel wrapper object.
+ * ::CCLKernel wrapper object.
  * 
  * @param kernel The OpenCL kernel to be wrapped.
- * @return The ::CL4Kernel wrapper for the given OpenCL kernel.
+ * @return The ::CCLKernel wrapper for the given OpenCL kernel.
  * */
-CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel) {
+CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
 	
-	return (CL4Kernel*) cl4_wrapper_new(
-		(void*) kernel, sizeof(CL4Kernel));
+	return (CCLKernel*) ccl_wrapper_new(
+		(void*) kernel, sizeof(CCLKernel));
 		
 }

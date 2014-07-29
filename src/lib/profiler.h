@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_PROFILER_H
-#define CL4_PROFILER_H
+#ifndef _CCL_PROFILER_H_
+#define _CCL_PROFILER_H_
 
 #include <glib.h>
 #include <string.h>
@@ -51,34 +51,34 @@
 
 /** @brief Profile class, contains profiling information of OpenCL 
  * queues and events. */
-typedef struct cl4_prof CL4Prof;
+typedef struct ccl_prof CCLProf;
 
 /**
  * @brief Sort order for the profile module iterators.
  * */
 typedef enum {
 	/** Sort ascending (default). */
-	CL4_PROF_SORT_ASC  = 0x0,
+	CCL_PROF_SORT_ASC  = 0x0,
 	/** Sort descending. */
-	CL4_PROF_SORT_DESC = 0x1
-} CL4ProfSortOrder;
+	CCL_PROF_SORT_DESC = 0x1
+} CCLProfSortOrder;
 
 
 /**
  * @brief Aggregate event info.
  */
-typedef struct cl4_prof_agg {
+typedef struct ccl_prof_agg {
 
 	/** Name of event which the instant refers to. */
 	const char* event_name;
 	/** Total (absolute) time of events with name equal to 
-	 * ::CL4ProfAgg#event_name. */
+	 * ::CCLProfAgg#event_name. */
 	cl_ulong absolute_time;
 	/** Relative time of events with name equal to 
-	 * ::CL4ProfAgg#event_name. */
+	 * ::CCLProfAgg#event_name. */
 	double relative_time;
 	
-} CL4ProfAgg;
+} CCLProfAgg;
 
 
 /**
@@ -87,16 +87,16 @@ typedef struct cl4_prof_agg {
 typedef enum {
 
 	 /** Sort aggregate event data instances by name. */
-	CL4_PROF_AGG_SORT_NAME = 0x00,
+	CCL_PROF_AGG_SORT_NAME = 0x00,
 	/** Sort aggregate event data instances by time. */
-	CL4_PROF_AGG_SORT_TIME = 0x10
+	CCL_PROF_AGG_SORT_TIME = 0x10
 
-} CL4ProfAggSort;
+} CCLProfAggSort;
 
 /**
  * @brief Event profiling info. 
  * */
-typedef struct cl4_prof_info {
+typedef struct ccl_prof_info {
 
 	/** Name of event. */
 	const char* event_name;
@@ -116,7 +116,7 @@ typedef struct cl4_prof_info {
 	 * has finished execution on the device. */
 	cl_ulong t_end;
 
-} CL4ProfInfo;
+} CCLProfInfo;
 
 /**
  * @brief Sort criteria for event profiling info instances.
@@ -124,37 +124,37 @@ typedef struct cl4_prof_info {
 typedef enum {
 
 	 /** Sort event profiling info instances by event name. */
-	CL4_PROF_INFO_SORT_NAME_EVENT = 0x20,
+	CCL_PROF_INFO_SORT_NAME_EVENT = 0x20,
 	 /** Sort event profiling info instances by queue name. */
-	CL4_PROF_INFO_SORT_NAME_QUEUE = 0x30,
+	CCL_PROF_INFO_SORT_NAME_QUEUE = 0x30,
 	 /** Sort event profiling info instances by queued time. */
-	CL4_PROF_INFO_SORT_T_QUEUED   = 0x40,
+	CCL_PROF_INFO_SORT_T_QUEUED   = 0x40,
 	 /** Sort event profiling info instances by submit time. */
-	CL4_PROF_INFO_SORT_T_SUBMIT   = 0x50,
+	CCL_PROF_INFO_SORT_T_SUBMIT   = 0x50,
 	 /** Sort event profiling info instances by start time. */
-	CL4_PROF_INFO_SORT_T_START    = 0x60,
+	CCL_PROF_INFO_SORT_T_START    = 0x60,
 	 /** Sort event profiling info instances by end time. */
-	CL4_PROF_INFO_SORT_T_END      = 0x70
+	CCL_PROF_INFO_SORT_T_END      = 0x70
 
-} CL4ProfInfoSort;
+} CCLProfInfoSort;
 
 
 /**
- * @brief Type of event instant (::CL4ProfInst).
+ * @brief Type of event instant (::CCLProfInst).
  */
 typedef enum {
 	
 	/** Start event instant. */
-	CL4_PROF_INST_TYPE_START,
+	CCL_PROF_INST_TYPE_START,
 	/** End event instant. */
-	CL4_PROF_INST_TYPE_END
+	CCL_PROF_INST_TYPE_END
 	
-} CL4ProfInstType;
+} CCLProfInstType;
 
 /**
  * @brief Event instant.
  */
-typedef struct cl4_prof_inst {
+typedef struct ccl_prof_inst {
 
 	 /** Name of event which the instant refers to. */
 	const char* event_name;
@@ -165,28 +165,28 @@ typedef struct cl4_prof_inst {
 	/** Event instant in nanoseconds from current device time counter. */
 	cl_ulong instant;
 	/** Type of event instant 
-	 * (CL4ProfInstType::CL4_PROF_INST_TYPE_START or 
-	 * CL4ProfInstType::CL4_PROF_INST_TYPE_END). */
-	CL4ProfInstType type;
+	 * (CCLProfInstType::CCL_PROF_INST_TYPE_START or 
+	 * CCLProfInstType::CCL_PROF_INST_TYPE_END). */
+	CCLProfInstType type;
 
-} CL4ProfInst;
+} CCLProfInst;
 
 /**
- * @brief Sort criteria for event instants (::CL4ProfInst).
+ * @brief Sort criteria for event instants (::CCLProfInst).
  */
 typedef enum {
 	
 	/** Sort event instants by instant. */
-	CL4_PROF_INST_SORT_INSTANT = 0x80,
+	CCL_PROF_INST_SORT_INSTANT = 0x80,
 	/** Sort event instants by event id. */
-	CL4_PROF_INST_SORT_ID      = 0x90
+	CCL_PROF_INST_SORT_ID      = 0x90
 
-} CL4ProfInstSort;
+} CCLProfInstSort;
 
 /**
  * @brief Representation of an overlap of events.
  */
-typedef struct cl4_prof_overlap {
+typedef struct ccl_prof_overlap {
 
 	 /** Name of first overlapping event. */
 	const char* event1_name;
@@ -195,24 +195,24 @@ typedef struct cl4_prof_overlap {
 	/** Overlap duration in nanoseconds. */
 	cl_ulong duration;
 
-} CL4ProfOverlap;
+} CCLProfOverlap;
 
 /**
- * @brief Sort criteria for overlaps (::CL4ProfOverlap).
+ * @brief Sort criteria for overlaps (::CCLProfOverlap).
  */
 typedef enum {
 	
 	/** Sort overlaps by event name. */
-	CL4_PROF_OVERLAP_SORT_NAME     = 0xa0,
+	CCL_PROF_OVERLAP_SORT_NAME     = 0xa0,
 	/** Sort overlaps by overlap duration. */
-	CL4_PROF_OVERLAP_SORT_DURATION = 0xb0
+	CCL_PROF_OVERLAP_SORT_DURATION = 0xb0
 
-} CL4ProfOverlapSort;
+} CCLProfOverlapSort;
 
 /**
  * @brief Export options.
  * */
-typedef struct cl4_prof_export_options {
+typedef struct ccl_prof_export_options {
 
 	/** Field separator, defaults to tab (\\t). */
 	const char* separator;
@@ -226,92 +226,92 @@ typedef struct cl4_prof_export_options {
 	 * returned by OpenCL (FALSE). */
 	cl_bool zero_start;
 	
-}  CL4ProfExportOptions;
+}  CCLProfExportOptions;
 
 /** @brief Create a new profile object. */
-CL4Prof* cl4_prof_new();
+CCLProf* ccl_prof_new();
 
 /** @brief Destroy a profile object. */
-void cl4_prof_destroy(CL4Prof* prof);
+void ccl_prof_destroy(CCLProf* prof);
 
 /** @brief Starts the global profiler timer. Only required if client
 * wishes to compare the effectively ellapsed time with the OpenCL
 * kernels time. */
-void cl4_prof_start(CL4Prof* prof);
+void ccl_prof_start(CCLProf* prof);
 
 /** @brief Stops the global profiler timer. Only required if 
- * cl4_prof_start() was called. */
-void cl4_prof_stop(CL4Prof* prof);
+ * ccl_prof_start() was called. */
+void ccl_prof_stop(CCLProf* prof);
 
 /** @brief If profiling has started but not stopped, returns the time
  * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
-double cl4_prof_time_elapsed(CL4Prof* prof);
+double ccl_prof_time_elapsed(CCLProf* prof);
 
 /** @brief Add a command queue wrapper for profiling. */
-void cl4_prof_add_queue(
-	CL4Prof* prof, const char* cq_name, CL4Queue* cq);
+void ccl_prof_add_queue(
+	CCLProf* prof, const char* cq_name, CCLQueue* cq);
 
 /** @brief Determine aggregate statistics for the given profile object. */
-cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);
+cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
 
 /** @brief Return aggregate statistics for events with the given name. */
-const CL4ProfAgg const* cl4_prof_get_agg(
-	CL4Prof* prof, const char* event_name);
+const CCLProfAgg const* ccl_prof_get_agg(
+	CCLProf* prof, const char* event_name);
 
 /** @brief Initialize an iterator for profiled aggregate event 
  * instances. */
-void cl4_prof_iter_agg_init(CL4Prof* prof, int sort);
+void ccl_prof_iter_agg_init(CCLProf* prof, int sort);
 
 /** @brief Return the next profiled aggregate event instance. */
-const CL4ProfAgg const* cl4_prof_iter_agg_next(CL4Prof* prof);
+const CCLProfAgg const* ccl_prof_iter_agg_next(CCLProf* prof);
 
 /** @brief Initialize an iterator for event profiling info instances. */
-void cl4_prof_iter_info_init(CL4Prof* prof, int sort);
+void ccl_prof_iter_info_init(CCLProf* prof, int sort);
 
 /** @brief Return the next event profiling info instance. */
-const CL4ProfInfo const* cl4_prof_iter_info_next(CL4Prof* prof);
+const CCLProfInfo const* ccl_prof_iter_info_next(CCLProf* prof);
 
 /** @brief Initialize an iterator for event instant instances. */
-void cl4_prof_iter_inst_init(CL4Prof* prof, int sort);
+void ccl_prof_iter_inst_init(CCLProf* prof, int sort);
 
 /** @brief Return the next event instant instance. */
-const CL4ProfInst const* cl4_prof_inst_info_next(CL4Prof* prof);
+const CCLProfInst const* ccl_prof_inst_info_next(CCLProf* prof);
 
 /** @brief Initialize an iterator for overlap instances. */
-void cl4_prof_iter_overlap_init(CL4Prof* prof, int sort);
+void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);
 
 /** @brief Return the next overlap instance. */
-const CL4ProfOverlap const* cl4_prof_iter_overlap_next(CL4Prof* prof);
+const CCLProfOverlap const* ccl_prof_iter_overlap_next(CCLProf* prof);
 
 /** @brief Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted
  * by absolute time), and a table of event overlaps (sorted by overlap
  * duration). */ 
-void cl4_prof_print_summary(CL4Prof* prof);
+void ccl_prof_print_summary(CCLProf* prof);
 
 /** @brief Get a summary with the profiling info. More specifically,
  * this function returns a string containing a table of aggregate event 
  * statistics and a table of event overlaps. The order of the returned
  * information can be specified in the function arguments. The returned
  * string must be freed with the `g_free()` function from GLib. */ 
-gchar* cl4_prof_get_summary(
-	CL4Prof* prof, int agg_sort, int ovlp_sort);
+gchar* ccl_prof_get_summary(
+	CCLProf* prof, int agg_sort, int ovlp_sort);
 
 /** @brief Export profiling info to a given stream. */
-cl_bool cl4_prof_export_info(CL4Prof* profile, FILE* stream, GError** err);
+cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, GError** err);
 
 /** @brief Helper function which exports profiling info to a given file,
  * automatically opening and closing the file. Check the
- * cl4_prof_export_info() for more information. */
-cl_bool cl4_prof_export_info_file(
-	CL4Prof* profile, const char* filename, GError** err);
+ * ccl_prof_export_info() for more information. */
+cl_bool ccl_prof_export_info_file(
+	CCLProf* profile, const char* filename, GError** err);
 
-/** @brief Set export options using a ::CL4ProfExportOptions struct. */
-void cl4_prof_set_export_opts(CL4ProfExportOptions export_opts);
+/** @brief Set export options using a ::CCLProfExportOptions struct. */
+void ccl_prof_set_export_opts(CCLProfExportOptions export_opts);
 
 /** @brief Get current export options. */
-CL4ProfExportOptions cl4_prof_get_export_opts();
+CCLProfExportOptions ccl_prof_get_export_opts();
 
 /** @} */
 

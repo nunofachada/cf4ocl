@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_PROGRAM_WRAPPER_H
-#define CL4_PROGRAM_WRAPPER_H 
+#ifndef _CCL_PROGRAM_WRAPPER_H_
+#define _CCL_PROGRAM_WRAPPER_H_
 
 #include <glib.h>
 #include "oclversions.h"
@@ -48,107 +48,107 @@
  */
  
 /** @brief Program wrapper object. */
-typedef struct cl4_program CL4Program;
+typedef struct ccl_program CCLProgram;
 
 /** @brief Represents a OpenCL binary object. */
-typedef struct cl4_program_binary CL4ProgramBinary;
+typedef struct ccl_program_binary CCLProgramBinary;
 
-typedef void (CL_CALLBACK* cl4_program_callback)(
+typedef void (CL_CALLBACK* ccl_program_callback)(
 	cl_program program, void* user_data);
 
 /* WRAPPER API */
 /** @brief Get the program wrapper for the given OpenCL program. */
-CL4Program* cl4_program_new_wrap(cl_program program);
+CCLProgram* ccl_program_new_wrap(cl_program program);
 
 /** @brief Decrements the reference count of the program wrapper object. 
  * If it reaches 0, the program wrapper object is destroyed. */
-void cl4_program_destroy(CL4Program* prg);
+void ccl_program_destroy(CCLProgram* prg);
 
 /* SOURCES */
-CL4Program* cl4_program_new_from_source_file(CL4Context* ctx, 
+CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx, 
 	const char* filename, GError** err);
 
-CL4Program* cl4_program_new_from_source_files(CL4Context* ctx, 
+CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx, 
 	cl_uint count, const char** filenames, GError** err);
 
-#define cl4_program_new_from_source(ctx, src, err) \
-	cl4_program_new_with_source( \
-		cl4_context_unwrap(ctx), 1, &src, NULL, err)
+#define ccl_program_new_from_source(ctx, src, err) \
+	ccl_program_new_with_source( \
+		ccl_context_unwrap(ctx), 1, &src, NULL, err)
 
-#define cl4_program_new_from_sources(ctx, count, strings, err) \
-	cl4_program_new_with_source( \
-		cl4_context_unwrap(ctx), count, strings, NULL, err)
+#define ccl_program_new_from_sources(ctx, count, strings, err) \
+	ccl_program_new_with_source( \
+		ccl_context_unwrap(ctx), count, strings, NULL, err)
 	
-CL4Program* cl4_program_new_with_source(cl_context context,
+CCLProgram* ccl_program_new_with_source(cl_context context,
 	cl_uint count, const char **strings, const size_t *lengths,
 	GError** err);
 
 /* BINARIES */
-CL4Program* cl4_program_new_from_binary_file(CL4Context* ctx, 
-	CL4Device* dev, const char* filename, GError** err);
+CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx, 
+	CCLDevice* dev, const char* filename, GError** err);
 
-CL4Program* cl4_program_new_from_binary_files(CL4Context* ctx, 
-	cl_uint num_devices, CL4Device** devs, const char** filenames, 
+CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx, 
+	cl_uint num_devices, CCLDevice** devs, const char** filenames, 
 	GError** err);
 
-#define cl4_program_new_from_binary(ctx, dev, binary, err) \
-	cl4_program_new_from_binaries(ctx, 1, &dev, &binary, err)
+#define ccl_program_new_from_binary(ctx, dev, binary, err) \
+	ccl_program_new_from_binaries(ctx, 1, &dev, &binary, err)
 
-CL4Program* cl4_program_new_from_binaries(CL4Context* ctx,
-	cl_uint num_devices, CL4Device** devs, CL4ProgramBinary** bins,
+CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
+	cl_uint num_devices, CCLDevice** devs, CCLProgramBinary** bins,
 	GError** err);
 
-CL4Program* cl4_program_new_with_binary(cl_context context,
+CCLProgram* ccl_program_new_with_binary(cl_context context,
 	cl_uint num_devices, const cl_device_id* device_list,
 	const size_t *lengths, const unsigned char **binaries,
 	cl_int *binary_status, GError** err);
 
 #ifdef CL_VERSION_1_2
 
-CL4Program* cl4_program_new_with_built_in_kernels(cl_context context,
+CCLProgram* ccl_program_new_with_built_in_kernels(cl_context context,
 	cl_uint num_devices, const cl_device_id *device_list,
 	const char *kernel_names, GError** err);
 
 #endif
  
-#define cl4_program_build(prg, options, err) \
-	cl4_program_build_from_devices_full( \
+#define ccl_program_build(prg, options, err) \
+	ccl_program_build_from_devices_full( \
 		prg, 0, NULL, options, NULL, NULL, err)
 
-cl_bool cl4_program_build_from_devices_full(CL4Program* prg, 
-	cl_uint num_devices, CL4Device** devices, const char *options, 
-	cl4_program_callback pfn_notify, void *user_data, GError** err);
+cl_bool ccl_program_build_from_devices_full(CCLProgram* prg, 
+	cl_uint num_devices, CCLDevice** devices, const char *options, 
+	ccl_program_callback pfn_notify, void *user_data, GError** err);
 
-cl_bool cl4_program_build_from_cldevices_full(CL4Program* prg, 
+cl_bool ccl_program_build_from_cldevices_full(CCLProgram* prg, 
 	cl_uint num_devices, cl_device_id* device_list, const char *options, 
-	cl4_program_callback pfn_notify, void *user_data, GError** err);
+	ccl_program_callback pfn_notify, void *user_data, GError** err);
 
-CL4Kernel* cl4_program_get_kernel(
-	CL4Program* prg, const char* kernel_name, GError** err);
+CCLKernel* ccl_program_get_kernel(
+	CCLProgram* prg, const char* kernel_name, GError** err);
 	
-CL4Event* cl4_program_run(CL4Program* prg, const char* kernel_name,
-	CL4Queue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+CCLEvent* ccl_program_run(CCLProgram* prg, const char* kernel_name,
+	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, ...)
+	CCLEventWaitList evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
-CL4Event* cl4_program_run_v(CL4Program* prg, const char* kernel_name,
-	CL4Queue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+CCLEvent* ccl_program_run_v(CCLProgram* prg, const char* kernel_name,
+	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CL4EventWaitList evt_wait_lst, GError** err, va_list args);
+	CCLEventWaitList evt_wait_lst, GError** err, va_list args);
 	
-CL4ProgramBinary* cl4_program_get_binary(CL4Program* prg, CL4Device* dev,
+CCLProgramBinary* ccl_program_get_binary(CCLProgram* prg, CCLDevice* dev,
 	GError** err);
 
-cl_bool cl4_program_save_binary(CL4Program* prg, CL4Device* dev,
+cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	const char* filename, GError** err);
 
-cl_bool cl4_program_save_all_binaries(CL4Program* prg, 
+cl_bool ccl_program_save_all_binaries(CCLProgram* prg, 
 	const char* file_prefix, const char* file_suffix, GError** err);
 
 /**
- * @brief Get a ::CL4WrapperInfo program information object. To get the 
- * program binaries use the ::cl4_program_get_binary() function instead, 
+ * @brief Get a ::CCLWrapperInfo program information object. To get the 
+ * program binaries use the ::ccl_program_get_binary() function instead, 
  * as this macro will return NULL when the CL_PROGRAM_BINARIES parameter 
  * is requested.
  * 
@@ -161,11 +161,11 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * destroyed.  If an error occurs or if the CL_PROGRAM_BINARIES 
  * parameter is requested, NULL is returned.
  * */
-#define cl4_program_get_info(prg, param_name, err) \
+#define ccl_program_get_info(prg, param_name, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
-	: cl4_wrapper_get_info((CL4Wrapper*) prg, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
+	: ccl_wrapper_get_info((CCLWrapper*) prg, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar program information value. 
@@ -184,16 +184,16 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * If an error occurs or if the CL_PROGRAM_BINARIES parameter is 
  * requested, zero is returned.
  * */
-#define cl4_program_get_scalar_info(prg, param_name, param_type, err) \
+#define ccl_program_get_scalar_info(prg, param_name, param_type, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? (param_type) 0 \
-	: *((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetProgramInfo, \
+	: *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetProgramInfo, \
 		CL_TRUE, err))
 
 /** 
  * @brief Macro which returns an array program information value. To get 
- * the program binaries use the ::cl4_program_get_binary() function 
+ * the program binaries use the ::ccl_program_get_binary() function 
  * instead, as this macro will return NULL when the CL_PROGRAM_BINARIES 
  * parameter is requested.
  * 
@@ -211,15 +211,15 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * If an error occurs or if the CL_PROGRAM_BINARIES parameter is 
  * requested, NULL is returned.
  * */
-#define cl4_program_get_array_info(prg, param_name, param_type, err) \
+#define ccl_program_get_array_info(prg, param_name, param_type, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
-	: (param_type) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetProgramInfo, \
+	: (param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetProgramInfo, \
 		CL_TRUE, err)
 
 /**
- * @brief Get a ::CL4WrapperInfo program build information object.
+ * @brief Get a ::CCLWrapperInfo program build information object.
  * 
  * @param prg The program wrapper object.
  * @param dev The device wrapper object.
@@ -231,9 +231,9 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * automatically freed when the program wrapper object is destroyed. If 
  * an error occurs, NULL is returned.
  * */
-#define cl4_program_get_build_info(prg, dev, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) prg, (CL4Wrapper*) dev, \
-		param_name, (cl4_wrapper_info_fp) clGetProgramBuildInfo, \
+#define ccl_program_get_build_info(prg, dev, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) prg, (CCLWrapper*) dev, \
+		param_name, (ccl_wrapper_info_fp) clGetProgramBuildInfo, \
 		CL_FALSE, err)
 
 /** 
@@ -253,11 +253,11 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * will be automatically freed when the program wrapper object is 
  * destroyed. If an error occurs, zero is returned.
  * */
-#define cl4_program_get_scalar_build_info(prg, dev, param_name, \
+#define ccl_program_get_scalar_build_info(prg, dev, param_name, \
 	param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
-		(CL4Wrapper*) dev, param_name, \
-		(cl4_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err))
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+		(CCLWrapper*) dev, param_name, \
+		(ccl_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err))
 
 /** 
  * @brief Macro which returns an array program build information value. 
@@ -276,27 +276,27 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * will be automatically freed when the program wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_program_get_array_build_info(prg, dev, param_name, \
+#define ccl_program_get_array_build_info(prg, dev, param_name, \
 	param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
-		(CL4Wrapper*) dev, param_name, \
-		(cl4_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err)
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+		(CCLWrapper*) dev, param_name, \
+		(ccl_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err)
 
 /** 
  * @brief Increase the reference count of the program object.
  * 
  * @param prg The program wrapper object. 
  * */
-#define cl4_program_ref(prg) \
-	cl4_wrapper_ref((CL4Wrapper*) prg)
+#define ccl_program_ref(prg) \
+	ccl_wrapper_ref((CCLWrapper*) prg)
 
 /**
- * @brief Alias to cl4_program_destroy().
+ * @brief Alias to ccl_program_destroy().
  * 
  * @param prg Program wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_program_unref(prg) cl4_program_destroy(prg)
+#define ccl_program_unref(prg) ccl_program_destroy(prg)
 
 /**
  * @brief Get the OpenCL program object.
@@ -304,22 +304,22 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * @param prg The program wrapper object.
  * @return The OpenCL program object.
  * */
-#define cl4_program_unwrap(prg) \
-	((cl_program) cl4_wrapper_unwrap((CL4Wrapper*) prg))		
+#define ccl_program_unwrap(prg) \
+	((cl_program) ccl_wrapper_unwrap((CCLWrapper*) prg))		
 
 /** 
- * @brief Get ::CL4Device wrapper at given index. 
+ * @brief Get ::CCLDevice wrapper at given index. 
  * 
  * @param prg The program wrapper object.
  * @param index Index of device in program.
  * @param err Return location for a GError, or NULL if error reporting 
  * is to be ignored.
- * @return The ::CL4Device wrapper at given index or NULL if an error 
+ * @return The ::CCLDevice wrapper at given index or NULL if an error 
  * occurs.
  * */
-#define cl4_program_get_device(prg, index, err) \
-	cl4_dev_container_get_device((CL4DevContainer*) prg, \
-	cl4_program_get_cldevices, index, err)
+#define ccl_program_get_device(prg, index, err) \
+	ccl_dev_container_get_device((CCLDevContainer*) prg, \
+	ccl_program_get_cldevices, index, err)
 
 /**
  * @brief Return number of devices in program.
@@ -330,27 +330,27 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
  * @return The number of devices in program or 0 if an error occurs or 
  * is otherwise not possible to get any device.
  * */
-#define cl4_program_get_num_devices(prg, err) \
-	cl4_dev_container_get_num_devices((CL4DevContainer*) prg, \
-	cl4_program_get_cldevices, err)
+#define ccl_program_get_num_devices(prg, err) \
+	ccl_dev_container_get_num_devices((CCLDevContainer*) prg, \
+	ccl_program_get_cldevices, err)
 
 /** @} */
 
-/** @brief Create a new ::CL4ProgramBinary object with a given value 
+/** @brief Create a new ::CCLProgramBinary object with a given value 
  * size. */
-CL4ProgramBinary* cl4_program_binary_new(
+CCLProgramBinary* ccl_program_binary_new(
 	unsigned char* data, size_t size);
 
-#define cl4_program_binary_new_empty() \
-	cl4_program_binary_new(NULL, 0);
+#define ccl_program_binary_new_empty() \
+	ccl_program_binary_new(NULL, 0);
 
-/** @brief Destroy a ::CL4ProgramBinary object. */
-void cl4_program_binary_destroy(CL4ProgramBinary* bin);
+/** @brief Destroy a ::CCLProgramBinary object. */
+void ccl_program_binary_destroy(CCLProgramBinary* bin);
 
-/** @brief Implementation of cl4_dev_container_get_cldevices() for the
+/** @brief Implementation of ccl_dev_container_get_cldevices() for the
  * program wrapper. */
-CL4WrapperInfo* cl4_program_get_cldevices(
-	CL4DevContainer* devcon, GError** err);
+CCLWrapperInfo* ccl_program_get_cldevices(
+	CCLDevContainer* devcon, GError** err);
 
 #endif
 

@@ -34,7 +34,7 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 	
 	if (platforms == NULL) {
 		if (num_platforms != NULL) {
-			*num_platforms = cl4_test_num_platforms;
+			*num_platforms = ccl_test_num_platforms;
 		} else {
 			status = CL_INVALID_VALUE;
 		}
@@ -43,8 +43,8 @@ cl_int clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 			status = CL_INVALID_VALUE;
 		} else {
 			for (guint i = 0; 
-				i < MIN(num_entries, cl4_test_num_platforms); i++) {
-				platforms[i] = (cl_platform_id) &cl4_test_platforms[i];
+				i < MIN(num_entries, ccl_test_num_platforms); i++) {
+				platforms[i] = (cl_platform_id) &ccl_test_platforms[i];
 			}
 		}
 	}
@@ -63,15 +63,15 @@ cl_int clGetPlatformInfo(cl_platform_id platform,
 	} else {
 		switch (param_name) {
 			case CL_PLATFORM_PROFILE:
-				cl4_test_char_info(platform, profile);
+				ccl_test_char_info(platform, profile);
 			case CL_PLATFORM_VERSION:
-				cl4_test_char_info(platform, version);
+				ccl_test_char_info(platform, version);
 			case CL_PLATFORM_NAME:
-				cl4_test_char_info(platform, name);
+				ccl_test_char_info(platform, name);
 			case CL_PLATFORM_VENDOR:
-				cl4_test_char_info(platform, vendor);
+				ccl_test_char_info(platform, vendor);
 			case CL_PLATFORM_EXTENSIONS:
-				cl4_test_char_info(platform, extensions);
+				ccl_test_char_info(platform, extensions);
 			default:
 				status = CL_INVALID_VALUE;
 		}

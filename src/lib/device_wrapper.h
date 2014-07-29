@@ -26,8 +26,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_DEVICE_WRAPPER_H
-#define CL4_DEVICE_WRAPPER_H
+#ifndef _CCL_DEVICE_WRAPPER_H_
+#define _CCL_DEVICE_WRAPPER_H_
 
 #include "common.h"
 #include "gerrorf.h"
@@ -36,9 +36,9 @@
 #include "oclversions.h"
 #include <string.h>
 
-/* Forward declaration of CL4Platform, as we can't include platform.h
+/* Forward declaration of CCLPlatform, as we can't include platform.h
  * here due to circular dependency. */
-typedef struct cl4_platform CL4Platform;
+typedef struct ccl_platform CCLPlatform;
 
 /**
  * @defgroup DEVICE_WRAPPER Device wrapper
@@ -52,16 +52,16 @@ typedef struct cl4_platform CL4Platform;
  */
 
 /** @brief Device wrapper object. */
-typedef struct cl4_device CL4Device;
+typedef struct ccl_device CCLDevice;
 
 /** @brief Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed. */
-void cl4_device_destroy(CL4Device* dev);
+void ccl_device_destroy(CCLDevice* dev);
 
-CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
+CCLPlatform* ccl_device_get_platform(CCLDevice* dev, GError** err);
 
 /**
- * @brief Get a ::CL4WrapperInfo device information object.
+ * @brief Get a ::CCLWrapperInfo device information object.
  * 
  * @param dev The device wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -71,9 +71,9 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_device_get_info(dev, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) dev, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
+#define ccl_device_get_info(dev, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) dev, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar device information value. 
@@ -91,9 +91,9 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * automatically freed when the device wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define cl4_device_get_scalar_info(dev, param_name, param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) dev, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetDeviceInfo, \
+#define ccl_device_get_scalar_info(dev, param_name, param_type, err) \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetDeviceInfo, \
 		CL_TRUE, err))
 
 /** 
@@ -112,9 +112,9 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * automatically freed when the device wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_device_get_array_info(dev, param_name, param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) dev, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetDeviceInfo, \
+#define ccl_device_get_array_info(dev, param_name, param_type, err) \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetDeviceInfo, \
 		CL_TRUE, err)
 
 /** 
@@ -122,16 +122,16 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * 
  * @param device The device wrapper object. 
  * */
-#define cl4_device_ref(device) \
-	cl4_wrapper_ref((CL4Wrapper*) device)
+#define ccl_device_ref(device) \
+	ccl_wrapper_ref((CCLWrapper*) device)
 
 /**
- * @brief Alias to cl4_device_destroy().
+ * @brief Alias to ccl_device_destroy().
  * 
  * @param device Device wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_device_unref(device) cl4_device_destroy(device)
+#define ccl_device_unref(device) ccl_device_destroy(device)
 
 /**
  * @brief Get the OpenCL device_id object.
@@ -139,12 +139,12 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * @param device The device wrapper object.
  * @return The OpenCL device_id object.
  * */
-#define cl4_device_unwrap(device) \
-	((cl_device_id) cl4_wrapper_unwrap((CL4Wrapper*) device))
+#define ccl_device_unwrap(device) \
+	((cl_device_id) ccl_wrapper_unwrap((CCLWrapper*) device))
 	
 /** @} */
 
 /** @brief Get the device wrapper for the given OpenCL device. */
-CL4Device* cl4_device_new_wrap(cl_device_id device);
+CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 #endif

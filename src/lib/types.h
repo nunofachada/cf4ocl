@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_TYPES_H
-#define CL4_TYPES_H
+#ifndef _CCL_TYPES_H_
+#define _CCL_TYPES_H_
 
 #include <glib.h>
 #include "common.h"
@@ -42,24 +42,24 @@
  */
 
 typedef enum {
-	CL4_CHAR = 0,
-	CL4_UCHAR = 1,
-	CL4_INT = 2,
-	CL4_UINT = 3,
-	CL4_LONG = 4,
-	CL4_ULONG = 5,
-	CL4_HALF = 6,
-	CL4_FLOAT = 7,
-	CL4_DOUBLE = 8
-} CL4Type;
+	CCL_CHAR = 0,
+	CCL_UCHAR = 1,
+	CCL_INT = 2,
+	CCL_UINT = 3,
+	CCL_LONG = 4,
+	CCL_ULONG = 5,
+	CCL_HALF = 6,
+	CCL_FLOAT = 7,
+	CCL_DOUBLE = 8
+} CCLType;
 
-typedef struct cl4_type_info CL4TypeInfo;
+typedef struct ccl_type_info CCLTypeInfo;
 
 /** @brief Return OpenCL type name. */
-const char* cl4_type_name_get(CL4Type type);
+const char* ccl_type_name_get(CCLType type);
 
 /** @brief Return OpenCL type size in bytes. */
-int cl4_type_sizeof(CL4Type type);
+int ccl_type_sizeof(CCLType type);
 
 /** @} */
 

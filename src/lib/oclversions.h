@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_OCLVERSIONS_H
-#define CL4_OCLVERSIONS_H
+#ifndef _CCL_OCLVERSIONS_H_
+#define _CCL_OCLVERSIONS_H_
 
 #if defined(__APPLE__) || defined(__MACOSX)
     #include <OpenCL/opencl.h>

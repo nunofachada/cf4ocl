@@ -47,17 +47,17 @@ int main(int argc, char *argv[])
 	/* Error management. */
 	GError *err = NULL;
 	/* Context wrapper. */
-	CL4Context* ctx = NULL;
+	CCLContext* ctx = NULL;
 	/* Program wrapper. */
-	CL4Program* prg = NULL;
+	CCLProgram* prg = NULL;
 	/* Kernel wrapper. */
-	CL4Kernel* krnl = NULL;
+	CCLKernel* krnl = NULL;
 	/* Device wrapper. */
-	CL4Device* dev = NULL;
+	CCLDevice* dev = NULL;
 	/* Kernel information. */
-	CL4WrapperInfo* info = NULL;
+	CCLWrapperInfo* info = NULL;
 	/* Device filters. */
-	CL4DevSelFilters filters = NULL;
+	CCLDevSelFilters filters = NULL;
 	/* Default device index. */
 	cl_int dev_idx = -1;
 	
@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
 	/* Parse command line options */
 	/* ************************** */
 
-	gef_if_error_create_goto(err, CL4_ERROR, (argc < 3) || (argc > 4), 
-		CL4_ERROR_ARGS, error_handler, 
+	gef_if_error_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4), 
+		CCL_ERROR_ARGS, error_handler, 
 		"Usage: %s <program_file> <kernel_name> [device_index]\n", 
 		argv[0]);
 	if (argc == 4) dev_idx = atoi(argv[3]);
@@ -76,26 +76,26 @@ int main(int argc, char *argv[])
 	/* ********************************************* */
 	
 	/* Select a context/device. */
-	cl4_devsel_add_dep_filter(
-		&filters, cl4_devsel_dep_menu, 
+	ccl_devsel_add_dep_filter(
+		&filters, ccl_devsel_dep_menu, 
 		(dev_idx == -1) ? NULL : (void*) &dev_idx);
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = ccl_context_new_from_filters(&filters, &err);
 	gef_if_err_goto(err, error_handler);
 	
 	/* Get program which contains kernel. */
-	prg = cl4_program_new_from_source_file(ctx, argv[1], &err);
+	prg = ccl_program_new_from_source_file(ctx, argv[1], &err);
 	gef_if_err_goto(err, error_handler);
 	
 	/* Build program. */
-	cl4_program_build(prg, NULL, &err);
+	ccl_program_build(prg, NULL, &err);
 	gef_if_err_goto(err, error_handler);
 
 	/* Get kernel */
-	krnl = cl4_program_get_kernel(prg, argv[2], &err);
+	krnl = ccl_program_get_kernel(prg, argv[2], &err);
 	gef_if_err_goto(err, error_handler);
 	
 	/* Get the device. */
-	dev = cl4_context_get_device(ctx, 0, &err);
+	dev = ccl_context_get_device(ctx, 0, &err);
 	gef_if_err_goto(err, error_handler);
 
 	/* *************************** */
@@ -104,37 +104,37 @@ int main(int argc, char *argv[])
 	
 	g_printf("\n   ======================== Static Kernel Information =======================\n\n");
 	
-	info = cl4_kernel_get_workgroup_info(
+	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Maximum workgroup size                  : %lu\n", 
-		(unsigned long) cl4_info_scalar(info, size_t));
+		(unsigned long) ccl_info_scalar(info, size_t));
 
-	info = cl4_kernel_get_workgroup_info(
+	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Preferred multiple of workgroup size    : %lu\n", 
-		(unsigned long) cl4_info_scalar(info, size_t));
+		(unsigned long) ccl_info_scalar(info, size_t));
 		
-	info = cl4_kernel_get_workgroup_info(
+	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", 
-		(unsigned long) cl4_info_array(info, size_t*)[0], 
-		(unsigned long) cl4_info_array(info, size_t*)[1], 
-		(unsigned long) cl4_info_array(info, size_t*)[2]);
+		(unsigned long) ccl_info_array(info, size_t*)[0], 
+		(unsigned long) ccl_info_array(info, size_t*)[1], 
+		(unsigned long) ccl_info_array(info, size_t*)[2]);
 		
-	info = cl4_kernel_get_workgroup_info(
+	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_LOCAL_MEM_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Local memory used by kernel             : %lu bytes\n", 
-		(unsigned long) cl4_info_scalar(info, cl_ulong));
+		(unsigned long) ccl_info_scalar(info, cl_ulong));
 		
-	info = cl4_kernel_get_workgroup_info(
+	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PRIVATE_MEM_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Min. private mem. used by each workitem : %lu bytes\n", 
-		(unsigned long) cl4_info_scalar(info, cl_ulong));
+		(unsigned long) ccl_info_scalar(info, cl_ulong));
 	
 	g_printf("\n");
 	
@@ -160,8 +160,8 @@ cleanup:
 	/* Free stuff! */
 	/* *********** */
 	
-	if (prg != NULL) cl4_program_destroy(prg);
-	if (ctx != NULL) cl4_context_destroy(ctx);
+	if (prg != NULL) ccl_program_destroy(prg);
+	if (ctx != NULL) ccl_context_destroy(ctx);
 	
 	/* Return status. */
 	return status;

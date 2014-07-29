@@ -29,8 +29,8 @@
 #include "event_wrapper.h"
 #include "queue_wrapper.h"
 
-#ifndef CL4_MEMOBJ_WRAPPER_H
-#define CL4_MEMOBJ_WRAPPER_H
+#ifndef _CCL_MEMOBJ_WRAPPER_H_
+#define _CCL_MEMOBJ_WRAPPER_H_
 
 /**
  * @defgroup MEMOBJ_WRAPPER Memory object wrapper
@@ -43,25 +43,25 @@
  * @{
  */
 
-typedef struct cl4_memobj CL4MemObj;
+typedef struct ccl_memobj CCLMemObj;
 
 /** @brief Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed. */
-void cl4_memobj_destroy(CL4MemObj* mo);
+void ccl_memobj_destroy(CCLMemObj* mo);
 
-CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4Queue* cq, 
-	void* mapped_ptr, CL4EventWaitList evt_wait_lst, GError** err);
+CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq, 
+	void* mapped_ptr, CCLEventWaitList evt_wait_lst, GError** err);
 	
 #ifdef CL_VERSION_1_2
 
-CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
- 	CL4Queue* cq, cl_mem_migration_flags flags, 
- 	CL4EventWaitList evt_wait_lst, GError** err);
+CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
+ 	CCLQueue* cq, cl_mem_migration_flags flags, 
+ 	CCLEventWaitList evt_wait_lst, GError** err);
 
 #endif
 
 /**
- * @brief Get a ::CL4WrapperInfo memory object information object.
+ * @brief Get a ::CCLWrapperInfo memory object information object.
  * 
  * @param mo The memory object wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -71,9 +71,9 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
  * be automatically freed when the memory object wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_memobj_get_info(mo, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) mo, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err)
+#define ccl_memobj_get_info(mo, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) mo, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar memory object information value. 
@@ -91,9 +91,9 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
  * automatically freed when the memory object wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define cl4_memobj_get_scalar_info(mo, param_name, param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) mo, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetMemObjectInfo, \
+#define ccl_memobj_get_scalar_info(mo, param_name, param_type, err) \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetMemObjectInfo, \
 		CL_TRUE, err))
 
 /** 
@@ -112,9 +112,9 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
  * automatically freed when the memory object wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_memobj_get_array_info(mo, param_name, param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) mo, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetMemObjectInfo, \
+#define ccl_memobj_get_array_info(mo, param_name, param_type, err) \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetMemObjectInfo, \
 		CL_TRUE, err)
 
 /** 
@@ -122,16 +122,16 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
  * 
  * @param mo The cl_mem wrapper object. 
  * */
-#define cl4_memobj_ref(mo) \
-	cl4_wrapper_ref((CL4Wrapper*) mo)
+#define ccl_memobj_ref(mo) \
+	ccl_wrapper_ref((CCLWrapper*) mo)
 
 /**
- * @brief Alias to cl4_memobj_destroy().
+ * @brief Alias to ccl_memobj_destroy().
  * 
  * @param mo cl_mem wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_memobj_unref(mo) cl4_memobj_destroy(mo)
+#define ccl_memobj_unref(mo) ccl_memobj_destroy(mo)
 
 /**
  * @brief Get the OpenCL cl_mem object.
@@ -139,12 +139,12 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
  * @param mo The cl_mem wrapper object.
  * @return The OpenCL cl_mem object.
  * */
-#define cl4_memobj_unwrap(mo) \
-	((cl_mem) cl4_wrapper_unwrap((CL4Wrapper*) mo))		
+#define ccl_memobj_unwrap(mo) \
+	((cl_mem) ccl_wrapper_unwrap((CCLWrapper*) mo))		
 
 /** @} */
 
 /** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
-CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object);
+CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object);
 
 #endif

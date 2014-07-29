@@ -32,9 +32,9 @@
  * @brief Object which contains the list of OpenCL platforms available
  * in the system.
  */
-struct cl4_platforms {
+struct ccl_platforms {
 	/** Platforms available in the system. */
-	CL4Platform** platfs;
+	CCLPlatform** platfs;
 	/** Number of platforms available in the system. */
 	cl_uint num_platfs;
 };
@@ -45,14 +45,14 @@ struct cl4_platforms {
  */
 
 /**
- * @brief Creates a new CL4Platforms* object, which contains the list 
+ * @brief Creates a new CCLPlatforms* object, which contains the list 
  * of OpenCL platforms available in the system.
  * 
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return A new CL4Platforms* object, or NULL in case an error occurs.
+ * @return A new CCLPlatforms* object, or NULL in case an error occurs.
  * */
-CL4Platforms* cl4_platforms_new(GError **err) {
+CCLPlatforms* ccl_platforms_new(GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -62,7 +62,7 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 	
 	/* Object which represents the list of OpenCL platforms available 
 	 * in the system. */
-	CL4Platforms* platforms = NULL;
+	CCLPlatforms* platforms = NULL;
 	
 	/* Size in bytes of array of platform IDs. */
 	gsize platf_ids_size;
@@ -70,15 +70,15 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 	/* Array of platform IDs. */
 	cl_platform_id* platf_ids = NULL;
 	
-	/* Allocate memory for the CL4Platforms object. */
-	platforms = g_slice_new0(CL4Platforms);
+	/* Allocate memory for the CCLPlatforms object. */
+	platforms = g_slice_new0(CCLPlatforms);
 	
 	/* Get number of platforms */
 	ocl_status = clGetPlatformIDs(0, NULL, &platforms->num_platfs);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status, 
-		CL4_ERROR_OCL, error_handler, 
+	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
 		"%s: get number of platforms (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
 	/* Determine size in bytes of array of platform IDs. */
 	platf_ids_size = sizeof(cl_platform_id) * platforms->num_platfs;
@@ -89,19 +89,19 @@ CL4Platforms* cl4_platforms_new(GError **err) {
 	/* Get existing platform IDs. */
 	ocl_status = clGetPlatformIDs(
 		platforms->num_platfs, platf_ids, NULL);
-	gef_if_error_create_goto(*err, CL4_ERROR, CL_SUCCESS != ocl_status,
-		CL4_ERROR_OCL, error_handler, 
+	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status,
+		CCL_ERROR_OCL, error_handler, 
 		"%s: get platforms IDs (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, cl4_err(ocl_status));
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
 	/* Allocate memory for array of platform wrapper objects. */
 	platforms->platfs = 
-		g_slice_alloc(sizeof(CL4Platform*) * platforms->num_platfs);
+		g_slice_alloc(sizeof(CCLPlatform*) * platforms->num_platfs);
 	
 	/* Wrap platform IDs in platform wrapper objects. */
 	for (guint i = 0; i < platforms->num_platfs; i++) {
 		/* Add platform wrapper object to array of wrapper objects. */
-		platforms->platfs[i] = cl4_platform_new_wrap(platf_ids[i]);
+		platforms->platfs[i] = ccl_platform_new_wrap(platf_ids[i]);
 	}
 
 	/* Free array of platform ids. */
@@ -116,10 +116,10 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
 	
-	/* Destroy the CL4Platforms object, or what was possible to build 
+	/* Destroy the CCLPlatforms object, or what was possible to build 
 	 * of it. */
 	if (platforms) {
-		cl4_platforms_destroy(platforms);
+		ccl_platforms_destroy(platforms);
 	}
 	
 	/* Set platforms to NULL, indicating an error occurred.*/
@@ -127,44 +127,44 @@ error_handler:
 
 finish:		
 	
-	/* Return the CL4Platforms object. */
+	/* Return the CCLPlatforms object. */
 	return platforms;
 
 }
 
 /**
- * @brief Destroy a CL4Platforms* object, including all underlying
+ * @brief Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data.
  * 
- * @param platforms CL4Platforms* object to destroy.
+ * @param platforms CCLPlatforms* object to destroy.
  * */
-void cl4_platforms_destroy(CL4Platforms* platforms) {
+void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
 	/* Platforms object can't be NULL. */
 	g_return_if_fail(platforms != NULL);
 	
 	/* Destroy underlying platforms. */
 	for (guint i = 0; i < platforms->num_platfs; i++) {
-		cl4_platform_unref(platforms->platfs[i]);
+		ccl_platform_unref(platforms->platfs[i]);
 	}
 	
 	/* Free underlying platforms array. */
 	g_slice_free1(
-		sizeof(CL4Platform*) * platforms->num_platfs, platforms->platfs);
+		sizeof(CCLPlatform*) * platforms->num_platfs, platforms->platfs);
 		
-	/* Free CL4Platforms object. */	
-	g_slice_free(CL4Platforms, platforms);
+	/* Free CCLPlatforms object. */	
+	g_slice_free(CCLPlatforms, platforms);
 }
 
 
 /**
- * @brief Return number of OpenCL platforms found in CL4Platforms* 
+ * @brief Return number of OpenCL platforms found in CCLPlatforms* 
  * object.
  * 
  * @param platforms Object containing the OpenCL platforms.
  * @return The number of OpenCL platforms found.
  * */
-guint cl4_platforms_count(CL4Platforms* platforms) {
+guint ccl_platforms_count(CCLPlatforms* platforms) {
 	
 	/* Platforms object can't be NULL. */
 	g_return_val_if_fail(platforms != NULL, 0);
@@ -174,13 +174,13 @@ guint cl4_platforms_count(CL4Platforms* platforms) {
 }
 
 /**
- * @brief Get CL4 platform wrapper object at given index.
+ * @brief Get CCL platform wrapper object at given index.
  * 
  * @param platforms Object containing the OpenCL platforms.
  * @param index Index of platform to return.
  * @return Platform wrapper object at given index.
  * */
-CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index) {
+CCLPlatform* ccl_platforms_get_platform(CCLPlatforms* platforms, guint index) {
 	
 	/* Platforms object can't be NULL. */
 	g_return_val_if_fail(platforms != NULL, NULL);

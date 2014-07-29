@@ -27,7 +27,7 @@
  
 #include "types.h"
 
-struct cl4_type_info {
+struct ccl_type_info {
 	const char* name;
 	const int size;
 };
@@ -37,19 +37,19 @@ struct cl4_type_info {
  * @{
  */
 
-static const CL4TypeInfo cl4_types[] = {
+static const CCLTypeInfo ccl_types[] = {
 	
-	{"char",   1}, /* CL4_CHAR   = 0 */
-	{"uchar",  1}, /* CL4_UCHAR  = 1 */
-	{"short",  2}, /* CL4_SHORT  = 2 */
-	{"ushort", 2}, /* CL4_USHORT = 3 */
-	{"int",    4}, /* CL4_INT    = 4 */
-	{"uint",   4}, /* CL4_UINT   = 5 */
-	{"long",   8}, /* CL4_LONG   = 6 */
-	{"ulong",  8}, /* CL4_ULONG  = 7 */
-	{"half",   2}, /* CL4_HALF   = 8 */
-	{"float",  4}, /* CL4_FLOAT  = 9 */
-	{"double", 8}  /* CL4_DOUBLE = 10 */
+	{"char",   1}, /* CCL_CHAR   = 0 */
+	{"uchar",  1}, /* CCL_UCHAR  = 1 */
+	{"short",  2}, /* CCL_SHORT  = 2 */
+	{"ushort", 2}, /* CCL_USHORT = 3 */
+	{"int",    4}, /* CCL_INT    = 4 */
+	{"uint",   4}, /* CCL_UINT   = 5 */
+	{"long",   8}, /* CCL_LONG   = 6 */
+	{"ulong",  8}, /* CCL_ULONG  = 7 */
+	{"half",   2}, /* CCL_HALF   = 8 */
+	{"float",  4}, /* CCL_FLOAT  = 9 */
+	{"double", 8}  /* CCL_DOUBLE = 10 */
 };
 
 /** 
@@ -58,10 +58,10 @@ static const CL4TypeInfo cl4_types[] = {
  * @param type Type constant.
  * @return A string containing the OpenCL type name.
  * */
-const char* cl4_type_name_get(CL4Type type) {
-	g_assert_cmpint(type, <=, CL4_DOUBLE);
-	g_assert_cmpint(type, >=, CL4_CHAR);
-	return cl4_types[type].name;
+const char* ccl_type_name_get(CCLType type) {
+	g_assert_cmpint(type, <=, CCL_DOUBLE);
+	g_assert_cmpint(type, >=, CCL_CHAR);
+	return ccl_types[type].name;
 }
 
 /** 
@@ -70,10 +70,10 @@ const char* cl4_type_name_get(CL4Type type) {
  * @param type Type constant.
  * @return The size of the OpenCL type in bytes.
  * */
-int cl4_type_sizeof(CL4Type type) {
-	g_assert_cmpint(type, <=, CL4_DOUBLE);
-	g_assert_cmpint(type, >=, CL4_CHAR);
-	return cl4_types[type].size;
+int ccl_type_sizeof(CCLType type) {
+	g_assert_cmpint(type, <=, CCL_DOUBLE);
+	g_assert_cmpint(type, >=, CCL_CHAR);
+	return ccl_types[type].size;
 }
 
 /** @} */

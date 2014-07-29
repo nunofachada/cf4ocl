@@ -27,7 +27,7 @@
  
 #include "errors.h"
 
-static const char* cl4_errors[] = {
+static const char* ccl_errors[] = {
 	"Successful operation", /* CL_SUCCESS - 0 */
 	"Device not found", /* CL_DEVICE_NOT_FOUND - 1 */
 	"Device not available", /* CL_DEVICE_NOT_AVAILABLE - 2 */
@@ -110,8 +110,8 @@ static const char* cl4_errors[] = {
  * @param code OpenCL error code.
  * @return A readable string.
  * */
-const char* cl4_err(int code) {
-	return cl4_errors[-1 * code];
+const char* ccl_err(int code) {
+	return ccl_errors[-1 * code];
 }
 
 /** @} */

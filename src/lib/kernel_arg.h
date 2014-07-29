@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef CL4_KERNEL_ARG_H
-#define CL4_KERNEL_ARG_H 
+#ifndef _CCL_KERNEL_ARG_H_
+#define _CCL_KERNEL_ARG_H_
 
 #include "common.h"
 #include "abstract_wrapper.h"
@@ -42,21 +42,21 @@
  * @{
  */
 
-typedef CL4Wrapper CL4Arg;
+typedef CCLWrapper CCLArg;
 
-#define cl4_arg_private(value, type) \
-	cl4_arg_new(&value, sizeof(type))
+#define ccl_arg_private(value, type) \
+	ccl_arg_new(&value, sizeof(type))
 
-#define cl4_arg_local(count, type) \
-	cl4_arg_new(NULL, count * sizeof(type))
+#define ccl_arg_local(count, type) \
+	ccl_arg_new(NULL, count * sizeof(type))
 	
-CL4Arg* cl4_arg_new(void* value, size_t size);
+CCLArg* ccl_arg_new(void* value, size_t size);
 
-void cl4_arg_destroy(CL4Arg* arg);
+void ccl_arg_destroy(CCLArg* arg);
 
-size_t cl4_arg_size(CL4Arg* arg);
+size_t ccl_arg_size(CCLArg* arg);
 
-void* cl4_arg_value(CL4Arg* arg);
+void* ccl_arg_value(CCLArg* arg);
 
 /** @} */
 

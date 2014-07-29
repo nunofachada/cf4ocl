@@ -24,8 +24,8 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#ifndef CL4_EXAMPLES_BANKCONFLICTS_H
-#define CL4_EXAMPLES_BANKCONFLICTS_H
+#ifndef _CCL_EXAMPLES_BANKCONFLICTS_H_
+#define _CCL_EXAMPLES_BANKCONFLICTS_H_
  
 #include "examples_common.h"
 

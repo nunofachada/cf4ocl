@@ -389,24 +389,24 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 	} else {
 		switch (param_name) {
 			case CL_PROGRAM_REFERENCE_COUNT:
-				cl4_test_basic_info(cl_uint, program, ref_count);
+				ccl_test_basic_info(cl_uint, program, ref_count);
 			case CL_PROGRAM_CONTEXT:
-				cl4_test_basic_info(cl_context, program, context);
+				ccl_test_basic_info(cl_context, program, context);
 			case CL_PROGRAM_NUM_DEVICES:
-				cl4_test_basic_info(cl_uint, program, num_devices);
+				ccl_test_basic_info(cl_uint, program, num_devices);
 			case CL_PROGRAM_DEVICES:
-				cl4_test_predefvector_info(cl_device_id, program->num_devices, program, devices);
+				ccl_test_predefvector_info(cl_device_id, program->num_devices, program, devices);
 			case CL_PROGRAM_SOURCE:
-				cl4_test_char_info(program, source);
+				ccl_test_char_info(program, source);
 			case CL_PROGRAM_BINARY_SIZES:
-				cl4_test_predefvector_info(size_t, program->num_devices, program, binary_sizes);
+				ccl_test_predefvector_info(size_t, program->num_devices, program, binary_sizes);
 			case CL_PROGRAM_BINARIES:
-				cl4_test_predefvector2d_info(unsigned char, program->num_devices, 
+				ccl_test_predefvector2d_info(unsigned char, program->num_devices, 
 					program, binary_sizes, binaries);
 			case CL_PROGRAM_NUM_KERNELS:
-				cl4_test_basic_info(size_t, program, num_kernels);
+				ccl_test_basic_info(size_t, program, num_kernels);
 			case CL_PROGRAM_KERNEL_NAMES:
-				cl4_test_char_info(program, kernel_names);
+				ccl_test_char_info(program, kernel_names);
 			default:
 				status = CL_INVALID_VALUE;
 		}
@@ -448,13 +448,13 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 		/* Get info. */
 		switch (param_name) {
 			case CL_PROGRAM_BUILD_STATUS:
-				cl4_test_basic_info(cl_build_status, program, build_status[i]);
+				ccl_test_basic_info(cl_build_status, program, build_status[i]);
 			case CL_PROGRAM_BUILD_OPTIONS:
-				cl4_test_char_info(program, build_options[i]);
+				ccl_test_char_info(program, build_options[i]);
 			case CL_PROGRAM_BUILD_LOG:
-				cl4_test_char_info(program, build_log[i]);
+				ccl_test_char_info(program, build_log[i]);
 			case CL_PROGRAM_BINARY_TYPE:
-				cl4_test_basic_info(cl_program_binary_type, program, binary_type[i]);
+				ccl_test_basic_info(cl_program_binary_type, program, binary_type[i]);
 			default:
 				status = CL_INVALID_VALUE;
 		}

@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_DEVICE_QUERY_H
-#define CL4_DEVICE_QUERY_H
+#ifndef _CCL_DEVICE_QUERY_H_
+#define _CCL_DEVICE_QUERY_H_
 
 #include "common.h"
 #include "gerrorf.h"
@@ -54,14 +54,14 @@
  * @param units Parameter units suffix.
  * @return Formatted output (same address as parameter out).
  * */
-typedef gchar* (*cl4_devquery_format)(
-	CL4WrapperInfo* info, gchar* out, guint size, 
+typedef gchar* (*ccl_devquery_format)(
+	CCLWrapperInfo* info, gchar* out, guint size, 
 	const gchar const* units);
 
 /** 
  * @brief Maps a string to a cl_device_info bitfield. 
  * */
-typedef struct cl4_devquery_map {
+typedef struct ccl_devquery_map {
 	
 	/** Parameter name string. */
 	const gchar const* param_name;
@@ -70,35 +70,35 @@ typedef struct cl4_devquery_map {
 	/** Long description of parameter. */
 	const gchar const* description;
 	/** Output formatting function. */
-	const cl4_devquery_format format;
+	const ccl_devquery_format format;
 	/** Parameter units suffix. */
 	const gchar const* units;
 	
-} CL4DevQueryMap;
+} CCLDevQueryMap;
 
 /** @brief Size of parameter information map. */
-extern const gint cl4_devquery_info_map_size;
+extern const gint ccl_devquery_info_map_size;
 
 /** @brief Map of parameter name strings to respective cl_device_info 
  * bitfields, long description string, format output function and a
  * units suffix. */
-extern const CL4DevQueryMap cl4_devquery_info_map[];
+extern const CCLDevQueryMap ccl_devquery_info_map[];
 
 /** @brief Get a final device info prefix in the same format as 
- * kept in the cl4_devquery_info_map. */
-gchar* cl4_devquery_get_prefix_final(gchar* prefix);
+ * kept in the ccl_devquery_info_map. */
+gchar* ccl_devquery_get_prefix_final(gchar* prefix);
 
 /** @brief Return a cl_device_info object given its name. */
-cl_device_info cl4_devquery_name(gchar* name);
+cl_device_info ccl_devquery_name(gchar* name);
 
 /** @brief Get a list of device information parameters which have the 
  * given prefix. */
-const CL4DevQueryMap* cl4_devquery_prefix(
+const CCLDevQueryMap* ccl_devquery_prefix(
 	gchar* prefix, gint* size);
 
 /** @brief Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. */
-const CL4DevQueryMap* cl4_devquery_match(gchar* substr, gint* idx);
+const CCLDevQueryMap* ccl_devquery_match(gchar* substr, gint* idx);
 
 /** 
  * @brief Map an OpenCL cl_device_type object to a string identifying
@@ -106,11 +106,13 @@ const CL4DevQueryMap* cl4_devquery_match(gchar* substr, gint* idx);
  * 
  * @param type The OpenCL cl_device_type.
  * */
-#define cl4_devquery_type2str(type) \
+#define ccl_devquery_type2str(type) \
 	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \
 		(((type) & CL_DEVICE_TYPE_GPU) ? "GPU" : \
 			(((type) & CL_DEVICE_TYPE_ACCELERATOR) ? "Accelerator" : \
 				(((type) & CL_DEVICE_TYPE_CUSTOM) ? "Custom" : \
 					"Unknown"))))
+
+/** @} */
 
 #endif

@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_CQUEUE_WRAPPER_H
-#define CL4_CQUEUE_WRAPPER_H 
+#ifndef _CCL_CQUEUE_WRAPPER_H_
+#define _CCL_CQUEUE_WRAPPER_H_
 
 #include <glib.h>
 #include "oclversions.h"
@@ -47,36 +47,36 @@
  */
 
 /** @brief Command queue wrapper object. */
-typedef struct cl4_queue CL4Queue;
+typedef struct ccl_queue CCLQueue;
 
-CL4Queue* cl4_queue_new_direct(cl_context context, 
+CCLQueue* ccl_queue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
 	GError** err);
 
-CL4Queue* cl4_queue_new(CL4Context* ctx, CL4Device* dev, 
+CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err);
 
 /** @brief Decrements the reference count of the command queue wrapper 
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed. */
-void cl4_queue_destroy(CL4Queue* cq);
+void ccl_queue_destroy(CCLQueue* cq);
 
-CL4Context* cl4_queue_get_context(CL4Queue* cq, GError** err);
+CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err);
 
-CL4Device* cl4_queue_get_device(CL4Queue* cq, GError** err);
+CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err);
 
-CL4Event* cl4_queue_produce_event(CL4Queue* cq, cl_event event);
+CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event);
 
-void cl4_queue_iter_event_init(CL4Queue* cq);
+void ccl_queue_iter_event_init(CCLQueue* cq);
 
-CL4Event* cl4_queue_iter_event_next(CL4Queue* cq);
+CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq);
 
-cl_int cl4_queue_flush(CL4Queue* cq, GError** err);
+cl_int ccl_queue_flush(CCLQueue* cq, GError** err);
 
-cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
+cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 
 /**
- * @brief Get a ::CL4WrapperInfo command queue information object.
+ * @brief Get a ::CCLWrapperInfo command queue information object.
  * 
  * @param cq The command queue wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -86,9 +86,9 @@ cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
  * be automatically freed when the command queue wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_queue_get_info(cq, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) cq, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
+#define ccl_queue_get_info(cq, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar command queue information value. 
@@ -106,9 +106,9 @@ cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
  * automatically freed when the command queue wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define cl4_queue_get_scalar_info(cq, param_name, param_type, err) \
-	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) cq, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetCommandQueueInfo, \
+#define ccl_queue_get_scalar_info(cq, param_name, param_type, err) \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetCommandQueueInfo, \
 		CL_TRUE, err))
 
 /** 
@@ -127,9 +127,9 @@ cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
  * automatically freed when the command queue wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_queue_get_array_info(cq, param_name, param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) cq, \
-		NULL, param_name, (cl4_wrapper_info_fp) clGetCommandQueueInfo, \
+#define ccl_queue_get_array_info(cq, param_name, param_type, err) \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetCommandQueueInfo, \
 		CL_TRUE, err)
 
 /** 
@@ -137,16 +137,16 @@ cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
  * 
  * @param cq The command queue wrapper object. 
  * */
-#define cl4_queue_ref(cq) \
-	cl4_wrapper_ref((CL4Wrapper*) cq)
+#define ccl_queue_ref(cq) \
+	ccl_wrapper_ref((CCLWrapper*) cq)
 
 /**
- * @brief Alias to cl4_queue_destroy().
+ * @brief Alias to ccl_queue_destroy().
  * 
  * @param cq Command queue wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_queue_unref(cq) cl4_queue_destroy(cq)
+#define ccl_queue_unref(cq) ccl_queue_destroy(cq)
 
 /**
  * @brief Get the OpenCL command queue object.
@@ -154,13 +154,13 @@ cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
  * @param cq The command queue wrapper object.
  * @return The OpenCL command queue object.
  * */
-#define cl4_queue_unwrap(cq) \
-	((cl_command_queue) cl4_wrapper_unwrap((CL4Wrapper*) cq))		
+#define ccl_queue_unwrap(cq) \
+	((cl_command_queue) ccl_wrapper_unwrap((CCLWrapper*) cq))		
 
 /** @} */
 
 /** @brief Get the command queue wrapper for the given OpenCL command 
  * queue. */
-CL4Queue* cl4_queue_new_wrap(cl_command_queue command_queue);
+CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 
 #endif

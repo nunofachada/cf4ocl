@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef GERRORF_H
-#define GERRORF_H
+#ifndef _GERRORF_H_
+#define _GERRORF_H_
 
 #include <glib.h>
 

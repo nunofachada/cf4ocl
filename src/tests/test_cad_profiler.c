@@ -36,38 +36,38 @@ static void create_add_destroy_test() {
 	GError* err = NULL;
 	
 	/* Create a new profile object. */
-	CL4Prof* prof = cl4_prof_new();
+	CCLProf* prof = ccl_prof_new();
 	
 	/* Get a context and a device. */
-	CL4Context* ctx = cl4_context_new_any(&err);
+	CCLContext* ctx = ccl_context_new_any(&err);
 	g_assert_no_error(err);
 	
-	CL4Device* d = cl4_context_get_device(ctx, 0, &err);
+	CCLDevice* d = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 
 	/* Create two command queue wrappers. */
-	CL4Queue* cq1 = cl4_queue_new(
+	CCLQueue* cq1 = ccl_queue_new(
 		ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 	
-	CL4Queue* cq2 = cl4_queue_new(
+	CCLQueue* cq2 = ccl_queue_new(
 		ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 
 	/* Add both queues to profile object. */
-	cl4_prof_add_queue(prof, "A Queue", cq1);
-	cl4_prof_add_queue(prof, "Another Queue", cq2);
+	ccl_prof_add_queue(prof, "A Queue", cq1);
+	ccl_prof_add_queue(prof, "Another Queue", cq2);
 	
 	/* Unref cq1, which should not be destroyed because it is held
 	 * by the profile object. */
-	cl4_queue_destroy(cq1);
+	ccl_queue_destroy(cq1);
 
 	/* Destroy the profile object, which will also destroy cq1. cq2 
 	 * will me merely unrefed and must still be explicitly destroyed. */
-	cl4_prof_destroy(prof);
+	ccl_prof_destroy(prof);
 
 	/* Destroy cq2. */
-	cl4_queue_destroy(cq2);
+	ccl_queue_destroy(cq2);
 	
 }
 

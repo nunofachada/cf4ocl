@@ -37,17 +37,17 @@
 #include <glib/gstdio.h>
 
 /* Max. length of information string. */
-#define CL4_TEST_PLATFORMS_MAXINFOSTR 200
+#define CCL_TEST_PLATFORMS_MAXINFOSTR 200
 
 /* Test utility macro. Presents either the required information, or 
  * the error message, if it occurred. Also frees the error object if 
  * an error occurred. */
-#define cl4_test_platforms_msg(base_msg, format, ...) \
+#define ccl_test_platforms_msg(base_msg, format, ...) \
 	if (err == NULL) { \
-		g_snprintf(info_str, CL4_TEST_PLATFORMS_MAXINFOSTR, \
+		g_snprintf(info_str, CCL_TEST_PLATFORMS_MAXINFOSTR, \
 			format, ##__VA_ARGS__); \
 	} else { \
-		g_snprintf(info_str, CL4_TEST_PLATFORMS_MAXINFOSTR, \
+		g_snprintf(info_str, CCL_TEST_PLATFORMS_MAXINFOSTR, \
 			"%s", err->message); \
 		g_clear_error(&err); \
 	} \
@@ -59,57 +59,57 @@
  * */
 static void platforms_create_info_destroy_test() {
 	
-	CL4Platforms* platfs = NULL;
-	CL4Platform* p = NULL;
-	CL4Device* d = NULL;
-	CL4Device** ds = NULL;
+	CCLPlatforms* platfs = NULL;
+	CCLPlatform* p = NULL;
+	CCLDevice* d = NULL;
+	CCLDevice** ds = NULL;
 	GError* err = NULL;
-	CL4WrapperInfo* info;
+	CCLWrapperInfo* info;
 	gchar* platf_info;
 	guint num_devs;
 	guint num_platfs;
-	gchar info_str[CL4_TEST_PLATFORMS_MAXINFOSTR];
+	gchar info_str[CCL_TEST_PLATFORMS_MAXINFOSTR];
 	
 	char* info_check_array;
 	cl_uint info_check_scalar;
 
 	/* Get platforms. */
-	platfs = cl4_platforms_new(&err);
+	platfs = ccl_platforms_new(&err);
 	g_assert_no_error(err);
 	
 	/* Number of platforms. */
-	num_platfs = cl4_platforms_count(platfs);
+	num_platfs = ccl_platforms_count(platfs);
 	g_debug("* Found %d OpenCL platforms", num_platfs);
 		
 	/* Cycle through platforms. */
 	for (guint i = 0; i < num_platfs; i++) {
 	
 		/* Get current platform. */
-		p = cl4_platforms_get_platform(platfs, i);
+		p = ccl_platforms_get_platform(platfs, i);
 		g_debug(">> Platform %d:", i);
 
 		/* Get platform profile. */
-		platf_info = cl4_platform_get_info_string(p, CL_PLATFORM_PROFILE, &err);
-		cl4_test_platforms_msg("==== Profile :", "%s", platf_info);
+		platf_info = ccl_platform_get_info_string(p, CL_PLATFORM_PROFILE, &err);
+		ccl_test_platforms_msg("==== Profile :", "%s", platf_info);
 
 		/* Get platform version. */
-		platf_info = cl4_platform_get_info_string(p, CL_PLATFORM_VERSION, &err);
-		cl4_test_platforms_msg("==== Version :", "%s", platf_info);
+		platf_info = ccl_platform_get_info_string(p, CL_PLATFORM_VERSION, &err);
+		ccl_test_platforms_msg("==== Version :", "%s", platf_info);
 		
 		/* Get platform name. */
-		platf_info = cl4_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
-		cl4_test_platforms_msg("==== Name    :", "%s", platf_info);
+		platf_info = ccl_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
+		ccl_test_platforms_msg("==== Name    :", "%s", platf_info);
 
 		/* Get platform vendor. */
-		platf_info = cl4_platform_get_info_string(p, CL_PLATFORM_VENDOR, &err);
-		cl4_test_platforms_msg("==== Vendor  :", "%s", platf_info);
+		platf_info = ccl_platform_get_info_string(p, CL_PLATFORM_VENDOR, &err);
+		ccl_test_platforms_msg("==== Vendor  :", "%s", platf_info);
 
 		/* Get platform extensions. */
-		platf_info = cl4_platform_get_info_string(p, CL_PLATFORM_EXTENSIONS, &err);
-		cl4_test_platforms_msg("==== Extens. :", "%s", platf_info);
+		platf_info = ccl_platform_get_info_string(p, CL_PLATFORM_EXTENSIONS, &err);
+		ccl_test_platforms_msg("==== Extens. :", "%s", platf_info);
 		
 		/* Get number of devices. */
-		num_devs = cl4_platform_get_num_devices(p, &err);
+		num_devs = ccl_platform_get_num_devices(p, &err);
 		
 		/* Only test for device information if device count was 
 		 * successfully obtained. */
@@ -125,327 +125,327 @@ static void platforms_create_info_destroy_test() {
 			for (guint j = 0; j < num_devs; j++) {
 				
 				/* Get current device. */
-				d = cl4_platform_get_device(p, j, &err);
+				d = ccl_platform_get_device(p, j, &err);
 				g_assert_no_error(err);
 				g_debug("====== Device #%d", j);
 
-				info = cl4_device_get_info(d, CL_DEVICE_NAME, &err);
-				cl4_test_platforms_msg("...... Name :", "%s", 
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
+				ccl_test_platforms_msg("...... Name :", "%s", 
+					ccl_info_array(info, char*));
 				
 				g_debug("...... Memory location : %p", 
-					*((void**) cl4_device_unwrap(d)));
+					*((void**) ccl_device_unwrap(d)));
 				
-				info = cl4_device_get_info(d, CL_DEVICE_ADDRESS_BITS, &err);
-				cl4_test_platforms_msg("...... Address bits :", "%d", 
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_ADDRESS_BITS, &err);
+				ccl_test_platforms_msg("...... Address bits :", "%d", 
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_AVAILABLE, &err);
-				cl4_test_platforms_msg("...... Device available :", "%s", 
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_AVAILABLE, &err);
+				ccl_test_platforms_msg("...... Device available :", "%s", 
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_BUILT_IN_KERNELS, &err);
-				cl4_test_platforms_msg("...... Built-in kernels :", "%s", 
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_BUILT_IN_KERNELS, &err);
+				ccl_test_platforms_msg("...... Built-in kernels :", "%s", 
+					ccl_info_array(info, char*));
 
-				info = cl4_device_get_info(d, CL_DEVICE_COMPILER_AVAILABLE, &err);
-				cl4_test_platforms_msg("...... Compiler available :", "%s", 
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_COMPILER_AVAILABLE, &err);
+				ccl_test_platforms_msg("...... Compiler available :", "%s", 
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_DOUBLE_FP_CONFIG, &err);
-				cl4_test_platforms_msg("...... FP config (Double) :", "%lx", 
-					cl4_info_scalar(info, cl_device_fp_config));
+				info = ccl_device_get_info(d, CL_DEVICE_DOUBLE_FP_CONFIG, &err);
+				ccl_test_platforms_msg("...... FP config (Double) :", "%lx", 
+					ccl_info_scalar(info, cl_device_fp_config));
 
-				info = cl4_device_get_info(d, CL_DEVICE_SINGLE_FP_CONFIG, &err);
-				cl4_test_platforms_msg("...... FP config (Single) :", "%lx", 
-					cl4_info_scalar(info, cl_device_fp_config));
+				info = ccl_device_get_info(d, CL_DEVICE_SINGLE_FP_CONFIG, &err);
+				ccl_test_platforms_msg("...... FP config (Single) :", "%lx", 
+					ccl_info_scalar(info, cl_device_fp_config));
 
-				info = cl4_device_get_info(d, CL_DEVICE_HALF_FP_CONFIG, &err);
-				cl4_test_platforms_msg("...... FP config (Half) :", "%lx", 
-					cl4_info_scalar(info, cl_device_fp_config));
+				info = ccl_device_get_info(d, CL_DEVICE_HALF_FP_CONFIG, &err);
+				ccl_test_platforms_msg("...... FP config (Half) :", "%lx", 
+					ccl_info_scalar(info, cl_device_fp_config));
 
-				info = cl4_device_get_info(d, CL_DEVICE_ENDIAN_LITTLE, &err);
-				cl4_test_platforms_msg("...... Endian little :", "%s", 
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_ENDIAN_LITTLE, &err);
+				ccl_test_platforms_msg("...... Endian little :", "%s", 
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_ERROR_CORRECTION_SUPPORT, &err);
-				cl4_test_platforms_msg("...... Error correction support :", "%s", 
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_ERROR_CORRECTION_SUPPORT, &err);
+				ccl_test_platforms_msg("...... Error correction support :", "%s", 
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_EXECUTION_CAPABILITIES, &err);
-				cl4_test_platforms_msg("...... FP config (Single) :", "%lx", 
-					cl4_info_scalar(info, cl_device_exec_capabilities));
+				info = ccl_device_get_info(d, CL_DEVICE_EXECUTION_CAPABILITIES, &err);
+				ccl_test_platforms_msg("...... FP config (Single) :", "%lx", 
+					ccl_info_scalar(info, cl_device_exec_capabilities));
 
-				info = cl4_device_get_info(d, CL_DEVICE_EXTENSIONS, &err);
-				cl4_test_platforms_msg("...... Extensions :", "%s", 
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_EXTENSIONS, &err);
+				ccl_test_platforms_msg("...... Extensions :", "%s", 
+					ccl_info_array(info, char*));
 
-				info = cl4_device_get_info(d, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, &err);
-				cl4_test_platforms_msg("...... Global mem. cache size :", "%ld", 
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, &err);
+				ccl_test_platforms_msg("...... Global mem. cache size :", "%ld", 
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, &err);
-				cl4_test_platforms_msg("...... Global mem. cache type :", "%d", 
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, &err);
+				ccl_test_platforms_msg("...... Global mem. cache type :", "%d", 
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, &err);
-				cl4_test_platforms_msg("...... Global mem. cacheline size :", "%d", 
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, &err);
+				ccl_test_platforms_msg("...... Global mem. cacheline size :", "%d", 
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_GLOBAL_MEM_SIZE, &err);
-				cl4_test_platforms_msg("...... Global mem. size :", "%ld", 
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_GLOBAL_MEM_SIZE, &err);
+				ccl_test_platforms_msg("...... Global mem. size :", "%ld", 
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_HOST_UNIFIED_MEMORY, &err);
-				cl4_test_platforms_msg("...... Host unified memory :", "%s",
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_HOST_UNIFIED_MEMORY, &err);
+				ccl_test_platforms_msg("...... Host unified memory :", "%s",
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE_SUPPORT, &err);
-				cl4_test_platforms_msg("...... Image support :", "%s",
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE_SUPPORT, &err);
+				ccl_test_platforms_msg("...... Image support :", "%s",
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE2D_MAX_HEIGHT, &err);
-				cl4_test_platforms_msg("...... Image2d max. height :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE2D_MAX_HEIGHT, &err);
+				ccl_test_platforms_msg("...... Image2d max. height :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE2D_MAX_WIDTH, &err);
-				cl4_test_platforms_msg("...... Image2d max. width :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE2D_MAX_WIDTH, &err);
+				ccl_test_platforms_msg("...... Image2d max. width :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE3D_MAX_DEPTH, &err);
-				cl4_test_platforms_msg("...... Image3d max. depth :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE3D_MAX_DEPTH, &err);
+				ccl_test_platforms_msg("...... Image3d max. depth :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE3D_MAX_HEIGHT, &err);
-				cl4_test_platforms_msg("...... Image3d max. height :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE3D_MAX_HEIGHT, &err);
+				ccl_test_platforms_msg("...... Image3d max. height :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE3D_MAX_WIDTH, &err);
-				cl4_test_platforms_msg("...... Image3d max. width :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE3D_MAX_WIDTH, &err);
+				ccl_test_platforms_msg("...... Image3d max. width :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, &err);
-				cl4_test_platforms_msg("...... Image max. buffer size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, &err);
+				ccl_test_platforms_msg("...... Image max. buffer size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, &err);
-				cl4_test_platforms_msg("...... Image max. array size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, &err);
+				ccl_test_platforms_msg("...... Image max. array size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_LINKER_AVAILABLE, &err);
-				cl4_test_platforms_msg("...... Linker available :", "%s",
-					cl4_info_scalar(info, cl_bool) ? "Yes" : "No");
+				info = ccl_device_get_info(d, CL_DEVICE_LINKER_AVAILABLE, &err);
+				ccl_test_platforms_msg("...... Linker available :", "%s",
+					ccl_info_scalar(info, cl_bool) ? "Yes" : "No");
 
-				info = cl4_device_get_info(d, CL_DEVICE_LOCAL_MEM_SIZE, &err);
-				cl4_test_platforms_msg("...... Local mem. size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_LOCAL_MEM_SIZE, &err);
+				ccl_test_platforms_msg("...... Local mem. size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_LOCAL_MEM_TYPE, &err);
-				cl4_test_platforms_msg("...... Local mem. type :", "%d", 
-					cl4_info_scalar(info, cl_device_local_mem_type));
+				info = ccl_device_get_info(d, CL_DEVICE_LOCAL_MEM_TYPE, &err);
+				ccl_test_platforms_msg("...... Local mem. type :", "%d", 
+					ccl_info_scalar(info, cl_device_local_mem_type));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_CLOCK_FREQUENCY, &err);
-				cl4_test_platforms_msg("...... Max. clock frequency :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_CLOCK_FREQUENCY, &err);
+				ccl_test_platforms_msg("...... Max. clock frequency :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_COMPUTE_UNITS, &err);
-				cl4_test_platforms_msg("...... Max. compute units :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_COMPUTE_UNITS, &err);
+				ccl_test_platforms_msg("...... Max. compute units :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_CONSTANT_ARGS, &err);
-				cl4_test_platforms_msg("...... Max. constant args. :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_CONSTANT_ARGS, &err);
+				ccl_test_platforms_msg("...... Max. constant args. :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, &err);
-				cl4_test_platforms_msg("...... Max. constant buffer size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, &err);
+				ccl_test_platforms_msg("...... Max. constant buffer size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_MEM_ALLOC_SIZE, &err);
-				cl4_test_platforms_msg("...... Max. mem. alloc. size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_MEM_ALLOC_SIZE, &err);
+				ccl_test_platforms_msg("...... Max. mem. alloc. size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_PARAMETER_SIZE, &err);
-				cl4_test_platforms_msg("...... Max. parameter size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_PARAMETER_SIZE, &err);
+				ccl_test_platforms_msg("...... Max. parameter size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_READ_IMAGE_ARGS, &err);
-				cl4_test_platforms_msg("...... Max. read image args. :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_READ_IMAGE_ARGS, &err);
+				ccl_test_platforms_msg("...... Max. read image args. :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_SAMPLERS, &err);
-				cl4_test_platforms_msg("...... Max. samplers. :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_SAMPLERS, &err);
+				ccl_test_platforms_msg("...... Max. samplers. :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_WORK_GROUP_SIZE, &err);
-				cl4_test_platforms_msg("...... Max. work-group size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_WORK_GROUP_SIZE, &err);
+				ccl_test_platforms_msg("...... Max. work-group size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, &err);
-				cl4_test_platforms_msg("...... Max. work-item dims. :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, &err);
+				ccl_test_platforms_msg("...... Max. work-item dims. :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
-				cl4_test_platforms_msg("...... Max wkitem sizes :", "%d, %d, %d", 
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_WORK_ITEM_SIZES, &err);
+				ccl_test_platforms_msg("...... Max wkitem sizes :", "%d, %d, %d", 
 					(int) ((size_t*) info->value)[0], 
 					(int) ((size_t*) info->value)[1], 
 					(int) ((size_t*) info->value)[2]);
 
-				info = cl4_device_get_info(d, CL_DEVICE_MAX_WRITE_IMAGE_ARGS, &err);
-				cl4_test_platforms_msg("...... Max. write image args. :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MAX_WRITE_IMAGE_ARGS, &err);
+				ccl_test_platforms_msg("...... Max. write image args. :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MEM_BASE_ADDR_ALIGN, &err);
-				cl4_test_platforms_msg("...... Mem. base address align :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MEM_BASE_ADDR_ALIGN, &err);
+				ccl_test_platforms_msg("...... Mem. base address align :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, &err);
-				cl4_test_platforms_msg("...... Min. data type align size (deprecated in OpenCL 1.2) :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, &err);
+				ccl_test_platforms_msg("...... Min. data type align size (deprecated in OpenCL 1.2) :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, &err);
-				cl4_test_platforms_msg("...... Native vector width char :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, &err);
+				ccl_test_platforms_msg("...... Native vector width char :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, &err);
-				cl4_test_platforms_msg("...... Native vector width short :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, &err);
+				ccl_test_platforms_msg("...... Native vector width short :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, &err);
-				cl4_test_platforms_msg("...... Native vector width int :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, &err);
+				ccl_test_platforms_msg("...... Native vector width int :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, &err);
-				cl4_test_platforms_msg("...... Native vector width long :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, &err);
+				ccl_test_platforms_msg("...... Native vector width long :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, &err);
-				cl4_test_platforms_msg("...... Native vector width float :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, &err);
+				ccl_test_platforms_msg("...... Native vector width float :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, &err);
-				cl4_test_platforms_msg("...... Native vector width double :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, &err);
+				ccl_test_platforms_msg("...... Native vector width double :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, &err);
-				cl4_test_platforms_msg("...... Native vector width half :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, &err);
+				ccl_test_platforms_msg("...... Native vector width half :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_OPENCL_C_VERSION, &err);
-				cl4_test_platforms_msg("...... OpenCL C version :", "%s",
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_OPENCL_C_VERSION, &err);
+				ccl_test_platforms_msg("...... OpenCL C version :", "%s",
+					ccl_info_array(info, char*));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PARENT_DEVICE, &err);
-				cl4_test_platforms_msg("...... Parent device :", "%p", 
+				info = ccl_device_get_info(d, CL_DEVICE_PARENT_DEVICE, &err);
+				ccl_test_platforms_msg("...... Parent device :", "%p", 
 					*((void**) info->value));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PARTITION_MAX_SUB_DEVICES, &err);
-				cl4_test_platforms_msg("...... Partition max. sub-devices :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PARTITION_MAX_SUB_DEVICES, &err);
+				ccl_test_platforms_msg("...... Partition max. sub-devices :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PARTITION_PROPERTIES, &err);
-				cl4_test_platforms_msg("...... Partition properties (only first) :", "%x", 
+				info = ccl_device_get_info(d, CL_DEVICE_PARTITION_PROPERTIES, &err);
+				ccl_test_platforms_msg("...... Partition properties (only first) :", "%x", 
 					info != NULL ? (int) ((intptr_t*) info->value)[0] : 0);
 
-				info = cl4_device_get_info(d, CL_DEVICE_PARTITION_AFFINITY_DOMAIN, &err);
-				cl4_test_platforms_msg("...... Partition affinity domain :", "%lx", 
-					cl4_info_scalar(info, cl_device_affinity_domain));
+				info = ccl_device_get_info(d, CL_DEVICE_PARTITION_AFFINITY_DOMAIN, &err);
+				ccl_test_platforms_msg("...... Partition affinity domain :", "%lx", 
+					ccl_info_scalar(info, cl_device_affinity_domain));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PARTITION_TYPE, &err);
-				cl4_test_platforms_msg("...... Partition type (only first):", "%x", 
+				info = ccl_device_get_info(d, CL_DEVICE_PARTITION_TYPE, &err);
+				ccl_test_platforms_msg("...... Partition type (only first):", "%x", 
 					info != NULL ? (int) ((intptr_t*) info->value)[0] : 0);
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, &err);
-				cl4_test_platforms_msg("...... Preferred vector width char :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, &err);
+				ccl_test_platforms_msg("...... Preferred vector width char :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, &err);
-				cl4_test_platforms_msg("...... Preferred vector width short :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, &err);
+				ccl_test_platforms_msg("...... Preferred vector width short :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, &err);
-				cl4_test_platforms_msg("...... Preferred vector width int :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, &err);
+				ccl_test_platforms_msg("...... Preferred vector width int :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, &err);
-				cl4_test_platforms_msg("...... Preferred vector width long :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, &err);
+				ccl_test_platforms_msg("...... Preferred vector width long :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, &err);
-				cl4_test_platforms_msg("...... Preferred vector width float :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, &err);
+				ccl_test_platforms_msg("...... Preferred vector width float :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, &err);
-				cl4_test_platforms_msg("...... Preferred vector width double :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, &err);
+				ccl_test_platforms_msg("...... Preferred vector width double :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, &err);
-				cl4_test_platforms_msg("...... Preferred vector width half :", "%d",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, &err);
+				ccl_test_platforms_msg("...... Preferred vector width half :", "%d",
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PRINTF_BUFFER_SIZE, &err);
-				cl4_test_platforms_msg("...... Printf buffer size :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_PRINTF_BUFFER_SIZE, &err);
+				ccl_test_platforms_msg("...... Printf buffer size :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, &err);
-				cl4_test_platforms_msg("...... Preferred interop. user sync. :", "%s", 
-					cl4_info_scalar(info, cl_bool) ? "User sync." : "Device sync.");
+				info = ccl_device_get_info(d, CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, &err);
+				ccl_test_platforms_msg("...... Preferred interop. user sync. :", "%s", 
+					ccl_info_scalar(info, cl_bool) ? "User sync." : "Device sync.");
 
-				info = cl4_device_get_info(d, CL_DEVICE_PROFILE, &err);
-				cl4_test_platforms_msg("...... Profile :", "%s",
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_PROFILE, &err);
+				ccl_test_platforms_msg("...... Profile :", "%s",
+					ccl_info_array(info, char*));
 
-				info = cl4_device_get_info(d, CL_DEVICE_PROFILING_TIMER_RESOLUTION, &err);
-				cl4_test_platforms_msg("...... Profiling timer resolution :", "%ld",
-					cl4_info_scalar(info, cl_ulong));
+				info = ccl_device_get_info(d, CL_DEVICE_PROFILING_TIMER_RESOLUTION, &err);
+				ccl_test_platforms_msg("...... Profiling timer resolution :", "%ld",
+					ccl_info_scalar(info, cl_ulong));
 
-				info = cl4_device_get_info(d, CL_DEVICE_QUEUE_PROPERTIES, &err);
-				cl4_test_platforms_msg("...... Command queue properties :", "%s %s", 
-					(cl4_info_scalar(info, cl_command_queue_properties) & CL_QUEUE_PROFILING_ENABLE) 
+				info = ccl_device_get_info(d, CL_DEVICE_QUEUE_PROPERTIES, &err);
+				ccl_test_platforms_msg("...... Command queue properties :", "%s %s", 
+					(ccl_info_scalar(info, cl_command_queue_properties) & CL_QUEUE_PROFILING_ENABLE) 
 						? "Profiling" : "", 
-					(cl4_info_scalar(info, cl_command_queue_properties) & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) 
+					(ccl_info_scalar(info, cl_command_queue_properties) & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) 
 						? "Out-Of-Order" : "");
 
-				info = cl4_device_get_info(d, CL_DEVICE_TYPE, &err);
-				cl4_test_platforms_msg("...... Type :", "%s", 
-					cl4_devquery_type2str(cl4_info_scalar(info, cl_device_type)));
+				info = ccl_device_get_info(d, CL_DEVICE_TYPE, &err);
+				ccl_test_platforms_msg("...... Type :", "%s", 
+					ccl_devquery_type2str(ccl_info_scalar(info, cl_device_type)));
 
-				info = cl4_device_get_info(d, CL_DEVICE_VENDOR, &err);
-				cl4_test_platforms_msg("...... Vendor :", "%s",
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_VENDOR, &err);
+				ccl_test_platforms_msg("...... Vendor :", "%s",
+					ccl_info_array(info, char*));
 
 				/* Special check for info_value_array macro. */
-				info_check_array = cl4_device_get_array_info(d, CL_DEVICE_VENDOR, char*, &err);
+				info_check_array = ccl_device_get_array_info(d, CL_DEVICE_VENDOR, char*, &err);
 				g_assert_cmpstr((char*) info->value, ==, info_check_array);
 
-				info = cl4_device_get_info(d, CL_DEVICE_VENDOR_ID, &err);
-				cl4_test_platforms_msg("...... Vendor ID :", "%x",
-					cl4_info_scalar(info, cl_uint));
+				info = ccl_device_get_info(d, CL_DEVICE_VENDOR_ID, &err);
+				ccl_test_platforms_msg("...... Vendor ID :", "%x",
+					ccl_info_scalar(info, cl_uint));
 
 				/* Special check for info_value_scalar macro. */
-				info_check_scalar = cl4_device_get_scalar_info(d, CL_DEVICE_VENDOR_ID, cl_uint, &err);
+				info_check_scalar = ccl_device_get_scalar_info(d, CL_DEVICE_VENDOR_ID, cl_uint, &err);
 				g_assert_cmphex(info_check_scalar, ==,
-					cl4_info_scalar(info, cl_uint));
+					ccl_info_scalar(info, cl_uint));
 
-				info = cl4_device_get_info(d, CL_DEVICE_VERSION, &err);
-				cl4_test_platforms_msg("...... Device version :", "%s",
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DEVICE_VERSION, &err);
+				ccl_test_platforms_msg("...... Device version :", "%s",
+					ccl_info_array(info, char*));
 
-				info = cl4_device_get_info(d, CL_DRIVER_VERSION, &err);
-				cl4_test_platforms_msg("...... Driver version :", "%s",
-					cl4_info_array(info, char*));
+				info = ccl_device_get_info(d, CL_DRIVER_VERSION, &err);
+				ccl_test_platforms_msg("...... Driver version :", "%s",
+					ccl_info_array(info, char*));
 
 			}
 		}
 	}
 	
 	/* Test get_all_devices method of platform module. */
-	for (guint i = 0; i < cl4_platforms_count(platfs); i++) {
-		p = cl4_platforms_get_platform(platfs, i);
-		ds = cl4_platform_get_all_devices(p, &err);
+	for (guint i = 0; i < ccl_platforms_count(platfs); i++) {
+		p = ccl_platforms_get_platform(platfs, i);
+		ds = ccl_platform_get_all_devices(p, &err);
 		g_assert_no_error(err);
-		for (guint j = 0; j < cl4_platform_get_num_devices(p, &err); j++) {
+		for (guint j = 0; j < ccl_platform_get_num_devices(p, &err); j++) {
 			g_assert_no_error(err);
-			d = cl4_platform_get_device(p, j, &err);
+			d = ccl_platform_get_device(p, j, &err);
 			g_assert_no_error(err);
 			g_assert(d == ds[j]);
 		}
@@ -453,7 +453,7 @@ static void platforms_create_info_destroy_test() {
 	}
 
 	/* Destroy list of platforms. */
-	cl4_platforms_destroy(platfs);
+	ccl_platforms_destroy(platfs);
 		
 }
 
@@ -468,40 +468,40 @@ static void platforms_create_info_destroy_test() {
  * */
 static void platforms_ref_unref_test() {
 
-	CL4Platforms* platfs = NULL;
-	CL4Platform* p = NULL;
-	CL4Device* d = NULL;
+	CCLPlatforms* platfs = NULL;
+	CCLPlatform* p = NULL;
+	CCLDevice* d = NULL;
 	GError* err = NULL;
 
 	/* Get platforms. */
-	platfs = cl4_platforms_new(&err);
+	platfs = ccl_platforms_new(&err);
 	g_assert_no_error(err);		
 	
 	/* Use first device of first platform. */
-	p = cl4_platforms_get_platform(platfs, 0);
+	p = ccl_platforms_get_platform(platfs, 0);
 	
-	d = cl4_platform_get_device(p, 0, &err);
+	d = ccl_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);
 	
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) p), ==, 1);
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 1);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 1);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
 
-	cl4_platform_ref(p);
-	cl4_device_ref(d);
+	ccl_platform_ref(p);
+	ccl_device_ref(d);
 
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) p), ==, 2);
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 2);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 2);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
 		
-	cl4_platforms_destroy(platfs);
+	ccl_platforms_destroy(platfs);
 		
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) p), ==, 1);
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 2);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 1);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
 		
-	cl4_platform_destroy(p);
+	ccl_platform_destroy(p);
 	
-	g_assert_cmpint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 1);
+	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
 		
-	cl4_device_destroy(d);
+	ccl_device_destroy(d);
 
 }
 

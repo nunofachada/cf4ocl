@@ -39,13 +39,13 @@ clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
 	} else {
 		switch (param_name) {
 			case CL_PROFILING_COMMAND_QUEUED:
-				cl4_test_basic_info(cl_ulong, event, t_queued);
+				ccl_test_basic_info(cl_ulong, event, t_queued);
 			case CL_PROFILING_COMMAND_SUBMIT:
-				cl4_test_basic_info(cl_ulong, event, t_submit);
+				ccl_test_basic_info(cl_ulong, event, t_submit);
 			case CL_PROFILING_COMMAND_START:
-				cl4_test_basic_info(cl_ulong, event, t_start);
+				ccl_test_basic_info(cl_ulong, event, t_start);
 			case CL_PROFILING_COMMAND_END:
-				cl4_test_basic_info(cl_ulong, event, t_end);
+				ccl_test_basic_info(cl_ulong, event, t_end);
 			default:
 				status = CL_INVALID_VALUE;
 		}
@@ -67,15 +67,15 @@ clGetEventInfo(cl_event event, cl_event_info param_name,
 	} else {
 		switch (param_name) {
 			case CL_EVENT_COMMAND_QUEUE:
-				cl4_test_basic_info(cl_command_queue, event, command_queue);
+				ccl_test_basic_info(cl_command_queue, event, command_queue);
 			case CL_EVENT_CONTEXT:
-				cl4_test_basic_info(cl_context, event, context);
+				ccl_test_basic_info(cl_context, event, context);
 			case CL_EVENT_COMMAND_TYPE:
-				cl4_test_basic_info(cl_command_type, event, command_type);
+				ccl_test_basic_info(cl_command_type, event, command_type);
 			case CL_EVENT_COMMAND_EXECUTION_STATUS:
-				cl4_test_basic_info(cl_int, event, exec_status);
+				ccl_test_basic_info(cl_int, event, exec_status);
 			case CL_EVENT_REFERENCE_COUNT:
-				cl4_test_basic_info(cl_uint, event, ref_count);
+				ccl_test_basic_info(cl_uint, event, ref_count);
 			default:
 				status = CL_INVALID_VALUE;
 		}

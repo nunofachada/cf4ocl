@@ -34,7 +34,7 @@
  * @return A GQuark structure defined by category identifying string,
  * which identifies the error as a cf4ocl generated error.
  */
-GQuark cl4_error_quark() {
+GQuark ccl_error_quark() {
 	return g_quark_from_static_string("cl4-error-quark");
 }
 

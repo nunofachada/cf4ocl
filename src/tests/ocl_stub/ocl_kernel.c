@@ -92,17 +92,17 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 	} else {
 		switch (param_name) {
 			case CL_KERNEL_FUNCTION_NAME:
-				cl4_test_char_info(kernel, function_name);
+				ccl_test_char_info(kernel, function_name);
 			case CL_KERNEL_NUM_ARGS:
-				cl4_test_basic_info(cl_uint, kernel, num_args);
+				ccl_test_basic_info(cl_uint, kernel, num_args);
 			case CL_KERNEL_REFERENCE_COUNT:
-				cl4_test_basic_info(cl_uint, kernel, ref_count);
+				ccl_test_basic_info(cl_uint, kernel, ref_count);
 			case CL_KERNEL_CONTEXT:
-				cl4_test_basic_info(cl_context, kernel, context);
+				ccl_test_basic_info(cl_context, kernel, context);
 			case CL_KERNEL_PROGRAM:
-				cl4_test_basic_info(cl_program, kernel, program);
+				ccl_test_basic_info(cl_program, kernel, program);
 			case CL_KERNEL_ATTRIBUTES:
-				cl4_test_char_info(kernel, attributes);
+				ccl_test_char_info(kernel, attributes);
 			default:
 				status = CL_INVALID_VALUE;
 		}

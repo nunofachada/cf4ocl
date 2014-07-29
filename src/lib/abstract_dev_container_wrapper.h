@@ -26,8 +26,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_ABSTRACT_DEV_CONTAINER_WRAPPER_H
-#define CL4_ABSTRACT_DEV_CONTAINER_WRAPPER_H 
+#ifndef _CCL_ABSTRACT_DEV_CONTAINER_WRAPPER_H_
+#define _CCL_ABSTRACT_DEV_CONTAINER_WRAPPER_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,38 +44,38 @@
 #include "device_wrapper.h"
 #include "abstract_wrapper.h"
 
-typedef struct cl4_dev_container {
+typedef struct ccl_dev_container {
 
 	/** Parent wrapper object. */
-	CL4Wrapper base;
+	CCLWrapper base;
 
 	/** Number of devices in context (can be lazy initialized). */
 	cl_uint num_devices;
 	
 	/** Devices in context (can be lazy initialized). */
-	CL4Device** devices;
+	CCLDevice** devices;
 	
-} CL4DevContainer;
+} CCLDevContainer;
 
-typedef CL4WrapperInfo* (*cl4_dev_container_get_cldevices)(
-	CL4DevContainer* devcon, GError** err);
+typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
+	CCLDevContainer* devcon, GError** err);
 
-/** @brief Release the devices held by the given #CL4DevContainer 
+/** @brief Release the devices held by the given #CCLDevContainer 
  * object. */
-void cl4_dev_container_release_devices(CL4DevContainer* devcon);
+void ccl_dev_container_release_devices(CCLDevContainer* devcon);
 
-/** @brief Get all ::CL4Device wrappers in device container. */
-CL4Device** cl4_dev_container_get_all_devices(CL4DevContainer* devcon,
-	cl4_dev_container_get_cldevices get_devices, GError** err);
+/** @brief Get all ::CCLDevice wrappers in device container. */
+CCLDevice** ccl_dev_container_get_all_devices(CCLDevContainer* devcon,
+	ccl_dev_container_get_cldevices get_devices, GError** err);
 
-/** @brief Get ::CL4Device wrapper at given index. */
-CL4Device* cl4_dev_container_get_device(CL4DevContainer* devcon, 
-	cl4_dev_container_get_cldevices get_devices, 
+/** @brief Get ::CCLDevice wrapper at given index. */
+CCLDevice* ccl_dev_container_get_device(CCLDevContainer* devcon, 
+	ccl_dev_container_get_cldevices get_devices, 
 	unsigned int index, GError** err);
 
 /** @brief Return number of devices in device container. */
-unsigned int cl4_dev_container_get_num_devices(CL4DevContainer* devcon, 
-	cl4_dev_container_get_cldevices get_devices, GError** err);
+unsigned int ccl_dev_container_get_num_devices(CCLDevContainer* devcon, 
+	ccl_dev_container_get_cldevices get_devices, GError** err);
 
 #endif
 

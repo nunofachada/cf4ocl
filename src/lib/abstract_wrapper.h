@@ -25,8 +25,8 @@
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
  
-#ifndef CL4_ABSTRACT_WRAPPER_H
-#define CL4_ABSTRACT_WRAPPER_H 
+#ifndef _CCL_ABSTRACT_WRAPPER_H_
+#define _CCL_ABSTRACT_WRAPPER_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@
 #include "common.h"
 #include "errors.h"
 
-typedef struct cl4_wrapper {
+typedef struct ccl_wrapper {
 
 	/** The wrapped OpenCL object. */
 	gpointer cl_object;
@@ -48,32 +48,32 @@ typedef struct cl4_wrapper {
 	/** Reference count. */
 	gint ref_count;    
 	
-} CL4Wrapper;
+} CCLWrapper;
 
-typedef void (*cl4_wrapper_release_fields)(CL4Wrapper* wrapper);
+typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
 
-typedef cl_int (*cl4_wrapper_release_cl_object)(gpointer cl_object);
+typedef cl_int (*ccl_wrapper_release_cl_object)(gpointer cl_object);
 
 /** @brief Create a new wrapper object. This function is called by the
  * concrete wrapper constructors and should not be called by client
  * code. */
-CL4Wrapper* cl4_wrapper_new(void* cl_object, size_t size);
+CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size);
 
 /** @brief Increase the reference count of the wrapper object. */
-void cl4_wrapper_ref(CL4Wrapper* wrapper);
+void ccl_wrapper_ref(CCLWrapper* wrapper);
 
 /** @brief Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed. */
-cl_bool cl4_wrapper_unref(CL4Wrapper* wrapper, size_t size,
-	cl4_wrapper_release_fields rel_fields_fun,
-	cl4_wrapper_release_cl_object rel_cl_fun, GError** err);
+cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
+	ccl_wrapper_release_fields rel_fields_fun,
+	ccl_wrapper_release_cl_object rel_cl_fun, GError** err);
 
 /** @brief Returns the wrapper object reference count. For debugging and 
  * testing purposes only. */
-gint cl4_wrapper_ref_count(CL4Wrapper* wrapper);
+gint ccl_wrapper_ref_count(CCLWrapper* wrapper);
 
 /** @brief Get the wrapped OpenCL object. */
-void* cl4_wrapper_unwrap(CL4Wrapper* wrapper);
+void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 
 /**
  * @brief Generic type for OpenCL clget*Info() functions.
@@ -89,7 +89,7 @@ void* cl4_wrapper_unwrap(CL4Wrapper* wrapper);
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
-typedef cl_int (*cl4_wrapper_info_fp1)(gpointer cl_object,
+typedef cl_int (*ccl_wrapper_info_fp1)(gpointer cl_object,
 	cl_uint param_name, size_t param_value_size, void* param_value,
 	size_t* param_value_size_ret);
 
@@ -109,42 +109,42 @@ typedef cl_int (*cl4_wrapper_info_fp1)(gpointer cl_object,
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
- typedef cl_int (*cl4_wrapper_info_fp2)(gpointer cl_object1,
+ typedef cl_int (*ccl_wrapper_info_fp2)(gpointer cl_object1,
 	gpointer cl_object2, cl_uint param_name, size_t param_value_size, 
 	void* param_value, size_t* param_value_size_ret);
 
-typedef cl_int (*cl4_wrapper_info_fp)(void);
+typedef cl_int (*ccl_wrapper_info_fp)(void);
 
 /**
  * @brief Information about a wrapped OpenCL entity.
  * */
-typedef struct cl4_wrapper_info {
+typedef struct ccl_wrapper_info {
 	/** Device information. */
 	gpointer value;
 	/** Size in bytes of device information. */
 	gsize size;
-} CL4WrapperInfo;
+} CCLWrapperInfo;
 
-/** @brief Create a new CL4WrapperInfo* object with a given value size. */
-CL4WrapperInfo* cl4_wrapper_info_new(gsize size);
+/** @brief Create a new CCLWrapperInfo* object with a given value size. */
+CCLWrapperInfo* ccl_wrapper_info_new(gsize size);
 
-/** @brief Destroy a ::CL4WrapperInfo object. */
-void cl4_wrapper_info_destroy(CL4WrapperInfo* info);
+/** @brief Destroy a ::CCLWrapperInfo object. */
+void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
 /** @brief Get information about any wrapped OpenCL object. */
-CL4WrapperInfo* cl4_wrapper_get_info(CL4Wrapper* wrapper1,
-	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
+CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
+	CCLWrapper* wrapper2, cl_uint param_name, 
+	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
 /** @brief Get pointer to information value. */
-gpointer cl4_wrapper_get_info_value(CL4Wrapper* wrapper1,
-	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
+gpointer ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
+	CCLWrapper* wrapper2, cl_uint param_name, 
+	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /** @brief Get information size. */
-gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
-	CL4Wrapper* wrapper2, cl_uint param_name, 
-	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
+gsize ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
+	CCLWrapper* wrapper2, cl_uint param_name, 
+	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
 /**
  * @brief Helper macro which returns a scalar information value casted 
@@ -154,7 +154,7 @@ gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
  * @param type Scalar type to which to cast value to.
  * @return The information value casted to the specified scalar type.
  * */
-#define cl4_info_scalar(info, type) *((type*) (info)->value)
+#define ccl_info_scalar(info, type) *((type*) (info)->value)
 
 /**
  * @brief Helper macro which returns an array information value casted 
@@ -165,7 +165,7 @@ gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
  * @return The information value casted to the specified array (pointer)
  * type.
  * */
-#define cl4_info_array(info, type) ((type) (info)->value)
+#define ccl_info_array(info, type) ((type) (info)->value)
 
 #endif
 

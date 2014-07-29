@@ -24,6 +24,9 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
+#ifndef _CCL_OCL_STUB_UTILS_H_
+#define _CCL_OCL_STUB_UTILS_H_
+
 #include "ocl_impl.h"
 
 guint veclen(void* vector, size_t elem_size);
@@ -31,7 +34,7 @@ guint veclen(void* vector, size_t elem_size);
 #define seterrcode(errcode_ret, errcode) \
 	if ((errcode_ret) != NULL) *(errcode_ret) = (errcode)
 
-#define cl4_test_char_info(object, info) \
+#define ccl_test_char_info(object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
 			*param_value_size_ret = strlen(object->info) + 1; \
@@ -47,7 +50,7 @@ guint veclen(void* vector, size_t elem_size);
 	break;
 
 
-#define cl4_test_vector_info(type, object, info) \
+#define ccl_test_vector_info(type, object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
 			*param_value_size_ret = \
@@ -63,7 +66,7 @@ guint veclen(void* vector, size_t elem_size);
 	} \
 	break;
 
-#define cl4_test_predefvector2d_info(type, qty, object, sizes, info) \
+#define ccl_test_predefvector2d_info(type, qty, object, sizes, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
 			*param_value_size_ret = sizeof(type*) * qty; \
@@ -79,7 +82,7 @@ guint veclen(void* vector, size_t elem_size);
 	} \
 	break;
 
-#define cl4_test_predefvector_info(type, qty, object, info) \
+#define ccl_test_predefvector_info(type, qty, object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
 			*param_value_size_ret = sizeof(type) * qty; \
@@ -93,7 +96,7 @@ guint veclen(void* vector, size_t elem_size);
 	} \
 	break;
 		
-#define cl4_test_basic_info(type, object, info) \
+#define ccl_test_basic_info(type, object, info) \
 	if (param_value == NULL) { \
 		if (param_value_size_ret != NULL) { \
 			*param_value_size_ret = sizeof(type); \
@@ -104,3 +107,5 @@ guint veclen(void* vector, size_t elem_size);
 		*((type*) param_value) = object->info; \
 	} \
 	break;
+
+#endif

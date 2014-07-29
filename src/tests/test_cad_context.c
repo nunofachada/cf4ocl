@@ -39,8 +39,8 @@
 /*
  * Independent pass-all filter for testing.
  * */
-static gboolean cl4_devsel_indep_test_true(
-	CL4Device* device, void *data, GError **err) {
+static gboolean ccl_devsel_indep_test_true(
+	CCLDevice* device, void *data, GError **err) {
 
 	device = device;
 	data = data;
@@ -55,14 +55,14 @@ static gboolean cl4_devsel_indep_test_true(
  * */
 static void context_create_info_destroy_test() {
 	
-	CL4Context* ctx = NULL;
+	CCLContext* ctx = NULL;
 	GError* err = NULL;
-	CL4Platforms* ps = NULL;
-	CL4Platform* p = NULL;
-	CL4Device* d = NULL;
+	CCLPlatforms* ps = NULL;
+	CCLPlatform* p = NULL;
+	CCLDevice* d = NULL;
 	cl_device_id d_id = NULL;
-	CL4DevSelFilters filters = NULL;
-	CL4WrapperInfo* info = NULL;
+	CCLDevSelFilters filters = NULL;
+	CCLWrapperInfo* info = NULL;
 	cl_context_properties* ctx_props = NULL;
 	cl_platform_id platform, platf_ref;
 	cl_context context;
@@ -76,28 +76,28 @@ static void context_create_info_destroy_test() {
 	 * */
 	 
 	/* Get platforms object. */
-	ps = cl4_platforms_new(&err);
+	ps = ccl_platforms_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first platform wrapper from platforms object. */
-	p = cl4_platforms_get_platform(ps, 0);
+	p = ccl_platforms_get_platform(ps, 0);
 	g_assert(p != NULL);
 	
 	/* Get first device wrapper from platform wrapper. */
-	d = cl4_platform_get_device(p, 0, &err);
+	d = ccl_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);
 	
 	/* Unwrap cl_device_id from device wrapper object. */
-	d_id = cl4_device_unwrap(d);
+	d_id = ccl_device_unwrap(d);
 	
 	/* Create a context from this cl_device_id. */
-	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);
+	ctx = ccl_context_new_from_cldevices(1, &d_id, &err);
 	g_assert_no_error(err);
 	
 	/* Get number of devices from context wrapper, check that this
 	 * number is 1. */
 #ifdef CL_VERSION_1_1
-	info = cl4_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
+	info = ccl_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
 #endif
@@ -105,7 +105,7 @@ static void context_create_info_destroy_test() {
 	/* Get the cl_device_id from context via context info and check
 	 * that it corresponds to the cl_device_id with which the context
 	 * was created. */
-	info = cl4_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
+	info = ccl_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert(((cl_device_id*) info->value)[0] == d_id);
 
@@ -114,7 +114,7 @@ static void context_create_info_destroy_test() {
 	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
 
 	/* Free context. */
-	cl4_context_destroy(ctx);
+	ccl_context_destroy(ctx);
 
 	/* 
 	 * 2. Test context creation by cl_context. 
@@ -122,7 +122,7 @@ static void context_create_info_destroy_test() {
 	
 	/* Create some context properties. */
 	ctx_props = g_new0(cl_context_properties, 3);
-	platform = (cl_platform_id) cl4_wrapper_unwrap((CL4Wrapper*) p);
+	platform = (cl_platform_id) ccl_wrapper_unwrap((CCLWrapper*) p);
 	ctx_props[0] = CL_CONTEXT_PLATFORM;
 	ctx_props[1] = (cl_context_properties) platform;
 	ctx_props[2] = 0;
@@ -136,29 +136,29 @@ static void context_create_info_destroy_test() {
 	/* Create a context wrapper using the cl_context, check that the
 	 * unwrapped cl_context corresponds to the cl_context with which
 	 * the context wrapper was created.*/
-	ctx = cl4_context_new_wrap(context);
-	g_assert(cl4_context_unwrap(ctx) == context);
+	ctx = ccl_context_new_wrap(context);
+	g_assert(ccl_context_unwrap(ctx) == context);
 	
 	/* Get the first device wrapper from the context wrapper, check that 
 	 * the unwrapped cl_device_id corresponds to the cl_device_id with
 	 * which the cl_context was created. */
-	d = cl4_context_get_device(ctx, 0, &err);
+	d = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
-	g_assert(cl4_device_unwrap(d) == d_id);
+	g_assert(ccl_device_unwrap(d) == d_id);
 
 	/* Check that the context number of devices taken using context
 	 * info is 1. */
 #ifdef CL_VERSION_1_1
-	info = cl4_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
+	info = ccl_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
 	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
 #else
-	info = cl4_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
+	info = ccl_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
 	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
 #endif
 
 	/* Free context, platforms and context properties. */
-	cl4_context_destroy(ctx);
-	cl4_platforms_destroy(ps);
+	ccl_context_destroy(ctx);
+	ccl_platforms_destroy(ps);
 	g_free(ctx_props);
 	
 	/* 
@@ -173,8 +173,8 @@ static void context_create_info_destroy_test() {
 	/* 3.1. GPU device type filter. */
 		
 	/* Check that either there was no error or that no GPU was found. */
-	ctx = cl4_context_new_gpu(&err);
-	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	ctx = ccl_context_new_gpu(&err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 	any_device |= (ctx != NULL);
 
 	/* Free context if no error and set filters to NULL. */
@@ -182,15 +182,15 @@ static void context_create_info_destroy_test() {
 		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else { 
-		cl4_context_destroy(ctx);
+		ccl_context_destroy(ctx);
 	}
 	filters = NULL;
 
 	/* 3.2. CPU device type filter. */
 
 	/* Check that either there was no error or that no CPU was found. */
-	ctx = cl4_context_new_cpu(&err);
-	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	ctx = ccl_context_new_cpu(&err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 	any_device |= (ctx != NULL);
 
 	/* Free context if no error and set filters to NULL. */
@@ -198,7 +198,7 @@ static void context_create_info_destroy_test() {
 		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else { 
-		cl4_context_destroy(ctx);
+		ccl_context_destroy(ctx);
 	}
 	filters = NULL;
 
@@ -206,8 +206,8 @@ static void context_create_info_destroy_test() {
 	
 	/* Check that either there was no error or that no accelerator was 
 	 * found. */
-	ctx = cl4_context_new_accel(&err);
-	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	ctx = ccl_context_new_accel(&err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 	any_device |= (ctx != NULL);
 
 	/* Free context if no error and set filters to NULL. */
@@ -215,7 +215,7 @@ static void context_create_info_destroy_test() {
 		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else { 
-		cl4_context_destroy(ctx);
+		ccl_context_destroy(ctx);
 	}
 	filters = NULL;
 	
@@ -225,23 +225,23 @@ static void context_create_info_destroy_test() {
 	/* 3.4. Specific platform filter. */
 
 	/* Check that a context wrapper was created. */
-	ctx = cl4_context_new_from_indep_filter(
-		cl4_devsel_indep_platform, (void*) platform, &err);
+	ctx = ccl_context_new_from_indep_filter(
+		ccl_devsel_indep_platform, (void*) platform, &err);
 	g_assert_no_error(err);
 	
 	/* Check that context wrapper contains a device. */
-	d = cl4_context_get_device(ctx, 0, &err);
+	d = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 	
 	/* Check that the device platform corresponds to the expected 
 	 * platform (the one used in the filter). */
-	platf_ref = cl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
+	platf_ref = ccl_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err);
 	g_assert_no_error(err);
 	g_assert(platf_ref == platform);
 	
 	/* Free context and set filters to NULL. */
-	cl4_context_destroy(ctx);
+	ccl_context_destroy(ctx);
 	filters = NULL;
 	
 	/* 
@@ -250,33 +250,33 @@ static void context_create_info_destroy_test() {
 	 * */
 	 
 	/* Same platform filter. */
-	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
 
 	/* Check that a context wrapper was created. */
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = ccl_context_new_from_filters(&filters, &err);
 	g_assert_no_error(err);
 	
 	/* Check that context wrapper contains a device. */
-	d = cl4_context_get_device(ctx, 0, &err);
+	d = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 	
 	/* Check that the device platform corresponds to the expected 
 	 * platform (the one which the first device belongs to). */
-	platf_ref = cl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
+	platf_ref = ccl_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err);
 	g_assert_no_error(err);
 	
 	/* Get number of devices. */
-	num_devices = cl4_context_get_num_devices(ctx, &err);
+	num_devices = ccl_context_get_num_devices(ctx, &err);
 	g_assert_no_error(err);
 	
 	/* Check that all devices belong to the same platform. */
 	for (guint i = 1; i < num_devices; i++) {
 		
-		d = cl4_context_get_device(ctx, i, &err);
+		d = ccl_context_get_device(ctx, i, &err);
 		g_assert_no_error(err);
 		
-		platform = cl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
+		platform = ccl_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 			cl_platform_id, &err);
 		g_assert_no_error(err);
 			
@@ -284,7 +284,7 @@ static void context_create_info_destroy_test() {
 	}
 	
 	/* Free context and set filters to NULL. */
-	cl4_context_destroy(ctx);
+	ccl_context_destroy(ctx);
 	filters = NULL;
 
 	/* 
@@ -293,28 +293,28 @@ static void context_create_info_destroy_test() {
 	 * */
 	
 	/* Add pass all independent filter for testing. */
-	cl4_devsel_add_indep_filter(
-		&filters, cl4_devsel_indep_test_true, NULL);
+	ccl_devsel_add_indep_filter(
+		&filters, ccl_devsel_indep_test_true, NULL);
 		
 	/* Add another pass all independent filter by manipulating the
-	 * cl4_devsel_indep_type() filter. */
+	 * ccl_devsel_indep_type() filter. */
 	device_type = CL_DEVICE_TYPE_ALL;
-	cl4_devsel_add_indep_filter(
-		&filters, cl4_devsel_indep_type, &device_type);
+	ccl_devsel_add_indep_filter(
+		&filters, ccl_devsel_indep_type, &device_type);
 	
 	/* Add same platform dependent filter. */
-	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
 
 	/* Create context wrapper, which must have at least one device. */
-	ctx = cl4_context_new_from_filters(&filters, &err);
+	ctx = ccl_context_new_from_filters(&filters, &err);
 	g_assert_no_error(err);
 	
-	num_devices = cl4_context_get_num_devices(ctx, &err);
+	num_devices = ccl_context_get_num_devices(ctx, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(num_devices, >, 0);
 
 	/* Free context and set filters to NULL. */
-	cl4_context_destroy(ctx);
+	ccl_context_destroy(ctx);
 	filters = NULL;
 
 }
@@ -330,72 +330,72 @@ static void context_create_info_destroy_test() {
  * */
 static void context_ref_unref_test() {
 
-	CL4Context* ctx = NULL;
+	CCLContext* ctx = NULL;
 	GError* err = NULL;
-	CL4Platforms* ps = NULL;
-	CL4Platform* p = NULL;
-	CL4Device* d = NULL;
+	CCLPlatforms* ps = NULL;
+	CCLPlatform* p = NULL;
+	CCLDevice* d = NULL;
 	cl_device_id d_id = NULL;
-	CL4DevSelFilters filters = NULL;
+	CCLDevSelFilters filters = NULL;
 	
 	/* Test context creating from cl_devices. */
-	ps = cl4_platforms_new(&err);
+	ps = ccl_platforms_new(&err);
 	g_assert_no_error(err);
 
-	p = cl4_platforms_get_platform(ps, 0);
+	p = ccl_platforms_get_platform(ps, 0);
 	g_assert(p != NULL);
 	
-	d = cl4_platform_get_device(p, 0, &err);
+	d = ccl_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);
 	
-	d_id = cl4_device_unwrap(d);
+	d_id = ccl_device_unwrap(d);
 		
-	ctx = cl4_context_new_from_cldevices(1, &d_id, &err);
+	ctx = ccl_context_new_from_cldevices(1, &d_id, &err);
 	g_assert_no_error(err);
 	
-	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) d), ==, 1);
-	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
 	
-	cl4_context_ref(ctx);
-	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 2);
-	cl4_context_unref(ctx);
-	g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
+	ccl_context_ref(ctx);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 2);
+	ccl_context_unref(ctx);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
 	
-	cl4_platforms_destroy(ps);
-	cl4_context_destroy(ctx);
+	ccl_platforms_destroy(ps);
+	ccl_context_destroy(ctx);
 
 	/* Test context creating by device filtering. */
-	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_gpu, NULL);
-	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);	
+	ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_gpu, NULL);
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);	
 	
-	ctx = cl4_context_new_from_filters(&filters, &err);
-	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	ctx = ccl_context_new_from_filters(&filters, &err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 
 	if (err != NULL) {
 		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else {
-		g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
-		cl4_context_destroy(ctx);
+		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+		ccl_context_destroy(ctx);
 	}
 	filters = NULL;
 
-	cl4_devsel_add_indep_filter(&filters, cl4_devsel_indep_type_cpu, NULL);
-	cl4_devsel_add_dep_filter(&filters, cl4_devsel_dep_platform, NULL);
+	ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_cpu, NULL);
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
 	
-	ctx = cl4_context_new_from_filters(&filters, &err);
-	g_assert((err == NULL) || (err->code == CL4_ERROR_DEVICE_NOT_FOUND));
+	ctx = ccl_context_new_from_filters(&filters, &err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 
 	if (err != NULL) {
 		g_test_message("%s", err->message);
 		g_clear_error(&err);
 	} else {
-		g_assert_cmpuint(cl4_wrapper_ref_count((CL4Wrapper*) ctx), ==, 1);
-		cl4_context_destroy(ctx);
+		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+		ccl_context_destroy(ctx);
 	}
 	filters = NULL;
 
-	/// @todo Test context from CL4Platform, check that devices have ref=2 (kept by CL4Platform and CL4Context)
+	/// @todo Test context from CCLPlatform, check that devices have ref=2 (kept by CCLPlatform and CCLContext)
 	/// @todo Add test for device selection using menu filter
 	/// @todo Test ref/unref program
 	/// @todo Test ref/unref queue

@@ -31,35 +31,35 @@
 /** 
  * @brief Filter type. 
  * */
-typedef enum cl4_devsel_filter_type {
+typedef enum ccl_devsel_filter_type {
 	
 	/** Independent filter, filters one device at a time. */
-	CL4_DEVSEL_INDEP,
+	CCL_DEVSEL_INDEP,
 	/** Dependent filter, filters devices depending on the currently
 	 * available device choices. */
-	CL4_DEVSEL_DEP
+	CCL_DEVSEL_DEP
 	
-} CL4DevSelFilterType;
+} CCLDevSelFilterType;
 
 /** 
  * @brief Filter object, includes a filter function (independent or 
  * dependent) and the respective filter data.
  * */
-typedef struct cl4_devsel_filter {
+typedef struct ccl_devsel_filter {
 	
 	/** Filter function. */
 	gpointer function;
 	/** Filter data. */
 	gpointer data;
 	/** Filter type. */
-	CL4DevSelFilterType type;
+	CCLDevSelFilterType type;
 	
-} CL4DevSelFilter;
+} CCLDevSelFilter;
 
 /**
  * @brief Add any filter to the filter set.
  * 
- * This private function is used by the public cl4_devsel_add_*_filter()
+ * This private function is used by the public ccl_devsel_add_*_filter()
  * functions.
  * 
  * @param filters The filter set.
@@ -67,15 +67,15 @@ typedef struct cl4_devsel_filter {
  * @param data Filter data.
  * @param type Type of filter: independent or dependent.
  * */
-static void cl4_devsel_add_filter(CL4DevSelFilters* filters, 
-	gpointer function, gpointer data, CL4DevSelFilterType type) {
+static void ccl_devsel_add_filter(CCLDevSelFilters* filters, 
+	gpointer function, gpointer data, CCLDevSelFilterType type) {
 
 	/* Initialize filters if required. */
 	if (*filters == NULL)
 		*filters = g_ptr_array_new();
 	
 	/* Allocate space for new filter. */
-	CL4DevSelFilter* filter = g_slice_new0(CL4DevSelFilter);
+	CCLDevSelFilter* filter = g_slice_new0(CCLDevSelFilter);
 	
 	/* Set filter function, filter data and type. */
 	filter->function = function;
@@ -96,19 +96,19 @@ static void cl4_devsel_add_filter(CL4DevSelFilters* filters,
  * @return One or more OpenCL devices selected based on the provided
  * filters.
  *  */
-static CL4DevSelDevices cl4_devsel_get_devices(GError **err) {
+static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	/* Platforms wrapper object. */
-	CL4Platforms* platforms = NULL;
+	CCLPlatforms* platforms = NULL;
 	
 	/* Platform wrapper object. */
-	CL4Platform* platform = NULL;
+	CCLPlatform* platform = NULL;
 	
 	/* Device wrapper object. */
-	CL4Device* device = NULL;
+	CCLDevice* device = NULL;
 	
 	/* Array of device wrapper objects. Devices will be selected from
 	 * this array.  */
@@ -120,26 +120,26 @@ static CL4DevSelDevices cl4_devsel_get_devices(GError **err) {
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 	
-	/* Get all OpenCL platforms in system wrapped in a CL4Platforms
+	/* Get all OpenCL platforms in system wrapped in a CCLPlatforms
 	 * object. */
-	platforms = cl4_platforms_new(&err_internal);
+	platforms = ccl_platforms_new(&err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Determine number of platforms. */
-	num_platfs = cl4_platforms_count(platforms);
+	num_platfs = ccl_platforms_count(platforms);
 	
 	/* Create array of device wrapper objects. */
 	devices = g_ptr_array_new_with_free_func(
-		(GDestroyNotify) cl4_device_destroy);
+		(GDestroyNotify) ccl_device_destroy);
 	
 	/* Cycle through OpenCL platforms. */
 	for (guint i = 0; i < num_platfs; i++) {
 		
 		/* Get next platform wrapper. */
-		platform = cl4_platforms_get_platform(platforms, i);
+		platform = ccl_platforms_get_platform(platforms, i);
 		
 		/* Get number of devices in current platform.*/
-		guint num_devices = cl4_platform_get_num_devices(
+		guint num_devices = ccl_platform_get_num_devices(
 			platform, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
@@ -147,7 +147,7 @@ static CL4DevSelDevices cl4_devsel_get_devices(GError **err) {
 		for (guint j = 0; j < num_devices; j++) {
 			
 			/* Get current device wrapper. */
-			device = cl4_platform_get_device(platform, j, &err_internal);
+			device = ccl_platform_get_device(platform, j, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 			
 			/* Add device wrapper to array of device wrapper objects. */
@@ -155,7 +155,7 @@ static CL4DevSelDevices cl4_devsel_get_devices(GError **err) {
 			
 			/* Update device reference (because it is kept also in
 			 * the array of device wrapper objects). */
-			cl4_device_ref(device);
+			ccl_device_ref(device);
 			
 		} 
 		
@@ -172,7 +172,7 @@ error_handler:
 finish:
 
 	/* Free platforms wrapper object. */
-	cl4_platforms_destroy(platforms);
+	ccl_platforms_destroy(platforms);
 
 	/* Return the selected devices. */
 	return devices;
@@ -191,8 +191,8 @@ finish:
  * name and vendor of each device in the device array. If an error
  * occurs, NULL is returned.
  *  */
-static gchar** cl4_get_device_strings_from_array(
-	CL4DevSelDevices devices, GError** err) {
+static gchar** ccl_get_device_strings_from_array(
+	CCLDevSelDevices devices, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -213,12 +213,12 @@ static gchar** cl4_get_device_strings_from_array(
 	for (guint i = 0; i < devices->len; i++) {
 	
 		/* Get device name. */
-		gchar* name = cl4_device_get_array_info(
+		gchar* name = ccl_device_get_array_info(
 				devices->pdata[i], CL_DEVICE_NAME, char*, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		/* Get device vendor. */
-		gchar* vendor = cl4_device_get_array_info(
+		gchar* vendor = ccl_device_get_array_info(
 				devices->pdata[i], CL_DEVICE_VENDOR, char*, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
@@ -256,7 +256,7 @@ finish:
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * */
-static void cl4_devsel_dep_menu_list(CL4DevSelDevices devices, 
+static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices, 
 	cl_int selected, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
@@ -272,7 +272,7 @@ static void cl4_devsel_dep_menu_list(CL4DevSelDevices devices,
 	gchar** dev_strings;
 	
 	/* Get device description strings. */
-	dev_strings = cl4_get_device_strings_from_array(devices, &err_internal);
+	dev_strings = ccl_get_device_strings_from_array(devices, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	
@@ -322,7 +322,7 @@ finish:
  * @param devices Array of devices.
  * @return The list index of the selected device.
  * */
-static cl_int cl4_devsel_dep_menu_query(CL4DevSelDevices devices,
+static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	GError** err) {
 	
 	/* Index of selected device. */
@@ -333,7 +333,7 @@ static cl_int cl4_devsel_dep_menu_query(CL4DevSelDevices devices,
 	GError* err_internal = NULL;
 	
 	/* Print available devices */
-	cl4_devsel_dep_menu_list(devices, -1, &err_internal);
+	ccl_devsel_dep_menu_list(devices, -1, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If only one device exists, return that one. */
@@ -393,7 +393,7 @@ finish:
  * should be freed with the g_strfreev() function from GLib. If an error
  * occurs, NULL is returned.
  * */
-gchar** cl4_devsel_get_device_strings(GError** err) {
+gchar** ccl_devsel_get_device_strings(GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -402,17 +402,17 @@ gchar** cl4_devsel_get_device_strings(GError** err) {
 	GError* err_internal = NULL;
 	
 	/* Array of devices. */
-	CL4DevSelDevices devices = NULL;
+	CCLDevSelDevices devices = NULL;
 	
 	/* Array of strings. */
 	gchar** dev_strings = NULL;
 	
 	/* Get all devices present in the system. */
-	devices = cl4_devsel_get_devices(&err_internal);
+	devices = ccl_devsel_get_devices(&err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Get the array of strings describing the devices. */
-	dev_strings = cl4_get_device_strings_from_array(
+	dev_strings = ccl_get_device_strings_from_array(
 		devices, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -445,7 +445,7 @@ finish:
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * */
-void cl4_devsel_print_device_strings(GError** err) {
+void ccl_devsel_print_device_strings(GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -457,7 +457,7 @@ void cl4_devsel_print_device_strings(GError** err) {
 	gchar** dev_strings = NULL;
 	
 	/* Get the array of strings describing the devices. */
-	dev_strings = cl4_devsel_get_device_strings(&err_internal);
+	dev_strings = ccl_devsel_get_device_strings(&err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Print device list to stdout. */
@@ -488,10 +488,10 @@ finish:
  * @param function Indendent filter function.
  * @param data Filter data.
  * */
-void cl4_devsel_add_indep_filter(
-	CL4DevSelFilters* filters, cl4_devsel_indep function, gpointer data) {
+void ccl_devsel_add_indep_filter(
+	CCLDevSelFilters* filters, ccl_devsel_indep function, gpointer data) {
 
-	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_INDEP);
+	ccl_devsel_add_filter(filters, function, data, CCL_DEVSEL_INDEP);
 }
 
 /**
@@ -501,10 +501,10 @@ void cl4_devsel_add_indep_filter(
  * @param function Indendent filter function.
  * @param data Filter data.
  * */
-void cl4_devsel_add_dep_filter(
-	CL4DevSelFilters* filters, cl4_devsel_dep function, gpointer data) {
+void ccl_devsel_add_dep_filter(
+	CCLDevSelFilters* filters, ccl_devsel_dep function, gpointer data) {
 
-	cl4_devsel_add_filter(filters, function, data, CL4_DEVSEL_DEP);
+	ccl_devsel_add_filter(filters, function, data, CCL_DEVSEL_DEP);
 }
 
 /** 
@@ -512,7 +512,7 @@ void cl4_devsel_add_dep_filter(
  * filters.
  * 
  * This function is internally used by the 
- * cl4_context_new_from_filters_full() function for selecting context
+ * ccl_context_new_from_filters_full() function for selecting context
  * devices. Clients should not need to use it frequently.
  * 
  * @param filters Filters used to select device(s).
@@ -521,8 +521,8 @@ void cl4_devsel_add_dep_filter(
  * @return One or more OpenCL devices selected based on the provided
  * filters.
  *  */
-CL4DevSelDevices cl4_devsel_select(
-	CL4DevSelFilters* filters, GError **err) {
+CCLDevSelDevices ccl_devsel_select(
+	CCLDevSelFilters* filters, GError **err) {
 
 	/* Make sure filters is not NULL. */
 	g_return_val_if_fail(filters != NULL, NULL);
@@ -534,10 +534,10 @@ CL4DevSelDevices cl4_devsel_select(
 	GError* err_internal = NULL;
 	
 	/* Array of devices. */
-	CL4DevSelDevices devices;
+	CCLDevSelDevices devices;
 	
 	/* Get all devices present in the system. */
-	devices = cl4_devsel_get_devices(&err_internal);
+	devices = ccl_devsel_get_devices(&err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* *** Filter devices. *** */
@@ -549,13 +549,13 @@ CL4DevSelDevices cl4_devsel_select(
 		if (devices->len == 0) break;
 		
 		/* Get current filter. */
-		CL4DevSelFilter* curr_filter = g_ptr_array_index(*filters, i);
+		CCLDevSelFilter* curr_filter = g_ptr_array_index(*filters, i);
 		
 		/* Check type of filter, proceed accordingly. */
-		if (curr_filter->type == CL4_DEVSEL_DEP) {
+		if (curr_filter->type == CCL_DEVSEL_DEP) {
 			
 			/* It's a dependent filter.*/
-			devices = ((cl4_devsel_dep) (curr_filter->function))(
+			devices = ((ccl_devsel_dep) (curr_filter->function))(
 				devices, curr_filter->data, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 				
@@ -566,13 +566,13 @@ CL4DevSelDevices cl4_devsel_select(
 			for (guint j = 0; j < devices->len; j++) {
 				
 				/* Get current device wrapper. */
-				CL4Device* curr_device = 
-					(CL4Device*) g_ptr_array_index(devices, j);
+				CCLDevice* curr_device = 
+					(CCLDevice*) g_ptr_array_index(devices, j);
 
 				/* Check if current device is accepted by current 
 				 * filter. */
 				gboolean pass = 
-					((cl4_devsel_indep) curr_filter->function)(
+					((ccl_devsel_indep) curr_filter->function)(
 						curr_device, curr_filter->data, &err_internal);
 				gef_if_err_propagate_goto(
 					err, err_internal, error_handler);
@@ -604,7 +604,7 @@ finish:
 
 	/* Free individual filters. */
 	for (guint i = 0; i < (*filters)->len; i++)
-		g_slice_free(CL4DevSelFilter, g_ptr_array_index(*filters, i));
+		g_slice_free(CCLDevSelFilter, g_ptr_array_index(*filters, i));
 		
 	/* Free filter array. */
 	g_ptr_array_free(*filters, TRUE);
@@ -623,7 +623,7 @@ finish:
  * @brief Independent filter function which accepts devices of the type
  * given in the data parameter.
  * 
- * This function is used by the cl4_devsel_indep_type_*() group of
+ * This function is used by the ccl_devsel_indep_type_*() group of
  * functions. Using these is simpler than using this function directly.
  * 
  * @param dev OpenCL device to filter depending on type.
@@ -632,8 +632,8 @@ finish:
  * is to be ignored.
  * @return TRUE if device is of the given type, FALSE otherwise.
  * */
-gboolean cl4_devsel_indep_type(
-	CL4Device* dev, void* data, GError **err) {
+gboolean ccl_devsel_indep_type(
+	CCLDevice* dev, void* data, GError **err) {
 	
 	/* Make sure dev is not NULL. */ 
 	g_return_val_if_fail(dev != NULL, FALSE);
@@ -644,15 +644,15 @@ gboolean cl4_devsel_indep_type(
 	GError* err_internal = NULL;
 	
 	/* Make sure data is not NULL. */
-	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
-		CL4_ERROR_INVALID_DATA, error_handler,
+	gef_if_error_create_goto(*err, CCL_ERROR, data == NULL, 
+		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get type to check for. */
 	cl_device_type type_to_check = *((cl_device_type*) data);
 	
 	/* Get device type. */
-	cl_device_type type = cl4_device_get_scalar_info(
+	cl_device_type type = ccl_device_get_scalar_info(
 		dev, CL_DEVICE_TYPE, cl_device_type, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -679,8 +679,8 @@ finish:
  * is to be ignored.
  * @return TRUE if device is a GPU, FALSE otherwise.
  * */
-gboolean cl4_devsel_indep_type_gpu(
-	CL4Device* dev, void *data, GError **err) {
+gboolean ccl_devsel_indep_type_gpu(
+	CCLDevice* dev, void *data, GError **err) {
 
 	/* Set device type to GPU. */
 	cl_device_type type_to_check = CL_DEVICE_TYPE_GPU;
@@ -689,7 +689,7 @@ gboolean cl4_devsel_indep_type_gpu(
 	data = data;
 	
 	/* Return result. */
-	return cl4_devsel_indep_type(dev, (void*) &type_to_check, err);
+	return ccl_devsel_indep_type(dev, (void*) &type_to_check, err);
 	
 }
 
@@ -702,8 +702,8 @@ gboolean cl4_devsel_indep_type_gpu(
  * is to be ignored.
  * @return TRUE if device is a CPU, FALSE otherwise.
  * */
-gboolean cl4_devsel_indep_type_cpu(
-	CL4Device* dev, void *data, GError **err) {
+gboolean ccl_devsel_indep_type_cpu(
+	CCLDevice* dev, void *data, GError **err) {
 
 	/* Set device type to CPU. */
 	cl_device_type type_to_check = CL_DEVICE_TYPE_CPU;
@@ -712,7 +712,7 @@ gboolean cl4_devsel_indep_type_cpu(
 	data = data;
 	
 	/* Return result. */
-	return cl4_devsel_indep_type(dev, (void*) &type_to_check, err);
+	return ccl_devsel_indep_type(dev, (void*) &type_to_check, err);
 
 }
 
@@ -726,8 +726,8 @@ gboolean cl4_devsel_indep_type_cpu(
  * is to be ignored.
  * @return TRUE if device is a accelerator, FALSE otherwise.
  * */
-gboolean cl4_devsel_indep_type_accel(
-	CL4Device* dev, void *data, GError **err) {
+gboolean ccl_devsel_indep_type_accel(
+	CCLDevice* dev, void *data, GError **err) {
 
 	/* Set device type to Accelerator. */
 	cl_device_type type_to_check = CL_DEVICE_TYPE_ACCELERATOR;
@@ -736,7 +736,7 @@ gboolean cl4_devsel_indep_type_accel(
 	data = data;
 	
 	/* Return result. */
-	return cl4_devsel_indep_type(dev, (void*) &type_to_check, err);
+	return ccl_devsel_indep_type(dev, (void*) &type_to_check, err);
 
 }
 
@@ -750,8 +750,8 @@ gboolean cl4_devsel_indep_type_accel(
  * is to be ignored.
  * @return TRUE if device is accepted by filter, FALSE otherwise.
  * */
-gboolean cl4_devsel_indep_string(
-	CL4Device* dev, void *data, GError **err) {
+gboolean ccl_devsel_indep_string(
+	CCLDevice* dev, void *data, GError **err) {
 	
 	/* Make sure device is not NULL. */ 
 	g_return_val_if_fail(dev != NULL, FALSE);
@@ -769,15 +769,15 @@ gboolean cl4_devsel_indep_string(
 	gchar *complt_info, *complt_info_lowr, *part_info;
 	
 	/* Make sure data is not NULL. */
-	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
-		CL4_ERROR_INVALID_DATA, error_handler,
+	gef_if_error_create_goto(*err, CCL_ERROR, data == NULL, 
+		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Lower-case partial name for comparison. */
 	part_info = g_ascii_strdown((gchar*) data, -1);
 
 	/* Compare with device name. */
-	complt_info = cl4_device_get_array_info(
+	complt_info = ccl_device_get_array_info(
 		dev, CL_DEVICE_NAME, char*, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -790,7 +790,7 @@ gboolean cl4_devsel_indep_string(
 		g_free(complt_info_lowr);
 		
 		/* Compare with device vendor. */
-		complt_info = cl4_device_get_array_info(
+		complt_info = ccl_device_get_array_info(
 			dev, CL_DEVICE_VENDOR, char*, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -803,14 +803,14 @@ gboolean cl4_devsel_indep_string(
 			g_free(complt_info_lowr);
 			
 			/* Compare with platform name. */
-			CL4Platform* platf;
+			CCLPlatform* platf;
 			
 			/* Get device platform. */
-			platf = cl4_device_get_platform(dev, &err_internal);
+			platf = ccl_device_get_platform(dev, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 			
 			/* Get platform name. */
-			complt_info = cl4_platform_get_info_string(
+			complt_info = ccl_platform_get_info_string(
 				platf, CL_PLATFORM_NAME, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 			
@@ -861,8 +861,8 @@ finish:
  * @return TRUE if device belongs to the specified platform, FALSE 
  * otherwise.
  * */
-gboolean cl4_devsel_indep_platform(
-	CL4Device* device, void *data, GError **err) {
+gboolean ccl_devsel_indep_platform(
+	CCLDevice* device, void *data, GError **err) {
 		
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);
@@ -880,12 +880,12 @@ gboolean cl4_devsel_indep_platform(
 	gboolean pass;
 
 	/* Check if data is NULL, throw error if so. */
-	gef_if_error_create_goto(*err, CL4_ERROR, data == NULL, 
-		CL4_ERROR_INVALID_DATA, error_handler,
+	gef_if_error_create_goto(*err, CCL_ERROR, data == NULL, 
+		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get device platform. */
-	platf = cl4_device_get_scalar_info(device, CL_DEVICE_PLATFORM,
+	platf = ccl_device_get_scalar_info(device, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -927,8 +927,8 @@ finish:
  * is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
-CL4DevSelDevices cl4_devsel_dep_platform(
-	CL4DevSelDevices devices, void *data, GError **err) {
+CCLDevSelDevices ccl_devsel_dep_platform(
+	CCLDevSelDevices devices, void *data, GError **err) {
 		
 	/* Make sure devices is not NULL. */
 	g_return_val_if_fail(devices != NULL, NULL);
@@ -936,7 +936,7 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	/* Current device. */
-	CL4Device* dev;
+	CCLDevice* dev;
 	
 	/* Reference platform and current device platform.*/
 	cl_platform_id platf_ref, platf_curr;
@@ -948,10 +948,10 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 	data = data;
 	
 	/* Get first device, which will determine the reference platform. */
-	dev = (CL4Device*) g_ptr_array_index(devices, 0);
+	dev = (CCLDevice*) g_ptr_array_index(devices, 0);
 	
 	/* Determine reference platform (i.e. platform of first device). */
-	platf_ref = cl4_device_get_scalar_info(dev, CL_DEVICE_PLATFORM,
+	platf_ref = ccl_device_get_scalar_info(dev, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
@@ -960,10 +960,10 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 	for (guint i = 1; i < devices->len; i++) {
 		
 		/* Get current device. */
-		dev = (CL4Device*) g_ptr_array_index(devices, i);
+		dev = (CCLDevice*) g_ptr_array_index(devices, i);
 		
 		/* Get current device platform. */
-		platf_curr = cl4_device_get_scalar_info(
+		platf_curr = ccl_device_get_scalar_info(
 			dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -1010,8 +1010,8 @@ finish:
  * is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
-CL4DevSelDevices cl4_devsel_dep_menu(
-	CL4DevSelDevices devices, void *data, GError **err) {
+CCLDevSelDevices ccl_devsel_dep_menu(
+	CCLDevSelDevices devices, void *data, GError **err) {
 		
 	/* Make sure devices is not NULL. */
 	g_return_val_if_fail(devices != NULL, NULL);
@@ -1031,7 +1031,7 @@ CL4DevSelDevices cl4_devsel_dep_menu(
 		/* Check if index is within bounds. */
 		if ((index >= 0) && (index < (cl_int) devices->len)) {
 			/* Device index is within bounds, print list with selection. */
-			cl4_devsel_dep_menu_list(devices, index, &err_internal);
+			ccl_devsel_dep_menu_list(devices, index, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 		} else {
 			/* If we get here, an invalid device index was given. */
@@ -1042,13 +1042,13 @@ CL4DevSelDevices cl4_devsel_dep_menu(
 	
 	/* If no proper index was given ask the user for the correct index. */
 	if (index == -1) {
-		index = cl4_devsel_dep_menu_query(devices, &err_internal);
+		index = ccl_devsel_dep_menu_query(devices, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 	
 	/* Remove all devices except the selected device. */
 	gpointer sel_dev = g_ptr_array_index(devices, index);
-	cl4_device_ref((CL4Device*) sel_dev);
+	ccl_device_ref((CCLDevice*) sel_dev);
 	g_ptr_array_remove_range(devices, 0, devices->len);
 	g_ptr_array_add(devices, sel_dev);
 	g_assert_cmpint(1, ==, devices->len);

@@ -33,7 +33,7 @@
 #include "profiler.h"
 #include "ocl_stub/ocl_impl.h"
 
-#define cl4_test_prof_is_overlap(ev1, ev2) \
+#define ccl_test_prof_is_overlap(ev1, ev2) \
 	( \
 		(g_strcmp0(o->event1_name, ev1) == 0) \
 		&& \
@@ -50,64 +50,64 @@
 static void operationTest() {
 	
 	/* Aux vars. */
-	CL4Context* ctx;
-	CL4Device* dev;
-	CL4Queue *q1, *q2, *q3;
-	CL4Event *ev1, *ev2, *ev3, *ev4, *ev5, *ev6, *ev7, *ev8;
-	CL4Buffer* buf;
-	CL4Program* prg;
-	CL4Kernel* krnl;
-	CL4Prof* prof;
+	CCLContext* ctx;
+	CCLDevice* dev;
+	CCLQueue *q1, *q2, *q3;
+	CCLEvent *ev1, *ev2, *ev3, *ev4, *ev5, *ev6, *ev7, *ev8;
+	CCLBuffer* buf;
+	CCLProgram* prg;
+	CCLKernel* krnl;
+	CCLProf* prof;
 	GError* err = NULL;
 	cl_event ev_unwrapped;
 	void* a_bug = NULL;
 	const char* src = "__kernel void k1(_global int* a){}";
 	
 	/* Create OpenCL wrappers for testing. */
-	ctx = cl4_context_new_any(&err);
+	ctx = ccl_context_new_any(&err);
 	g_assert_no_error(err);
 	
-	dev = cl4_context_get_device(ctx, 0, &err);
+	dev = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 	
-	q1 = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	q1 = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
-	q2 = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	q2 = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
-	q3 = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
-	g_assert_no_error(err);
-	
-	buf = cl4_buffer_new(ctx, CL_MEM_READ_ONLY, sizeof(cl_int) * 100, NULL, &err);
+	q3 = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 	
-	prg = cl4_program_new_from_source(ctx, src, &err);
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, sizeof(cl_int) * 100, NULL, &err);
+	g_assert_no_error(err);
+	
+	prg = ccl_program_new_from_source(ctx, src, &err);
 	g_assert_no_error(err);
 
-	krnl = cl4_program_get_kernel(prg, "k1", &err);
+	krnl = ccl_program_get_kernel(prg, "k1", &err);
 	g_assert_no_error(err);
 	
 	/* Profiling object. */
-	prof = cl4_prof_new();
+	prof = ccl_prof_new();
 
 	/* Test with 5 different event names. */
-	ev1 = cl4_buffer_write(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
+	ev1 = ccl_buffer_write(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev1, "Event1");
-	ev_unwrapped = cl4_event_unwrap(ev1);
+	ccl_event_set_name(ev1, "Event1");
+	ev_unwrapped = ccl_event_unwrap(ev1);
 	ev_unwrapped->t_start = 10;
 	ev_unwrapped->t_end = 15;
 
-	cl4_buffer_map(q1, buf, CL_TRUE, CL_MAP_READ, 0, sizeof(cl_int) * 100, NULL, &ev2, &err);
+	ccl_buffer_map(q1, buf, CL_TRUE, CL_MAP_READ, 0, sizeof(cl_int) * 100, NULL, &ev2, &err);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev2, "Event2");
-	ev_unwrapped = cl4_event_unwrap(ev2);
+	ccl_event_set_name(ev2, "Event2");
+	ev_unwrapped = ccl_event_unwrap(ev2);
 	ev_unwrapped->t_start = 16;
 	ev_unwrapped->t_end = 20;
 
-	ev3 = cl4_memobj_unmap((CL4MemObj*) buf, q1, a_bug, NULL, &err);
+	ev3 = ccl_memobj_unmap((CCLMemObj*) buf, q1, a_bug, NULL, &err);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev3, "Event3");
-	ev_unwrapped = cl4_event_unwrap(ev3);
+	ccl_event_set_name(ev3, "Event3");
+	ev_unwrapped = ccl_event_unwrap(ev3);
 	ev_unwrapped->t_start = 17;
 	ev_unwrapped->t_end = 30;
 
@@ -115,77 +115,77 @@ static void operationTest() {
 	size_t lws = 16;
 	size_t gwo = 0;
 
-	ev4 = cl4_kernel_set_args_and_run(krnl, q3, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
+	ev4 = ccl_kernel_set_args_and_run(krnl, q3, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev4, "Event4");
-	ev_unwrapped = cl4_event_unwrap(ev4);
+	ccl_event_set_name(ev4, "Event4");
+	ev_unwrapped = ccl_event_unwrap(ev4);
 	ev_unwrapped->t_start = 19;
 	ev_unwrapped->t_end = 25;
 
-	ev5 = cl4_buffer_read(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
+	ev5 = ccl_buffer_read(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev5, "Event5");
-	ev_unwrapped = cl4_event_unwrap(ev5);
+	ccl_event_set_name(ev5, "Event5");
+	ev_unwrapped = ccl_event_unwrap(ev5);
 	ev_unwrapped->t_start = 29;
 	ev_unwrapped->t_end = 40;
 
-	ev6 = cl4_buffer_write(q2, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
+	ev6 = ccl_buffer_write(q2, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev6, "Event1");
-	ev_unwrapped = cl4_event_unwrap(ev6);
+	ccl_event_set_name(ev6, "Event1");
+	ev_unwrapped = ccl_event_unwrap(ev6);
 	ev_unwrapped->t_start = 35;
 	ev_unwrapped->t_end = 45;
 
-	ev7 = cl4_kernel_set_args_and_run(krnl, q1, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
+	ev7 = ccl_kernel_set_args_and_run(krnl, q1, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev7, "Event1");
-	ev_unwrapped = cl4_event_unwrap(ev7);
+	ccl_event_set_name(ev7, "Event1");
+	ev_unwrapped = ccl_event_unwrap(ev7);
 	ev_unwrapped->t_start = 68;
 	ev_unwrapped->t_end = 69;
 
-	ev8 = cl4_buffer_write(q3, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
+	ev8 = ccl_buffer_write(q3, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
 	g_assert_no_error(err);
-	cl4_event_set_name(ev8, "Event1");
-	ev_unwrapped = cl4_event_unwrap(ev8);
+	ccl_event_set_name(ev8, "Event1");
+	ev_unwrapped = ccl_event_unwrap(ev8);
 	ev_unwrapped->t_start = 50;
 	ev_unwrapped->t_end = 70;
 
 	/* Add queues. */
-	cl4_prof_add_queue(prof, "Q1", q1);
-	cl4_prof_add_queue(prof, "Q2", q2);
-	cl4_prof_add_queue(prof, "Q3", q3);
+	ccl_prof_add_queue(prof, "Q1", q1);
+	ccl_prof_add_queue(prof, "Q2", q2);
+	ccl_prof_add_queue(prof, "Q3", q3);
 
 	/* Perform profiling calculations. */
-	cl4_prof_calc(prof, &err);
+	ccl_prof_calc(prof, &err);
 	g_assert_no_error(err);
 	
 	/* ************************* */
 	/* Test aggregate statistics */
 	/* ************************* */
 	
-	const CL4ProfAgg const* agg;
+	const CCLProfAgg const* agg;
 	
-	agg = cl4_prof_get_agg(prof, "Event1");
+	agg = ccl_prof_get_agg(prof, "Event1");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 36);
 	g_assert_cmpfloat(agg->relative_time - 0.51728, <, 0.0001);
 	
-	agg = cl4_prof_get_agg(prof, "Event2");
+	agg = ccl_prof_get_agg(prof, "Event2");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 4);
 	g_assert_cmpfloat(agg->relative_time - 0.05714, <, 0.0001);
 
-	agg = (CL4ProfAgg*) cl4_prof_get_agg(prof, "Event3");
+	agg = (CCLProfAgg*) ccl_prof_get_agg(prof, "Event3");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 13);
 	g_assert_cmpfloat(agg->relative_time - 0.18571, <, 0.0001);
 
-	agg = (CL4ProfAgg*) cl4_prof_get_agg(prof, "Event4");
+	agg = (CCLProfAgg*) ccl_prof_get_agg(prof, "Event4");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 6);
 	g_assert_cmpfloat(agg->relative_time - 0.08571, <, 0.0001);
 
-	agg = (CL4ProfAgg*) cl4_prof_get_agg(prof, "Event5");
+	agg = (CCLProfAgg*) ccl_prof_get_agg(prof, "Event5");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 11);
 	g_assert_cmpfloat(agg->relative_time - 0.15714, <, 0.0001);
@@ -194,21 +194,21 @@ static void operationTest() {
 	/* Test overlaps */
 	/* ************* */
 	
-	const CL4ProfOverlap const* o;
-	cl4_prof_iter_overlap_init(prof, CL4_PROF_OVERLAP_SORT_DURATION |
-		CL4_PROF_SORT_DESC);
-	while ((o = cl4_prof_iter_overlap_next(prof)) != NULL) {
-		if (cl4_test_prof_is_overlap("Event3", "Event4")) {
+	const CCLProfOverlap const* o;
+	ccl_prof_iter_overlap_init(prof, CCL_PROF_OVERLAP_SORT_DURATION |
+		CCL_PROF_SORT_DESC);
+	while ((o = ccl_prof_iter_overlap_next(prof)) != NULL) {
+		if (ccl_test_prof_is_overlap("Event3", "Event4")) {
 			g_assert_cmpuint(o->duration, ==, 6);
-		} else if (cl4_test_prof_is_overlap("Event1", "Event5")) {
+		} else if (ccl_test_prof_is_overlap("Event1", "Event5")) {
 			g_assert_cmpuint(o->duration, ==, 5);
-		} else if (cl4_test_prof_is_overlap("Event2", "Event3")) {
+		} else if (ccl_test_prof_is_overlap("Event2", "Event3")) {
 			g_assert_cmpuint(o->duration, ==, 3);
-		} else if (cl4_test_prof_is_overlap("Event3", "Event5")) {
+		} else if (ccl_test_prof_is_overlap("Event3", "Event5")) {
 			g_assert_cmpuint(o->duration, ==, 1);
-		} else if (cl4_test_prof_is_overlap("Event2", "Event4")) {
+		} else if (ccl_test_prof_is_overlap("Event2", "Event4")) {
 			g_assert_cmpuint(o->duration, ==, 1);
-		} else if (cl4_test_prof_is_overlap("Event1", "Event1")) {
+		} else if (ccl_test_prof_is_overlap("Event1", "Event1")) {
 			g_assert_cmpuint(o->duration, ==, 1);
 		} else {
 			g_assert_not_reached();
@@ -220,12 +220,12 @@ static void operationTest() {
 	/* ******************* */
 	
 	/* Set some export options. */
-	CL4ProfExportOptions export_options = cl4_prof_get_export_opts();
+	CCLProfExportOptions export_options = ccl_prof_get_export_opts();
 	export_options.separator = "\t"; /* Default */
 	export_options.queue_delim = ""; /* Default */
 	export_options.evname_delim = ""; /* Default */
 	export_options.zero_start = FALSE; /* Not default */
-	cl4_prof_set_export_opts(export_options);
+	ccl_prof_set_export_opts(export_options);
 	
 	/* Export options. */
 	gchar *name_used;
@@ -233,7 +233,7 @@ static void operationTest() {
 		g_file_open_tmp("test_profiler_XXXXXX.txt", &name_used, NULL),
 		"wb"
 	);
-	cl_bool export_status = cl4_prof_export_info(prof, fp, NULL);
+	cl_bool export_status = ccl_prof_export_info(prof, fp, NULL);
 	g_assert(export_status);
 	fclose(fp);
 
@@ -256,30 +256,30 @@ static void operationTest() {
 	g_free(name_used);
 	
 	/* Print summary to debug output. */
-	gchar* summary = cl4_prof_get_summary(prof, 
-		CL4_PROF_AGG_SORT_TIME | CL4_PROF_SORT_DESC,
-		CL4_PROF_OVERLAP_SORT_DURATION | CL4_PROF_SORT_DESC);
+	gchar* summary = ccl_prof_get_summary(prof, 
+		CCL_PROF_AGG_SORT_TIME | CCL_PROF_SORT_DESC,
+		CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC);
 	
 	g_debug("\n%s", summary);
 	
 	g_free(summary); 
 	
 	/* Free profile. */
-	cl4_prof_destroy(prof);
+	ccl_prof_destroy(prof);
 
 	/* Free program wrapper. */
-	cl4_program_destroy(prg);
+	ccl_program_destroy(prg);
 	
 	/* Free buffer wrapper. */
-	cl4_memobj_destroy(buf);
+	ccl_memobj_destroy(buf);
 	
 	/* Free queue wrappers. */
-	cl4_queue_destroy(q3);
-	cl4_queue_destroy(q2);
-	cl4_queue_destroy(q1);
+	ccl_queue_destroy(q3);
+	ccl_queue_destroy(q2);
+	ccl_queue_destroy(q1);
 	
 	/* Free context. */
-	cl4_context_destroy(ctx);
+	ccl_context_destroy(ctx);
 	
 }
 

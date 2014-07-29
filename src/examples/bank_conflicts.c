@@ -117,15 +117,15 @@ int main(int argc, char *argv[]) {
 	/* Error management. */
 	GError *err = NULL;
 	/* Profiling / Timmings. */
-	CL4Prof* prof = NULL;
+	CCLProf* prof = NULL;
 	/* Context wrapper. */
-	CL4Context* ctx = NULL;
+	CCLContext* ctx = NULL;
 	/* Program wrapper. */
-	CL4Program* prg = NULL;
+	CCLProgram* prg = NULL;
 	/* Command queue wrapper. */
-	CL4Queue* cq = NULL;
+	CCLQueue* cq = NULL;
 	/* Data in device. */
-	CL4Buffer* buf_data_dev = NULL;
+	CCLBuffer* buf_data_dev = NULL;
 	/* Full kernel path. */
 	gchar* kernel_path = NULL;
 	/* Data in host. */
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 	g_option_context_parse(opt_ctx, &argc, &argv, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	/* Check if global worksize is multiple of local worksize. */
-	gef_if_error_create_goto(err, CL4_ERROR, 
+	gef_if_error_create_goto(err, CCL_ERROR, 
 		(gws[0] % lws[0] != 0) || (gws[1] % lws[1] != 0), 
 		CLEXP_FAIL, error_handler, 
 		"Global worksize is not multiple of local worksize.");
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 	 * exit. */
 	if (dev_list) {
 		g_printf("\n");
-		cl4_devsel_print_device_strings(&err);
+		ccl_devsel_print_device_strings(&err);
 		g_printf("\n");
 		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 		exit(0);
@@ -174,10 +174,10 @@ int main(int argc, char *argv[]) {
 	rng = g_rand_new_with_seed(0);
 		
 	/* Initialize profiling object. */
-	prof = cl4_prof_new();
+	prof = ccl_prof_new();
 
 	/* Create a GPU context. */
-	ctx = cl4_context_new_gpu(&err);
+	ctx = ccl_context_new_gpu(&err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Get location of kernel file, which should be in the same 
@@ -185,31 +185,31 @@ int main(int argc, char *argv[]) {
 	kernel_path = clexp_kernelpath_get(kernel_files[0], argv[0]);
 	
 	/* Create program. */
-	prg = cl4_program_new_from_source_file(ctx, kernel_files[0], &err);
+	prg = ccl_program_new_from_source_file(ctx, kernel_files[0], &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Build program. */
-	status = cl4_program_build(prg, compiler_opts, &err);
+	status = ccl_program_build(prg, compiler_opts, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Create a command queue. */
-	cq = cl4_queue_new(ctx, NULL, CL_QUEUE_PROFILING_ENABLE, &err);
+	cq = ccl_queue_new(ctx, NULL, CL_QUEUE_PROFILING_ENABLE, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Start basic timming / profiling. */
-	cl4_prof_start(prof);
+	ccl_prof_start(prof);
 
 	/* Allocate data in host */
 	size_data_in_bytes = gws[0] * gws[1] * sizeof(cl_int);
 	data_host = (cl_int*) g_malloc(size_data_in_bytes);
 	
 	/* Allocate data in device */
-	buf_data_dev = cl4_buffer_new(ctx, CL_MEM_READ_WRITE, 
+	buf_data_dev = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, 
 		size_data_in_bytes, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Copy data from host to device. */
-	cl4_buffer_write(cq, buf_data_dev, CL_TRUE, 0, size_data_in_bytes,
+	ccl_buffer_write(cq, buf_data_dev, CL_TRUE, 0, size_data_in_bytes,
 		data_host, NULL, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
@@ -224,27 +224,27 @@ int main(int argc, char *argv[]) {
 	/*  Set kernel arguments and run kernel */
 	/* ************************************ */
 	
-	cl4_program_run(prg, "bankconf", cq, 2, NULL, gws, lws, NULL, &err,
-		buf_data_dev, cl4_arg_local(lws[1] * lws[0], cl_int),
-		cl4_arg_private(stride, cl_uint), NULL);
+	ccl_program_run(prg, "bankconf", cq, 2, NULL, gws, lws, NULL, &err,
+		buf_data_dev, ccl_arg_local(lws[1] * lws[0], cl_int),
+		ccl_arg_private(stride, cl_uint), NULL);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Wait... */
-	cl4_queue_finish(cq, &err);
+	ccl_queue_finish(cq, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ******************** */
 	/*  Show profiling info */
 	/* ******************** */
 	
-	cl4_prof_stop(prof); 
+	ccl_prof_stop(prof); 
 
-	cl4_prof_add_queue(prof, "Q1", cq);
+	ccl_prof_add_queue(prof, "Q1", cq);
 	
-	cl4_prof_calc(prof, &err);
+	ccl_prof_calc(prof, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	cl4_prof_print_summary(prof);
+	ccl_prof_print_summary(prof);
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
 	g_assert (err == NULL);
@@ -277,13 +277,13 @@ cleanup:
 	if (rng != NULL) g_rand_free(rng);
 	
 	/* Free profile */
-	if (prof) cl4_prof_destroy(prof);
+	if (prof) ccl_prof_destroy(prof);
 	
 	/* Free wrappers. */
-	if (buf_data_dev) cl4_buffer_destroy(buf_data_dev);
-	if (cq) cl4_queue_destroy(cq);
-	if (prg) cl4_program_destroy(prg);
-	if (ctx) cl4_context_destroy(ctx);
+	if (buf_data_dev) ccl_buffer_destroy(buf_data_dev);
+	if (cq) ccl_queue_destroy(cq);
+	if (prg) ccl_program_destroy(prg);
+	if (ctx) ccl_context_destroy(ctx);
 	
 	/* Free host resources */
 	if (data_host) g_free(data_host);
