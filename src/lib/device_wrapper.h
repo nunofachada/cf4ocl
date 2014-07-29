@@ -83,20 +83,6 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
 		(void*) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
- * @brief Get device information size.
- * 
- * @param device The device wrapper object.
- * @param param_name Name of information/parameter to get size of.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return The requested device information size. If an error occurs, 
- * a size of 0 is returned.
- * */
-#define cl4_device_info_size(device, param_name, err) \
-	cl4_wrapper_get_info_size((CL4Wrapper*) device, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
-
-/** 
  * @brief Macro which returns a scalar device information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
