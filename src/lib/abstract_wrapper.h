@@ -146,10 +146,26 @@ gsize cl4_wrapper_get_info_size(CL4Wrapper* wrapper1,
 	CL4Wrapper* wrapper2, cl_uint param_name, 
 	cl4_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
+/**
+ * @brief Helper macro which returns a scalar information value casted 
+ * to specified scalar type.
+ * 
+ * @param info Wrapper information object.
+ * @param type Scalar type to which to cast value to.
+ * @return The information value casted to the specified scalar type.
+ * */
 #define cl4_info_scalar(info, type) *((type*) (info)->value)
 
+/**
+ * @brief Helper macro which returns an array information value casted 
+ * to specified array type.
+ * 
+ * @param info Wrapper information object.
+ * @param type Array (pointer) type to which to cast value to.
+ * @return The information value casted to the specified array (pointer)
+ * type.
+ * */
 #define cl4_info_array(info, type) ((type) (info)->value)
-
 
 #endif
 

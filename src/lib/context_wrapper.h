@@ -222,19 +222,64 @@ CL4Context* cl4_context_new_from_menu_full(void* data, GError** err);
 void cl4_context_destroy(CL4Context* ctx);
 
 /**
- * @brief Get context information object.
+ * @brief Get a ::CL4WrapperInfo context information object.
  * 
- * @param ctx The context wrapper object.
+ * @param context The context wrapper object.
  * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting 
+ * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested context information object. This object will 
- * be automatically freed when the device wrapper object is 
+ * @return The requested context information object. This object will
+ * be automatically freed when the context wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_context_info(ctx, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) (ctx), NULL, (param_name), \
-		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, (err))
+#define cl4_context_get_info(context, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) context, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
+
+/** 
+ * @brief Macro which returns a scalar context information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param context The context wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested context information value. This value will be 
+ * automatically freed when the context wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define ccl4_context_get_scalar_info(context, param_name, param_type, err) \
+	(cl4_wrapper_get_info_value((CL4Wrapper*) context, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err) != NULL \
+		? *((param_type*) (cl4_wrapper_get_info_value( \
+				(CL4Wrapper*) context, NULL, param_name, \
+				(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err))) \
+		: 0)
+
+/** 
+ * @brief Macro which returns an array context information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param context The context wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested context information value. This value will be 
+ * automatically freed when the context wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define cl4_context_get_array_info(context, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) context, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetContextInfo, \
+		CL_TRUE, err)
 
 /** 
  * @brief Increase the reference count of the context wrapper object.

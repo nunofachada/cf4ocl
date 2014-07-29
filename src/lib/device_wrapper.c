@@ -93,7 +93,7 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err) {
 		platf = dev->platf;
 	} else {
 		CL4WrapperInfo* info = NULL;
-		info = cl4_device_info(
+		info = cl4_device_get_info(
 			dev, CL_DEVICE_PLATFORM, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		platf = cl4_platform_new_wrap(*((cl_platform_id*) info->value));

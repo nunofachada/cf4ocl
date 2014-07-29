@@ -846,7 +846,7 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
 		dev = cl4_program_get_device(prg, i, &err_internal);	
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
-		file_middle = cl4_device_info(dev, CL_DEVICE_NAME, &err_internal);
+		file_middle = cl4_device_get_info(dev, CL_DEVICE_NAME, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		filename = g_strdup_printf("%s%s_%2d%s", 

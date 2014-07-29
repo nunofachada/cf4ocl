@@ -213,12 +213,12 @@ static gchar** cl4_get_device_strings_from_array(
 	for (guint i = 0; i < devices->len; i++) {
 	
 		/* Get device name. */
-		gchar* name = cl4_device_info_value_array(
+		gchar* name = cl4_device_get_array_info(
 				devices->pdata[i], CL_DEVICE_NAME, char*, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		/* Get device vendor. */
-		gchar* vendor = cl4_device_info_value_array(
+		gchar* vendor = cl4_device_get_array_info(
 				devices->pdata[i], CL_DEVICE_VENDOR, char*, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
@@ -639,7 +639,7 @@ gboolean cl4_devsel_indep_type(
 	cl_device_type type_to_check = *((cl_device_type*) data);
 	
 	/* Get device type. */
-	cl_device_type type = cl4_device_info_value_scalar(
+	cl_device_type type = ccl4_device_get_scalar_info(
 		dev, CL_DEVICE_TYPE, cl_device_type, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -764,7 +764,7 @@ gboolean cl4_devsel_indep_string(
 	part_info = g_ascii_strdown((gchar*) data, -1);
 
 	/* Compare with device name. */
-	complt_info = cl4_device_info_value_array(
+	complt_info = cl4_device_get_array_info(
 		dev, CL_DEVICE_NAME, char*, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -777,7 +777,7 @@ gboolean cl4_devsel_indep_string(
 		g_free(complt_info_lowr);
 		
 		/* Compare with device vendor. */
-		complt_info = cl4_device_info_value_array(
+		complt_info = cl4_device_get_array_info(
 			dev, CL_DEVICE_VENDOR, char*, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -872,7 +872,7 @@ gboolean cl4_devsel_indep_platform(
 		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get device platform. */
-	platf = cl4_device_info_value_scalar(device, CL_DEVICE_PLATFORM,
+	platf = ccl4_device_get_scalar_info(device, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -931,7 +931,7 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 	dev = (CL4Device*) g_ptr_array_index(devices, 0);
 	
 	/* Determine reference platform (i.e. platform of first device). */
-	platf_ref = cl4_device_info_value_scalar(dev, CL_DEVICE_PLATFORM,
+	platf_ref = ccl4_device_get_scalar_info(dev, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
@@ -943,7 +943,7 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 		dev = (CL4Device*) g_ptr_array_index(devices, i);
 		
 		/* Get current device platform. */
-		platf_curr = cl4_device_info_value_scalar(
+		platf_curr = ccl4_device_get_scalar_info(
 			dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 

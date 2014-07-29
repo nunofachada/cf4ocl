@@ -97,7 +97,7 @@ static void context_create_info_destroy_test() {
 	/* Get number of devices from context wrapper, check that this
 	 * number is 1. */
 #ifdef CL_VERSION_1_1
-	info = cl4_context_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
+	info = cl4_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
 #endif
@@ -105,7 +105,7 @@ static void context_create_info_destroy_test() {
 	/* Get the cl_device_id from context via context info and check
 	 * that it corresponds to the cl_device_id with which the context
 	 * was created. */
-	info = cl4_context_info(ctx, CL_CONTEXT_DEVICES, &err);
+	info = cl4_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert(((cl_device_id*) info->value)[0] == d_id);
 
@@ -149,10 +149,10 @@ static void context_create_info_destroy_test() {
 	/* Check that the context number of devices taken using context
 	 * info is 1. */
 #ifdef CL_VERSION_1_1
-	info = cl4_context_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
+	info = cl4_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
 	g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
 #else
-	info = cl4_context_info(ctx, CL_CONTEXT_DEVICES, &err);
+	info = cl4_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
 	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
 #endif
 
@@ -235,7 +235,7 @@ static void context_create_info_destroy_test() {
 	
 	/* Check that the device platform corresponds to the expected 
 	 * platform (the one used in the filter). */
-	platf_ref = cl4_device_info_value_scalar(d, CL_DEVICE_PLATFORM,
+	platf_ref = ccl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err);
 	g_assert_no_error(err);
 	g_assert(platf_ref == platform);
@@ -262,7 +262,7 @@ static void context_create_info_destroy_test() {
 	
 	/* Check that the device platform corresponds to the expected 
 	 * platform (the one which the first device belongs to). */
-	platf_ref = cl4_device_info_value_scalar(d, CL_DEVICE_PLATFORM,
+	platf_ref = ccl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err);
 	g_assert_no_error(err);
 	
@@ -276,7 +276,7 @@ static void context_create_info_destroy_test() {
 		d = cl4_context_get_device(ctx, i, &err);
 		g_assert_no_error(err);
 		
-		platform = cl4_device_info_value_scalar(d, CL_DEVICE_PLATFORM,
+		platform = ccl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 			cl_platform_id, &err);
 		g_assert_no_error(err);
 			

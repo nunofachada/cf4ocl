@@ -521,5 +521,5 @@ void cl4_context_destroy(CL4Context* ctx) {
 CL4WrapperInfo* cl4_context_get_cldevices(
 	CL4DevContainer* devcon, GError** err) {
 
-	return cl4_context_info(devcon, CL_CONTEXT_DEVICES, err);
+	return cl4_context_get_info(devcon, CL_CONTEXT_DEVICES, err);
 }

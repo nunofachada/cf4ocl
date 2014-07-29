@@ -53,7 +53,7 @@ void cl4_device_destroy(CL4Device* dev);
 CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
 
 /**
- * @brief Get device information object.
+ * @brief Get a ::CL4WrapperInfo device information object.
  * 
  * @param device The device wrapper object.
  * @param param_name Name of information/parameter to get.
@@ -63,24 +63,9 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_device_info(device, param_name, err) \
+#define cl4_device_get_info(device, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) device, NULL, param_name, \
-		(void*) clGetDeviceInfo, CL_TRUE, err)
-
-/** 
- * @brief Get pointer to device information value.
- * 
- * @param device The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return A pointer to the requested device information value. This 
- * value will be automatically freed when the device wrapper object is 
- * destroyed. If an error occurs, NULL is returned.
- * */
-#define cl4_device_info_value(device, param_name, err) \
-	cl4_wrapper_get_info_value((CL4Wrapper*) device, NULL, param_name, \
-		(void*) clGetDeviceInfo, CL_TRUE, err)
+		(cl4_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
  * @brief Macro which returns a scalar device information value. 
@@ -94,14 +79,17 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested device information value. This 
- * value will be automatically freed when the device wrapper object is 
- * destroyed. If an error occurs, zero is returned.
+ * @return The requested device information value. This value will be 
+ * automatically freed when the device wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
  * */
-#define cl4_device_info_value_scalar(device, param_name, param_type, err) \
-	(cl4_device_info_value(device, param_name, err) != NULL ? \
-		*((param_type*) (cl4_device_info_value(device, param_name, err))) : \
-		0)
+#define ccl4_device_get_scalar_info(device, param_name, param_type, err) \
+	(cl4_wrapper_get_info_value((CL4Wrapper*) device, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err) != NULL \
+		? *((param_type*) (cl4_wrapper_get_info_value( \
+				(CL4Wrapper*) device, NULL, param_name, \
+				(cl4_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err))) \
+		: 0)
 
 /** 
  * @brief Macro which returns an array device information value. 
@@ -115,14 +103,14 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested device information value. This 
- * value will be automatically freed when the device wrapper object is 
- * destroyed. If an error occurs, NULL is returned.
+ * @return The requested device information value. This value will be 
+ * automatically freed when the device wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
  * */
-#define cl4_device_info_value_array(device, param_name, param_type, err) \
-	(cl4_device_info_value(device, param_name, err) != NULL ? \
-		(param_type) (cl4_device_info_value(device, param_name, err)) : \
-		NULL)
+#define cl4_device_get_array_info(device, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) device, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetDeviceInfo, \
+		CL_TRUE, err)
 
 /** 
  * @brief Increase the reference count of the device wrapper object.

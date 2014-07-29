@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
 					err, GEF_USE_GERROR, status, error_handler);
 					
 				/* Get device name. */
-				info_value = cl4_device_info(d, CL_DEVICE_NAME, &err);
+				info_value = cl4_device_get_info(d, CL_DEVICE_NAME, &err);
 				gef_if_error_goto(
 					err, GEF_USE_GERROR, status, error_handler);
 				dev_name = (gchar*) info_value->value;
@@ -339,7 +339,7 @@ void cl4_device_query_show_device_info_all(CL4Device* d) {
 	for (gint k = 0; k < cl4_devquery_info_map_size; k++) {
 		
 		/* Get the device information value and size. */
-		param_value = cl4_device_info(
+		param_value = cl4_device_get_info(
 			d, cl4_devquery_info_map[k].device_info, &err);
 		
 		/* Check for errors. */
@@ -413,7 +413,7 @@ void cl4_device_query_show_device_info_custom(CL4Device* d) {
 		while (info_row != NULL) {
 
 			/* Get parameter value for current info_map row. */
-			param_value = cl4_device_info(d, info_row->device_info, &err);
+			param_value = cl4_device_get_info(d, info_row->device_info, &err);
 			
 			/* Check for errors. */
 			if (err == NULL) {
@@ -485,7 +485,7 @@ void cl4_device_query_show_device_info_basic(CL4Device* d) {
 		g_assert(info_row != NULL);
 		
 		/* Get parameter value for current info_map row. */
-		param_value = cl4_device_info(d, info_row->device_info, &err);
+		param_value = cl4_device_get_info(d, info_row->device_info, &err);
 			
 		/* Check for errors. */
 		if (err == NULL) {

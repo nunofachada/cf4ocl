@@ -84,7 +84,7 @@ static void helpers_test() {
 					g_debug("====== Device #%d", j);
 
 					for (gint k = 0; k < cl4_devquery_info_map_size; k++) {
-						info = cl4_device_info(d, cl4_devquery_info_map[k].device_info, &err);
+						info = cl4_device_get_info(d, cl4_devquery_info_map[k].device_info, &err);
 						if (err == NULL) {
 							g_debug("\t%s : %s", 
 								cl4_devquery_info_map[k].param_name, 

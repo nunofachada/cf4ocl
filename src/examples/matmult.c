@@ -275,10 +275,10 @@ int main(int argc, char *argv[]) {
 	dev = cl4_context_get_device(ctx, 0, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	dev_name = cl4_device_info_value_array(dev, CL_DEVICE_NAME, char*, &err);
+	dev_name = cl4_device_get_array_info(dev, CL_DEVICE_NAME, char*, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
-	dev_vendor = cl4_device_info_value_array(dev, CL_DEVICE_VENDOR, char*, &err);
+	dev_vendor = cl4_device_get_array_info(dev, CL_DEVICE_VENDOR, char*, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	g_printf("\n   == Using device '%s' from '%s'\n", dev_name, dev_vendor);
