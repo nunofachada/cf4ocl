@@ -47,33 +47,33 @@
  */
 
 /** @brief Command queue wrapper object. */
-typedef struct cl4_cqueue CL4CQueue;
+typedef struct cl4_queue CL4Queue;
 
-CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
+CL4Queue* cl4_queue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
 	GError** err);
 
-CL4CQueue* cl4_cqueue_new(CL4Context* ctx, CL4Device* dev, 
+CL4Queue* cl4_queue_new(CL4Context* ctx, CL4Device* dev, 
 	cl_command_queue_properties properties, GError** err);
 
 /** @brief Decrements the reference count of the command queue wrapper 
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed. */
-void cl4_cqueue_destroy(CL4CQueue* cq);
+void cl4_queue_destroy(CL4Queue* cq);
 
-CL4Context* cl4_cqueue_get_context(CL4CQueue* cq, GError** err);
+CL4Context* cl4_queue_get_context(CL4Queue* cq, GError** err);
 
-CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err);
+CL4Device* cl4_queue_get_device(CL4Queue* cq, GError** err);
 
-CL4Event* cl4_cqueue_produce_event(CL4CQueue* cq, cl_event event);
+CL4Event* cl4_queue_produce_event(CL4Queue* cq, cl_event event);
 
-void cl4_cqueue_iter_event_init(CL4CQueue* cq);
+void cl4_queue_iter_event_init(CL4Queue* cq);
 
-CL4Event* cl4_cqueue_iter_event_next(CL4CQueue* cq);
+CL4Event* cl4_queue_iter_event_next(CL4Queue* cq);
 
-cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err);
+cl_int cl4_queue_flush(CL4Queue* cq, GError** err);
 
-cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
+cl_int cl4_queue_finish(CL4Queue* cq, GError** err);
 
 /**
  * @brief Get a ::CL4WrapperInfo command queue information object.
@@ -86,7 +86,7 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * be automatically freed when the command queue wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_cqueue_get_info(cq, param_name, err) \
+#define cl4_queue_get_info(cq, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) cq, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
@@ -106,7 +106,7 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * automatically freed when the command queue wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define cl4_cqueue_get_scalar_info(cq, param_name, param_type, err) \
+#define cl4_queue_get_scalar_info(cq, param_name, param_type, err) \
 	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) cq, \
 		NULL, param_name, (cl4_wrapper_info_fp) clGetCommandQueueInfo, \
 		CL_TRUE, err))
@@ -127,7 +127,7 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * automatically freed when the command queue wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_cqueue_get_array_info(cq, param_name, param_type, err) \
+#define cl4_queue_get_array_info(cq, param_name, param_type, err) \
 	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) cq, \
 		NULL, param_name, (cl4_wrapper_info_fp) clGetCommandQueueInfo, \
 		CL_TRUE, err)
@@ -137,7 +137,7 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * 
  * @param cq The command queue wrapper object. 
  * */
-#define cl4_cqueue_ref(cq) \
+#define cl4_queue_ref(cq) \
 	cl4_wrapper_ref((CL4Wrapper*) cq)
 
 /**
@@ -146,7 +146,7 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * @param cq Command queue wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
-#define cl4_cqueue_unref(cq) cl4_cqueue_destroy(cq)
+#define cl4_queue_unref(cq) cl4_queue_destroy(cq)
 
 /**
  * @brief Get the OpenCL command queue object.
@@ -154,13 +154,13 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * @param cq The command queue wrapper object.
  * @return The OpenCL command queue object.
  * */
-#define cl4_cqueue_unwrap(cq) \
+#define cl4_queue_unwrap(cq) \
 	((cl_command_queue) cl4_wrapper_unwrap((CL4Wrapper*) cq))		
 
 /** @} */
 
 /** @brief Get the command queue wrapper for the given OpenCL command 
  * queue. */
-CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue);
+CL4Queue* cl4_queue_new_wrap(cl_command_queue command_queue);
 
 #endif

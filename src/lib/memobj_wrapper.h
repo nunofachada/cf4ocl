@@ -49,13 +49,13 @@ typedef struct cl4_memobj CL4MemObj;
  * reaches 0, the wrapper object is destroyed. */
 void cl4_memobj_destroy(CL4MemObj* mo);
 
-CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4CQueue* cq, 
+CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4Queue* cq, 
 	void* mapped_ptr, CL4EventWaitList evt_wait_lst, GError** err);
 	
 #ifdef CL_VERSION_1_2
 
 CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
- 	CL4CQueue* cq, cl_mem_migration_flags flags, 
+ 	CL4Queue* cq, cl_mem_migration_flags flags, 
  	CL4EventWaitList evt_wait_lst, GError** err);
 
 #endif

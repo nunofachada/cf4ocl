@@ -250,7 +250,7 @@ double cl4_prof_time_elapsed(CL4Prof* prof);
 
 /** @brief Add a command queue wrapper for profiling. */
 void cl4_prof_add_queue(
-	CL4Prof* prof, const char* cq_name, CL4CQueue* cq);
+	CL4Prof* prof, const char* cq_name, CL4Queue* cq);
 
 /** @brief Determine aggregate statistics for the given profile object. */
 cl_bool cl4_prof_calc(CL4Prof* prof, GError** err);

@@ -61,7 +61,7 @@ static void program_create_info_destroy_test() {
 	CL4Kernel* krnl = NULL;
 	CL4WrapperInfo* info = NULL;
 	CL4Device* d = NULL;
-	CL4CQueue* cq = NULL;
+	CL4Queue* cq = NULL;
 	GError* err = NULL;
 	
 	/* Create a temporary kernel file. */
@@ -180,7 +180,7 @@ static void program_create_info_destroy_test() {
 		(gchar*) info->value, ==, CL4_TEST_PROGRAM_SUM);
 
 	/* Create a command queue. */
-	cq = cl4_cqueue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
+	cq = cl4_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 	
 	/* Set args and execute kernel. */
@@ -234,7 +234,7 @@ static void program_create_info_destroy_test() {
 	cl4_memobj_destroy(c_w);
 	
 	/* Destroy the command queue. */
-	cl4_cqueue_destroy(cq);
+	cl4_queue_destroy(cq);
 
 	/* Delete all created binaries. */
 	/// @todo

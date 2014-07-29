@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
 	/* Program wrapper. */
 	CL4Program* prg = NULL;
 	/* Command queue wrapper. */
-	CL4CQueue* cq = NULL;
+	CL4Queue* cq = NULL;
 	/* Data in device. */
 	CL4Buffer* buf_data_dev = NULL;
 	/* Full kernel path. */
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Create a command queue. */
-	cq = cl4_cqueue_new(ctx, NULL, CL_QUEUE_PROFILING_ENABLE, &err);
+	cq = cl4_queue_new(ctx, NULL, CL_QUEUE_PROFILING_ENABLE, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Start basic timming / profiling. */
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Wait... */
-	cl4_cqueue_finish(cq, &err);
+	cl4_queue_finish(cq, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ******************** */
@@ -281,7 +281,7 @@ cleanup:
 	
 	/* Free wrappers. */
 	if (buf_data_dev) cl4_buffer_destroy(buf_data_dev);
-	if (cq) cl4_cqueue_destroy(cq);
+	if (cq) cl4_queue_destroy(cq);
 	if (prg) cl4_program_destroy(prg);
 	if (ctx) cl4_context_destroy(ctx);
 	

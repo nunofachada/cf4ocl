@@ -58,7 +58,7 @@ struct cl4_prof {
 	/** Reverse of event_names in terms of key-values. */ 
 	GHashTable* event_name_ids;
 	/** Table of command queue wrappers. */
-	GHashTable* cqueues;
+	GHashTable* queues;
 
 	/** Total number of events. */
 	guint num_events;
@@ -541,13 +541,13 @@ static void cl4_prof_process_queues(CL4Prof* prof, GError** err) {
 	gpointer cq;
 	
 	/* Iterate over the command queues. */
-	g_hash_table_iter_init(&iter, prof->cqueues);
+	g_hash_table_iter_init(&iter, prof->queues);
 	while (g_hash_table_iter_next(&iter, &cq_name, &cq)) {
 		
 		/* Iterate over the events in current command queue. */
 		CL4Event* evt;
-		cl4_cqueue_iter_event_init((CL4CQueue*) cq);
-		while ((evt = cl4_cqueue_iter_event_next((CL4CQueue*) cq))) {
+		cl4_queue_iter_event_init((CL4Queue*) cq);
+		while ((evt = cl4_queue_iter_event_next((CL4Queue*) cq))) {
 
 			/* Add event for profiling. */
 			cl4_prof_add_event(prof, (const char*) cq_name, evt, err);
@@ -877,8 +877,8 @@ void cl4_prof_destroy(CL4Prof* prof) {
 		g_hash_table_destroy(prof->event_name_ids);
 		
 	/* Destroy table of command queue wrappers. */
-	if (prof->cqueues != NULL)
-		g_hash_table_destroy(prof->cqueues);
+	if (prof->queues != NULL)
+		g_hash_table_destroy(prof->queues);
 	
 	/* Destroy list of all event instants. */
 	if (prof->instants != NULL)
@@ -965,7 +965,7 @@ double cl4_prof_time_elapsed(CL4Prof* prof) {
  * @param cq Command queue wrapper object.
  * */
 void cl4_prof_add_queue(
-	CL4Prof* prof, const char* cq_name, CL4CQueue* cq) {
+	CL4Prof* prof, const char* cq_name, CL4Queue* cq) {
 	
 	/* Make sure profile is not NULL. */
 	g_return_if_fail(prof != NULL);
@@ -975,22 +975,22 @@ void cl4_prof_add_queue(
 	g_return_if_fail(prof->calc == FALSE);
 	
 	/* Check if table needs to be created first. */
-	if (prof->cqueues == NULL) {
-		prof->cqueues = g_hash_table_new_full(
+	if (prof->queues == NULL) {
+		prof->queues = g_hash_table_new_full(
 			g_str_hash, g_direct_equal, NULL, 
-			(GDestroyNotify) cl4_cqueue_destroy);
+			(GDestroyNotify) cl4_queue_destroy);
 	}
 	/* Warn if table already contains a queue with the specified 
 	 * name. */
-	if (g_hash_table_contains(prof->cqueues, cq_name))
+	if (g_hash_table_contains(prof->queues, cq_name))
 		g_warning("Profile object already contains a queue named '%s'." \
 			"The existing queue will be replaced.", cq_name);
 			
 	/* Add queue to queue table. */
-	g_hash_table_replace(prof->cqueues, (gpointer) cq_name, cq);
+	g_hash_table_replace(prof->queues, (gpointer) cq_name, cq);
 	
 	/* Increment queue ref. count. */
-	cl4_cqueue_ref(cq);
+	cl4_queue_ref(cq);
 
 }
 

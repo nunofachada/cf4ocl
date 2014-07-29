@@ -588,7 +588,7 @@ finish:
 }
 
 CL4Event* cl4_program_run(CL4Program* prg, const char* kernel_name,
-	CL4CQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+	CL4Queue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err, ...) {
 
@@ -604,7 +604,7 @@ CL4Event* cl4_program_run(CL4Program* prg, const char* kernel_name,
 }
 
 CL4Event* cl4_program_run_v(CL4Program* prg, const char* kernel_name,
-	CL4CQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
+	CL4Queue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err, va_list args) {
 

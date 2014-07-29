@@ -46,11 +46,11 @@ static void create_add_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Create two command queue wrappers. */
-	CL4CQueue* cq1 = cl4_cqueue_new(
+	CL4Queue* cq1 = cl4_queue_new(
 		ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 	
-	CL4CQueue* cq2 = cl4_cqueue_new(
+	CL4Queue* cq2 = cl4_queue_new(
 		ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 
@@ -60,14 +60,14 @@ static void create_add_destroy_test() {
 	
 	/* Unref cq1, which should not be destroyed because it is held
 	 * by the profile object. */
-	cl4_cqueue_destroy(cq1);
+	cl4_queue_destroy(cq1);
 
 	/* Destroy the profile object, which will also destroy cq1. cq2 
 	 * will me merely unrefed and must still be explicitly destroyed. */
 	cl4_prof_destroy(prof);
 
 	/* Destroy cq2. */
-	cl4_cqueue_destroy(cq2);
+	cl4_queue_destroy(cq2);
 	
 }
 

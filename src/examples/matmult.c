@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
 	/* Program wrapper. */
 	CL4Program* prg = NULL;
 	/* Command queue wrapper. */
-	CL4CQueue* cq = NULL;
+	CL4Queue* cq = NULL;
 	/* Kernel wrapper. */
 	CL4Kernel* krnl = NULL;
 	/* Kernel name */
@@ -302,7 +302,7 @@ int main(int argc, char *argv[]) {
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* Create command queue wrapper. */
-	cq = cl4_cqueue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	cq = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 	
 	/* ********************************** */	
@@ -459,7 +459,7 @@ int main(int argc, char *argv[]) {
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* Finish execution. */
-	cl4_cqueue_finish(cq, &err);
+	cl4_queue_finish(cq, &err);
 	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
 
 	/* ************************************** */
@@ -644,7 +644,7 @@ cleanup:
 	if (matrixB_dev) cl4_buffer_destroy(matrixB_dev);
 	if (matrixA_dev) cl4_buffer_destroy(matrixA_dev);
 	if (prg) cl4_program_destroy(prg);
-	if (cq) cl4_cqueue_destroy(cq);
+	if (cq) cl4_queue_destroy(cq);
 	if (ctx) cl4_context_destroy(ctx);
 
 	/* Free host resources */

@@ -69,7 +69,7 @@ finish:
 
 }
 
-CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
+CL4Event* cl4_buffer_read(CL4Queue* cq, CL4Buffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CL4EventWaitList evt_wait_lst, GError** err) {
 
@@ -84,7 +84,7 @@ CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
 	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
-	ocl_status = clEnqueueReadBuffer(cl4_cqueue_unwrap(cq), 
+	ocl_status = clEnqueueReadBuffer(cl4_queue_unwrap(cq), 
 		cl4_memobj_unwrap(buf), blocking_read, offset, size, ptr,
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
@@ -96,7 +96,7 @@ CL4Event* cl4_buffer_read(CL4CQueue* cq, CL4Buffer* buf,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
@@ -119,7 +119,7 @@ finish:
 
 }
 
-CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
+CL4Event* cl4_buffer_write(CL4Queue* cq, CL4Buffer* buf,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CL4EventWaitList evt_wait_lst, GError** err) {
 
@@ -134,7 +134,7 @@ CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
 	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
-	ocl_status = clEnqueueWriteBuffer(cl4_cqueue_unwrap(cq), 
+	ocl_status = clEnqueueWriteBuffer(cl4_queue_unwrap(cq), 
 		cl4_memobj_unwrap(buf), blocking_write, offset, size, ptr,
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
@@ -146,7 +146,7 @@ CL4Event* cl4_buffer_write(CL4CQueue* cq, CL4Buffer* buf,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
@@ -169,7 +169,7 @@ finish:
 	
 }
 
-void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
+void* cl4_buffer_map(CL4Queue* cq, CL4Buffer* buf,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CL4EventWaitList evt_wait_lst, CL4Event** evt,
 	GError** err) {
@@ -186,7 +186,7 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 	CL4Event* evt_inner = NULL;
 	void* ptr = NULL;
 	
-	ptr = clEnqueueMapBuffer(cl4_cqueue_unwrap(cq), 
+	ptr = clEnqueueMapBuffer(cl4_queue_unwrap(cq), 
 		cl4_memobj_unwrap(buf), blocking_map, map_flags, offset, size,
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
 		cl4_event_wait_list_get_clevents(evt_wait_lst), 
@@ -199,7 +199,7 @@ void* cl4_buffer_map(CL4CQueue* cq, CL4Buffer* buf,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt_inner = cl4_cqueue_produce_event(cq, event);
+	evt_inner = cl4_queue_produce_event(cq, event);
 	if (evt != NULL)
 		*evt = evt_inner;
 	
@@ -225,7 +225,7 @@ finish:
 
 }
 
-CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
+CL4Event* cl4_buffer_copy(CL4Queue* cq, CL4Buffer* src_buf,
 	CL4Buffer* dst_buf, size_t src_offset, size_t dst_offset, 
 	size_t size, CL4EventWaitList evt_wait_lst, GError** err) {
 
@@ -242,7 +242,7 @@ CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
 	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
-	ocl_status = clEnqueueCopyBuffer(cl4_cqueue_unwrap(cq), 
+	ocl_status = clEnqueueCopyBuffer(cl4_queue_unwrap(cq), 
 		cl4_memobj_unwrap(src_buf), cl4_memobj_unwrap(dst_buf),
 		src_offset, dst_offset, size,
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
@@ -255,7 +255,7 @@ CL4Event* cl4_buffer_copy(CL4CQueue* cq, CL4Buffer* src_buf,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
@@ -278,7 +278,7 @@ finish:
 
 }
 	
-CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
+CL4Event* cl4_buffer_copy_to_image(CL4Queue* cq, CL4Buffer* src_buf,
 	CL4Buffer* dst_img, size_t src_offset, const size_t *dst_origin,
 	const size_t *region, CL4EventWaitList evt_wait_lst, GError** err) {
 
@@ -295,7 +295,7 @@ CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
 	cl_event event = NULL;
 	CL4Event* evt = NULL;
 	
-	ocl_status = clEnqueueCopyBufferToImage(cl4_cqueue_unwrap(cq), 
+	ocl_status = clEnqueueCopyBufferToImage(cl4_queue_unwrap(cq), 
 		cl4_memobj_unwrap(src_buf), cl4_memobj_unwrap(dst_img),
 		src_offset, dst_origin, region,
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
@@ -308,7 +308,7 @@ CL4Event* cl4_buffer_copy_to_image(CL4CQueue* cq, CL4Buffer* src_buf,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
@@ -344,7 +344,7 @@ finish:
 //~ 
 //~ }
 //~ 
-//~ CL4Event* cl4_buffer_read_rect(CL4CQueue* cq, CL4Buffer* buf,
+//~ CL4Event* cl4_buffer_read_rect(CL4Queue* cq, CL4Buffer* buf,
 	//~ cl_bool blocking_read, const size_t* buffer_origin,
 	//~ const size_t* host_origin, const size_t* region, 
 	//~ size_t buffer_row_pitch, size_t buffer_slice_pitch, 
@@ -360,7 +360,7 @@ finish:
 //~ 
 //~ }
 //~ 
-//~ CL4Event* cl4_buffer_write_rect(CL4CQueue* cq, CL4Buffer* buf,
+//~ CL4Event* cl4_buffer_write_rect(CL4Queue* cq, CL4Buffer* buf,
 	//~ cl_bool blocking_write, const size_t* buffer_origin,
 	//~ const size_t* host_origin, const size_t* region, 
 	//~ size_t buffer_row_pitch, size_t buffer_slice_pitch, 
@@ -377,7 +377,7 @@ finish:
 //~ 
 //~ }
 //~ 
-//~ CL4Event* cl4_buffer_copy_rect(CL4CQueue* cq, CL4Buffer* src_buf,
+//~ CL4Event* cl4_buffer_copy_rect(CL4Queue* cq, CL4Buffer* src_buf,
 	//~ CL4Buffer* dst_buf, const size_t *src_origin, 
 	//~ const size_t *dst_origin, const size_t *region, 
 	//~ size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
@@ -400,7 +400,7 @@ finish:
 //~ 
 //~ #ifdef CL_VERSION_1_2
 //~ 
-//~ CL4Event* cl4_buffer_fill(CL4CQueue* cq, CL4Buffer* buf, 
+//~ CL4Event* cl4_buffer_fill(CL4Queue* cq, CL4Buffer* buf, 
 	//~ const void *pattern, size_t pattern_size, size_t offset, 
 	//~ size_t size, CL4EventWaitList evt_wait_lst, GError** err) {
 //~ 

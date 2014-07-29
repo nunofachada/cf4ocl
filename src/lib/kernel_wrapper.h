@@ -66,19 +66,19 @@ void cl4_kernel_set_args(CL4Kernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
 void cl4_kernel_set_args_v(CL4Kernel* krnl, va_list args);
 
-CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq, 
+CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4Queue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err);
 
 /** @brief Set kernel arguments and run it. */
-CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq, 
+CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4Queue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
-CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4CQueue* cq, 
+CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err, va_list args);

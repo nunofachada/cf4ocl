@@ -76,7 +76,7 @@ void cl4_memobj_destroy(CL4MemObj* mo) {
 
 }
 
-CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4CQueue* cq, 
+CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4Queue* cq, 
 	void* mapped_ptr, CL4EventWaitList evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
@@ -93,7 +93,7 @@ CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4CQueue* cq,
 	/* Event wrapper. */
 	CL4Event* evt;
 	
-	ocl_status = clEnqueueUnmapMemObject (cl4_cqueue_unwrap(cq),
+	ocl_status = clEnqueueUnmapMemObject (cl4_queue_unwrap(cq),
 		cl4_memobj_unwrap(mo), mapped_ptr, 
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);
@@ -105,7 +105,7 @@ CL4Event* cl4_memobj_unmap(CL4MemObj* mo, CL4CQueue* cq,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
@@ -133,7 +133,7 @@ finish:
 #ifdef CL_VERSION_1_2
 
 CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
- 	CL4CQueue* cq, cl_mem_migration_flags flags, 
+ 	CL4Queue* cq, cl_mem_migration_flags flags, 
  	CL4EventWaitList evt_wait_lst, GError** err) {
 		
 	/* Make sure cq is not NULL. */
@@ -157,7 +157,7 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
 		mem_objects[i] = cl4_memobj_unwrap(mos[i]);
 	}
 	
-	ocl_status = clEnqueueMigrateMemObjects(cl4_cqueue_unwrap(cq),
+	ocl_status = clEnqueueMigrateMemObjects(cl4_queue_unwrap(cq),
 		num_mos, (const cl_mem*) mem_objects, flags,
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
 		cl4_event_wait_list_get_clevents(evt_wait_lst), &event);		
@@ -169,7 +169,7 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);

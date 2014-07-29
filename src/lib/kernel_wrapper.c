@@ -162,7 +162,7 @@ void cl4_kernel_set_args_v(CL4Kernel* krnl, va_list args) {
 	}
 
 }
-CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq, 
+CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4Queue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err) {
@@ -203,7 +203,7 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	}
 		
 	/* Run kernel. */
-	ocl_status = clEnqueueNDRangeKernel(cl4_cqueue_unwrap(cq),
+	ocl_status = clEnqueueNDRangeKernel(cl4_queue_unwrap(cq),
 		cl4_kernel_unwrap(krnl), work_dim, global_work_offset,
 		global_work_size, local_work_size, 
 		cl4_event_wait_list_get_num_events(evt_wait_lst),
@@ -216,7 +216,7 @@ CL4Event* cl4_kernel_run(CL4Kernel* krnl, CL4CQueue* cq,
 	/* Wrap event and associate it with the respective command queue. 
 	 * The event object will be released automatically when the command
 	 * queue is released. */
-	evt = cl4_cqueue_produce_event(cq, event);
+	evt = cl4_queue_produce_event(cq, event);
 	
 	/* Clear event wait list. */
 	cl4_event_wait_list_clear(evt_wait_lst);
@@ -259,7 +259,7 @@ finish:
  * @param ...
  * @return
  * */
-CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq, 
+CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4Queue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err, ...) {
@@ -282,7 +282,7 @@ CL4Event* cl4_kernel_set_args_and_run(CL4Kernel* krnl, CL4CQueue* cq,
 	
 }
 
-CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4CQueue* cq, 
+CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4Queue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CL4EventWaitList evt_wait_lst, GError** err, va_list args) {

@@ -52,7 +52,7 @@ static void operationTest() {
 	/* Aux vars. */
 	CL4Context* ctx;
 	CL4Device* dev;
-	CL4CQueue *q1, *q2, *q3;
+	CL4Queue *q1, *q2, *q3;
 	CL4Event *ev1, *ev2, *ev3, *ev4, *ev5, *ev6, *ev7, *ev8;
 	CL4Buffer* buf;
 	CL4Program* prg;
@@ -70,11 +70,11 @@ static void operationTest() {
 	dev = cl4_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 	
-	q1 = cl4_cqueue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	q1 = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
-	q2 = cl4_cqueue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	q2 = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
-	q3 = cl4_cqueue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	q3 = cl4_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 	
 	buf = cl4_buffer_new(ctx, CL_MEM_READ_ONLY, sizeof(cl_int) * 100, NULL, &err);
@@ -274,9 +274,9 @@ static void operationTest() {
 	cl4_memobj_destroy(buf);
 	
 	/* Free queue wrappers. */
-	cl4_cqueue_destroy(q3);
-	cl4_cqueue_destroy(q2);
-	cl4_cqueue_destroy(q1);
+	cl4_queue_destroy(q3);
+	cl4_queue_destroy(q2);
+	cl4_queue_destroy(q1);
 	
 	/* Free context. */
 	cl4_context_destroy(ctx);
