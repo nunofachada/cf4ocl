@@ -72,7 +72,7 @@ static void context_create_info_destroy_test() {
 	gboolean any_device;
 	
 	/* 
-	 * 1. Test context creation from cl_devices. 
+	 * 1. Test context creation from devices. 
 	 * */
 	 
 	/* Get platforms object. */
@@ -90,8 +90,8 @@ static void context_create_info_destroy_test() {
 	/* Unwrap cl_device_id from device wrapper object. */
 	d_id = ccl_device_unwrap(d);
 	
-	/* Create a context from this cl_device_id. */
-	ctx = ccl_context_new_from_cldevices(1, &d_id, &err);
+	/* Create a context from the device. */
+	ctx = ccl_context_new_from_devices(1, &d, &err);
 	g_assert_no_error(err);
 	
 	/* Get number of devices from context wrapper, check that this
@@ -335,7 +335,6 @@ static void context_ref_unref_test() {
 	CCLPlatforms* ps = NULL;
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
-	cl_device_id d_id = NULL;
 	CCLDevSelFilters filters = NULL;
 	
 	/* Test context creating from cl_devices. */
@@ -347,10 +346,8 @@ static void context_ref_unref_test() {
 	
 	d = ccl_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);
-	
-	d_id = ccl_device_unwrap(d);
 		
-	ctx = ccl_context_new_from_cldevices(1, &d_id, &err);
+	ctx = ccl_context_new_from_devices(1, &d, &err);
 	g_assert_no_error(err);
 	
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);

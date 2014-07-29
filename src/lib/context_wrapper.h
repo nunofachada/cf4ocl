@@ -99,25 +99,9 @@ typedef void (CL_CALLBACK* ccl_context_callback)(
  * @return A new context wrapper object.
  * */
 #define ccl_context_new_from_devices(num_devices, devices, err) \
-	ccl_context_new_from_cldevices_full( \
+	ccl_context_new_from_devices_full( \
 		NULL, (num_devices), (devices), NULL, NULL, (err))
 
-/** 
- * @brief Creates a context wrapper given an array of cl_device_id's.
- * 
- * This macro simply calls ccl_context_new_from_cldevices_full() 
- * setting properties, callback and user data to NULL.
- * 
- * @param num_devices Number of cl_devices_id's in list.
- * @param devices Array of cl_device_id's.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return A new context wrapper object.
- * */
-#define ccl_context_new_from_cldevices(num_devices, devices, err) \
-	ccl_context_new_from_cldevices_full( \
-		NULL, (num_devices), (devices), NULL, NULL, (err))
-		
 /** 
  * @brief Creates a context wrapper for a CPU device.
  * 
@@ -189,16 +173,6 @@ CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, 
 	cl_uint num_devices,
 	CCLDevice** devices,
-	ccl_context_callback pfn_notify,
-    void* user_data,
-    GError** err);
-
-/** @brief Creates a context wrapper using the exact parameters received 
- * by the clCreateContext function. */
-CCLContext* ccl_context_new_from_cldevices_full(
-	const cl_context_properties* properties, 
-	cl_uint num_devices,
-	const cl_device_id* devices,
 	ccl_context_callback pfn_notify,
     void* user_data,
     GError** err);
