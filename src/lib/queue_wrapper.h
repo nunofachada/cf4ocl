@@ -49,10 +49,6 @@
 /** @brief Command queue wrapper object. */
 typedef struct ccl_queue CCLQueue;
 
-CCLQueue* ccl_queue_new_direct(cl_context context, 
-	cl_device_id device, cl_command_queue_properties properties, 
-	GError** err);
-
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err);
 

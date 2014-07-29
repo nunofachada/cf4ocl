@@ -287,7 +287,7 @@ void ccl_context_destroy(CCLContext* ctx);
  * */
 #define ccl_context_get_device(ctx, index, err) \
 	ccl_dev_container_get_device((CCLDevContainer*) ctx, \
-	ccl_context_get_cldevices, index, err)
+		ccl_context_get_cldevices, index, err)
 
 /**
  * @brief Return number of devices in context.
@@ -300,7 +300,7 @@ void ccl_context_destroy(CCLContext* ctx);
  * */
 #define ccl_context_get_num_devices(ctx, err) \
 	ccl_dev_container_get_num_devices((CCLDevContainer*) ctx, \
-	ccl_context_get_cldevices, err)
+		ccl_context_get_cldevices, err)
 
 /** @} */
 

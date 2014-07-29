@@ -74,12 +74,7 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
 
 }
 
-/** 
- * @addtogroup QUEUE_WRAPPER
- * @{
- */
-
-CCLQueue* ccl_queue_new_direct(cl_context context, 
+static CCLQueue* ccl_queue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
 	GError** err) {
 
@@ -124,6 +119,11 @@ finish:
 	return cq;	
 	
 }
+
+/** 
+ * @addtogroup QUEUE_WRAPPER
+ * @{
+ */
 
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err) {
