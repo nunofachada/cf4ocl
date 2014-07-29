@@ -643,17 +643,17 @@ static void cl4_program_load_binaries(CL4Program* prg, GError** err) {
 	cl_int ocl_status;
 	
 	/* Get number of program devices. */
-	info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
+	info = cl4_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);	
 	num_devices = *((cl_uint*) info->value);
 	
 	/* Get program devices. */
-	info = cl4_program_info(prg, CL_PROGRAM_DEVICES, &err_internal);
+	info = cl4_program_get_info(prg, CL_PROGRAM_DEVICES, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	devices = (cl_device_id*) info->value;
 		
 	/* Get binary sizes. */
-	info = cl4_program_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
+	info = cl4_program_get_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	binary_sizes = (size_t*) info->value;
 
@@ -919,6 +919,6 @@ void cl4_program_binary_destroy(CL4ProgramBinary* pbin) {
 CL4WrapperInfo* cl4_program_get_cldevices(
 	CL4DevContainer* devcon, GError** err) {
 
-	return cl4_program_info(devcon, CL_PROGRAM_DEVICES, err);
+	return cl4_program_get_info(devcon, CL_PROGRAM_DEVICES, err);
 }
 

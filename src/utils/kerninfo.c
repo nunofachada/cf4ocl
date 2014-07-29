@@ -104,19 +104,19 @@ int main(int argc, char *argv[])
 	
 	g_printf("\n   ======================== Static Kernel Information =======================\n\n");
 	
-	info = cl4_kernel_workgroup_info(
+	info = cl4_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Maximum workgroup size                  : %lu\n", 
 		(unsigned long) cl4_info_scalar(info, size_t));
 
-	info = cl4_kernel_workgroup_info(
+	info = cl4_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Preferred multiple of workgroup size    : %lu\n", 
 		(unsigned long) cl4_info_scalar(info, size_t));
 		
-	info = cl4_kernel_workgroup_info(
+	info = cl4_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", 
@@ -124,13 +124,13 @@ int main(int argc, char *argv[])
 		(unsigned long) cl4_info_array(info, size_t*)[1], 
 		(unsigned long) cl4_info_array(info, size_t*)[2]);
 		
-	info = cl4_kernel_workgroup_info(
+	info = cl4_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_LOCAL_MEM_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Local memory used by kernel             : %lu bytes\n", 
 		(unsigned long) cl4_info_scalar(info, cl_ulong));
 		
-	info = cl4_kernel_workgroup_info(
+	info = cl4_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PRIVATE_MEM_SIZE, &err);
 	gef_if_err_goto(err, error_handler);
 	g_printf("     Min. private mem. used by each workitem : %lu bytes\n", 

@@ -76,35 +76,127 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4CQueue* cq,
 	CL4EventWaitList evt_wait_lst, GError** err, va_list args);
 
 /**
- * @brief Get kernel information object.
+ * @brief Get a ::CL4WrapperInfo kernel information object.
  * 
  * @param krnl The kernel wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The requested kernel information object. This object will
+ * be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_kernel_info(krnl, param_name, err) \
+#define cl4_kernel_get_info(krnl, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) krnl, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetKernelInfo, CL_TRUE, err)
 
+/** 
+ * @brief Macro which returns a scalar kernel information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param krnl The kernel wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested kernel information value. This value will be 
+ * automatically freed when the kernel wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define cl4_kernel_get_scalar_info(krnl, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetKernelInfo, \
+		CL_TRUE, err))
+
+/** 
+ * @brief Macro which returns an array kernel information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param krnl The kernel wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested kernel information value. This value will be 
+ * automatically freed when the kernel wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define cl4_kernel_get_array_info(krnl, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetKernelInfo, \
+		CL_TRUE, err)
+
 /**
- * @brief Get kernel workgroup information object.
+ * @brief Get a ::CL4WrapperInfo kernel workgroup information object.
  * 
  * @param krnl The kernel wrapper object.
  * @param dev The device wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The requested kernel workgroup information object. This 
+ * object will be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_kernel_workgroup_info(krnl, dev, param_name, err) \
+#define cl4_kernel_get_workgroup_info(krnl, dev, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) krnl, (CL4Wrapper*) dev, \
 		param_name, (cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+		CL_FALSE, err)
+
+/** 
+ * @brief Macro which returns a scalar kernel workgroup information 
+ * value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param krnl The kernel wrapper object.
+ * @param dev The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested kernel workgroup information value. This value 
+ * will be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, zero is returned.
+ * */
+#define cl4_kernel_get_scalar_workgroup_info(krnl, dev, param_name, \
+	param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
+		(CL4Wrapper*) dev, param_name, \
+		(cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+		CL_FALSE, err))
+
+/** 
+ * @brief Macro which returns an array kernel workgroup information 
+ * value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param krnl The kernel wrapper object.
+ * @param dev The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested kernel workgroup information value. This value 
+ * will be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_kernel_get_array_workgroup_info(krnl, dev, param_name, \
+	param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) krnl, \
+		(CL4Wrapper*) dev, param_name, \
+		(cl4_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, err)
 
 /** 

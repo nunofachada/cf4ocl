@@ -235,7 +235,7 @@ static void context_create_info_destroy_test() {
 	
 	/* Check that the device platform corresponds to the expected 
 	 * platform (the one used in the filter). */
-	platf_ref = ccl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
+	platf_ref = cl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err);
 	g_assert_no_error(err);
 	g_assert(platf_ref == platform);
@@ -262,7 +262,7 @@ static void context_create_info_destroy_test() {
 	
 	/* Check that the device platform corresponds to the expected 
 	 * platform (the one which the first device belongs to). */
-	platf_ref = ccl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
+	platf_ref = cl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err);
 	g_assert_no_error(err);
 	
@@ -276,7 +276,7 @@ static void context_create_info_destroy_test() {
 		d = cl4_context_get_device(ctx, i, &err);
 		g_assert_no_error(err);
 		
-		platform = ccl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
+		platform = cl4_device_get_scalar_info(d, CL_DEVICE_PLATFORM,
 			cl_platform_id, &err);
 		g_assert_no_error(err);
 			

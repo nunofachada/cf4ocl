@@ -422,7 +422,7 @@ static void platforms_create_info_destroy_test() {
 					cl4_info_scalar(info, cl_uint));
 
 				/* Special check for info_value_scalar macro. */
-				info_check_scalar = ccl4_device_get_scalar_info(d, CL_DEVICE_VENDOR_ID, cl_uint, &err);
+				info_check_scalar = cl4_device_get_scalar_info(d, CL_DEVICE_VENDOR_ID, cl_uint, &err);
 				g_assert_cmphex(info_check_scalar, ==,
 					cl4_info_scalar(info, cl_uint));
 

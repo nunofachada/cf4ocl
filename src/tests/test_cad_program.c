@@ -83,22 +83,22 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Get some program info, compare it with expected info. */
-	info = cl4_program_info(prg, CL_PROGRAM_CONTEXT, &err);
+	info = cl4_program_get_info(prg, CL_PROGRAM_CONTEXT, &err);
 	g_assert_no_error(err);
 	g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
 
-	info = cl4_program_info(prg, CL_PROGRAM_NUM_DEVICES, &err);
+	info = cl4_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(*((cl_uint*) info->value), 
 		==, cl4_context_get_num_devices(ctx, &err));
 	g_assert_no_error(err);
 
-	info = cl4_program_info(prg, CL_PROGRAM_SOURCE, &err);
+	info = cl4_program_get_info(prg, CL_PROGRAM_SOURCE, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr((char*) info->value, 
 		==, CL4_TEST_PROGRAM_SUM_CONTENT);
 	
-	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	info = cl4_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert_cmpint(*((cl_build_status*) info->value), ==, CL_BUILD_NONE);
 	
@@ -107,12 +107,12 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Get some program build info, compare it with expected values. */
-	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	info = cl4_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
 		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
 
-	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
+	info = cl4_program_get_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
 
 	/* Get kernel wrapper object. */
@@ -121,16 +121,16 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Get some kernel info, compare it with expected info. */
-	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
+	info = cl4_kernel_get_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(
 		(gchar*) info->value, ==, CL4_TEST_PROGRAM_SUM);
 
-	info = cl4_kernel_info(krnl, CL_KERNEL_CONTEXT, &err);
+	info = cl4_kernel_get_info(krnl, CL_KERNEL_CONTEXT, &err);
 	g_assert_no_error(err);
 	g_assert(*((cl_context*) info->value) == cl4_context_unwrap(ctx));
 
-	info = cl4_kernel_info(krnl, CL_KERNEL_PROGRAM, &err);
+	info = cl4_kernel_get_info(krnl, CL_KERNEL_PROGRAM, &err);
 	g_assert_no_error(err);
 	g_assert(*((cl_program*) info->value) == cl4_program_unwrap(prg));
 
@@ -160,12 +160,12 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Get some program build info, compare it with expected values. */
-	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	info = cl4_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
 		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
 
-	info = cl4_program_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
+	info = cl4_program_get_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
 
 	/* Get kernel wrapper object. */
@@ -174,7 +174,7 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Get some kernel info, compare it with expected info. */
-	info = cl4_kernel_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
+	info = cl4_kernel_get_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(
 		(gchar*) info->value, ==, CL4_TEST_PROGRAM_SUM);

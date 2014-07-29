@@ -53,19 +53,61 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
 #endif
 
 /**
- * @brief Get cl_mem information object.
+ * @brief Get a ::CL4WrapperInfo memory object information object.
  * 
- * @param mo The cl_mem wrapper object.
+ * @param mo The memory object wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The requested memory object information object. This object will
+ * be automatically freed when the memory object wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_memobj_info(mo, param_name, err) \
+#define cl4_memobj_get_info(mo, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) mo, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetMemObjectInfo, CL_FALSE, err)
+		(cl4_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err)
+
+/** 
+ * @brief Macro which returns a scalar memory object information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param mo The memory object wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested memory object information value. This value will be 
+ * automatically freed when the memory object wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define cl4_memobj_get_scalar_info(mo, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) mo, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetMemObjectInfo, \
+		CL_TRUE, err))
+
+/** 
+ * @brief Macro which returns an array memory object information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param mo The memory object wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested memory object information value. This value will be 
+ * automatically freed when the memory object wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define cl4_memobj_get_array_info(mo, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) mo, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetMemObjectInfo, \
+		CL_TRUE, err)
 
 /** 
  * @brief Increase the reference count of the cl_mem wrapper object.

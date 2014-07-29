@@ -147,41 +147,140 @@ cl_bool cl4_program_save_all_binaries(CL4Program* prg,
 	const char* file_prefix, const char* file_suffix, GError** err);
 
 /**
- * @brief Get program information object. To get the program binaries
- * use the cl4_program_get_binary() function instead, as this macro will
- * return NULL when the CL_PROGRAM_BINARIES parameter is requested.
+ * @brief Get a ::CL4WrapperInfo program information object. To get the 
+ * program binaries use the ::cl4_program_get_binary() function instead, 
+ * as this macro will return NULL when the CL_PROGRAM_BINARIES parameter 
+ * is requested.
  * 
  * @param prg The program wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs or if the CL_PROGRAM_BINARIES parameter is requested, NULL is 
- * returned.
+ * @return The requested program information object. This object will
+ * be automatically freed when the program wrapper object is 
+ * destroyed.  If an error occurs or if the CL_PROGRAM_BINARIES 
+ * parameter is requested, NULL is returned.
  * */
-#define cl4_program_info(prg, param_name, err) \
+#define cl4_program_get_info(prg, param_name, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
 	: cl4_wrapper_get_info((CL4Wrapper*) prg, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
-/**
- * @brief Get program build information object.
+/** 
+ * @brief Macro which returns a scalar program information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
  * 
  * @param prg The program wrapper object.
- * @param dev The device wrapper object to which to build refers to.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested program information value. This value will be 
+ * automatically freed when the program wrapper object is destroyed. 
+ * If an error occurs or if the CL_PROGRAM_BINARIES parameter is 
+ * requested, zero is returned.
+ * */
+#define cl4_program_get_scalar_info(prg, param_name, param_type, err) \
+	(param_name == CL_PROGRAM_BINARIES) \
+	? (param_type) 0 \
+	: *((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetProgramInfo, \
+		CL_TRUE, err))
+
+/** 
+ * @brief Macro which returns an array program information value. To get 
+ * the program binaries use the ::cl4_program_get_binary() function 
+ * instead, as this macro will return NULL when the CL_PROGRAM_BINARIES 
+ * parameter is requested.
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param prg The program wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested program information value. This value will be 
+ * automatically freed when the program wrapper object is destroyed. 
+ * If an error occurs or if the CL_PROGRAM_BINARIES parameter is 
+ * requested, NULL is returned.
+ * */
+#define cl4_program_get_array_info(prg, param_name, param_type, err) \
+	(param_name == CL_PROGRAM_BINARIES) \
+	? NULL \
+	: (param_type) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetProgramInfo, \
+		CL_TRUE, err)
+
+/**
+ * @brief Get a ::CL4WrapperInfo program build information object.
+ * 
+ * @param prg The program wrapper object.
+ * @param dev The device wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The reque
+ * sted program build information object. This object will be 
+ * automatically freed when the program wrapper object is destroyed. If 
+ * an error occurs, NULL is returned.
  * */
-#define cl4_program_build_info(prg, dev, param_name, err) \
+#define cl4_program_get_build_info(prg, dev, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) prg, (CL4Wrapper*) dev, \
 		param_name, (cl4_wrapper_info_fp) clGetProgramBuildInfo, \
 		CL_FALSE, err)
+
+/** 
+ * @brief Macro which returns a scalar program build information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param prg The program wrapper object.
+ * @param dev The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested program build information value. This value 
+ * will be automatically freed when the program wrapper object is 
+ * destroyed. If an error occurs, zero is returned.
+ * */
+#define cl4_program_get_scalar_build_info(prg, dev, param_name, \
+	param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
+		(CL4Wrapper*) dev, param_name, \
+		(cl4_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err))
+
+/** 
+ * @brief Macro which returns an array program build information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param prg The program wrapper object.
+ * @param dev The device wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested program build information value. This value 
+ * will be automatically freed when the program wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_program_get_array_build_info(prg, dev, param_name, \
+	param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) prg, \
+		(CL4Wrapper*) dev, param_name, \
+		(cl4_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err)
 
 /** 
  * @brief Increase the reference count of the program object.

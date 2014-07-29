@@ -52,34 +52,118 @@ cl_command_type cl4_event_get_command_type(
 	CL4Event* evt, GError** err);
 
 /**
- * @brief Get event information object.
+ * @brief Get a ::CL4WrapperInfo event information object.
  * 
  * @param evt The event wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The requested event information object. This object will
+ * be automatically freed when the event wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_event_info(evt, param_name, err) \
+#define cl4_event_get_info(evt, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) evt, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetEventInfo, CL_FALSE, err)
 
+/** 
+ * @brief Macro which returns a scalar event information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param evt The event wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested event information value. This value will be 
+ * automatically freed when the event wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define cl4_event_get_scalar_info(evt, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) evt, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetEventInfo, \
+		CL_FALSE, err))
+
+/** 
+ * @brief Macro which returns an array event information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param evt The event wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested event information value. This value will be 
+ * automatically freed when the event wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define cl4_event_get_array_info(evt, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) evt, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetEventInfo, \
+		CL_FALSE, err)
+
 /**
- * @brief Get event profiling information object.
+ * @brief Get a ::CL4WrapperInfo event profiling information object.
  * 
  * @param evt The event wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The requested event profiling information object. This object
+ * will be automatically freed when the event wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
 #define cl4_event_get_profiling_info(evt, param_name, err) \
 	cl4_wrapper_get_info((CL4Wrapper*) evt, NULL, param_name, \
-	(cl4_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err)
+		(cl4_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err)
+
+/** 
+ * @brief Macro which returns a scalar event profiling information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param evt The event wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested event profiling information value. This value 
+ * will be automatically freed when the event wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define cl4_event_get_scalar_profiling_info(evt, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) evt, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetEventProfilingInfo, \
+		CL_FALSE, err))
+
+/** 
+ * @brief Macro which returns an array event profiling information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param evt The event wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested event profiling information value. This value 
+ * will be automatically freed when the event wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_event_get_array_profiling_info(evt, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) evt, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetEventProfilingInfo, \
+		CL_FALSE, err)
 
 /** 
  * @brief Increase the reference count of the event object.

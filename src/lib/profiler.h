@@ -165,8 +165,8 @@ typedef struct cl4_prof_inst {
 	/** Event instant in nanoseconds from current device time counter. */
 	cl_ulong instant;
 	/** Type of event instant 
-	 * (::CL4ProfInstType#CL4_PROF_INST_TYPE_START or 
-	 * ::CL4ProfInstType#CL4_PROF_INST_TYPE_END). */
+	 * (CL4ProfInstType::CL4_PROF_INST_TYPE_START or 
+	 * CL4ProfInstType::CL4_PROF_INST_TYPE_END). */
 	CL4ProfInstType type;
 
 } CL4ProfInst;
@@ -198,7 +198,7 @@ typedef struct cl4_prof_overlap {
 } CL4ProfOverlap;
 
 /**
- * @brief Sort criteria for overlaps (::CL4ProfOverlaps).
+ * @brief Sort criteria for overlaps (::CL4ProfOverlap).
  */
 typedef enum {
 	

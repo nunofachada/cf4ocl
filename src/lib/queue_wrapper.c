@@ -221,7 +221,7 @@ CL4Context* cl4_cqueue_get_context(CL4CQueue* cq, GError** err) {
 		ctx = cq->ctx;
 	} else {
 		CL4WrapperInfo* info = NULL;
-		info = cl4_cqueue_info(
+		info = cl4_cqueue_get_info(
 			cq, CL_QUEUE_CONTEXT, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		ctx = cl4_context_new_wrap(*((cl_context*) info->value));
@@ -260,7 +260,7 @@ CL4Device* cl4_cqueue_get_device(CL4CQueue* cq, GError** err) {
 		dev = cq->dev;
 	} else {
 		CL4WrapperInfo* info = NULL;
-		info = cl4_cqueue_info(
+		info = cl4_cqueue_get_info(
 			cq, CL_QUEUE_DEVICE, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		dev = cl4_device_new_wrap(*((cl_device_id*) info->value));

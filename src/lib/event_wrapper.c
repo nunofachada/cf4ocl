@@ -268,7 +268,7 @@ cl_command_type cl4_event_get_command_type(
 
 	/* Determine the command type. */
 	CL4WrapperInfo* info = 
-		cl4_event_info(evt, CL_EVENT_COMMAND_TYPE, err);
+		cl4_event_get_info(evt, CL_EVENT_COMMAND_TYPE, err);
 	
 	if (info == NULL) {
 		/* Some error ocurred, return 0. */

@@ -57,20 +57,77 @@ CL4Platform* cl4_platform_new_wrap(cl_platform_id platform);
 void cl4_platform_destroy(CL4Platform* platf);
 
 /**
- * @brief Get platform information value.
+ * @brief Get a ::CL4WrapperInfo platform information object.
  * 
- * @param platform The platform wrapper object.
+ * @param platf The platform wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested platform information value. This information 
+ * @return The requested platform information object. This object will
+ * be automatically freed when the platform wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define cl4_platform_get_info(platf, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) platf, NULL, param_name, \
+		(cl4_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
+
+/** 
+ * @brief Macro which returns a scalar platform information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param platf The platform wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested platform information value. This value will be 
+ * automatically freed when the platform wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define cl4_platform_get_scalar_info(platf, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) platf, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, \
+		CL_TRUE, err))
+
+/** 
+ * @brief Macro which returns an array platform information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param platf The platform wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested platform information value. This value will be 
+ * automatically freed when the platform wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define cl4_platform_get_array_info(platf, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) platf, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, \
+		CL_TRUE, err)
+
+/**
+ * @brief Helper macro which gets a platform information string. This 
+ * macro simply wraps the cl4_platform_get_array_info() macro, because
+ * (as of OpenCL 2.0) all platform information return types are char*.
+ * 
+ * @param platf The platform wrapper object.
+ * @param param_name Name of information/parameter to get.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested platform information string. This information 
  * will be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_platform_get_info_string(platform, param_name, err) \
-	((gchar*) cl4_wrapper_get_info_value((CL4Wrapper*) platform, NULL, \
-		param_name, (cl4_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, \
-		err))
+#define cl4_platform_get_info_string(platf, param_name, err) \
+	cl4_platform_get_array_info(platf, param_name, char*, err)
 
 /** 
  * @brief Increase the reference count of the platform wrapper object.

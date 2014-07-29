@@ -540,6 +540,9 @@ CL4DevSelDevices cl4_devsel_select(
 	/* Cycle through all filters. */
 	for (guint i = 0; i < (*filters)->len; i++) {
 		
+		/* If there are no more devices left, get out... */
+		if (devices->len == 0) break;
+		
 		/* Get current filter. */
 		CL4DevSelFilter* curr_filter = g_ptr_array_index(*filters, i);
 		
@@ -639,7 +642,7 @@ gboolean cl4_devsel_indep_type(
 	cl_device_type type_to_check = *((cl_device_type*) data);
 	
 	/* Get device type. */
-	cl_device_type type = ccl4_device_get_scalar_info(
+	cl_device_type type = cl4_device_get_scalar_info(
 		dev, CL_DEVICE_TYPE, cl_device_type, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -872,7 +875,7 @@ gboolean cl4_devsel_indep_platform(
 		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get device platform. */
-	platf = ccl4_device_get_scalar_info(device, CL_DEVICE_PLATFORM,
+	platf = cl4_device_get_scalar_info(device, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
@@ -931,7 +934,7 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 	dev = (CL4Device*) g_ptr_array_index(devices, 0);
 	
 	/* Determine reference platform (i.e. platform of first device). */
-	platf_ref = ccl4_device_get_scalar_info(dev, CL_DEVICE_PLATFORM,
+	platf_ref = cl4_device_get_scalar_info(dev, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
@@ -943,7 +946,7 @@ CL4DevSelDevices cl4_devsel_dep_platform(
 		dev = (CL4Device*) g_ptr_array_index(devices, i);
 		
 		/* Get current device platform. */
-		platf_curr = ccl4_device_get_scalar_info(
+		platf_curr = cl4_device_get_scalar_info(
 			dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 

@@ -224,7 +224,7 @@ void cl4_context_destroy(CL4Context* ctx);
 /**
  * @brief Get a ::CL4WrapperInfo context information object.
  * 
- * @param context The context wrapper object.
+ * @param ctx The context wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
@@ -232,8 +232,8 @@ void cl4_context_destroy(CL4Context* ctx);
  * be automatically freed when the context wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_context_get_info(context, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) context, NULL, param_name, \
+#define cl4_context_get_info(ctx, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) ctx, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
 
 /** 
@@ -243,7 +243,7 @@ void cl4_context_destroy(CL4Context* ctx);
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param context The context wrapper object.
+ * @param ctx The context wrapper object.
  * @param param_name Name of information/parameter to get value of.
  * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
  * @param err Return location for a GError, or NULL if error reporting
@@ -252,13 +252,10 @@ void cl4_context_destroy(CL4Context* ctx);
  * automatically freed when the context wrapper object is destroyed. 
  * If an error occurs, zero is returned.
  * */
-#define ccl4_context_get_scalar_info(context, param_name, param_type, err) \
-	(cl4_wrapper_get_info_value((CL4Wrapper*) context, NULL, param_name, \
-		(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err) != NULL \
-		? *((param_type*) (cl4_wrapper_get_info_value( \
-				(CL4Wrapper*) context, NULL, param_name, \
-				(cl4_wrapper_info_fp) clGetContextInfo, CL_TRUE, err))) \
-		: 0)
+#define cl4_context_get_scalar_info(ctx, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) ctx, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetContextInfo, \
+		CL_TRUE, err))
 
 /** 
  * @brief Macro which returns an array context information value. 
@@ -267,7 +264,7 @@ void cl4_context_destroy(CL4Context* ctx);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param context The context wrapper object.
+ * @param ctx The context wrapper object.
  * @param param_name Name of information/parameter to get value of.
  * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
  * @param err Return location for a GError, or NULL if error reporting
@@ -276,11 +273,10 @@ void cl4_context_destroy(CL4Context* ctx);
  * automatically freed when the context wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
  * */
-#define cl4_context_get_array_info(context, param_name, param_type, err) \
-	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) context, \
+#define cl4_context_get_array_info(ctx, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) ctx, \
 		NULL, param_name, (cl4_wrapper_info_fp) clGetContextInfo, \
 		CL_TRUE, err)
-
 /** 
  * @brief Increase the reference count of the context wrapper object.
  * 

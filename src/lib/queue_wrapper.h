@@ -69,19 +69,61 @@ cl_int cl4_cqueue_flush(CL4CQueue* cq, GError** err);
 cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
 
 /**
- * @brief Get command queue information object.
+ * @brief Get a ::CL4WrapperInfo command queue information object.
  * 
- * @param queue The command queue wrapper object.
+ * @param cq The command queue wrapper object.
  * @param param_name Name of information/parameter to get.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return The requested information object. This object will be 
- * automatically freed when the wrapper object is destroyed. If an error 
- * occurs, NULL is returned.
+ * @return The requested command queue information object. This object will
+ * be automatically freed when the command queue wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
-#define cl4_cqueue_info(queue, param_name, err) \
-	cl4_wrapper_get_info((CL4Wrapper*) queue, NULL, param_name, \
+#define cl4_cqueue_get_info(cq, param_name, err) \
+	cl4_wrapper_get_info((CL4Wrapper*) cq, NULL, param_name, \
 		(cl4_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
+
+/** 
+ * @brief Macro which returns a scalar command queue information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param cq The command queue wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested command queue information value. This value will be 
+ * automatically freed when the command queue wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define cl4_cqueue_get_scalar_info(cq, param_name, param_type, err) \
+	*((param_type*) cl4_wrapper_get_info_value((CL4Wrapper*) cq, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetCommandQueueInfo, \
+		CL_TRUE, err))
+
+/** 
+ * @brief Macro which returns an array command queue information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @param cq The command queue wrapper object.
+ * @param param_name Name of information/parameter to get value of.
+ * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The requested command queue information value. This value will be 
+ * automatically freed when the command queue wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define cl4_cqueue_get_array_info(cq, param_name, param_type, err) \
+	(param_type) cl4_wrapper_get_info_value((CL4Wrapper*) cq, \
+		NULL, param_name, (cl4_wrapper_info_fp) clGetCommandQueueInfo, \
+		CL_TRUE, err)
 
 /** 
  * @brief Increase the reference count of the command queue object.
