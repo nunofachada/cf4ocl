@@ -28,7 +28,19 @@
 #ifndef CL4_ERRORS_H
 #define CL4_ERRORS_H
 
+/**
+ * @defgroup ERRORS Errors
+ *
+ * @brief Readable OpenCL error codes.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** @brief Convert OpenCL error code to a readable string. */
 const char* cl4_err(int code);
+
+/** @} */
 
 #endif

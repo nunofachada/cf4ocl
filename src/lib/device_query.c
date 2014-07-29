@@ -340,6 +340,11 @@ static gchar* cl4_devquery_format_queueprop(CL4WrapperInfo* info,
 //~ }
 
 /** 
+ * @addtogroup DEVICE_QUERY
+ * @{
+ */
+
+/** 
  * @brief Size of parameter information map. 
  * */
 const gint cl4_devquery_info_map_size = 96;
@@ -907,3 +912,5 @@ const CL4DevQueryMap* cl4_devquery_match(gchar* substr, gint* idx) {
 	return info_row;
 	
 }
+
+/** @} */

@@ -27,6 +27,10 @@
 
 #include "buffer_wrapper.h"
 
+/** 
+ * @addtogroup BUFFER_WRAPPER
+ * @{
+ */
 
 /** @brief Create a ::CL4Buffer wrapper object. */
 CL4Buffer* cl4_buffer_new(CL4Context* ctx, cl_mem_flags flags,
@@ -411,3 +415,5 @@ finish:
 //~ }
 //~ 
 //~ #endif
+
+/** @} */

@@ -37,7 +37,7 @@
 #include "queue_wrapper.h"
 
 /**
- * @defgroup PROFILER The profiler module.
+ * @defgroup PROFILER Profiler
  *
  * @brief The profiler module provides classes and methods for
  * profiling wrapped OpenCL events and queues.

@@ -375,6 +375,11 @@ finish:
 }
 
 /** 
+ * @addtogroup DEVICE_SELECTOR
+ * @{
+ */
+
+/** 
  * @brief Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the system.
  * 
@@ -608,6 +613,11 @@ finish:
 	return devices;
 
 }
+
+/** 
+ * @addtogroup DEVICE_SELECTOR_INDEP_FILTERS
+ * @{
+ */
 
 /**
  * @brief Independent filter function which accepts devices of the type
@@ -900,6 +910,13 @@ finish:
 	return pass;
 }
 
+/** @} */
+
+/** 
+ * @addtogroup DEVICE_SELECTOR_DEP_FILTERS
+ * @{
+ */
+
 /**
  * @brief Dependent filter function which only accepts devices of the
  * same platform (the platform to which the first device belong to).
@@ -1053,4 +1070,7 @@ finish:
 	return devices;
 }
 
+/** @} */
+
+/** @} */
 

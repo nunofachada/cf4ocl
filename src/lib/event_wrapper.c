@@ -45,30 +45,10 @@ struct cl4_event {
 	
 };
 
-/**
- * @brief Get the event wrapper for the given OpenCL event.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to wrap the OpenCL event directly.
- * 
- * @param event The OpenCL event to be wrapped.
- * @return The event wrapper for the given OpenCL event.
- * */
-CL4Event* cl4_event_new_wrap(cl_event event) {
-	
-	CL4Event* evt = (CL4Event*) cl4_wrapper_new(
-		(void*) event, sizeof(CL4Event));
-	
-	evt->name = NULL;
-	evt->final_name = NULL;
-	
-	return evt;
-		
-}
+/** 
+ * @addtogroup EVENT_WRAPPER
+ * @{
+ */
 
 /** 
  * @brief Decrements the reference count of the event wrapper object. 
@@ -281,7 +261,12 @@ cl_command_type cl4_event_get_command_type(
 	/* Return the command type. */
 	return ct;
 }
-			
+
+/** 
+ * @addtogroup EVENT_WAIT_LIST
+ * @{
+ */
+ 
 cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
@@ -313,4 +298,33 @@ finish:
 	/* Return event. */
 	return ocl_status;
 
+}
+
+/** @} */
+
+/** @} */
+
+/**
+ * @brief Get the event wrapper for the given OpenCL event.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to wrap the OpenCL event directly.
+ * 
+ * @param event The OpenCL event to be wrapped.
+ * @return The event wrapper for the given OpenCL event.
+ * */
+CL4Event* cl4_event_new_wrap(cl_event event) {
+	
+	CL4Event* evt = (CL4Event*) cl4_wrapper_new(
+		(void*) event, sizeof(CL4Event));
+	
+	evt->name = NULL;
+	evt->final_name = NULL;
+	
+	return evt;
+		
 }

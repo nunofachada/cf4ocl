@@ -88,7 +88,7 @@ static void cl4_program_release_fields(CL4Program* prg) {
 }
 
 /** 
- * @addtogroup PROGRAM
+ * @addtogroup PROGRAM_WRAPPER
  * @{
  */
 

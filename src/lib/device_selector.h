@@ -18,7 +18,7 @@
 
 /**
  * @file
- * @brief Functions for filtering and selecting OpenCL devices.
+ * @brief Functions for filtering and selecting OpenCL devices
  *
  * @author Nuno Fachada
  * @date 2014
@@ -32,6 +32,17 @@
 #include "oclversions.h"
 #include "device_wrapper.h"
 #include "platforms.h"
+
+/**
+ * @defgroup DEVICE_SELECTOR Device selector
+ *
+ * @brief This module provides objects and functions for selecting
+ * OpenCL devices for context creation.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
 
 /** @brief A set of device wrappers, used between filtering steps. */
 typedef GPtrArray* CL4DevSelDevices;
@@ -104,7 +115,7 @@ CL4DevSelDevices cl4_devsel_select(
 	CL4DevSelFilters* filters, GError **err);
 
 /**
- * @defgroup CL4_DEVSEL_INDEP_FILTERS Independent filters.
+ * @defgroup DEVICE_SELECTOR_INDEP_FILTERS Independent filters
  *
  * @{
  */
@@ -140,7 +151,7 @@ gboolean cl4_devsel_indep_platform(
 /** @} */
 
 /**
- * @defgroup CL4_DEVSEL_DEP_FILTERS Dependent filters.
+ * @defgroup DEVICE_SELECTOR_DEP_FILTERS Dependent filters
  *
  * @{
  */
@@ -154,6 +165,8 @@ CL4DevSelDevices cl4_devsel_dep_platform(
  * allowing him to select the desired device. */
 CL4DevSelDevices cl4_devsel_dep_menu(
 	CL4DevSelDevices devices, void *data, GError **err);
+
+/** @} */
 
 /** @} */
 

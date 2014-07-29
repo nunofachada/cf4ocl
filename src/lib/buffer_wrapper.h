@@ -30,6 +30,17 @@
 
 #include "memobj_wrapper.h"
 
+/**
+ * @defgroup BUFFER_WRAPPER Buffer wrapper
+ *
+ * @brief A wrapper object for OpenCL buffers and functions to manage 
+ * them.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** @brief Buffer wrapper object. */
 typedef CL4MemObj CL4Buffer;
 
@@ -97,6 +108,8 @@ CL4Event* cl4_buffer_fill(CL4CQueue* cq, CL4Buffer* buf,
 
 /// @todo We can emulate the OpenCL>1.0 functions if not available in
 /// OpenCL
+
+/** @} */
 
 #endif
 

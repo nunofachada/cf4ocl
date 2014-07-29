@@ -39,7 +39,7 @@ struct cl4_platform {
 };
 
 /** 
- * @addtogroup PLATFORM
+ * @addtogroup PLATFORM_WRAPPER
  * @{
  */
 

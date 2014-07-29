@@ -30,6 +30,16 @@
 
 #include "memobj_wrapper.h"
 
+/**
+ * @defgroup IMAGE_WRAPPER Image wrapper
+ *
+ * @brief A wrapper for handling images in OpenCL.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** @brief Image wrapper object. */
 typedef CL4MemObj CL4Image;
 
@@ -49,6 +59,8 @@ typedef CL4MemObj CL4Image;
 
 /// @todo We can emulate the OpenCL>1.0 functions if not available in
 /// OpenCL
+
+/** @} */
 
 #endif
 

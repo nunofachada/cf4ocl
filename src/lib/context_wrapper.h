@@ -38,25 +38,23 @@
 #include "abstract_dev_container_wrapper.h"
 
 /**
- * @defgroup CONTEXT The context wrapper module.
+ * @defgroup CONTEXT_WRAPPER Context wrapper
  *
  * @brief A wrapper object for OpenCL contexts and functions to manage 
- * it.
+ * them.
  * 
- * Todo: detailed description of module.
+ * Todo: detailed description of module with code examples.
  * 
  * @{
  */
  
 /**
  * @brief The context wrapper object wraps the OpenCL context and 
- * associated devices. Should be managed with the @ref CONTEXT "context module" 
- * group of functions and macros.
+ * associated devices. Should be managed with the 
+ * @ref CONTEXT_WRAPPER "context wrapper module" group of functions and 
+ * macros.
  * */
 typedef struct cl4_context CL4Context;
-
-/** @brief Get the context wrapper for the given OpenCL context. */
-CL4Context* cl4_context_new_wrap(cl_context context);
 
 /** 
  * @brief A callback function used by the OpenCL implementation to 
@@ -331,6 +329,9 @@ void cl4_context_destroy(CL4Context* ctx);
 	cl4_context_get_cldevices, err)
 
 /** @} */
+
+/** @brief Get the context wrapper for the given OpenCL context. */
+CL4Context* cl4_context_new_wrap(cl_context context);
 
 /** @brief Implementation of cl4_dev_container_get_cldevices() for the
  * context wrapper. */

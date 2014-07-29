@@ -35,6 +35,16 @@
 #include "errors.h"
 
 /**
+ * @defgroup PLATFORMS Platforms
+ *
+ * @brief Objects and functions for managing sets of OpenCL platforms.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
+/**
  * @brief Object which contains the list of OpenCL platforms available
  * in the system.
  */
@@ -54,5 +64,7 @@ guint cl4_platforms_count(CL4Platforms* platforms);
 
 /** @brief Get CL4 platform wrapper object at given index. */
 CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index);
+
+/** @} */
 
 #endif

@@ -27,3 +27,11 @@
 
 #include "image_wrapper.h"
 
+/** 
+ * @addtogroup IMAGE_WRAPPER
+ * @{
+ */
+
+
+/** @} */
+

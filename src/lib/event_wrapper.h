@@ -32,11 +32,19 @@
 #include "oclversions.h"
 #include "abstract_wrapper.h"
 
+/**
+ * @defgroup EVENT_WRAPPER Event wrapper
+ *
+ * @brief A wrapper object for OpenCL events and functions to manage 
+ * them.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** @brief Event wrapper object. */
 typedef struct cl4_event CL4Event;
-
-/** @brief Get the event wrapper for the given OpenCL event. */
-CL4Event* cl4_event_new_wrap(cl_event event);
 
 /** @brief Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed. */
@@ -190,6 +198,16 @@ cl_command_type cl4_event_get_command_type(
 #define cl4_event_unwrap(evt) \
 	((cl_event) cl4_wrapper_unwrap((CL4Wrapper*) evt))
 
+/**
+ * @defgroup EVENT_WAIT_LIST Event wait lists
+ *
+ * @brief Simple management of event wait lists.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 typedef GPtrArray* CL4EventWaitList;
 
 cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err);
@@ -215,6 +233,13 @@ cl_int cl4_event_wait(CL4EventWaitList evt_wait_lst, GError** err);
 	
 #define cl4_event_wait_list_destroy(evt_wait_lst) \
 	g_ptr_array_free(evt_wait_lst, TRUE)
+
+/** @} */
+
+/** @} */
+
+/** @brief Get the event wrapper for the given OpenCL event. */
+CL4Event* cl4_event_new_wrap(cl_event event);
 
 #endif
 

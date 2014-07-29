@@ -59,41 +59,10 @@ static void cl4_kernel_release_fields(CL4Kernel* krnl) {
 
 }
 
-/**
- * @brief Get the kernel wrapper for the given OpenCL kernel.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL kernel directly (using the
- * clCreateKernel() function) and then wrap the OpenCL kernel in a 
- * ::CL4Kernel wrapper object.
- * 
- * @param kernel The OpenCL kernel to be wrapped.
- * @return The ::CL4Kernel wrapper for the given OpenCL kernel.
- * */
-CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel) {
-	
-	return (CL4Kernel*) cl4_wrapper_new(
-		(void*) kernel, sizeof(CL4Kernel));
-		
-}
-
 /** 
- * @brief Decrements the reference count of the kernel wrapper object. 
- * If it reaches 0, the kernel wrapper object is destroyed.
- *
- * @param krnl The kernel wrapper object.
- * */
-void cl4_kernel_destroy(CL4Kernel* krnl) {
-	
-	cl4_wrapper_unref((CL4Wrapper*) krnl, sizeof(CL4Kernel),
-		(cl4_wrapper_release_fields) cl4_kernel_release_fields, 
-		(cl4_wrapper_release_cl_object) clReleaseKernel, NULL); 
-
-}
+ * @addtogroup KERNEL_WRAPPER
+ * @{
+ */
 
 CL4Kernel* cl4_kernel_new(
 	CL4Program* prg, const char* kernel_name, GError** err) {
@@ -143,6 +112,20 @@ finish:
 	/* Return kernel wrapper. */
 	return krnl;
 		
+}
+
+/** 
+ * @brief Decrements the reference count of the kernel wrapper object. 
+ * If it reaches 0, the kernel wrapper object is destroyed.
+ *
+ * @param krnl The kernel wrapper object.
+ * */
+void cl4_kernel_destroy(CL4Kernel* krnl) {
+	
+	cl4_wrapper_unref((CL4Wrapper*) krnl, sizeof(CL4Kernel),
+		(cl4_wrapper_release_fields) cl4_kernel_release_fields, 
+		(cl4_wrapper_release_cl_object) clReleaseKernel, NULL); 
+
 }
 
 void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
@@ -337,4 +320,28 @@ finish:
 	/* Return event wrapper. */
 	return evt;
 	
+}
+
+/** @} */
+
+/**
+ * @brief Get the kernel wrapper for the given OpenCL kernel.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL kernel directly (using the
+ * clCreateKernel() function) and then wrap the OpenCL kernel in a 
+ * ::CL4Kernel wrapper object.
+ * 
+ * @param kernel The OpenCL kernel to be wrapped.
+ * @return The ::CL4Kernel wrapper for the given OpenCL kernel.
+ * */
+CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel) {
+	
+	return (CL4Kernel*) cl4_wrapper_new(
+		(void*) kernel, sizeof(CL4Kernel));
+		
 }

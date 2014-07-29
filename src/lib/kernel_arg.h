@@ -31,6 +31,17 @@
 #include "common.h"
 #include "abstract_wrapper.h"
 
+/**
+ * @defgroup KERNEL_ARG Kernel argument wrappers
+ * @ingroup KERNEL_WRAPPER
+ *
+ * @brief Wrapper objects for OpenCL kernel arguments.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 typedef CL4Wrapper CL4Arg;
 
 #define cl4_arg_private(value, type) \
@@ -46,5 +57,7 @@ void cl4_arg_destroy(CL4Arg* arg);
 size_t cl4_arg_size(CL4Arg* arg);
 
 void* cl4_arg_value(CL4Arg* arg);
+
+/** @} */
 
 #endif

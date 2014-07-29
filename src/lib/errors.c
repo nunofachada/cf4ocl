@@ -100,6 +100,11 @@ static const char* cl4_errors[] = {
 };
 
 /** 
+ * @addtogroup ERRORS
+ * @{
+ */
+
+/** 
  * @brief Convert OpenCL error code to a readable string.
  * 
  * @param code OpenCL error code.
@@ -108,3 +113,5 @@ static const char* cl4_errors[] = {
 const char* cl4_err(int code) {
 	return cl4_errors[-1 * code];
 }
+
+/** @} */

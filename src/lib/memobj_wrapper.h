@@ -32,10 +32,18 @@
 #ifndef CL4_MEMOBJ_WRAPPER_H
 #define CL4_MEMOBJ_WRAPPER_H
 
-typedef struct cl4_memobj CL4MemObj;
+/**
+ * @defgroup MEMOBJ_WRAPPER Memory object wrapper
+ *
+ * @brief A wrapper object for OpenCL memory objects (buffers and 
+ * images) and functions to manage them.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
 
-/** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
-CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object);
+typedef struct cl4_memobj CL4MemObj;
 
 /** @brief Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed. */
@@ -133,5 +141,10 @@ CL4Event* cl4_memobj_migrate(CL4MemObj** mos, cl_uint num_mos,
  * */
 #define cl4_memobj_unwrap(mo) \
 	((cl_mem) cl4_wrapper_unwrap((CL4Wrapper*) mo))		
+
+/** @} */
+
+/** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
+CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object);
 
 #endif

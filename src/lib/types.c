@@ -32,6 +32,11 @@ struct cl4_type_info {
 	const int size;
 };
 
+/** 
+ * @addtogroup TYPES
+ * @{
+ */
+
 static const CL4TypeInfo cl4_types[] = {
 	
 	{"char",   1}, /* CL4_CHAR   = 0 */
@@ -70,3 +75,5 @@ int cl4_type_sizeof(CL4Type type) {
 	g_assert_cmpint(type, >=, CL4_CHAR);
 	return cl4_types[type].size;
 }
+
+/** @} */

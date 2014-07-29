@@ -31,6 +31,16 @@
 #include <glib.h>
 #include "common.h"
 
+/**
+ * @defgroup TYPES Types
+ *
+ * @brief Use and pass abstract OpenCL types in C functions.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 typedef enum {
 	CL4_CHAR = 0,
 	CL4_UCHAR = 1,
@@ -50,6 +60,8 @@ const char* cl4_type_name_get(CL4Type type);
 
 /** @brief Return OpenCL type size in bytes. */
 int cl4_type_sizeof(CL4Type type);
+
+/** @} */
 
 #endif
 

@@ -35,6 +35,16 @@
 #include "string.h"
 #include "oclversions.h"
 
+/**
+ * @defgroup DEVICE_QUERY Device query
+ *
+ * @brief Objects and functions to query OpenCL devices.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** 
  * @brief Output formatting function.
  * 

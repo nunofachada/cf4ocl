@@ -38,18 +38,26 @@
 /* Forward declaration of CL4Program. */
 typedef struct cl4_program CL4Program;
 
+/**
+ * @defgroup KERNEL_WRAPPER Kernel wrapper
+ *
+ * @brief A wrapper object for OpenCL kernels and functions to manage 
+ * them.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** @brief Kernel wrapper object. */
 typedef struct cl4_kernel CL4Kernel;
 
-/** @brief Get the kernel wrapper for the given OpenCL kernel. */
-CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel);
+CL4Kernel* cl4_kernel_new(
+	CL4Program* prg, const char* kernel_name, GError** err);
 
 /** @brief Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed. */
 void cl4_kernel_destroy(CL4Kernel* krnl);
-
-CL4Kernel* cl4_kernel_new(
-	CL4Program* prg, const char* kernel_name, GError** err);
 
 void cl4_kernel_set_arg(CL4Kernel* krnl, cl_uint arg_index, 
 	CL4Arg* arg);
@@ -222,7 +230,13 @@ CL4Event* cl4_kernel_set_args_and_run_v(CL4Kernel* krnl, CL4CQueue* cq,
  * @return The OpenCL kernel object.
  * */
 #define cl4_kernel_unwrap(krnl) \
-	((cl_kernel) cl4_wrapper_unwrap((CL4Wrapper*) krnl))		
+	((cl_kernel) cl4_wrapper_unwrap((CL4Wrapper*) krnl))
+
+
+/** @} */
+
+/** @brief Get the kernel wrapper for the given OpenCL kernel. */
+CL4Kernel* cl4_kernel_new_wrap(cl_kernel kernel);
 
 #endif
 

@@ -39,6 +39,11 @@ struct cl4_platforms {
 	cl_uint num_platfs;
 };
 
+/** 
+ * @addtogroup PLATFORMS
+ * @{
+ */
+
 /**
  * @brief Creates a new CL4Platforms* object, which contains the list 
  * of OpenCL platforms available in the system.
@@ -187,3 +192,5 @@ CL4Platform* cl4_platforms_get_platform(CL4Platforms* platforms, guint index) {
 	/* Return platform at given index. */
 	return platforms->platfs[index];
 }
+
+/** @} */

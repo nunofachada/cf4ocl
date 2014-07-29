@@ -42,27 +42,10 @@ struct cl4_device {
 	
 };
 
-/**
- * @brief Get the device wrapper for the given OpenCL device.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to get the OpenCL device directly (using the
- * clGetDeviceIDs() function) and then wrap the OpenCL device in a
- * ::CL4Device wrapper object.
- * 
- * @param device The OpenCL device to be wrapped.
- * @return The device wrapper for the given OpenCL device.
- * */
-CL4Device* cl4_device_new_wrap(cl_device_id device) {
-	
-	return (CL4Device*) cl4_wrapper_new(
-		(void*) device, sizeof(CL4Device));
-		
-}
+/** 
+ * @addtogroup DEVICE_WRAPPER
+ * @{
+ */
 
 /** 
  * @brief Decrements the reference count of the device wrapper object. 
@@ -114,4 +97,28 @@ finish:
 	/* Return the device platform wrapper. */
 	return platf;	
 	
+}
+
+/** @} */
+
+/**
+ * @brief Get the device wrapper for the given OpenCL device.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to get the OpenCL device directly (using the
+ * clGetDeviceIDs() function) and then wrap the OpenCL device in a
+ * ::CL4Device wrapper object.
+ * 
+ * @param device The OpenCL device to be wrapped.
+ * @return The device wrapper for the given OpenCL device.
+ * */
+CL4Device* cl4_device_new_wrap(cl_device_id device) {
+	
+	return (CL4Device*) cl4_wrapper_new(
+		(void*) device, sizeof(CL4Device));
+		
 }

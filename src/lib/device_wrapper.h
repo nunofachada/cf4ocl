@@ -36,15 +36,23 @@
 #include "oclversions.h"
 #include <string.h>
 
-/** @brief Device wrapper object. */
-typedef struct cl4_device CL4Device;
-
 /* Forward declaration of CL4Platform, as we can't include platform.h
  * here due to circular dependency. */
 typedef struct cl4_platform CL4Platform;
 
-/** @brief Get the device wrapper for the given OpenCL device. */
-CL4Device* cl4_device_new_wrap(cl_device_id device);
+/**
+ * @defgroup DEVICE_WRAPPER Device wrapper
+ *
+ * @brief A wrapper object for OpenCL devices and functions to manage 
+ * them.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
+/** @brief Device wrapper object. */
+typedef struct cl4_device CL4Device;
 
 /** @brief Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed. */
@@ -133,5 +141,10 @@ CL4Platform* cl4_device_get_platform(CL4Device* dev, GError** err);
  * */
 #define cl4_device_unwrap(device) \
 	((cl_device_id) cl4_wrapper_unwrap((CL4Wrapper*) device))
+	
+/** @} */
+
+/** @brief Get the device wrapper for the given OpenCL device. */
+CL4Device* cl4_device_new_wrap(cl_device_id device);
 
 #endif

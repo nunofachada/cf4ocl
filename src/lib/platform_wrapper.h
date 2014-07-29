@@ -36,10 +36,10 @@
 #include "abstract_dev_container_wrapper.h"
 
 /**
- * @defgroup PLATFORM The platform wrapper module.
+ * @defgroup PLATFORM_WRAPPER Platform wrapper
  *
  * @brief A wrapper object for OpenCL platforms and functions to manage 
- * it.
+ * them.
  * 
  * Todo: detailed description of module.
  * 

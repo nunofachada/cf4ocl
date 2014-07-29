@@ -57,26 +57,10 @@ static void cl4_memobj_release_fields(CL4MemObj* mo) {
 
 }
 
-/**
- * @brief Get the cl_mem wrapper for the given OpenCL memory object.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to directly wrap an OpenCL memory object in a 
- * ::CL4MemObj wrapper object.
- * 
- * @param mem_object The OpenCL memory object to be wrapped.
- * @return The ::CL4MemObj wrapper for the given OpenCL memory object.
- * */
-CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object) {
-	
-	return (CL4MemObj*) cl4_wrapper_new(
-		(void*) mem_object, sizeof(CL4MemObj));
-		
-}
+/** 
+ * @addtogroup MEMOBJ_WRAPPER
+ * @{
+ */
 
 /** 
  * @brief Decrements the reference count of the wrapper object. If it 
@@ -207,6 +191,29 @@ finish:
 	/* Return evt. */
 	return evt;		
 
+}
+
+/** @} */
+
+/**
+ * @brief Get the cl_mem wrapper for the given OpenCL memory object.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to directly wrap an OpenCL memory object in a 
+ * ::CL4MemObj wrapper object.
+ * 
+ * @param mem_object The OpenCL memory object to be wrapped.
+ * @return The ::CL4MemObj wrapper for the given OpenCL memory object.
+ * */
+CL4MemObj* cl4_memobj_new_wrap(cl_mem mem_object) {
+	
+	return (CL4MemObj*) cl4_wrapper_new(
+		(void*) mem_object, sizeof(CL4MemObj));
+		
 }
 
 #endif

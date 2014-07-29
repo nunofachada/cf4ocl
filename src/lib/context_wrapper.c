@@ -146,31 +146,9 @@ finish:
 }
 
 /** 
- * @addtogroup CONTEXT
+ * @addtogroup CONTEXT_WRAPPER
  * @{
  */
-
-/**
- * @brief Get the context wrapper for the given OpenCL context.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL context directly (using the
- * clCreateContext() function) and then wrap the OpenCL context in a
- * ::CL4Context wrapper object.
- * 
- * @param context The OpenCL context to be wrapped.
- * @return The context wrapper for the given OpenCL context.
- * */
-CL4Context* cl4_context_new_wrap(cl_context context) {
-	
-	return (CL4Context*) cl4_wrapper_new(
-		(void*) context, sizeof(CL4Context));
-		
-}
 
 /**
  * @brief Create a new context wrapper object selecting devices using 
@@ -507,6 +485,28 @@ void cl4_context_destroy(CL4Context* ctx) {
 }
 
 /** @}*/
+
+/**
+ * @brief Get the context wrapper for the given OpenCL context.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL context directly (using the
+ * clCreateContext() function) and then wrap the OpenCL context in a
+ * ::CL4Context wrapper object.
+ * 
+ * @param context The OpenCL context to be wrapped.
+ * @return The context wrapper for the given OpenCL context.
+ * */
+CL4Context* cl4_context_new_wrap(cl_context context) {
+	
+	return (CL4Context*) cl4_wrapper_new(
+		(void*) context, sizeof(CL4Context));
+		
+}
 
 /** 
  * @brief Implementation of cl4_dev_container_get_cldevices() for the

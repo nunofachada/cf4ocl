@@ -37,10 +37,10 @@
 #include "kernel_wrapper.h"
 
 /**
- * @defgroup PROGRAM The program wrapper module.
+ * @defgroup PROGRAM_WRAPPER Program wrapper
  *
  * @brief A wrapper object for OpenCL programs and functions to manage 
- * it.
+ * them.
  * 
  * Todo: detailed description of module.
  * 

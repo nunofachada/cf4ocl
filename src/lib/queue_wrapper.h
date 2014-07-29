@@ -35,12 +35,19 @@
 #include "context_wrapper.h"
 #include "event_wrapper.h"
 
+/**
+ * @defgroup QUEUE_WRAPPER Command queue wrapper
+ *
+ * @brief A wrapper object for OpenCL command queues and functions to 
+ * manage them.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /** @brief Command queue wrapper object. */
 typedef struct cl4_cqueue CL4CQueue;
-
-/** @brief Get the command queue wrapper for the given OpenCL command 
- * queue. */
-CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue);
 
 CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
@@ -149,5 +156,11 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err);
  * */
 #define cl4_cqueue_unwrap(cq) \
 	((cl_command_queue) cl4_wrapper_unwrap((CL4Wrapper*) cq))		
+
+/** @} */
+
+/** @brief Get the command queue wrapper for the given OpenCL command 
+ * queue. */
+CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue);
 
 #endif

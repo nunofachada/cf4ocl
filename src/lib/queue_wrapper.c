@@ -74,28 +74,10 @@ static void cl4_cqueue_release_fields(CL4CQueue* cq) {
 
 }
 
-/**
- * @brief Get the command queue wrapper for the given OpenCL command 
- * queue.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL command queue directly (using the
- * clCreateCommandQueue() function) and then wrap the OpenCL command 
- * queue in a ::CL4CQueue wrapper object.
- * 
- * @param command_queue The OpenCL command queue to be wrapped.
- * @return The ::CL4CQueue wrapper for the given OpenCL command queue.
- * */
-CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue) {
-	
-	return (CL4CQueue*) cl4_wrapper_new(
-		(void*) command_queue, sizeof(CL4CQueue));
-		
-}
+/** 
+ * @addtogroup QUEUE_WRAPPER
+ * @{
+ */
 
 CL4CQueue* cl4_cqueue_new_direct(cl_context context, 
 	cl_device_id device, cl_command_queue_properties properties, 
@@ -357,4 +339,29 @@ cl_int cl4_cqueue_finish(CL4CQueue* cq, GError** err) {
 
 	return ocl_status;
 
+}
+
+/** @} */
+
+/**
+ * @brief Get the command queue wrapper for the given OpenCL command 
+ * queue.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count of 
+ * 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL command queue directly (using the
+ * clCreateCommandQueue() function) and then wrap the OpenCL command 
+ * queue in a ::CL4CQueue wrapper object.
+ * 
+ * @param command_queue The OpenCL command queue to be wrapped.
+ * @return The ::CL4CQueue wrapper for the given OpenCL command queue.
+ * */
+CL4CQueue* cl4_cqueue_new_wrap(cl_command_queue command_queue) {
+	
+	return (CL4CQueue*) cl4_wrapper_new(
+		(void*) command_queue, sizeof(CL4CQueue));
+		
 }
