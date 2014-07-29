@@ -115,6 +115,17 @@ typedef cl_int (*ccl_wrapper_info_fp1)(gpointer cl_object,
 
 typedef cl_int (*ccl_wrapper_info_fp)(void);
 
+
+/**
+ * @defgroup WRAPPER_INFO Wrapper information
+ *
+ * @brief Wrapper information object and associated macros.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
 /**
  * @brief Information about a wrapped OpenCL entity.
  * */
@@ -124,6 +135,29 @@ typedef struct ccl_wrapper_info {
 	/** Size in bytes of device information. */
 	gsize size;
 } CCLWrapperInfo;
+
+/**
+ * @brief Helper macro which returns a scalar information value casted 
+ * to specified scalar type.
+ * 
+ * @param info ::CCLWrapperInfo information object.
+ * @param type Scalar type to which to cast value to.
+ * @return The information value casted to the specified scalar type.
+ * */
+#define ccl_info_scalar(info, type) *((type*) (info)->value)
+
+/**
+ * @brief Helper macro which returns an array information value casted 
+ * to specified array type.
+ * 
+ * @param info ::CCLWrapperInfo information object.
+ * @param type Array (pointer) type to which to cast value to.
+ * @return The information value casted to the specified array (pointer)
+ * type.
+ * */
+#define ccl_info_array(info, type) ((type) (info)->value)
+
+/** @} */
 
 /** @brief Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(gsize size);
@@ -145,27 +179,6 @@ gpointer ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 gsize ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
-	
-/**
- * @brief Helper macro which returns a scalar information value casted 
- * to specified scalar type.
- * 
- * @param info Wrapper information object.
- * @param type Scalar type to which to cast value to.
- * @return The information value casted to the specified scalar type.
- * */
-#define ccl_info_scalar(info, type) *((type*) (info)->value)
-
-/**
- * @brief Helper macro which returns an array information value casted 
- * to specified array type.
- * 
- * @param info Wrapper information object.
- * @param type Array (pointer) type to which to cast value to.
- * @return The information value casted to the specified array (pointer)
- * type.
- * */
-#define ccl_info_array(info, type) ((type) (info)->value)
 
 #endif
 
