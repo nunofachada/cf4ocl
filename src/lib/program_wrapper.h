@@ -293,34 +293,18 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * @return The OpenCL program object.
  * */
 #define ccl_program_unwrap(prg) \
-	((cl_program) ccl_wrapper_unwrap((CCLWrapper*) prg))		
+	((cl_program) ccl_wrapper_unwrap((CCLWrapper*) prg))
 
-/** 
- * @brief Get ::CCLDevice wrapper at given index. 
- * 
- * @param prg The program wrapper object.
- * @param index Index of device in program.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return The ::CCLDevice wrapper at given index or NULL if an error 
- * occurs.
- * */
-#define ccl_program_get_device(prg, index, err) \
-	ccl_dev_container_get_device((CCLDevContainer*) prg, \
-	ccl_program_get_cldevices, index, err)
+/** @brief Get ::CCLDevice wrapper at given index. */
+CCLDevice* ccl_program_get_device(
+	CCLProgram* prg, cl_uint index, GError** err);
 
-/**
- * @brief Return number of devices in program.
- * 
- * @param prg The program wrapper object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return The number of devices in program or 0 if an error occurs or 
- * is otherwise not possible to get any device.
- * */
-#define ccl_program_get_num_devices(prg, err) \
-	ccl_dev_container_get_num_devices((CCLDevContainer*) prg, \
-	ccl_program_get_cldevices, err)
+/** @brief Return number of devices in program. */
+cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err);
+
+/** @brief Get all device wrappers in program. */
+const CCLDevice** ccl_program_get_all_devices(CCLProgram* prg, 
+	GError** err);
 
 /** @} */
 
@@ -334,11 +318,6 @@ CCLProgramBinary* ccl_program_binary_new(
 
 /** @brief Destroy a ::CCLProgramBinary object. */
 void ccl_program_binary_destroy(CCLProgramBinary* bin);
-
-/** @brief Implementation of ccl_dev_container_get_cldevices() for the
- * program wrapper. */
-CCLWrapperInfo* ccl_program_get_cldevices(
-	CCLDevContainer* devcon, GError** err);
 
 #endif
 

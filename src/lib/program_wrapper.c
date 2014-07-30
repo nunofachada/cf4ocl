@@ -88,6 +88,22 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 }
 
 /** 
+ * @brief Implementation of ccl_dev_container_get_cldevices() for the
+ * program wrapper. 
+ * 
+ * @param devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
+ * object.
+ * */
+static CCLWrapperInfo* ccl_program_get_cldevices(
+	CCLDevContainer* devcon, GError** err) {
+
+	return ccl_program_get_info(devcon, CL_PROGRAM_DEVICES, err);
+}
+
+/** 
  * @addtogroup PROGRAM_WRAPPER
  * @{
  */
@@ -843,8 +859,63 @@ finish:
 
 }
 
+/** 
+ * @brief Get ::CCLDevice wrapper at given index. 
+ * 
+ * @param prg The program wrapper object.
+ * @param index Index of device in program.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The ::CCLDevice wrapper at given index or NULL if an error 
+ * occurs.
+ * */
+CCLDevice* ccl_program_get_device(
+	CCLProgram* prg, cl_uint index, GError** err) {
+	
+	return ccl_dev_container_get_device(
+		(CCLDevContainer*) prg, ccl_program_get_cldevices, index, err);
+}
+
+/**
+ * @brief Return number of devices in program.
+ * 
+ * @param prg The program wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The number of devices in program or 0 if an error occurs or 
+ * is otherwise not possible to get any device.
+ * */
+cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
+	
+	return ccl_dev_container_get_num_devices(
+		(CCLDevContainer*) prg, ccl_program_get_cldevices, err);
+
+}
+
+/** 
+ * @brief Get all device wrappers in program. 
+ * 
+ * This function returns the internal array containing the program
+ * device wrappers. As such, clients should not modify the returned 
+ * array (e.g. they should not free it directly).
+ * 
+ * @param prg The program wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return An array containing the ::CCLDevice wrappers which belong to
+ * the given program, or NULL if an error occurs.
+ * */
+const CCLDevice** ccl_program_get_all_devices(CCLProgram* prg, 
+	GError** err) {
+	
+	return ccl_dev_container_get_all_devices((CCLDevContainer*) prg,
+		ccl_program_get_cldevices, err);
+
+}
+
 /** @}*/
 
+/// @todo Can these be static?
 CCLProgramBinary* ccl_program_binary_new(
 	unsigned char* data, size_t size) {
 		
@@ -867,20 +938,3 @@ void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
 	g_slice_free(CCLProgramBinary, pbin);
 
 }
-
-/** 
- * @brief Implementation of ccl_dev_container_get_cldevices() for the
- * program wrapper. 
- * 
- * @param devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
- * object.
- * */
-CCLWrapperInfo* ccl_program_get_cldevices(
-	CCLDevContainer* devcon, GError** err) {
-
-	return ccl_program_get_info(devcon, CL_PROGRAM_DEVICES, err);
-}
-

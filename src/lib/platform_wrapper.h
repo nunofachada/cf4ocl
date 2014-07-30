@@ -153,56 +153,18 @@ void ccl_platform_destroy(CCLPlatform* platf);
  * */
 #define ccl_platform_unwrap(platform) \
 	((cl_platform) ccl_wrapper_unwrap((CCLWrapper*) platform))
+	
+/** @brief Get all device wrappers in platform. */
+const CCLDevice** ccl_platform_get_all_devices(
+	CCLPlatform* platf, GError** err);
  
-/** 
- * @brief Get all device wrappers in platform. 
- * 
- * This function returns the internal array containing the platform
- * device wrappers. As such, clients should not modify the returned 
- * array (e.g. they should not free it directly).
- * 
- * @param platf The platform wrapper object.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
- * @return An array containing the ::CCLDevice wrappers which belong to
- * this platform, or NULL if an error occurs.
- */
-#define ccl_platform_get_all_devices(platf, err) \
-	ccl_dev_container_get_all_devices((CCLDevContainer*) platf, \
-		ccl_platform_get_cldevices, err)
+/** @brief Get ::CCLDevice wrapper at given index. */
+CCLDevice* ccl_platform_get_device(
+	CCLPlatform* platf, cl_uint index, GError** err);
+
+/** @brief Return number of devices in platform. */
+cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err);
  
-/** 
- * @brief Get ::CCLDevice wrapper at given index. 
- * 
- * @param platf The platform wrapper object.
- * @param index Index of device in platform.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return The ::CCLDevice wrapper at given index or NULL if an error 
- * occurs.
- * */
-#define ccl_platform_get_device(platf, index, err) \
-	ccl_dev_container_get_device((CCLDevContainer*) platf, \
-		ccl_platform_get_cldevices, index, err)
-
-/**
- * @brief Return number of devices in platform.
- * 
- * @param platf The platform wrapper object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return The number of devices in platform or 0 if an error occurs or 
- * is otherwise not possible to get any device.
- * */
-#define ccl_platform_get_num_devices(platf, err) \
-	ccl_dev_container_get_num_devices((CCLDevContainer*) platf, \
-		ccl_platform_get_cldevices, err)
-
 /** @} */
-
-/** @brief Implementation of ccl_dev_container_get_cldevices() for the
- * platform wrapper. */
-CCLWrapperInfo* ccl_platform_get_cldevices(
-	CCLDevContainer* devcon, GError** err);
 
 #endif

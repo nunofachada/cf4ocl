@@ -115,7 +115,8 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
  * @return All ::CCLDevice wrappers in device container or NULL if an 
  * error occurs.
  * */
-CCLDevice** ccl_dev_container_get_all_devices(CCLDevContainer* devcon,
+const CCLDevice** ccl_dev_container_get_all_devices(
+	CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError** err) {
 		
 	/* Make sure err is NULL or it is not set. */
@@ -133,7 +134,7 @@ CCLDevice** ccl_dev_container_get_all_devices(CCLDevContainer* devcon,
 	}
 	
 	/* Return all devices in platform. */
-	return devcon->devices;
+	return (const CCLDevice**) devcon->devices;
 
 }
 
@@ -152,7 +153,7 @@ CCLDevice** ccl_dev_container_get_all_devices(CCLDevContainer* devcon,
  * */
 CCLDevice* ccl_dev_container_get_device(
 	CCLDevContainer* devcon, 
-	ccl_dev_container_get_cldevices get_devices, unsigned int index, 
+	ccl_dev_container_get_cldevices get_devices, cl_uint index, 
 	GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -214,7 +215,7 @@ finish:
  * @return The number of devices in device container or 0 if an error 
  * occurs or is otherwise not possible to get any device.
  * */
-unsigned int ccl_dev_container_get_num_devices(
+cl_uint ccl_dev_container_get_num_devices(
 	CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError** err) {
 	

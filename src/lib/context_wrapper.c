@@ -232,6 +232,22 @@ finish:
 }
 
 /** 
+ * @brief Implementation of ccl_dev_container_get_cldevices() for the
+ * context wrapper. 
+ * 
+ * @param devcon A ::CCLContext wrapper, passed as a ::CCLDevContainer .
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
+ * object.
+ * */
+static CCLWrapperInfo* ccl_context_get_cldevices(
+	CCLDevContainer* devcon, GError** err) {
+
+	return ccl_context_get_info(devcon, CL_CONTEXT_DEVICES, err);
+}
+
+/** 
  * @addtogroup CONTEXT_WRAPPER
  * @{
  */
@@ -486,6 +502,60 @@ void ccl_context_destroy(CCLContext* ctx) {
 
 }
 
+/**
+ * @brief Get ::CCLDevice wrapper at given index. 
+ * 
+ * @param ctx The context wrapper object.
+ * @param index Index of device in context.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The ::CCLDevice wrapper at given index or NULL if an error 
+ * occurs.
+ * */
+CCLDevice* ccl_context_get_device(
+	CCLContext* ctx, cl_uint index, GError** err) {
+
+	return ccl_dev_container_get_device((CCLDevContainer*) ctx,
+		ccl_context_get_cldevices, index, err);
+}
+
+/**
+ * @brief Return number of devices in context.
+ * 
+ * @param ctx The context wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return The number of devices in context or 0 if an error occurs or 
+ * is otherwise not possible to get any device.
+ * */
+cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
+	
+	return ccl_dev_container_get_num_devices((CCLDevContainer*) ctx,
+		ccl_context_get_cldevices, err);
+
+}
+
+/** 
+ * @brief Get all device wrappers in context.
+ * 
+ * This function returns the internal array containing the context
+ * device wrappers. As such, clients should not modify the returned 
+ * array (e.g. they should not free it directly).
+ * 
+ * @param ctx The context wrapper object.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return An array containing the ::CCLDevice wrappers which belong to
+ * the given context, or NULL if an error occurs.
+ * */
+const CCLDevice** ccl_context_get_all_devices(CCLContext* ctx, 
+	GError** err) {
+	
+	return ccl_dev_container_get_all_devices((CCLDevContainer*) ctx,
+		ccl_context_get_cldevices, err);
+
+}
+
 /** @}*/
 
 /**
@@ -508,20 +578,4 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
 	return (CCLContext*) ccl_wrapper_new(
 		(void*) context, sizeof(CCLContext));
 		
-}
-
-/** 
- * @brief Implementation of ccl_dev_container_get_cldevices() for the
- * context wrapper. 
- * 
- * @param devcon A ::CCLContext wrapper, passed as a ::CCLDevContainer .
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
- * object.
- * */
-CCLWrapperInfo* ccl_context_get_cldevices(
-	CCLDevContainer* devcon, GError** err) {
-
-	return ccl_context_get_info(devcon, CL_CONTEXT_DEVICES, err);
 }

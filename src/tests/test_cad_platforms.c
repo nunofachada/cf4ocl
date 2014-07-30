@@ -62,7 +62,7 @@ static void platforms_create_info_destroy_test() {
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
-	CCLDevice** ds = NULL;
+	const CCLDevice** ds = NULL;
 	GError* err = NULL;
 	CCLWrapperInfo* info;
 	gchar* platf_info;

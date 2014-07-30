@@ -274,42 +274,21 @@ void ccl_context_destroy(CCLContext* ctx);
  * */
 #define ccl_context_unwrap(ctx) \
 	((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
- 
-/** 
- * @brief Get ::CCLDevice wrapper at given index. 
- * 
- * @param ctx The context wrapper object.
- * @param index Index of device in context.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return The ::CCLDevice wrapper at given index or NULL if an error 
- * occurs.
- * */
-#define ccl_context_get_device(ctx, index, err) \
-	ccl_dev_container_get_device((CCLDevContainer*) ctx, \
-		ccl_context_get_cldevices, index, err)
 
-/**
- * @brief Return number of devices in context.
- * 
- * @param ctx The context wrapper object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return The number of devices in context or 0 if an error occurs or 
- * is otherwise not possible to get any device.
- * */
-#define ccl_context_get_num_devices(ctx, err) \
-	ccl_dev_container_get_num_devices((CCLDevContainer*) ctx, \
-		ccl_context_get_cldevices, err)
+/** @brief Get ::CCLDevice wrapper at given index. */
+CCLDevice* ccl_context_get_device(
+	CCLContext* ctx, cl_uint index, GError** err);
+
+/** @brief Return number of devices in context. */
+cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
+
+/** @brief Get all device wrappers in context. */
+const CCLDevice** ccl_context_get_all_devices(CCLContext* ctx, 
+	GError** err);
 
 /** @} */
 
 /** @brief Get the context wrapper for the given OpenCL context. */
 CCLContext* ccl_context_new_wrap(cl_context context);
-
-/** @brief Implementation of ccl_dev_container_get_cldevices() for the
- * context wrapper. */
-CCLWrapperInfo* ccl_context_get_cldevices(
-	CCLDevContainer* devcon, GError** err);
 
 #endif

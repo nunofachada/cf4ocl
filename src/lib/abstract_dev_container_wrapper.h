@@ -65,16 +65,17 @@ typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
 void ccl_dev_container_release_devices(CCLDevContainer* devcon);
 
 /** @brief Get all ::CCLDevice wrappers in device container. */
-CCLDevice** ccl_dev_container_get_all_devices(CCLDevContainer* devcon,
+const CCLDevice** ccl_dev_container_get_all_devices(
+	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 
 /** @brief Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_dev_container_get_device(CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, 
-	unsigned int index, GError** err);
+	cl_uint index, GError** err);
 
 /** @brief Return number of devices in device container. */
-unsigned int ccl_dev_container_get_num_devices(CCLDevContainer* devcon, 
+cl_uint ccl_dev_container_get_num_devices(CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 
 #endif
