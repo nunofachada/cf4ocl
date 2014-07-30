@@ -65,49 +65,41 @@ CCLProgram* ccl_program_new_wrap(cl_program program);
 void ccl_program_destroy(CCLProgram* prg);
 
 /* SOURCES */
+CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx, 
+	cl_uint count, const char** filenames, GError** err);
+	
 CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx, 
 	const char* filename, GError** err);
 
-CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx, 
-	cl_uint count, const char** filenames, GError** err);
-
-#define ccl_program_new_from_source(ctx, src, err) \
-	ccl_program_new_with_source( \
-		ccl_context_unwrap(ctx), 1, &src, NULL, err)
-
-#define ccl_program_new_from_sources(ctx, count, strings, err) \
-	ccl_program_new_with_source( \
-		ccl_context_unwrap(ctx), count, strings, NULL, err)
-	
-CCLProgram* ccl_program_new_with_source(cl_context context,
+CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	cl_uint count, const char **strings, const size_t *lengths,
 	GError** err);
 
-/* BINARIES */
-CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx, 
-	CCLDevice* dev, const char* filename, GError** err);
+#define ccl_program_new_from_source(ctx, src, err) \
+	ccl_program_new_from_sources(ctx, 1, &src, NULL, err)
 
+/* BINARIES */
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx, 
 	cl_uint num_devices, CCLDevice** devs, const char** filenames, 
-	GError** err);
+	cl_int *binary_status, GError** err);
 
-#define ccl_program_new_from_binary(ctx, dev, binary, err) \
-	ccl_program_new_from_binaries(ctx, 1, &dev, &binary, err)
+CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx, 
+	CCLDevice* dev, const char* filename, cl_int *binary_status, 
+	GError** err);
 
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice** devs, CCLProgramBinary** bins,
-	GError** err);
-
-CCLProgram* ccl_program_new_with_binary(cl_context context,
-	cl_uint num_devices, const cl_device_id* device_list,
-	const size_t *lengths, const unsigned char **binaries,
 	cl_int *binary_status, GError** err);
 
+#define ccl_program_new_from_binary(ctx, dev, binary, bin_status, err) \
+	ccl_program_new_from_binaries(ctx, 1, &dev, &binary, bin_status, err)
+
+/* BUILT-IN KERNELS */
 #ifdef CL_VERSION_1_2
 
-CCLProgram* ccl_program_new_with_built_in_kernels(cl_context context,
-	cl_uint num_devices, const cl_device_id *device_list,
-	const char *kernel_names, GError** err);
+CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
+	cl_uint num_devices, CCLDevice** devs, const char *kernel_names, 
+	GError** err);
 
 #endif
  
@@ -117,10 +109,6 @@ CCLProgram* ccl_program_new_with_built_in_kernels(cl_context context,
 
 cl_bool ccl_program_build_from_devices_full(CCLProgram* prg, 
 	cl_uint num_devices, CCLDevice** devices, const char *options, 
-	ccl_program_callback pfn_notify, void *user_data, GError** err);
-
-cl_bool ccl_program_build_from_cldevices_full(CCLProgram* prg, 
-	cl_uint num_devices, cl_device_id* device_list, const char *options, 
 	ccl_program_callback pfn_notify, void *user_data, GError** err);
 
 CCLKernel* ccl_program_get_kernel(

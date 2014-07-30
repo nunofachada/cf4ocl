@@ -152,7 +152,8 @@ static void program_create_info_destroy_test() {
 	ccl_program_destroy(prg);
 
 	/* Create a new program using the saved binary. */
-	prg = ccl_program_new_from_binary_file(ctx, d, "test_prg.bin", &err);
+	prg = ccl_program_new_from_binary_file(
+		ctx, d, "test_prg.bin", NULL, &err);
 	g_assert_no_error(err);
 	
 	/* **** BUILD PROGRAM **** */

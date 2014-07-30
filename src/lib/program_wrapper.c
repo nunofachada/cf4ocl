@@ -164,9 +164,8 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 	
 	}
 	
-	prg = ccl_program_new_with_source(
-		ccl_context_unwrap(ctx), count, (const char**)strings, NULL, 
-		&err_internal);
+	prg = ccl_program_new_from_sources(ctx, count, 
+		(const char**) strings, NULL, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 	/* If we got here, everything is OK. */
@@ -194,26 +193,28 @@ finish:
 
 }
 
-CCLProgram* ccl_program_new_with_source(cl_context context,
+CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	cl_uint count, const char **strings, const size_t *lengths,
 	GError** err) {
 
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	cl_int ocl_status;
-	
 	cl_program program = NULL;
-	
 	CCLProgram* prg = NULL;
-		
+	
+	/* Build program from sources. */
 	program = clCreateProgramWithSource(
-		context, count, strings, lengths, &ocl_status);
+		ccl_context_unwrap(ctx), count, strings, lengths, &ocl_status);
 	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
 		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to create cl_program with source (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
+	/* Wrap OpenCL program object. */
 	prg = ccl_program_new_wrap(program);
 	
 	/* If we got here, everything is OK. */
@@ -233,15 +234,16 @@ finish:
 }
 
 CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx, 
-	CCLDevice* dev, const char* filename, GError** err) {
+	CCLDevice* dev, const char* filename, cl_int *binary_status, 
+	GError** err) {
 	
 	return ccl_program_new_from_binary_files(
-		ctx, 1, &(dev), &(filename), err);
+		ctx, 1, &(dev), &(filename), binary_status, err);
 }
 
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx, 
 	cl_uint num_devices, CCLDevice** devs, const char** filenames, 
-	GError** err) {
+	cl_int *binary_status, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -269,7 +271,7 @@ CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 
 	/* Create program. */
 	prg = ccl_program_new_from_binaries(
-		ctx, num_devices, devs, bins, &err_internal);
+		ctx, num_devices, devs, bins, binary_status, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
@@ -300,7 +302,7 @@ finish:
 
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice** devs, CCLProgramBinary** bins,
-	GError** err) {
+	cl_int *binary_status, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -311,11 +313,12 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	/* Make sure num_devices > 0. */
 	g_return_val_if_fail(num_devices > 0, NULL);
 	
+	cl_int ocl_status;
 	CCLProgram* prg = NULL;
+	cl_program program = NULL;
 	cl_device_id* device_list = NULL;
 	size_t* lengths = NULL;
 	unsigned char** bins_raw = NULL;
-	GError* err_internal = NULL;
 		
 	/* Unwrap devices, binaries and lengths. */
 	device_list = g_slice_alloc(num_devices * sizeof(cl_device_id));
@@ -328,10 +331,17 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	}
 	
 	/* Create program. */
-	prg = ccl_program_new_with_binary(ccl_context_unwrap(ctx), 
+	program = clCreateProgramWithBinary(ccl_context_unwrap(ctx), 
 		num_devices, device_list, lengths, 
-		(const unsigned char**) bins_raw, NULL, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+		(const unsigned char**) bins_raw, 
+		binary_status, &ocl_status);
+	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
+		"%s: unable to create cl_program from binaries (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+
+	/* Wrap OpenCL program object. */
+	prg = ccl_program_new_wrap(program);
 	
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -356,69 +366,41 @@ finish:
 	return prg;
 
 }
-	
-CCLProgram* ccl_program_new_with_binary(cl_context context,
-	cl_uint num_devices, const cl_device_id* device_list,
-	const size_t *lengths, const unsigned char **binaries,
-	cl_int *binary_status, GError** err) {
-
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	
-	cl_int ocl_status;
-	cl_program program = NULL;
-	CCLProgram* prg = NULL;
-		
-	/* Create program. */
-	program = clCreateProgramWithBinary(context, 
-		num_devices, device_list, lengths, binaries, binary_status, 
-		&ocl_status);
-	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
-		CCL_ERROR_OCL, error_handler, 
-		"%s: unable to create cl_program from binaries (OpenCL error %d: %s).", 
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
-
-	prg = ccl_program_new_wrap(program);
-
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-	
-finish:
-	
-	/* Return prg. */
-	return prg;	
-
-
-}
 
 #ifdef CL_VERSION_1_2
 
-CCLProgram* ccl_program_new_with_built_in_kernels(cl_context context,
-	cl_uint num_devices, const cl_device_id *device_list,
-	const char *kernel_names, GError** err) {
+CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
+	cl_uint num_devices, CCLDevice** devs, const char *kernel_names, 
+	GError** err) {
 
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	cl_int ocl_status;
 	cl_program program = NULL;
 	CCLProgram* prg = NULL;
+	cl_device_id* device_list = NULL;
+		
+	/* Unwrap devices. */
+	device_list = g_slice_alloc(num_devices * sizeof(cl_device_id));
+	for (guint i = 0; i < num_devices; ++i) {
+		device_list[i] = ccl_device_unwrap(devs[i]);
+	}
 
 	/* Create program. */
 	program = clCreateProgramWithBuiltInKernels(
-		context, num_devices, device_list, kernel_names, &ocl_status);
+		ccl_context_unwrap(ctx), num_devices, device_list, kernel_names, 
+		&ocl_status);
 
+	/* Create kernel from built-in kernels. */
 	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
 		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to create cl_program from built-in kernels (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 
+	/* Wrap OpenCL program object. */
 	prg = ccl_program_new_wrap(program);
 
 	/* If we got here, everything is OK. */
@@ -432,6 +414,10 @@ error_handler:
 	
 finish:
 	
+	/* Free stuff if necessary. */
+	if (device_list != NULL)
+		g_slice_free1(num_devices * sizeof(cl_device_id), device_list);
+
 	/* Return prg. */
 	return prg;	
 
@@ -454,6 +440,9 @@ cl_bool ccl_program_build_from_devices_full(CCLProgram* prg,
 	/* Array of unwrapped devices. */
 	cl_device_id* cl_devices = NULL;
 	
+	/* Status of OpenCL function call. */
+	cl_int ocl_status;
+
 	/* Result of function call. */
 	gboolean result;
 	
@@ -465,42 +454,9 @@ cl_bool ccl_program_build_from_devices_full(CCLProgram* prg,
 			cl_devices[i] = ccl_device_unwrap(devices[i]);
 	}
 
-	/* Build the program. */
-	result = ccl_program_build_from_cldevices_full(
-		prg, num_devices, cl_devices, options, pfn_notify, 
-		user_data, err);
-	
-	/* Check if necessary to release array of unwrapped devices. */
-	if (cl_devices != NULL) {
-		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
-	}
-	
-	/* Return result of function call. */
-	return result;
-
-}
-
-cl_bool ccl_program_build_from_cldevices_full(CCLProgram* prg, 
-	cl_uint num_devices, cl_device_id* device_list, const char *options, 
-	ccl_program_callback pfn_notify, void *user_data, GError** err) {
-	
-	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	/* Make sure devices and num_devices are coherent. */
-	g_return_val_if_fail(((num_devices == 0) && (device_list == NULL)) 
-		|| ((num_devices > 0) && (device_list != NULL)), FALSE);
-
-	/* Status of OpenCL function call. */
-	cl_int ocl_status;
-
-	/* Result of function call. */
-	gboolean result;
-
 	/* Build program. */
 	ocl_status = clBuildProgram(ccl_program_unwrap(prg),
-		num_devices, device_list, options, pfn_notify, user_data);
+		num_devices, cl_devices, options, pfn_notify, user_data);
 	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
 		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to build program (OpenCL error %d: %s).", 
@@ -521,8 +477,14 @@ error_handler:
 	
 finish:
 
+	/* Check if necessary to release array of unwrapped devices. */
+	if (cl_devices != NULL) {
+		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
+	}
+
 	/* Return result of function call. */
 	return result;
+
 
 }
 
