@@ -34,7 +34,7 @@
  * @param gmem Global memory required.
  * @param lmem Local memory required.
  * */
-void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
+void cclexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 	
 	g_printf("\n   ========================= Execution requirements ========================\n\n");
 	g_printf("     Global work size       : (%lu, %lu)\n", 
@@ -59,32 +59,43 @@ void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
  * @return The full path of the kernel file, should be freed with 
  * g_free().
  * */
-gchar* clexp_kernelpath_get(gchar* kernel_filename, char* exec_name) {
+gchar* cclexp_kernelpath_get(gchar* kernel_filename, char* exec_name) {
 	
 	/* Required variables. */
-	gchar *execPath = NULL, *kernelDir = NULL, *kernelPath = NULL;
+	gchar *exec_path = NULL, *kernel_dir = NULL, *kernel_path = NULL;
 	
 	/* Get path of the executable. */
-	execPath = g_find_program_in_path(exec_name);
+	exec_path = g_find_program_in_path(exec_name);
 	
 	/* Get directory component of the path of the executable. */
-	kernelDir = g_path_get_dirname(execPath);
+	kernel_dir = g_path_get_dirname(exec_path);
 	
 	/* Check if it's indeed a directory. */
-	if (!g_file_test(kernelDir, G_FILE_TEST_IS_DIR)) {
+	if (!g_file_test(kernel_dir, G_FILE_TEST_IS_DIR)) {
 		/* If it's not a directory, assume current directory. */
-		g_free(kernelDir);
-		kernelDir = g_strdup(".");
+		g_free(kernel_dir);
+		kernel_dir = g_strdup(".");
 	}
 	
 	/* Build full kernel file path. */
-	kernelPath = g_build_filename(kernelDir, kernel_filename, NULL);
+	kernel_path = g_build_filename(kernel_dir, kernel_filename, NULL);
 	
 	/* Free stuff. */
-	g_free(execPath);
-	g_free(kernelDir);
+	g_free(exec_path);
+	g_free(kernel_dir);
 	
 	/* Return full kernel file path. */
-	return kernelPath;
+	return kernel_path;
 
+}
+
+/** 
+ * @brief Resolves to error category identifying string, in this case
+ * an error in the cf4ocl examples.
+ * 
+ * @return A GQuark structure defined by category identifying string,
+ * which identifies the error as a cf4ocl examples generated error.
+ */
+GQuark cclexp_error_quark() {
+	return g_quark_from_static_string("cclexp-error-quark");
 }

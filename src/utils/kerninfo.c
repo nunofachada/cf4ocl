@@ -33,7 +33,8 @@
  * 
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
- * @return CL_SUCCESS if program returns with no error, or another value otherwise.
+ * @return ::CCL_SUCCESS if program returns with no error, or another 
+ * ::CCLErrorCode value otherwise.
  * */
 int main(int argc, char *argv[])
 {
@@ -65,7 +66,7 @@ int main(int argc, char *argv[])
 	/* Parse command line options */
 	/* ************************** */
 
-	gef_if_error_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4), 
+	gef_if_err_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4), 
 		CCL_ERROR_ARGS, error_handler, 
 		"Usage: %s <program_file> <kernel_name> [device_index]\n", 
 		argv[0]);
@@ -144,14 +145,14 @@ int main(int argc, char *argv[])
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
 	g_assert (err == NULL);
-	status = CL_SUCCESS;
+	status = CCL_SUCCESS;
 	goto cleanup;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err != NULL);
 	g_fprintf(stderr, "%s\n", err->message);
-	status = err->code;
+	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
 	g_error_free(err);
 
 cleanup:

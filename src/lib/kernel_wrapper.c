@@ -88,7 +88,7 @@ CCLKernel* ccl_kernel_new(
 	/* Create kernel. */
 	kernel = clCreateKernel(ccl_program_unwrap(prg), 
 		kernel_name, &ocl_status);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler,
 		"%s: unable to create kernel (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -194,7 +194,7 @@ CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq,
 			CCLArg* arg = (CCLArg*) arg_ptr;
 			ocl_status = clSetKernelArg(ccl_kernel_unwrap(krnl), arg_index, 
 				ccl_arg_size(arg), ccl_arg_value(arg));
-			gef_if_error_create_goto(*err, CCL_ERROR, 
+			gef_if_err_create_goto(*err, CCL_ERROR, 
 				CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 				"%s: unable to set kernel arg %d (OpenCL error %d: %s).",
 				G_STRLOC, arg_index, ocl_status, ccl_err(ocl_status));
@@ -208,7 +208,7 @@ CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq,
 		global_work_size, local_work_size, 
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
 		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to enqueue kernel (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));

@@ -30,15 +30,6 @@
 
 #include <glib.h>
 
-/**
- * @brief Program error codes.
- * */ 
-enum gerrorf_flags {
-	GEF_USE_STATUS = -6000, /**< Don't change status variable. */
-	GEF_USE_GERROR = -7000  /**< Use error code in GError object. */
-};
-
-
 /** 
  * @brief If error is detected (`error_code != no_error_code`), 
  * create an error object (GError) and go to the specified label. 
@@ -51,51 +42,9 @@ enum gerrorf_flags {
  * @param msg Error message in case of error.
  * @param ... Extra parameters for error message. 
  * */
-#define gef_if_error_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
+#define gef_if_err_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
 	if (error_condition) { \
 		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
-		goto label; \
-	}
-	
-	
-/** 
- * @brief If error is detected in `err` object (`err != NULL`),
- * set `status` to specified `error_code`
- * OR to error code set in the GError object if 
- * `error_code = ` @link gerrorf_flags::GEF_USE_GERROR @endlink) 
- * OR leave status untouched if
- * `error_code = ` @link gerrorf_flags::GEF_USE_STATUS @endlink) 
- * and go to the specified label.
- * 
- * @param err GError* object.
- * @param error_code Error code.
- * @param status Error status variable.
- * @param label Label to goto if error is detected.
- * */
-#define gef_if_error_goto(err, error_code, status, label)	\
-	if ((err) != NULL) { \
-		if ((error_code) != (int) GEF_USE_STATUS) { \
-			status = ((int) (error_code) == (int) GEF_USE_GERROR) ? (err)->code : (error_code); \
-		} \
-		goto label; \
-	}
-
-/** 
- * @brief Same as gef_if_error_goto(), but rethrows error in a source
- * GError to a new destination GError object.
- * 
- * @param err_dest Destination GError** object.
- * @param err_src Source GError* object.
- * @param error_code Error code.
- * @param status Error status variable.
- * @param label Label to goto if error is detected.
- * */
-#define gef_if_error_propagate_goto(err_dest, err_src, error_code, status, label) \
-	if ((err_src) != NULL) { \
-		if ((error_code) != (int) GEF_USE_STATUS) { \
-			status = ((int) (error_code) == (int) GEF_USE_GERROR) ? (err_src)->code : (error_code); \
-		} \
-		g_propagate_error(err_dest, err_src); \
 		goto label; \
 	}
 

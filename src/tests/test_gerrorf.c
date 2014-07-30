@@ -52,7 +52,9 @@ GQuark test_gerrorf_error_quark() {
 /* ************** */
 
 int errorL2Aux(int code, const char* xtramsg, GError **err) {
-	gef_if_error_create_goto(*err, TEST_GERRORF_ERROR, code != TEST_GERRORF_SUCCESS, code, error_handler, "Big error in level %d function: %s", 2, xtramsg);
+	gef_if_err_create_goto(*err, TEST_GERRORF_ERROR, 
+		code != TEST_GERRORF_SUCCESS, code, error_handler, 
+		"Big error in level %d function: %s", 2, xtramsg);
 	goto finish;
 error_handler:
 	g_assert(*err != NULL);
@@ -62,10 +64,11 @@ finish:
 
 int errorL1Aux(int code, GError **err) {
 	int status = errorL2Aux(code, "called by errorL1Aux", err);
-	gef_if_error_goto(*err, GEF_USE_STATUS, status, error_handler);
+	gef_if_err_goto(*err, error_handler);
 	goto finish;
 error_handler:
 	g_assert(*err != NULL);
+	status = (*err)->code;
 finish:
 	return status;
 }
@@ -77,8 +80,9 @@ finish:
 static void errorOneLevelTest() {
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_GERRORF_ERROR_1, "called by errorOneLevelTest", &err);
-	gef_if_error_goto(err, GEF_USE_STATUS, status, error_handler);
+	int status = errorL2Aux(TEST_GERRORF_ERROR_1, 
+		"called by errorOneLevelTest", &err);
+	gef_if_err_goto(err, error_handler);
 	status = status; /* Avoid compiler warnings. */
 
 	g_assert_not_reached();
@@ -86,7 +90,8 @@ static void errorOneLevelTest() {
 
 error_handler:
 	g_assert_error(err, TEST_GERRORF_ERROR, TEST_GERRORF_ERROR_1);
-	g_assert_cmpstr(err->message, ==, "Big error in level 2 function: called by errorOneLevelTest");
+	g_assert_cmpstr(err->message, ==, 
+		"Big error in level 2 function: called by errorOneLevelTest");
 	g_error_free(err);
 
 cleanup:
@@ -98,7 +103,7 @@ static void errorTwoLevelTest() {
 	GError *err = NULL;
 
 	int status = errorL1Aux(TEST_GERRORF_ERROR_2, &err);
-	gef_if_error_goto(err, GEF_USE_STATUS, status, error_handler);
+	gef_if_err_goto(err, error_handler);
 	status = status; /* Avoid compiler warnings. */
 
 	g_assert_not_reached();
@@ -106,7 +111,8 @@ static void errorTwoLevelTest() {
 
 error_handler:
 	g_assert_error(err, TEST_GERRORF_ERROR, TEST_GERRORF_ERROR_2);
-	g_assert_cmpstr(err->message, ==, "Big error in level 2 function: called by errorL1Aux");
+	g_assert_cmpstr(err->message, ==, 
+		"Big error in level 2 function: called by errorL1Aux");
 	g_error_free(err);
 
 cleanup:
@@ -116,8 +122,9 @@ cleanup:
 static void errorNoneTest() {
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_GERRORF_SUCCESS, "called by errorOneLevelTest", &err);
-	gef_if_error_goto(err, GEF_USE_STATUS, status, error_handler);
+	int status = errorL2Aux(TEST_GERRORF_SUCCESS, 
+		"called by errorOneLevelTest", &err);
+	gef_if_err_goto(err, error_handler);
 	status = status; /* Avoid compiler warnings. */
 
 	goto cleanup;
@@ -134,7 +141,9 @@ cleanup:
 static void errorNoVargsTest() {
 	GError *err = NULL;
 
-	gef_if_error_create_goto(err, TEST_GERRORF_ERROR, 1, TEST_GERRORF_ERROR_1, error_handler, "I have no additional arguments");
+	gef_if_err_create_goto(err, TEST_GERRORF_ERROR, 1, 
+		TEST_GERRORF_ERROR_1, error_handler, 
+		"I have no additional arguments");
 
 	g_assert_not_reached();
 	goto cleanup;

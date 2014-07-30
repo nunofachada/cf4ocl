@@ -31,6 +31,16 @@
 #include "common.h"
 #include "abstract_wrapper.h"
 
+typedef CCLWrapper CCLArg;
+
+CCLArg* ccl_arg_new(void* value, size_t size);
+
+void ccl_arg_destroy(CCLArg* arg);
+
+size_t ccl_arg_size(CCLArg* arg);
+
+void* ccl_arg_value(CCLArg* arg);
+
 /**
  * @defgroup KERNEL_ARG Kernel argument wrappers
  * @ingroup KERNEL_WRAPPER
@@ -42,21 +52,14 @@
  * @{
  */
 
-typedef CCLWrapper CCLArg;
-
-#define ccl_arg_private(value, type) \
+#define ccl_arg_priv(value, type) \
 	ccl_arg_new(&value, sizeof(type))
 
 #define ccl_arg_local(count, type) \
 	ccl_arg_new(NULL, count * sizeof(type))
-	
-CCLArg* ccl_arg_new(void* value, size_t size);
 
-void ccl_arg_destroy(CCLArg* arg);
-
-size_t ccl_arg_size(CCLArg* arg);
-
-void* ccl_arg_value(CCLArg* arg);
+#define ccl_arg_full(value, size) \
+	ccl_arg_new(value, size)
 
 /** @} */
 

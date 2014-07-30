@@ -45,13 +45,15 @@ CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	cl_mem buffer;
 	CCLBuffer* buf = NULL;
 	
+	/* Create OpenCL buffer. */
 	buffer = clCreateBuffer(ccl_context_unwrap(ctx), flags, size,
 		host_ptr, &ocl_status);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to create buffer (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
+	/* Wrap OpenCL buffer. */
 	buf = ccl_memobj_new_wrap(buffer);
 	
 	/* If we got here, everything is OK. */
@@ -88,7 +90,7 @@ CCLEvent* ccl_buffer_read(CCLQueue* cq, CCLBuffer* buf,
 		ccl_memobj_unwrap(buf), blocking_read, offset, size, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to read buffer (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -138,7 +140,7 @@ CCLEvent* ccl_buffer_write(CCLQueue* cq, CCLBuffer* buf,
 		ccl_memobj_unwrap(buf), blocking_write, offset, size, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to write buffer (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -191,7 +193,7 @@ void* ccl_buffer_map(CCLQueue* cq, CCLBuffer* buf,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), 
 		&event, &ocl_status);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to map buffer (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -247,7 +249,7 @@ CCLEvent* ccl_buffer_copy(CCLQueue* cq, CCLBuffer* src_buf,
 		src_offset, dst_offset, size,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to write buffer (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -300,7 +302,7 @@ CCLEvent* ccl_buffer_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 		src_offset, dst_origin, region,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to copy buffer to image (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));

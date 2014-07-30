@@ -32,11 +32,6 @@
 	 
 static char arg_local_marker;
 
-/** 
- * @addtogroup KERNEL_ARG
- * @{
- */
-
 CCLArg* ccl_arg_new(void* value, size_t size) {
 
 	CCLArg* arg = g_slice_new(CCLArg);
@@ -79,5 +74,3 @@ void* ccl_arg_value(CCLArg* arg) {
 		? arg->cl_object
 		: &arg->cl_object;
 }
-
-/** @} */

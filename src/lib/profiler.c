@@ -1513,10 +1513,10 @@ cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
 			export_options.evname_delim,
 			export_options.newline);
 			
-		gef_if_error_create_goto(*err, CCL_ERROR, write_status < 0, 
-			ret_status = CCL_ERROR_STREAM_WRITE, error_handler, 
-			"Error while exporting profiling information \
-			(writing to stream).");
+		gef_if_err_create_goto(*err, CCL_ERROR, write_status < 0, 
+			CCL_ERROR_STREAM_WRITE, error_handler, 
+			"Error while exporting profiling information" \
+			"(writing to stream).");
 
 	}
 	
@@ -1560,8 +1560,8 @@ cl_bool ccl_prof_export_info_file(
 	
 	/* Open file. */
 	FILE* fp = fopen(filename, "w");
-	gef_if_error_create_goto(*err, CCL_ERROR, fp == NULL, 
-		status = CCL_ERROR_OPENFILE, error_handler, 
+	gef_if_err_create_goto(*err, CCL_ERROR, fp == NULL, 
+		CCL_ERROR_OPENFILE, error_handler, 
 		"Unable to open file '%s' for exporting.", filename);
 	
 	/* Export data. */

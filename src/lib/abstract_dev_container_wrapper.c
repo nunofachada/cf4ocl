@@ -181,7 +181,7 @@ CCLDevice* ccl_dev_container_get_device(
 	}
 	
 	/* Make sure device index is less than the number of devices. */
-	gef_if_error_create_goto(*err, CCL_ERROR, index >= devcon->num_devices, 
+	gef_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices, 
 		CCL_ERROR_DEVICE_NOT_FOUND, error_handler, 
 		"%s: device index (%d) out of bounds (%d devices in list).",
 		 G_STRLOC, index, devcon->num_devices);

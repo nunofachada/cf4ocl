@@ -34,29 +34,30 @@
 #include <glib/gprintf.h>
 #include "oclversions.h"
 
-#define CCL_COMMON_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."
+#define CCL_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGH" \
+	"IJKLMNOPQRSTUVWXYZ0123456789_."
+
 /**
  * @brief Error codes.
  * */
-enum ccl_error_codes {
+typedef enum ccl_error_code {
 	/** Successful operation. */
-	CCL_SUCCESS = 0,
-	/** Error code thrown when no memory allocation is possible. */
-	CCL_ERROR_NOALLOC = 1,
-	/** Error code thrown when it's not possible to open file. */
-	CCL_ERROR_OPENFILE = 2,
-	/** Error code thrown when passed arguments are invalid. */
-	CCL_ERROR_ARGS = 3,
-	/** Error code thrown when invalid data is passed to a function. */
-	CCL_ERROR_INVALID_DATA = 4,
-	/** Error code thrown when an error occurs while writing to a 
-	 * stream. */
-	CCL_ERROR_STREAM_WRITE = 5,
+	CCL_SUCCESS                = 0,
+	/** Unable to open file. */
+	CCL_ERROR_OPENFILE         = 1,
+	/** Invalid program arguments. */
+	CCL_ERROR_ARGS             = 2,
+	/** Invalid data passed to a function. */
+	CCL_ERROR_INVALID_DATA     = 3,
+	/** Error writing to a stream. */
+	CCL_ERROR_STREAM_WRITE     = 4,
 	/** The requested OpenCL device was not found. */
-	CCL_ERROR_DEVICE_NOT_FOUND = 6,
-	/** An OpenCL error ocurred. */
-	CCL_ERROR_OCL = 10
-};
+	CCL_ERROR_DEVICE_NOT_FOUND = 5,
+	/** OpenCL error. */
+	CCL_ERROR_OCL              = 6,
+	/** Any other errors. */
+	CCL_ERROR_OTHER            = 15
+} CCLErrorCode;
 
 /** Resolves to error category identifying string, in this case an error 
  * in the OpenCL utilities library. */

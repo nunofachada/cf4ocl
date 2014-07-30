@@ -97,7 +97,7 @@ CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq,
 		ccl_memobj_unwrap(mo), mapped_ptr, 
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
 		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to unmap memory object (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -161,7 +161,7 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 		num_mos, (const cl_mem*) mem_objects, flags,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);		
-	gef_if_error_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
 		CCL_ERROR_OCL, error_handler, 
 		"%s: unable to migrate memory objects (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));

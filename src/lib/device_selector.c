@@ -644,7 +644,7 @@ gboolean ccl_devsel_indep_type(
 	GError* err_internal = NULL;
 	
 	/* Make sure data is not NULL. */
-	gef_if_error_create_goto(*err, CCL_ERROR, data == NULL, 
+	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
@@ -769,7 +769,7 @@ gboolean ccl_devsel_indep_string(
 	gchar *complt_info, *complt_info_lowr, *part_info;
 	
 	/* Make sure data is not NULL. */
-	gef_if_error_create_goto(*err, CCL_ERROR, data == NULL, 
+	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
@@ -880,7 +880,7 @@ gboolean ccl_devsel_indep_platform(
 	gboolean pass;
 
 	/* Check if data is NULL, throw error if so. */
-	gef_if_error_create_goto(*err, CCL_ERROR, data == NULL, 
+	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	

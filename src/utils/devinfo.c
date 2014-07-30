@@ -72,12 +72,12 @@ static gchar* basic_info[] = {
 };
 
 /**
- * @brief Device query main program function.
+ * @brief Device info main program function.
  * 
  * @param argc Number of command line arguments.
  * @param argv Vector of command line arguments.
- * @return #CCL_SUCCESS if program returns with no error, or an error
- * code otherwise.
+ * @return ::CCL_SUCCESS if program returns with no error, or another 
+ * ::CCLErrorCode value otherwise.
  */
 int main(int argc, char* argv[]) {
 	
@@ -100,12 +100,12 @@ int main(int argc, char* argv[]) {
 	/* Device name. */
 	gchar* dev_name;
 	
-	/* Function status. */
+	/* Program return status. */
 	gint status;
 	
 	/* Parse command line options. */
 	ccl_device_query_args_parse(argc, argv, &err);
-	gef_if_error_goto(err, CCL_ERROR_ARGS, status, error_handler);
+	gef_if_err_goto(err, error_handler);
 	
 	/* Check if user requested a list of known information parameters. */
 	if (opt_list) {
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
 		
 		/* Get list of platform wrapper objects. */
 		platforms = ccl_platforms_new(&err);
-		gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+		gef_if_err_goto(err, error_handler);
 		
 		/* Cycle through platforms. */
 		for (guint i = 0; i < ccl_platforms_count(platforms); i++) {
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
 			
 			/* Get number of devices. */
 			num_devs = ccl_platform_get_num_devices(p, &err);
-			gef_if_error_goto(err, GEF_USE_GERROR, status, error_handler);
+			gef_if_err_goto(err, error_handler);
 		
 			/* Cycle through devices. */
 			for (guint j = 0; j < num_devs; j++) {
@@ -161,13 +161,12 @@ int main(int argc, char* argv[]) {
 
 				/* Get current device. */
 				d = ccl_platform_get_device(p, j, &err);
-				gef_if_error_goto(
-					err, GEF_USE_GERROR, status, error_handler);
+				gef_if_err_goto(err, error_handler);
 					
 				/* Get device name. */
 				info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
-				gef_if_error_goto(
-					err, GEF_USE_GERROR, status, error_handler);
+				gef_if_err_goto(err, error_handler);
+				
 				dev_name = (gchar*) info_value->value;
 				
 				/* Show device information. */
@@ -195,6 +194,7 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
 	g_fprintf(stderr, "%s\n", err->message);
+	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
 	g_error_free(err);
 
 cleanup:
@@ -225,9 +225,6 @@ void ccl_device_query_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Create parsing context. */
 	context = g_option_context_new(" - " CCL_DEVINFO_DESCRIPTION);
-	gef_if_error_create_goto(*err, CCL_ERROR, context == NULL, 
-		CCL_ERROR_ARGS, error_handler, 
-		"Unable to create command line parsing context.");
 	
 	/* Add acceptable command line options to context. */ 
 	g_option_context_add_main_entries(context, entries, NULL);
@@ -280,21 +277,21 @@ void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
 	version = ccl_platform_get_info_string(p, CL_PLATFORM_VERSION, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
-		profile = "Unknown version";
+		version = "Unknown version";
 	}
 			
 	/* Get platform name. */
 	name = ccl_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
-		profile = "Unknown name";
+		name = "Unknown name";
 	}
 
 	/* Get platform vendor. */
 	vendor = ccl_platform_get_info_string(p, CL_PLATFORM_VENDOR, &err);
 	if (err != NULL) {
 		g_clear_error(&err);
-		profile = "Unknown vendor";
+		vendor = "Unknown vendor";
 	}
 
 	/*  Send info to defined stream. */

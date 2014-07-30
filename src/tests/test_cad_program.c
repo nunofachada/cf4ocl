@@ -209,7 +209,7 @@ static void program_create_info_destroy_test() {
 	ccl_event_wait_list_add(ewl, evt_w2);
 	
 	CCLEvent* evt_kr = ccl_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, ewl, 
-		&err, a_w, b_w, c_w, ccl_arg_private(d_h, cl_uint), NULL);
+		&err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
 	ccl_event_wait_list_add(ewl, evt_kr);

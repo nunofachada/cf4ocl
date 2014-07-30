@@ -97,7 +97,7 @@ static CCLQueue* ccl_queue_new_direct(cl_context context,
 	/* Create and keep the OpenCL command queue object. */
 	queue = clCreateCommandQueue(context, device,
 		properties, &ocl_status);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: unable to create queue (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -316,7 +316,7 @@ cl_int ccl_queue_flush(CCLQueue* cq, GError** err) {
 
 	ocl_status = clFlush(ccl_queue_unwrap(cq));
 	if (ocl_status != CL_SUCCESS)
-		g_set_error(err, CCL_ERROR, ocl_status, 
+		g_set_error(err, CCL_ERROR, CCL_ERROR_OCL, 
 			"%s: unable to flush queue (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 
@@ -333,7 +333,7 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err) {
 
 	ocl_status = clFinish(ccl_queue_unwrap(cq));
 	if (ocl_status != CL_SUCCESS)
-		g_set_error(err, CCL_ERROR, ocl_status, 
+		g_set_error(err, CCL_ERROR, CCL_ERROR_OCL, 
 			"%s: unable to finish queue (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 

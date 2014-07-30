@@ -66,7 +66,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	/* Determine number of devices. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object, 
 		CL_DEVICE_TYPE_ALL, 0, NULL, &devcon->num_devices);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: get number of devices (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -78,7 +78,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	/* Get existing device IDs. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object, 
 		CL_DEVICE_TYPE_ALL, devcon->num_devices, info->value, NULL);
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: get device IDs (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));

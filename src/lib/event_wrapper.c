@@ -277,7 +277,7 @@ cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err) {
 	ocl_status = clWaitForEvents(
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst));
-	gef_if_error_create_goto(*err, CCL_ERROR, 
+	gef_if_err_create_goto(*err, CCL_ERROR, 
 		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
 		"%s: error while waiting for events (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));

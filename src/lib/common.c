@@ -35,6 +35,6 @@
  * which identifies the error as a cf4ocl generated error.
  */
 GQuark ccl_error_quark() {
-	return g_quark_from_static_string("cl4-error-quark");
+	return g_quark_from_static_string("ccl-error-quark");
 }
 

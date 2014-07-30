@@ -49,7 +49,7 @@
  * @param err GLib error object for error reporting.
  * @return TRUE if pair of numbers exists, FALSE otherwise.
  * */
-#define clexp_parse_pairs(in, out, option_name, data, err) \
+#define cclexp_parse_pairs(in, out, option_name, data, err) \
 	/* Avoid compiler warnings. */ \
 	option_name = option_name; data = data; \
 	/* Two numbers must be read... */ \
@@ -64,15 +64,29 @@
 		return FALSE; \
 	}
 
-/** @brief Code for operation successful. */
-#define CLEXP_SUCCESS 0
-/** @brief Code for operation failed. */
-#define CLEXP_FAIL -1
 
 /** @brief Print device requirements for program. */
-void clexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
+void cclexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
 
 /** @brief Get full kernel path name. */
-gchar* clexp_kernelpath_get(gchar* kernel_filename, char* exec_name);
+gchar* cclexp_kernelpath_get(gchar* kernel_filename, char* exec_name);
+
+/**
+ * @brief Error codes.
+ * */
+enum cclexp_error_codes {
+	/** Code for operation successful. */
+	CLEXP_SUCCESS = 0,
+	/** Code for operation failed. */
+	CLEXP_FAIL = -1,
+};
+
+/** Resolves to error category identifying string, in this case an error 
+ * in the cf4ocl examples. */
+#define CCLEXP_ERROR cclexp_error_quark()
+
+/** @brief Resolves to error category identifying string, in this case
+ * an error in the cf4ocl examples. */
+GQuark cclexp_error_quark(void);
 
 #endif
