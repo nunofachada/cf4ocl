@@ -246,6 +246,81 @@ static void program_create_info_destroy_test() {
 
 }
 
+/** 
+ * @brief Test increasing reference count of objects which compose 
+ * larger objects, then destroy the larger object and verify that 
+ * composing object still exists and must be freed by the function
+ * which increase its reference count.
+ * 
+ * This function tests the following modules: program, queue, kernel,
+ * event.
+ * */
+static void program_ref_unref_test() {
+
+	CCLContext* ctx = NULL;
+	GError* err = NULL;
+	//~ CCLDevice* d = NULL;
+	CCLProgram* prg = NULL;
+	CCLKernel* krnl1 = NULL;
+	CCLKernel* krnl2 = NULL;
+	CCLQueue* cq = NULL;
+	//~ CCLEvent* evt = NULL;
+	
+	const char* src = CCL_TEST_PROGRAM_SUM_CONTENT;
+	
+	/* Get some context. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+	
+	/* Create a program from source. */
+	prg = ccl_program_new_from_source(ctx, src, &err);
+	g_assert_no_error(err);
+
+	/* Build program. */
+	ccl_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Get kernel wrapper from program (will be the instance kept in the 
+	 * program wrapper). */
+	krnl1 = ccl_program_get_kernel(prg, CCL_TEST_PROGRAM_SUM, &err);
+	g_assert_no_error(err);
+	
+	/* Create another kernel wrapper for the same kernel. This should 
+	 * yield a different object because we're not getting it from 
+	 * the program wrapper. */
+	krnl2 = ccl_kernel_new(prg, CCL_TEST_PROGRAM_SUM, &err);
+	g_assert_no_error(err);
+
+	/* Check that they're different. */
+	g_assert_cmphex(GPOINTER_TO_UINT(krnl1), !=, GPOINTER_TO_UINT(krnl2));
+	
+	/* Check that each has a ref count of 1. */
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 1);
+	
+	/* Increment the ref count of the directly created kernel. */
+	ccl_kernel_ref(krnl2);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 2);
+	
+	/* Get rid of the directly created kernel. */
+	ccl_kernel_unref(krnl2);
+	ccl_kernel_unref(krnl2);
+
+	/* Create a command queue and check its ref count. */
+	cq = ccl_queue_new(ctx, NULL, 0, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) cq), ==, 1);
+	
+	/// @todo Do test for task and of native kernel
+	
+	/* Destroy remaining stuff. */
+	ccl_queue_destroy(cq);
+	ccl_program_destroy(prg);
+	ccl_context_destroy(ctx);
+
+}
+
 /**
  * @brief Main function.
  * @param argc Number of command line arguments.
@@ -258,7 +333,11 @@ int main(int argc, char** argv) {
 		
 	g_test_add_func(
 		"/wrappers/program/create-info-destroy", 
-		program_create_info_destroy_test);		
+		program_create_info_destroy_test);
+
+	g_test_add_func(
+		"/wrappers/program/ref-unref", 
+		program_ref_unref_test);
 
 	return g_test_run();
 }

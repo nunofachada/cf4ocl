@@ -337,7 +337,7 @@ static void context_ref_unref_test() {
 	CCLDevice* d = NULL;
 	CCLDevSelFilters filters = NULL;
 	
-	/* Test context creating from cl_devices. */
+	/* Test context creating from_devices. */
 	ps = ccl_platforms_new(&err);
 	g_assert_no_error(err);
 
@@ -391,12 +391,21 @@ static void context_ref_unref_test() {
 		ccl_context_destroy(ctx);
 	}
 	filters = NULL;
-
-	/// @todo Test context from CCLPlatform, check that devices have ref=2 (kept by CCLPlatform and CCLContext)
-	/// @todo Add test for device selection using menu filter
-	/// @todo Test ref/unref program
-	/// @todo Test ref/unref queue
-	/// @todo Test ref/unref kernels
+	
+	/* Test context creation by menu. */
+	int data = 0; /* Select device with index 0 in menu. */
+	ctx = ccl_context_new_from_menu_full(&data, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+	
+	d = ccl_context_get_device(ctx, 0, &err);
+	ccl_device_ref(d);
+	
+	ccl_context_destroy(ctx);
+	
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+	
+	ccl_device_unref(d);
 
 }
 
