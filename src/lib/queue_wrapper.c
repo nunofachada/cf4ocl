@@ -74,52 +74,6 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
 
 }
 
-static CCLQueue* ccl_queue_new_direct(cl_context context, 
-	cl_device_id device, cl_command_queue_properties properties, 
-	GError** err) {
-
-	/* Make sure context is not NULL. */
-	g_return_val_if_fail(context != NULL, NULL);
-	/* Make sure device is not NULL. */
-	g_return_val_if_fail(device != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-		
-	/* The command queue wrapper object. */
-	CCLQueue* cq = NULL;
-	
-	/* The OpenCL status flag. */
-	cl_int ocl_status;
-	
-	/* The OpenCL command queue object. */
-	cl_command_queue queue = NULL;
-	
-	/* Create and keep the OpenCL command queue object. */
-	queue = clCreateCommandQueue(context, device,
-		properties, &ocl_status);
-	gef_if_err_create_goto(*err, CCL_ERROR, 
-		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
-		"%s: unable to create queue (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
-
-	/* Wrap the queue. */
-	cq = ccl_queue_new_wrap(queue);
-
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	
-finish:		
-
-	/* Return the new command queue wrapper object. */
-	return cq;	
-	
-}
-
 /** 
  * @addtogroup QUEUE_WRAPPER
  * @{
@@ -133,9 +87,12 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
+	/* The OpenCL status flag. */
+	cl_int ocl_status;
+	/* The OpenCL command queue object. */
+	cl_command_queue queue = NULL;
 	/* The command queue wrapper object. */
 	CCLQueue* cq = NULL;
-	
 	/* Internal error object. */
 	GError* err_internal = NULL;
 	
@@ -145,11 +102,17 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 	
-	/* Create the command queue. */
-	cq = ccl_queue_new_direct(ccl_context_unwrap(ctx), 
-		ccl_device_unwrap(dev), properties, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	/* Create and keep the OpenCL command queue object. */
+	queue = clCreateCommandQueue(ccl_context_unwrap(ctx), 
+		ccl_device_unwrap(dev), properties, &ocl_status);
+	gef_if_err_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		"%s: unable to create queue (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
+	/* Wrap the queue. */
+	cq = ccl_queue_new_wrap(queue);
+
 	/* Keep the context and device wrappers, update their reference
 	 * count. */
 	cq->ctx = ctx;
