@@ -52,6 +52,9 @@ typedef struct ccl_platform CCLPlatform;
 /** @brief Get the platform wrapper for the given OpenCL platform. */
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 
+/** @brief Get the platform wrapper for the given device wrapper. */
+CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err);
+
 /** @brief Decrements the reference count of the platform wrapper 
  * object. If it reaches 0, the platform wrapper object is destroyed. */
 void ccl_platform_destroy(CCLPlatform* platf);

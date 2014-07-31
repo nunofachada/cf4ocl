@@ -138,6 +138,52 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
 }
 
 /** 
+ * @brief Get the platform wrapper for the given device wrapper. 
+ * 
+ * @param dev The device wrapper from where to get a platform wrapper.
+ * @param err Return location for a GError, or NULL if error reporting
+ * is to be ignored.
+ * @return The platform wrapper for the given device wrapper or NULL in
+ * case an error occurs. 
+ * */
+CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err) {
+
+	/* Make sure dev is not NULL. */
+	g_return_val_if_fail(dev != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* The OpenCL platform_id object. */
+	cl_platform_id platform_id;
+	/* The platform wrapper to return. */
+	CCLPlatform* platf = NULL;
+	/* Internal error object. */
+	GError* err_internal = NULL;
+	
+	/* Get OpenCL platform_id object from device. */
+	platform_id = ccl_device_get_scalar_info(
+		dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* Create/get the platform wrapper. */
+	platf = ccl_platform_new_wrap(platform_id);
+
+	/* If we got here, everything is OK. */
+	g_assert (err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:		
+
+	/* Return the device platform wrapper. */
+	return platf;	
+
+}
+
+/** 
  * @brief Decrements the reference count of the platform wrapper object. 
  * If it reaches 0, the platform wrapper object is destroyed.
  *

@@ -58,8 +58,6 @@ typedef struct ccl_device CCLDevice;
  * If it reaches 0, the device wrapper object is destroyed. */
 void ccl_device_destroy(CCLDevice* dev);
 
-CCLPlatform* ccl_device_get_platform(CCLDevice* dev, GError** err);
-
 /**
  * @brief Get a ::CCLWrapperInfo device information object.
  * 

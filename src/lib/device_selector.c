@@ -806,7 +806,7 @@ gboolean ccl_devsel_indep_string(
 			CCLPlatform* platf;
 			
 			/* Get device platform. */
-			platf = ccl_device_get_platform(dev, &err_internal);
+			platf = ccl_platform_new_from_device(dev, &err_internal);
 			gef_if_err_propagate_goto(err, err_internal, error_handler);
 			
 			/* Get platform name. */
@@ -820,6 +820,9 @@ gboolean ccl_devsel_indep_string(
 			if (g_strrstr(complt_info_lowr, part_info)) {
 				pass = TRUE;
 			}
+			
+			/* Destroy device platform. */
+			ccl_platform_destroy(platf);
 			
 		} else {
 			pass = TRUE;

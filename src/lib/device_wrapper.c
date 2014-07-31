@@ -36,10 +36,7 @@ struct ccl_device {
 
 	/** Parent wrapper object. */
 	CCLWrapper base;
-	
-	/** Device platform. */
-	CCLPlatform* platf;
-	
+
 };
 
 /** 
@@ -58,45 +55,6 @@ void ccl_device_destroy(CCLDevice* dev) {
 	ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
 		NULL, NULL, NULL); 
 
-}
-
-CCLPlatform* ccl_device_get_platform(CCLDevice* dev, GError** err) {
-	
-	/* Make sure dev is not NULL. */
-	g_return_val_if_fail(dev != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-	
-	CCLPlatform* platf = NULL;
-	
-	/* Internal error object. */
-	GError* err_internal = NULL;
-	
-	if (dev->platf != NULL) {
-		platf = dev->platf;
-	} else {
-		CCLWrapperInfo* info = NULL;
-		info = ccl_device_get_info(
-			dev, CL_DEVICE_PLATFORM, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		platf = ccl_platform_new_wrap(*((cl_platform_id*) info->value));
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
-		dev->platf = platf;
-	}
-
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	
-finish:		
-
-	/* Return the device platform wrapper. */
-	return platf;	
-	
 }
 
 /** @} */
