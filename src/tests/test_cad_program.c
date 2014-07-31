@@ -38,7 +38,7 @@
 
 #define CCL_TEST_PROGRAM_SUM "sum"
 
-#define CCL_TEST_PROGRAM_SUM_NAME CCL_TEST_PROGRAM_SUM ".cl"
+#define CCL_TEST_PROGRAM_SUM_FILENAME CCL_TEST_PROGRAM_SUM ".cl"
 
 #define CCL_TEST_PROGRAM_SUM_CONTENT \
 	"__kernel void " CCL_TEST_PROGRAM_SUM "(" \
@@ -50,22 +50,42 @@
 	"	c[gid] = a[gid] + b[gid] + d;" \
 	"}"
 
+#define CCL_TEST_PROGRAM_BUF_SIZE 16
+#define CCL_TEST_PROGRAM_LWS 8 /* Must be a divisor of CCL_TEST_PROGRAM_BUF_SIZE */
+#define CCL_TEST_PROGRAM_CONST 4
+G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
+
 /**
  * @brief Tests creation, getting info from and destruction of 
  * program wrapper objects.
  * */
 static void program_create_info_destroy_test() {
 
+	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLProgram* prg = NULL;
 	CCLKernel* krnl = NULL;
 	CCLWrapperInfo* info = NULL;
 	CCLDevice* d = NULL;
 	CCLQueue* cq = NULL;
+	size_t gws;
+	size_t lws;
+	cl_uint a_h[CCL_TEST_PROGRAM_BUF_SIZE];
+	cl_uint b_h[CCL_TEST_PROGRAM_BUF_SIZE];
+	cl_uint c_h[CCL_TEST_PROGRAM_BUF_SIZE];
+	cl_uint d_h ;
+	CCLMemObj* a_w;
+	CCLMemObj* b_w;
+	CCLMemObj* c_w;
+	CCLEvent* evt_w1;
+	CCLEvent* evt_w2;
+	CCLEvent* evt_kr;
+	CCLEvent* evt_r1;
+	CCLEventWaitList ewl;
 	GError* err = NULL;
 	
 	/* Create a temporary kernel file. */
-	g_file_set_contents(CCL_TEST_PROGRAM_SUM_NAME, 
+	g_file_set_contents(CCL_TEST_PROGRAM_SUM_FILENAME, 
 		CCL_TEST_PROGRAM_SUM_CONTENT, -1, &err);
 	g_assert_no_error(err);
 
@@ -79,7 +99,7 @@ static void program_create_info_destroy_test() {
 
 	/* Create a new program from kernel file. */
 	prg = ccl_program_new_from_source_file(
-		ctx, CCL_TEST_PROGRAM_SUM_NAME, &err);
+		ctx, CCL_TEST_PROGRAM_SUM_FILENAME, &err);
 	g_assert_no_error(err);
 	
 	/* Get some program info, compare it with expected info. */
@@ -87,17 +107,22 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	g_assert(*((cl_context*) info->value) == ccl_context_unwrap(ctx));
 
+	/* Get number of devices from program info, check that this is the
+	 * same value as the number of devices in context. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(*((cl_uint*) info->value), 
 		==, ccl_context_get_num_devices(ctx, &err));
 	g_assert_no_error(err);
 
+	/* Get program source from program info, check that it is the 
+	 * same as the passed source. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_SOURCE, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr((char*) info->value, 
 		==, CCL_TEST_PROGRAM_SUM_CONTENT);
 	
+	/* Check that no build was performed yet. */
 	info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert_cmpint(*((cl_build_status*) info->value), ==, CL_BUILD_NONE);
@@ -112,6 +137,7 @@ static void program_create_info_destroy_test() {
 	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
 		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
 
+	/* Get the build log, check that no error occurs. */
 	info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
 
@@ -121,11 +147,16 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Get some kernel info, compare it with expected info. */
+	
+	/* Get kernel function name from kernel info, compare it with the
+	 * expected value. */
 	info = ccl_kernel_get_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(
 		(gchar*) info->value, ==, CCL_TEST_PROGRAM_SUM);
 
+	/* Check if the kernel context is the same as the initial context 
+	 * and the program context. */
 	info = ccl_kernel_get_info(krnl, CL_KERNEL_CONTEXT, &err);
 	g_assert_no_error(err);
 	g_assert(*((cl_context*) info->value) == ccl_context_unwrap(ctx));
@@ -135,9 +166,9 @@ static void program_create_info_destroy_test() {
 	g_assert(*((cl_program*) info->value) == ccl_program_unwrap(prg));
 
 	/* Remove temporary kernel file. */
-	if (g_unlink(CCL_TEST_PROGRAM_SUM_NAME) < 0)
+	if (g_unlink(CCL_TEST_PROGRAM_SUM_FILENAME) < 0)
 		g_message("Unable to delete temporary file '"
-			CCL_TEST_PROGRAM_SUM_NAME "'");
+			CCL_TEST_PROGRAM_SUM_FILENAME "'");
 			
 	/* Save binaries for all available devices. */
 	ccl_program_save_all_binaries(prg, "test_", ".bin", &err);
@@ -184,52 +215,71 @@ static void program_create_info_destroy_test() {
 	cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 	
-	/* Set args and execute kernel. */
-	size_t gws = 16;
-	size_t lws = 8;
-	cl_uint a_h[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-	cl_uint b_h[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-	cl_uint c_h[16];
-	cl_uint d_h = 4;
+	/* Set kernel enqueue properties and initialize host data. */
+	gws = CCL_TEST_PROGRAM_BUF_SIZE;
+	lws = CCL_TEST_PROGRAM_LWS;
 	
-	CCLMemObj* a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &err);
+	for (cl_uint i = 0; i < CCL_TEST_PROGRAM_BUF_SIZE; ++i) {
+		a_h[i] = i + 1;
+		b_h[i] = i + 1;
+	}
+	d_h = CCL_TEST_PROGRAM_CONST;
+	
+	/* Create host buffers. */
+	a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);
-	CCLMemObj* b_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 16 * sizeof(cl_uint), NULL, &err);
+	b_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);
-	CCLMemObj* c_w = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY, 16 * sizeof(cl_uint), NULL, &err);
+	c_w = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);
 	
-	CCLEvent* evt_w1 = ccl_buffer_write(cq, a_w, CL_FALSE, 0, 16 * sizeof(cl_uint), a_h, NULL, &err);
+	/* Copy host data to device buffers without waiting for transfer
+	 * to terminate before continuing host program. */
+	evt_w1 = ccl_buffer_write(cq, a_w, CL_FALSE, 0, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
 	g_assert_no_error(err);
-	CCLEvent* evt_w2 = ccl_buffer_write(cq, b_w, CL_FALSE, 0, 16 * sizeof(cl_uint), b_h, NULL, &err);
+	evt_w2 = ccl_buffer_write(cq, b_w, CL_FALSE, 0, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
 	g_assert_no_error(err);
 
-	CCLEventWaitList ewl = ccl_event_wait_list_new();
+	/* Initialize event wait list and add the two transfer events. */
+	ewl = ccl_event_wait_list_new();
 	ccl_event_wait_list_add(ewl, evt_w1);
 	ccl_event_wait_list_add(ewl, evt_w2);
 	
-	CCLEvent* evt_kr = ccl_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, ewl, 
+	/* Set args and execute kernel, waiting for the two transfer events
+	 * to terminate (this will empty the event wait list). */
+	evt_kr = ccl_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, ewl, 
 		&err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
+	/* Add the kernel termination event to the wait list. */
 	ccl_event_wait_list_add(ewl, evt_kr);
-	CCLEvent* evt_r1 = ccl_buffer_read(cq, c_w, CL_FALSE, 0, 16 * sizeof(cl_uint), c_h, ewl, &err);
+	
+	/* Read back results from host, waiting for the kernel termination
+	 * event (this will empty the event wait list) without waiting for 
+	 * transfer to terminate before continuing host program.. */
+	evt_r1 = ccl_buffer_read(cq, c_w, CL_FALSE, 0, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, ewl, &err);
 	g_assert_no_error(err);
 	
+	/* Add read back results event to wait list. */
 	ccl_event_wait_list_add(ewl, evt_r1);
 	
+	/* Wait for all events in wait list to terminate (this will empty
+	 * the wait list). */
 	ccl_event_wait(ewl, &err);
 	g_assert_no_error(err);
 	
 #ifndef OPENCL_STUB
-	for (guint i = 0; i < 16; i++) {
+	/* Check results are as expected (not available with OpenCL stub). */
+	for (guint i = 0; i < CCL_TEST_PROGRAM_BUF_SIZE; i++) {
 		g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i] + d_h);
-		//printf("c_h[%d] = %d\n", i, c_h[i]);
+		g_debug("c_h[%d] = %d\n", i, c_h[i]);
 	}
 #endif
 
+	/* Destroy the event wait list. */
 	ccl_event_wait_list_destroy(ewl);
 
+	/* Destroy the memory objects. */
 	ccl_memobj_destroy(a_w);
 	ccl_memobj_destroy(b_w);
 	ccl_memobj_destroy(c_w);
@@ -237,9 +287,6 @@ static void program_create_info_destroy_test() {
 	/* Destroy the command queue. */
 	ccl_queue_destroy(cq);
 
-	/* Delete all created binaries. */
-	/// @todo
-	
 	/* Destroy stuff. */
 	ccl_program_destroy(prg);
 	ccl_context_destroy(ctx);
