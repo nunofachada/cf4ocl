@@ -816,24 +816,27 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	for (guint i = 0; i < num_devices; ++i) {
 		
 		CCLDevice* dev = NULL;
-		CCLWrapperInfo* file_middle = NULL;
+		gchar* file_middle = NULL;
 		gchar* filename;
 		
-		dev = ccl_program_get_device(prg, i, &err_internal);	
+		dev = ccl_program_get_device(prg, i, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 
-		file_middle = ccl_device_get_info(dev, CL_DEVICE_NAME, &err_internal);
+		file_middle = g_strdup(
+			ccl_device_get_array_info(
+				dev, CL_DEVICE_NAME, char*, &err_internal));
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
-		filename = g_strdup_printf("%s%s_%2d%s", 
-			file_prefix, (gchar*) file_middle->value, i, file_suffix);
+		g_strcanon(file_middle, CCL_VALIDFILECHARS, '_');
 		
-		g_strcanon(filename, CCL_VALIDFILECHARS, '_');
+		filename = g_strdup_printf("%s%s_%02d%s", 
+			file_prefix, file_middle, i, file_suffix);
 		
 		ccl_program_save_binary(prg, dev, filename, &err_internal);
 		gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		g_free(filename);
+		g_free(file_middle);
 	}
 
 
