@@ -345,6 +345,7 @@ static void context_ref_unref_test() {
 	const CCLDevice** ds;
 	CCLDevSelFilters filters = NULL;
 	cl_uint num_devs;
+	cl_device_type dev_type;
 	
 	/* ********************************************* */
 	/* **** Test context creating from_devices. **** */
@@ -542,8 +543,21 @@ static void context_ref_unref_test() {
 	} else {
 		/* No error, so check that the context ref. count is 1. */
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
-		/* And destroy context. */
+		/* Get first device. */
+		d = ccl_context_get_device(ctx, 0, &err);
+		g_assert_no_error(err);
+		/* Check that its a GPU and ref it. */
+		dev_type = ccl_device_get_scalar_info(d, CL_DEVICE_TYPE, cl_device_type, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(dev_type & CL_DEVICE_TYPE_GPU, ==, CL_DEVICE_TYPE_GPU);
+		ccl_device_ref(d);
+		/* Destroy context. */
 		ccl_context_destroy(ctx);
+		/* Check that device ref count is 1 (because we ref'ed it before
+		 * context destruction). */
+		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+		/* Destroy device. */
+		ccl_device_destroy(d);
 	}
 	/* Set filters to NULL so we can reuse variable. */
 	filters = NULL;
@@ -565,8 +579,21 @@ static void context_ref_unref_test() {
 	} else {
 		/* No error, so check that the context ref. count is 1. */
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
-		/* And destroy context. */
+		/* Get first device. */
+		d = ccl_context_get_device(ctx, 0, &err);
+		g_assert_no_error(err);
+		/* Check that its a CPU and ref it. */
+		dev_type = ccl_device_get_scalar_info(d, CL_DEVICE_TYPE, cl_device_type, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(dev_type & CL_DEVICE_TYPE_CPU, ==, CL_DEVICE_TYPE_CPU);
+		ccl_device_ref(d);
+		/* Destroy context. */
 		ccl_context_destroy(ctx);
+		/* Check that device ref count is 1 (because we ref'ed it before
+		 * context destruction). */
+		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+		/* Destroy device. */
+		ccl_device_destroy(d);
 	}
 	/* Set filters to NULL so we can reuse variable. */
 	filters = NULL;
