@@ -99,12 +99,8 @@ static void program_create_info_destroy_test() {
 		tmp_file_prefix, CCL_TEST_PROGRAM_SUM_CONTENT, -1, &err);
 	g_assert_no_error(err);
 
-	/* Create a context with first available device. */
+	/* Create a context with devices from first available platform. */
 	ctx = ccl_context_new_any(&err);
-	g_assert_no_error(err);
-	
-	/* Get the device being used. */
-	d = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 
 	/* Create a new program from kernel file. */
@@ -134,8 +130,13 @@ static void program_create_info_destroy_test() {
 	g_assert_cmpstr((char*) info->value, 
 		==, CCL_TEST_PROGRAM_SUM_CONTENT);
 	
+	/* Get first device in context (and in program). */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
 	/* Check that no build was performed yet. */
-	info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	info = ccl_program_get_build_info(
+		prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert_cmpint(*((cl_build_status*) info->value), ==, CL_BUILD_NONE);
 	
@@ -144,7 +145,8 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 	
 	/* Get some program build info, compare it with expected values. */
-	info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	info = ccl_program_get_build_info(
+		prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
 		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
