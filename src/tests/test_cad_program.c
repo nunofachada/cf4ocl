@@ -83,10 +83,20 @@ static void program_create_info_destroy_test() {
 	CCLEvent* evt_r1;
 	CCLEventWaitList ewl;
 	GError* err = NULL;
+	gchar* tmp_dir_name;
+	gchar* tmp_file_prefix;
+	
+	/* Get a temp. dir. */
+	tmp_dir_name = g_dir_make_tmp("test_cad_program_XXXXXX", &err);
+	g_assert_no_error(err);
+	
+	/* Get a temp file prefix. */
+	tmp_file_prefix = g_strdup_printf("%s%c%s", 
+		tmp_dir_name, G_DIR_SEPARATOR, CCL_TEST_PROGRAM_SUM_FILENAME);
 	
 	/* Create a temporary kernel file. */
-	g_file_set_contents(CCL_TEST_PROGRAM_SUM_FILENAME, 
-		CCL_TEST_PROGRAM_SUM_CONTENT, -1, &err);
+	g_file_set_contents(
+		tmp_file_prefix, CCL_TEST_PROGRAM_SUM_CONTENT, -1, &err);
 	g_assert_no_error(err);
 
 	/* Create a context with first available device. */
@@ -99,9 +109,11 @@ static void program_create_info_destroy_test() {
 
 	/* Create a new program from kernel file. */
 	prg = ccl_program_new_from_source_file(
-		ctx, CCL_TEST_PROGRAM_SUM_FILENAME, &err);
+		ctx, tmp_file_prefix, &err);
 	g_assert_no_error(err);
 	
+	g_free(tmp_file_prefix);
+
 	/* Get some program info, compare it with expected info. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_CONTEXT, &err);
 	g_assert_no_error(err);
@@ -164,19 +176,22 @@ static void program_create_info_destroy_test() {
 	info = ccl_kernel_get_info(krnl, CL_KERNEL_PROGRAM, &err);
 	g_assert_no_error(err);
 	g_assert(*((cl_program*) info->value) == ccl_program_unwrap(prg));
-
-	/* Remove temporary kernel file. */
-	if (g_unlink(CCL_TEST_PROGRAM_SUM_FILENAME) < 0)
-		g_message("Unable to delete temporary file '"
-			CCL_TEST_PROGRAM_SUM_FILENAME "'");
 			
 	/* Save binaries for all available devices. */
-	ccl_program_save_all_binaries(prg, "test_", ".bin", &err);
+	tmp_file_prefix = g_strdup_printf(
+		"%s%ctest_", tmp_dir_name, G_DIR_SEPARATOR);
+	
+	ccl_program_save_all_binaries(prg, tmp_file_prefix, ".bin", &err);
 	g_assert_no_error(err);
+	
+	g_free(tmp_file_prefix);
 	
 	/* Save binary for a specific device (which we will load into a new
 	 * program later). */
-	ccl_program_save_binary(prg, d, "test_prg.bin", &err);
+	tmp_file_prefix = g_strdup_printf(
+		"%s%ctest_prg.bin", tmp_dir_name, G_DIR_SEPARATOR);
+
+	ccl_program_save_binary(prg, d, tmp_file_prefix, &err);
 	g_assert_no_error(err);
 	
 	/* Destroy program. */
@@ -184,20 +199,24 @@ static void program_create_info_destroy_test() {
 
 	/* Create a new program using the saved binary. */
 	prg = ccl_program_new_from_binary_file(
-		ctx, d, "test_prg.bin", NULL, &err);
+		ctx, d, tmp_file_prefix, NULL, &err);
 	g_assert_no_error(err);
 	
+	g_free(tmp_file_prefix);
+
 	/* **** BUILD PROGRAM **** */
 	ccl_program_build(prg, NULL, &err);
 	g_assert_no_error(err);
 	
 	/* Get some program build info, compare it with expected values. */
-	info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+	info = ccl_program_get_build_info(
+		prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
 	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS) 
 		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
 
-	info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
+	info = ccl_program_get_build_info(
+		prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
 
 	/* Get kernel wrapper object. */
@@ -226,18 +245,23 @@ static void program_create_info_destroy_test() {
 	d_h = CCL_TEST_PROGRAM_CONST;
 	
 	/* Create host buffers. */
-	a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
+	a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);
-	b_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
+	b_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);
-	c_w = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
+	c_w = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY, 
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);
 	
 	/* Copy host data to device buffers without waiting for transfer
 	 * to terminate before continuing host program. */
-	evt_w1 = ccl_buffer_write(cq, a_w, CL_FALSE, 0, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
+	evt_w1 = ccl_buffer_write(cq, a_w, CL_FALSE, 0, 
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
 	g_assert_no_error(err);
-	evt_w2 = ccl_buffer_write(cq, b_w, CL_FALSE, 0, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
+	evt_w2 = ccl_buffer_write(cq, b_w, CL_FALSE, 0, 
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Initialize event wait list and add the two transfer events. */
@@ -247,8 +271,8 @@ static void program_create_info_destroy_test() {
 	
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
-	evt_kr = ccl_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, ewl, 
-		&err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
+	evt_kr = ccl_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, 
+		ewl, &err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
 	/* Add the kernel termination event to the wait list. */
@@ -257,7 +281,8 @@ static void program_create_info_destroy_test() {
 	/* Read back results from host, waiting for the kernel termination
 	 * event (this will empty the event wait list) without waiting for 
 	 * transfer to terminate before continuing host program.. */
-	evt_r1 = ccl_buffer_read(cq, c_w, CL_FALSE, 0, CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, ewl, &err);
+	evt_r1 = ccl_buffer_read(cq, c_w, CL_FALSE, 0, 
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, ewl, &err);
 	g_assert_no_error(err);
 	
 	/* Add read back results event to wait list. */
@@ -290,6 +315,9 @@ static void program_create_info_destroy_test() {
 	/* Destroy stuff. */
 	ccl_program_destroy(prg);
 	ccl_context_destroy(ctx);
+
+	/* Free strings. */
+	g_free(tmp_dir_name);
 
 }
 
