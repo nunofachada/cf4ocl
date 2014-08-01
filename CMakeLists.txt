@@ -11,7 +11,7 @@ set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_V
 add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 
 # Set executables prefix
-set(EXECS_PREFIX "${PROJECT_NAME}_")
+set(EXECS_PREFIX "ccl_")
 
 # Compiler options for GCC
 if(CMAKE_COMPILER_IS_GNUCC)
