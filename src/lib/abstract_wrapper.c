@@ -206,7 +206,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * @param size Parameter size in bytes.
  * @return A new CCLWrapperInfo* object.
  * */
-CCLWrapperInfo* ccl_wrapper_info_new(gsize size) {
+CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
 	
 	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
 	
@@ -296,7 +296,7 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 		/* Otherwise, get it from OpenCL device.*/
 		cl_int ocl_status;
 		/* Size of device information in bytes. */
-		gsize size_ret = 0;
+		size_t size_ret = 0;
 		
 		/* Get size of information. */
 		ocl_status = (wrapper2 == NULL)

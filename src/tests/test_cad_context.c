@@ -39,13 +39,13 @@
 /*
  * Independent pass-all filter for testing.
  * */
-static gboolean ccl_devsel_indep_test_true(
+static cl_bool ccl_devsel_indep_test_true(
 	CCLDevice* device, void *data, GError **err) {
 
 	device = device;
 	data = data;
 	err = err;
-	return TRUE;
+	return CL_TRUE;
 
 }
 

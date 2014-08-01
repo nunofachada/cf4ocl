@@ -256,13 +256,11 @@ static void operationTest() {
 	g_free(name_used);
 	
 	/* Print summary to debug output. */
-	gchar* summary = ccl_prof_get_summary(prof, 
+	const char* summary = ccl_prof_get_summary(prof, 
 		CCL_PROF_AGG_SORT_TIME | CCL_PROF_SORT_DESC,
 		CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC);
 	
 	g_debug("\n%s", summary);
-	
-	g_free(summary); 
 	
 	/* Free profile. */
 	ccl_prof_destroy(prof);

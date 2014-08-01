@@ -164,7 +164,7 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
  * @param platforms Object containing the OpenCL platforms.
  * @return The number of OpenCL platforms found.
  * */
-guint ccl_platforms_count(CCLPlatforms* platforms) {
+cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
 	
 	/* Platforms object can't be NULL. */
 	g_return_val_if_fail(platforms != NULL, 0);
@@ -180,7 +180,8 @@ guint ccl_platforms_count(CCLPlatforms* platforms) {
  * @param index Index of platform to return.
  * @return Platform wrapper object at given index.
  * */
-CCLPlatform* ccl_platforms_get_platform(CCLPlatforms* platforms, guint index) {
+CCLPlatform* ccl_platforms_get_platform(
+	CCLPlatforms* platforms, cl_uint index) {
 	
 	/* Platforms object can't be NULL. */
 	g_return_val_if_fail(platforms != NULL, NULL);

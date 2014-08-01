@@ -431,7 +431,7 @@ error_handler:
 finish:
 
 	/* Destroy array of devices. */
-	g_ptr_array_free(devices, TRUE);
+	g_ptr_array_free(devices, CL_TRUE);
 	
 	/* Return array of strings describing devices. */
 	return dev_strings;
@@ -571,7 +571,7 @@ CCLDevSelDevices ccl_devsel_select(
 
 				/* Check if current device is accepted by current 
 				 * filter. */
-				gboolean pass = 
+				cl_bool pass = 
 					((ccl_devsel_indep) curr_filter->function)(
 						curr_device, curr_filter->data, &err_internal);
 				gef_if_err_propagate_goto(
@@ -607,7 +607,7 @@ finish:
 		g_slice_free(CCLDevSelFilter, g_ptr_array_index(*filters, i));
 		
 	/* Free filter array. */
-	g_ptr_array_free(*filters, TRUE);
+	g_ptr_array_free(*filters, CL_TRUE);
 
 	/* Return the selected devices. */
 	return devices;
@@ -630,15 +630,15 @@ finish:
  * @param data Filter data, must point to a cl_device_type value.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if device is of the given type, FALSE otherwise.
+ * @return CL_TRUE if device is of the given type, CL_FALSE otherwise.
  * */
-gboolean ccl_devsel_indep_type(
+cl_bool ccl_devsel_indep_type(
 	CCLDevice* dev, void* data, GError **err) {
 	
 	/* Make sure dev is not NULL. */ 
-	g_return_val_if_fail(dev != NULL, FALSE);
+	g_return_val_if_fail(dev != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 	
 	/* Internal error object. */
 	GError* err_internal = NULL;
@@ -667,7 +667,7 @@ error_handler:
 finish:
 	
 	/* Return the selected devices. */
-	return (gboolean) (type & type_to_check);
+	return (cl_bool) (type & type_to_check);
 }
 
 /**
@@ -677,9 +677,9 @@ finish:
  * @param data Filter data, ignored.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if device is a GPU, FALSE otherwise.
+ * @return CL_TRUE if device is a GPU, CL_FALSE otherwise.
  * */
-gboolean ccl_devsel_indep_type_gpu(
+cl_bool ccl_devsel_indep_type_gpu(
 	CCLDevice* dev, void *data, GError **err) {
 
 	/* Set device type to GPU. */
@@ -700,9 +700,9 @@ gboolean ccl_devsel_indep_type_gpu(
  * @param data Filter data, ignored.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if device is a CPU, FALSE otherwise.
+ * @return CL_TRUE if device is a CPU, CL_FALSE otherwise.
  * */
-gboolean ccl_devsel_indep_type_cpu(
+cl_bool ccl_devsel_indep_type_cpu(
 	CCLDevice* dev, void *data, GError **err) {
 
 	/* Set device type to CPU. */
@@ -724,9 +724,9 @@ gboolean ccl_devsel_indep_type_cpu(
  * @param data Filter data, ignored.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if device is a accelerator, FALSE otherwise.
+ * @return CL_TRUE if device is a accelerator, CL_FALSE otherwise.
  * */
-gboolean ccl_devsel_indep_type_accel(
+cl_bool ccl_devsel_indep_type_accel(
 	CCLDevice* dev, void *data, GError **err) {
 
 	/* Set device type to Accelerator. */
@@ -748,22 +748,22 @@ gboolean ccl_devsel_indep_type_accel(
  * @param data Filter data, must be a string.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if device is accepted by filter, FALSE otherwise.
+ * @return CL_TRUE if device is accepted by filter, CL_FALSE otherwise.
  * */
-gboolean ccl_devsel_indep_string(
+cl_bool ccl_devsel_indep_string(
 	CCLDevice* dev, void *data, GError **err) {
 	
 	/* Make sure device is not NULL. */ 
-	g_return_val_if_fail(dev != NULL, FALSE);
+	g_return_val_if_fail(dev != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 	
 	/* Internal error object. */
 	GError* err_internal = NULL;
 	
 	/* Return value, i.e., flag indicating if device belongs to the 
 	 * specified platform. */
-	gboolean pass = FALSE;
+	cl_bool pass = CL_FALSE;
 	
 	/* Partial name must be a substring of complete name. */
 	gchar *complt_info, *complt_info_lowr, *part_info;
@@ -818,18 +818,18 @@ gboolean ccl_devsel_indep_string(
 			
 			/* Compare. */
 			if (g_strrstr(complt_info_lowr, part_info)) {
-				pass = TRUE;
+				pass = CL_TRUE;
 			}
 			
 			/* Destroy device platform. */
 			ccl_platform_destroy(platf);
 			
 		} else {
-			pass = TRUE;
+			pass = CL_TRUE;
 		}
 		
 	} else {
-		pass = TRUE;
+		pass = CL_TRUE;
 	}
 
 	g_free(complt_info_lowr);
@@ -844,7 +844,7 @@ error_handler:
 	g_assert (err == NULL || *err != NULL);
 	
 	/* Filter will not accept device in case an error occurs. */
-	pass = FALSE;
+	pass = CL_FALSE;
 	
 finish:
 
@@ -861,16 +861,16 @@ finish:
  * @param data Filter data, must be a cl_platform_id.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if device belongs to the specified platform, FALSE 
+ * @return CL_TRUE if device belongs to the specified platform, CL_FALSE 
  * otherwise.
  * */
-gboolean ccl_devsel_indep_platform(
+cl_bool ccl_devsel_indep_platform(
 	CCLDevice* device, void *data, GError **err) {
 		
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
 	/* Device platform. */
 	cl_platform_id platf;
@@ -880,7 +880,7 @@ gboolean ccl_devsel_indep_platform(
 	
 	/* Return value, i.e., flag indicating if device belongs to the 
 	 * specified platform. */
-	gboolean pass;
+	cl_bool pass;
 
 	/* Check if data is NULL, throw error if so. */
 	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
@@ -894,7 +894,7 @@ gboolean ccl_devsel_indep_platform(
 	
 	/* Determine filtering result, i.e. if device platform is the same
 	 * as the specified platform. */
-	pass = (platf == (cl_platform_id) data) ? TRUE : FALSE;
+	pass = (platf == (cl_platform_id) data) ? CL_TRUE : CL_FALSE;
 
 	/* If we got here, everything is OK. */
 	g_assert (err == NULL || *err == NULL);
@@ -905,7 +905,7 @@ error_handler:
 	g_assert (err == NULL || *err != NULL);
 	
 	/* Filter will not accept device in case an error occurs. */
-	pass = FALSE;
+	pass = CL_FALSE;
 	
 finish:
 

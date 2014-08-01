@@ -40,7 +40,7 @@
 typedef struct ccl_wrapper {
 
 	/** The wrapped OpenCL object. */
-	gpointer cl_object;
+	void* cl_object;
 
 	/** Information about the wrapped OpenCL object. */
 	GHashTable* info;
@@ -52,7 +52,7 @@ typedef struct ccl_wrapper {
 
 typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
 
-typedef cl_int (*ccl_wrapper_release_cl_object)(gpointer cl_object);
+typedef cl_int (*ccl_wrapper_release_cl_object)(void* cl_object);
 
 /** @brief Create a new wrapper object. This function is called by the
  * concrete wrapper constructors and should not be called by client
@@ -89,7 +89,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
-typedef cl_int (*ccl_wrapper_info_fp1)(gpointer cl_object,
+typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
 	cl_uint param_name, size_t param_value_size, void* param_value,
 	size_t* param_value_size_ret);
 
@@ -109,8 +109,8 @@ typedef cl_int (*ccl_wrapper_info_fp1)(gpointer cl_object,
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
- typedef cl_int (*ccl_wrapper_info_fp2)(gpointer cl_object1,
-	gpointer cl_object2, cl_uint param_name, size_t param_value_size, 
+ typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
+	void* cl_object2, cl_uint param_name, size_t param_value_size, 
 	void* param_value, size_t* param_value_size_ret);
 
 typedef cl_int (*ccl_wrapper_info_fp)(void);
@@ -133,7 +133,7 @@ typedef struct ccl_wrapper_info {
 	/** Device information. */
 	gpointer value;
 	/** Size in bytes of device information. */
-	gsize size;
+	size_t size;
 } CCLWrapperInfo;
 
 /**
@@ -160,7 +160,7 @@ typedef struct ccl_wrapper_info {
 /** @} */
 
 /** @brief Create a new CCLWrapperInfo* object with a given value size. */
-CCLWrapperInfo* ccl_wrapper_info_new(gsize size);
+CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
 
 /** @brief Destroy a ::CCLWrapperInfo object. */
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info);

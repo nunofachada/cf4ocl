@@ -293,9 +293,8 @@ void ccl_prof_print_summary(CCLProf* prof);
 /** @brief Get a summary with the profiling info. More specifically,
  * this function returns a string containing a table of aggregate event 
  * statistics and a table of event overlaps. The order of the returned
- * information can be specified in the function arguments. The returned
- * string must be freed with the `g_free()` function from GLib. */ 
-gchar* ccl_prof_get_summary(
+ * information can be specified in the function arguments. */ 
+const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort);
 
 /** @brief Export profiling info to a given stream. */

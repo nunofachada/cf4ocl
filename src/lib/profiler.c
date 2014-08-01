@@ -88,6 +88,9 @@ struct ccl_prof {
 	cl_ulong total_events_eff_time;
 	/** Time at which the first (oldest) event started. */
 	cl_ulong t_start;
+	
+	/** Summary string. */
+	gchar* summary;
 
 	/** Keeps track of time during the complete profiling session. */
 	GTimer* timer;
@@ -899,6 +902,10 @@ void ccl_prof_destroy(CCLProf* prof) {
 	if (prof->overlaps != NULL)
 		g_list_free_full(
 			prof->overlaps, (GDestroyNotify) ccl_prof_overlap_destroy);
+			
+	/* Free the summary string. */
+	if (prof->summary != NULL)
+		g_free(prof->summary);
 	
 	/* Destroy timer. */
 	if (prof->timer != NULL)
@@ -1325,7 +1332,7 @@ void ccl_prof_print_summary(CCLProf* prof) {
 	g_return_if_fail(prof->calc == TRUE);
 
 	/* Summary to print. */
-	gchar* summary;
+	const char* summary;
 	
 	/* Get the summary. */
 	summary = ccl_prof_get_summary(prof, 
@@ -1334,28 +1341,23 @@ void ccl_prof_print_summary(CCLProf* prof) {
 	
 	/* Print summary. */
 	g_printf("%s", summary);
-	
-	/* Free summary string. */
-	g_free(summary);
-	
+
 }
 
 /**
  * @brief Get a summary with the profiling info. More specifically,
  * this function returns a string containing a table of aggregate event 
  * statistics and a table of event overlaps. The order of the returned
- * information can be specified in the function arguments. The returned
- * string must be freed with the `g_free()` function from GLib.
+ * information can be specified in the function arguments.
  * 
  * @param prof Profile object.
  * @param agg_sort Sorting performed on aggregate statistics (bitfield
  * of ::CCLProfAggSort ORed with ::CCLProfSortOrder).
  * @param ovlp_sort Sorting performed on event overlaps (bitfield of 
  * ::CCLProfOverlapSort ORed with ::CCLProfSortOrder).
- * @return A string containing the summary, which must be freed with
- * the `g_free()` function from GLib.
+ * @return A string containing the summary.
  * */ 
-gchar* ccl_prof_get_summary(
+const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort) {
 	
 	/* Make sure prof is not NULL. */
@@ -1434,9 +1436,16 @@ gchar* ccl_prof_get_summary(
 			100 - prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 	}
 	
-	/* Return summary string. */
-	return g_string_free(str_obj, FALSE);
+	/* If a summary already exists, free it before keeping a new one. */
+	if (prof->summary != NULL)
+		g_free(prof->summary);
+	
+	/* Free String object and keep underlying string in prof struct. */
+	prof->summary = g_string_free(str_obj, FALSE);
 
+	/* Return summary string. */
+	return (const char*) prof->summary;
+	
 }
 
 /** 

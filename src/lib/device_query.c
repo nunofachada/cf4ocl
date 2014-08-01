@@ -27,20 +27,24 @@
  
 #include "device_query.h"
 
-/* Implementation of ccl_devquery_format() function for outputting
- * unsigned integers. */
-static gchar* ccl_devquery_format_uint(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/** 
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting unsigned integers. 
+ * */
+static char* ccl_devquery_format_uint(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 		
 	g_snprintf(out, size, "%d %s", *((cl_uint*) info->value), units);
 	return out;
 	
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * device information as a hexadecimal number. */
-static gchar* ccl_devquery_format_hex(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/** 
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting device information as a hexadecimal number. 
+ * */
+static char* ccl_devquery_format_hex(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 		
 	GString* str = g_string_new("0x");
 	gboolean start = FALSE;
@@ -61,17 +65,23 @@ static gchar* ccl_devquery_format_hex(CCLWrapperInfo* info,
 	
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * size_t unsigned integers. */
-static gchar* ccl_devquery_format_sizet(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting size_t unsigned integers. 
+ * */
+static char* ccl_devquery_format_sizet(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 		
 	g_snprintf(out, size, "%ld %s", (gulong) *((size_t*) info->value), units);
 	return out;
 	
 }
 
-/* Helper macro for format functions outputting values in bytes. */
+/**
+ * @brief Helper macro for format functions outputting values in bytes.
+ * 
+ * @param spec A positive integer value representing bytes.
+ * */
 #define ccl_devquery_format_bytes(spec) \
 	if (bytes < 1024) \
 		g_snprintf(out, size, "%" spec " bytes", bytes); \
@@ -85,10 +95,12 @@ static gchar* ccl_devquery_format_sizet(CCLWrapperInfo* info,
 		g_snprintf(out, size, "%.1lf GiB (%" spec " bytes)", \
 			bytes / (1024.0 * 1024 * 1024), bytes);
 
-/* Implementation of ccl_devquery_format() function for outputting
- * unsigned long integers which represent bytes. */
-static gchar* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for
+ * outputting unsigned long integers which represent bytes. 
+ * */
+static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_ulong bytes = *((cl_ulong*) info->value);
@@ -97,10 +109,12 @@ static gchar* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info,
 	
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * unsigned integers which represent bytes. */
-static gchar* ccl_devquery_format_uintbytes(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting unsigned integers which represent bytes. 
+ * */
+static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_uint bytes = *((cl_uint*) info->value);
@@ -109,10 +123,12 @@ static gchar* ccl_devquery_format_uintbytes(CCLWrapperInfo* info,
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * unsigned size_t integers which represent bytes. */
-static gchar* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting unsigned size_t integers which represent bytes. 
+ * */
+static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_ulong bytes = *((size_t*) info->value);
@@ -121,10 +137,12 @@ static gchar* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info,
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * a vector of size_t integers. */
-static gchar* ccl_devquery_format_sizetvec(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting a vector of size_t integers. 
+ * */
+static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	GString* str = g_string_new("(");
@@ -143,10 +161,12 @@ static gchar* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 	return out;
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * boolean values as a "Yes" or "No" string. */
-static gchar* ccl_devquery_format_yesno(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting boolean values as a "Yes" or "No" string. 
+ * */
+static char* ccl_devquery_format_yesno(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	g_snprintf(out, size, "%s", *((cl_bool*) info->value) ? "Yes" : "No");
@@ -154,20 +174,24 @@ static gchar* ccl_devquery_format_yesno(CCLWrapperInfo* info,
 	
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * strings. */
-static gchar* ccl_devquery_format_char(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for
+ * outputting strings. 
+ * */
+static char* ccl_devquery_format_char(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	g_snprintf(out, size, "%s %s", (gchar*) info->value, units);
 	return out;
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * memory addresses. */
-static gchar* ccl_devquery_format_ptr(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting memory addresses. 
+ * */
+static char* ccl_devquery_format_ptr(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	g_snprintf(out, size, "%p", *((void**) info->value));
@@ -175,10 +199,12 @@ static gchar* ccl_devquery_format_ptr(CCLWrapperInfo* info,
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * a string representing a device type. */
-static gchar* ccl_devquery_format_type(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for
+ * outputting a string representing a device type. 
+ * */
+static char* ccl_devquery_format_type(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	g_snprintf(out, size, "%s", 
@@ -187,10 +213,12 @@ static gchar* ccl_devquery_format_type(CCLWrapperInfo* info,
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * the device floating-point (FP) configuration for a FP type. */
-static gchar* ccl_devquery_format_fpconfig(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the device floating-point (FP) configuration for a FP 
+ * type. */
+static char* ccl_devquery_format_fpconfig(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_device_fp_config fpc = *((cl_device_fp_config*) info->value);
@@ -206,10 +234,12 @@ static gchar* ccl_devquery_format_fpconfig(CCLWrapperInfo* info,
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * the device execution capabilities. */
-static gchar* ccl_devquery_format_execcap(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the device execution capabilities. 
+ * */
+static char* ccl_devquery_format_execcap(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 
 	units = units;
 	cl_device_exec_capabilities exc = 
@@ -220,10 +250,11 @@ static gchar* ccl_devquery_format_execcap(CCLWrapperInfo* info,
 	return out;
 }
 
-/* Implementation of ccl_devquery_format() function for outputting
- * a local memory type. */
-static gchar* ccl_devquery_format_locmemtype(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting a local memory type. */
+static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_device_local_mem_type lmt = 
@@ -235,10 +266,12 @@ static gchar* ccl_devquery_format_locmemtype(CCLWrapperInfo* info,
 	return out;
 }
 
-/* Implementation of ccl_devquery_format() function for outputting the
- * partition properties of a device. */
-static gchar* ccl_devquery_format_partprop(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the partition properties of a device. 
+ * */
+static char* ccl_devquery_format_partprop(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_device_partition_property* pp = 
@@ -278,11 +311,13 @@ static gchar* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 	
 }
 
-/* Implementation of ccl_devquery_format() function for outputting the
- * supported affinity domains for partitioning a device using 
- * CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN. */
-static gchar* ccl_devquery_format_affdom(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the supported affinity domains for partitioning a device 
+ * using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN. 
+ * */
+static char* ccl_devquery_format_affdom(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_device_affinity_domain ad = 
@@ -299,10 +334,12 @@ static gchar* ccl_devquery_format_affdom(CCLWrapperInfo* info,
 
 }
 
-/* Implementation of ccl_devquery_format() function for outputting the
- * cache type of a device. */
-static gchar* ccl_devquery_format_cachetype(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the cache type of a device. 
+ * */
+static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_device_mem_cache_type mct = 
@@ -314,10 +351,12 @@ static gchar* ccl_devquery_format_cachetype(CCLWrapperInfo* info,
 	return out;
 }
 
-/* Implementation of ccl_devquery_format() function for outputting the
- * queue properties of a device. */
-static gchar* ccl_devquery_format_queueprop(CCLWrapperInfo* info, 
-	gchar* out, guint size, const gchar const* units) {
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the queue properties of a device. 
+ * */
+static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
 	
 	units = units;
 	cl_command_queue_properties qp = 
@@ -329,9 +368,11 @@ static gchar* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 
 }
 
-//~ /* Implementation of ccl_devquery_format() function for debugging
- //~ * purposes. */
-//~ static gchar* ccl_devquery_format_testsize(CCLWrapperInfo* info, 
+//~ /**
+ //~ * @brief Implementation of ccl_devquery_format() function for debugging
+ //~ * purposes. 
+ //~ * */
+//~ static char* ccl_devquery_format_testsize(CCLWrapperInfo* info, 
 	//~ gchar* out, guint size, const gchar const* units) {
 	//~ 
 	//~ g_snprintf(out, size, "%ld %s", (gulong) info->size, units);
@@ -347,7 +388,7 @@ static gchar* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 /** 
  * @brief Size of parameter information map. 
  * */
-const gint ccl_devquery_info_map_size = 96;
+const int ccl_devquery_info_map_size = 96;
 
 /** 
  * @brief Map of parameter name strings to respective cl_device_info 
@@ -660,7 +701,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
  * @return Index of the device information map object of the given 
  * parameter name, or -1 if device information map is not found.
  * */
-static gint ccl_devquery_get_index(gchar* name) {
+static int ccl_devquery_get_index(const char* name) {
 
 	/* Make sure name is not NULL. */
 	g_return_val_if_fail(name != NULL, 0);
@@ -708,9 +749,10 @@ static gint ccl_devquery_get_index(gchar* name) {
  * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
  * accepted.
  * @return A final device info prefix in the same format as 
- * kept in the ccl_devquery_info_map. Should be freed with g_free().
+ * kept in the ccl_devquery_info_map. Should be freed with g_free()
+ * function from GLib.
  * */
-gchar* ccl_devquery_get_prefix_final(gchar* prefix) {
+gchar* ccl_devquery_get_prefix_final(const char* prefix) {
 	
 	/* Make sure prefix is not NULL. */
 	g_return_val_if_fail(prefix != NULL, 0);
@@ -753,7 +795,7 @@ gchar* ccl_devquery_get_prefix_final(gchar* prefix) {
  * @return A cl_device_info object given its name or 0 if no suitable
  * cl_device_info is found for the given name.
  * */
-cl_device_info ccl_devquery_name(gchar* name) {
+cl_device_info ccl_devquery_name(const char* name) {
 
 	/* Make sure name is not NULL. */
 	g_return_val_if_fail(name != NULL, 0);
@@ -793,7 +835,7 @@ cl_device_info ccl_devquery_name(gchar* name) {
  * has the given prefix or NULL if nothing found.
  * */
 const CCLDevQueryMap* ccl_devquery_prefix(
-	gchar* prefix, gint* size) {
+	const char* prefix, int* size) {
 	
 	/* Make sure prefix is not NULL. */
 	g_return_val_if_fail(prefix != NULL, 0);
@@ -877,7 +919,7 @@ const CCLDevQueryMap* ccl_devquery_prefix(
  * function updates within calls.
  * @return A matching CCLDevQueryMap, or NULL if search is over.
  * */
-const CCLDevQueryMap* ccl_devquery_match(gchar* substr, gint* idx) {
+const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx) {
 	
 	/* Make sure substr is not NULL. */
 	g_return_val_if_fail(substr != NULL, NULL);

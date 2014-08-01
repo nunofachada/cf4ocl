@@ -55,9 +55,9 @@ typedef GPtrArray* CCLDevSelDevices;
  * @param data Filter data, implementation dependent.
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
- * @return TRUE if filter accepts device, FALSE otherwise.
+ * @return CL_TRUE if filter accepts device, CL_FALSE otherwise.
  */
-typedef gboolean (*ccl_devsel_indep)(
+typedef cl_bool (*ccl_devsel_indep)(
 	CCLDevice* device, void *data, GError **err);
 	
 /**
@@ -122,30 +122,30 @@ CCLDevSelDevices ccl_devsel_select(
  
 /** @brief Independent filter function which accepts devices of the type
  * given in the data parameter. */
-gboolean ccl_devsel_indep_type(
+cl_bool ccl_devsel_indep_type(
 	CCLDevice* device, void* data, GError **err);
 
 /** @brief Independent filter function which only accepts GPU devices. */
-gboolean ccl_devsel_indep_type_gpu(
+cl_bool ccl_devsel_indep_type_gpu(
 	CCLDevice* device, void *data, GError **err);
 
 /** @brief Independent filter function which only accepts CPU devices. */
-gboolean ccl_devsel_indep_type_cpu(
+cl_bool ccl_devsel_indep_type_cpu(
 	CCLDevice* device, void *data, GError **err);
 
 /** @brief Independent filter function which only accepts accelerator 
  * devices. */
-gboolean ccl_devsel_indep_type_accel(
+cl_bool ccl_devsel_indep_type_accel(
 	CCLDevice* device, void *data, GError **err);
 	
 /** @brief Independent filter which selects devices based on device 
  * name, device vendor and/or platform name. */
-gboolean ccl_devsel_indep_string(
+cl_bool ccl_devsel_indep_string(
 	CCLDevice* dev, void *data, GError **err);
 
 /** @brief Independent filter function which only accepts devices of a
  * specified platform. */
-gboolean ccl_devsel_indep_platform(
+cl_bool ccl_devsel_indep_platform(
 	CCLDevice* device, void *data, GError **err);
 
 /** @} */

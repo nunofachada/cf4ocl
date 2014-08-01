@@ -60,10 +60,11 @@ void ccl_platforms_destroy(CCLPlatforms* platforms);
 
 /** @brief Return number of OpenCL platforms found in CCLPlatforms* 
  * object. */
-guint ccl_platforms_count(CCLPlatforms* platforms);
+cl_uint ccl_platforms_count(CCLPlatforms* platforms);
 
 /** @brief Get CCL platform wrapper object at given index. */
-CCLPlatform* ccl_platforms_get_platform(CCLPlatforms* platforms, guint index);
+CCLPlatform* ccl_platforms_get_platform(
+	CCLPlatforms* platforms, cl_uint index);
 
 /** @} */
 
