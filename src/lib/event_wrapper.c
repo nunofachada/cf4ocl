@@ -50,6 +50,31 @@ struct ccl_event {
  * @{
  */
 
+/**
+ * @brief Get the event wrapper for the given OpenCL event.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count 
+ * of 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to wrap the OpenCL event directly.
+ * 
+ * @param event The OpenCL event to be wrapped.
+ * @return The event wrapper for the given OpenCL event.
+ * */
+CCLEvent* ccl_event_new_wrap(cl_event event) {
+	
+	CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
+		(void*) event, sizeof(CCLEvent));
+	
+	evt->name = NULL;
+	evt->final_name = NULL;
+	
+	return evt;
+		
+}
+
 /** 
  * @brief Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed.
@@ -303,28 +328,3 @@ finish:
 /** @} */
 
 /** @} */
-
-/**
- * @brief Get the event wrapper for the given OpenCL event.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to wrap the OpenCL event directly.
- * 
- * @param event The OpenCL event to be wrapped.
- * @return The event wrapper for the given OpenCL event.
- * */
-CCLEvent* ccl_event_new_wrap(cl_event event) {
-	
-	CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
-		(void*) event, sizeof(CCLEvent));
-	
-	evt->name = NULL;
-	evt->final_name = NULL;
-	
-	return evt;
-		
-}

@@ -72,6 +72,9 @@ typedef void (CL_CALLBACK* ccl_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
  
+/** @brief Get the context wrapper for the given OpenCL context. */
+CCLContext* ccl_context_new_wrap(cl_context context);
+
 /** 
  * @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. 
@@ -287,8 +290,5 @@ const CCLDevice** ccl_context_get_all_devices(CCLContext* ctx,
 	GError** err);
 
 /** @} */
-
-/** @brief Get the context wrapper for the given OpenCL context. */
-CCLContext* ccl_context_new_wrap(cl_context context);
 
 #endif

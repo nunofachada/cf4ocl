@@ -64,6 +64,28 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
  * @{
  */
 
+/**
+ * @brief Get the kernel wrapper for the given OpenCL kernel.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count 
+ * of 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL kernel directly (using the
+ * clCreateKernel() function) and then wrap the OpenCL kernel in a 
+ * ::CCLKernel wrapper object.
+ * 
+ * @param kernel The OpenCL kernel to be wrapped.
+ * @return The ::CCLKernel wrapper for the given OpenCL kernel.
+ * */
+CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
+	
+	return (CCLKernel*) ccl_wrapper_new(
+		(void*) kernel, sizeof(CCLKernel));
+		
+}
+
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err) {
 		
@@ -324,24 +346,3 @@ finish:
 
 /** @} */
 
-/**
- * @brief Get the kernel wrapper for the given OpenCL kernel.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL kernel directly (using the
- * clCreateKernel() function) and then wrap the OpenCL kernel in a 
- * ::CCLKernel wrapper object.
- * 
- * @param kernel The OpenCL kernel to be wrapped.
- * @return The ::CCLKernel wrapper for the given OpenCL kernel.
- * */
-CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
-	
-	return (CCLKernel*) ccl_wrapper_new(
-		(void*) kernel, sizeof(CCLKernel));
-		
-}

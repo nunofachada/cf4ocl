@@ -58,6 +58,9 @@ typedef struct ccl_device CCLDevice;
  * If it reaches 0, the device wrapper object is destroyed. */
 void ccl_device_destroy(CCLDevice* dev);
 
+/** @brief Get the device wrapper for the given OpenCL device. */
+CCLDevice* ccl_device_new_wrap(cl_device_id device);
+
 /**
  * @brief Get a ::CCLWrapperInfo device information object.
  * 
@@ -141,8 +144,5 @@ void ccl_device_destroy(CCLDevice* dev);
 	((cl_device_id) ccl_wrapper_unwrap((CCLWrapper*) device))
 	
 /** @} */
-
-/** @brief Get the device wrapper for the given OpenCL device. */
-CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 #endif

@@ -49,6 +49,10 @@
 /** @brief Command queue wrapper object. */
 typedef struct ccl_queue CCLQueue;
 
+/** @brief Get the command queue wrapper for the given OpenCL command 
+ * queue. */
+CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
+
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err);
 
@@ -154,9 +158,5 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 	((cl_command_queue) ccl_wrapper_unwrap((CCLWrapper*) cq))		
 
 /** @} */
-
-/** @brief Get the command queue wrapper for the given OpenCL command 
- * queue. */
-CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 
 #endif

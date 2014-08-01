@@ -44,26 +44,11 @@ struct ccl_device {
  * @{
  */
 
-/** 
- * @brief Decrements the reference count of the device wrapper object. 
- * If it reaches 0, the device wrapper object is destroyed.
- *
- * @param dev The device wrapper object.
- * */
-void ccl_device_destroy(CCLDevice* dev) {
-	
-	ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
-		NULL, NULL, NULL); 
-
-}
-
-/** @} */
-
 /**
  * @brief Get the device wrapper for the given OpenCL device.
  * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
+ * If the wrapper doesn't exist, its created with a reference count 
+ * of 1. Otherwise, the existing wrapper is returned and its reference 
  * count is incremented by 1.
  * 
  * This function will rarely be called from client code, except when
@@ -80,3 +65,18 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device) {
 		(void*) device, sizeof(CCLDevice));
 		
 }
+
+/** 
+ * @brief Decrements the reference count of the device wrapper object. 
+ * If it reaches 0, the device wrapper object is destroyed.
+ *
+ * @param dev The device wrapper object.
+ * */
+void ccl_device_destroy(CCLDevice* dev) {
+	
+	ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
+		NULL, NULL, NULL); 
+
+}
+
+/** @} */

@@ -46,6 +46,9 @@
 /** @brief Event wrapper object. */
 typedef struct ccl_event CCLEvent;
 
+/** @brief Get the event wrapper for the given OpenCL event. */
+CCLEvent* ccl_event_new_wrap(cl_event event);
+
 /** @brief Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed. */
 void ccl_event_destroy(CCLEvent* evt);
@@ -237,9 +240,6 @@ cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err);
 /** @} */
 
 /** @} */
-
-/** @brief Get the event wrapper for the given OpenCL event. */
-CCLEvent* ccl_event_new_wrap(cl_event event);
 
 #endif
 

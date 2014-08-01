@@ -45,6 +45,9 @@
 
 typedef struct ccl_memobj CCLMemObj;
 
+/** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
+CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object);
+
 /** @brief Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed. */
 void ccl_memobj_destroy(CCLMemObj* mo);
@@ -143,8 +146,5 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 	((cl_mem) ccl_wrapper_unwrap((CCLWrapper*) mo))		
 
 /** @} */
-
-/** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
-CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object);
 
 #endif

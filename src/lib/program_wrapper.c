@@ -111,8 +111,8 @@ static CCLWrapperInfo* ccl_program_get_cldevices(
 /**
  * @brief Get the program wrapper for the given OpenCL program.
  * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
+ * If the wrapper doesn't exist, its created with a reference count 
+ * of 1. Otherwise, the existing wrapper is returned and its reference 
  * count is incremented by 1.
  * 
  * This function will rarely be called from client code, except when

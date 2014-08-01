@@ -52,6 +52,9 @@ typedef struct ccl_program CCLProgram;
 /** @brief Kernel wrapper object. */
 typedef struct ccl_kernel CCLKernel;
 
+/** @brief Get the kernel wrapper for the given OpenCL kernel. */
+CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
+
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err);
 
@@ -234,9 +237,6 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 
 
 /** @} */
-
-/** @brief Get the kernel wrapper for the given OpenCL kernel. */
-CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
 #endif
 

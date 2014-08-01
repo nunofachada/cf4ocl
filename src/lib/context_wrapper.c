@@ -253,6 +253,28 @@ static CCLWrapperInfo* ccl_context_get_cldevices(
  */
 
 /**
+ * @brief Get the context wrapper for the given OpenCL context.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count 
+ * of 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to create the OpenCL context directly (using the
+ * clCreateContext() function) and then wrap the OpenCL context in a
+ * ::CCLContext wrapper object.
+ * 
+ * @param context The OpenCL context to be wrapped.
+ * @return The context wrapper for the given OpenCL context.
+ * */
+CCLContext* ccl_context_new_wrap(cl_context context) {
+	
+	return (CCLContext*) ccl_wrapper_new(
+		(void*) context, sizeof(CCLContext));
+		
+}
+
+/**
  * @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. 
  * 
@@ -557,25 +579,3 @@ const CCLDevice** ccl_context_get_all_devices(CCLContext* ctx,
 }
 
 /** @}*/
-
-/**
- * @brief Get the context wrapper for the given OpenCL context.
- * 
- * If the wrapper doesn't exist, its created with a reference count of 
- * 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL context directly (using the
- * clCreateContext() function) and then wrap the OpenCL context in a
- * ::CCLContext wrapper object.
- * 
- * @param context The OpenCL context to be wrapped.
- * @return The context wrapper for the given OpenCL context.
- * */
-CCLContext* ccl_context_new_wrap(cl_context context) {
-	
-	return (CCLContext*) ccl_wrapper_new(
-		(void*) context, sizeof(CCLContext));
-		
-}
