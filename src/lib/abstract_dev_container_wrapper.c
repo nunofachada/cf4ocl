@@ -115,7 +115,7 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
  * @return All ::CCLDevice wrappers in device container or NULL if an 
  * error occurs.
  * */
-const CCLDevice** ccl_dev_container_get_all_devices(
+CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError** err) {
 		
@@ -134,7 +134,7 @@ const CCLDevice** ccl_dev_container_get_all_devices(
 	}
 	
 	/* Return all devices in platform. */
-	return (const CCLDevice**) devcon->devices;
+	return (CCLDevice* const*) devcon->devices;
 
 }
 

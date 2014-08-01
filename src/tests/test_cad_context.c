@@ -342,7 +342,7 @@ static void context_ref_unref_test() {
 	CCLDevice* d = NULL;
 	CCLDevice* d_1 = NULL;
 	CCLDevice* d_l = NULL;
-	const CCLDevice** ds;
+	CCLDevice* const* ds;
 	CCLDevSelFilters filters = NULL;
 	cl_uint num_devs;
 	cl_device_type dev_type;

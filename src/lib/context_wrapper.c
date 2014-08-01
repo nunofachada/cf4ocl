@@ -570,7 +570,7 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given context, or NULL if an error occurs.
  * */
-const CCLDevice** ccl_context_get_all_devices(CCLContext* ctx, 
+CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx, 
 	GError** err) {
 	
 	return ccl_dev_container_get_all_devices((CCLDevContainer*) ctx,

@@ -286,7 +286,7 @@ CCLDevice* ccl_context_get_device(
 cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
 
 /** @brief Get all device wrappers in context. */
-const CCLDevice** ccl_context_get_all_devices(CCLContext* ctx, 
+CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx, 
 	GError** err);
 
 /** @} */

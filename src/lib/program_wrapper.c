@@ -906,7 +906,7 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given program, or NULL if an error occurs.
  * */
-const CCLDevice** ccl_program_get_all_devices(CCLProgram* prg, 
+CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg, 
 	GError** err) {
 	
 	return ccl_dev_container_get_all_devices((CCLDevContainer*) prg,

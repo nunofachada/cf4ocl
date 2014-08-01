@@ -210,7 +210,7 @@ void ccl_platform_destroy(CCLPlatform* platf) {
  * @return An array containing the ::CCLDevice wrappers which belong to
  * this platform, or NULL if an error occurs.
  */
-const CCLDevice** ccl_platform_get_all_devices(
+CCLDevice* const* ccl_platform_get_all_devices(
 	CCLPlatform* platf, GError** err) {
 	
 	return ccl_dev_container_get_all_devices(

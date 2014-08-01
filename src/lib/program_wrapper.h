@@ -303,7 +303,7 @@ CCLDevice* ccl_program_get_device(
 cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err);
 
 /** @brief Get all device wrappers in program. */
-const CCLDevice** ccl_program_get_all_devices(CCLProgram* prg, 
+CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg, 
 	GError** err);
 
 /** @} */

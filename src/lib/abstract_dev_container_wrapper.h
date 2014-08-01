@@ -54,7 +54,7 @@ typedef struct ccl_dev_container {
 	
 	/** Devices in context (can be lazy initialized). */
 	CCLDevice** devices;
-	
+
 } CCLDevContainer;
 
 typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
@@ -65,7 +65,7 @@ typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
 void ccl_dev_container_release_devices(CCLDevContainer* devcon);
 
 /** @brief Get all ::CCLDevice wrappers in device container. */
-const CCLDevice** ccl_dev_container_get_all_devices(
+CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 

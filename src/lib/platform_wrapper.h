@@ -158,7 +158,7 @@ void ccl_platform_destroy(CCLPlatform* platf);
 	((cl_platform) ccl_wrapper_unwrap((CCLWrapper*) platform))
 	
 /** @brief Get all device wrappers in platform. */
-const CCLDevice** ccl_platform_get_all_devices(
+CCLDevice* const* ccl_platform_get_all_devices(
 	CCLPlatform* platf, GError** err);
  
 /** @brief Get ::CCLDevice wrapper at given index. */
