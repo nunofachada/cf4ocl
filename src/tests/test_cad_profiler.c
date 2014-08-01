@@ -69,6 +69,13 @@ static void create_add_destroy_test() {
 	/* Destroy cq2. */
 	ccl_queue_destroy(cq2);
 	
+	/* Destroy the context. */
+	ccl_context_destroy(ctx);
+	
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+	
 }
 
 /**

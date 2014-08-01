@@ -164,6 +164,10 @@ cleanup:
 	if (prg != NULL) ccl_program_destroy(prg);
 	if (ctx != NULL) ccl_context_destroy(ctx);
 	
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
+
 	/* Return status. */
 	return status;
 

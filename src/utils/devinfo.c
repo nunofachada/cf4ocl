@@ -203,6 +203,10 @@ cleanup:
 	if (platforms) ccl_platforms_destroy(platforms);
 	g_strfreev(opt_custom);
 
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
+
 	/* Return status. */
 	return status;
 

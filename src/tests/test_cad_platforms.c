@@ -454,7 +454,11 @@ static void platforms_create_info_destroy_test() {
 
 	/* Destroy list of platforms. */
 	ccl_platforms_destroy(platfs);
-		
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+	
 }
 
 /** 
@@ -502,6 +506,10 @@ static void platforms_ref_unref_test() {
 	g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
 		
 	ccl_device_destroy(d);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
 
 }
 

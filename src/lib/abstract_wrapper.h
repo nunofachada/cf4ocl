@@ -157,6 +157,10 @@ typedef struct ccl_wrapper_info {
  * */
 #define ccl_info_array(info, type) ((type) (info)->value)
 
+/** @brief Debug function which checks if memory allocated by wrappers
+ * has been properly freed. */
+cl_bool ccl_wrapper_memcheck();
+
 /** @} */
 
 /** @brief Create a new CCLWrapperInfo* object with a given value size. */

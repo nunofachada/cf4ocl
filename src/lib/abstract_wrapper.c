@@ -414,3 +414,17 @@ gsize ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	/* Return value if information object is not NULL. */	
 	return diw != NULL ? diw->size : 0;
 }
+
+/** 
+ * @brief Debug function which checks if memory allocated by wrappers
+ * has been properly freed.
+ * 
+ * This function is merely a debug helper and shouldn't replace
+ * proper leak checks with Valgrind or similar tool.
+ * 
+ * @return CL_TRUE if memory allocated by wrappers has been properly
+ * freed, CL_FALSE otherwise.
+ */
+cl_bool ccl_wrapper_memcheck() {
+	return wrappers == NULL;
+}

@@ -57,11 +57,11 @@ static int stride = STRIDE;
 /* Callback functions to parse gws and lws. */
 static gboolean bct_parse_gws(const gchar *option_name, 
 	const gchar *value, gpointer data, GError **err) {
-	cclexp_parse_pairs(value, gws, option_name, data, err);
+	ccl_ex_parse_pairs(value, gws, option_name, data, err);
 }
 static gboolean bct_parse_lws(const gchar *option_name, 
 	const gchar *value, gpointer data, GError **err) {
-	cclexp_parse_pairs(value, lws, option_name, data, err);
+	ccl_ex_parse_pairs(value, lws, option_name, data, err);
 }
 
 /* Valid command line options. */
@@ -103,8 +103,8 @@ static char* kernel_files[] = {"bank_conflicts.cl"};
  * 
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
- * @return #CLEXP_SUCCESS if program returns with no error, or 
- * #CLEXP_FAIL otherwise.
+ * @return #CCL_EX_SUCCESS if program returns with no error, or 
+ * #CCL_EX_FAIL otherwise.
  * */
 int main(int argc, char *argv[]) {
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
 	/* Get location of kernel file, which should be in the same 
 	 * of the bank_conflicts executable. */
-	kernel_path = cclexp_kernelpath_get(kernel_files[0], argv[0]);
+	kernel_path = ccl_ex_kernelpath_get(kernel_files[0], argv[0]);
 	
 	/* Create program. */
 	prg = ccl_program_new_from_source_file(ctx, kernel_files[0], &err);
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
 	/* ************************************************** */
 
 	local_mem_size_in_bytes = lws[1] * lws[0] * sizeof(cl_int);
-	cclexp_reqs_print(gws, lws, size_data_in_bytes, local_mem_size_in_bytes);
+	ccl_ex_reqs_print(gws, lws, size_data_in_bytes, local_mem_size_in_bytes);
 
 	/* ************************************ */
 	/*  Set kernel arguments and run kernel */
@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
 	g_assert (err == NULL);
-	status = CLEXP_SUCCESS;
+	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
 	/* ************** */
@@ -256,7 +256,7 @@ error_handler:
 	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", 
 		err->code, g_quark_to_string(err->domain), err->message);
 	g_error_free(err);
-	status = CLEXP_FAIL;
+	status = CCL_EX_FAIL;
 
 cleanup:
 		
@@ -285,6 +285,10 @@ cleanup:
 
 	/* Free kernel path. */
 	if (kernel_path) g_free(kernel_path);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_EX_FAIL);
 	
 	/* Return status. */
 	return status;

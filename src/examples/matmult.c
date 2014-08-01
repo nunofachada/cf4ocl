@@ -98,16 +98,16 @@ static gchar* output_export = NULL;
 
 /* Callback functions to parse pairs of numbers. */
 static gboolean mm_parse_a(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	cclexp_parse_pairs(value, a_dim, option_name, data, err);
+	ccl_ex_parse_pairs(value, a_dim, option_name, data, err);
 }
 static gboolean mm_parse_b(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	cclexp_parse_pairs(value, b_dim, option_name, data, err);
+	ccl_ex_parse_pairs(value, b_dim, option_name, data, err);
 }
 static gboolean mm_parse_lws(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	cclexp_parse_pairs(value, lws, option_name, data, err);
+	ccl_ex_parse_pairs(value, lws, option_name, data, err);
 }
 static gboolean mm_parse_rge(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	cclexp_parse_pairs(value, matrix_range, option_name, data, err);
+	ccl_ex_parse_pairs(value, matrix_range, option_name, data, err);
 }
 
 /* Valid command line options. */
@@ -166,8 +166,8 @@ static char* kernel_files[] = {"matmult.cl"};
  * 
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
- * @return #CLEXP_SUCCESS if program returns with no error, or 
- * #CLEXP_FAIL otherwise.
+ * @return #CCL_EX_SUCCESS if program returns with no error, or 
+ * #CCL_EX_FAIL otherwise.
  * */
 int main(int argc, char *argv[]) {
 
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
 	
 	/* Get location of kernel file, which should be in the same location 
 	 * has the matmult executable. */
-	kernel_path = cclexp_kernelpath_get(kernel_files[0], argv[0]);
+	kernel_path = ccl_ex_kernelpath_get(kernel_files[0], argv[0]);
 	
 	/* Create and build program. */
 	prg = ccl_program_new_from_source_file(ctx, kernel_path, &err);
@@ -402,7 +402,7 @@ int main(int argc, char *argv[]) {
 	/* Print requirements information */
 	/* ****************************** */
 
-	cclexp_reqs_print(gws, lws, g_mem_size_in_bytes, 
+	ccl_ex_reqs_print(gws, lws, g_mem_size_in_bytes, 
 		l_mem_sizeA_in_bytes + l_mem_sizeB_in_bytes);
 
 	/* *************************** */
@@ -603,7 +603,7 @@ int main(int argc, char *argv[]) {
 	
 	/* If we get here, no need for error treatment, jump to cleanup. */
 	g_assert(err == NULL);
-	status = CLEXP_SUCCESS;
+	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
 error_handler:
@@ -612,7 +612,7 @@ error_handler:
 	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", 
 		err->code, g_quark_to_string(err->domain), err->message);
 	g_error_free(err);
-	status = CLEXP_FAIL;
+	status = CCL_EX_FAIL;
 
 cleanup:	
 
@@ -689,8 +689,8 @@ void matmult_matrix_free(int* matrix) {
  * @param argc Number of command line arguments.
  * @param argv Command line arguments.
  * @param err GLib error object for error reporting.
- * @return #CLEXP_SUCCESS if program returns with no error, or 
- * #CLEXP_FAIL otherwise.
+ * @return #CCL_EX_SUCCESS if program returns with no error, or 
+ * #CCL_EX_FAIL otherwise.
  * */
 int matmult_args_parse(int argc, char* argv[], GError** err) {
 	
@@ -702,8 +702,8 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Create parsing context. */
 	context = g_option_context_new (" - " PROG_DESCRIPTION);
-	gef_if_err_create_goto(*err, CCLEXP_ERROR, context == NULL, 
-		CLEXP_FAIL, error_handler, 
+	gef_if_err_create_goto(*err, CCL_EX_ERROR, context == NULL, 
+		CCL_EX_FAIL, error_handler, 
 		"Unable to create command line parsing context.");
 	
 	/* Add acceptable command line options to context. */ 
@@ -718,8 +718,8 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	if (!IS_AAT(kernel_id)) {
 		/* Check if number of rows in B is the same as the number of 
 		 * columns in A. */
-		gef_if_err_create_goto(*err, CCLEXP_ERROR, 
-			(b_dim[1] != a_dim[0]), CLEXP_FAIL, error_handler, 
+		gef_if_err_create_goto(*err, CCL_EX_ERROR, 
+			(b_dim[1] != a_dim[0]), CCL_EX_FAIL, error_handler, 
 			"Number of rows in B must the same as the number of columns in A.");
 	} else {
 		/* In this case (transpose multiplication), dimensions of B are 
@@ -729,26 +729,30 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	}
 
 	/* Check if kernel ID is within 0 to 4. */
-	gef_if_err_create_goto(*err, CCLEXP_ERROR, 
-		((kernel_id < 0) || (kernel_id > 4)), CLEXP_FAIL, error_handler, 
+	gef_if_err_create_goto(*err, CCL_EX_ERROR, 
+		((kernel_id < 0) || (kernel_id > 4)), CCL_EX_FAIL, error_handler, 
 		"Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 \
 		(for C=AA^T kernels).");
 
 	/* If we get here, no need for error treatment, jump to cleanup. */
 	g_assert (err == NULL || *err == NULL);
-	status = CLEXP_SUCCESS;
+	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert (err == NULL || *err != NULL);
-	status = CLEXP_FAIL;
+	status = CCL_EX_FAIL;
 
-cleanup:	
+cleanup:
 
 	/* Free context. */
 	if (context) g_option_context_free(context);
 	
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_EX_FAIL);
+
 	/* Return function status. */
 	return status;
 

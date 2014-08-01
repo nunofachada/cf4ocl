@@ -114,6 +114,10 @@ static void helpers_test() {
 			err->message);
 		g_test_fail();
 	}
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
 	
 }
 

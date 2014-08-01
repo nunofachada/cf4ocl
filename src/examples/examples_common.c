@@ -34,7 +34,7 @@
  * @param gmem Global memory required.
  * @param lmem Local memory required.
  * */
-void cclexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
+void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 	
 	g_printf("\n   ========================= Execution requirements ========================\n\n");
 	g_printf("     Global work size       : (%lu, %lu)\n", 
@@ -59,7 +59,7 @@ void cclexp_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
  * @return The full path of the kernel file, should be freed with 
  * g_free().
  * */
-gchar* cclexp_kernelpath_get(gchar* kernel_filename, char* exec_name) {
+gchar* ccl_ex_kernelpath_get(gchar* kernel_filename, char* exec_name) {
 	
 	/* Required variables. */
 	gchar *exec_path = NULL, *kernel_dir = NULL, *kernel_path = NULL;
@@ -96,6 +96,6 @@ gchar* cclexp_kernelpath_get(gchar* kernel_filename, char* exec_name) {
  * @return A GQuark structure defined by category identifying string,
  * which identifies the error as a cf4ocl examples generated error.
  */
-GQuark cclexp_error_quark() {
+GQuark ccl_ex_error_quark() {
 	return g_quark_from_static_string("cclexp-error-quark");
 }

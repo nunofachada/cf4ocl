@@ -316,6 +316,10 @@ static void context_create_info_destroy_test() {
 	/* Free context and set filters to NULL. */
 	ccl_context_destroy(ctx);
 	filters = NULL;
+	
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
 
 }
 
@@ -632,6 +636,10 @@ static void context_ref_unref_test() {
 	
 	/* Unref device. */
 	ccl_device_unref(d);
+	
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
 
 }
 

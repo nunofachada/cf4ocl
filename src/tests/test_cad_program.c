@@ -321,6 +321,10 @@ static void program_create_info_destroy_test() {
 	/* Free strings. */
 	g_free(tmp_dir_name);
 
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
 }
 
 /** 
@@ -395,6 +399,10 @@ static void program_ref_unref_test() {
 	ccl_queue_destroy(cq);
 	ccl_program_destroy(prg);
 	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
 
 }
 
