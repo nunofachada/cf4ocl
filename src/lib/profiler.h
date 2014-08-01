@@ -256,7 +256,7 @@ void ccl_prof_add_queue(
 cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
 
 /** @brief Return aggregate statistics for events with the given name. */
-const CCLProfAgg const* ccl_prof_get_agg(
+const CCLProfAgg* ccl_prof_get_agg(
 	CCLProf* prof, const char* event_name);
 
 /** @brief Initialize an iterator for profiled aggregate event 
@@ -264,25 +264,25 @@ const CCLProfAgg const* ccl_prof_get_agg(
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort);
 
 /** @brief Return the next profiled aggregate event instance. */
-const CCLProfAgg const* ccl_prof_iter_agg_next(CCLProf* prof);
+const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof);
 
 /** @brief Initialize an iterator for event profiling info instances. */
 void ccl_prof_iter_info_init(CCLProf* prof, int sort);
 
 /** @brief Return the next event profiling info instance. */
-const CCLProfInfo const* ccl_prof_iter_info_next(CCLProf* prof);
+const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof);
 
 /** @brief Initialize an iterator for event instant instances. */
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort);
 
 /** @brief Return the next event instant instance. */
-const CCLProfInst const* ccl_prof_inst_info_next(CCLProf* prof);
+const CCLProfInst* ccl_prof_inst_info_next(CCLProf* prof);
 
 /** @brief Initialize an iterator for overlap instances. */
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);
 
 /** @brief Return the next overlap instance. */
-const CCLProfOverlap const* ccl_prof_iter_overlap_next(CCLProf* prof);
+const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof);
 
 /** @brief Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted

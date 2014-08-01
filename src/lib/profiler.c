@@ -1077,7 +1077,7 @@ finish:
  * @param event_name Event name.
  * @return Aggregate statistics for events with the given name.
  */
-const CCLProfAgg const* ccl_prof_get_agg(
+const CCLProfAgg* ccl_prof_get_agg(
 	CCLProf* prof, const char* event_name) {
 
 	/* Make sure prof is not NULL. */
@@ -1132,7 +1132,7 @@ void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
  * @param prof Profile object.
  * @return The next aggregate statistic instance. 
  * */
-const CCLProfAgg const* ccl_prof_iter_agg_next(CCLProf* prof) {
+const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
@@ -1153,7 +1153,7 @@ const CCLProfAgg const* ccl_prof_iter_agg_next(CCLProf* prof) {
 	}
 	
 	/* Return the aggregate statistic. */
-	return (const CCLProfAgg const*) agg;
+	return (const CCLProfAgg*) agg;
 }
 
 /** 
@@ -1184,7 +1184,7 @@ void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
  * @param prof Profile object.
  * @return The next event profiling info instance. 
  * */
-const CCLProfInfo const* ccl_prof_iter_info_next(CCLProf* prof) {
+const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
@@ -1205,7 +1205,7 @@ const CCLProfInfo const* ccl_prof_iter_info_next(CCLProf* prof) {
 	}
 	
 	/* Return the profiling info instance. */
-	return (const CCLProfInfo const*) info;
+	return (const CCLProfInfo*) info;
 }
 
 /** 
@@ -1237,7 +1237,7 @@ void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
  * @param prof Profile object.
  * @return The next event instant instance. 
  * */
-const CCLProfInst const* ccl_prof_iter_inst_next(CCLProf* prof) {
+const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
@@ -1258,7 +1258,7 @@ const CCLProfInst const* ccl_prof_iter_inst_next(CCLProf* prof) {
 	}
 	
 	/* Return the profiling info instance. */
-	return (const CCLProfInst const*) inst;
+	return (const CCLProfInst*) inst;
 }
 
 /** 
@@ -1289,7 +1289,7 @@ void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
  * @param prof Profile object.
  * @return The next overlap instance. 
  * */
-const CCLProfOverlap const* ccl_prof_iter_overlap_next(CCLProf* prof) {
+const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
@@ -1310,7 +1310,7 @@ const CCLProfOverlap const* ccl_prof_iter_overlap_next(CCLProf* prof) {
 	}
 	
 	/* Return the overlap instance. */
-	return (const CCLProfOverlap const*) ovlp;
+	return (const CCLProfOverlap*) ovlp;
 }
 
 /**
@@ -1366,9 +1366,9 @@ const char* ccl_prof_get_summary(
 	g_return_if_fail(prof->calc == TRUE);
 
 	/* Current aggregate statistic to print. */
-	const CCLProfAgg const* agg = NULL;
+	const CCLProfAgg* agg = NULL;
 	/* Current overlap to print. */
-	const CCLProfOverlap const* ovlp = NULL;
+	const CCLProfOverlap* ovlp = NULL;
 	/* The summary string. */
 	GString* str_obj = g_string_new("");
 
@@ -1491,7 +1491,7 @@ cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
 	/* Return status. */
 	cl_bool ret_status;
 	/* Current event information. */
-	const CCLProfInfo const* curr_ev;
+	const CCLProfInfo* curr_ev;
 	/* Start time. */
 	cl_ulong t_start = 0;
 	

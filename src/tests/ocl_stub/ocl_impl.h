@@ -108,7 +108,7 @@ struct _cl_device_id {
 	const cl_uint max_samplers;
 	const size_t max_work_group_size;
 	const cl_uint max_work_item_dimensions;
-	const size_t const* max_work_item_sizes;
+	const size_t* max_work_item_sizes;
 	const cl_uint max_write_image_args;
 	const cl_uint mem_base_addr_align;
 	const cl_uint min_data_type_align_size;
@@ -123,9 +123,9 @@ struct _cl_device_id {
 	const char* opencl_c_version;
 	const cl_device_id parent_device;
 	const cl_uint partition_max_sub_devices;
-	const cl_device_partition_property const* partition_properties;
+	const cl_device_partition_property* partition_properties;
 	const cl_device_affinity_domain partition_affinity_domain;
-	const cl_device_partition_property const* partition_type;
+	const cl_device_partition_property* partition_type;
 	const cl_platform_id platform_id;
 	const cl_uint preferred_vector_width_char;
 	const cl_uint preferred_vector_width_short;
@@ -154,7 +154,7 @@ struct _cl_platform_id {
 	const char* vendor;
 	const char* extensions;
 	const guint num_devices;
-	const struct _cl_device_id const* devices;
+	const struct _cl_device_id* devices;
 };
 
 struct _cl_context {

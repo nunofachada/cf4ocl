@@ -163,7 +163,7 @@ static void operationTest() {
 	/* Test aggregate statistics */
 	/* ************************* */
 	
-	const CCLProfAgg const* agg;
+	const CCLProfAgg* agg;
 	
 	agg = ccl_prof_get_agg(prof, "Event1");
 	g_assert(agg != NULL);
@@ -194,7 +194,7 @@ static void operationTest() {
 	/* Test overlaps */
 	/* ************* */
 	
-	const CCLProfOverlap const* o;
+	const CCLProfOverlap* o;
 	ccl_prof_iter_overlap_init(prof, CCL_PROF_OVERLAP_SORT_DURATION |
 		CCL_PROF_SORT_DESC);
 	while ((o = ccl_prof_iter_overlap_next(prof)) != NULL) {
