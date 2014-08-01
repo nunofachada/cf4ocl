@@ -34,6 +34,9 @@ static char arg_local_marker;
 
 CCLArg* ccl_arg_new(void* value, size_t size) {
 
+	/* Make sure size is > 0. */
+	g_return_val_if_fail(size > 0, NULL);
+
 	CCLArg* arg = g_slice_new(CCLArg);
 	
 	arg->cl_object = g_memdup((const void*) value, size);
@@ -58,7 +61,7 @@ void ccl_arg_destroy(CCLArg* arg) {
 size_t ccl_arg_size(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
-	g_return_if_fail(arg != NULL);
+	g_return_val_if_fail(arg != NULL, 0);
 
 	return ccl_arg_is_local(arg)
 		? (size_t) arg->ref_count
@@ -68,7 +71,7 @@ size_t ccl_arg_size(CCLArg* arg) {
 void* ccl_arg_value(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
-	g_return_if_fail(arg != NULL);
+	g_return_val_if_fail(arg != NULL, NULL);
 
 	return ccl_arg_is_local(arg)
 		? arg->cl_object

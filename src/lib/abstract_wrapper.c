@@ -45,6 +45,9 @@ G_LOCK_DEFINE(wrappers);
  * */
 CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 
+	/* Make sure OpenCL object is not NULL. */
+	g_return_val_if_fail(cl_object != NULL, NULL);
+
 	/* The new wrapper object. */
 	CCLWrapper* w;
 	
@@ -115,8 +118,11 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_cl_object rel_cl_fun, GError** err) {
 	
 	/* Make sure wrapper object is not NULL. */
-	g_return_val_if_fail(wrapper != NULL, FALSE);
+	g_return_val_if_fail(wrapper != NULL, CL_FALSE);
 	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+
 	/* Flag which indicates if wrapper was destroyed or not. */
 	cl_bool destroyed = CL_FALSE;
 	
@@ -173,9 +179,9 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
  * testing purposes only.
  * 
  * @param wrapper The wrapper object.
- * @return The wrapper object reference count or -1 if device is NULL.
+ * @return The wrapper object reference count or -1 if wrapper is NULL.
  * */
-gint ccl_wrapper_ref_count(CCLWrapper* wrapper) {
+int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
 	
 	/* Make sure wrapper is not NULL. */
 	g_return_val_if_fail(wrapper != NULL, -1);
@@ -365,7 +371,7 @@ finish:
  * value will be automatically freed when the wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
  * */
-gpointer ccl_wrapper_get_info_value(CCLWrapper* wrapper1, 
+void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1, 
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
@@ -397,7 +403,7 @@ gpointer ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @return The requested information size. If an error occurs, 
  * a size of 0 is returned.
  * */
-gsize ccl_wrapper_get_info_size(CCLWrapper* wrapper1, 
+size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1, 
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 	

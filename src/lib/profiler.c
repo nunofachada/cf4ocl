@@ -142,7 +142,7 @@ static CCLProfInst* ccl_prof_inst_new(const char* event_name,
  * 
  * @param instant Event instant to destroy. 
  */
-static void ccl_prof_inst_destroy(gpointer instant) {
+static void ccl_prof_inst_destroy(CCLProfInst* instant) {
 	
 	g_return_if_fail(instant != NULL);
 	
@@ -204,7 +204,7 @@ static CCLProfAgg* ccl_prof_agg_new(const char* event_name) {
  * 
  * @param agg Aggregate statistic to free.
  * */
-static void ccl_prof_agg_destroy(gpointer agg) {
+static void ccl_prof_agg_destroy(CCLProfAgg* agg) {
 	g_return_if_fail(agg != NULL);
 	g_slice_free(CCLProfAgg, agg);
 }
@@ -429,6 +429,15 @@ static gint ccl_prof_overlap_comp(
 static void ccl_prof_add_event(CCLProf* prof, const char* cq_name, 
 	CCLEvent* evt, GError** err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
+	/* Make sure profile object is not NULL. */
+	g_return_if_fail(prof != NULL);
+	/* Make sure command queue name is not NULL. */
+	g_return_if_fail(cq_name != NULL);
+	/* Make sure event wrapper is not NULL. */
+	g_return_if_fail(evt != NULL);
+
 	/* Event name ID. */
 	guint* event_name_id;
 	/* Specific event ID. */
@@ -537,6 +546,11 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
  */ 
 static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_if_fail(err == NULL || *err == NULL);
+	/* Make sure profile object is not NULL. */
+	g_return_if_fail(prof != NULL);
+
 	/* Hash table iterator. */
 	GHashTableIter iter;
 	/* Command queue name and wrapper. */
@@ -569,6 +583,9 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
  * */
 static void ccl_prof_calc_agg(CCLProf* prof) {
 	
+	/* Make sure profile object is not NULL. */
+	g_return_if_fail(prof != NULL);
+
 	/* Hash table iterator. */
 	GHashTableIter iter;
 	/* Aux. hash table for aggregate statistics. */
@@ -656,6 +673,9 @@ static void ccl_prof_calc_agg(CCLProf* prof) {
  */ 
 static void ccl_prof_calc_overlaps(CCLProf* prof) {
 	
+	/* Make sure profile object is not NULL. */
+	g_return_if_fail(prof != NULL);
+
 	/* Total overlap time. */
 	cl_ulong total_overlap = 0;
 	/* Overlap matrix. */
@@ -1053,14 +1073,14 @@ cl_bool ccl_prof_calc(CCLProf* prof, GError** err) {
 	ccl_prof_calc_overlaps(prof);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	status = CL_TRUE;
 	prof->calc = TRUE;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	status = CL_FALSE;
 
 finish:	
@@ -1082,6 +1102,8 @@ const CCLProfAgg* ccl_prof_get_agg(
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, NULL);
+	/* Make sure event name is not NULL. */
+	g_return_val_if_fail(event_name != NULL, NULL);
 	/* This function can only be called after calculations are made. */
 	g_return_val_if_fail(prof->calc == TRUE, NULL);
 	
@@ -1361,9 +1383,9 @@ const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort) {
 	
 	/* Make sure prof is not NULL. */
-	g_return_if_fail(prof != NULL);
+	g_return_val_if_fail(prof != NULL, NULL);
 	/* This function can only be called after calculations are made. */
-	g_return_if_fail(prof->calc == TRUE);
+	g_return_val_if_fail(prof->calc == TRUE, NULL);
 
 	/* Current aggregate statistic to print. */
 	const CCLProfAgg* agg = NULL;
@@ -1484,7 +1506,7 @@ cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 	/* This function can only be called after calculations are made. */
-	g_return_if_fail(prof->calc == TRUE);
+	g_return_val_if_fail(prof->calc == TRUE, CL_FALSE);
 
 	/* Stream write status. */
 	int write_status;
@@ -1530,13 +1552,13 @@ cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
 	}
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	ret_status = CL_TRUE;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	ret_status = CL_FALSE;
 	
 finish:	
@@ -1561,6 +1583,15 @@ finish:
 cl_bool ccl_prof_export_info_file(
 	CCLProf* prof, const char* filename, GError** err) {
 
+	/* Make sure prof is not NULL. */
+	g_return_val_if_fail(prof != NULL, CL_FALSE);
+	/* Make sure filename is not NULL. */
+	g_return_val_if_fail(filename != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+	/* This function can only be called after calculations are made. */
+	g_return_val_if_fail(prof->calc == TRUE, CL_FALSE);
+
 	/* Aux. var. */
 	cl_bool status;
 	
@@ -1578,13 +1609,13 @@ cl_bool ccl_prof_export_info_file(
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	status = CL_TRUE;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	status = CL_FALSE;
 
 finish:	

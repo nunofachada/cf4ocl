@@ -46,7 +46,7 @@ typedef struct ccl_wrapper {
 	GHashTable* info;
 
 	/** Reference count. */
-	gint ref_count;    
+	int ref_count;    
 	
 } CCLWrapper;
 
@@ -70,7 +70,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 
 /** @brief Returns the wrapper object reference count. For debugging and 
  * testing purposes only. */
-gint ccl_wrapper_ref_count(CCLWrapper* wrapper);
+int ccl_wrapper_ref_count(CCLWrapper* wrapper);
 
 /** @brief Get the wrapped OpenCL object. */
 void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
@@ -109,7 +109,7 @@ typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
- typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
+typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
 	void* cl_object2, cl_uint param_name, size_t param_value_size, 
 	void* param_value, size_t* param_value_size_ret);
 
@@ -131,7 +131,7 @@ typedef cl_int (*ccl_wrapper_info_fp)(void);
  * */
 typedef struct ccl_wrapper_info {
 	/** Device information. */
-	gpointer value;
+	void* value;
 	/** Size in bytes of device information. */
 	size_t size;
 } CCLWrapperInfo;
@@ -175,12 +175,12 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
 /** @brief Get pointer to information value. */
-gpointer ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
+void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /** @brief Get information size. */
-gsize ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
+size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 

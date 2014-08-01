@@ -131,104 +131,18 @@ static cl_context_properties* ccl_context_properties_default(
 	}
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 	
 	/* Return properties. */
 	return ctx_props;
 
-}
-
-/**
- * @brief Creates a context wrapper using the exact parameters received 
- * by the clCreateContext function.
- * 
- * If the properties parameter is NULL, this function obtains 
- * the cl_platform_id object from the first device.
- * 
- * @param properties Context properties, may be NULL.
- * @param num_devices Number of cl_devices_id's in devices array.
- * @param devices Array of cl_device_id's.
- * @param pfn_notify A callback function used by the OpenCL 
- * implementation to report information on errors during context 
- * creation as well as errors that occur at runtime in this context. 
- * Ignored if NULL.
- * @param user_data Passed as argument to pfn_notify, can be NULL.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
- * @return A new context wrapper object.
- * */
-static CCLContext* ccl_context_new_from_cldevices_full(
-	const cl_context_properties* properties, 
-	cl_uint num_devices,
-	const cl_device_id* devices,
-	ccl_context_callback pfn_notify,
-    void* user_data,
-    GError** err) {
-		
-	/* Make sure number of devices is not zero. */
-
-
-
-	g_return_val_if_fail(num_devices > 0, NULL);
-	/* Make sure device array is not NULL. */
-	g_return_val_if_fail(devices != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
-	/* Error reporting object. */
-	GError* err_internal = NULL;
-	/* Context properties, in case the properties parameter is NULL. */
-	cl_context_properties* ctx_props = NULL;
-	/* Return status of OpenCL function calls. */
-	cl_int ocl_status;
-	/* OpenCL context. */
-	cl_context context = NULL;
-	/* Context wrapper to create. */
-	CCLContext* ctx = NULL;
-	
-	/* Get a set of default context properties, if required. */
-	ctx_props = ccl_context_properties_default(
-			properties, devices[0], &err_internal);
-	
-	/* Create OpenCL context. */
-	context = clCreateContext(
-		(const cl_context_properties*) ctx_props, num_devices, devices, 
-		pfn_notify, user_data, &ocl_status);
-	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
-		CCL_ERROR_OCL, error_handler, 
-		"%s: unable to create cl_context (OpenCL error %d: %s).", 
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
-		
-	/* Wrap OpenCL context. */
-	ctx = ccl_context_new_wrap(context);
-
-	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	goto finish;
-	
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-
-	/* Destroy what was built for the context wrapper. */
-	ccl_context_destroy(ctx);
-	ctx = NULL;
-
-finish:
-
-	/* Free stuff. */
-	ccl_context_properties_default_free(properties, ctx_props);
-	
-	/* Return ctx. */
-	return ctx;
-	
 }
 
 /** 
@@ -299,11 +213,8 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
  * @return A new context wrapper object.
  * */
 CCLContext* ccl_context_new_from_filters_full(
-	const cl_context_properties* properties, 
-	CCLDevSelFilters* filters,
-	ccl_context_callback pfn_notify,
-    void* user_data,
-	GError **err) {
+	const cl_context_properties* properties, CCLDevSelFilters* filters,
+	ccl_context_callback pfn_notify, void* user_data, GError **err) {
 
 	/* Make sure number ds is not NULL. */
 	g_return_val_if_fail(filters != NULL, NULL);
@@ -335,13 +246,13 @@ CCLContext* ccl_context_new_from_filters_full(
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 
@@ -373,12 +284,9 @@ finish:
  * @return A new context wrapper object.
  * */
 CCLContext* ccl_context_new_from_devices_full(
-	const cl_context_properties* properties, 
-	cl_uint num_devices,
-	CCLDevice** devices,
-	ccl_context_callback pfn_notify,
-    void* user_data,
-    GError** err) {
+	const cl_context_properties* properties, cl_uint num_devices,
+	CCLDevice** devices, ccl_context_callback pfn_notify,
+	void* user_data, GError** err) {
 
 	/* Make sure number of devices is not zero. */
 	g_return_val_if_fail(num_devices > 0, NULL);
@@ -389,17 +297,54 @@ CCLContext* ccl_context_new_from_devices_full(
 	
 	/* Array of unwrapped devices. */
 	cl_device_id cl_devices[num_devices];
-	
+	/* Context properties, in case the properties parameter is NULL. */
+	cl_context_properties* ctx_props = NULL;
+	/* Return status of OpenCL function calls. */
+	cl_int ocl_status;
+	/* OpenCL context. */
+	cl_context context = NULL;
 	/* New context wrapper. */
 	CCLContext* ctx = NULL;
+	/* Error reporting object. */
+	GError* err_internal = NULL;
 	
 	/* Unwrap devices. */
 	for (guint i = 0; i < num_devices; i++)
 		cl_devices[i] = ccl_device_unwrap(devices[i]);
 
-	/* Create context wrapper. */
-	ctx = ccl_context_new_from_cldevices_full(properties, num_devices,
-		cl_devices, pfn_notify, user_data, err);
+	/* Get a set of default context properties, if required. */
+	ctx_props = ccl_context_properties_default(
+			properties, cl_devices[0], &err_internal);
+	
+	/* Create OpenCL context. */
+	context = clCreateContext(
+		(const cl_context_properties*) ctx_props, num_devices, 
+		(const cl_device_id*) cl_devices, pfn_notify, user_data, 
+		&ocl_status);
+	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
+		"%s: unable to create cl_context (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	/* Wrap OpenCL context. */
+	ctx = ccl_context_new_wrap(context);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* Destroy what was built for the context wrapper. */
+	ccl_context_destroy(ctx);
+	ctx = NULL;
+
+finish:
+
+	/* Free stuff. */
+	ccl_context_properties_default_free(properties, ctx_props);
 	
 	/* Return result of function call. */
 	return ctx;
@@ -448,13 +393,13 @@ CCLContext* ccl_context_new_from_indep_filter(
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:	
 
@@ -495,13 +440,13 @@ CCLContext* ccl_context_new_from_menu_full(void* data, GError** err) {
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:	
 

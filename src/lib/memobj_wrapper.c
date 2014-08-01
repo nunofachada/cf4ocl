@@ -132,13 +132,13 @@ CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq,
 	ccl_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;
@@ -196,13 +196,13 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 	ccl_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;

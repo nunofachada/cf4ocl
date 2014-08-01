@@ -119,13 +119,13 @@ CCLKernel* ccl_kernel_new(
 	krnl = ccl_kernel_new_wrap(kernel);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	krnl = NULL;
 	
@@ -244,13 +244,13 @@ CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq,
 	ccl_event_wait_list_clear(evt_wait_lst);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;
@@ -329,13 +329,13 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 

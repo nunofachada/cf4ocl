@@ -103,11 +103,11 @@ void ccl_devsel_print_device_strings(GError** err);
 
 /** @brief Add a independent device filter to the filter set. */
 void ccl_devsel_add_indep_filter(
-	CCLDevSelFilters* filters, ccl_devsel_indep filter, gpointer data);
+	CCLDevSelFilters* filters, ccl_devsel_indep filter, void* data);
 
 /** @brief Add a dependent device filter to the filter set. */
 void ccl_devsel_add_dep_filter(
-	CCLDevSelFilters* filters, ccl_devsel_dep filter, gpointer data);
+	CCLDevSelFilters* filters, ccl_devsel_dep filter, void* data);
 
 /** @brief Select one or more OpenCL devices based on the provided
  * filters.  */

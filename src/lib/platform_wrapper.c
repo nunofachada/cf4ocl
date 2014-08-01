@@ -169,7 +169,7 @@ CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err) {
 	platf = ccl_platform_new_wrap(platform_id);
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 
 error_handler:

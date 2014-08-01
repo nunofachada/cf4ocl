@@ -704,7 +704,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 static int ccl_devquery_get_index(const char* name) {
 
 	/* Make sure name is not NULL. */
-	g_return_val_if_fail(name != NULL, 0);
+	g_return_val_if_fail(name != NULL, -1);
 	
 	/* Search indexes. */
 	gint idx_middle;
@@ -749,13 +749,13 @@ static int ccl_devquery_get_index(const char* name) {
  * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
  * accepted.
  * @return A final device info prefix in the same format as 
- * kept in the ccl_devquery_info_map. Should be freed with g_free()
- * function from GLib.
+ * kept in the ccl_devquery_info_map, or NULL if given prefix is not
+ * valid. Should be freed with g_free() function from GLib.
  * */
 gchar* ccl_devquery_get_prefix_final(const char* prefix) {
 	
 	/* Make sure prefix is not NULL. */
-	g_return_val_if_fail(prefix != NULL, 0);
+	g_return_val_if_fail(prefix != NULL, NULL);
 	
 	/* Auxiliary string variables. */
 	gchar* str_upper;
@@ -838,7 +838,7 @@ const CCLDevQueryMap* ccl_devquery_prefix(
 	const char* prefix, int* size) {
 	
 	/* Make sure prefix is not NULL. */
-	g_return_val_if_fail(prefix != NULL, 0);
+	g_return_val_if_fail(prefix != NULL, NULL);
 	
 	/* Final prefix to search for. */
 	gchar* prefix_final;

@@ -185,13 +185,13 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -234,13 +234,13 @@ CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	prg = ccl_program_new_wrap(program);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 
@@ -291,13 +291,13 @@ CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -360,13 +360,13 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	prg = ccl_program_new_wrap(program);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -393,6 +393,8 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	g_return_val_if_fail(ctx != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	/* Make sure num_devices > 0. */
+	g_return_val_if_fail(num_devices > 0, NULL);
 	
 	cl_int ocl_status;
 	cl_program program = NULL;
@@ -420,13 +422,13 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	prg = ccl_program_new_wrap(program);
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 	
@@ -446,12 +448,12 @@ cl_bool ccl_program_build_from_devices_full(CCLProgram* prg,
 	ccl_program_callback pfn_notify, void *user_data, GError** err) {
 	
 	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, FALSE);
+	g_return_val_if_fail(prg != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 	/* Make sure devices and num_devices are coherent. */
 	g_return_val_if_fail(((num_devices == 0) && (devices == NULL)) 
-		|| ((num_devices > 0) && (devices != NULL)), FALSE);
+		|| ((num_devices > 0) && (devices != NULL)), CL_FALSE);
 
 	/* Array of unwrapped devices. */
 	cl_device_id* cl_devices = NULL;
@@ -460,7 +462,7 @@ cl_bool ccl_program_build_from_devices_full(CCLProgram* prg,
 	cl_int ocl_status;
 
 	/* Result of function call. */
-	gboolean result;
+	cl_bool result;
 	
 	/* Check if its necessary to unwrap devices. */
 	if (devices != NULL) {
@@ -479,14 +481,14 @@ cl_bool ccl_program_build_from_devices_full(CCLProgram* prg,
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	result = CL_TRUE;
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 	/* Bad result. */
 	result = CL_FALSE;
@@ -550,13 +552,13 @@ CCLKernel* ccl_program_get_kernel(
 	}
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 
@@ -604,13 +606,13 @@ CCLEvent* ccl_program_run_v(CCLProgram* prg, const char* kernel_name,
 static void ccl_program_load_binaries(CCLProgram* prg, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	g_return_if_fail((err) == NULL || *(err) == NULL);
 	
 	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, NULL);
+	g_return_if_fail(prg != NULL);
 
 	/* Make sure binaries table is initialized. */
-	g_return_val_if_fail(prg->binaries != NULL, NULL);
+	g_return_if_fail(prg->binaries != NULL);
 
 	cl_uint num_devices;
 	cl_device_id* devices;
@@ -667,13 +669,13 @@ static void ccl_program_load_binaries(CCLProgram* prg, GError** err) {
 	g_slice_free1(num_devices * sizeof(unsigned char*), bins_raw);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	return;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	return;
 
 }
@@ -733,13 +735,13 @@ CCLProgramBinary* ccl_program_get_binary(CCLProgram* prg, CCLDevice* dev,
 	}
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 
@@ -751,13 +753,15 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	const char* filename, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
 	
 	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, NULL);
+	g_return_val_if_fail(prg != NULL, CL_FALSE);
 	
 	/* Make sure filename is not NULL. */
-	g_return_val_if_fail(filename != NULL, NULL);
+	g_return_val_if_fail(filename != NULL, CL_FALSE);
+	
+	cl_bool status;
 	
 	GError* err_internal = NULL;
 	
@@ -775,14 +779,14 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
-	cl_bool status = CL_TRUE;
+	g_assert(err == NULL || *err == NULL);
+	status = CL_TRUE;
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	status = CL_FALSE;
 
@@ -796,14 +800,14 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	const char* file_prefix, const char* file_suffix, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
 	
 	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, NULL);
+	g_return_val_if_fail(prg != NULL, CL_FALSE);
 	
 	/* Make sure file prefix and suffix are not NULL. */
 	g_return_val_if_fail(
-		(file_prefix != NULL) && (file_suffix != NULL), NULL);
+		(file_prefix != NULL) && (file_suffix != NULL), CL_FALSE);
 	
 	GError* err_internal = NULL;
 	guint num_devices;
@@ -841,14 +845,14 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	status = CL_TRUE;
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	status = CL_FALSE;
 

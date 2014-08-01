@@ -32,13 +32,13 @@ static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_if_fail(err == NULL || *err == NULL);
 	
 	/* Make sure devcon is not NULL. */
-	g_return_val_if_fail(devcon != NULL, NULL);
+	g_return_if_fail(devcon != NULL);
 	
 	/* Make sure device list is not initialized. */
-	g_return_val_if_fail(devcon->devices == NULL, NULL);
+	g_return_if_fail(devcon->devices == NULL);
 
 	CCLWrapperInfo* info_devs;
 	GError* err_internal = NULL;
@@ -120,10 +120,10 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
 	ccl_dev_container_get_cldevices get_devices, GError** err) {
 		
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
 	/* Make sure devcon is not NULL. */
-	g_return_val_if_fail(devcon != NULL, 0);
+	g_return_val_if_fail(devcon != NULL, NULL);
 	
 	/* Check if device list is already initialized. */
 	if (devcon->devices == NULL) {

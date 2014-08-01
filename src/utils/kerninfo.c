@@ -144,13 +144,13 @@ int main(int argc, char *argv[])
 	/* ************** */
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
-	g_assert (err == NULL);
+	g_assert(err == NULL);
 	status = CCL_SUCCESS;
 	goto cleanup;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err != NULL);
+	g_assert(err != NULL);
 	g_fprintf(stderr, "%s\n", err->message);
 	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
 	g_error_free(err);

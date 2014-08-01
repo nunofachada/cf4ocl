@@ -608,7 +608,7 @@ int main(int argc, char *argv[]) {
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err != NULL);
+	g_assert(err != NULL);
 	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", 
 		err->code, g_quark_to_string(err->domain), err->message);
 	g_error_free(err);
@@ -735,13 +735,13 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 		(for C=AA^T kernels).");
 
 	/* If we get here, no need for error treatment, jump to cleanup. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	status = CCL_EX_FAIL;
 
 cleanup:

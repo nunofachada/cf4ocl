@@ -29,6 +29,7 @@
 #define _CCL_BUFFER_WRAPPER_H_
 
 #include "memobj_wrapper.h"
+#include "image_wrapper.h"
 
 /**
  * @defgroup BUFFER_WRAPPER Buffer wrapper
@@ -68,7 +69,7 @@ CCLEvent* ccl_buffer_copy(CCLQueue* cq, CCLBuffer* src_buf,
 	size_t size, CCLEventWaitList evt_wait_lst, GError** err);
 	
 CCLEvent* ccl_buffer_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
-	CCLBuffer* dst_img, size_t src_offset, const size_t *dst_origin,
+	CCLImage* dst_img, size_t src_offset, const size_t *dst_origin,
 	const size_t *region, CCLEventWaitList evt_wait_lst, GError** err);
 
 #ifdef CL_VERSION_1_1

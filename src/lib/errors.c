@@ -99,6 +99,8 @@ static const char* ccl_errors[] = {
 	"Invalid device partition count" /* CL_INVALID_DEVICE_PARTITION_COUNT - 68 */
 };
 
+static const int ccl_errors_count = 69;
+
 /** 
  * @addtogroup ERRORS
  * @{
@@ -111,7 +113,10 @@ static const char* ccl_errors[] = {
  * @return A readable string.
  * */
 const char* ccl_err(int code) {
-	return ccl_errors[-1 * code];
+	int index = -1 * code;
+	return (index >= 0) || (index < ccl_errors_count)
+		? ccl_errors[-1 * code]
+		: "Unknown OpenCL error code";
 }
 
 /** @} */

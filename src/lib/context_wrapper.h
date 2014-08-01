@@ -163,22 +163,16 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /** @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. */
 CCLContext* ccl_context_new_from_filters_full(
-	const cl_context_properties* properties, 
-	CCLDevSelFilters* filters,
-	ccl_context_callback pfn_notify,
-    void* user_data,
-	GError **err);
+	const cl_context_properties* properties, CCLDevSelFilters* filters,
+	ccl_context_callback pfn_notify, void* user_data, GError **err);
 
 /** @brief Creates a context wrapper given an array of ::CCLDevice 
  * wrappers and the remaining parameters required by the 
  * clCreateContext function. */
 CCLContext* ccl_context_new_from_devices_full(
-	const cl_context_properties* properties, 
-	cl_uint num_devices,
-	CCLDevice** devices,
-	ccl_context_callback pfn_notify,
-    void* user_data,
-    GError** err);
+	const cl_context_properties* properties, cl_uint num_devices,
+	CCLDevice** devices, ccl_context_callback pfn_notify,
+	void* user_data, GError** err);
 
 /** @brief Creates a context wrapper using one independent device filter 
  * specified in the function parameters. */

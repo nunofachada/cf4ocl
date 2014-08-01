@@ -59,6 +59,7 @@ const char* ccl_event_get_name(CCLEvent* evt);
 
 const char* ccl_event_get_final_name(CCLEvent* evt);
 
+/** @brief Get the command type which fired the given event. */
 cl_command_type ccl_event_get_command_type(
 	CCLEvent* evt, GError** err);
 
@@ -213,8 +214,6 @@ cl_command_type ccl_event_get_command_type(
 
 typedef GPtrArray* CCLEventWaitList;
 
-cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err);
-
 #define ccl_event_wait_list_new() \
 	g_ptr_array_new()
 	
@@ -238,6 +237,11 @@ cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err);
 	g_ptr_array_free(evt_wait_lst, TRUE)
 
 /** @} */
+
+/** @brief Waits on the host thread for commands identified by events 
+ * in the wait list to complete. This function is a wrapper for the
+ * clWaitForEvents() OpenCL function. */ 
+cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err);
 
 /** @} */
 

@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
 	ccl_prof_print_summary(prof);
 	
 	/* If we get here, no need for error checking, jump to cleanup. */
-	g_assert (err == NULL);
+	g_assert(err == NULL);
 	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err != NULL);
+	g_assert(err != NULL);
 	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", 
 		err->code, g_quark_to_string(err->domain), err->message);
 	g_error_free(err);

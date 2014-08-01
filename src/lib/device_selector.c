@@ -41,6 +41,13 @@ typedef enum ccl_devsel_filter_type {
 	
 } CCLDevSelFilterType;
 
+/**
+ * @brief Generic filter function pointer. Used to keep either a
+ * dependent or independent filter function in a ::CCLDevSelFilter
+ * object.
+ * */
+typedef void (*ccl_devsel_fp)(void);
+
 /** 
  * @brief Filter object, includes a filter function (independent or 
  * dependent) and the respective filter data.
@@ -48,9 +55,9 @@ typedef enum ccl_devsel_filter_type {
 typedef struct ccl_devsel_filter {
 	
 	/** Filter function. */
-	gpointer function;
+	ccl_devsel_fp function;
 	/** Filter data. */
-	gpointer data;
+	void* data;
 	/** Filter type. */
 	CCLDevSelFilterType type;
 	
@@ -68,7 +75,7 @@ typedef struct ccl_devsel_filter {
  * @param type Type of filter: independent or dependent.
  * */
 static void ccl_devsel_add_filter(CCLDevSelFilters* filters, 
-	gpointer function, gpointer data, CCLDevSelFilterType type) {
+	ccl_devsel_fp function, void* data, CCLDevSelFilterType type) {
 
 	/* Initialize filters if required. */
 	if (*filters == NULL)
@@ -162,12 +169,12 @@ static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
 	}
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -188,8 +195,9 @@ finish:
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return A NULL-terminated array of strings, each one containing the
- * name and vendor of each device in the device array. If an error
- * occurs, NULL is returned.
+ * name and vendor of each device in the device array. The array of 
+ * strings should be freed with the g_strfreev() function from GLib. If
+ * an error occurs, NULL is returned.
  *  */
 static gchar** ccl_get_device_strings_from_array(
 	CCLDevSelDevices devices, GError** err) {
@@ -228,12 +236,12 @@ static gchar** ccl_get_device_strings_from_array(
 	}	
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* Free what was built of the array of strings. */
 	g_strfreev(dev_strings);
@@ -260,10 +268,10 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 	cl_int selected, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_if_fail(err == NULL || *err == NULL);
 	
 	/* Make sure devices array is not null. */
-	g_return_val_if_fail(devices != NULL, NULL);
+	g_return_if_fail(devices != NULL);
 	
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
@@ -283,7 +291,7 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 	
 	/* Print each device description string. */
 	for (cl_int i = 0; i < (cl_int) devices->len; i++) {
-		
+	
 		/* Current device string. */
 		gchar* sel_str;
 		
@@ -296,17 +304,17 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 		/* Print string. */
 		g_printf(" %s %s\n", 
 			sel_str, dev_strings[i]);
-		
+	
 	}
 	
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -320,11 +328,17 @@ finish:
  * from a list. 
  * 
  * @param devices Array of devices.
- * @return The list index of the selected device.
+ * @return The list index of the selected device or -1 if an error
+ * ocurrs.
  * */
 static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	GError** err) {
 	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, -1);
+	/* Make sure devices array is not null. */
+	g_return_val_if_fail(devices != NULL, -1);
+
 	/* Index of selected device. */
 	cl_int index = -1;
 	/* Number of results read from user input. */
@@ -359,12 +373,12 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	}
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	index = -1;
 	
 finish:
@@ -417,12 +431,12 @@ gchar** ccl_devsel_get_device_strings(GError** err) {
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* Free what was built of the array of strings. */
 	g_strfreev(dev_strings);
@@ -448,7 +462,7 @@ finish:
 void ccl_devsel_print_device_strings(GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_if_fail(err == NULL || *err == NULL);
 	
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
@@ -466,13 +480,13 @@ void ccl_devsel_print_device_strings(GError** err) {
 	}
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -489,9 +503,10 @@ finish:
  * @param data Filter data.
  * */
 void ccl_devsel_add_indep_filter(
-	CCLDevSelFilters* filters, ccl_devsel_indep function, gpointer data) {
+	CCLDevSelFilters* filters, ccl_devsel_indep function, void* data) {
 
-	ccl_devsel_add_filter(filters, function, data, CCL_DEVSEL_INDEP);
+	ccl_devsel_add_filter(
+		filters, (ccl_devsel_fp) function, data, CCL_DEVSEL_INDEP);
 }
 
 /**
@@ -502,9 +517,10 @@ void ccl_devsel_add_indep_filter(
  * @param data Filter data.
  * */
 void ccl_devsel_add_dep_filter(
-	CCLDevSelFilters* filters, ccl_devsel_dep function, gpointer data) {
+	CCLDevSelFilters* filters, ccl_devsel_dep function, void* data) {
 
-	ccl_devsel_add_filter(filters, function, data, CCL_DEVSEL_DEP);
+	ccl_devsel_add_filter(
+		filters, (ccl_devsel_fp) function, data, CCL_DEVSEL_DEP);
 }
 
 /** 
@@ -593,12 +609,12 @@ CCLDevSelDevices ccl_devsel_select(
 	}
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 
@@ -657,12 +673,12 @@ cl_bool ccl_devsel_indep_type(
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 finish:
 	
@@ -836,12 +852,12 @@ cl_bool ccl_devsel_indep_string(
 	g_free(part_info);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* Filter will not accept device in case an error occurs. */
 	pass = CL_FALSE;
@@ -862,13 +878,13 @@ finish:
  * @param err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return CL_TRUE if device belongs to the specified platform, CL_FALSE 
- * otherwise.
+ * otherwise (or if an error occurs).
  * */
 cl_bool ccl_devsel_indep_platform(
 	CCLDevice* device, void *data, GError **err) {
 		
 	/* Make sure device is not NULL. */
-	g_return_val_if_fail(device != NULL, NULL);
+	g_return_val_if_fail(device != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
@@ -897,12 +913,12 @@ cl_bool ccl_devsel_indep_platform(
 	pass = (platf == (cl_platform_id) data) ? CL_TRUE : CL_FALSE;
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* Filter will not accept device in case an error occurs. */
 	pass = CL_FALSE;
@@ -986,12 +1002,12 @@ CCLDevSelDevices ccl_devsel_dep_platform(
 	}
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* Set return value to NULL to conform to specification. */
 	devices = NULL;
@@ -1057,12 +1073,12 @@ CCLDevSelDevices ccl_devsel_dep_menu(
 	g_assert_cmpint(1, ==, devices->len);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 	
 	/* Set return value to NULL to conform to specification. */
 	devices = NULL;

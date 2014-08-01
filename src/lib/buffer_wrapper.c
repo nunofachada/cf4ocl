@@ -57,12 +57,12 @@ CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	buf = ccl_memobj_new_wrap(buffer);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 finish:
 	
@@ -104,12 +104,12 @@ CCLEvent* ccl_buffer_read(CCLQueue* cq, CCLBuffer* buf,
 	ccl_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;
@@ -154,12 +154,12 @@ CCLEvent* ccl_buffer_write(CCLQueue* cq, CCLBuffer* buf,
 	ccl_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;
@@ -209,12 +209,12 @@ void* ccl_buffer_map(CCLQueue* cq, CCLBuffer* buf,
 	ccl_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 	/* An error occurred, return NULL to signal it. */
 	ptr = NULL;
@@ -263,12 +263,12 @@ CCLEvent* ccl_buffer_copy(CCLQueue* cq, CCLBuffer* src_buf,
 	ccl_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;
@@ -281,7 +281,7 @@ finish:
 }
 	
 CCLEvent* ccl_buffer_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
-	CCLBuffer* dst_img, size_t src_offset, const size_t *dst_origin,
+	CCLImage* dst_img, size_t src_offset, const size_t *dst_origin,
 	const size_t *region, CCLEventWaitList evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
@@ -316,12 +316,12 @@ CCLEvent* ccl_buffer_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 	ccl_event_wait_list_clear(evt_wait_lst);
 		
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
+	g_assert(err == NULL || *err != NULL);
 
 	/* An error occurred, return NULL to signal it. */
 	evt = NULL;

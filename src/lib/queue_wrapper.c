@@ -144,7 +144,7 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	ccl_device_ref(dev);
 	
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 	
 error_handler:
@@ -198,7 +198,7 @@ CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err) {
 	}
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 
 error_handler:
@@ -237,7 +237,7 @@ CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err) {
 	}
 
 	/* If we got here, everything is OK. */
-	g_assert (err == NULL || *err == NULL);
+	g_assert(err == NULL || *err == NULL);
 	goto finish;
 
 error_handler:
@@ -294,6 +294,8 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
 
 cl_int ccl_queue_flush(CCLQueue* cq, GError** err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
 	
@@ -311,6 +313,8 @@ cl_int ccl_queue_flush(CCLQueue* cq, GError** err) {
 
 cl_int ccl_queue_finish(CCLQueue* cq, GError** err) {
 
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
 	

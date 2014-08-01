@@ -689,7 +689,7 @@ int main(int argc, char* argv[])
 	
 error_handler:
     /* If we got here there was an error, verify that it is so. */
-    g_assert (err != NULL);
+    g_assert(err != NULL);
     /* Print error message. */
     fprintf(stderr, "Error message: %s\n", err->message);
     /* Make sure function status contains an error code. */
@@ -742,7 +742,7 @@ void some_function(some params, GError** err)
     /* It's good practice to check if err is NULL (caller doesn't */
     /* care about error reporting OR if a non-null err is         */
     /* pointing to NULL (i.e. no error was reported).             */
-    g_assert (err == NULL || *err == NULL);
+    g_assert(err == NULL || *err == NULL);
 
     /* Goto finish label, ignoring the error handling section.    */
     goto finish;
@@ -752,7 +752,7 @@ error_handler:
     /* i.e. either the caller doesn't care about error reporting, */
     /* in which case err is NULL, OR a non-null err is in fact    */
     /* pointing to an initialized GError object.                  */
-    g_assert (err == NULL || *err != NULL);
+    g_assert(err == NULL || *err != NULL);
 
     /* Run any other error handling code. */
     ...
