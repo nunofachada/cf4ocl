@@ -34,7 +34,7 @@
 static char* ccl_devquery_format_uint(CCLWrapperInfo* info, 
 	char* out, size_t size, const char* units) {
 		
-	g_snprintf(out, size, "%d %s", *((cl_uint*) info->value), units);
+	g_snprintf(out, size, "%u %s", *((cl_uint*) info->value), units);
 	return out;
 	
 }
@@ -72,7 +72,7 @@ static char* ccl_devquery_format_hex(CCLWrapperInfo* info,
 static char* ccl_devquery_format_sizet(CCLWrapperInfo* info, 
 	char* out, size_t size, const char* units) {
 		
-	g_snprintf(out, size, "%ld %s", (gulong) *((size_t*) info->value), units);
+	g_snprintf(out, size, "%lu %s", (gulong) *((size_t*) info->value), units);
 	return out;
 	
 }
@@ -104,7 +104,7 @@ static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info,
 	
 	units = units;
 	cl_ulong bytes = *((cl_ulong*) info->value);
-	ccl_devquery_format_bytes("ld");
+	ccl_devquery_format_bytes("lu");
 	return out;
 	
 }
@@ -118,7 +118,7 @@ static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info,
 	
 	units = units;
 	cl_uint bytes = *((cl_uint*) info->value);
-	ccl_devquery_format_bytes("d");
+	ccl_devquery_format_bytes("u");
 	return out;
 
 }
@@ -132,7 +132,7 @@ static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info,
 	
 	units = units;
 	cl_ulong bytes = *((size_t*) info->value);
-	ccl_devquery_format_bytes("ld");
+	ccl_devquery_format_bytes("lu");
 	return out;
 
 }
@@ -151,7 +151,7 @@ static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 
 	for (guint i = 0; i < count; i++) {
 		if (i > 0) g_string_append(str, ", ");
-		g_string_append_printf(str, "%ld", (gulong) vec[i]);
+		g_string_append_printf(str, "%lu", (gulong) vec[i]);
 	}
 	
 	g_string_append(str, ")");
@@ -336,6 +336,51 @@ static char* ccl_devquery_format_affdom(CCLWrapperInfo* info,
 
 /**
  * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the supported affinity domains for partitioning a device 
+ * using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT. 
+ * */
+static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
+	
+	units = units;
+	cl_device_partition_property_ext* ade = 
+		(cl_device_partition_property_ext*) info->value;
+	GString* str = g_string_new("");
+	guint count = info->size / sizeof(cl_device_partition_property_ext);
+	for (guint i = 0; i < count; i++) {
+		switch (ade[i]) {
+			case CL_AFFINITY_DOMAIN_L1_CACHE_EXT:
+				g_string_append_printf(str, "L1_CACHE_EXT ");
+				break;
+			case CL_AFFINITY_DOMAIN_L2_CACHE_EXT:
+				g_string_append_printf(str, "L2_CACHE_EXT ");
+				break;
+			case CL_AFFINITY_DOMAIN_L3_CACHE_EXT:
+				g_string_append_printf(str, "L3_CACHE_EXT ");
+				break;
+			case CL_AFFINITY_DOMAIN_L4_CACHE_EXT:
+				g_string_append_printf(str, "L4_CACHE_EXT ");
+				break;
+			case CL_AFFINITY_DOMAIN_NUMA_EXT:
+				g_string_append_printf(str, "NUMA_EXT ");
+				break;
+			case CL_AFFINITY_DOMAIN_NEXT_FISSIONABLE_EXT:
+				g_string_append_printf(str, "NEXT_FISSIONABLE_EXT ");
+				break;
+			case CL_PROPERTIES_LIST_END_EXT:
+				break;
+			default:
+				g_string_append_printf(str, "UNKNOWN(0x%lx) ", ade[i]);
+		}
+	}
+	g_snprintf(out, size, "%s", str->str);
+	g_string_free(str, TRUE);
+	return out;
+	
+}
+
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
  * outputting the cache type of a device. 
  * */
 static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info, 
@@ -368,6 +413,25 @@ static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 
 }
 
+/**
+ * @brief Implementation of ccl_devquery_format() function for 
+ * outputting the shared virtual memory (SVM) memory allocation
+ * capabilities of the device.
+ * */
+static char* ccl_devquery_format_svmc(CCLWrapperInfo* info, 
+	char* out, size_t size, const char* units) {
+	
+	units = units;
+	cl_device_svm_capabilities svmc = 
+		*((cl_device_svm_capabilities*) info->value);
+	g_snprintf(out, size, "%s%s%s%s", 
+		svmc & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER ? "COARSE_GRAIN_BUFFER " : "",
+		svmc & CL_DEVICE_SVM_FINE_GRAIN_BUFFER ? "FINE_GRAIN_BUFFER " : "",
+		svmc & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM ? "FINE_GRAIN_SYSTEM " : "",
+		svmc & CL_DEVICE_SVM_ATOMICS ? "ATOMICS" : "");
+	return out;
+}
+
 //~ /**
  //~ * @brief Implementation of ccl_devquery_format() function for debugging
  //~ * purposes. 
@@ -388,7 +452,7 @@ static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 /** 
  * @brief Size of parameter information map. 
  * */
-const int ccl_devquery_info_map_size = 96;
+const int ccl_devquery_info_map_size = 123;
 
 /** 
  * @brief Map of parameter name strings to respective cl_device_info 
@@ -400,11 +464,14 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"ADDRESS_BITS", CL_DEVICE_ADDRESS_BITS, 
 		"Address space size in bits", 
 		ccl_devquery_format_uint, "bits"},
+	{"AFFINITY_DOMAINS_EXT", CL_DEVICE_AFFINITY_DOMAINS_EXT,
+		"Ext.: List of supported affinity domains for partitioning the device",
+		ccl_devquery_format_affdom_ext, ""},
 	{"AVAILABLE", CL_DEVICE_AVAILABLE, 
 		"Is device available", 
 		ccl_devquery_format_yesno, ""},
 	{"BOARD_NAME_AMD", CL_DEVICE_BOARD_NAME_AMD, 
-		"Name of the GPU board and model of the specific device", 
+		"AMD ext.: Name of the GPU board and model of the specific device", 
 		ccl_devquery_format_char, ""},
 	{"BUILT_IN_KERNELS", CL_DEVICE_BUILT_IN_KERNELS, 
 		"Device built-in kernels", 
@@ -413,10 +480,10 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 		"Is a compiler available for device", 
 		ccl_devquery_format_yesno, ""},
 	{"COMPUTE_CAPABILITY_MAJOR_NV", CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV, 
-		"Major revision number that defines the CUDA compute capability of the device", 
+		"NVidia ext.: Major revision number that defines the CUDA compute capability of the device", 
 		ccl_devquery_format_uint, ""},
 	{"COMPUTE_CAPABILITY_MINOR_NV", CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV, 
-		"Minor revision number that defines the CUDA compute capability of the device", 
+		"NVidia ext.: Minor revision number that defines the CUDA compute capability of the device", 
 		ccl_devquery_format_uint, ""},
 	{"DOUBLE_FP_CONFIG", CL_DEVICE_DOUBLE_FP_CONFIG, 
 		"Floating-point device configuration (double)", 
@@ -436,11 +503,14 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"EXTENSIONS", CL_DEVICE_EXTENSIONS, 
 		"Extensions", 
 		ccl_devquery_format_char, ""},
+	{"EXT_MEM_PADDING_IN_BYTES_QCOM", CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM,
+		"Qualcomm ext.: Amount of padding necessary at the end of the buffer",
+		ccl_devquery_format_sizetbytes, ""},
 	/* The parameter bellow has in fact a length of 16 bytes,
 	 * but due to the lack of documentation, only the first half 
 	 * of it is shown for now. */
 	{"GLOBAL_FREE_MEMORY_AMD", CL_DEVICE_GLOBAL_FREE_MEMORY_AMD, 
-		"Free device memory", 
+		"AMD ext.: Free device memory", 
 		ccl_devquery_format_ulongbytes, ""},
 	{"GLOBAL_MEM_CACHELINE_SIZE", CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, 
 		"Global mem. cache line size", 
@@ -452,19 +522,22 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 		"Global mem. cache type", 
 		ccl_devquery_format_cachetype, ""},
 	{"GLOBAL_MEM_CHANNELS_AMD", CL_DEVICE_GLOBAL_MEM_CHANNELS_AMD, 
-		"Global mem. channels", 
+		"AMD ext.: Global mem. channels", 
 		ccl_devquery_format_uint, ""},
 	{"GLOBAL_MEM_CHANNEL_BANKS_AMD", CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, 
-		"Global mem. channel banks", 
+		"AMD ext.: Global mem. channel banks", 
 		ccl_devquery_format_uint, ""},
 	{"GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD", CL_DEVICE_GLOBAL_MEM_CHANNEL_BANK_WIDTH_AMD, 
-		"Global mem. channel bank width", 
+		"AMD ext.: Global mem. channel bank width", 
 		ccl_devquery_format_uint, ""},
 	{"GLOBAL_MEM_SIZE", CL_DEVICE_GLOBAL_MEM_SIZE, 
 		"Global mem. size", 
 		ccl_devquery_format_ulongbytes, ""},
+	{"GLOBAL_VARIABLE_PREFERRED_TOTAL_SIZE", CL_DEVICE_GLOBAL_VARIABLE_PREFERRED_TOTAL_SIZE,
+		"Max. pref. total size of all program variables in the global address space",
+		ccl_devquery_format_sizetbytes, ""},
 	{"GPU_OVERLAP_NV", CL_DEVICE_GPU_OVERLAP_NV, 
-		"Can device concurrently copy memory between host and device while executing a kernel", 
+		"NVidia ext.: Can device concurrently copy memory between host and device while executing a kernel", 
 		ccl_devquery_format_yesno, ""},
 	{"HALF_FP_CONFIG", CL_DEVICE_HALF_FP_CONFIG, 
 		"Floating-point device configuration (half)", 
@@ -487,38 +560,44 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"IMAGE3D_MAX_WIDTH", CL_DEVICE_IMAGE3D_MAX_WIDTH, 
 		"Max. width of 3D image (pixels)", 
 		ccl_devquery_format_sizet, "px"},
+	{"IMAGE_BASE_ADDRESS_ALIGNMENT", CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT,
+		"Min. alignment of the host_ptr specified to clCreateBuffer (for 2D images created from a buffer in turn created using CL_MEM_USE_HOST_PTR)",
+		ccl_devquery_format_uint, "px"},
 	{"IMAGE_MAX_ARRAY_SIZE", CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, 
 		"Max. images in a 1D or 2D image array", 
 		ccl_devquery_format_sizet, "images"},
 	{"IMAGE_MAX_BUFFER_SIZE", CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, 
 		"Max. pixels for 1D image from buffer object", 
 		ccl_devquery_format_sizet, "px"},
+	{"IMAGE_PITCH_ALIGNMENT", CL_DEVICE_IMAGE_PITCH_ALIGNMENT,
+		"Row pitch alignment size in pixels for 2D images created from a buffer",
+		ccl_devquery_format_uint, "px"},
 	{"IMAGE_SUPPORT", CL_DEVICE_IMAGE_SUPPORT, 
 		"Image support", 
 		ccl_devquery_format_yesno, ""},
 	{"INTEGRATED_MEMORY_NV", CL_DEVICE_INTEGRATED_MEMORY_NV, 
-		"Is device integrated with the memory subsystem?", 
+		"NVidia ext.: Is device integrated with the memory subsystem?", 
 		ccl_devquery_format_yesno, ""},
 	{"KERNEL_EXEC_TIMEOUT_NV", CL_DEVICE_KERNEL_EXEC_TIMEOUT_NV, 
-		"Is there a limit for kernels executed on device?", 
+		"Nvidia ext.: Is there a limit for kernels executed on device?", 
 		ccl_devquery_format_yesno, ""},
 	{"LINKER_AVAILABLE", CL_DEVICE_LINKER_AVAILABLE, 
 		"Linker available", 
 		ccl_devquery_format_yesno, ""},
 	{"LOCAL_MEM_BANKS_AMD", CL_DEVICE_LOCAL_MEM_BANKS_AMD, 
-		"Local mem. banks", 
+		"AMD ext.: Local mem. banks", 
 		ccl_devquery_format_uint, ""},
 	{"LOCAL_MEM_SIZE", CL_DEVICE_LOCAL_MEM_SIZE, 
 		"Local mem. size", 
 		ccl_devquery_format_ulongbytes, ""},
 	{"LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD", CL_DEVICE_LOCAL_MEM_SIZE_PER_COMPUTE_UNIT_AMD, 
-		"Local mem. size per compute unit", 
+		"AMD ext.: Local mem. size per compute unit", 
 		ccl_devquery_format_uintbytes, ""},
 	{"LOCAL_MEM_TYPE", CL_DEVICE_LOCAL_MEM_TYPE, 
 		"Local mem. type", 
 		ccl_devquery_format_locmemtype, ""},
 	{"MAX_ATOMIC_COUNTERS_EXT", CL_DEVICE_MAX_ATOMIC_COUNTERS_EXT, 
-		"Max. atomic counters", 
+		"Ext.: Max. atomic counters", 
 		ccl_devquery_format_uint, ""},
 	{"MAX_CLOCK_FREQUENCY", CL_DEVICE_MAX_CLOCK_FREQUENCY, 
 		"Max. clock frequency (MHz)", 
@@ -532,15 +611,30 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"MAX_CONSTANT_BUFFER_SIZE", CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, 
 		"Max. size in bytes of a constant buffer allocation", 
 		ccl_devquery_format_ulongbytes, ""},
+	{"MAX_GLOBAL_VARIABLE_SIZE", CL_DEVICE_MAX_GLOBAL_VARIABLE_SIZE,
+		"Max. storage that may be allocated for any single variable in program scope or inside a function in OpenCL C declared in the global address space",
+		ccl_devquery_format_sizetbytes, ""},
 	{"MAX_MEM_ALLOC_SIZE", CL_DEVICE_MAX_MEM_ALLOC_SIZE, 
 		"Max. size of memory object allocation in bytes", 
 		ccl_devquery_format_ulongbytes, ""},
+	{"MAX_ON_DEVICE_EVENTS", CL_DEVICE_MAX_ON_DEVICE_EVENTS,
+		"The maximum number of events in use by a device queue",
+		ccl_devquery_format_uint, ""},
+	{"MAX_ON_DEVICE_QUEUES", CL_DEVICE_MAX_ON_DEVICE_QUEUES,
+		"Max. number of device queues that can be created per context",
+		ccl_devquery_format_uint, ""},
 	{"MAX_PARAMETER_SIZE", CL_DEVICE_MAX_PARAMETER_SIZE, 
 		"Max. size in bytes of the arguments that can be passed to a kernel", 
 		ccl_devquery_format_sizetbytes, ""},
+	{"MAX_PIPE_ARGS", CL_DEVICE_MAX_PIPE_ARGS,
+		"Max. pipe objects that can be passed as arguments to a kernel",
+		ccl_devquery_format_uint, ""},
 	{"MAX_READ_IMAGE_ARGS", CL_DEVICE_MAX_READ_IMAGE_ARGS, 
 		"Max. number of simultaneous image objects that can be read by a kernel", 
 		ccl_devquery_format_uint, "images"},
+	{"MAX_READ_WRITE_IMAGE_ARGS", CL_DEVICE_MAX_READ_WRITE_IMAGE_ARGS,
+		"Max. image objects arguments of a kernel declared with the read_only qualifier",
+		ccl_devquery_format_uint, ""},
 	{"MAX_SAMPLERS", CL_DEVICE_MAX_SAMPLERS, 
 		"Max. samplers that can be used in kernel", 
 		ccl_devquery_format_uint, "samplers"},
@@ -589,9 +683,15 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"OPENCL_C_VERSION", CL_DEVICE_OPENCL_C_VERSION, 
 		"Highest OpenCL C version supported by the device compiler", 
 		ccl_devquery_format_char, ""},
+	{"PAGE_SIZE_QCOM", CL_DEVICE_PAGE_SIZE_QCOM,
+		"Qualcomm ext.: Page size of device",
+		ccl_devquery_format_sizetbytes, ""},
 	{"PARENT_DEVICE", CL_DEVICE_PARENT_DEVICE, 
 		"The cl_device_id of the parent device to which the sub-device belongs", 
 		ccl_devquery_format_ptr, ""},
+	{"PARENT_DEVICE_EXT", CL_DEVICE_PARENT_DEVICE_EXT,
+		"Ext.: Get the parent device to which the sub-device belongs",
+		ccl_devquery_format_hex, ""},
 	{"PARTITION_AFFINITY_DOMAIN", CL_DEVICE_PARTITION_AFFINITY_DOMAIN, 
 		"Supported affinity domains for partitioning the device using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN", 
 		ccl_devquery_format_affdom, ""},
@@ -601,15 +701,36 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"PARTITION_PROPERTIES", CL_DEVICE_PARTITION_PROPERTIES, 
 		"Partition types supported by device", 
 		ccl_devquery_format_partprop, ""},
+	{"PARTITION_STYLE_EXT", CL_DEVICE_PARTITION_STYLE_EXT,
+		"Ext.: Partition properties used to create the sub-device",
+		ccl_devquery_format_affdom_ext, ""},
 	{"PARTITION_TYPE", CL_DEVICE_PARTITION_TYPE, 
 		"Properties specified in clCreateSubDevices if device is a subdevice", 
 		ccl_devquery_format_uint, ""},
+	{"PARTITION_TYPES_EXT", CL_DEVICE_PARTITION_TYPES_EXT,
+		"Ext.: List of supported partition types for partitioning a device",
+		ccl_devquery_format_partprop, ""},
+	{"PIPE_MAX_ACTIVE_RESERVATIONS", CL_DEVICE_PIPE_MAX_ACTIVE_RESERVATIONS,
+		"Max. reservations that can be active for a pipe per work-item in a kernel",
+		ccl_devquery_format_uint, ""},
+	{"PIPE_MAX_PACKET_SIZE", CL_DEVICE_PIPE_MAX_PACKET_SIZE,
+		"Max. size of pipe packet",
+		ccl_devquery_format_uintbytes, ""},
 	{"PLATFORM", CL_DEVICE_PLATFORM, 
 		"The platform associated with device", 
 		ccl_devquery_format_ptr, ""},
+	{"PREFERRED_GLOBAL_ATOMIC_ALIGNMENT", CL_DEVICE_PREFERRED_GLOBAL_ATOMIC_ALIGNMENT,
+		"Preferred alignment for OpenCL 2.0 atomic types to global memory",
+		ccl_devquery_format_uintbytes, ""},
 	{"PREFERRED_INTEROP_USER_SYNC", CL_DEVICE_PREFERRED_INTEROP_USER_SYNC, 
 		"'Yes' if device prefers user to be responsible for sync. when sharing memory objects between OpenCL and other APIs, 'No' if device has a performant path for performing such sync.", 
 		ccl_devquery_format_yesno, ""},
+	{"PREFERRED_LOCAL_ATOMIC_ALIGNMENT", CL_DEVICE_PREFERRED_LOCAL_ATOMIC_ALIGNMENT,
+		"Preferred alignment for OpenCL 2.0 atomic types to local memory",
+		ccl_devquery_format_uintbytes, ""},
+	{"PREFERRED_PLATFORM_ATOMIC_ALIGNMENT", CL_DEVICE_PREFERRED_PLATFORM_ATOMIC_ALIGNMENT,
+		"Preferred alignment for OpenCL 2.0 fine-grained SVM atomic types",
+		ccl_devquery_format_uintbytes, ""},
 	{"PREFERRED_VECTOR_WIDTH_CHAR", CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, 
 		"Preferred ISA char vector width (number of scalar elements that can be stored in the vector)", 
 		ccl_devquery_format_uint, ""},
@@ -638,37 +759,61 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 		"Profile name supported by the device (FULL or EMBEDDED)", 
 		ccl_devquery_format_char, ""},
 	{"PROFILING_TIMER_OFFSET_AMD", CL_DEVICE_PROFILING_TIMER_OFFSET_AMD, 
-		"Offset between event timestamps in nanoseconds", 
+		"AMD ext.: Offset between event timestamps in nanoseconds", 
 		ccl_devquery_format_sizet, "ns"},
 	{"PROFILING_TIMER_RESOLUTION", CL_DEVICE_PROFILING_TIMER_RESOLUTION, 
 		"Resolution of device timer in nanoseconds", 
 		ccl_devquery_format_sizet, "ns"},
+	{"QUEUE_ON_DEVICE_MAX_SIZE", CL_DEVICE_QUEUE_ON_DEVICE_MAX_SIZE,
+		"Max. size of the device queue",
+		ccl_devquery_format_uintbytes, ""},
+	{"QUEUE_ON_DEVICE_PREFERRED_SIZE", CL_DEVICE_QUEUE_ON_DEVICE_PREFERRED_SIZE,
+		"Size of the device queue preferred by the implementation",
+		ccl_devquery_format_uintbytes, ""},
+	{"QUEUE_ON_DEVICE_PROPERTIES", CL_DEVICE_QUEUE_ON_DEVICE_PROPERTIES,
+		"On-device command-queue properties supported by the device",
+		ccl_devquery_format_queueprop , ""},
+	{"QUEUE_ON_HOST_PROPERTIES", CL_DEVICE_QUEUE_ON_HOST_PROPERTIES,
+		"On-host command-queue properties supported by the device",
+		ccl_devquery_format_queueprop, ""},
 	{"QUEUE_PROPERTIES", CL_DEVICE_QUEUE_PROPERTIES, 
 		"Command-queue properties supported by device", 
 		ccl_devquery_format_queueprop, ""},
 	{"REFERENCE_COUNT", CL_DEVICE_REFERENCE_COUNT, 
 		"Device reference count", 
 		ccl_devquery_format_uint, ""},
+	{"REFERENCE_COUNT_EXT", CL_DEVICE_REFERENCE_COUNT_EXT,
+		"Ext.: Device reference count",
+		ccl_devquery_format_uint, ""},
 	{"REGISTERS_PER_BLOCK_NV", CL_DEVICE_REGISTERS_PER_BLOCK_NV, 
-		"Maximum number of 32-bit registers available to a work-group", 
+		"NVidia ext.: Maximum number of 32-bit registers available to a work-group", 
 		ccl_devquery_format_uint, ""},
 	{"SIMD_INSTRUCTION_WIDTH_AMD", CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, 
-		"SIMD instruction width", 
+		"AMD ext.: SIMD instruction width", 
 		ccl_devquery_format_uint, ""},
 	{"SIMD_PER_COMPUTE_UNIT_AMD", CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD, 
-		"SIMD per compute unit", 
+		"AMD ext.: SIMD per compute unit", 
 		ccl_devquery_format_uint, ""},
 	{"SIMD_WIDTH_AMD", CL_DEVICE_SIMD_WIDTH_AMD, 
-		"SIMD width", 
+		"AMD ext.: SIMD width", 
 		ccl_devquery_format_uint, ""},
 	{"SINGLE_FP_CONFIG", CL_DEVICE_SINGLE_FP_CONFIG, 
 		"Floating-point device configuration (single)", 
 		ccl_devquery_format_fpconfig, ""},
+	{"SPIR_VERSIONS", CL_DEVICE_SPIR_VERSIONS,
+		"Space separated list of SPIR versions supported by the device",
+		ccl_devquery_format_char, ""},
+	{"SVM_CAPABILITIES", CL_DEVICE_SVM_CAPABILITIES,
+		"Shared virtual memory (SVM) memory allocation types the device supports",
+		ccl_devquery_format_svmc, ""},
+	{"TERMINATE_CAPABILITY_KHR", CL_DEVICE_TERMINATE_CAPABILITY_KHR,
+		"Termination capability of the OpenCL device",
+		ccl_devquery_format_hex, ""},
 	{"THREAD_TRACE_SUPPORTED_AMD", CL_DEVICE_THREAD_TRACE_SUPPORTED_AMD, 
-		"Is thread trace supported", 
+		"AMD ext.: Is thread trace supported", 
 		ccl_devquery_format_yesno, ""},
 	{"TOPOLOGY_AMD", CL_DEVICE_TOPOLOGY_AMD, 
-		"Description of the topology used to connect the device to the host", 
+		"AMD ext.: Description of the topology used to connect the device to the host", 
 		ccl_devquery_format_hex, ""},
 	{"TYPE", CL_DEVICE_TYPE, 
 		"Type of OpenCL device", 
@@ -683,10 +828,10 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 		"OpenCL software driver version", 
 		ccl_devquery_format_char, ""},
 	{"WARP_SIZE_NV", CL_DEVICE_WARP_SIZE_NV, 
-		"Warp size in work-items", 
+		"NVidia ext.: Warp size in work-items", 
 		ccl_devquery_format_uint, ""},
 	{"WAVEFRONT_WIDTH_AMD", CL_DEVICE_WAVEFRONT_WIDTH_AMD, 
-		"Wavefront width", 
+		"AMD ext.: Wavefront width", 
 		ccl_devquery_format_uint, ""},
 	{NULL, 0, NULL, NULL, NULL}	
 		
@@ -715,17 +860,14 @@ static int ccl_devquery_get_index(const char* name) {
 	
 	/* Found info flag. */
 	gboolean found = FALSE;
-	
-	/* Size of name. */
-	gint len_name = strlen(name);
 
 	/* Binary search. */
 	idx_start = 0;
 	idx_end = ccl_devquery_info_map_size - 1;
 	while (idx_end >= idx_start) {
 		idx_middle = (idx_start + idx_end) / 2;
-		cmp_res = g_ascii_strncasecmp(
-			name, ccl_devquery_info_map[idx_middle].param_name, len_name);
+		cmp_res = g_strcmp0(
+			name, ccl_devquery_info_map[idx_middle].param_name);
 		if (cmp_res == 0) {
 			found = TRUE;
 			break;
