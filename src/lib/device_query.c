@@ -103,7 +103,7 @@ static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 	
 	units = units;
-	cl_ulong bytes = *((cl_ulong*) info->value);
+	unsigned long bytes = (unsigned long) *((cl_ulong*) info->value);
 	ccl_devquery_format_bytes("lu");
 	return out;
 	
@@ -117,7 +117,7 @@ static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 	
 	units = units;
-	cl_uint bytes = *((cl_uint*) info->value);
+	unsigned int bytes = (unsigned int) *((cl_uint*) info->value);
 	ccl_devquery_format_bytes("u");
 	return out;
 
@@ -131,7 +131,7 @@ static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 	
 	units = units;
-	cl_ulong bytes = *((size_t*) info->value);
+	unsigned long bytes = (unsigned long) *((size_t*) info->value);
 	ccl_devquery_format_bytes("lu");
 	return out;
 
@@ -302,7 +302,8 @@ static char* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 				g_string_append_printf(str, "BY_AFFINITY_DOMAIN_EXT ");
 				break;
 			default:
-				g_string_append_printf(str, "UNKNOWN(0x%lx) ", pp[i]);
+				g_string_append_printf(str, "UNKNOWN(0x%lx) ", 
+					(unsigned long) pp[i]);
 		}
 	}
 	g_snprintf(out, size, "%s", str->str);
@@ -370,7 +371,8 @@ static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info,
 			case CL_PROPERTIES_LIST_END_EXT:
 				break;
 			default:
-				g_string_append_printf(str, "UNKNOWN(0x%lx) ", ade[i]);
+				g_string_append_printf(str, "UNKNOWN(0x%lx) ", 
+					(unsigned long) ade[i]);
 		}
 	}
 	g_snprintf(out, size, "%s", str->str);

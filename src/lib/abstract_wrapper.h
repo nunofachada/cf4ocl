@@ -169,6 +169,11 @@ CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
 /** @brief Destroy a ::CCLWrapperInfo object. */
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
+/** @brief Add a ::CCLWrapperInfo object to the info table of the
+ * given wrapper. */
+void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
+	CCLWrapperInfo* info);
+
 /** @brief Get information about any wrapped OpenCL object. */
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 

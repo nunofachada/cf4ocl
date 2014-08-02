@@ -243,6 +243,35 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
 }
 
 /**
+ * @brief Add a ::CCLWrapperInfo object to the info table of the
+ * given wrapper.
+ * 
+ * @param wrapper Wrapper to add info to.
+ * @param param_name Name of parameter which will refer to this info.
+ * @param info Object to destroy.
+ * */
+void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
+	CCLWrapperInfo* info) {
+		
+	/* Make sure wrapper is not NULL. */
+	g_return_if_fail(wrapper != NULL);
+	/* Make sure info is not NULL. */
+	g_return_if_fail(info != NULL);
+
+	/* If information table is not yet initialized, then
+	 * initialize it. */
+	if (wrapper->info == NULL) {
+		wrapper->info = g_hash_table_new_full(
+			g_direct_hash, g_direct_equal,
+			NULL, (GDestroyNotify) ccl_wrapper_info_destroy);
+	}
+	
+	/* Keep information in information table. */
+	g_hash_table_replace(wrapper->info,
+		GUINT_TO_POINTER(param_name), info);
+}
+
+/**
  * @brief Get information about any wrapped OpenCL object.
  * 
  * This function should not be called directly, but using the
@@ -273,33 +302,16 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	/* Information object. */
 	CCLWrapperInfo* info = NULL;
 	
-	/* If information table is not yet initialized, then
-	 * initialize it. */
-	if (!wrapper1->info) {
-		wrapper1->info = g_hash_table_new_full(
-			g_direct_hash, g_direct_equal,
-			NULL, (GDestroyNotify) ccl_wrapper_info_destroy);
-	}
-	
-	/* If cache is not to be used... */
-	if (!use_cache) {
-		/* ...force removal. */
-		g_hash_table_remove(
-			wrapper1->info, GUINT_TO_POINTER(param_name));
-	}
-	
-	/* Check if requested information is already present in the
-	 * information table. */
-	if (g_hash_table_contains(
-		wrapper1->info, GUINT_TO_POINTER(param_name))) {
-		
-		/* If so, retrieve it from there. */
-		info = g_hash_table_lookup(
-			wrapper1->info, GUINT_TO_POINTER(param_name));
-		
-	} else {
-		
-		/* Otherwise, get it from OpenCL device.*/
+	/* Check if it is required to query OpenCL object. */
+	if ((!use_cache) /* Query it if info table cache is not to be used. */
+		/* Do query if info table is not yet initialized. */
+		|| (wrapper1->info == NULL)
+		/* Do query if info table does not contain requested info.  */
+		|| (!g_hash_table_contains(
+				wrapper1->info, GUINT_TO_POINTER(param_name)))
+		) {
+
+		/* Let's query OpenCL object.*/
 		cl_int ocl_status;
 		/* Size of device information in bytes. */
 		size_t size_ret = 0;
@@ -333,11 +345,16 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler,
 			"%s: get context info [info] (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
-		
+			
 		/* Keep information in information table. */
-		g_hash_table_insert(wrapper1->info,
-			GUINT_TO_POINTER(param_name),
-			info);
+		ccl_wrapper_add_info(wrapper1, param_name, info);
+
+	} else {
+
+		/* Requested infor is already present in the info table,
+		 * retrieve it from there. */
+		info = g_hash_table_lookup(
+			wrapper1->info, GUINT_TO_POINTER(param_name));
 		
 	}
 	
@@ -408,10 +425,10 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
 	/* Make sure wrapper1 is not NULL. */
-	g_return_val_if_fail(wrapper1 != NULL, NULL);
+	g_return_val_if_fail(wrapper1 != NULL, 0);
 	
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2, 

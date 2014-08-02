@@ -61,8 +61,6 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	
 	cl_int ocl_status;
 	
-	GError* err_internal = NULL;
-	
 	/* Determine number of devices. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object, 
 		CL_DEVICE_TYPE_ALL, 0, NULL, &devcon->num_devices);
@@ -83,15 +81,12 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 		"%s: get device IDs (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
-	/* Dirty trick to allow for automatic memory release of this info 
-	 * when platform object is destroyed. */
-	 
-	/* 1 - Make sure info table is initialized by requesting some info. */
-	ccl_platform_get_info_string(devcon, CL_PLATFORM_NAME, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
-	/* 2 - Insert device list in info table, so that it will be 
-	 * automatically released. */
-	g_hash_table_insert(devcon->base.info, GINT_TO_POINTER(-1), info);
+	/* Add device list to info table, so that it will be 
+	 * automatically released. Because the cl_platform_id object 
+	 * doesn't have a CL_PLATFORM_DEVICES parameter, we keep this info
+	 * referenced has CL_CONTEXT_DEVICES. */
+	ccl_wrapper_add_info(
+		(CCLWrapper*) devcon, CL_CONTEXT_DEVICES, info);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
