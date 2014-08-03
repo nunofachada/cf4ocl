@@ -19,7 +19,7 @@
  /** 
  * @file
  * @brief Abstract wrapper for OpenCL objects which contain a list of
- * devices. Extends abstract_wrapper.c
+ * devices. Extends abstract_wrapper.c.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -33,17 +33,18 @@
 #include <stdlib.h>
 #include <glib.h>
 #include <glib/gprintf.h>
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
+#include "oclversions.h"
 #include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
 #include "device_wrapper.h"
 #include "abstract_wrapper.h"
 
+/**
+ * @brief Base class for wrappers which contain devices, i.e.,
+ * ::CCLPlatform, ::CCLProgram and ::CCLContext. This class extends
+ * ::CCLWrapper.
+ * */
 typedef struct ccl_dev_container {
 
 	/** Parent wrapper object. */
@@ -57,6 +58,19 @@ typedef struct ccl_dev_container {
 
 } CCLDevContainer;
 
+/**
+ * @brief Returns the list of cl_device_id OpenCL objects in the
+ * wrapped OpenCL device container object (i.e. cl_platform_id, 
+ * cl_program and cl_context). This is an abstract function prototype
+ * which must be implemented by device container wrappers, i.e.,
+ * ::CCLPlatform, ::CCLProgram and ::CCLContext. 
+ * 
+ * @param devcon The device container wrapper.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * @return List of cl_device_id OpenCL objects in the OpenCL device 
+ * container object wrapped by the given device container wrapper.
+ * */
 typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
 	CCLDevContainer* devcon, GError** err);
 

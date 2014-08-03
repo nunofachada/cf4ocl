@@ -465,10 +465,8 @@ static void platforms_create_info_destroy_test() {
  * @brief Test increasing reference count of objects which compose 
  * larger objects, then destroy the larger object and verify that 
  * composing object still exists and must be freed by the function
- * which increase its reference count.
- * 
- * This function tests the following modules: platforms, platform and
- * device.
+ * which increase its reference count. This function tests the following
+ * modules: platforms, platform and device wrappers.
  * */
 static void platforms_ref_unref_test() {
 

@@ -26,7 +26,8 @@
  
 #include "gerrorf.h"
 
-/** Resolves to error category identifying string, in this case an error in the GErrorf tests. */
+/** Resolves to error category identifying string, in this case an error
+ * in the GErrorf tests. */
 #define TEST_GERRORF_ERROR test_gerrorf_error_quark()
 
 /**
@@ -39,9 +40,11 @@ enum test_gerrorf_error_codes {
 };
 
 /** 
- * @brief Resolves to error category identifying string, in this case an error in the GErrorf tests.
+ * @brief Resolves to error category identifying string, in this case an
+ * error in the GErrorf tests.
  * 
- * @return A GQuark structure defined by category identifying string, which identifies the error as a gerrof tests generated error.
+ * @return A GQuark structure defined by category identifying string, 
+ * which identifies the error as a gerrof tests generated error.
  */
 GQuark test_gerrorf_error_quark() {
 	return g_quark_from_static_string("test-gerrorf-error-quark");
@@ -77,6 +80,9 @@ finish:
 /* Test functions */
 /* ************** */
 
+/**
+ * @brief Test one level error handling.
+ * */
 static void errorOneLevelTest() {
 	GError *err = NULL;
 
@@ -99,6 +105,9 @@ cleanup:
 	
 }
 
+/**
+ * @brief Test two level error handling.
+ * */
 static void errorTwoLevelTest() {
 	GError *err = NULL;
 
@@ -119,6 +128,9 @@ cleanup:
 	return;
 }
 
+/**
+ * @brief Test no errors.
+ * */
 static void errorNoneTest() {
 	GError *err = NULL;
 
@@ -138,6 +150,9 @@ cleanup:
 	return;
 }
 
+/**
+ * @brief Test an error without additional arguments.
+ * */
 static void errorNoVargsTest() {
 	GError *err = NULL;
 

@@ -28,7 +28,9 @@
 #include "profiler.h"
 
 /**
- * @brief Tests .
+ * @brief Tests creation, getting info from and destruction of 
+ * profiler objects, and their relationship with context, device and 
+ * queue wrapper objects.
  * */
 static void create_add_destroy_test() {
 	

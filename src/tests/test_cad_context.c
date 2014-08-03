@@ -327,10 +327,8 @@ static void context_create_info_destroy_test() {
  * @brief Test increasing reference count of objects which compose 
  * larger objects, then destroy the larger object and verify that 
  * composing object still exists and must be freed by the function
- * which increase its reference count.
- * 
- * This function tests the following modules: context, device and 
- * platform.
+ * which increase its reference count. This function tests the following
+ * modules: context, device and platform wrappers.
  * */
 static void context_ref_unref_test() {
 

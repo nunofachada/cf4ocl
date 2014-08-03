@@ -18,8 +18,8 @@
  
 /** 
  * @file
- * @brief Functions for obtaining information about OpenCL entities
- * such as platforms, devices, contexts, queues, kernels, etc.
+ * @brief Abstract wrapper for OpenCL objects which contain a list of
+ * devices. Extends abstract_wrapper.c.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,6 +28,16 @@
  
 #include "abstract_dev_container_wrapper.h"
 
+/**
+ * @brief Initialize device list in device container.
+ * 
+ * @param devcon Device container wrapper.
+ * @param get_devices Concrete wrapper implementation of 
+ * ccl_dev_container_get_cldevices(), which returns a list of 
+ * cl_device_id's for the wrapper.
+ * @param err Return location for a GError, or NULL if error reporting 
+ * is to be ignored.
+ * */ 
 static void ccl_dev_container_init_devices(CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError **err) {
 
@@ -70,7 +80,7 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
 	
-finish:		
+finish:
 	
 	/* Terminate function. */
 	return;

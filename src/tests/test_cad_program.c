@@ -331,10 +331,8 @@ static void program_create_info_destroy_test() {
  * @brief Test increasing reference count of objects which compose 
  * larger objects, then destroy the larger object and verify that 
  * composing object still exists and must be freed by the function
- * which increase its reference count.
- * 
- * This function tests the following modules: program, queue, kernel,
- * event.
+ * which increase its reference count. This function tests the following
+ * modules: program, queue, kernel and event wrappers.
  * */
 static void program_ref_unref_test() {
 
