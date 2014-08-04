@@ -28,6 +28,21 @@
 #include "image_wrapper.h"
 
 /** 
+ * @brief Image wrapper class.
+ * 
+ * @extends ccl_memobj
+ * */
+struct ccl_image {
+
+	/** 
+	 * Parent wrapper object. 
+	 * @protected
+	 * */
+	CCLMemObj mo;
+
+};
+
+/** 
  * @addtogroup IMAGE_WRAPPER
  * @{
  */

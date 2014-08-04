@@ -74,9 +74,9 @@ static void program_create_info_destroy_test() {
 	cl_uint b_h[CCL_TEST_PROGRAM_BUF_SIZE];
 	cl_uint c_h[CCL_TEST_PROGRAM_BUF_SIZE];
 	cl_uint d_h ;
-	CCLMemObj* a_w;
-	CCLMemObj* b_w;
-	CCLMemObj* c_w;
+	CCLBuffer* a_w;
+	CCLBuffer* b_w;
+	CCLBuffer* c_w;
 	CCLEvent* evt_w1;
 	CCLEvent* evt_w2;
 	CCLEvent* evt_kr;
@@ -307,9 +307,9 @@ static void program_create_info_destroy_test() {
 	ccl_event_wait_list_destroy(ewl);
 
 	/* Destroy the memory objects. */
-	ccl_memobj_destroy(a_w);
-	ccl_memobj_destroy(b_w);
-	ccl_memobj_destroy(c_w);
+	ccl_buffer_destroy(a_w);
+	ccl_buffer_destroy(b_w);
+	ccl_buffer_destroy(c_w);
 	
 	/* Destroy the command queue. */
 	ccl_queue_destroy(cq);

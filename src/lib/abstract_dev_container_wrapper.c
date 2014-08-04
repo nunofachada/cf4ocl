@@ -31,6 +31,8 @@
 /**
  * @brief Initialize device list in device container.
  * 
+ * @private @memberof ccl_dev_container
+ * 
  * @param[in] devcon Device container wrapper.
  * @param[in] get_devices Concrete wrapper implementation of 
  * ccl_dev_container_get_cldevices(), which returns a list of 
@@ -88,7 +90,10 @@ finish:
 }
 
 /**
- * @brief Release the devices held by the given #CCLDevContainer object.
+ * @brief Release the devices held by the given ::CCLDevContainer 
+ * object. Implements the ccl_wrapper_release_fields() function.
+ * 
+ * @protected @memberof ccl_dev_container
  * 
  * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
@@ -116,6 +121,8 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 
 /** 
  * @brief Get all ::CCLDevice wrappers in device container. 
+ * 
+ * @protected @memberof ccl_dev_container
  * 
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get cl_device_id's from wrapped
@@ -151,6 +158,8 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
 
 /** 
  * @brief Get ::CCLDevice wrapper at given index. 
+ * 
+ * @protected @memberof ccl_dev_container
  * 
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get cl_device_id's from wrapped
@@ -216,6 +225,8 @@ finish:
 
 /**
  * @brief Return number of devices in device container.
+ * 
+ * @protected @memberof ccl_dev_container
  * 
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get cl_device_id's from wrapped

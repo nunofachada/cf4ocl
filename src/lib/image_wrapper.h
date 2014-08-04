@@ -40,8 +40,12 @@
  * @{
  */
 
-/** @brief Image wrapper object. */
-typedef CCLMemObj CCLImage;
+/** 
+ * @brief Image wrapper class
+ * 
+ * @extends ccl_memobj
+ * */
+typedef struct ccl_image CCLImage;
 
 /// @todo
 

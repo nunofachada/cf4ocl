@@ -43,14 +43,24 @@
  * @{
  */
 
-typedef struct ccl_memobj CCLMemObj;
+/**
+ * @brief Memory objects wrapper.
+ * 
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_memobj {
 
-/** @brief Get the cl_mem wrapper for the given OpenCL memory object. */
-CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object);
+	/** Parent wrapper object. */
+	CCLWrapper base;
+	
+	/** Context wrapper. */
+	CCLContext* ctx;
+	
+} CCLMemObj;
 
-/** @brief Decrements the reference count of the wrapper object. If it 
- * reaches 0, the wrapper object is destroyed. */
-void ccl_memobj_destroy(CCLMemObj* mo);
+/** @brief Implementation of ccl_wrapper_release_fields() function for
+ * ::CCLMemObj wrapper objects. */
+void ccl_memobj_release_fields(CCLMemObj* mo);
 
 CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq, 
 	void* mapped_ptr, CCLEventWaitList evt_wait_lst, GError** err);
@@ -66,6 +76,8 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 /**
  * @brief Get a ::CCLWrapperInfo memory object information object.
  * 
+ * @public @memberof ccl_memobj
+ *  
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or NULL if error
@@ -85,6 +97,8 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_memobj
+ *  
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
@@ -106,6 +120,8 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_memobj
+ *  
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -123,21 +139,17 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 /** 
  * @brief Increase the reference count of the cl_mem wrapper object.
  * 
+ * @public @memberof ccl_memobj
+ *  
  * @param[in] mo The cl_mem wrapper object. 
  * */
 #define ccl_memobj_ref(mo) \
 	ccl_wrapper_ref((CCLWrapper*) mo)
 
 /**
- * @brief Alias to ccl_memobj_destroy().
- * 
- * @param[in] mo cl_mem wrapper object to destroy if reference count 
- * is 1, otherwise just decrement the reference count.
- * */
-#define ccl_memobj_unref(mo) ccl_memobj_destroy(mo)
-
-/**
  * @brief Get the OpenCL cl_mem object.
+ * 
+ * @public @memberof ccl_memobj
  * 
  * @param[in] mo The cl_mem wrapper object.
  * @return The OpenCL cl_mem object.

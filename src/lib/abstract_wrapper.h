@@ -37,21 +37,58 @@
 #include "common.h"
 #include "errors.h"
 
+/**
+ * @brief Class which represents information about a wrapped OpenCL 
+ * entity.
+ * */
+typedef struct ccl_wrapper_info CCLWrapperInfo;
+
+/**
+ * @brief Base class for all OpenCL wrappers.
+ * */
 typedef struct ccl_wrapper {
 
-	/** The wrapped OpenCL object. */
+	/** 
+	 * The wrapped OpenCL object. 
+	 * @protected
+	 * */
 	void* cl_object;
 
-	/** Information about the wrapped OpenCL object. */
+	/** 
+	 * Information about the wrapped OpenCL object. 
+	 * @protected
+	 * */
 	GHashTable* info;
 
-	/** Reference count. */
+	/** 
+	 * Reference count. 
+	 * @protected
+	 * */
 	int ref_count;    
 	
 } CCLWrapper;
 
+/**
+ * @brief Release the fields of the concrete wrapper implementation.
+ * @protected @memberof ccl_wrapper
+ * 
+ * @param[in] wrapper A concrete wrapper implementation.
+ * */
 typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
 
+/**
+ * @brief Release the OpenCL object wrapped by the concrete wrapper 
+ * implementation.
+ * 
+ * @private @memberof ccl_wrapper
+ * 
+ * Concrete implementations of this function are provided by the OpenCL
+ * implementation.
+ * 
+ * @param[in] cl_object The OpenCL object to release.
+ * @return Returns CL_SUCCESS if the function is executed successfully
+ * or an OpenCL error code otherwise.
+ * */
 typedef cl_int (*ccl_wrapper_release_cl_object)(void* cl_object);
 
 /** @brief Create a new wrapper object. This function is called by the
@@ -78,6 +115,11 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 /**
  * @brief Generic type for OpenCL clget*Info() functions.
  * 
+ * @private @memberof ccl_wrapper
+ * 
+ * Concrete implementations of this function are provided by the OpenCL
+ * implementation.
+ * 
  * @param[in] cl_object OpenCL object to be queried.
  * @param[in] param_name Parameter to query.
  * @param[in] param_value_size Used to specify the size in bytes of
@@ -98,6 +140,11 @@ typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
  * @brief Generic type for OpenCL clget**Info() functions, in which two
  * OpenCL objects are involved.
  * 
+ * @private @memberof ccl_wrapper
+ * 
+ * Concrete implementations of this function are provided by the OpenCL
+ * implementation.
+ * 
  * @param[in] cl_object1 OpenCL object to be queried.
  * @param[in] cl_object2 OpenCL object required for query.
  * @param[in] param_name Parameter to query.
@@ -115,61 +162,21 @@ typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
 	void* cl_object2, cl_uint param_name, size_t param_value_size, 
 	void* param_value, size_t* param_value_size_ret);
 
+/**
+ * @brief Generic function pointer for OpenCL clget**Info() functions
+ * used to point to ccl_wrapper_info_fp1() and ccl_wrapper_info_fp2()
+ * concrete implementations.
+ * 
+ * @private @memberof ccl_wrapper
+ * 
+ * Concrete implementations of this function are provided by the OpenCL
+ * implementation.
+ * */
 typedef cl_int (*ccl_wrapper_info_fp)(void);
-
-
-/**
- * @defgroup WRAPPER_INFO Wrapper information
- *
- * @brief Wrapper information object and associated macros.
- * 
- * Todo: detailed description of module with code examples.
- * 
- * @{
- */
-
-/**
- * @brief Information about a wrapped OpenCL entity.
- * */
-typedef struct ccl_wrapper_info {
-	/** Device information. */
-	void* value;
-	/** Size in bytes of device information. */
-	size_t size;
-} CCLWrapperInfo;
-
-/**
- * @brief Helper macro which returns a scalar information value casted 
- * to specified scalar type.
- * 
- * @param[in] info ::CCLWrapperInfo information object.
- * @param[in] type Scalar type to which to cast value to.
- * @return The information value casted to the specified scalar type.
- * */
-#define ccl_info_scalar(info, type) *((type*) (info)->value)
-
-/**
- * @brief Helper macro which returns an array information value casted 
- * to specified array type.
- * 
- * @param[in] info ::CCLWrapperInfo information object.
- * @param[in] type Array (pointer) type to which to cast value to.
- * @return The information value casted to the specified array (pointer)
- * type.
- * */
-#define ccl_info_array(info, type) ((type) (info)->value)
 
 /** @brief Debug function which checks if memory allocated by wrappers
  * has been properly freed. */
 cl_bool ccl_wrapper_memcheck();
-
-/** @} */
-
-/** @brief Create a new CCLWrapperInfo* object with a given value size. */
-CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
-
-/** @brief Destroy a ::CCLWrapperInfo object. */
-void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
 /** @brief Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper. */
@@ -190,6 +197,70 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
+
+/**
+ * @defgroup WRAPPER_INFO Wrapper information
+ *
+ * @brief Wrapper information object and associated macros.
+ * 
+ * Todo: detailed description of module with code examples.
+ * 
+ * @{
+ */
+
+/**
+ * @brief Class which represents information about a wrapped OpenCL 
+ * entity.
+ * */
+struct ccl_wrapper_info {
+	
+	/** 
+	 * Device information. 
+	 * @public
+	 * */
+	void* value;
+	
+	/** 
+	 * Size in bytes of device information. 
+	 * @public
+	 * */
+	size_t size;
+
+};
+
+
+/** @brief Create a new CCLWrapperInfo* object with a given value size. */
+CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
+
+/** @brief Destroy a ::CCLWrapperInfo object. */
+void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
+
+/**
+ * @brief Helper macro which returns a scalar information value casted 
+ * to specified scalar type.
+ * 
+ * @public @memberof ccl_wrapper_info
+ * 
+ * @param[in] info ::CCLWrapperInfo information object.
+ * @param[in] type Scalar type to which to cast value to.
+ * @return The information value casted to the specified scalar type.
+ * */
+#define ccl_info_scalar(info, type) *((type*) (info)->value)
+
+/**
+ * @brief Helper macro which returns an array information value casted 
+ * to specified array type.
+ * 
+ * @public @memberof ccl_wrapper_info
+ * 
+ * @param[in] info ::CCLWrapperInfo information object.
+ * @param[in] type Array (pointer) type to which to cast value to.
+ * @return The information value casted to the specified array (pointer)
+ * type.
+ * */
+#define ccl_info_array(info, type) ((type) (info)->value)
+
+/** @} */
 
 #endif
 

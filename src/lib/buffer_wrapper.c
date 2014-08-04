@@ -28,11 +28,80 @@
 #include "buffer_wrapper.h"
 
 /** 
+ * @brief Buffer wrapper class
+ * 
+ * @extends ccl_memobj
+ * */
+struct ccl_buffer {
+
+	/** 
+	 * Parent wrapper object. 
+	 * @protected
+	 * */
+	CCLMemObj mo;
+
+};
+
+/** 
  * @addtogroup BUFFER_WRAPPER
  * @{
  */
+ 
+/**
+ * @brief Get the buffer wrapper for the given OpenCL buffer.
+ * 
+ * If the wrapper doesn't exist, its created with a reference count 
+ * of 1. Otherwise, the existing wrapper is returned and its reference 
+ * count is incremented by 1.
+ * 
+ * This function will rarely be called from client code, except when
+ * clients wish to directly wrap an OpenCL buffer in a 
+ * ::CCLBuffer wrapper object.
+ * 
+ * @protected @memberof ccl_buffer
+ * 
+ * @param[in] mem_object The OpenCL buffer to be wrapped.
+ * @return The ::CCLBuffer wrapper for the given OpenCL buffer.
+ * */
+CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object) {
+	
+	return (CCLBuffer*) ccl_wrapper_new(
+		(void*) mem_object, sizeof(CCLBuffer));
+		
+}
 
-/** @brief Create a ::CCLBuffer wrapper object. */
+/** 
+ * @brief Decrements the reference count of the wrapper object. If it 
+ * reaches 0, the wrapper object is destroyed.
+ *
+ * @public @memberof ccl_buffer
+ * 
+ * @param[in] buf The buffer wrapper object.
+ * */
+void ccl_buffer_destroy(CCLBuffer* buf) {
+	
+	ccl_wrapper_unref((CCLWrapper*) buf, sizeof(CCLBuffer),
+		(ccl_wrapper_release_fields) ccl_memobj_release_fields, 
+		(ccl_wrapper_release_cl_object) clReleaseMemObject, NULL); 
+
+} 
+
+/**
+ * @brief Create a ::CCLBuffer wrapper object.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @param[in] ctx Context wrapper.
+ * @param[in] flags OpenCL memory flags.
+ * @param[in] size The size in bytes of the buffer memory object to be 
+ * allocated.
+ * @param[in] host_ptr A pointer to the buffer data that may already be
+ * allocated by the application. The size of the buffer that host_ptr 
+ * points to must be >= size bytes.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return A new wrapper object.
+ * */
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	size_t size, void *host_ptr, GError** err) {
 		
@@ -54,7 +123,7 @@ CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
 	/* Wrap OpenCL buffer. */
-	buf = ccl_memobj_new_wrap(buffer);
+	buf = ccl_buffer_new_wrap(buffer);
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);

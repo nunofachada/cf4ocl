@@ -42,15 +42,34 @@
  * @{
  */
 
-/** @brief Buffer wrapper object. */
-typedef CCLMemObj CCLBuffer;
+/** 
+ * @brief Buffer wrapper class
+ * 
+ * @extends ccl_memobj
+ * */
+typedef struct ccl_buffer CCLBuffer;
 
 /** @brief Create a ::CCLBuffer wrapper object. */
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	size_t size, void *host_ptr, GError** err);
 	
-#define ccl_buffer_destroy(buf) ccl_memobj_destroy((CCLMemObj*) buf)
+/** @brief Get the buffer wrapper for the given OpenCL buffer. */
+CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object);
 
+/** @brief Decrements the reference count of the wrapper object. If it 
+ * reaches 0, the wrapper object is destroyed. */
+void ccl_buffer_destroy(CCLBuffer* buf);
+
+/**
+ * @brief Alias to ccl_buffer_destroy().
+ * 
+ * @public @memberof ccl_buffer
+ *  
+ * @param[in] mo Buffer wrapper object to destroy if reference count 
+ * is 1, otherwise just decrement the reference count.
+ * */
+#define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
+	
 CCLEvent* ccl_buffer_read(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CCLEventWaitList evt_wait_lst, GError** err);

@@ -28,25 +28,14 @@
  * */
 
 /**
- * @brief cl_mem wrapper object.
- */
-struct ccl_memobj {
-
-	/** Parent wrapper object. */
-	CCLWrapper base;
-	
-	/** Context wrapper. */
-	CCLContext* ctx;
-	
-};
-
-/**
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects.
  * 
+ * @protected @memberof ccl_memobj
+ * 
  * @param[in] mo A ::CCLMemObj wrapper object.
  * */
-static void ccl_memobj_release_fields(CCLMemObj* mo) {
+void ccl_memobj_release_fields(CCLMemObj* mo) {
 
 	/* Make sure mo wrapper object is not NULL. */
 	g_return_if_fail(mo != NULL);
@@ -61,41 +50,6 @@ static void ccl_memobj_release_fields(CCLMemObj* mo) {
  * @addtogroup MEMOBJ_WRAPPER
  * @{
  */
-
-/**
- * @brief Get the cl_mem wrapper for the given OpenCL memory object.
- * 
- * If the wrapper doesn't exist, its created with a reference count 
- * of 1. Otherwise, the existing wrapper is returned and its reference 
- * count is incremented by 1.
- * 
- * This function will rarely be called from client code, except when
- * clients wish to directly wrap an OpenCL memory object in a 
- * ::CCLMemObj wrapper object.
- * 
- * @param[in] mem_object The OpenCL memory object to be wrapped.
- * @return The ::CCLMemObj wrapper for the given OpenCL memory object.
- * */
-CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object) {
-	
-	return (CCLMemObj*) ccl_wrapper_new(
-		(void*) mem_object, sizeof(CCLMemObj));
-		
-}
-
-/** 
- * @brief Decrements the reference count of the wrapper object. If it 
- * reaches 0, the wrapper object is destroyed.
- *
- * @param[in] mo The cl_mem wrapper object.
- * */
-void ccl_memobj_destroy(CCLMemObj* mo) {
-	
-	ccl_wrapper_unref((CCLWrapper*) mo, sizeof(CCLMemObj),
-		(ccl_wrapper_release_fields) ccl_memobj_release_fields, 
-		(ccl_wrapper_release_cl_object) clReleaseMemObject, NULL); 
-
-}
 
 CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq, 
 	void* mapped_ptr, CCLEventWaitList evt_wait_lst, GError** err) {

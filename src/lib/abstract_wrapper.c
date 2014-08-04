@@ -35,9 +35,11 @@ static GHashTable* wrappers = NULL;
 G_LOCK_DEFINE(wrappers);
 
 /**
- * @brief Create a new wrapper object. This function is called by the
- * concrete wrapper constructors and should not be called by client
+ * @brief Create a new ::CCLWrapper object. This function is called by 
+ * the concrete wrapper constructors and should not be called by client
  * code.
+ * 
+ * @protected @memberof ccl_wrapper
  * 
  * @param[in] cl_object OpenCL object to wrap.
  * @param[in] size Size in bytes of wrapper.
@@ -85,6 +87,8 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 /** 
  * @brief Increase the reference count of the wrapper object.
  * 
+ * @protected @memberof ccl_wrapper
+ * 
  * @param[in] wrapper The wrapper object. 
  * */
 void ccl_wrapper_ref(CCLWrapper* wrapper) {
@@ -100,6 +104,8 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
 /** 
  * @brief Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed.
+ * 
+ * @protected @memberof ccl_wrapper
  *
  * @param[in] wrapper The wrapper object.
  * @param[in] size Size in bytes of wrapper object.
@@ -178,6 +184,8 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
  * @brief Returns the wrapper object reference count. For debugging and 
  * testing purposes only.
  * 
+ * @protected @memberof ccl_wrapper
+ * 
  * @param[in] wrapper The wrapper object.
  * @return The wrapper object reference count or -1 if wrapper is NULL.
  * */
@@ -194,6 +202,8 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
 /**
  * @brief Get the wrapped OpenCL object.
  * 
+ * @protected @memberof ccl_wrapper
+ * 
  * @param[in] wrapper The wrapper object.
  * @return The wrapped OpenCL object.
  * */
@@ -207,49 +217,15 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 }
 
 /**
- * @brief Create a new CCLWrapperInfo* object with a given value size.
- * 
- * @param[in] size Parameter size in bytes.
- * @return A new CCLWrapperInfo* object.
- * */
-CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
-	
-	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
-	
-	if (size > 0) 
-		info->value = g_slice_alloc0(size);
-	else
-		info->value = NULL;
-	info->size = size;
-	
-	return info;
-	
-}
-
-/**
- * @brief Destroy a ::CCLWrapperInfo object.
- * 
- * @param[in] info Object to destroy.
- * */
-void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
-		
-	/* Make sure info is not NULL. */
-	g_return_if_fail(info != NULL);
-
-	if (info->size > 0)
-		g_slice_free1(info->size, info->value);
-	g_slice_free(CCLWrapperInfo, info);
-	
-}
-
-/**
  * @brief Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper.
+ * 
+ * @protected @memberof ccl_wrapper
  * 
  * @param[in] wrapper Wrapper to add info to.
  * @param[in] param_name Name of parameter which will refer to this 
  * info.
- * @param info Object to destroy.
+ * @param[in] info Info object to add.
  * */
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	CCLWrapperInfo* info) {
@@ -277,6 +253,8 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * 
  * This function should not be called directly, but using the
  * ccl_*_info() macros instead.
+ * 
+ * @protected @memberof ccl_wrapper
  * 
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some 
@@ -378,6 +356,8 @@ finish:
 /** 
  * @brief Get pointer to information value.
  * 
+ * @protected @memberof ccl_wrapper
+ * 
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some 
  * queries.
@@ -411,6 +391,8 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 
 /** 
  * @brief Get information size.
+ * 
+ * @protected @memberof ccl_wrapper
  * 
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some
@@ -446,6 +428,8 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
  * @brief Debug function which checks if memory allocated by wrappers
  * has been properly freed.
  * 
+ * @public @memberof ccl_wrapper
+ * 
  * This function is merely a debug helper and shouldn't replace
  * proper leak checks with Valgrind or similar tool.
  * 
@@ -455,3 +439,51 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 cl_bool ccl_wrapper_memcheck() {
 	return wrappers == NULL;
 }
+
+/**
+ * @addtogroup WRAPPER_INFO
+ *  
+ * @{
+ */
+ 
+/**
+ * @brief Create a new ::CCLWrapperInfo object with a given value size.
+ * 
+ * @public @memberof ccl_wrapper_info
+ * 
+ * @param[in] size Parameter size in bytes.
+ * @return A new CCLWrapperInfo* object.
+ * */
+CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
+	
+	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
+	
+	if (size > 0) 
+		info->value = g_slice_alloc0(size);
+	else
+		info->value = NULL;
+	info->size = size;
+	
+	return info;
+	
+}
+
+/**
+ * @brief Destroy a ::CCLWrapperInfo object.
+ * 
+ * @public @memberof ccl_wrapper_info
+ * 
+ * @param[in] info Object to destroy.
+ * */
+void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
+		
+	/* Make sure info is not NULL. */
+	g_return_if_fail(info != NULL);
+
+	if (info->size > 0)
+		g_slice_free1(info->size, info->value);
+	g_slice_free(CCLWrapperInfo, info);
+	
+}
+
+/** @} */

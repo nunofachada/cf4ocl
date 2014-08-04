@@ -30,11 +30,16 @@
 #include "platform_wrapper.h"
 
 /**
- * @brief Device wrapper object.
+ * @brief Device wrapper class.
+ * 
+ * @extends ccl_wrapper
  */
 struct ccl_device {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private
+	 * */
 	CCLWrapper base;
 
 };
@@ -56,6 +61,8 @@ struct ccl_device {
  * clGetDeviceIDs() function) and then wrap the OpenCL device in a
  * ::CCLDevice wrapper object.
  * 
+ * @public @memberof ccl_device
+ * 
  * @param[in] device The OpenCL device to be wrapped.
  * @return The device wrapper for the given OpenCL device.
  * */
@@ -70,6 +77,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device) {
  * @brief Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed.
  *
+ * @public @memberof ccl_device
+ * 
  * @param[in] dev The device wrapper object.
  * */
 void ccl_device_destroy(CCLDevice* dev) {

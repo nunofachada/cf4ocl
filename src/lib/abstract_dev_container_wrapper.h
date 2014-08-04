@@ -44,6 +44,8 @@
  * @brief Base class for wrappers which contain devices, i.e.,
  * ::CCLPlatform, ::CCLProgram and ::CCLContext. This class extends
  * ::CCLWrapper.
+ * 
+ * @extends ccl_wrapper
  * */
 typedef struct ccl_dev_container {
 
@@ -64,6 +66,8 @@ typedef struct ccl_dev_container {
  * cl_program and cl_context). This is an abstract function prototype
  * which must be implemented by device container wrappers, i.e.,
  * ::CCLPlatform, ::CCLProgram and ::CCLContext. 
+ * 
+ * @protected @memberof ccl_dev_container
  * 
  * @param[in] devcon The device container wrapper.
  * @param[out] err Return location for a GError, or NULL if error 

@@ -269,7 +269,7 @@ static void operationTest() {
 	ccl_program_destroy(prg);
 	
 	/* Free buffer wrapper. */
-	ccl_memobj_destroy(buf);
+	ccl_buffer_destroy(buf);
 	
 	/* Free queue wrappers. */
 	ccl_queue_destroy(q3);

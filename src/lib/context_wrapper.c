@@ -28,14 +28,22 @@
 #include "context_wrapper.h"
 
 /**
- * Context wrapper object.
- */
+ * @brief The context wrapper class.
+ * 
+ * @extends ccl_dev_container
+ * */
 struct ccl_context {
 	
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private
+	 * */
 	CCLDevContainer base;
 	
-	/** Platform (can be lazy initialized). */
+	/** 
+	 * Platform (can be lazy initialized). 
+	 * @private
+	 * */
 	CCLPlatform* platform;
 		
 };
@@ -43,6 +51,8 @@ struct ccl_context {
 /**
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLContext wrapper objects.
+ * 
+ * @private @memberof ccl_context
  * 
  * @param[in] ctx A ::CCLContext wrapper object.
  * */
@@ -63,6 +73,8 @@ static void ccl_context_release_fields(CCLContext* ctx) {
 /**
  * @brief Free the default context properties if required.
  * 
+ * @private @memberof ccl_context
+ * 
  * @param[in] properties The original const properties, may be NULL, in 
  * which case the ctx_props parameter will be freed.
  * @param[in] ctx_props Context properties to be freed, if different 
@@ -76,6 +88,8 @@ static void ccl_context_release_fields(CCLContext* ctx) {
  * @brief Create a default context properties object, if required. The 
  * only property set in the default properties object is the OpenCL 
  * cl_platform_id object.
+ * 
+ * @private @memberof ccl_context
  * 
  * @param[in] properties Original const properties, which if NULL imply 
  * that a new default properties object should be created.
@@ -150,6 +164,8 @@ finish:
  * @brief Implementation of ccl_dev_container_get_cldevices() for the
  * context wrapper. 
  * 
+ * @private @memberof ccl_context
+ * 
  * @param[in] devcon A ::CCLContext wrapper, passed as a 
  * ::CCLDevContainer .
  * @param[out] err Return location for a GError, or NULL if error
@@ -180,6 +196,8 @@ static CCLWrapperInfo* ccl_context_get_cldevices(
  * clCreateContext() function) and then wrap the OpenCL context in a
  * ::CCLContext wrapper object.
  * 
+ * @public @memberof ccl_context
+ * 
  * @param[in] context The OpenCL context to be wrapped.
  * @return The context wrapper for the given OpenCL context.
  * */
@@ -202,6 +220,8 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
  * filtered devices belong to the same platform. Adding the 
  * ccl_devsel_dep_platform() filter last to the filters set will ensure 
  * this.
+ * 
+ * @public @memberof ccl_context
  * 
  * @param[in] properties A set of OpenCL context properties.
  * @param[in] filters Filters for selecting device.
@@ -273,6 +293,8 @@ finish:
  * 
  * If the properties parameter is NULL, this function obtains 
  * the cl_platform_id object from the first device.
+ * 
+ * @public @memberof ccl_context
  * 
  * @param[in] properties Context properties, may be NULL.
  * @param[in] num_devices Number of ::CCLDevice wrappers in array.
@@ -362,6 +384,8 @@ finish:
  * than one device may be used if all devices belong to the same 
  * platform (and pass the given filter).
  * 
+ * @public @memberof ccl_context
+ * 
  * @param[in] filter An independent device filter. If NULL, no 
  * independent filter is used, and the first found device(s) is used.
  * @param[in] data Specific filter data.
@@ -415,6 +439,8 @@ finish:
  * @brief Creates a context wrapper using a device which the user 
  * selects from a menu.
  * 
+ * @public @memberof ccl_context
+ * 
  * @param[in] data If not NULL, can point to a device index, such that
  * the device is automatically selected.
  * @param[out] err Return location for a GError, or NULL if error
@@ -462,6 +488,8 @@ finish:
  * @brief Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed.
  *
+ * @public @memberof ccl_context
+ * 
  * @param[in] ctx The context wrapper object.
  * */
 void ccl_context_destroy(CCLContext* ctx) {
@@ -474,11 +502,13 @@ void ccl_context_destroy(CCLContext* ctx) {
 
 /**
  * @brief Get ::CCLDevice wrapper at given index. 
+ *
+ * @public @memberof ccl_context
  * 
  * @param[in] ctx The context wrapper object.
  * @param[in] index Index of device in context.
- * @param[out] err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or NULL if an error 
  * occurs.
  * */
@@ -491,6 +521,8 @@ CCLDevice* ccl_context_get_device(
 
 /**
  * @brief Return number of devices in context.
+ * 
+ * @public @memberof ccl_context
  * 
  * @param[in] ctx The context wrapper object.
  * @param[out] err Return location for a GError, or NULL if error
@@ -511,6 +543,8 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
  * This function returns the internal array containing the context
  * device wrappers. As such, clients should not modify the returned 
  * array (e.g. they should not free it directly).
+ * 
+ * @public @memberof ccl_context
  * 
  * @param[in] ctx The context wrapper object.
  * @param[in] err Return location for a GError, or NULL if error

@@ -51,7 +51,11 @@ typedef struct ccl_platform CCLPlatform;
  * @{
  */
 
-/** @brief Device wrapper object. */
+/** 
+ * @brief Device wrapper class. 
+ * 
+ * @extends ccl_wrapper
+ * */
 typedef struct ccl_device CCLDevice;
 
 /** @brief Decrements the reference count of the device wrapper object. 
@@ -63,6 +67,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 /**
  * @brief Get a ::CCLWrapperInfo device information object.
+ * 
+ * @public @memberof ccl_device
  * 
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
@@ -82,6 +88,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_device
  * 
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -104,6 +112,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_device
+ * 
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -121,6 +131,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 /** 
  * @brief Increase the reference count of the device wrapper object.
  * 
+ * @public @memberof ccl_device
+ * 
  * @param device The device wrapper object. 
  * */
 #define ccl_device_ref(device) \
@@ -129,6 +141,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 /**
  * @brief Alias to ccl_device_destroy().
  * 
+ * @public @memberof ccl_device
+ * 
  * @param[in] device Device wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
@@ -136,6 +150,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 /**
  * @brief Get the OpenCL device_id object.
+ * 
+ * @public @memberof ccl_device
  * 
  * @param[in] device The device wrapper object.
  * @return The OpenCL device_id object.

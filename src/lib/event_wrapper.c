@@ -27,20 +27,31 @@
 
 #include "event_wrapper.h"
 
-/**
- * @brief Event wrapper object.
- */
+/** 
+ * @brief Event wrapper class. 
+ * 
+ * @extends ccl_wrapper
+ * */
 struct ccl_event {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private
+	 * */
 	CCLWrapper base;
 	
-	/** Event name, for profiling purposes only. */
+	/** 
+	 * Event name, for profiling purposes only. 
+	 * @private
+	 * */
 	const char* name;
 	
-	/** Final event name, for profiling purposes only. It is 
+	/** 
+	 * Final event name, for profiling purposes only. It is 
 	 * automatically determined based on event type when event name is 
-	 * not set. */
+	 * not set. 
+	 * @private
+	 * */
 	const char* final_name;
 	
 };
@@ -59,6 +70,8 @@ struct ccl_event {
  * 
  * This function will rarely be called from client code, except when
  * clients wish to wrap the OpenCL event directly.
+ * 
+ * @public @memberof ccl_event
  * 
  * @param[in] event The OpenCL event to be wrapped.
  * @return The event wrapper for the given OpenCL event.
@@ -79,6 +92,8 @@ CCLEvent* ccl_event_new_wrap(cl_event event) {
  * @brief Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed.
  *
+ * @public @memberof ccl_event
+ * 
  * @param[in] evt The event wrapper object.
  * */
 void ccl_event_destroy(CCLEvent* evt) {
@@ -264,6 +279,8 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
 
 /**
  * @brief Get the command type which fired the given event.
+ * 
+ * @public @memberof ccl_event
  * 
  * @param[in] evt Event wrapper.
  * @param[out] err Return location for a GError, or NULL if error

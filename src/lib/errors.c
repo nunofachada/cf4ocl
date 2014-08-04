@@ -48,16 +48,16 @@ static const char* ccl_errors[] = {
 	"Link program failure", /* CL_LINK_PROGRAM_FAILURE - 17 */
 	"Device partition failed", /* CL_DEVICE_PARTITION_FAILED - 18 */
 	"Argument information not available", /* CL_KERNEL_ARG_INFO_NOT_AVAILABLE - 19 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 20 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 21 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 22 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 23 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 24 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 25 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 26 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 27 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 28 */
-	"Unassigned error code", /* Unassigned as of OpenCL 1.2 - 29 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 20 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 21 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 22 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 23 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 24 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 25 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 26 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 27 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 28 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 29 */
 	"Invalid value", /* CL_INVALID_VALUE - 30 */
 	"Invalid device type", /* CL_INVALID_DEVICE_TYPE - 31 */
 	"Invalid platform", /* CL_INVALID_PLATFORM - 32 */
@@ -96,10 +96,12 @@ static const char* ccl_errors[] = {
 	"Invalid image descriptor", /* CL_INVALID_IMAGE_DESCRIPTOR - 65 */
 	"Invalid compiler options", /* CL_INVALID_COMPILER_OPTIONS - 66 */
 	"Invalid linker options", /* CL_INVALID_LINKER_OPTIONS - 67 */
-	"Invalid device partition count" /* CL_INVALID_DEVICE_PARTITION_COUNT - 68 */
+	"Invalid device partition count", /* CL_INVALID_DEVICE_PARTITION_COUNT - 68 */
+	"Invalid pipe size", /* CL_INVALID_PIPE_SIZE - 69 */
+	"Invalid device queue" /* CL_INVALID_DEVICE_QUEUE - 70 */
 };
 
-static const int ccl_errors_count = 69;
+static const int ccl_errors_count = 71;
 
 /** 
  * @addtogroup ERRORS
