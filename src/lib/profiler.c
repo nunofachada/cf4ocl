@@ -84,7 +84,8 @@ struct ccl_prof {
 
 	/** Total time taken by all events. */
 	cl_ulong total_events_time;
-	/** Total time taken by all events except intervals where events overlaped. */
+	/** Total time taken by all events except intervals where events 
+	 * overlaped. */
 	cl_ulong total_events_eff_time;
 	/** Time at which the first (oldest) event started. */
 	cl_ulong t_start;
@@ -111,11 +112,11 @@ static CCLProfExportOptions export_options = {
 /** 
  * @brief Create new event instant.
  * 
- * @param event_name Name of event.
- * @param queue_name Name of command queue associated with event.
- * @param id Id of event.
- * @param instant Even instant in nanoseconds.
- * @param type Type of event instant: CCL_PROF_INST_TYPE_START or 
+ * @param[in] event_name Name of event.
+ * @param[in] queue_name Name of command queue associated with event.
+ * @param[in] id Id of event.
+ * @param[in] instant Even instant in nanoseconds.
+ * @param[in] type Type of event instant: CCL_PROF_INST_TYPE_START or 
  * CCL_PROF_INST_TYPE_END.
  * @return A new event instant.
  */
@@ -140,7 +141,7 @@ static CCLProfInst* ccl_prof_inst_new(const char* event_name,
 /**
  * @brief Free an event instant.
  * 
- * @param instant Event instant to destroy. 
+ * @param[in] instant Event instant to destroy. 
  */
 static void ccl_prof_inst_destroy(CCLProfInst* instant) {
 	
@@ -153,10 +154,11 @@ static void ccl_prof_inst_destroy(CCLProfInst* instant) {
  * @brief Compares two event instants for sorting within a GList. It is
  * an implementation of GCompareDataFunc from GLib.
  * 
- * @param a First event instant to compare.
- * @param b Second event instant to compare.
- * @param userdata Defines the sort criteria and order.
- * @return Negative value if a < b; zero if a = b; positive value if a > b.
+ * @param[in] a First event instant to compare.
+ * @param[in] b Second event instant to compare.
+ * @param[in] userdata Defines the sort criteria and order.
+ * @return Negative value if a < b; zero if a = b; positive value if 
+ * a > b.
  */
 static gint ccl_prof_inst_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
@@ -190,7 +192,7 @@ static gint ccl_prof_inst_comp(
 /** 
  * @brief Create a new aggregate statistic for events of a given type.
  * 
- * @param event_name Name of event.
+ * @param[in] event_name Name of event.
  * @return New aggregate statistic.
  * */
 static CCLProfAgg* ccl_prof_agg_new(const char* event_name) {
@@ -202,7 +204,7 @@ static CCLProfAgg* ccl_prof_agg_new(const char* event_name) {
 /** 
  * @brief Free an aggregate statistic. 
  * 
- * @param agg Aggregate statistic to free.
+ * @param[in] agg Aggregate statistic to free.
  * */
 static void ccl_prof_agg_destroy(CCLProfAgg* agg) {
 	g_return_if_fail(agg != NULL);
@@ -213,10 +215,11 @@ static void ccl_prof_agg_destroy(CCLProfAgg* agg) {
  * @brief Compares two aggregate event data instances for sorting 
  * within a GList. It is an implementation of GCompareDataFunc from GLib.
  * 
- * @param a First aggregate event data instance to compare.
- * @param b Second aggregate event data instance to compare.
- * @param userdata Defines the sort criteria and order.
- * @return Negative value if a < b; zero if a = b; positive value if a > b.
+ * @param[in] a First aggregate event data instance to compare.
+ * @param[in] b Second aggregate event data instance to compare.
+ * @param[in] userdata Defines the sort criteria and order.
+ * @return Negative value if a < b; zero if a = b; positive value if 
+ * a > b.
  */
 static gint ccl_prof_agg_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
@@ -249,17 +252,17 @@ static gint ccl_prof_agg_comp(
 /**
  * @brief Create a new event profiling information object.
  * 
- * @param event_name Name of event.
- * @param cq_name Name of command queue which generated this event.
- * @param t_queued Device time in nanoseconds when the command 
+ * @param[in] event_name Name of event.
+ * @param[in] cq_name Name of command queue which generated this event.
+ * @param[in] t_queued Device time in nanoseconds when the command 
  * identified by event is enqueued in a command-queue by the host.
- * @param t_submit Device time counter in nanoseconds when the command 
- * identified by event that has been enqueued is submitted by the host 
- * to the device associated with the command-queue. 
- * @param t_start Device time in nanoseconds when the command identified
- * by event starts execution on the device.
- * @param t_end Device time in nanoseconds when the command identified 
- * by event has finished execution on the device. 
+ * @param[in] t_submit Device time counter in nanoseconds when the
+ * command identified by event that has been enqueued is submitted by 
+ * the host to the device associated with the command-queue. 
+ * @param[in] t_start Device time in nanoseconds when the command
+ * identified by event starts execution on the device.
+ * @param[in] t_end Device time in nanoseconds when the command
+ * identified by event has finished execution on the device. 
  * @return A new event profiling information object.
  * */
 static CCLProfInfo* ccl_prof_info_new(const char* event_name, 
@@ -281,7 +284,7 @@ static CCLProfInfo* ccl_prof_info_new(const char* event_name,
 /** 
  * @brief Free an event profiling information object. 
  * 
- * @param info Event profiling information object to free.
+ * @param[in] info Event profiling information object to free.
  * */
 static void ccl_prof_info_destroy(CCLProfInfo* info) {
 	g_return_if_fail(info != NULL);
@@ -292,10 +295,11 @@ static void ccl_prof_info_destroy(CCLProfInfo* info) {
  * @brief Compares two event profiling information instances for sorting 
  * within a GList. It is an implementation of GCompareDataFunc from GLib.
  * 
- * @param a First event profiling information instance to compare.
- * @param b Second event profiling information instance to compare.
- * @param userdata Defines the sort criteria and order.
- * @return Negative value if a < b; zero if a = b; positive value if a > b.
+ * @param[in] a First event profiling information instance to compare.
+ * @param[in] b Second event profiling information instance to compare.
+ * @param[in] userdata Defines the sort criteria and order.
+ * @return Negative value if a < b; zero if a = b; positive value if 
+ * a > b.
  */
 static gint ccl_prof_info_comp(
 	gconstpointer a, gconstpointer b, gpointer userdata) {
@@ -346,9 +350,9 @@ static gint ccl_prof_info_comp(
 /**
  * @brief Create a new event overlap object.
  * 
- * @param event1_name Name of first overlapping event.
- * @param event2_name Name of second overlapping event.
- * @param duration Overlap duration in nanoseconds.
+ * @param[in] event1_name Name of first overlapping event.
+ * @param[in] event2_name Name of second overlapping event.
+ * @param[in] duration Overlap duration in nanoseconds.
  * @return A new event overlap object.
  * */
 static CCLProfOverlap* ccl_prof_overlap_new(const char* event1_name, 
@@ -367,7 +371,7 @@ static CCLProfOverlap* ccl_prof_overlap_new(const char* event1_name,
 /**
  * @brief Destroy an event overlap object.
  * 
- * @param ovlp Event overlap object to destroy.
+ * @param[in] ovlp Event overlap object to destroy.
  * */
 static void ccl_prof_overlap_destroy(CCLProfOverlap* ovlp) {
 	
@@ -380,9 +384,9 @@ static void ccl_prof_overlap_destroy(CCLProfOverlap* ovlp) {
  * @brief Compares two event overlap instances for sorting within a 
  * GList. It is an implementation of GCompareDataFunc from GLib.
  * 
- * @param a First event overlap instance to compare.
- * @param b Second event overlap instance to compare.
- * @param userdata Defines the sort criteria and order.
+ * @param[in] a First event overlap instance to compare.
+ * @param[in] b Second event overlap instance to compare.
+ * @param[in] userdata Defines the sort criteria and order.
  * @return Negative value if a < b; zero if a = b; positive value if a > b.
  */
 static gint ccl_prof_overlap_comp(
@@ -422,9 +426,9 @@ static gint ccl_prof_overlap_comp(
 /**
  * @brief Add event for profiling.
  * 
- * @param prof Profile object.
- * @param cq_name Command queue name.
- * @param evt Event wrapper object.
+ * @param[in] prof Profile object.
+ * @param[in] cq_name Command queue name.
+ * @param[in] evt Event wrapper object.
  * */
 static void ccl_prof_add_event(CCLProf* prof, const char* cq_name, 
 	CCLEvent* evt, GError** err) {
@@ -540,9 +544,9 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
  * @brief Process command queues, i.e., add the respective events for 
  * profiling.
  * 
- * @param prof Profile object.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prof Profile object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  */ 
 static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 
@@ -579,7 +583,7 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 /**
  * @brief Determine aggregate event statistics.
  * 
- * @param prof The profile object.
+ * @param[in] prof The profile object.
  * */
 static void ccl_prof_calc_agg(CCLProf* prof) {
 	
@@ -669,7 +673,7 @@ static void ccl_prof_calc_agg(CCLProf* prof) {
 /**
  * @brief Determine event overlaps for the given profile object.
  * 
- * @param prof Profile object.
+ * @param[in] prof Profile object.
  */ 
 static void ccl_prof_calc_overlaps(CCLProf* prof) {
 	
@@ -884,7 +888,7 @@ CCLProf* ccl_prof_new() {
 /** 
  * @brief Destroy a profile object.
  * 
- * @param prof Profile object to destroy. 
+ * @param[in] prof Profile object to destroy. 
  */
 void ccl_prof_destroy(CCLProf* prof) {
 	
@@ -941,7 +945,7 @@ void ccl_prof_destroy(CCLProf* prof) {
 * wishes to compare the effectively ellapsed time with the OpenCL
 * kernels time.
 * 
-* @param prof A profile object.
+* @param[in] prof A profile object.
 * */
 void ccl_prof_start(CCLProf* prof) {
 	
@@ -956,7 +960,7 @@ void ccl_prof_start(CCLProf* prof) {
  * @brief Stops the global profiler timer. Only required if 
  * ccl_prof_start() was called.
  * 
- * @param prof A profile object. 
+ * @param[in] prof A profile object. 
  * */
 void ccl_prof_stop(CCLProf* prof) {
 	
@@ -972,7 +976,7 @@ void ccl_prof_stop(CCLProf* prof) {
  * since the profiling started. If profiling has been stopped, returns 
  * the elapsed time between the time it started and the time it stopped.
  * 
- * @param prof A profile object. 
+ * @param[in] prof A profile object. 
  * @return number of seconds elapsed, including any fractional part.
  * */
 double ccl_prof_time_elapsed(CCLProf* prof) {
@@ -987,9 +991,9 @@ double ccl_prof_time_elapsed(CCLProf* prof) {
 /** 
  * @brief Add a command queue wrapper for profiling. 
  * 
- * @param prof A profile object.
- * @param cq_name Command queue name.
- * @param cq Command queue wrapper object.
+ * @param[in] prof A profile object.
+ * @param[in] cq_name Command queue name.
+ * @param[in] cq Command queue wrapper object.
  * */
 void ccl_prof_add_queue(
 	CCLProf* prof, const char* cq_name, CCLQueue* cq) {
@@ -1024,9 +1028,9 @@ void ccl_prof_add_queue(
 /** 
  * @brief Determine aggregate statistics for the given profile object. 
  * 
- * @param prof A profile object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] prof A profile object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, or CL_FALSE
  * otherwise.
  * */
@@ -1093,8 +1097,8 @@ finish:
 /**
  * @brief Return aggregate statistics for events with the given name.
  * 
- * @param prof Profile object.
- * @param event_name Event name.
+ * @param[in] prof Profile object.
+ * @param[in] event_name Event name.
  * @return Aggregate statistics for events with the given name.
  */
 const CCLProfAgg* ccl_prof_get_agg(
@@ -1128,9 +1132,9 @@ const CCLProfAgg* ccl_prof_get_agg(
  * @brief Initialize an iterator for profiled aggregate event 
  * instances. 
  * 
- * @param prof Profile object.
- * @param sort Bitfield of ::CCLProfAggSort OR ::CCLProfSortOrder, for
- * example `CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC`.
+ * @param[in] prof Profile object.
+ * @param[in] sort Bitfield of ::CCLProfAggSort OR ::CCLProfSortOrder,
+ * for example `CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC`.
  * */
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
 
@@ -1151,7 +1155,7 @@ void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
 /** 
  * @brief Return the next aggregate statistic instance.
  * 
- * @param prof Profile object.
+ * @param[in] prof Profile object.
  * @return The next aggregate statistic instance. 
  * */
 const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
@@ -1181,9 +1185,9 @@ const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
 /** 
  * @brief Initialize an iterator for event profiling info instances. 
  * 
- * @param prof Profile object.
- * @param sort Bitfield of ::CCLProfInfoSort OR ::CCLProfSortOrder, for
- * example `CCL_PROF_INFO_SORT_T_START | CCL_PROF_SORT_ASC`.
+ * @param[in] prof Profile object.
+ * @param[in] sort Bitfield of ::CCLProfInfoSort OR ::CCLProfSortOrder, 
+ * for example `CCL_PROF_INFO_SORT_T_START | CCL_PROF_SORT_ASC`.
  * */
 void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
 
@@ -1203,7 +1207,7 @@ void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
 /** 
  * @brief Return the next event profiling info instance. 
  * 
- * @param prof Profile object.
+ * @param[in] prof Profile object.
  * @return The next event profiling info instance. 
  * */
 const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
@@ -1233,9 +1237,9 @@ const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
 /** 
  * @brief Initialize an iterator for event instant instances. 
  * 
- * @param prof Profile object.
- * @param sort Bitfield of ::CCLProfInstSort OR ::CCLProfSortOrder, for
- * example `CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC`.
+ * @param[in] prof Profile object.
+ * @param[in] sort Bitfield of ::CCLProfInstSort OR ::CCLProfSortOrder,
+ * for example `CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC`.
  * */
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
 
@@ -1256,7 +1260,7 @@ void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
 /** 
  * @brief Return the next event instant instance. 
  * 
- * @param prof Profile object.
+ * @param[in] prof Profile object.
  * @return The next event instant instance. 
  * */
 const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
@@ -1286,9 +1290,10 @@ const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
 /** 
  * @brief Initialize an iterator for overlap instances. 
  * 
- * @param prof Profile object.
- * @param sort Bitfield of ::CCLProfOverlapSort OR ::CCLProfSortOrder, for
- * example `CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC`.
+ * @param[in] prof Profile object.
+ * @param[in] sort Bitfield of ::CCLProfOverlapSort OR 
+ * ::CCLProfSortOrder, for example 
+ * `CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC`.
  * */
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
 
@@ -1308,7 +1313,7 @@ void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
 /** 
  * @brief Return the next overlap instance. 
  * 
- * @param prof Profile object.
+ * @param[in] prof Profile object.
  * @return The next overlap instance. 
  * */
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
@@ -1344,7 +1349,7 @@ const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
  * For more control of where and how this summary is printed, use the
  * ccl_prof_get_summary() function.
  * 
- * @param prof Profile object.
+ * @param[in] prof Profile object.
  * */ 
 void ccl_prof_print_summary(CCLProf* prof) {
 
@@ -1372,10 +1377,10 @@ void ccl_prof_print_summary(CCLProf* prof) {
  * statistics and a table of event overlaps. The order of the returned
  * information can be specified in the function arguments.
  * 
- * @param prof Profile object.
- * @param agg_sort Sorting performed on aggregate statistics (bitfield
- * of ::CCLProfAggSort ORed with ::CCLProfSortOrder).
- * @param ovlp_sort Sorting performed on event overlaps (bitfield of 
+ * @param[in] prof Profile object.
+ * @param[in] agg_sort Sorting performed on aggregate statistics 
+ * (bitfield of ::CCLProfAggSort ORed with ::CCLProfSortOrder).
+ * @param[in] ovlp_sort Sorting performed on event overlaps (bitfield of 
  * ::CCLProfOverlapSort ORed with ::CCLProfSortOrder).
  * @return A string containing the summary.
  * */ 
@@ -1490,10 +1495,10 @@ const char* ccl_prof_get_summary(
  * ccl_prof_get_export_opts() and ccl_prof_set_export_opts() functions, 
  * by manipulating a ::CCLProfExportOptions struct.
  * 
- * @param prof Profile object.
- * @param stream Stream where export info to.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] prof Profile object.
+ * @param[out] stream Stream where export info to.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
  * */ 
@@ -1573,10 +1578,10 @@ finish:
  * automatically opening and closing the file. See the 
  * ccl_prof_export_info() for more information.
  * 
- * @param prof Profile object.
- * @param filename Name of file where information will be saved to.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] prof Profile object.
+ * @param[in] filename Name of file where information will be saved to.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
  * */ 
@@ -1631,7 +1636,7 @@ finish:
 /**
  * @brief Set export options using a ::CCLProfExportOptions struct.
  * 
- * @param export_opts Export options to set.
+ * @param[in] export_opts Export options to set.
  * */
 void ccl_prof_set_export_opts(CCLProfExportOptions export_opts) {
 	export_options = export_opts;

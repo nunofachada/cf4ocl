@@ -843,7 +843,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
  * @brief Return the index of the device information map object of the
  * given parameter name.
  * 
- * @param A parameter name, in the format stored in the 
+ * @param[in] A parameter name, in the format stored in the 
  * ccl_devquery_info_map array.
  * @return Index of the device information map object of the given 
  * parameter name, or -1 if device information map is not found.
@@ -888,7 +888,7 @@ static int ccl_devquery_get_index(const char* name) {
  * @brief Get a final device info prefix in the same format as 
  * kept in the ccl_devquery_info_map.
  * 
- * @param prefix Raw device information prefix. Several forms are 
+ * @param[in] prefix Raw device information prefix. Several forms are 
  * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
  * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
  * accepted.
@@ -932,7 +932,7 @@ gchar* ccl_devquery_get_prefix_final(const char* prefix) {
 /**
  * @brief Return a cl_device_info object given its name.
  * 
- * @param name Name of cl_device_info object. Several forms are 
+ * @param[in] name Name of cl_device_info object. Several forms are 
  * accepted. For example, for CL_DEVICE_ENDIAN_LITTLE, strings such as
  * "CL_DEVICE_ENDIAN_LITTLE", "ENDIAN_LITTLE" or "endian_little" are
  * accepted.
@@ -971,10 +971,10 @@ cl_device_info ccl_devquery_name(const char* name) {
  * @brief Get a pointer to the first device information parameter which 
  * has the given prefix.
  * 
- * @param prefix Device information parameter prefix. Can be in lower
- * or uppercase, and start with "cl_device_" or not.
- * @param size Location where to put number of matching parameters, or
- * NULL if it is to be ignored.
+ * @param[in] prefix Device information parameter prefix. Can be in
+ * lower or uppercase, and start with "cl_device_" or not.
+ * @param[out] size Location where to put number of matching parameters,
+ * or NULL if it is to be ignored.
  * @return pointer to the first device information parameter which 
  * has the given prefix or NULL if nothing found.
  * */
@@ -1058,9 +1058,9 @@ const CCLDevQueryMap* ccl_devquery_prefix(
  * @brief Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. 
  * 
- * @param substr String to match with parameter name.
- * @param idx Next index, should be zero in the first call, and the 
- * function updates within calls.
+ * @param[in] substr String to match with parameter name.
+ * @param[in,out] idx Next index, should be zero in the first call, and
+ * the function updates within calls.
  * @return A matching CCLDevQueryMap, or NULL if search is over.
  * */
 const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx) {

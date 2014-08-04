@@ -53,7 +53,7 @@ struct ccl_queue {
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLQueue wrapper objects.
  * 
- * @param cq A ::CCLQueue wrapper object.
+ * @param[in] cq A ::CCLQueue wrapper object.
  * */
 static void ccl_queue_release_fields(CCLQueue* cq) {
 
@@ -92,7 +92,7 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
  * clCreateCommandQueue() function) and then wrap the OpenCL command 
  * queue in a ::CCLQueue wrapper object.
  * 
- * @param command_queue The OpenCL command queue to be wrapped.
+ * @param[in] command_queue The OpenCL command queue to be wrapped.
  * @return The ::CCLQueue wrapper for the given OpenCL command queue.
  * */
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {

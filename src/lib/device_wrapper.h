@@ -64,10 +64,10 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 /**
  * @brief Get a ::CCLWrapperInfo device information object.
  * 
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested device information object. This object will
  * be automatically freed when the device wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -83,11 +83,11 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested device information value. This value will be 
  * automatically freed when the device wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -104,11 +104,11 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested device information value. This value will be 
  * automatically freed when the device wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
@@ -129,7 +129,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 /**
  * @brief Alias to ccl_device_destroy().
  * 
- * @param device Device wrapper object to destroy if reference count
+ * @param[in] device Device wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_device_unref(device) ccl_device_destroy(device)
@@ -137,7 +137,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 /**
  * @brief Get the OpenCL device_id object.
  * 
- * @param device The device wrapper object.
+ * @param[in] device The device wrapper object.
  * @return The OpenCL device_id object.
  * */
 #define ccl_device_unwrap(device) \

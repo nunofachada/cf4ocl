@@ -62,10 +62,10 @@ void ccl_platform_destroy(CCLPlatform* platf);
 /**
  * @brief Get a ::CCLWrapperInfo platform information object.
  * 
- * @param platf The platform wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] platf The platform wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested platform information object. This object will
  * be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -81,11 +81,11 @@ void ccl_platform_destroy(CCLPlatform* platf);
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param platf The platform wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] platf The platform wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested platform information value. This value will be 
  * automatically freed when the platform wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -102,11 +102,11 @@ void ccl_platform_destroy(CCLPlatform* platf);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param platf The platform wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] platf The platform wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested platform information value. This value will be 
  * automatically freed when the platform wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
@@ -121,10 +121,10 @@ void ccl_platform_destroy(CCLPlatform* platf);
  * macro simply wraps the ccl_platform_get_array_info() macro, because
  * (as of OpenCL 2.0) all platform information return types are char*.
  * 
- * @param platf The platform wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] platf The platform wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested platform information string. This information 
  * will be automatically freed when the platform wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -135,7 +135,7 @@ void ccl_platform_destroy(CCLPlatform* platf);
 /** 
  * @brief Increase the reference count of the platform wrapper object.
  * 
- * @param platform The platform wrapper object.
+ * @param[in] platform The platform wrapper object.
  * */
 #define ccl_platform_ref(platform) \
 	ccl_wrapper_ref((CCLWrapper*) platform)
@@ -143,15 +143,15 @@ void ccl_platform_destroy(CCLPlatform* platf);
 /**
  * @brief Alias to ccl_platform_destroy().
  * 
- * @param platform Platform wrapper object to destroy if reference count
- * is 1, otherwise just decrement the reference count.
+ * @param[in] platform Platform wrapper object to destroy if reference
+ * count is 1, otherwise just decrement the reference count.
  * */
 #define ccl_platform_unref(platform) ccl_platform_destroy(platform)
 
 /**
  * @brief Get the OpenCL platform object.
  * 
- * @param platform The platform wrapper object.
+ * @param[in] platform The platform wrapper object.
  * @return The OpenCL platform object.
  * */
 #define ccl_platform_unwrap(platform) \

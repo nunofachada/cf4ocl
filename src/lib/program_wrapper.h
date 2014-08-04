@@ -140,10 +140,10 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * as this macro will return NULL when the CL_PROGRAM_BINARIES parameter 
  * is requested.
  * 
- * @param prg The program wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested program information object. This object will
  * be automatically freed when the program wrapper object is 
  * destroyed.  If an error occurs or if the CL_PROGRAM_BINARIES 
@@ -162,11 +162,11 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param prg The program wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested program information value. This value will be 
  * automatically freed when the program wrapper object is destroyed. 
  * If an error occurs or if the CL_PROGRAM_BINARIES parameter is 
@@ -189,11 +189,11 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param prg The program wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested program information value. This value will be 
  * automatically freed when the program wrapper object is destroyed. 
  * If an error occurs or if the CL_PROGRAM_BINARIES parameter is 
@@ -209,11 +209,11 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /**
  * @brief Get a ::CCLWrapperInfo program build information object.
  * 
- * @param prg The program wrapper object.
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The reque
  * sted program build information object. This object will be 
  * automatically freed when the program wrapper object is destroyed. If 
@@ -231,12 +231,12 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param prg The program wrapper object.
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested program build information value. This value 
  * will be automatically freed when the program wrapper object is 
  * destroyed. If an error occurs, zero is returned.
@@ -254,12 +254,12 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param prg The program wrapper object.
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested program build information value. This value 
  * will be automatically freed when the program wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -273,7 +273,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /** 
  * @brief Increase the reference count of the program object.
  * 
- * @param prg The program wrapper object. 
+ * @param[in] prg The program wrapper object. 
  * */
 #define ccl_program_ref(prg) \
 	ccl_wrapper_ref((CCLWrapper*) prg)
@@ -281,7 +281,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /**
  * @brief Alias to ccl_program_destroy().
  * 
- * @param prg Program wrapper object to destroy if reference count 
+ * @param[in] prg Program wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_program_unref(prg) ccl_program_destroy(prg)
@@ -289,7 +289,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /**
  * @brief Get the OpenCL program object.
  * 
- * @param prg The program wrapper object.
+ * @param[in] prg The program wrapper object.
  * @return The OpenCL program object.
  * */
 #define ccl_program_unwrap(prg) \

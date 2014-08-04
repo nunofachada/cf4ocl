@@ -66,10 +66,10 @@ cl_command_type ccl_event_get_command_type(
 /**
  * @brief Get a ::CCLWrapperInfo event information object.
  * 
- * @param evt The event wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt The event wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested event information object. This object will
  * be automatically freed when the event wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -85,11 +85,11 @@ cl_command_type ccl_event_get_command_type(
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param evt The event wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt The event wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested event information value. This value will be 
  * automatically freed when the event wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -106,11 +106,11 @@ cl_command_type ccl_event_get_command_type(
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param evt The event wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt The event wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested event information value. This value will be 
  * automatically freed when the event wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
@@ -123,10 +123,10 @@ cl_command_type ccl_event_get_command_type(
 /**
  * @brief Get a ::CCLWrapperInfo event profiling information object.
  * 
- * @param evt The event wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt The event wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested event profiling information object. This object
  * will be automatically freed when the event wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -142,11 +142,11 @@ cl_command_type ccl_event_get_command_type(
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param evt The event wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt The event wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested event profiling information value. This value 
  * will be automatically freed when the event wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -163,11 +163,11 @@ cl_command_type ccl_event_get_command_type(
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param evt The event wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt The event wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested event profiling information value. This value 
  * will be automatically freed when the event wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -180,7 +180,7 @@ cl_command_type ccl_event_get_command_type(
 /** 
  * @brief Increase the reference count of the event object.
  * 
- * @param evt The event wrapper object. 
+ * @param[in] evt The event wrapper object. 
  * */
 #define ccl_event_ref(evt) \
 	ccl_wrapper_ref((CCLWrapper*) evt)
@@ -188,7 +188,7 @@ cl_command_type ccl_event_get_command_type(
 /**
  * @brief Alias to ccl_event_destroy().
  * 
- * @param evt Event wrapper object to destroy if reference count 
+ * @param[in] evt Event wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_event_unref(evt) ccl_event_destroy(evt)
@@ -196,7 +196,7 @@ cl_command_type ccl_event_get_command_type(
 /**
  * @brief Get the OpenCL event object.
  * 
- * @param evt The event wrapper object.
+ * @param[in] evt The event wrapper object.
  * @return The OpenCL event object.
  * */
 #define ccl_event_unwrap(evt) \

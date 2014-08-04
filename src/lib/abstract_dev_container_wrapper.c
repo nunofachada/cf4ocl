@@ -31,12 +31,12 @@
 /**
  * @brief Initialize device list in device container.
  * 
- * @param devcon Device container wrapper.
- * @param get_devices Concrete wrapper implementation of 
+ * @param[in] devcon Device container wrapper.
+ * @param[in] get_devices Concrete wrapper implementation of 
  * ccl_dev_container_get_cldevices(), which returns a list of 
  * cl_device_id's for the wrapper.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * */ 
 static void ccl_dev_container_init_devices(CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError **err) {
@@ -90,7 +90,7 @@ finish:
 /**
  * @brief Release the devices held by the given #CCLDevContainer object.
  * 
- * @param devcon A ::CCLDevContainer wrapper object.
+ * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
 void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 
@@ -117,11 +117,11 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 /** 
  * @brief Get all ::CCLDevice wrappers in device container. 
  * 
- * @param devcon The device container object.
- * @param get_devices Function to get cl_device_id's from wrapped
+ * @param[in] devcon The device container object.
+ * @param[in] get_devices Function to get cl_device_id's from wrapped
  * object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return All ::CCLDevice wrappers in device container or NULL if an 
  * error occurs.
  * */
@@ -152,12 +152,12 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
 /** 
  * @brief Get ::CCLDevice wrapper at given index. 
  * 
- * @param devcon The device container object.
- * @param get_devices Function to get cl_device_id's from wrapped
+ * @param[in] devcon The device container object.
+ * @param[in] get_devices Function to get cl_device_id's from wrapped
  * object.
- * @param index Index of device in device container.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] index Index of device in device container.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or NULL if an error 
  * occurs.
  * */
@@ -217,11 +217,11 @@ finish:
 /**
  * @brief Return number of devices in device container.
  * 
- * @param devcon The device container object.
- * @param get_devices Function to get cl_device_id's from wrapped
+ * @param[in] devcon The device container object.
+ * @param[in] get_devices Function to get cl_device_id's from wrapped
  * object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * @return The number of devices in device container or 0 if an error 
  * occurs or is otherwise not possible to get any device.
  * */

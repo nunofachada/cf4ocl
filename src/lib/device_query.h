@@ -48,10 +48,11 @@
 /** 
  * @brief Output formatting function.
  * 
- * @param info CL device information bitfield.
- * @param out Char buffer (pre-allocated) were to write formatted output.
- * @param size Maximum output length.
- * @param units Parameter units suffix.
+ * @param[in] info CL device information bitfield.
+ * @param[out] out Char buffer (pre-allocated) were to write formatted
+ * output.
+ * @param[in] size Maximum output length.
+ * @param[in] units Parameter units suffix.
  * @return Formatted output (same address as parameter out).
  * */
 typedef char* (*ccl_devquery_format)(CCLWrapperInfo* info, char* out, 
@@ -102,7 +103,7 @@ const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx);
  * @brief Map an OpenCL cl_device_type object to a string identifying
  * the device type.
  * 
- * @param type The OpenCL cl_device_type.
+ * @param[in] type The OpenCL cl_device_type.
  * */
 #define ccl_devquery_type2str(type) \
 	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \

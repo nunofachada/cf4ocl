@@ -60,7 +60,7 @@ struct ccl_event {
  * This function will rarely be called from client code, except when
  * clients wish to wrap the OpenCL event directly.
  * 
- * @param event The OpenCL event to be wrapped.
+ * @param[in] event The OpenCL event to be wrapped.
  * @return The event wrapper for the given OpenCL event.
  * */
 CCLEvent* ccl_event_new_wrap(cl_event event) {
@@ -79,7 +79,7 @@ CCLEvent* ccl_event_new_wrap(cl_event event) {
  * @brief Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed.
  *
- * @param evt The event wrapper object.
+ * @param[in] evt The event wrapper object.
  * */
 void ccl_event_destroy(CCLEvent* evt) {
 	
@@ -265,9 +265,9 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
 /**
  * @brief Get the command type which fired the given event.
  * 
- * @param evt Event wrapper.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt Event wrapper.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The command type which fired the given event or 0 if an error
  * occurs.
  * */
@@ -304,9 +304,9 @@ cl_command_type ccl_event_get_command_type(
  * in the wait list to complete. This function is a wrapper for the
  * clWaitForEvents() OpenCL function.
  * 
- * @param evt_wait_lst Event wait list.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] evt_wait_lst Event wait list.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The status of the clWaitForEvents() OpenCL function or
  * CL_INT_MAX if an error occurs.
  * */ 

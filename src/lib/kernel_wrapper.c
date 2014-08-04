@@ -45,7 +45,7 @@ struct ccl_kernel {
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLKernel wrapper objects.
  * 
- * @param krnl A ::CCLKernel wrapper object.
+ * @param[in] krnl A ::CCLKernel wrapper object.
  * */
 static void ccl_kernel_release_fields(CCLKernel* krnl) {
 
@@ -76,7 +76,7 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
  * clCreateKernel() function) and then wrap the OpenCL kernel in a 
  * ::CCLKernel wrapper object.
  * 
- * @param kernel The OpenCL kernel to be wrapped.
+ * @param[in] kernel The OpenCL kernel to be wrapped.
  * @return The ::CCLKernel wrapper for the given OpenCL kernel.
  * */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
@@ -140,7 +140,7 @@ finish:
  * @brief Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed.
  *
- * @param krnl The kernel wrapper object.
+ * @param[in] krnl The kernel wrapper object.
  * */
 void ccl_kernel_destroy(CCLKernel* krnl) {
 	
@@ -270,15 +270,16 @@ finish:
  * a kernel wrapper for the given kernel function with ccl_kernel_new(),
  * one for each thread.
  * 
- * @param krnl
- * @param cq
- * @param work_dim
- * @param global_work_offset
- * @param global_work_size
- * @param local_work_size
- * @param evt_wait_lst
- * @param err
- * @param ...
+ * @param[in] krnl
+ * @param[in] cq
+ * @param[in] work_dim
+ * @param[in] global_work_offset
+ * @param[in] global_work_size
+ * @param[in] local_work_size
+ * @param[in,out] evt_wait_lst
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @param[in] ...
  * @return
  * */
 CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq, 

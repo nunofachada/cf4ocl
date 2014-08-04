@@ -1,6 +1,15 @@
 # List of examples
 SET(EXAMPLES matmult bank_conflicts)
 
+# Exclude examples from documentation?
+if (DOXYGEN_FOUND) 
+	option(DOC_EXCLUDE_EXAMPLES "Exclude examples from API docs?" ON)
+	if (DOC_EXCLUDE_EXAMPLES)
+		# Add examples path to doc exclude path
+		set(DOC_EXCLUDE_PATHS "${CMAKE_CURRENT_SOURCE_DIR} ${DOC_EXCLUDE_PATHS}" CACHE INTERNAL "")
+	endif()
+endif()
+
 # Common libraries for examples
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} 
 	examples_common)

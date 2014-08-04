@@ -61,12 +61,12 @@ typedef struct ccl_context CCLContext;
  * report information on errors during context creation as well as 
  * errors that occur at runtime in this context. Ignored if NULL.
  * 
- * @param errinfo Pointer to an error string.
- * @param private_info Pointer to binary data returned OpenCL, used to 
- * log additional debugging information.
- * @param cb Size of private_info data.
- * @param user_data Passed as the user_data argument when pfn_notify is 
- * called. user_data can be NULL.
+ * @param[in] errinfo Pointer to an error string.
+ * @param[out] private_info Pointer to binary data returned by OpenCL,
+ * used to log additional debugging information.
+ * @param[out] cb Size of private_info data.
+ * @param[in] user_data Passed as the user_data argument when pfn_notify
+ * is called. user_data can be NULL.
  * */
 typedef void (CL_CALLBACK* ccl_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
@@ -79,9 +79,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @brief Create a new context wrapper object selecting devices using 
  * the given set of filters. 
  *  
- * @param filters Filters for selecting device.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] filters Filters for selecting device.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
 #define ccl_context_new_from_filters(filters, err) \
@@ -95,10 +95,10 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * This macro simply calls ccl_context_new_from_devices_full() 
  * setting properties, callback and user data to NULL.
  * 
- * @param num_devices Number of cl_devices_id's in list.
- * @param devices Array of ::CCLDevice wrappers.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] num_devices Number of cl_devices_id's in list.
+ * @param[in] devices Array of ::CCLDevice wrappers.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
 #define ccl_context_new_from_devices(num_devices, devices, err) \
@@ -111,8 +111,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found CPU device is used. More than one CPU might be used 
  * if all CPUs belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define ccl_context_new_cpu(err) \
@@ -125,8 +125,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found GPU device is used. More than one GPU might be used 
  * if all GPUs belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define ccl_context_new_gpu(err) \
@@ -139,8 +139,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found Accelerator device is used. More than one Accelerator 
  * might be used if all Accelerators belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define ccl_context_new_accel(err) \
@@ -153,8 +153,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found device is used. More than one device might be used if 
  * all devices belong to the same platform.
  * 
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A new context wrapper object or NULL if an error occurs.
  * */
 #define ccl_context_new_any(err) \
@@ -193,10 +193,10 @@ void ccl_context_destroy(CCLContext* ctx);
 /**
  * @brief Get a ::CCLWrapperInfo context information object.
  * 
- * @param ctx The context wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] ctx The context wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested context information object. This object will
  * be automatically freed when the context wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -212,11 +212,11 @@ void ccl_context_destroy(CCLContext* ctx);
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param ctx The context wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] ctx The context wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested context information value. This value will be 
  * automatically freed when the context wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -233,11 +233,11 @@ void ccl_context_destroy(CCLContext* ctx);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param ctx The context wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] ctx The context wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested context information value. This value will be 
  * automatically freed when the context wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
@@ -249,7 +249,7 @@ void ccl_context_destroy(CCLContext* ctx);
 /** 
  * @brief Increase the reference count of the context wrapper object.
  * 
- * @param ctx The context wrapper object. 
+ * @param[in] ctx The context wrapper object. 
  * */
 #define ccl_context_ref(ctx) \
 	ccl_wrapper_ref((CCLWrapper*) ctx)
@@ -257,8 +257,8 @@ void ccl_context_destroy(CCLContext* ctx);
 /**
  * @brief Alias to ccl_context_destroy().
  * 
- * @param ctx Context wrapper object to destroy if reference count is 1, 
- * otherwise just decrement the reference count.
+ * @param[in] ctx Context wrapper object to destroy if reference count
+ * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_context_unref(ctx) \
 	ccl_context_destroy(ctx)
@@ -266,7 +266,7 @@ void ccl_context_destroy(CCLContext* ctx);
 /**
  * @brief Get the OpenCL context object.
  * 
- * @param ctx The context wrapper object.
+ * @param[in] ctx The context wrapper object.
  * @return The OpenCL context object.
  * */
 #define ccl_context_unwrap(ctx) \

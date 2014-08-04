@@ -1,6 +1,15 @@
 # List of tests
 set(TESTS test_gerrorf test_cad_profiler test_cad_platforms 
 	test_devquery test_cad_context test_cad_program test_op_profiler)
+	
+# Exclude tests from documentation?
+if (DOXYGEN_FOUND) 
+	option(DOC_EXCLUDE_TESTS "Exclude tests from API docs?" ON)
+	if (DOC_EXCLUDE_TESTS)
+		# Add tests path to doc exclude path
+		set(DOC_EXCLUDE_PATHS "${CMAKE_CURRENT_SOURCE_DIR} ${DOC_EXCLUDE_PATHS}" CACHE INTERNAL "")
+	endif()
+endif()
 
 # Add subdir to build OpenCL stub lib
 add_subdirectory(ocl_stub)

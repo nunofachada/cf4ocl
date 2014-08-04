@@ -51,10 +51,10 @@ typedef GPtrArray* CCLDevSelDevices;
  * @brief Independent filter function: Abstract function for filtering 
  * one OpenCL device at a time.
  *
- * @param device OpenCL device to filter.
- * @param data Filter data, implementation dependent.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] device OpenCL device to filter.
+ * @param[in] data Filter data, implementation dependent.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if filter accepts device, CL_FALSE otherwise.
  */
 typedef cl_bool (*ccl_devsel_indep)(
@@ -64,10 +64,10 @@ typedef cl_bool (*ccl_devsel_indep)(
  * @brief Dependent filter function: Abstract function for filtering 
  * several OpenCL devices depending on the available device choices.
  *
- * @param devices OpenCL devices to filter.
- * @param data Filter data, implementation dependent.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] devices OpenCL devices to filter.
+ * @param[in] data Filter data, implementation dependent.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  */
 typedef CCLDevSelDevices (*ccl_devsel_dep)(

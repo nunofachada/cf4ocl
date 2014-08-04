@@ -78,14 +78,15 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 /**
  * @brief Generic type for OpenCL clget*Info() functions.
  * 
- * @param cl_object OpenCL object to be queried.
- * @param param_name Parameter to query.
- * @param param_value_size Used to specify the size in bytes of memory 
- * pointed to by param_value.
- * @param param_value A pointer to memory where the appropriate result 
- * being queried is returned
- * @param param_value_size_ret Returns the actual size in bytes of data 
- * copied to param_value. If param_value_size_ret is NULL, it is ignored.
+ * @param[in] cl_object OpenCL object to be queried.
+ * @param[in] param_name Parameter to query.
+ * @param[in] param_value_size Used to specify the size in bytes of
+ * memory pointed to by param_value.
+ * @param[out] param_value A pointer to memory where the appropriate 
+ * result being queried is returned
+ * @param[out] param_value_size_ret Returns the actual size in bytes of 
+ * data copied to param_value. If param_value_size_ret is NULL, it is 
+ * ignored.
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
@@ -97,15 +98,16 @@ typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
  * @brief Generic type for OpenCL clget**Info() functions, in which two
  * OpenCL objects are involved.
  * 
- * @param cl_object1 OpenCL object to be queried.
- * @param cl_object2 OpenCL object required for query.
- * @param param_name Parameter to query.
- * @param param_value_size Used to specify the size in bytes of memory 
- * pointed to by param_value.
- * @param param_value A pointer to memory where the appropriate result 
- * being queried is returned
- * @param param_value_size_ret Returns the actual size in bytes of data 
- * copied to param_value. If param_value_size_ret is NULL, it is ignored.
+ * @param[in] cl_object1 OpenCL object to be queried.
+ * @param[in] cl_object2 OpenCL object required for query.
+ * @param[in] param_name Parameter to query.
+ * @param[in] param_value_size Used to specify the size in bytes of 
+ * memory pointed to by param_value.
+ * @param[out] param_value A pointer to memory where the appropriate 
+ * result being queried is returned
+ * @param[out] param_value_size_ret Returns the actual size in bytes of 
+ * data copied to param_value. If param_value_size_ret is NULL, it is 
+ * ignored.
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
@@ -140,8 +142,8 @@ typedef struct ccl_wrapper_info {
  * @brief Helper macro which returns a scalar information value casted 
  * to specified scalar type.
  * 
- * @param info ::CCLWrapperInfo information object.
- * @param type Scalar type to which to cast value to.
+ * @param[in] info ::CCLWrapperInfo information object.
+ * @param[in] type Scalar type to which to cast value to.
  * @return The information value casted to the specified scalar type.
  * */
 #define ccl_info_scalar(info, type) *((type*) (info)->value)
@@ -150,8 +152,8 @@ typedef struct ccl_wrapper_info {
  * @brief Helper macro which returns an array information value casted 
  * to specified array type.
  * 
- * @param info ::CCLWrapperInfo information object.
- * @param type Array (pointer) type to which to cast value to.
+ * @param[in] info ::CCLWrapperInfo information object.
+ * @param[in] type Array (pointer) type to which to cast value to.
  * @return The information value casted to the specified array (pointer)
  * type.
  * */

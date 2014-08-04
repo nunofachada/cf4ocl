@@ -90,9 +90,9 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * @brief Get a ::CCLWrapperInfo kernel information object.
  * 
  * @param krnl The kernel wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested kernel information object. This object will
  * be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -108,11 +108,11 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param krnl The kernel wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested kernel information value. This value will be 
  * automatically freed when the kernel wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -129,11 +129,11 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param krnl The kernel wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested kernel information value. This value will be 
  * automatically freed when the kernel wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
@@ -146,11 +146,11 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /**
  * @brief Get a ::CCLWrapperInfo kernel workgroup information object.
  * 
- * @param krnl The kernel wrapper object.
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested kernel workgroup information object. This 
  * object will be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -168,12 +168,12 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param krnl The kernel wrapper object.
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested kernel workgroup information value. This value 
  * will be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, zero is returned.
@@ -193,12 +193,12 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param krnl The kernel wrapper object.
- * @param dev The device wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] dev The device wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested kernel workgroup information value. This value 
  * will be automatically freed when the kernel wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -213,7 +213,7 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /** 
  * @brief Increase the reference count of the kernel object.
  * 
- * @param krnl The kernel wrapper object. 
+ * @param[in] krnl The kernel wrapper object. 
  * */
 #define ccl_kernel_ref(krnl) \
 	ccl_wrapper_ref((CCLWrapper*) krnl)
@@ -221,7 +221,7 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /**
  * @brief Alias to ccl_kernel_destroy().
  * 
- * @param krnl Kernel wrapper object to destroy if reference count 
+ * @param[in] krnl Kernel wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_kernel_unref(krnl) ccl_kernel_destroy(krnl)
@@ -229,7 +229,7 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /**
  * @brief Get the OpenCL kernel object.
  * 
- * @param krnl The kernel wrapper object.
+ * @param[in] krnl The kernel wrapper object.
  * @return The OpenCL kernel object.
  * */
 #define ccl_kernel_unwrap(krnl) \

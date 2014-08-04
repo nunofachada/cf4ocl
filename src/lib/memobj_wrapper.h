@@ -66,10 +66,10 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 /**
  * @brief Get a ::CCLWrapperInfo memory object information object.
  * 
- * @param mo The memory object wrapper object.
- * @param param_name Name of information/parameter to get.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] mo The memory object wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested memory object information object. This object will
  * be automatically freed when the memory object wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -85,11 +85,11 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param mo The memory object wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] mo The memory object wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested memory object information value. This value will be 
  * automatically freed when the memory object wrapper object is destroyed. 
  * If an error occurs, zero is returned.
@@ -106,11 +106,11 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @param mo The memory object wrapper object.
- * @param param_name Name of information/parameter to get value of.
- * @param param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] mo The memory object wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested memory object information value. This value will be 
  * automatically freed when the memory object wrapper object is destroyed. 
  * If an error occurs, NULL is returned.
@@ -123,7 +123,7 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 /** 
  * @brief Increase the reference count of the cl_mem wrapper object.
  * 
- * @param mo The cl_mem wrapper object. 
+ * @param[in] mo The cl_mem wrapper object. 
  * */
 #define ccl_memobj_ref(mo) \
 	ccl_wrapper_ref((CCLWrapper*) mo)
@@ -131,7 +131,7 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 /**
  * @brief Alias to ccl_memobj_destroy().
  * 
- * @param mo cl_mem wrapper object to destroy if reference count 
+ * @param[in] mo cl_mem wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_memobj_unref(mo) ccl_memobj_destroy(mo)
@@ -139,7 +139,7 @@ CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
 /**
  * @brief Get the OpenCL cl_mem object.
  * 
- * @param mo The cl_mem wrapper object.
+ * @param[in] mo The cl_mem wrapper object.
  * @return The OpenCL cl_mem object.
  * */
 #define ccl_memobj_unwrap(mo) \

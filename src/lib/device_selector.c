@@ -69,10 +69,10 @@ typedef struct ccl_devsel_filter {
  * This private function is used by the public ccl_devsel_add_*_filter()
  * functions.
  * 
- * @param filters The filter set.
- * @param function Filter function (independent or dependent).
- * @param data Filter data.
- * @param type Type of filter: independent or dependent.
+ * @param[in] filters The filter set.
+ * @param[in] function Filter function (independent or dependent).
+ * @param[in] data Filter data.
+ * @param[in] type Type of filter: independent or dependent.
  * */
 static void ccl_devsel_add_filter(CCLDevSelFilters* filters, 
 	ccl_devsel_fp function, void* data, CCLDevSelFilterType type) {
@@ -98,8 +98,8 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
  * @brief Populate array of device wrapper objects with all OpenCL
  * devices present in the system
  * 
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return One or more OpenCL devices selected based on the provided
  * filters.
  *  */
@@ -191,9 +191,9 @@ finish:
  * containing the name and vendor of each device in the given device 
  * array.
  * 
- * @param devices Array of devices.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] devices Array of devices.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A NULL-terminated array of strings, each one containing the
  * name and vendor of each device in the device array. The array of 
  * strings should be freed with the g_strfreev() function from GLib. If
@@ -257,12 +257,12 @@ finish:
  * @brief Private helper function, prints a list of the devices 
  * specified in the given list.
  * 
- * @param devices List of devices.
- * @param selected Index of selected device (a message will appear near
- * the device name indicating the device is selected). Pass -1 to 
+ * @param[in] devices List of devices.
+ * @param[in] selected Index of selected device (a message will appear
+ * near the device name indicating the device is selected). Pass -1 to 
  * ignore it.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * */
 static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices, 
 	cl_int selected, GError** err) {
@@ -327,7 +327,7 @@ finish:
  * @brief Private helper function, asks the user to select a device 
  * from a list. 
  * 
- * @param devices Array of devices.
+ * @param[in] devices Array of devices.
  * @return The list index of the selected device or -1 if an error
  * ocurrs.
  * */
@@ -400,8 +400,8 @@ finish:
  * The array of strings should be freed with the g_strfreev() function
  * from GLib.
  * 
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A NULL-terminated array of strings, each one containing the 
  * name and vendor of each device in the system. The array of strings 
  * should be freed with the g_strfreev() function from GLib. If an error
@@ -456,8 +456,8 @@ finish:
  * @brief Print to stdout a device description string for each device in
  * the system.
  * 
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * */
 void ccl_devsel_print_device_strings(GError** err) {
 	
@@ -498,9 +498,9 @@ finish:
 /**
  * @brief Add an independent filter to the filter set.
  * 
- * @param filters The filter set.
- * @param function Indendent filter function.
- * @param data Filter data.
+ * @param[in] filters The filter set.
+ * @param[in] function Indendent filter function.
+ * @param[in] data Filter data.
  * */
 void ccl_devsel_add_indep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_indep function, void* data) {
@@ -512,9 +512,9 @@ void ccl_devsel_add_indep_filter(
 /**
  * @brief Add a dependent filter to the filter set.
  * 
- * @param filters The filter set.
- * @param function Indendent filter function.
- * @param data Filter data.
+ * @param[in] filters The filter set.
+ * @param[in] function Indendent filter function.
+ * @param[in] data Filter data.
  * */
 void ccl_devsel_add_dep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_dep function, void* data) {
@@ -531,8 +531,8 @@ void ccl_devsel_add_dep_filter(
  * ccl_context_new_from_filters_full() function for selecting context
  * devices. Clients should not need to use it frequently.
  * 
- * @param filters Filters used to select device(s).
- * @param err Return location for a GError, or NULL if error reporting
+ * @param[in] filters Filters used to select device(s).
+ * @param[out] err Return location for a GError, or NULL if error reporting
  * is to be ignored.
  * @return One or more OpenCL devices selected based on the provided
  * filters.
@@ -642,10 +642,10 @@ finish:
  * This function is used by the ccl_devsel_indep_type_*() group of
  * functions. Using these is simpler than using this function directly.
  * 
- * @param dev OpenCL device to filter depending on type.
- * @param data Filter data, must point to a cl_device_type value.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev OpenCL device to filter depending on type.
+ * @param[in] data Filter data, must point to a cl_device_type value.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if device is of the given type, CL_FALSE otherwise.
  * */
 cl_bool ccl_devsel_indep_type(
@@ -689,10 +689,10 @@ finish:
 /**
  * @brief Independent filter function which only accepts GPU devices.
  * 
- * @param dev OpenCL device to check for GPU type.
- * @param data Filter data, ignored.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev OpenCL device to check for GPU type.
+ * @param[in] data Filter data, ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if device is a GPU, CL_FALSE otherwise.
  * */
 cl_bool ccl_devsel_indep_type_gpu(
@@ -712,10 +712,10 @@ cl_bool ccl_devsel_indep_type_gpu(
 /**
  * @brief Independent filter function which only accepts CPU devices.
  * 
- * @param dev OpenCL device to check for CPU type.
- * @param data Filter data, ignored.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev OpenCL device to check for CPU type.
+ * @param[in] data Filter data, ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if device is a CPU, CL_FALSE otherwise.
  * */
 cl_bool ccl_devsel_indep_type_cpu(
@@ -736,10 +736,10 @@ cl_bool ccl_devsel_indep_type_cpu(
  * @brief Independent filter function which only accepts accelerator 
  * devices.
  * 
- * @param dev OpenCL device to check for accelerator type.
- * @param data Filter data, ignored.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev OpenCL device to check for accelerator type.
+ * @param[in] data Filter data, ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if device is a accelerator, CL_FALSE otherwise.
  * */
 cl_bool ccl_devsel_indep_type_accel(
@@ -760,10 +760,10 @@ cl_bool ccl_devsel_indep_type_accel(
  * @brief Independent filter which selects devices based on device name, 
  * device vendor and/or platform name.
  * 
- * @param dev OpenCL device to filter by platform.
- * @param data Filter data, must be a string.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] dev OpenCL device to filter by platform.
+ * @param[in] data Filter data, must be a string.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if device is accepted by filter, CL_FALSE otherwise.
  * */
 cl_bool ccl_devsel_indep_string(
@@ -873,10 +873,10 @@ finish:
  * @brief Independent filter function which only accepts devices of a
  * specified platform.
  * 
- * @param device OpenCL device to filter by platform.
- * @param data Filter data, must be a cl_platform_id.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] device OpenCL device to filter by platform.
+ * @param[in] data Filter data, must be a cl_platform_id.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return CL_TRUE if device belongs to the specified platform, CL_FALSE 
  * otherwise (or if an error occurs).
  * */
@@ -940,10 +940,10 @@ finish:
  * @brief Dependent filter function which only accepts devices of the
  * same platform (the platform to which the first device belong to).
  * 
- * @param devices Currently available OpenCL devices.
- * @param data Filter data, ignored.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] devices Currently available OpenCL devices.
+ * @param[in] data Filter data, ignored.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
 CCLDevSelDevices ccl_devsel_dep_platform(
@@ -1022,11 +1022,11 @@ finish:
  * @brief Dependent filter function which presents a menu to the user
  * allowing him to select the desired device.
  * 
- * @param devices List of devices.
- * @param data If not NULL, can contain a device index, such that the
- * device is automatically selected by this filter.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] devices List of devices.
+ * @param[in] data If not NULL, can contain a device index, such that
+ * the device is automatically selected by this filter.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
 CCLDevSelDevices ccl_devsel_dep_menu(

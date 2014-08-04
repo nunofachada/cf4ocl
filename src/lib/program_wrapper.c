@@ -56,7 +56,7 @@ struct ccl_program_binary {
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
  * 
- * @param prg A ::CCLProgram wrapper object.
+ * @param[in] prg A ::CCLProgram wrapper object.
  * */
 static void ccl_program_release_fields(CCLProgram* prg) {
 
@@ -91,9 +91,9 @@ static void ccl_program_release_fields(CCLProgram* prg) {
  * @brief Implementation of ccl_dev_container_get_cldevices() for the
  * program wrapper. 
  * 
- * @param devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
  * */
@@ -120,7 +120,7 @@ static CCLWrapperInfo* ccl_program_get_cldevices(
  * clCreateProgramWith*() functions) and then wrap the OpenCL program
  * in a ::CCLProgram wrapper object.
  * 
- * @param program The OpenCL program to be wrapped.
+ * @param[in] program The OpenCL program to be wrapped.
  * @return The ::CCLProgram wrapper for the given OpenCL program.
  * */
 CCLProgram* ccl_program_new_wrap(cl_program program) {
@@ -134,7 +134,7 @@ CCLProgram* ccl_program_new_wrap(cl_program program) {
  * @brief Decrements the reference count of the program wrapper object. 
  * If it reaches 0, the program wrapper object is destroyed.
  *
- * @param prg The program wrapper object.
+ * @param[in] prg The program wrapper object.
  * */
 void ccl_program_destroy(CCLProgram* prg) {
 	
@@ -867,10 +867,10 @@ finish:
 /** 
  * @brief Get ::CCLDevice wrapper at given index. 
  * 
- * @param prg The program wrapper object.
- * @param index Index of device in program.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[in] index Index of device in program.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or NULL if an error 
  * occurs.
  * */
@@ -884,9 +884,9 @@ CCLDevice* ccl_program_get_device(
 /**
  * @brief Return number of devices in program.
  * 
- * @param prg The program wrapper object.
- * @param err Return location for a GError, or NULL if error reporting 
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The number of devices in program or 0 if an error occurs or 
  * is otherwise not possible to get any device.
  * */
@@ -904,9 +904,9 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
  * device wrappers. As such, clients should not modify the returned 
  * array (e.g. they should not free it directly).
  * 
- * @param prg The program wrapper object.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] prg The program wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given program, or NULL if an error occurs.
  * */

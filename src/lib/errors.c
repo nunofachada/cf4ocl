@@ -109,7 +109,7 @@ static const int ccl_errors_count = 69;
 /** 
  * @brief Convert OpenCL error code to a readable string.
  * 
- * @param code OpenCL error code.
+ * @param[in] code OpenCL error code.
  * @return A readable string.
  * */
 const char* ccl_err(int code) {

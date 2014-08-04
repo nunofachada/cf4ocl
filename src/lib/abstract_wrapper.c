@@ -39,8 +39,8 @@ G_LOCK_DEFINE(wrappers);
  * concrete wrapper constructors and should not be called by client
  * code.
  * 
- * @param cl_object OpenCL object to wrap.
- * @param size Size in bytes of wrapper.
+ * @param[in] cl_object OpenCL object to wrap.
+ * @param[in] size Size in bytes of wrapper.
  * @return A new wrapper object.
  * */
 CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
@@ -85,7 +85,7 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 /** 
  * @brief Increase the reference count of the wrapper object.
  * 
- * @param wrapper The wrapper object. 
+ * @param[in] wrapper The wrapper object. 
  * */
 void ccl_wrapper_ref(CCLWrapper* wrapper) {
 	
@@ -101,14 +101,14 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
  * @brief Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed.
  *
- * @param wrapper The wrapper object.
- * @param size Size in bytes of wrapper object.
- * @param rel_fields_fun Function for releasing specific wrapper 
+ * @param[in] wrapper The wrapper object.
+ * @param[in] size Size in bytes of wrapper object.
+ * @param[in] rel_fields_fun Function for releasing specific wrapper 
  * fields.
- * @param rel_cl_fun Function for releasing OpenCL object.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored. The only error which may be reported by this
- * function is if some problem occurred when releasing the OpenCL 
+ * @param[in] rel_cl_fun Function for releasing OpenCL object.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored. The only error which may be reported by 
+ * this function is if some problem occurred when releasing the OpenCL 
  * object.
  * @return CL_TRUE if wrapper was destroyed (i.e. its ref. count reached
  * zero), CL_FALSE otherwise.
@@ -178,7 +178,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
  * @brief Returns the wrapper object reference count. For debugging and 
  * testing purposes only.
  * 
- * @param wrapper The wrapper object.
+ * @param[in] wrapper The wrapper object.
  * @return The wrapper object reference count or -1 if wrapper is NULL.
  * */
 int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
@@ -194,7 +194,7 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
 /**
  * @brief Get the wrapped OpenCL object.
  * 
- * @param wrapper The wrapper object.
+ * @param[in] wrapper The wrapper object.
  * @return The wrapped OpenCL object.
  * */
 void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
@@ -209,7 +209,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 /**
  * @brief Create a new CCLWrapperInfo* object with a given value size.
  * 
- * @param size Parameter size in bytes.
+ * @param[in] size Parameter size in bytes.
  * @return A new CCLWrapperInfo* object.
  * */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
@@ -229,7 +229,7 @@ CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
 /**
  * @brief Destroy a ::CCLWrapperInfo object.
  * 
- * @param info Object to destroy.
+ * @param[in] info Object to destroy.
  * */
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
 		
@@ -246,8 +246,9 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
  * @brief Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper.
  * 
- * @param wrapper Wrapper to add info to.
- * @param param_name Name of parameter which will refer to this info.
+ * @param[in] wrapper Wrapper to add info to.
+ * @param[in] param_name Name of parameter which will refer to this 
+ * info.
  * @param info Object to destroy.
  * */
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
@@ -277,14 +278,15 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * This function should not be called directly, but using the
  * ccl_*_info() macros instead.
  * 
- * @param wrapper1 The wrapper object to query.
- * @param wrapper2 A second wrapper object, required in some queries.
- * @param param_name Name of information/parameter to get.
- * @param info_fun OpenCL clGet*Info function.
- * @param use_cache TRUE if cached information is to be used, FALSE to 
- * force a new query even if information is in cache.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] wrapper1 The wrapper object to query.
+ * @param[in] wrapper2 A second wrapper object, required in some 
+ * queries.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[in] info_fun OpenCL clGet*Info function.
+ * @param[in] use_cache TRUE if cached information is to be used, FALSE 
+ * to force a new query even if information is in cache.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * @return The requested information object. This object will
  * be automatically freed when the respective wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -376,14 +378,15 @@ finish:
 /** 
  * @brief Get pointer to information value.
  * 
- * @param wrapper1 The wrapper object to query.
- * @param wrapper2 A second wrapper object, required in some queries.
- * @param param_name Name of information/parameter to get value of.
- * @param info_fun OpenCL clGet*Info function.
- * @param use_cache TRUE if cached information is to be used, FALSE to 
- * force a new query even if information is in cache.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] wrapper1 The wrapper object to query.
+ * @param[in] wrapper2 A second wrapper object, required in some 
+ * queries.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] info_fun OpenCL clGet*Info function.
+ * @param[in] use_cache TRUE if cached information is to be used, FALSE
+ * to force a new query even if information is in cache.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return A pointer to the requested information value. This 
  * value will be automatically freed when the wrapper object is 
  * destroyed. If an error occurs, NULL is returned.
@@ -409,14 +412,15 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 /** 
  * @brief Get information size.
  * 
- * @param wrapper1 The wrapper object to query.
- * @param wrapper2 A second wrapper object, required in some queries.
- * @param param_name Name of information/parameter to get value of.
- * @param info_fun OpenCL clGet*Info function.
- * @param use_cache TRUE if cached information is to be used, FALSE to 
- * force a new query even if information is in cache.
- * @param err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[in] wrapper1 The wrapper object to query.
+ * @param[in] wrapper2 A second wrapper object, required in some
+ * queries.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] info_fun OpenCL clGet*Info function.
+ * @param[in] use_cache TRUE if cached information is to be used, FALSE
+ * to force a new query even if information is in cache.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The requested information size. If an error occurs, 
  * a size of 0 is returned.
  * */

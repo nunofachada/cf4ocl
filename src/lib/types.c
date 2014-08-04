@@ -55,7 +55,7 @@ static const CCLTypeInfo ccl_types[] = {
 /** 
  * @brief Return OpenCL type name.
  * 
- * @param type Type constant.
+ * @param[in] type Type constant.
  * @return A string containing the OpenCL type name.
  * */
 const char* ccl_type_name_get(CCLType type) {
@@ -67,7 +67,7 @@ const char* ccl_type_name_get(CCLType type) {
 /** 
  * @brief Return OpenCL type size in bytes.
  * 
- * @param type Type constant.
+ * @param[in] type Type constant.
  * @return The size of the OpenCL type in bytes.
  * */
 int ccl_type_sizeof(CCLType type) {

@@ -44,7 +44,7 @@ struct ccl_memobj {
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects.
  * 
- * @param mo A ::CCLMemObj wrapper object.
+ * @param[in] mo A ::CCLMemObj wrapper object.
  * */
 static void ccl_memobj_release_fields(CCLMemObj* mo) {
 
@@ -73,7 +73,7 @@ static void ccl_memobj_release_fields(CCLMemObj* mo) {
  * clients wish to directly wrap an OpenCL memory object in a 
  * ::CCLMemObj wrapper object.
  * 
- * @param mem_object The OpenCL memory object to be wrapped.
+ * @param[in] mem_object The OpenCL memory object to be wrapped.
  * @return The ::CCLMemObj wrapper for the given OpenCL memory object.
  * */
 CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object) {
@@ -87,7 +87,7 @@ CCLMemObj* ccl_memobj_new_wrap(cl_mem mem_object) {
  * @brief Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed.
  *
- * @param mo The cl_mem wrapper object.
+ * @param[in] mo The cl_mem wrapper object.
  * */
 void ccl_memobj_destroy(CCLMemObj* mo) {
 	
