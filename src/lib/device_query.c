@@ -843,7 +843,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
  * @brief Return the index of the device information map object of the
  * given parameter name.
  * 
- * @param[in] A parameter name, in the format stored in the 
+ * @param[in] name A parameter name, in the format stored in the 
  * ccl_devquery_info_map array.
  * @return Index of the device information map object of the given 
  * parameter name, or -1 if device information map is not found.

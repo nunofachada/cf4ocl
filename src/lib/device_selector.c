@@ -328,6 +328,8 @@ finish:
  * from a list. 
  * 
  * @param[in] devices Array of devices.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return The list index of the selected device or -1 if an error
  * ocurrs.
  * */

@@ -253,7 +253,8 @@ static gint ccl_prof_agg_comp(
  * @brief Create a new event profiling information object.
  * 
  * @param[in] event_name Name of event.
- * @param[in] cq_name Name of command queue which generated this event.
+ * @param[in] queue_name Name of command queue which generated this 
+ * event.
  * @param[in] t_queued Device time in nanoseconds when the command 
  * identified by event is enqueued in a command-queue by the host.
  * @param[in] t_submit Device time counter in nanoseconds when the
@@ -429,6 +430,8 @@ static gint ccl_prof_overlap_comp(
  * @param[in] prof Profile object.
  * @param[in] cq_name Command queue name.
  * @param[in] evt Event wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * */
 static void ccl_prof_add_event(CCLProf* prof, const char* cq_name, 
 	CCLEvent* evt, GError** err) {
