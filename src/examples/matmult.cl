@@ -30,11 +30,11 @@
  * 
  * Based on [Unoptimized matrix multiplication](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab__unoptimized-matrix-multiplication).
  * 
- * @param A Matrix A.
- * @param B Matrix B.
- * @param C Result matrix.
- * @param dimsA Dimensions of matrix A.
- * @param dimsB Dimensions of matrix B.
+ * @param[in] A Matrix A.
+ * @param[in] B Matrix B.
+ * @param[out] C Result matrix.
+ * @param[in] dimsA Dimensions of matrix A.
+ * @param[in] dimsB Dimensions of matrix B.
  */
 __kernel void matmult0(__global int * A, __global int * B, 
 	__global int * C, __private int2 dimsA, __private int2 dimsB) {
@@ -58,12 +58,12 @@ __kernel void matmult0(__global int * A, __global int * B,
  * 
  * Based on [Using shared memory to improve the global memory load efficiency in matrix multiplication](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab__using-shared-memory-improve-global-memory-load-efficiency-matrix-multiplication).
  * 
- * @param A Matrix A.
- * @param B Matrix B.
- * @param C Result matrix.
- * @param dimsA Dimensions of matrix A.
- * @param dimsB Dimensions of matrix B.
- * @param tileOfA Local memory used to improve matrix multiplication.
+ * @param[in] A Matrix A.
+ * @param[in] B Matrix B.
+ * @param[out] C Result matrix.
+ * @param[in] dimsA Dimensions of matrix A.
+ * @param[in] dimsB Dimensions of matrix B.
+ * @param[in] tileOfA Local memory used to improve matrix multiplication.
  * */
 __kernel void matmult1(__global int * A, __global int * B, __global int * C, __private int2 dimsA, __private int2 dimsB, __local int * tileOfA)
 {
@@ -104,13 +104,13 @@ __kernel void matmult1(__global int * A, __global int * B, __global int * C, __p
  * 
  * Based on [Improvement by reading additional data into shared memory](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab__improvement-reading-additional-data-shared-memory).
  * 
- * @param A Matrix A.
- * @param B Matrix B.
- * @param C Result matrix.
- * @param dimsA Dimensions of matrix A.
- * @param dimsB Dimensions of matrix B.
- * @param tileOfA Local memory used to improve matrix multiplication.
- * @param tileOfB Additional local memory used to improve matrix 
+ * @param[in] A Matrix A.
+ * @param[in] B Matrix B.
+ * @param[out] C Result matrix.
+ * @param[in] dimsA Dimensions of matrix A.
+ * @param[in] dimsB Dimensions of matrix B.
+ * @param[in] tileOfA Local memory used to improve matrix multiplication.
+ * @param[in] tileOfB Additional local memory used to improve matrix 
  * multiplication.
  */
 __kernel void matmult2(__global int * A, __global int * B, __global int * C, __private int2 dimsA, __private int2 dimsB, __local int * tileOfA, __local int * tileOfB)
@@ -166,9 +166,9 @@ __kernel void matmult2(__global int * A, __global int * B, __global int * C, __p
  * 
  * Based on [Unoptimized handling of strided accesses to global memory](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aa__unoptimized-handling-strided-accesses-global-memory).
  * 
- * @param A Matrix A.
- * @param C Result matrix.
- * @param dimsA Dimensions of matrix A.
+ * @param[in] A Matrix A.
+ * @param[out] C Result matrix.
+ * @param[in] dimsA Dimensions of matrix A.
  */
 __kernel void matmult3(__global int * A, __global int * C, __private int2 dimsA)
 {
@@ -186,17 +186,16 @@ __kernel void matmult3(__global int * A, __global int * C, __private int2 dimsA)
 	}
 }
 
-
 /**
  * @brief Optimized kernel for matrix transpose multiplication.
  * 
  * Based on [An optimized handling of strided accesses using coalesced reads from global memory](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aa__optimized-version-coalesced-reads-global-memory).
  * 
- * @param A Matrix A.
- * @param C Result matrix.
- * @param dimsA Dimensions of matrix A.
- * @param tileOfA Local memory used to improve matrix multiplication.
- * @param tileOfAT Additional local memory used to improve matrix 
+ * @param[in] A Matrix A.
+ * @param[out] C Result matrix.
+ * @param[in] dimsA Dimensions of matrix A.
+ * @param[in] tileOfA Local memory used to improve matrix multiplication.
+ * @param[in] tileOfAT Additional local memory used to improve matrix 
  * multiplication.
  */
 __kernel void matmult4(__global int * A, __global int * C, __private int2 dimsA, __local int * tileOfA, __local int * tileOfAT)

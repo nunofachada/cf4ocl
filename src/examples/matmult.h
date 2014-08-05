@@ -37,7 +37,7 @@
  * @brief Check if the multiplication is @f$C=AA^T@f$ (matrix A and its 
  * transpose).
  * 
- * @param kid Kernel ID.
+ * @param[in] kid Kernel ID.
  * @return Logical true if multiplication is @f$C=AA^T@f$, or logical
  * false if multiplication is @f$C=AB@f$.
  * */

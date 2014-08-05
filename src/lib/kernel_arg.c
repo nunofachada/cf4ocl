@@ -27,11 +27,33 @@
  
 #include "kernel_arg.h"
 
+/**
+ * @brief Determine if argument is local/private.
+ * 
+ * @param[in] arg Kernel argument.
+ * @return True if argument is local or private, false if argument is
+ * a real ::CCLWrapper object.
+ * */
 #define ccl_arg_is_local(arg) \
 	 (arg->info == (void*) &arg_local_marker)
-	 
+
+/**
+ * @brief Marker which determines if argument is local/private or a 
+ * real ::CCLWrapper object.
+ * */
 static char arg_local_marker;
 
+/** 
+ * @brief Create a new kernel argument. 
+ * 
+ * Arguments created with this function can local, private or NULL.
+ * Client code shouldn't directly use this function, but use instead
+ * ccl_arg_priv(), ccl_arg_local() or ccl_arg_full(). 
+ * 
+ * @param[in] value Argument value.
+ * @param[in] size Argument size.
+ * @return A new kernel argument.
+ * */
 CCLArg* ccl_arg_new(void* value, size_t size) {
 
 	/* Make sure size is > 0. */
@@ -47,6 +69,13 @@ CCLArg* ccl_arg_new(void* value, size_t size) {
 	
 }
 
+/** 
+ * @brief Destroy a kernel argument. 
+ * 
+ * Client code shouldn't directly use this function.
+ * 
+ * @param[in] arg Argument to destroy.
+ * */
 void ccl_arg_destroy(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
@@ -58,6 +87,14 @@ void ccl_arg_destroy(CCLArg* arg) {
 	}
 }
 
+/** 
+ * @brief Get size in bytes of kernel argument. 
+ * 
+ * Client code shouldn't directly use this function.
+ * 
+ * @param[in] arg Argument to get size of.
+ * @return Argument size in bytes.
+ * */
 size_t ccl_arg_size(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
@@ -68,6 +105,14 @@ size_t ccl_arg_size(CCLArg* arg) {
 		: sizeof(void*);
 }
 
+/** 
+ * @brief Get value of kernel argument. 
+ * 
+ * Client code shouldn't directly use this function.
+ * 
+ * @param[in] arg Argument to get value of.
+ * @return Argument value.
+ * */
 void* ccl_arg_value(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */

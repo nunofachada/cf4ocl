@@ -49,16 +49,27 @@ typedef enum ccl_devsel_filter_type {
 typedef void (*ccl_devsel_fp)(void);
 
 /** 
- * @brief Filter object, includes a filter function (independent or 
- * dependent) and the respective filter data.
+ * @brief Device filter class, includes a filter function (independent 
+ * or dependent) and the respective filter data.
  * */
 typedef struct ccl_devsel_filter {
 	
-	/** Filter function. */
+	/** 
+	 * Filter function. 
+	 * @private
+	 * */
 	ccl_devsel_fp function;
-	/** Filter data. */
+	
+	/** 
+	 * Filter data. 
+	 * @private
+	 * */
 	void* data;
-	/** Filter type. */
+	
+	/** 
+	 * Filter type. 
+	 * @private
+	 * */
 	CCLDevSelFilterType type;
 	
 } CCLDevSelFilter;
@@ -534,8 +545,8 @@ void ccl_devsel_add_dep_filter(
  * devices. Clients should not need to use it frequently.
  * 
  * @param[in] filters Filters used to select device(s).
- * @param[out] err Return location for a GError, or NULL if error reporting
- * is to be ignored.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
  * @return One or more OpenCL devices selected based on the provided
  * filters.
  *  */

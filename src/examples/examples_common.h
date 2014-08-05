@@ -42,11 +42,12 @@
 /**
  * @brief Parse a pair of positive integers from a string separated by a comma.
  * 
- * @param in Input string from where to extract pair of integers.
- * @param out Array where to put pair of integers.
- * @param option_name Not used.
- * @param data Not used.
- * @param err GLib error object for error reporting.
+ * @param[in] in Input string from where to extract pair of integers.
+ * @param[in] out Array where to put pair of integers.
+ * @param[in] option_name Not used.
+ * @param[in] data Not used.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return TRUE if pair of numbers exists, FALSE otherwise.
  * */
 #define ccl_ex_parse_pairs(in, out, option_name, data, err) \

@@ -74,8 +74,8 @@ static gchar* basic_info[] = {
 /**
  * @brief Device info main program function.
  * 
- * @param argc Number of command line arguments.
- * @param argv Vector of command line arguments.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Vector of command line arguments.
  * @return ::CCL_SUCCESS if program returns with no error, or another 
  * ::CCLErrorCode value otherwise.
  */
@@ -215,9 +215,10 @@ cleanup:
 /**
  * @brief Parse and verify command line arguments.
  * 
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
- * @param err GLib error object for error reporting.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * */
 void ccl_device_query_args_parse(int argc, char* argv[], GError** err) {
 	
@@ -259,8 +260,8 @@ cleanup:
 /**
  * @brief Show platform information.
  * 
- * @param p Platform wrapper object.
- * @param idx Platform index.
+ * @param[in] p Platform wrapper object.
+ * @param[in] idx Platform index.
  * */
 void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
 
@@ -323,7 +324,7 @@ void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
 /**
  * @brief Show all available device information.
  * 
- * @param d Device wrapper object.
+ * @param[in] d Device wrapper object.
  * */
 void ccl_device_query_show_device_info_all(CCLDevice* d) {
 
@@ -375,7 +376,7 @@ void ccl_device_query_show_device_info_all(CCLDevice* d) {
 /**
  * @brief Show user specified device information.
  * 
- * @param d Device wrapper object.
+ * @param[in] d Device wrapper object.
  * */
 void ccl_device_query_show_device_info_custom(CCLDevice* d) {
 
@@ -459,7 +460,7 @@ void ccl_device_query_show_device_info_custom(CCLDevice* d) {
 /**
  * @brief Show basic device information.
  * 
- * @param d Device wrapper object.
+ * @param[in] d Device wrapper object.
  * */
 void ccl_device_query_show_device_info_basic(CCLDevice* d) {
 	

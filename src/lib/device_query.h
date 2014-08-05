@@ -63,15 +63,35 @@ typedef char* (*ccl_devquery_format)(CCLWrapperInfo* info, char* out,
  * */
 typedef struct ccl_devquery_map {
 	
-	/** Parameter name string. */
+	/** 
+	 * Parameter name string. 
+	 * @public
+	 * */
 	const char* const param_name;
-	/** CL device information bitfield. */
+	
+	/** 
+	 * CL device information bitfield. 
+	 * @public
+	 * */
+	 
 	const cl_device_info device_info;
-	/** Long description of parameter. */
+	
+	/** 
+	 * Long description of parameter. 
+	 * @public
+	 * */
 	const char* const description;
-	/** Output formatting function. */
+	
+	/** 
+	 * Output formatting function. 
+	 * @public
+	 * */
 	const ccl_devquery_format format;
-	/** Parameter units suffix. */
+	
+	/** 
+	 * Parameter units suffix. 
+	 * @public
+	 * */
 	const char* const units;
 	
 } CCLDevQueryMap;
@@ -104,6 +124,7 @@ const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx);
  * the device type.
  * 
  * @param[in] type The OpenCL cl_device_type.
+ * @return String identifying device type.
  * */
 #define ccl_devquery_type2str(type) \
 	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \

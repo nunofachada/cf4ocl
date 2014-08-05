@@ -186,7 +186,7 @@ finish:
  *
  * @public @memberof ccl_queue
  * 
- * @param cq The command queue wrapper object.
+ * @param[in] cq The command queue wrapper object.
  * */
 void ccl_queue_destroy(CCLQueue* cq) {
 	

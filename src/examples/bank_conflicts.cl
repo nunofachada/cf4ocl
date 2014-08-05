@@ -27,9 +27,9 @@
 /**
  * @brief Kernel for testing bank conflicts.
  * 
- * @param globalData Pointer to global data.
- * @param localData Pointer to allocated local memory.
- * @param stride Control level of bank conflicts.
+ * @param[in,out] globalData Pointer to global data.
+ * @param[in] localData Pointer to allocated local memory.
+ * @param[in] stride Control level of bank conflicts.
  * */
 __kernel void bankconf(__global int * globalData, __local int * localData, __private uint stride)
 {

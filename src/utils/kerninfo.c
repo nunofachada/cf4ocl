@@ -31,8 +31,8 @@
 /** 
  * @brief Kernel info main function.
  * 
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
  * @return ::CCL_SUCCESS if program returns with no error, or another 
  * ::CCLErrorCode value otherwise.
  * */

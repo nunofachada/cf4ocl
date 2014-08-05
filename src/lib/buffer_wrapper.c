@@ -30,7 +30,7 @@
 /** 
  * @brief Buffer wrapper class
  * 
- * @extends ccl_memobj
+ * @implements ccl_memobj
  * */
 struct ccl_buffer {
 

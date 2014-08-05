@@ -133,7 +133,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * 
  * @public @memberof ccl_device
  * 
- * @param device The device wrapper object. 
+ * @param[in] device The device wrapper object. 
  * */
 #define ccl_device_ref(device) \
 	ccl_wrapper_ref((CCLWrapper*) device)

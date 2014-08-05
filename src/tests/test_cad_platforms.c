@@ -513,8 +513,8 @@ static void platforms_ref_unref_test() {
 
 /**
  * @brief Main function.
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
 int main(int argc, char** argv) {

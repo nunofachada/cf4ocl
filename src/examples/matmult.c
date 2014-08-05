@@ -164,8 +164,8 @@ static char* kernel_files[] = {"matmult.cl"};
 /** 
  * @brief OpenCL and OpenMP matrix multiplication main function. 
  * 
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
  * @return #CCL_EX_SUCCESS if program returns with no error, or 
  * #CCL_EX_FAIL otherwise.
  * */
@@ -657,11 +657,13 @@ cleanup:
 /**
  * @brief Create a new matrix with random values.
  * 
- * @param cols Number of columns in matrix.
- * @param rows Number of rows in matrix.
- * @param matrix_range Array containing the min. and max. matrix values;
+ * @param[in] cols Number of columns in matrix.
+ * @param[in] rows Number of rows in matrix.
+ * @param[in] matrix_range Array containing the min. and max. matrix 
+ * values;
  * if NULL, matrix is only allocated.
- * @param rng Random number generator; can be NULL if `matrix_range` is NULL.
+ * @param[in] rng Random number generator; can be NULL if `matrix_range` 
+ * is NULL.
  * @return The new matrix or NULL if memory allocation failed.
  * */
 int* matmult_matrix_new(int cols, int rows, int* matrix_range, GRand* rng) {
@@ -678,7 +680,7 @@ int* matmult_matrix_new(int cols, int rows, int* matrix_range, GRand* rng) {
 /**
  * @brief Free's a matrix created with matmult_matrix_new().
  * 
- * @param matrix The matrix to free.
+ * @param[in] matrix The matrix to free.
  * */
 void matmult_matrix_free(int* matrix) {
 	g_free(matrix);
@@ -686,9 +688,10 @@ void matmult_matrix_free(int* matrix) {
 
 /**
  * @brief Parse and verify command line arguments.
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
- * @param err GLib error object for error reporting.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
  * @return #CCL_EX_SUCCESS if program returns with no error, or 
  * #CCL_EX_FAIL otherwise.
  * */

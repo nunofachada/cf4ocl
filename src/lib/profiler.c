@@ -27,73 +27,173 @@
 
 #include "profiler.h"
 
+/**
+ * @brief Compare two integers depending on the sort order. 
+ * 
+ * @param[in] x First integer to compare.
+ * @param[in] y Second integer to compare.
+ * @param[in] ord Sort order (ascending or descending).
+ * @return 1, 0 or -1.
+ * */
 #define CCL_PROF_CMP_INT(x, y, ord) (((ord) == CCL_PROF_SORT_ASC) \
 	? (((x) > (y)) ? 1 : (((x) < (y)) ? -1 : 0)) \
 	: (((x) < (y)) ? 1 : (((x) > (y)) ? -1 : 0)))
 
+/**
+ * @brief Compare two strings depending on the sort order. 
+ * 
+ * @param[in] s1 First string to compare.
+ * @param[in] s2 Second string to compare.
+ * @param[in] ord Sort order (ascending or descending).
+ * @return 1, 0 or -1.
+ * */
 #define CCL_PROF_CMP_STR(s1, s2, ord) (((ord) == CCL_PROF_SORT_ASC) \
 	? g_strcmp0(s1, s2) : g_strcmp0(s2, s1))
 
+/**
+ * @brief Get a ::CCLProfSort object from the given user data.
+ * 
+ * @param[in] userdata An integer representing a bitfield containing
+ * the sort order and the sort criteria.
+ * @return A ::CCLProfSort object containing the sort order and the
+ * sort criteria separately.
+ * */
 #define ccl_prof_get_sort(userdata) \
 	{0x0F & *((int*) userdata), 0xF0 & *((int*) userdata)}
-	
-typedef struct ccl_prof_sort_data {
-	CCLProfSortOrder order;
-	int criteria;
-} CCLProfSort;
 
 /**
+ * @brief Class representing a sort order (ascending or descending) and
+ * the a sort criteria (context dependent).
+ * */
+typedef struct ccl_prof_sort_data {
+	
+	/** Sort order. */
+	CCLProfSortOrder order;
+	
+	/** Sort criteria. */
+	int criteria;
+	
+} CCLProfSort;
+
+/** 
  * @brief Profile class, contains profiling information of OpenCL 
  * queues and events.
- */
+ * 
+ * @warning Instances of this class are not thread-safe.
+ * 
+ * */
 struct ccl_prof {
 	
-	/** Flag indicating if the profiling information has already been 
-	 * determined. */
+	/** 
+	 * Flag indicating if the profiling information has already been 
+	 * determined. 
+	 * @private
+	 * */
 	gboolean calc;
 
-	/** Hash table with keys equal to the events name, and values
-	 * equal to a unique id for each event name. */
+	/** 
+	 * Hash table with keys equal to the events name, and values
+	 * equal to a unique id for each event name. 
+	 * @private
+	 * */
 	GHashTable* event_names;
-	/** Reverse of event_names in terms of key-values. */ 
+	
+	/** 
+	 * Reverse of event_names in terms of key-values. 
+	 * @private
+	 * */ 
 	GHashTable* event_name_ids;
-	/** Table of command queue wrappers. */
+	
+	/** 
+	 * Table of command queue wrappers. 
+	 * @private
+	 * */
 	GHashTable* queues;
 
-	/** Total number of events. */
+	/** 
+	 * Total number of events. 
+	 * @private
+	 * */
 	guint num_events;
 
-	/** Instants (start and end) of all events. */
+	/** 
+	 * Instants (start and end) of all events. 
+	 * @private
+	 * */
 	GList* instants;
-	/** List of all events profiling information. */
+
+	/** 
+	 * List of all events profiling information. 
+	 * @private
+	 * */
 	GList* infos;
-	/** Aggregate statistics for all events in 
-	 * CCLProf#instants. */
+
+	/** 
+	 * Aggregate statistics for all events in 
+	 * ::CCLProf::instants. 
+	 * @private
+	 * */
 	GList* aggs;
-	/** List of event overlaps. */
+
+	/** 
+	 * List of event overlaps. 
+	 * @private
+	 * */
 	GList* overlaps;
 
-	/** Aggregate event statistics iterator. */
+	/** 
+	 * Aggregate event statistics iterator. 
+	 * @private
+	 * */
 	GList* agg_iter;
-	/** Event info iterator. */
+
+	/** 
+	 * Event info iterator. 
+	 * @private
+	 * */
 	GList* info_iter;
-	/** Event instant iterator. */
+
+	/** 
+	 * Event instant iterator. 
+	 * @private
+	 * */
 	GList* inst_iter;
-	/** Overlaps iterator. */
+
+	/** 
+	 * Overlaps iterator. 
+	 * @private
+	 * */
 	GList* overlap_iter;
 
-	/** Total time taken by all events. */
+	/** 
+	 * Total time taken by all events. 
+	 * @private
+	 * */
 	cl_ulong total_events_time;
-	/** Total time taken by all events except intervals where events 
-	 * overlaped. */
+	
+	/** 
+	 * Total time taken by all events except intervals where events 
+	 * overlaped. 
+	 * @private
+	 * */
 	cl_ulong total_events_eff_time;
-	/** Time at which the first (oldest) event started. */
+
+	/** 
+	 * Time at which the first (oldest) event started. 
+	 * @private
+	 * */
 	cl_ulong t_start;
 	
-	/** Summary string. */
+	/** 
+	 * Summary string. 
+	 * @private
+	 * */
 	gchar* summary;
 
-	/** Keeps track of time during the complete profiling session. */
+	/** 
+	 * Keeps track of time during the complete profiling session. 
+	 * @private
+	 * */
 	GTimer* timer;
 
 };
@@ -111,6 +211,8 @@ static CCLProfExportOptions export_options = {
 
 /** 
  * @brief Create new event instant.
+ * 
+ * @private @memberof ccl_prof_inst
  * 
  * @param[in] event_name Name of event.
  * @param[in] queue_name Name of command queue associated with event.
@@ -141,6 +243,8 @@ static CCLProfInst* ccl_prof_inst_new(const char* event_name,
 /**
  * @brief Free an event instant.
  * 
+ * @private @memberof ccl_prof_inst
+ * 
  * @param[in] instant Event instant to destroy. 
  */
 static void ccl_prof_inst_destroy(CCLProfInst* instant) {
@@ -153,6 +257,8 @@ static void ccl_prof_inst_destroy(CCLProfInst* instant) {
 /**
  * @brief Compares two event instants for sorting within a GList. It is
  * an implementation of GCompareDataFunc from GLib.
+ * 
+ * @private @memberof ccl_prof_inst
  * 
  * @param[in] a First event instant to compare.
  * @param[in] b Second event instant to compare.
@@ -192,6 +298,8 @@ static gint ccl_prof_inst_comp(
 /** 
  * @brief Create a new aggregate statistic for events of a given type.
  * 
+ * @private @memberof ccl_prof_agg
+ * 
  * @param[in] event_name Name of event.
  * @return New aggregate statistic.
  * */
@@ -204,6 +312,8 @@ static CCLProfAgg* ccl_prof_agg_new(const char* event_name) {
 /** 
  * @brief Free an aggregate statistic. 
  * 
+ * @private @memberof ccl_prof_agg
+ * 
  * @param[in] agg Aggregate statistic to free.
  * */
 static void ccl_prof_agg_destroy(CCLProfAgg* agg) {
@@ -214,6 +324,8 @@ static void ccl_prof_agg_destroy(CCLProfAgg* agg) {
 /**
  * @brief Compares two aggregate event data instances for sorting 
  * within a GList. It is an implementation of GCompareDataFunc from GLib.
+ * 
+ * @private @memberof ccl_prof_agg
  * 
  * @param[in] a First aggregate event data instance to compare.
  * @param[in] b Second aggregate event data instance to compare.
@@ -252,6 +364,8 @@ static gint ccl_prof_agg_comp(
 /**
  * @brief Create a new event profiling information object.
  * 
+ * @private @memberof ccl_prof_info
+ * 
  * @param[in] event_name Name of event.
  * @param[in] queue_name Name of command queue which generated this 
  * event.
@@ -285,6 +399,8 @@ static CCLProfInfo* ccl_prof_info_new(const char* event_name,
 /** 
  * @brief Free an event profiling information object. 
  * 
+ * @private @memberof ccl_prof_info
+ * 
  * @param[in] info Event profiling information object to free.
  * */
 static void ccl_prof_info_destroy(CCLProfInfo* info) {
@@ -295,6 +411,8 @@ static void ccl_prof_info_destroy(CCLProfInfo* info) {
 /**
  * @brief Compares two event profiling information instances for sorting 
  * within a GList. It is an implementation of GCompareDataFunc from GLib.
+ * 
+ * @private @memberof ccl_prof_info
  * 
  * @param[in] a First event profiling information instance to compare.
  * @param[in] b Second event profiling information instance to compare.
@@ -351,6 +469,8 @@ static gint ccl_prof_info_comp(
 /**
  * @brief Create a new event overlap object.
  * 
+ * @private @memberof ccl_prof_overlap
+ * 
  * @param[in] event1_name Name of first overlapping event.
  * @param[in] event2_name Name of second overlapping event.
  * @param[in] duration Overlap duration in nanoseconds.
@@ -372,6 +492,8 @@ static CCLProfOverlap* ccl_prof_overlap_new(const char* event1_name,
 /**
  * @brief Destroy an event overlap object.
  * 
+ * @private @memberof ccl_prof_overlap
+ * 
  * @param[in] ovlp Event overlap object to destroy.
  * */
 static void ccl_prof_overlap_destroy(CCLProfOverlap* ovlp) {
@@ -384,6 +506,8 @@ static void ccl_prof_overlap_destroy(CCLProfOverlap* ovlp) {
 /**
  * @brief Compares two event overlap instances for sorting within a 
  * GList. It is an implementation of GCompareDataFunc from GLib.
+ * 
+ * @private @memberof ccl_prof_overlap
  * 
  * @param[in] a First event overlap instance to compare.
  * @param[in] b Second event overlap instance to compare.
@@ -426,6 +550,8 @@ static gint ccl_prof_overlap_comp(
 
 /**
  * @brief Add event for profiling.
+ * 
+ * @private @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  * @param[in] cq_name Command queue name.
@@ -547,6 +673,8 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
  * @brief Process command queues, i.e., add the respective events for 
  * profiling.
  * 
+ * @private @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
@@ -585,6 +713,8 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 
 /**
  * @brief Determine aggregate event statistics.
+ * 
+ * @private @memberof ccl_prof
  * 
  * @param[in] prof The profile object.
  * */
@@ -675,6 +805,8 @@ static void ccl_prof_calc_agg(CCLProf* prof) {
 
 /**
  * @brief Determine event overlaps for the given profile object.
+ * 
+ * @private @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  */ 
@@ -873,6 +1005,8 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 /** 
  * @brief Create a new profile object.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @return A new profile object. 
  */
 CCLProf* ccl_prof_new() {
@@ -890,6 +1024,8 @@ CCLProf* ccl_prof_new() {
 
 /** 
  * @brief Destroy a profile object.
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof Profile object to destroy. 
  */
@@ -944,12 +1080,14 @@ void ccl_prof_destroy(CCLProf* prof) {
 }
 
 /** 
-* @brief Starts the global profiler timer. Only required if client
-* wishes to compare the effectively ellapsed time with the OpenCL
-* kernels time.
-* 
-* @param[in] prof A profile object.
-* */
+ * @brief Starts the global profiler timer. Only required if client
+ * wishes to compare the effectively ellapsed time with the OpenCL
+ * kernels time.
+ * 
+ * @public @memberof ccl_prof
+ * 
+ * @param[in] prof A profile object.
+ * */
 void ccl_prof_start(CCLProf* prof) {
 	
 	/* Make sure profile is not NULL. */
@@ -962,6 +1100,8 @@ void ccl_prof_start(CCLProf* prof) {
 /** 
  * @brief Stops the global profiler timer. Only required if 
  * ccl_prof_start() was called.
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof A profile object. 
  * */
@@ -979,6 +1119,8 @@ void ccl_prof_stop(CCLProf* prof) {
  * since the profiling started. If profiling has been stopped, returns 
  * the elapsed time between the time it started and the time it stopped.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof A profile object. 
  * @return number of seconds elapsed, including any fractional part.
  * */
@@ -993,6 +1135,8 @@ double ccl_prof_time_elapsed(CCLProf* prof) {
 
 /** 
  * @brief Add a command queue wrapper for profiling. 
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof A profile object.
  * @param[in] cq_name Command queue name.
@@ -1030,6 +1174,8 @@ void ccl_prof_add_queue(
 
 /** 
  * @brief Determine aggregate statistics for the given profile object. 
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof A profile object.
  * @param[out] err Return location for a GError, or NULL if error
@@ -1100,6 +1246,8 @@ finish:
 /**
  * @brief Return aggregate statistics for events with the given name.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[in] event_name Event name.
  * @return Aggregate statistics for events with the given name.
@@ -1135,6 +1283,8 @@ const CCLProfAgg* ccl_prof_get_agg(
  * @brief Initialize an iterator for profiled aggregate event 
  * instances. 
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[in] sort Bitfield of ::CCLProfAggSort OR ::CCLProfSortOrder,
  * for example `CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC`.
@@ -1157,6 +1307,8 @@ void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
 
 /** 
  * @brief Return the next aggregate statistic instance.
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  * @return The next aggregate statistic instance. 
@@ -1188,6 +1340,8 @@ const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
 /** 
  * @brief Initialize an iterator for event profiling info instances. 
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[in] sort Bitfield of ::CCLProfInfoSort OR ::CCLProfSortOrder, 
  * for example `CCL_PROF_INFO_SORT_T_START | CCL_PROF_SORT_ASC`.
@@ -1209,6 +1363,8 @@ void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
 
 /** 
  * @brief Return the next event profiling info instance. 
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  * @return The next event profiling info instance. 
@@ -1240,6 +1396,8 @@ const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
 /** 
  * @brief Initialize an iterator for event instant instances. 
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[in] sort Bitfield of ::CCLProfInstSort OR ::CCLProfSortOrder,
  * for example `CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC`.
@@ -1262,6 +1420,8 @@ void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
 
 /** 
  * @brief Return the next event instant instance. 
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  * @return The next event instant instance. 
@@ -1293,6 +1453,8 @@ const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
 /** 
  * @brief Initialize an iterator for overlap instances. 
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[in] sort Bitfield of ::CCLProfOverlapSort OR 
  * ::CCLProfSortOrder, for example 
@@ -1315,6 +1477,8 @@ void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
 
 /** 
  * @brief Return the next overlap instance. 
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  * @return The next overlap instance. 
@@ -1352,6 +1516,8 @@ const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
  * For more control of where and how this summary is printed, use the
  * ccl_prof_get_summary() function.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * */ 
 void ccl_prof_print_summary(CCLProf* prof) {
@@ -1379,6 +1545,8 @@ void ccl_prof_print_summary(CCLProf* prof) {
  * this function returns a string containing a table of aggregate event 
  * statistics and a table of event overlaps. The order of the returned
  * information can be specified in the function arguments.
+ * 
+ * @public @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
  * @param[in] agg_sort Sorting performed on aggregate statistics 
@@ -1498,6 +1666,8 @@ const char* ccl_prof_get_summary(
  * ccl_prof_get_export_opts() and ccl_prof_set_export_opts() functions, 
  * by manipulating a ::CCLProfExportOptions struct.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[out] stream Stream where export info to.
  * @param[out] err Return location for a GError, or NULL if error
@@ -1581,6 +1751,8 @@ finish:
  * automatically opening and closing the file. See the 
  * ccl_prof_export_info() for more information.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] prof Profile object.
  * @param[in] filename Name of file where information will be saved to.
  * @param[out] err Return location for a GError, or NULL if error
@@ -1639,6 +1811,8 @@ finish:
 /**
  * @brief Set export options using a ::CCLProfExportOptions struct.
  * 
+ * @public @memberof ccl_prof
+ * 
  * @param[in] export_opts Export options to set.
  * */
 void ccl_prof_set_export_opts(CCLProfExportOptions export_opts) {
@@ -1647,6 +1821,8 @@ void ccl_prof_set_export_opts(CCLProfExportOptions export_opts) {
 
 /**
  * @brief Get current export options.
+ * 
+ * @public @memberof ccl_prof
  * 
  * @return Current export options.
  * */

@@ -135,7 +135,7 @@ error_handler:
 	/* Set platforms to NULL, indicating an error occurred.*/
 	platforms = NULL;
 
-finish:		
+finish:
 	
 	/* Return the CCLPlatforms object. */
 	return platforms;

@@ -29,10 +29,10 @@
 /**
  * @brief Print device requirements for program.
  * 
- * @param gws Global work size.
- * @param lws Local work size.
- * @param gmem Global memory required.
- * @param lmem Local memory required.
+ * @param[in] gws Global work size.
+ * @param[in] lws Local work size.
+ * @param[in] gmem Global memory required.
+ * @param[in] lmem Local memory required.
  * */
 void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 	
@@ -54,8 +54,8 @@ void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
  * * Kernel file is in the same place as executable.
  * * Argv[0] corresponds to the invocation of the executable.
  * 
- * @param kernel_filename Name of file containing kernels.
- * @param exec_name Name of executable (argv[0]).
+ * @param[in] kernel_filename Name of file containing kernels.
+ * @param[in] exec_name Name of executable (argv[0]).
  * @return The full path of the kernel file, should be freed with 
  * g_free().
  * */

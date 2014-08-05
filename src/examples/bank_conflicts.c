@@ -101,8 +101,8 @@ static char* kernel_files[] = {"bank_conflicts.cl"};
  * conflicts is obtained  with `s=16` or `s=32`, depending if the GPU 
  * has 16 or 32 banks of local memory.
  * 
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
  * @return #CCL_EX_SUCCESS if program returns with no error, or 
  * #CCL_EX_FAIL otherwise.
  * */

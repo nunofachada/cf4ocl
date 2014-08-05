@@ -27,16 +27,25 @@
  
 #include "types.h"
 
+/**
+ * @brief Information about an OpenCL type.
+ * */
 struct ccl_type_info {
+	
+	/**
+	 * Type name.
+	 * @private
+	 * */
 	const char* name;
+	
+	/**
+	 * Type size in bytes.
+	 * @private
+	 * */
 	const int size;
 };
 
-/** 
- * @addtogroup TYPES
- * @{
- */
-
+/* Relation between OpenCL type names and sizes in bytes. */
 static const CCLTypeInfo ccl_types[] = {
 	
 	{"char",   1}, /* CCL_CHAR   = 0 */
@@ -51,6 +60,11 @@ static const CCLTypeInfo ccl_types[] = {
 	{"float",  4}, /* CCL_FLOAT  = 9 */
 	{"double", 8}  /* CCL_DOUBLE = 10 */
 };
+
+/** 
+ * @addtogroup TYPES
+ * @{
+ */
 
 /** 
  * @brief Return OpenCL type name.

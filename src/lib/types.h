@@ -40,7 +40,10 @@
  * 
  * @{
  */
-
+ 
+/**
+ * @brief Enumeration of OpenCL types.
+ * */
 typedef enum {
 	CCL_CHAR = 0,
 	CCL_UCHAR = 1,
@@ -53,6 +56,9 @@ typedef enum {
 	CCL_DOUBLE = 8
 } CCLType;
 
+/**
+ * @brief Information about an OpenCL type.
+ * */
 typedef struct ccl_type_info CCLTypeInfo;
 
 /** @brief Return OpenCL type name. */

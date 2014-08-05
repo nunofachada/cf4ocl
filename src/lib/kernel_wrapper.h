@@ -95,7 +95,7 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * 
  * @public @memberof ccl_kernel
  * 
- * @param krnl The kernel wrapper object.
+ * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.

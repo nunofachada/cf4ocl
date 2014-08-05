@@ -49,8 +49,13 @@
  * @{
  */
 
-/** @brief Profile class, contains profiling information of OpenCL 
- * queues and events. */
+/** 
+ * @brief Profile class, contains profiling information of OpenCL 
+ * queues and events.
+ * 
+ * @warning Instances of this class are not thread-safe.
+ * 
+ * */
 typedef struct ccl_prof CCLProf;
 
 /**
@@ -69,13 +74,24 @@ typedef enum {
  */
 typedef struct ccl_prof_agg {
 
-	/** Name of event which the instant refers to. */
+	/** 
+	 * Name of event which the instant refers to. 
+	 * @public
+	 * */
 	const char* event_name;
-	/** Total (absolute) time of events with name equal to 
-	 * ::CCLProfAgg#event_name. */
+	
+	/** 
+	 * Total (absolute) time of events with name equal to 
+	 * ::CCLProfAgg::event_name. 
+	 * @public
+	 * */
 	cl_ulong absolute_time;
-	/** Relative time of events with name equal to 
-	 * ::CCLProfAgg#event_name. */
+	
+	/** 
+	 * Relative time of events with name equal to 
+	 * ::CCLProfAgg::event_name. 
+	 * @public
+	 * */
 	double relative_time;
 	
 } CCLProfAgg;
@@ -88,6 +104,7 @@ typedef enum {
 
 	 /** Sort aggregate event data instances by name. */
 	CCL_PROF_AGG_SORT_NAME = 0x00,
+	
 	/** Sort aggregate event data instances by time. */
 	CCL_PROF_AGG_SORT_TIME = 0x10
 
@@ -98,22 +115,45 @@ typedef enum {
  * */
 typedef struct ccl_prof_info {
 
-	/** Name of event. */
+	/** 
+	 * Name of event. 
+	 * @public
+	 * */
 	const char* event_name;
-	/** Name of command queue which generated this event. */
+	
+	/** 
+	 * Name of command queue which generated this event. 
+	 * @public
+	 * */
 	const char* queue_name;
-	/** Device time in nanoseconds when the command identified by event 
-	 * is enqueued in a command-queue by the host. */
+
+	/** 
+	 * Device time in nanoseconds when the command identified by event 
+	 * is enqueued in a command-queue by the host. 
+	 * @public
+	 * */
 	cl_ulong t_queued;
-	/** Device time counter in nanoseconds when the command identified 
+
+	/** 
+	 * Device time counter in nanoseconds when the command identified 
 	 * by event that has been enqueued is submitted by the host to the 
-	 * device associated with the command-queue. */
+	 * device associated with the command-queue. 
+	 * @public
+	 * */
 	cl_ulong t_submit;
-	/** Device time in nanoseconds when the command identified by event
-	 * starts execution on the device. */
+
+	/** 
+	 * Device time in nanoseconds when the command identified by event
+	 * starts execution on the device. 
+	 * @public
+	 * */
 	cl_ulong t_start;
-	/** Device time in nanoseconds when the command identified by event
-	 * has finished execution on the device. */
+
+	/** 
+	 * Device time in nanoseconds when the command identified by event
+	 * has finished execution on the device. 
+	 * @public
+	 * */
 	cl_ulong t_end;
 
 } CCLProfInfo;
@@ -125,14 +165,19 @@ typedef enum {
 
 	 /** Sort event profiling info instances by event name. */
 	CCL_PROF_INFO_SORT_NAME_EVENT = 0x20,
+
 	 /** Sort event profiling info instances by queue name. */
 	CCL_PROF_INFO_SORT_NAME_QUEUE = 0x30,
+
 	 /** Sort event profiling info instances by queued time. */
 	CCL_PROF_INFO_SORT_T_QUEUED   = 0x40,
+
 	 /** Sort event profiling info instances by submit time. */
 	CCL_PROF_INFO_SORT_T_SUBMIT   = 0x50,
+
 	 /** Sort event profiling info instances by start time. */
 	CCL_PROF_INFO_SORT_T_START    = 0x60,
+
 	 /** Sort event profiling info instances by end time. */
 	CCL_PROF_INFO_SORT_T_END      = 0x70
 
@@ -146,6 +191,7 @@ typedef enum {
 	
 	/** Start event instant. */
 	CCL_PROF_INST_TYPE_START,
+
 	/** End event instant. */
 	CCL_PROF_INST_TYPE_END
 	
@@ -156,17 +202,36 @@ typedef enum {
  */
 typedef struct ccl_prof_inst {
 
-	 /** Name of event which the instant refers to. */
+	 /** 
+	  * Name of event which the instant refers to. 
+	 * @public
+	  * */
 	const char* event_name;
-	/** Name of command queue associated with event. */
+
+	/** 
+	 * Name of command queue associated with event. 
+	 * @public
+	 * */
 	const char* queue_name;
-	/** Event instant ID. */
+
+	/** 
+	 * Event instant ID. 
+	 * @public
+	 * */
 	guint id;
-	/** Event instant in nanoseconds from current device time counter. */
+
+	/** 
+	 * Event instant in nanoseconds from current device time counter. 
+	 * @public
+	 * */
 	cl_ulong instant;
-	/** Type of event instant 
+
+	/** 
+	 * Type of event instant 
 	 * (CCLProfInstType::CCL_PROF_INST_TYPE_START or 
-	 * CCLProfInstType::CCL_PROF_INST_TYPE_END). */
+	 * CCLProfInstType::CCL_PROF_INST_TYPE_END). 
+	 * @public
+	 * */
 	CCLProfInstType type;
 
 } CCLProfInst;
@@ -178,6 +243,7 @@ typedef enum {
 	
 	/** Sort event instants by instant. */
 	CCL_PROF_INST_SORT_INSTANT = 0x80,
+
 	/** Sort event instants by event id. */
 	CCL_PROF_INST_SORT_ID      = 0x90
 
@@ -188,11 +254,22 @@ typedef enum {
  */
 typedef struct ccl_prof_overlap {
 
-	 /** Name of first overlapping event. */
+	/** 
+	 * Name of first overlapping event. 
+	 * @public
+	 * */
 	const char* event1_name;
-	 /** Name of second overlapping event. */
+
+	/** 
+	 * Name of second overlapping event. 
+	 * @public
+	 * */
 	const char* event2_name;
-	/** Overlap duration in nanoseconds. */
+
+	/** 
+	 * Overlap duration in nanoseconds. 
+	 * @public
+	 * */
 	cl_ulong duration;
 
 } CCLProfOverlap;
@@ -204,6 +281,7 @@ typedef enum {
 	
 	/** Sort overlaps by event name. */
 	CCL_PROF_OVERLAP_SORT_NAME     = 0xa0,
+
 	/** Sort overlaps by overlap duration. */
 	CCL_PROF_OVERLAP_SORT_DURATION = 0xb0
 
@@ -214,16 +292,34 @@ typedef enum {
  * */
 typedef struct ccl_prof_export_options {
 
-	/** Field separator, defaults to tab (\\t). */
+	/** 
+	 * Field separator, defaults to tab (\\t). 
+	 * @public
+	 * */
 	const char* separator;
-	/** Newline character, Defaults to Unix newline (\\n). */
+
+	/** 
+	 * Newline character, Defaults to Unix newline (\\n). 
+	 * @public
+	 * */
 	const char* newline;
-	/** Queue name delimiter, defaults to empty string. */
+
+	/** 
+	 * Queue name delimiter, defaults to empty string. 
+	 * @public
+	 * */
 	const char* queue_delim;
-	/** Event name delimiter, defaults to empty string. */
+
+	/** 
+	 * Event name delimiter, defaults to empty string. 
+	 * @public
+	 * */
 	const char* evname_delim;
+
 	/** Start at instant 0 (TRUE, default), or start at oldest instant 
-	 * returned by OpenCL (FALSE). */
+	 * returned by OpenCL (FALSE). 
+	 * @public
+	 * */
 	cl_bool zero_start;
 	
 }  CCLProfExportOptions;

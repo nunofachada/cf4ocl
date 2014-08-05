@@ -31,14 +31,26 @@
 #include "common.h"
 #include "abstract_wrapper.h"
 
+/** 
+ * @brief The ::CCLArg type is an alias for ::CCLWrapper type. The value
+ * and size of local/private arguments is kept inside ::CCLWrapper
+ * instances and manipulated by the ccl_arg_*() functions. This
+ * allows client code to pass real wrappers, e.g. ::CCLBuffer, or 
+ * local/private parameters as kernel arguments in a transparent
+ * fashion. 
+ * */
 typedef CCLWrapper CCLArg;
 
+/** @brief Create a new kernel argument. */
 CCLArg* ccl_arg_new(void* value, size_t size);
 
+/** @brief Destroy a kernel argument. */
 void ccl_arg_destroy(CCLArg* arg);
 
+/** @brief Get size in bytes of kernel argument. */
 size_t ccl_arg_size(CCLArg* arg);
 
+/** @brief Get value of kernel argument. */
 void* ccl_arg_value(CCLArg* arg);
 
 /**
@@ -52,12 +64,43 @@ void* ccl_arg_value(CCLArg* arg);
  * @{
  */
 
+/**
+ * @brief Define a private kernel argument.
+ * 
+ * The created object is automatically released when kernel is
+ * enqueued.
+ * 
+ * @param[in] value Argument value.
+ * @param[in] type Argument scalar type, such as cl_int, cl_float, etc.
+ * @return A private kernel argument.
+ * */
 #define ccl_arg_priv(value, type) \
 	ccl_arg_new(&value, sizeof(type))
 
+/**
+ * @brief Define a local kernel argument, which allocates local memory
+ * within the kernel with the specified size.
+ * 
+ * The created object is automatically released when kernel is
+ * enqueued.
+ * 
+ * @param[in] count Number of values of type given in next parameter.
+ * @param[in] type Argument scalar type, such as cl_int, cl_float, etc.
+ * @return A local kernel argument.
+ * */
 #define ccl_arg_local(count, type) \
 	ccl_arg_new(NULL, count * sizeof(type))
 
+/**
+ * @brief Define a kernel argument which more control.
+ * 
+ * The created object is automatically released when kernel is
+ * enqueued.
+ * 
+ * @param[in] value Argument value. Can be NULL if argument is local.
+ * @param[in] size Size in bytes of argument.
+ * @return A private or local kernel argument.
+ * */
 #define ccl_arg_full(value, size) \
 	ccl_arg_new(value, size)
 
