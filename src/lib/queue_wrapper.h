@@ -46,7 +46,11 @@
  * @{
  */
 
-/** @brief Command queue wrapper object. */
+/**
+ * @brief Command queue wrapper class.
+ * 
+ * @extends ccl_wrapper
+ */
 typedef struct ccl_queue CCLQueue;
 
 /** @brief Get the command queue wrapper for the given OpenCL command 
@@ -78,6 +82,8 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 /**
  * @brief Get a ::CCLWrapperInfo command queue information object.
  * 
+ * @public @memberof ccl_queue
+ * 
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or NULL if error
@@ -96,6 +102,8 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_queue
  * 
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -118,6 +126,8 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_queue
+ * 
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -135,6 +145,8 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 /** 
  * @brief Increase the reference count of the command queue object.
  * 
+ * @public @memberof ccl_queue
+ * 
  * @param[in] cq The command queue wrapper object. 
  * */
 #define ccl_queue_ref(cq) \
@@ -143,6 +155,8 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 /**
  * @brief Alias to ccl_queue_destroy().
  * 
+ * @public @memberof ccl_queue
+ * 
  * @param[in] cq Command queue wrapper object to destroy if reference
  * count is 1, otherwise just decrement the reference count.
  * */
@@ -150,6 +164,8 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 
 /**
  * @brief Get the OpenCL command queue object.
+ * 
+ * @public @memberof ccl_queue
  * 
  * @param[in] cq The command queue wrapper object.
  * @return The OpenCL command queue object.

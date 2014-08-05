@@ -29,13 +29,21 @@
 #include "platforms.h"
 
 /**
- * @brief Object which contains the list of OpenCL platforms available
+ * @brief Class which represents the OpenCL platforms available
  * in the system.
  */
 struct ccl_platforms {
-	/** Platforms available in the system. */
+	
+	/** 
+	 * Platforms available in the system. 
+	 * @private
+	 * */
 	CCLPlatform** platfs;
-	/** Number of platforms available in the system. */
+	
+	/** 
+	 * Number of platforms available in the system. 
+	 * @private
+	 * */
 	cl_uint num_platfs;
 };
 
@@ -47,6 +55,8 @@ struct ccl_platforms {
 /**
  * @brief Creates a new CCLPlatforms* object, which contains the list 
  * of OpenCL platforms available in the system.
+ * 
+ * @public @memberof ccl_platforms
  * 
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
@@ -136,6 +146,8 @@ finish:
  * @brief Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data.
  * 
+ * @public @memberof ccl_platforms
+ * 
  * @param[in] platforms CCLPlatforms* object to destroy.
  * */
 void ccl_platforms_destroy(CCLPlatforms* platforms) {
@@ -161,6 +173,8 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
  * @brief Return number of OpenCL platforms found in CCLPlatforms* 
  * object.
  * 
+ * @public @memberof ccl_platforms
+ * 
  * @param[in] platforms Object containing the OpenCL platforms.
  * @return The number of OpenCL platforms found.
  * */
@@ -175,6 +189,8 @@ cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
 
 /**
  * @brief Get CCL platform wrapper object at given index.
+ * 
+ * @public @memberof ccl_platforms
  * 
  * @param[in] platforms Object containing the OpenCL platforms.
  * @param[in] index Index of platform to return.

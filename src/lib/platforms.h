@@ -45,7 +45,7 @@
  */
 
 /**
- * @brief Object which contains the list of OpenCL platforms available
+ * @brief Class which represents the OpenCL platforms available
  * in the system.
  */
 typedef struct ccl_platforms CCLPlatforms;

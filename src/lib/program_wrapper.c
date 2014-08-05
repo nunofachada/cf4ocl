@@ -28,33 +28,55 @@
 #include "program_wrapper.h"
 
 /**
- * @brief Program wrapper object.
+ * @brief Program wrapper class.
+ * 
+ * @extends ccl_dev_container
  */
 struct ccl_program {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private
+	 * */
 	CCLDevContainer base;
 
-	/** Program binaries. */
+	/** 
+	 * Program binaries. 
+	 * @private
+	 * */
 	GHashTable* binaries;
 	
-	/** Program kernels. */
+	/** 
+	 * Program kernels. 
+	 * @private
+	 * */
 	GHashTable* krnls;
 	
 };
 
+/**
+ * @brief Program binary class.
+ * */
 struct ccl_program_binary {
 	
-	/** Binary data. */
+	/** 
+	 * Binary data. 
+	 * @private
+	 * */
 	unsigned char* data;
 	
-	/** Size of binary data. */
+	/** 
+	 * Size of binary data. 
+	 * @private
+	 * */
 	size_t size;
 };
 
 /**
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
+ * 
+ * @private @memberof ccl_program
  * 
  * @param[in] prg A ::CCLProgram wrapper object.
  * */
@@ -91,6 +113,8 @@ static void ccl_program_release_fields(CCLProgram* prg) {
  * @brief Implementation of ccl_dev_container_get_cldevices() for the
  * program wrapper. 
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
@@ -120,6 +144,8 @@ static CCLWrapperInfo* ccl_program_get_cldevices(
  * clCreateProgramWith*() functions) and then wrap the OpenCL program
  * in a ::CCLProgram wrapper object.
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] program The OpenCL program to be wrapped.
  * @return The ::CCLProgram wrapper for the given OpenCL program.
  * */
@@ -134,6 +160,8 @@ CCLProgram* ccl_program_new_wrap(cl_program program) {
  * @brief Decrements the reference count of the program wrapper object. 
  * If it reaches 0, the program wrapper object is destroyed.
  *
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg The program wrapper object.
  * */
 void ccl_program_destroy(CCLProgram* prg) {
@@ -867,6 +895,8 @@ finish:
 /** 
  * @brief Get ::CCLDevice wrapper at given index. 
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg The program wrapper object.
  * @param[in] index Index of device in program.
  * @param[out] err Return location for a GError, or NULL if error
@@ -883,6 +913,8 @@ CCLDevice* ccl_program_get_device(
 
 /**
  * @brief Return number of devices in program.
+ * 
+ * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[out] err Return location for a GError, or NULL if error
@@ -903,6 +935,8 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
  * This function returns the internal array containing the program
  * device wrappers. As such, clients should not modify the returned 
  * array (e.g. they should not free it directly).
+ * 
+ * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[out] err Return location for a GError, or NULL if error

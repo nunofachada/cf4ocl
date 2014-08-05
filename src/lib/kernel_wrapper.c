@@ -29,14 +29,22 @@
 #include "program_wrapper.h"
 
 /**
- * @brief Kernel wrapper object.
+ * @brief Kernel wrapper class.
+ * 
+ * @extends ccl_wrapper
  */
 struct ccl_kernel {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private 
+	 * */
 	CCLWrapper base;
 	
-	/** Kernel arguments. */
+	/** 
+	 * Kernel arguments. 
+	 * @private
+	 * */
 	GHashTable* args;
 	
 };
@@ -44,6 +52,8 @@ struct ccl_kernel {
 /**
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLKernel wrapper objects.
+ * 
+ * @private @memberof ccl_kernel
  * 
  * @param[in] krnl A ::CCLKernel wrapper object.
  * */
@@ -75,6 +85,8 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
  * clients wish to create the OpenCL kernel directly (using the
  * clCreateKernel() function) and then wrap the OpenCL kernel in a 
  * ::CCLKernel wrapper object.
+ * 
+ * @public @memberof ccl_kernel
  * 
  * @param[in] kernel The OpenCL kernel to be wrapped.
  * @return The ::CCLKernel wrapper for the given OpenCL kernel.
@@ -140,6 +152,8 @@ finish:
  * @brief Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed.
  *
+ * @public @memberof ccl_kernel
+ * 
  * @param[in] krnl The kernel wrapper object.
  * */
 void ccl_kernel_destroy(CCLKernel* krnl) {
@@ -269,6 +283,8 @@ finish:
  * execution of the same kernel function, create multiple instances of 
  * a kernel wrapper for the given kernel function with ccl_kernel_new(),
  * one for each thread.
+ * 
+ * @public @memberof ccl_kernel
  * 
  * @param[in] krnl
  * @param[in] cq

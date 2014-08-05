@@ -28,23 +28,40 @@
 #include "queue_wrapper.h"
 
 /**
- * @brief Command queue wrapper object.
+ * @brief Command queue wrapper class.
+ * 
+ * @extends ccl_wrapper
  */
 struct ccl_queue {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private
+	 * */
 	CCLWrapper base;
 	
-	/** Context wrapper to which the queue is associated with. */
+	/** 
+	 * Context wrapper to which the queue is associated with. 
+	 * @private
+	 * */
 	CCLContext* ctx;
 	
-	/** Device wrapper to which the queue is associated with. */
+	/** 
+	 * Device wrapper to which the queue is associated with. 
+	 * @private
+	 * */
 	CCLDevice* dev;
 	
-	/** Events associated with the command queue. */
+	/** 
+	 * Events associated with the command queue. 
+	 * @private
+	 * */
 	GHashTable* evts;
 	
-	/** Event iterator. */
+	/** 
+	 * Event iterator. 
+	 * @private
+	 * */
 	GHashTableIter evt_iter;
 	
 };
@@ -52,6 +69,8 @@ struct ccl_queue {
 /**
  * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLQueue wrapper objects.
+ * 
+ * @private @memberof ccl_queue
  * 
  * @param[in] cq A ::CCLQueue wrapper object.
  * */
@@ -91,6 +110,8 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
  * clients wish to create the OpenCL command queue directly (using the
  * clCreateCommandQueue() function) and then wrap the OpenCL command 
  * queue in a ::CCLQueue wrapper object.
+ * 
+ * @public @memberof ccl_queue
  * 
  * @param[in] command_queue The OpenCL command queue to be wrapped.
  * @return The ::CCLQueue wrapper for the given OpenCL command queue.
@@ -163,6 +184,8 @@ finish:
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed.
  *
+ * @public @memberof ccl_queue
+ * 
  * @param cq The command queue wrapper object.
  * */
 void ccl_queue_destroy(CCLQueue* cq) {

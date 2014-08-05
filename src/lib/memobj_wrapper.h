@@ -50,10 +50,16 @@
  * */
 typedef struct ccl_memobj {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @protected
+	 * */
 	CCLWrapper base;
 	
-	/** Context wrapper. */
+	/** 
+	 * Context wrapper. 
+	 * @protected
+	 * */
 	CCLContext* ctx;
 	
 } CCLMemObj;

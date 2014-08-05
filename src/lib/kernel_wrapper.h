@@ -49,7 +49,11 @@ typedef struct ccl_program CCLProgram;
  * @{
  */
 
-/** @brief Kernel wrapper object. */
+/**
+ * @brief Kernel wrapper class.
+ * 
+ * @extends ccl_wrapper
+ */
 typedef struct ccl_kernel CCLKernel;
 
 /** @brief Get the kernel wrapper for the given OpenCL kernel. */
@@ -89,6 +93,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /**
  * @brief Get a ::CCLWrapperInfo kernel information object.
  * 
+ * @public @memberof ccl_kernel
+ * 
  * @param krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or NULL if error
@@ -107,6 +113,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -129,6 +137,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_kernel
+ * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -145,6 +155,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 
 /**
  * @brief Get a ::CCLWrapperInfo kernel workgroup information object.
+ * 
+ * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -167,6 +179,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -193,6 +207,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_kernel
+ * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -213,6 +229,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /** 
  * @brief Increase the reference count of the kernel object.
  * 
+ * @public @memberof ccl_kernel
+ * 
  * @param[in] krnl The kernel wrapper object. 
  * */
 #define ccl_kernel_ref(krnl) \
@@ -221,6 +239,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 /**
  * @brief Alias to ccl_kernel_destroy().
  * 
+ * @public @memberof ccl_kernel
+ * 
  * @param[in] krnl Kernel wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
@@ -228,6 +248,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 
 /**
  * @brief Get the OpenCL kernel object.
+ * 
+ * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @return The OpenCL kernel object.

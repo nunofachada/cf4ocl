@@ -47,7 +47,11 @@
  * @{
  */
  
-/** @brief Program wrapper object. */
+/**
+ * @brief Program wrapper class.
+ * 
+ * @extends ccl_dev_container
+ */
 typedef struct ccl_program CCLProgram;
 
 /** @brief Represents a OpenCL binary object. */
@@ -140,6 +144,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * as this macro will return NULL when the CL_PROGRAM_BINARIES parameter 
  * is requested.
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or NULL if error
@@ -161,6 +167,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -189,6 +197,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -208,6 +218,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 /**
  * @brief Get a ::CCLWrapperInfo program build information object.
+ * 
+ * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
@@ -230,6 +242,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
@@ -254,6 +268,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -273,6 +289,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /** 
  * @brief Increase the reference count of the program object.
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg The program wrapper object. 
  * */
 #define ccl_program_ref(prg) \
@@ -281,6 +299,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /**
  * @brief Alias to ccl_program_destroy().
  * 
+ * @public @memberof ccl_program
+ * 
  * @param[in] prg Program wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
@@ -288,6 +308,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 /**
  * @brief Get the OpenCL program object.
+ * 
+ * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @return The OpenCL program object.
