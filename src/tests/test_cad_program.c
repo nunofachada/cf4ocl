@@ -182,72 +182,97 @@ static void program_create_info_destroy_test() {
 #ifndef OPENCL_STUB
 #ifdef CL_VERSION_1_2
 
-	/// @todo Make sure platform is >= 1.2
-
-	/* Get kernel argument information, compare it with expected info. */
-	
+	CCLPlatform* platf = NULL;
+	double platf_ver;
 	cl_kernel_arg_address_qualifier kaaq;
 	char* kernel_arg_type_name;
 	char* kernel_arg_name;
-	
-	/* First kernel argument. */
-	kaaq = ccl_kernel_get_scalar_arg_info(krnl, 0, 
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
-			cl_kernel_arg_address_qualifier, &err);
+
+	/* Get kernel argument information, compare it with expected info. */
+
+	/* Make sure platform is OpenCL >= 1.2 */
+	platf = ccl_context_get_platform(ctx, &err);
 	g_assert_no_error(err);
-	g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	
-	kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 0,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	
+	platf_ver = ccl_platform_get_opencl_version(platf, &err);
 	g_assert_no_error(err);
-	g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	
-	kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 0,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	g_assert_no_error(err);
-	g_assert_cmpstr(kernel_arg_name, ==, "a");
-	
-	/* Second kernel argument. */
-	kaaq = ccl_kernel_get_scalar_arg_info(krnl, 1, 
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
-			cl_kernel_arg_address_qualifier, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	
-	kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 1,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	g_assert_no_error(err);
-	g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	
-	kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 1,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	g_assert_no_error(err);
-	//~ g_assert_cmpstr(kernel_arg_name, ==, "b");
-	
-	/* Third kernel argument. */
-	kaaq = ccl_kernel_get_scalar_arg_info(krnl, 2, 
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
-			cl_kernel_arg_address_qualifier, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	
-	kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 2,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	g_assert_no_error(err);
-	g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	
-	kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 2,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	g_assert_no_error(err);
-	//~ g_assert_cmpstr(kernel_arg_name, ==, "c");
-	
-	/* Bogus request, should return NULL and should raise an error. */
-	kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 0,
-		0 /* invalid value */, char*, &err);
-	g_assert(kernel_arg_type_name == NULL);
-	g_assert_error(err, CCL_ERROR, CCL_ERROR_OCL);
-	g_clear_error(&err);
+	if (platf_ver >= 1.2) {
+		
+		/* First kernel argument. */
+		kaaq = ccl_kernel_get_scalar_arg_info(krnl, 0, 
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
+				cl_kernel_arg_address_qualifier, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		
+		kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 0,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		
+		kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 0,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_name, ==, "a");
+		
+		/* Second kernel argument. */
+		kaaq = ccl_kernel_get_scalar_arg_info(krnl, 1, 
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
+				cl_kernel_arg_address_qualifier, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		
+		kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 1,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		
+		kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 1,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_name, ==, "b");
+		
+		/* Third kernel argument. */
+		kaaq = ccl_kernel_get_scalar_arg_info(krnl, 2, 
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
+				cl_kernel_arg_address_qualifier, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		
+		kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 2,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		
+		kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 2,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_name, ==, "c");
+		
+		/* Fourth kernel argument. */
+		kaaq = ccl_kernel_get_scalar_arg_info(krnl, 3, 
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER, 
+				cl_kernel_arg_address_qualifier, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
+		
+		kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 3,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
+		
+		kernel_arg_name = ccl_kernel_get_array_arg_info(krnl, 3,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert_no_error(err);
+		g_assert_cmpstr(kernel_arg_name, ==, "d");
+
+		/* Bogus request, should return NULL and should raise an error. */
+		kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 0,
+			0 /* invalid value */, char*, &err);
+		g_assert(kernel_arg_type_name == NULL);
+		g_assert_error(err, CCL_ERROR, CCL_ERROR_OCL);
+		g_clear_error(&err);
+	}
 
 #endif
 #endif
