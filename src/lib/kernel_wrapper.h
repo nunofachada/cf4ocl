@@ -226,6 +226,67 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 		(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, err)
 
+#ifdef CL_VERSION_1_2
+
+/** @brief Get a ::CCLWrapperInfo kernel argument information object. */
+CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx, 
+	cl_kernel_arg_info param_name, GError** err);
+
+/** 
+ * @brief Macro which returns a scalar kernel argument information 
+ * value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_kernel
+ * 
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] idx Argument index.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return The requested kernel argument information value. This value 
+ * will be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, zero is returned.
+ * */
+#define ccl_kernel_get_scalar_arg_info(krnl, idx, param_name, \
+	param_type, err) \
+	(param_type) \
+	((ccl_kernel_get_arg_info(krnl, idx, param_name, err) != NULL) \
+	? **((param_type**) ccl_kernel_get_arg_info(krnl, idx, param_name, err)) \
+	: 0)
+	
+/** 
+ * @brief Macro which returns an array kernel argument information 
+ * value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_kernel
+ * 
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] idx Argument index.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return The requested kernel argument information value. This value 
+ * will be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define ccl_kernel_get_array_arg_info(krnl, idx, param_name, \
+	param_type, err) \
+	(ccl_kernel_get_arg_info(krnl, idx, param_name, err) != NULL) \
+	? *((param_type*) ccl_kernel_get_arg_info(krnl, idx, param_name, err)) \
+	: NULL
+
+#endif /* OpenCL >=1.2 */
+
 /** 
  * @brief Increase the reference count of the kernel object.
  * 

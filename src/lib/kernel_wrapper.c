@@ -361,5 +361,63 @@ finish:
 	
 }
 
+#ifdef CL_VERSION_1_2
+
+/**
+ * @brief Kernel argument information adapter between a
+ * ccl_wrapper_info_fp() function and the clGetKernelArgInfo()
+ * function.
+ * 
+ * @param[in] kernel The kernel wrapper object.
+ * @param[in] ptr_arg_indx The kernel argument index, stuffed in a 
+ * pointer.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[in] param_value_size Size in bytes of memory pointed to by p
+ * aram_value.
+ * @param[out] param_value A pointer to memory where the appropriate 
+ * result being queried is returned.
+ * @param[out] param_value_size_ret Returns the actual size in bytes of 
+ * data copied to param_value.
+ * @return CL_SUCCESS if the function is executed successfully, or an
+ * OpenCL error code otherwise.
+ * */
+static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
+	void* ptr_arg_indx, cl_kernel_arg_info param_name, 
+	size_t param_value_size, void *param_value, 
+	size_t* param_value_size_ret) {
+	
+	return clGetKernelArgInfo(kernel, GPOINTER_TO_UINT(ptr_arg_indx),
+		param_name, param_value_size, param_value, param_value_size_ret);
+}
+
+/**
+ * @brief Get a ::CCLWrapperInfo kernel argument information object.
+ * 
+ * @public @memberof ccl_kernel
+ * 
+ * @param[in] krnl The kernel wrapper object.
+ * @param[in] idx Argument index.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return The requested kernel argument information object. This 
+ * object will be automatically freed when the kernel wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx, 
+	cl_kernel_arg_info param_name, GError** err) {
+	
+	CCLWrapper fake_wrapper;
+	
+	fake_wrapper.cl_object = GUINT_TO_POINTER(idx);
+	
+	return ccl_wrapper_get_info(
+		(CCLWrapper*) krnl, &fake_wrapper, param_name,
+		(ccl_wrapper_info_fp) ccl_kernel_get_arg_info_adapter, 
+		CL_TRUE, err);
+}
+
+#endif /* OpenCL >=1.2 */
+
 /** @} */
 

@@ -111,3 +111,20 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 	return status;
 
 }
+
+CL_API_ENTRY cl_int CL_API_CALL
+clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
+	cl_kernel_arg_info param_name, size_t param_value_size,
+	void* param_value, size_t* param_value_size_ret) 
+	CL_API_SUFFIX__VERSION_1_2 {
+		
+	kernel = kernel;
+	arg_indx = arg_indx;
+	param_name = param_name;
+	param_value_size = param_value_size;
+	param_value = param_value;
+	param_value_size_ret = param_value_size_ret;
+
+	return CL_INVALID_VALUE;
+
+}
