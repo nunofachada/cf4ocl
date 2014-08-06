@@ -305,6 +305,9 @@ void ccl_context_destroy(CCLContext* ctx);
  * */
 #define ccl_context_unwrap(ctx) \
 	((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
+	
+/** @brief Get the platform associated with the context devices. */
+CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
 
 /** @brief Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_context_get_device(

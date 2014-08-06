@@ -44,7 +44,7 @@ struct ccl_context {
 	 * Platform (can be lazy initialized). 
 	 * @private
 	 * */
-	CCLPlatform* platform;
+	CCLPlatform* platf;
 		
 };
 
@@ -65,8 +65,8 @@ static void ccl_context_release_fields(CCLContext* ctx) {
 	ccl_dev_container_release_devices((CCLDevContainer*) ctx);
 
 	/* Release platform. */
-	if (ctx->platform) {
-		ccl_platform_unref(ctx->platform);
+	if (ctx->platf) {
+		ccl_platform_unref(ctx->platf);
 	}
 }
 
@@ -498,6 +498,58 @@ void ccl_context_destroy(CCLContext* ctx) {
 		(ccl_wrapper_release_fields) ccl_context_release_fields, 
 		(ccl_wrapper_release_cl_object) clReleaseContext, NULL); 
 
+}
+
+/** 
+ * @brief Get the platform associated with the context devices. 
+ * 
+ * @public @memberof ccl_context
+ * 
+ * @param[in] ctx The context wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return The ::CCLPlatform wrapper associated with the context 
+ * devices or NULL if an error occurs.
+ * */
+CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err) {
+
+	/* Make sure context is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	CCLPlatform* platf = NULL;
+	CCLDevice* dev;
+	GError* err_internal = NULL;
+	
+	/* Check if platform wrapper already in context object. */
+	if (ctx->platf != NULL) {
+		/* Yes, use it. */
+		platf = ctx->platf;
+	} else {
+		/* Get platform using device. */
+		dev = ccl_context_get_device(ctx, 0, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		platf = ccl_platform_new_from_device(dev, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		/* Keep platform. */
+		ctx->platf = platf;
+	}
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:	
+
+	/* Return platform wrapper. */
+	return platf;
+	
 }
 
 /**
