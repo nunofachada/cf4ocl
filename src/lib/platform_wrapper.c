@@ -208,6 +208,28 @@ void ccl_platform_destroy(CCLPlatform* platf) {
 }
 
 /** 
+ * @brief Get numeric OpenCL version of platform. 
+ * 
+ * @param[in] platf The platform wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return OpenCL version of platform in numeric format. If an error
+ * occurs, 0 is returned.
+ * */
+double ccl_platform_get_opencl_version(
+	CCLPlatform* platf, GError** err) {
+
+	char* ver_str;
+	
+	/* Get version string which has the format "OpenCL x.x ..." */
+	ver_str = ccl_platform_get_info_string(
+		platf, CL_PLATFORM_VERSION, err);
+		
+	/* strlen("OpenCL ") == 7 */
+	return (ver_str != NULL) ? atof(ver_str + 7) : 0.0;
+}
+
+/** 
  * @brief Get all device wrappers in platform. 
  * 
  * This function returns the internal array containing the platform

@@ -63,6 +63,10 @@ CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err);
  * object. If it reaches 0, the platform wrapper object is destroyed. */
 void ccl_platform_destroy(CCLPlatform* platf);
 
+/** @brief Get numeric OpenCL version of platform. */
+double ccl_platform_get_opencl_version(
+	CCLPlatform* platf, GError** err);
+
 /**
  * @brief Get a ::CCLWrapperInfo platform information object.
  * 
