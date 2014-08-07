@@ -954,7 +954,13 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 
 /** @}*/
 
-/// @todo Can these be static?
+/** 
+ * @class ccl_program_binary
+ * @todo Can ccl_program_binary_new() and ccl_program_binary_destroy()
+ * be static? These functions will probably only be used by ccl_program
+ * methods. The same can be said of the ::CCLProgramBinary class itself.
+ * */
+ 
 CCLProgramBinary* ccl_program_binary_new(
 	unsigned char* data, size_t size) {
 		

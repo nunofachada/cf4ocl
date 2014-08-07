@@ -95,14 +95,19 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
 	
-//~ CCLEvent* ccl_kernel_enqueue_native_full(CCLQueue* cq, 
-	//~ void (CL_CALLBACK *user_func)(void *), void *args, size_t cb_args,
- 	//~ cl_uint num_mem_objects,
- 	//~ const cl_mem *mem_list,
- 	//~ const void **args_mem_loc,
- 	//~ cl_uint num_events_in_wait_list,
- 	//~ const cl_event *event_wait_list,
- 	//~ cl_event *event) )
+
+/**
+ * @class ccl_kernel
+ * @todo Wrapper function for clEnqueueNativeKernel(). A possible header 
+ * for such wrapper function could be: 
+ * @code CCLEvent* ccl_kernel_enqueue_native_full(CCLQueue* cq, 
+ *     void (CL_CALLBACK *user_func)(void *), CCLKernelNativeArgs args,
+ *     CCLEventWaitList* evt_wait_lst, GError** err); @endcode
+ * Some links regarding the use of clEnqueueNativeKernel():
+ * * http://steckdenis.wordpress.com/2011/06/18/use-opencl-to-execute-native-kernels/
+ * * http://stackoverflow.com/questions/10140494/using-clenqueuenativekernel-in-opencl
+ * * https://github.com/pcpratts/gcc_opencl/blob/master/example.c 
+ * */
 
 /**
  * @brief Get a ::CCLWrapperInfo kernel information object.
