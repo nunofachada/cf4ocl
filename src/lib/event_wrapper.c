@@ -26,6 +26,7 @@
  * */
 
 #include "event_wrapper.h"
+#include "queue_wrapper.h"
 
 /** 
  * Event wrapper class. 
@@ -347,15 +348,15 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
  * @param[in] evt_wait_lst Event wait list.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
- * @return The status of the clWaitForEvents() OpenCL function or
- * CL_INT_MAX if an error occurs.
+ * @return CL_TRUE if operation is successful, or CL_FALSE otherwise.
  * */ 
-cl_int ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
+cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
 	cl_int ocl_status;
+	cl_bool ret_status;
 	
 	ocl_status = clWaitForEvents(
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
@@ -370,17 +371,312 @@ cl_int ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
 		
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
+	ret_status = CL_TRUE;
 	goto finish;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
+	ret_status = CL_FALSE;
+
+finish:
+	
+	/* Return status. */
+	return ret_status;
+
+}
+
+
+
+
+static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq, 
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+		
+	/* OpenCL status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	
+	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	
+	/* Exact OpenCL function to use depends on whether evt_wait_lst 
+	 * is NULL or empty. */
+	if ((evt_wait_lst == NULL) || 
+		(ccl_event_wait_list_get_num_events(evt_wait_lst) == 0)) {
+		
+		/* If so, use clEnqueueBarrier() */
+		ocl_status = clEnqueueBarrier(ccl_queue_unwrap(cq));
+		gef_if_err_create_goto(*err, CCL_ERROR, 
+			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+			"%s: error in clEnqueueBarrier() (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	} else {
+		
+		/* Otherwise use clEnqueueWaitForEvents(). */
+		ocl_status = clEnqueueWaitForEvents(ccl_queue_unwrap(cq),
+			ccl_event_wait_list_get_num_events(evt_wait_lst),
+			ccl_event_wait_list_get_clevents(evt_wait_lst));
+		gef_if_err_create_goto(*err, CCL_ERROR, 
+			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+			"%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	}
+
+	/* Enqueue a marker so we get an OpenCL event object. */
+	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
+	gef_if_err_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+
+	G_GNUC_END_IGNORE_DEPRECATIONS
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+	/* In case of error, return a NULL event. */
+	event = NULL;
+
+finish:
+	
+	/* Return OpenCL event. */
+	return event;	
+		
+}
+
+
+CCLEvent* ccl_enqueue_barrier(CCLQueue* cq, 
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL status. */
+	cl_int ocl_status;
+	/* Event wrapper to return. */
+	CCLEvent* evt;
+	/* OpenCL event object. */
+	cl_event event;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+#ifdef CL_VERSION_1_2
+
+	/* If library is compiled with support for OpenCL >= 1.2, then use
+	 * the platform's OpenCL version for selecting the desired 
+	 * functionality. */
+	CCLContext* ctx;
+	CCLPlatform* platf;
+	double platf_ver;
+	
+	/* Get platform version. */
+	ctx = ccl_queue_get_context(cq, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	platf = ccl_context_get_platform(ctx, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	platf_ver = ccl_platform_get_opencl_version(platf, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Proceed depending on platform version. */
+	if (platf_ver >= 1.2) {
+		
+		/* Use "new" functions. */
+		ocl_status = clEnqueueBarrierWithWaitList(ccl_queue_unwrap(cq),
+			ccl_event_wait_list_get_num_events(evt_wait_lst),
+			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+		gef_if_err_create_goto(*err, CCL_ERROR, 
+			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+			"%s: error in clEnqueueBarrierWithWaitList() (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	} else {
+		
+		/* Use "old" functions. */
+		event = ccl_enqueue_barrier_deprecated(
+			cq, evt_wait_lst,  &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+	}
+	
+#else
+
+	/* If library is compiled with support for OpenCL 1.0 and 1.1,
+	 * then use those functions by default. */
+	event = ccl_enqueue_barrier_deprecated(
+		cq, evt_wait_lst,  &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+#endif
+
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* In case of error, return NULL. */
+	evt = NULL;
 
 finish:
 	
 	/* Return event. */
-	return ocl_status;
+	return evt;
 
 }
+
+static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq, 
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+		
+	/* OpenCL status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	
+	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	
+	/* evt_wait_lst must be NULL or empty, because getting a marker to
+	 * wait on some events is only supported in OpenCL >= 1.2. */
+	gef_if_err_create_goto(*err, CCL_ERROR, 
+		evt_wait_lst != NULL, CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: The selected platform OpenCL version doesn't support markers on specific events.",
+		G_STRLOC);
+	 
+	/* Call clEnqueueMarker() once. */
+	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
+	gef_if_err_create_goto(*err, CCL_ERROR, 
+		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+
+	G_GNUC_END_IGNORE_DEPRECATIONS
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+	/* In case of error, return a NULL event. */
+	event = NULL;
+
+finish:
+	
+	/* Return OpenCL event. */
+	return event;	
+		
+}
+
+CCLEvent* ccl_enqueue_marker(CCLQueue* cq, 
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL status. */
+	cl_int ocl_status;
+	/* Event wrapper to return. */
+	CCLEvent* evt;
+	/* OpenCL event object. */
+	cl_event event;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+#ifdef CL_VERSION_1_2
+
+	/* If library is compiled with support for OpenCL >= 1.2, then use
+	 * the platform's OpenCL version for selecting the desired 
+	 * functionality. */
+	CCLContext* ctx;
+	CCLPlatform* platf;
+	double platf_ver;
+	
+	/* Get platform version. */
+	ctx = ccl_queue_get_context(cq, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	platf = ccl_context_get_platform(ctx, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	platf_ver = ccl_platform_get_opencl_version(platf, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Proceed depending on platform version. */
+	if (platf_ver >= 1.2) {
+		
+		/* Use "new" functions. */
+		ocl_status = clEnqueueMarkerWithWaitList(ccl_queue_unwrap(cq),
+			ccl_event_wait_list_get_num_events(evt_wait_lst),
+			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+		gef_if_err_create_goto(*err, CCL_ERROR, 
+			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+			"%s: error in clEnqueueMarkerWithWaitList() (OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	} else {
+		
+		/* Use "old" functions. */
+		event = ccl_enqueue_marker_deprecated(
+			cq, evt_wait_lst, &err_internal);
+		gef_if_err_propagate_goto(err, err_internal, error_handler);
+	}
+	
+#else
+
+	/* If library is compiled with support for OpenCL 1.0 and 1.1,
+	 * then use those functions by default. */
+	event = ccl_enqueue_marker_deprecated(
+		cq, evt_wait_lst, &err_internal);
+	gef_if_err_propagate_goto(err, err_internal, error_handler);
+
+#endif	
+
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* In case of error, return NULL. */
+	evt = NULL;
+
+finish:
+	
+	/* Return event. */
+	return evt;
+
+}
+
 
 /** @} */

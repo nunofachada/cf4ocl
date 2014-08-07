@@ -53,8 +53,11 @@ typedef enum ccl_error_code {
 	CCL_ERROR_STREAM_WRITE     = 4,
 	/** The requested OpenCL device was not found. */
 	CCL_ERROR_DEVICE_NOT_FOUND = 5,
+	/** The operation is not supported by the version of the
+	 * selected OpenCL platform. */
+	CCL_ERROR_UNSUPPORTED_OCL  = 6,
 	/** OpenCL error. */
-	CCL_ERROR_OCL              = 6,
+	CCL_ERROR_OCL              = 7,
 	/** Any other errors. */
 	CCL_ERROR_OTHER            = 15
 } CCLErrorCode;

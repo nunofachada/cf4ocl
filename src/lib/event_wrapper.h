@@ -32,6 +32,9 @@
 #include "oclversions.h"
 #include "abstract_wrapper.h"
 
+/* Forward declaration of CLLQueue. */
+typedef struct ccl_queue CCLQueue;
+
 /**
  * @defgroup EVENT_WRAPPER Event wrapper
  *
@@ -257,7 +260,13 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 /** Waits on the host thread for commands identified by events 
  * in the wait list to complete. This function is a wrapper for the
  * clWaitForEvents() OpenCL function. */ 
-cl_int ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
+cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
+
+CCLEvent* ccl_enqueue_barrier(CCLQueue* cq, 
+	CCLEventWaitList* evt_wait_lst, GError** err);
+	
+CCLEvent* ccl_enqueue_marker(CCLQueue* cq, 
+	CCLEventWaitList* evt_wait_lst, GError** err);
 
 /** @} */
 
