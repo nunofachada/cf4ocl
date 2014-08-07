@@ -142,7 +142,7 @@ finish:
 
 CCLEvent* ccl_buffer_enqueue_read(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
-	CCLEventWaitList evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -192,7 +192,7 @@ finish:
 
 CCLEvent* ccl_buffer_enqueue_write(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
- 	CCLEventWaitList evt_wait_lst, GError** err) {
+ 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -242,7 +242,7 @@ finish:
 
 void* ccl_buffer_enqueue_map(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
-	size_t size, CCLEventWaitList evt_wait_lst, CCLEvent** evt,
+	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
 	GError** err) {
 
 	/* Make sure cq is not NULL. */
@@ -298,7 +298,7 @@ finish:
 
 CCLEvent* ccl_buffer_enqueue_copy(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, size_t src_offset, size_t dst_offset, 
-	size_t size, CCLEventWaitList evt_wait_lst, GError** err) {
+	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -351,7 +351,7 @@ finish:
 	
 CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLImage* dst_img, size_t src_offset, const size_t *dst_origin,
-	const size_t *region, CCLEventWaitList evt_wait_lst, GError** err) {
+	const size_t *region, CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -420,7 +420,7 @@ finish:
 	//~ const size_t* host_origin, const size_t* region, 
 	//~ size_t buffer_row_pitch, size_t buffer_slice_pitch, 
 	//~ size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
-	//~ CCLEventWaitList evt_wait_lst, GError** err) {
+	//~ CCLEventWaitList* evt_wait_lst, GError** err) {
 //~ 
 	//~ /* Make sure cq is not NULL. */
 	//~ g_return_val_if_fail(cq != NULL, NULL);
@@ -436,7 +436,7 @@ finish:
 	//~ const size_t* host_origin, const size_t* region, 
 	//~ size_t buffer_row_pitch, size_t buffer_slice_pitch, 
 	//~ size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
-	//~ CCLEventWaitList evt_wait_lst, GError** err) {
+	//~ CCLEventWaitList* evt_wait_lst, GError** err) {
 //~ 
 	//~ /* Make sure cq is not NULL. */
 	//~ g_return_val_if_fail(cq != NULL, NULL);
@@ -452,7 +452,7 @@ finish:
 	//~ CCLBuffer* dst_buf, const size_t *src_origin, 
 	//~ const size_t *dst_origin, const size_t *region, 
 	//~ size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
-	//~ size_t dst_slice_pitch, CCLEventWaitList evt_wait_lst, 
+	//~ size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst, 
 	//~ GError** err) {
 //~ 
 	//~ /* Make sure cq is not NULL. */
@@ -473,7 +473,7 @@ finish:
 //~ 
 //~ CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf, 
 	//~ const void *pattern, size_t pattern_size, size_t offset, 
-	//~ size_t size, CCLEventWaitList evt_wait_lst, GError** err) {
+	//~ size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
 //~ 
 	//~ /* Make sure cq is not NULL. */
 	//~ g_return_val_if_fail(cq != NULL, NULL);

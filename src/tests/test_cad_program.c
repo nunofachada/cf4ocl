@@ -81,7 +81,7 @@ static void program_create_info_destroy_test() {
 	CCLEvent* evt_w2;
 	CCLEvent* evt_kr;
 	CCLEvent* evt_r1;
-	CCLEventWaitList ewl;
+	CCLEventWaitList ewl = NULL;
 	GError* err = NULL;
 	gchar* tmp_dir_name;
 	gchar* tmp_file_prefix;
@@ -365,32 +365,31 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Initialize event wait list and add the two transfer events. */
-	ewl = ccl_event_wait_list_new();
-	ccl_event_wait_list_add(ewl, evt_w1);
-	ccl_event_wait_list_add(ewl, evt_w2);
+	ccl_event_wait_list_add(&ewl, evt_w1);
+	ccl_event_wait_list_add(&ewl, evt_w2);
 	
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
 	evt_kr = ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL, &gws, &lws, 
-		ewl, &err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
+		&ewl, &err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
 	/* Add the kernel termination event to the wait list. */
-	ccl_event_wait_list_add(ewl, evt_kr);
+	ccl_event_wait_list_add(&ewl, evt_kr);
 	
 	/* Read back results from host, waiting for the kernel termination
 	 * event (this will empty the event wait list) without waiting for 
 	 * transfer to terminate before continuing host program.. */
 	evt_r1 = ccl_buffer_enqueue_read(cq, c_w, CL_FALSE, 0, 
-		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, ewl, &err);
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, &ewl, &err);
 	g_assert_no_error(err);
 	
 	/* Add read back results event to wait list. */
-	ccl_event_wait_list_add(ewl, evt_r1);
+	ccl_event_wait_list_add(&ewl, evt_r1);
 	
 	/* Wait for all events in wait list to terminate (this will empty
 	 * the wait list). */
-	ccl_event_wait(ewl, &err);
+	ccl_event_wait(&ewl, &err);
 	g_assert_no_error(err);
 	
 #ifndef OPENCL_STUB
@@ -400,9 +399,6 @@ static void program_create_info_destroy_test() {
 		g_debug("c_h[%d] = %d\n", i, c_h[i]);
 	}
 #endif
-
-	/* Destroy the event wait list. */
-	ccl_event_wait_list_destroy(ewl);
 
 	/* Destroy the memory objects. */
 	ccl_buffer_destroy(a_w);

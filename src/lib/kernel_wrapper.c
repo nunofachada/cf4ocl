@@ -201,7 +201,7 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, GError** err) {
 		
 	/* Make sure number krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -301,7 +301,7 @@ finish:
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err, ...) {
+	CCLEventWaitList* evt_wait_lst, GError** err, ...) {
 
 	/* Event wrapper. */
 	CCLEvent* evt;
@@ -324,7 +324,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err, va_list args) {
+	CCLEventWaitList* evt_wait_lst, GError** err, va_list args) {
 
 	/* Make sure number krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);

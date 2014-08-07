@@ -121,13 +121,13 @@ CCLKernel* ccl_program_get_kernel(
 CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg, const char* kernel_name,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err, ...)
+	CCLEventWaitList* evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
 CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg, const char* kernel_name,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err, va_list args);
+	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
 	
 CCLProgramBinary* ccl_program_get_binary(CCLProgram* prg, CCLDevice* dev,
 	GError** err);

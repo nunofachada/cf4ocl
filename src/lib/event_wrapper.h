@@ -236,34 +236,28 @@ cl_command_type ccl_event_get_command_type(
 
 typedef GPtrArray* CCLEventWaitList;
 
-#define ccl_event_wait_list_new() \
-	g_ptr_array_new()
+void ccl_event_wait_list_add(
+	CCLEventWaitList* evt_wait_lst, CCLEvent* evt);
 	
-#define ccl_event_wait_list_add(evt_wait_lst, evt) \
-	g_ptr_array_add(evt_wait_lst, (void*) ccl_event_unwrap(evt))
+void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 #define ccl_event_wait_list_get_num_events(evt_wait_lst) \
-	((evt_wait_lst != NULL) ? evt_wait_lst->len : 0)
+	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
+	? (*(evt_wait_lst))->len \
+	: 0)
 	
 #define ccl_event_wait_list_get_clevents(evt_wait_lst) \
-	((evt_wait_lst != NULL) \
-		? (const cl_event*) evt_wait_lst->pdata \
+	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
+		? (const cl_event*) (*(evt_wait_lst))->pdata \
 		: NULL)
-	
-#define ccl_event_wait_list_clear(evt_wait_lst) \
-	if (evt_wait_lst != NULL) \
-		g_ptr_array_remove_range( \
-			evt_wait_lst, 0, evt_wait_lst->len)
-	
-#define ccl_event_wait_list_destroy(evt_wait_lst) \
-	g_ptr_array_free(evt_wait_lst, TRUE)
+
 
 /** @} */
 
 /** @brief Waits on the host thread for commands identified by events 
  * in the wait list to complete. This function is a wrapper for the
  * clWaitForEvents() OpenCL function. */ 
-cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err);
+cl_int ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
 
 /** @} */
 

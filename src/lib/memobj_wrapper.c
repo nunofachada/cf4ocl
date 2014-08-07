@@ -52,7 +52,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  */
 
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq, 
-	void* mapped_ptr, CCLEventWaitList evt_wait_lst, GError** err) {
+	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -109,7 +109,7 @@ finish:
 
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags, 
- 	CCLEventWaitList evt_wait_lst, GError** err) {
+ 	CCLEventWaitList* evt_wait_lst, GError** err) {
 		
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);

@@ -598,7 +598,7 @@ finish:
 CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg, const char* kernel_name,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err, ...) {
+	CCLEventWaitList* evt_wait_lst, GError** err, ...) {
 
 	CCLEvent* evt;
 	va_list args;
@@ -614,7 +614,7 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg, const char* kernel_name,
 CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg, const char* kernel_name,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList evt_wait_lst, GError** err, va_list args) {
+	CCLEventWaitList* evt_wait_lst, GError** err, va_list args) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);

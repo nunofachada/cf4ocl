@@ -316,6 +316,29 @@ cl_command_type ccl_event_get_command_type(
 	return ct;
 }
 
+void ccl_event_wait_list_add(
+	CCLEventWaitList* evt_wait_lst, CCLEvent* evt) {
+		
+	/* Check that evt_wait_lst is not NULL. */
+	g_return_if_fail(evt_wait_lst != NULL);
+
+	/* Initialize list if required. */
+	if (*evt_wait_lst == NULL)
+		*evt_wait_lst = g_ptr_array_new();
+	
+	/* Add wrapped cl_event to array. */
+	g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evt));
+
+}
+
+void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
+	
+	if ((evt_wait_lst != NULL) && (*evt_wait_lst != NULL)) {
+		g_ptr_array_free(*evt_wait_lst, TRUE);
+		*evt_wait_lst = NULL;
+	}
+}
+
 /**
  * @brief Waits on the host thread for commands identified by events 
  * in the wait list to complete. This function is a wrapper for the
@@ -327,7 +350,7 @@ cl_command_type ccl_event_get_command_type(
  * @return The status of the clWaitForEvents() OpenCL function or
  * CL_INT_MAX if an error occurs.
  * */ 
-cl_int ccl_event_wait(CCLEventWaitList evt_wait_lst, GError** err) {
+cl_int ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
 	
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
