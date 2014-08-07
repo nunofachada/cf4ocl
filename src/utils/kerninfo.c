@@ -36,8 +36,7 @@
  * @return ::CCL_SUCCESS if program returns with no error, or another 
  * ::CCLErrorCode value otherwise.
  * */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
 	/* ***************** */	
 	/* Program variables */
@@ -111,6 +110,8 @@ int main(int argc, char *argv[])
 	g_printf("     Maximum workgroup size                  : %lu\n", 
 		(unsigned long) ccl_info_scalar(info, size_t));
 
+	/** @todo Check that platform is >= OpenCL 1.1 before 
+	 * querying for CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE. */
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
 	gef_if_err_goto(err, error_handler);

@@ -368,6 +368,8 @@ finish:
  * ccl_wrapper_info_fp() function and the clGetKernelArgInfo()
  * function.
  * 
+ * @see ccl_wrapper_info_fp()
+ * 
  * @param[in] kernel The kernel wrapper object.
  * @param[in] ptr_arg_indx The kernel argument index, stuffed in a 
  * pointer.
@@ -394,6 +396,8 @@ static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
  * @brief Get a ::CCLWrapperInfo kernel argument information object.
  * 
  * @public @memberof ccl_kernel
+ * @see ccl_wrapper_get_info()
+ * @note OpenCL >= 1.2
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
