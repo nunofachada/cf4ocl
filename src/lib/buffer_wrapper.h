@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL buffer wrapper.
+ * OpenCL buffer wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -34,7 +34,7 @@
 /**
  * @defgroup BUFFER_WRAPPER Buffer wrapper
  *
- * @brief A wrapper object for OpenCL buffers and functions to manage 
+ * A wrapper object for OpenCL buffers and functions to manage 
  * them.
  * 
  * Todo: detailed description of module with code examples.
@@ -43,25 +43,25 @@
  */
 
 /** 
- * @brief Buffer wrapper class
+ * Buffer wrapper class
  * 
  * @extends ccl_memobj
  * */
 typedef struct ccl_buffer CCLBuffer;
 
-/** @brief Create a ::CCLBuffer wrapper object. */
+/** Create a ::CCLBuffer wrapper object. */
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	size_t size, void *host_ptr, GError** err);
 	
-/** @brief Get the buffer wrapper for the given OpenCL buffer. */
+/** Get the buffer wrapper for the given OpenCL buffer. */
 CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object);
 
-/** @brief Decrements the reference count of the wrapper object. If it 
+/** Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed. */
 void ccl_buffer_destroy(CCLBuffer* buf);
 
 /**
- * @brief Alias to ccl_buffer_destroy().
+ * Alias to ccl_buffer_destroy().
  * 
  * @public @memberof ccl_buffer
  *  
@@ -125,9 +125,6 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf,
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);
 
 #endif
-
-/// @todo We can emulate the OpenCL>1.0 functions if not available in
-/// OpenCL
 
 /** @} */
 

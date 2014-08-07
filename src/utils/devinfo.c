@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Utility to query OpenCL platforms and devices.
+ * Utility to query OpenCL platforms and devices.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -72,7 +72,7 @@ static gchar* basic_info[] = {
 };
 
 /**
- * @brief Device info main program function.
+ * Device info main program function.
  * 
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Vector of command line arguments.
@@ -213,7 +213,7 @@ cleanup:
 }
 
 /**
- * @brief Parse and verify command line arguments.
+ * Parse and verify command line arguments.
  * 
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -258,7 +258,7 @@ cleanup:
 }
 
 /**
- * @brief Show platform information.
+ * Show platform information.
  * 
  * @param[in] p Platform wrapper object.
  * @param[in] idx Platform index.
@@ -322,7 +322,7 @@ void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
 	
 
 /**
- * @brief Show all available device information.
+ * Show all available device information.
  * 
  * @param[in] d Device wrapper object.
  * */
@@ -374,7 +374,7 @@ void ccl_device_query_show_device_info_all(CCLDevice* d) {
 }
 
 /**
- * @brief Show user specified device information.
+ * Show user specified device information.
  * 
  * @param[in] d Device wrapper object.
  * */
@@ -458,7 +458,7 @@ void ccl_device_query_show_device_info_custom(CCLDevice* d) {
 }
 
 /**
- * @brief Show basic device information.
+ * Show basic device information.
  * 
  * @param[in] d Device wrapper object.
  * */

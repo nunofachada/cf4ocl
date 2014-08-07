@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL program stub functions.
+ * OpenCL program stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief OpenCL context wrapper.
+ * OpenCL context wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "context_wrapper.h"
 
 /**
- * @brief The context wrapper class.
+ * The context wrapper class.
  * 
  * @extends ccl_dev_container
  * */
@@ -49,7 +49,7 @@ struct ccl_context {
 };
 
 /**
- * @brief Implementation of ccl_wrapper_release_fields() function for
+ * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLContext wrapper objects.
  * 
  * @private @memberof ccl_context
@@ -71,7 +71,7 @@ static void ccl_context_release_fields(CCLContext* ctx) {
 }
 
 /**
- * @brief Free the default context properties if required.
+ * Free the default context properties if required.
  * 
  * @private @memberof ccl_context
  * 
@@ -85,7 +85,7 @@ static void ccl_context_release_fields(CCLContext* ctx) {
 		g_slice_free1(3 * sizeof(cl_context_properties), ctx_props)
 
 /**
- * @brief Create a default context properties object, if required. The 
+ * Create a default context properties object, if required. The 
  * only property set in the default properties object is the OpenCL 
  * cl_platform_id object.
  * 
@@ -161,7 +161,7 @@ finish:
 }
 
 /** 
- * @brief Implementation of ccl_dev_container_get_cldevices() for the
+ * Implementation of ccl_dev_container_get_cldevices() for the
  * context wrapper. 
  * 
  * @private @memberof ccl_context
@@ -185,7 +185,7 @@ static CCLWrapperInfo* ccl_context_get_cldevices(
  */
 
 /**
- * @brief Get the context wrapper for the given OpenCL context.
+ * Get the context wrapper for the given OpenCL context.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -209,7 +209,7 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
 }
 
 /**
- * @brief Create a new context wrapper object selecting devices using 
+ * Create a new context wrapper object selecting devices using 
  * the given set of filters. 
  * 
  * This function accepts all the parameters required for the 
@@ -287,7 +287,7 @@ finish:
 }
 
 /** 
- * @brief Creates a context wrapper given an array of ::CCLDevice 
+ * Creates a context wrapper given an array of ::CCLDevice 
  * wrappers and the remaining parameters required by the 
  * clCreateContext function. 
  * 
@@ -377,7 +377,7 @@ finish:
 }
 
 /** 
- * @brief Creates a context wrapper using one independent device filter 
+ * Creates a context wrapper using one independent device filter 
  * specified in the function parameters.
  * 
  * The first device accepted by the given filter is used. More 
@@ -436,7 +436,7 @@ finish:
 }
 
 /** 
- * @brief Creates a context wrapper using a device which the user 
+ * Creates a context wrapper using a device which the user 
  * selects from a menu.
  * 
  * @public @memberof ccl_context
@@ -485,7 +485,7 @@ finish:
 }
 
 /** 
- * @brief Decrements the reference count of the context wrapper object. 
+ * Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed.
  *
  * @public @memberof ccl_context
@@ -501,7 +501,7 @@ void ccl_context_destroy(CCLContext* ctx) {
 }
 
 /** 
- * @brief Get the platform associated with the context devices. 
+ * Get the platform associated with the context devices. 
  * 
  * @public @memberof ccl_context
  * 
@@ -553,7 +553,7 @@ finish:
 }
 
 /**
- * @brief Get ::CCLDevice wrapper at given index. 
+ * Get ::CCLDevice wrapper at given index. 
  *
  * @public @memberof ccl_context
  * 
@@ -572,7 +572,7 @@ CCLDevice* ccl_context_get_device(
 }
 
 /**
- * @brief Return number of devices in context.
+ * Return number of devices in context.
  * 
  * @public @memberof ccl_context
  * 
@@ -590,7 +590,7 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
 }
 
 /** 
- * @brief Get all device wrappers in context.
+ * Get all device wrappers in context.
  * 
  * This function returns the internal array containing the context
  * device wrappers. As such, clients should not modify the returned 

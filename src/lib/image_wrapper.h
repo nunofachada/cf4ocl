@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL image wrapper.
+ * OpenCL image wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -33,7 +33,7 @@
 /**
  * @defgroup IMAGE_WRAPPER Image wrapper
  *
- * @brief A wrapper for handling images in OpenCL.
+ * A wrapper for handling images in OpenCL.
  * 
  * Todo: detailed description of module with code examples.
  * 
@@ -41,7 +41,7 @@
  */
 
 /** 
- * @brief Image wrapper class
+ * Image wrapper class
  * 
  * @extends ccl_memobj
  * */

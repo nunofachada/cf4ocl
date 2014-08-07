@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL command queue stub functions.
+ * OpenCL command queue stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

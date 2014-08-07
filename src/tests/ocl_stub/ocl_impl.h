@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL stub object implementations.
+ * OpenCL stub object implementations.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -40,7 +40,7 @@
 #include "oclversions.h"
 
 
-/** @brief Stub for cl_event objects. */ 
+/** Stub for cl_event objects. */ 
 struct _cl_event {
 	cl_ulong t_queued;
 	cl_ulong t_submit;
@@ -53,7 +53,7 @@ struct _cl_event {
 	cl_uint ref_count;
 };
 
-/** @brief Stub for cl_command_queue objects. */ 
+/** Stub for cl_command_queue objects. */ 
 struct _cl_command_queue {
 	cl_context context;
 	cl_device_id device;

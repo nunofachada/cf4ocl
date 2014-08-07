@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Wrapper object for OpenCL devices. Contains device and device
+ * Wrapper object for OpenCL devices. Contains device and device
  * information.
  * 
  * @author Nuno Fachada
@@ -30,7 +30,7 @@
 #include "platform_wrapper.h"
 
 /**
- * @brief Device wrapper class.
+ * Device wrapper class.
  * 
  * @extends ccl_wrapper
  */
@@ -50,7 +50,7 @@ struct ccl_device {
  */
 
 /**
- * @brief Get the device wrapper for the given OpenCL device.
+ * Get the device wrapper for the given OpenCL device.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -74,7 +74,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device) {
 }
 
 /** 
- * @brief Decrements the reference count of the device wrapper object. 
+ * Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed.
  *
  * @public @memberof ccl_device

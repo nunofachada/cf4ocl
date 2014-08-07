@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL image wrapper.
+ * OpenCL image wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "image_wrapper.h"
 
 /** 
- * @brief Image wrapper class.
+ * Image wrapper class.
  * 
  * @extends ccl_memobj
  * */

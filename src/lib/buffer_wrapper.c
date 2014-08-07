@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL buffer wrapper.
+ * OpenCL buffer wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "buffer_wrapper.h"
 
 /** 
- * @brief Buffer wrapper class
+ * Buffer wrapper class
  * 
  * @implements ccl_memobj
  * */
@@ -48,7 +48,7 @@ struct ccl_buffer {
  */
  
 /**
- * @brief Get the buffer wrapper for the given OpenCL buffer.
+ * Get the buffer wrapper for the given OpenCL buffer.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -71,7 +71,7 @@ CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object) {
 }
 
 /** 
- * @brief Decrements the reference count of the wrapper object. If it 
+ * Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed.
  *
  * @public @memberof ccl_buffer
@@ -87,7 +87,7 @@ void ccl_buffer_destroy(CCLBuffer* buf) {
 } 
 
 /**
- * @brief Create a ::CCLBuffer wrapper object.
+ * Create a ::CCLBuffer wrapper object.
  * 
  * @public @memberof ccl_buffer
  * 

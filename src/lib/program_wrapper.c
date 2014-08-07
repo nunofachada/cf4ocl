@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL program wrapper.
+ * OpenCL program wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "program_wrapper.h"
 
 /**
- * @brief Program wrapper class.
+ * Program wrapper class.
  * 
  * @extends ccl_dev_container
  */
@@ -55,7 +55,7 @@ struct ccl_program {
 };
 
 /**
- * @brief Program binary class.
+ * Program binary class.
  * */
 struct ccl_program_binary {
 	
@@ -73,7 +73,7 @@ struct ccl_program_binary {
 };
 
 /**
- * @brief Implementation of ccl_wrapper_release_fields() function for
+ * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
  * 
  * @private @memberof ccl_program
@@ -110,7 +110,7 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 }
 
 /** 
- * @brief Implementation of ccl_dev_container_get_cldevices() for the
+ * Implementation of ccl_dev_container_get_cldevices() for the
  * program wrapper. 
  * 
  * @public @memberof ccl_program
@@ -133,7 +133,7 @@ static CCLWrapperInfo* ccl_program_get_cldevices(
  */
 
 /**
- * @brief Get the program wrapper for the given OpenCL program.
+ * Get the program wrapper for the given OpenCL program.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -157,7 +157,7 @@ CCLProgram* ccl_program_new_wrap(cl_program program) {
 }
 
 /** 
- * @brief Decrements the reference count of the program wrapper object. 
+ * Decrements the reference count of the program wrapper object. 
  * If it reaches 0, the program wrapper object is destroyed.
  *
  * @public @memberof ccl_program
@@ -893,7 +893,7 @@ finish:
 }
 
 /** 
- * @brief Get ::CCLDevice wrapper at given index. 
+ * Get ::CCLDevice wrapper at given index. 
  * 
  * @public @memberof ccl_program
  * 
@@ -912,7 +912,7 @@ CCLDevice* ccl_program_get_device(
 }
 
 /**
- * @brief Return number of devices in program.
+ * Return number of devices in program.
  * 
  * @public @memberof ccl_program
  * 
@@ -930,7 +930,7 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
 }
 
 /** 
- * @brief Get all device wrappers in program. 
+ * Get all device wrappers in program. 
  * 
  * This function returns the internal array containing the program
  * device wrappers. As such, clients should not modify the returned 

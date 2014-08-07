@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Common cf4ocl definitions.
+ * Common cf4ocl definitions.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -38,7 +38,7 @@
 	"IJKLMNOPQRSTUVWXYZ0123456789_."
 
 /**
- * @brief Error codes.
+ * Error codes.
  * */
 typedef enum ccl_error_code {
 	/** Successful operation. */
@@ -63,7 +63,7 @@ typedef enum ccl_error_code {
  * in the OpenCL utilities library. */
 #define CCL_ERROR ccl_error_quark()
 
-/** @brief Resolves to error category identifying string, in this case
+/** Resolves to error category identifying string, in this case
  * an error in the OpenCL utilities library. */
 GQuark ccl_error_quark(void);
 

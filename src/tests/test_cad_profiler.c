@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Tests creation, addition, destruction (CAD) for profiling 
+ * Tests creation, addition, destruction (CAD) for profiling 
  * framework objects.
  * 
  * @author Nuno Fachada
@@ -28,7 +28,7 @@
 #include "profiler.h"
 
 /**
- * @brief Tests creation, getting info from and destruction of 
+ * Tests creation, getting info from and destruction of 
  * profiler objects, and their relationship with context, device and 
  * queue wrapper objects.
  * */
@@ -81,7 +81,7 @@ static void create_add_destroy_test() {
 }
 
 /**
- * @brief Main function.
+ * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

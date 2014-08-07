@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Object which represents the list of OpenCL platforms available
+ * Object which represents the list of OpenCL platforms available
  * in the system and respective functions.
  * 
  * @author Nuno Fachada
@@ -37,7 +37,7 @@
 /**
  * @defgroup PLATFORMS Platforms
  *
- * @brief Objects and functions for managing sets of OpenCL platforms.
+ * Objects and functions for managing sets of OpenCL platforms.
  * 
  * Todo: detailed description of module with code examples.
  * 
@@ -45,24 +45,24 @@
  */
 
 /**
- * @brief Class which represents the OpenCL platforms available
+ * Class which represents the OpenCL platforms available
  * in the system.
  */
 typedef struct ccl_platforms CCLPlatforms;
 
-/** @brief Creates a new CCLPlatforms* object, which contains the list 
+/** Creates a new CCLPlatforms* object, which contains the list 
  * of OpenCL platforms available in the system. */
 CCLPlatforms* ccl_platforms_new(GError **err);
 
-/** @brief Destroy a CCLPlatforms* object, including all underlying
+/** Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data. */
 void ccl_platforms_destroy(CCLPlatforms* platforms);
 
-/** @brief Return number of OpenCL platforms found in CCLPlatforms* 
+/** Return number of OpenCL platforms found in CCLPlatforms* 
  * object. */
 cl_uint ccl_platforms_count(CCLPlatforms* platforms);
 
-/** @brief Get CCL platform wrapper object at given index. */
+/** Get CCL platform wrapper object at given index. */
 CCLPlatform* ccl_platforms_get_platform(
 	CCLPlatforms* platforms, cl_uint index);
 

@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Use and pass abstract OpenCL types in C functions.
+ * Use and pass abstract OpenCL types in C functions.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -34,7 +34,7 @@
 /**
  * @defgroup TYPES Types
  *
- * @brief Use and pass abstract OpenCL types in C functions.
+ * Use and pass abstract OpenCL types in C functions.
  * 
  * Todo: detailed description of module with code examples.
  * 
@@ -42,7 +42,7 @@
  */
  
 /**
- * @brief Enumeration of OpenCL types.
+ * Enumeration of OpenCL types.
  * */
 typedef enum {
 	CCL_CHAR = 0,
@@ -57,14 +57,14 @@ typedef enum {
 } CCLType;
 
 /**
- * @brief Information about an OpenCL type.
+ * Information about an OpenCL type.
  * */
 typedef struct ccl_type_info CCLTypeInfo;
 
-/** @brief Return OpenCL type name. */
+/** Return OpenCL type name. */
 const char* ccl_type_name_get(CCLType type);
 
-/** @brief Return OpenCL type size in bytes. */
+/** Return OpenCL type size in bytes. */
 int ccl_type_sizeof(CCLType type);
 
 /** @} */

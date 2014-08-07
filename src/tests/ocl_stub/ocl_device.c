@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL device stub functions.
+ * OpenCL device stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

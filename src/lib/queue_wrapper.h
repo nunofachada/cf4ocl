@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL command queue wrapper.
+ * OpenCL command queue wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -38,7 +38,7 @@
 /**
  * @defgroup QUEUE_WRAPPER Command queue wrapper
  *
- * @brief A wrapper object for OpenCL command queues and functions to 
+ * A wrapper object for OpenCL command queues and functions to 
  * manage them.
  * 
  * Todo: detailed description of module with code examples.
@@ -47,20 +47,20 @@
  */
 
 /**
- * @brief Command queue wrapper class.
+ * Command queue wrapper class.
  * 
  * @extends ccl_wrapper
  */
 typedef struct ccl_queue CCLQueue;
 
-/** @brief Get the command queue wrapper for the given OpenCL command 
+/** Get the command queue wrapper for the given OpenCL command 
  * queue. */
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err);
 
-/** @brief Decrements the reference count of the command queue wrapper 
+/** Decrements the reference count of the command queue wrapper 
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed. */
 void ccl_queue_destroy(CCLQueue* cq);
@@ -80,7 +80,7 @@ cl_int ccl_queue_flush(CCLQueue* cq, GError** err);
 cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 
 /**
- * @brief Get a ::CCLWrapperInfo command queue information object.
+ * Get a ::CCLWrapperInfo command queue information object.
  * 
  * @public @memberof ccl_queue
  * 
@@ -97,7 +97,7 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 		(ccl_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
 /** 
- * @brief Macro which returns a scalar command queue information value. 
+ * Macro which returns a scalar command queue information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -120,7 +120,7 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 		CL_TRUE, err))
 
 /** 
- * @brief Macro which returns an array command queue information value. 
+ * Macro which returns an array command queue information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -143,7 +143,7 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 		CL_TRUE, err)
 
 /** 
- * @brief Increase the reference count of the command queue object.
+ * Increase the reference count of the command queue object.
  * 
  * @public @memberof ccl_queue
  * 
@@ -153,7 +153,7 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 	ccl_wrapper_ref((CCLWrapper*) cq)
 
 /**
- * @brief Alias to ccl_queue_destroy().
+ * Alias to ccl_queue_destroy().
  * 
  * @public @memberof ccl_queue
  * 
@@ -163,7 +163,7 @@ cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
 #define ccl_queue_unref(cq) ccl_queue_destroy(cq)
 
 /**
- * @brief Get the OpenCL command queue object.
+ * Get the OpenCL command queue object.
  * 
  * @public @memberof ccl_queue
  * 

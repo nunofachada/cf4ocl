@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Use and pass abstract OpenCL types in C functions.
+ * Use and pass abstract OpenCL types in C functions.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "types.h"
 
 /**
- * @brief Information about an OpenCL type.
+ * Information about an OpenCL type.
  * */
 struct ccl_type_info {
 	
@@ -67,7 +67,7 @@ static const CCLTypeInfo ccl_types[] = {
  */
 
 /** 
- * @brief Return OpenCL type name.
+ * Return OpenCL type name.
  * 
  * @param[in] type Type constant.
  * @return A string containing the OpenCL type name.
@@ -79,7 +79,7 @@ const char* ccl_type_name_get(CCLType type) {
 }
 
 /** 
- * @brief Return OpenCL type size in bytes.
+ * Return OpenCL type size in bytes.
  * 
  * @param[in] type Type constant.
  * @return The size of the OpenCL type in bytes.

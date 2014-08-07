@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Matrix multiplication example OpenCL kernels based on the
+ * Matrix multiplication example OpenCL kernels based on the
  * [CUDA best practices guide](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html).
  * 
  * @author Nuno Fachada
@@ -26,7 +26,7 @@
  * */
 
 /**
- * @brief Matmult kernel non-optimized.
+ * Matmult kernel non-optimized.
  * 
  * Based on [Unoptimized matrix multiplication](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab__unoptimized-matrix-multiplication).
  * 
@@ -54,7 +54,7 @@ __kernel void matmult0(__global int * A, __global int * B,
 }
 
 /**
- * @brief Matmult kernel optimized for local memory (matrix A reads).
+ * Matmult kernel optimized for local memory (matrix A reads).
  * 
  * Based on [Using shared memory to improve the global memory load efficiency in matrix multiplication](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab__using-shared-memory-improve-global-memory-load-efficiency-matrix-multiplication).
  * 
@@ -100,7 +100,7 @@ __kernel void matmult1(__global int * A, __global int * B, __global int * C, __p
 }
 
 /**
- * @brief Matmult kernel optimized for local memory (matrix A reads, matrix B reads).
+ * Matmult kernel optimized for local memory (matrix A reads, matrix B reads).
  * 
  * Based on [Improvement by reading additional data into shared memory](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab__improvement-reading-additional-data-shared-memory).
  * 
@@ -162,7 +162,7 @@ __kernel void matmult2(__global int * A, __global int * B, __global int * C, __p
 }
 
 /**
- * @brief Non-optimized kernel for matrix transpose multiplication.
+ * Non-optimized kernel for matrix transpose multiplication.
  * 
  * Based on [Unoptimized handling of strided accesses to global memory](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aa__unoptimized-handling-strided-accesses-global-memory).
  * 
@@ -187,7 +187,7 @@ __kernel void matmult3(__global int * A, __global int * C, __private int2 dimsA)
 }
 
 /**
- * @brief Optimized kernel for matrix transpose multiplication.
+ * Optimized kernel for matrix transpose multiplication.
  * 
  * Based on [An optimized handling of strided accesses using coalesced reads from global memory](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aa__optimized-version-coalesced-reads-global-memory).
  * 

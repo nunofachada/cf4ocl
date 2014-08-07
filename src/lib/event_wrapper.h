@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL event wrapper.
+ * OpenCL event wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -35,7 +35,7 @@
 /**
  * @defgroup EVENT_WRAPPER Event wrapper
  *
- * @brief A wrapper object for OpenCL events and functions to manage 
+ * A wrapper object for OpenCL events and functions to manage 
  * them.
  * 
  * Todo: detailed description of module with code examples.
@@ -44,16 +44,16 @@
  */
 
 /** 
- * @brief Event wrapper class. 
+ * Event wrapper class. 
  * 
  * @extends ccl_wrapper
  * */
 typedef struct ccl_event CCLEvent;
 
-/** @brief Get the event wrapper for the given OpenCL event. */
+/** Get the event wrapper for the given OpenCL event. */
 CCLEvent* ccl_event_new_wrap(cl_event event);
 
-/** @brief Decrements the reference count of the event wrapper object. 
+/** Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed. */
 void ccl_event_destroy(CCLEvent* evt);
 
@@ -63,12 +63,12 @@ const char* ccl_event_get_name(CCLEvent* evt);
 
 const char* ccl_event_get_final_name(CCLEvent* evt);
 
-/** @brief Get the command type which fired the given event. */
+/** Get the command type which fired the given event. */
 cl_command_type ccl_event_get_command_type(
 	CCLEvent* evt, GError** err);
 
 /**
- * @brief Get a ::CCLWrapperInfo event information object.
+ * Get a ::CCLWrapperInfo event information object.
  * 
  * @public @memberof ccl_event
  * 
@@ -85,7 +85,7 @@ cl_command_type ccl_event_get_command_type(
 		(ccl_wrapper_info_fp) clGetEventInfo, CL_FALSE, err)
 
 /** 
- * @brief Macro which returns a scalar event information value. 
+ * Macro which returns a scalar event information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -108,7 +108,7 @@ cl_command_type ccl_event_get_command_type(
 		CL_FALSE, err))
 
 /** 
- * @brief Macro which returns an array event information value. 
+ * Macro which returns an array event information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -131,7 +131,7 @@ cl_command_type ccl_event_get_command_type(
 		CL_FALSE, err)
 
 /**
- * @brief Get a ::CCLWrapperInfo event profiling information object.
+ * Get a ::CCLWrapperInfo event profiling information object.
  * 
  * @public @memberof ccl_event
  * 
@@ -148,7 +148,7 @@ cl_command_type ccl_event_get_command_type(
 		(ccl_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err)
 
 /** 
- * @brief Macro which returns a scalar event profiling information value. 
+ * Macro which returns a scalar event profiling information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -171,7 +171,7 @@ cl_command_type ccl_event_get_command_type(
 		CL_FALSE, err))
 
 /** 
- * @brief Macro which returns an array event profiling information value. 
+ * Macro which returns an array event profiling information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -194,7 +194,7 @@ cl_command_type ccl_event_get_command_type(
 		CL_FALSE, err)
 
 /** 
- * @brief Increase the reference count of the event object.
+ * Increase the reference count of the event object.
  * 
  * @public @memberof ccl_event
  * 
@@ -204,7 +204,7 @@ cl_command_type ccl_event_get_command_type(
 	ccl_wrapper_ref((CCLWrapper*) evt)
 
 /**
- * @brief Alias to ccl_event_destroy().
+ * Alias to ccl_event_destroy().
  * 
  * @public @memberof ccl_event
  * 
@@ -214,7 +214,7 @@ cl_command_type ccl_event_get_command_type(
 #define ccl_event_unref(evt) ccl_event_destroy(evt)
 
 /**
- * @brief Get the OpenCL event object.
+ * Get the OpenCL event object.
  * 
  * @public @memberof ccl_event
  * 
@@ -227,7 +227,7 @@ cl_command_type ccl_event_get_command_type(
 /**
  * @defgroup EVENT_WAIT_LIST Event wait lists
  *
- * @brief Simple management of event wait lists.
+ * Simple management of event wait lists.
  * 
  * Todo: detailed description of module with code examples.
  * 
@@ -254,7 +254,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 /** @} */
 
-/** @brief Waits on the host thread for commands identified by events 
+/** Waits on the host thread for commands identified by events 
  * in the wait list to complete. This function is a wrapper for the
  * clWaitForEvents() OpenCL function. */ 
 cl_int ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);

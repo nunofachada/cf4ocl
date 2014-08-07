@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Object which represents the list of OpenCL platforms available
+ * Object which represents the list of OpenCL platforms available
  * in the system and respective functions.
  * 
  * @author Nuno Fachada
@@ -29,7 +29,7 @@
 #include "platforms.h"
 
 /**
- * @brief Class which represents the OpenCL platforms available
+ * Class which represents the OpenCL platforms available
  * in the system.
  */
 struct ccl_platforms {
@@ -53,7 +53,7 @@ struct ccl_platforms {
  */
 
 /**
- * @brief Creates a new CCLPlatforms* object, which contains the list 
+ * Creates a new CCLPlatforms* object, which contains the list 
  * of OpenCL platforms available in the system.
  * 
  * @public @memberof ccl_platforms
@@ -143,7 +143,7 @@ finish:
 }
 
 /**
- * @brief Destroy a CCLPlatforms* object, including all underlying
+ * Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data.
  * 
  * @public @memberof ccl_platforms
@@ -170,7 +170,7 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
 
 /**
- * @brief Return number of OpenCL platforms found in CCLPlatforms* 
+ * Return number of OpenCL platforms found in CCLPlatforms* 
  * object.
  * 
  * @public @memberof ccl_platforms
@@ -188,7 +188,7 @@ cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
 }
 
 /**
- * @brief Get CCL platform wrapper object at given index.
+ * Get CCL platform wrapper object at given index.
  * 
  * @public @memberof ccl_platforms
  * 

@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL enqueue API.
+ * OpenCL enqueue API.
  * 
  * @author Nuno Fachada
  * @date 2014

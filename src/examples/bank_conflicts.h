@@ -17,7 +17,7 @@
  
 /** 
  * @file
- * @brief Bank conflicts example: common headers and definitions.
+ * Bank conflicts example: common headers and definitions.
  * 
  * @author Nuno Fachada
  * @date 2013

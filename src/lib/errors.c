@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Convert OpenCL error codes to readable strings.
+ * Convert OpenCL error codes to readable strings.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -109,7 +109,7 @@ static const int ccl_errors_count = 71;
  */
 
 /** 
- * @brief Convert OpenCL error code to a readable string.
+ * Convert OpenCL error code to a readable string.
  * 
  * @param[in] code OpenCL error code.
  * @return A readable string.

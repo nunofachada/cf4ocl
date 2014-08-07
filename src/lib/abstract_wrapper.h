@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Generic OpenCL object wrapper.
+ * Generic OpenCL object wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -38,13 +38,13 @@
 #include "errors.h"
 
 /**
- * @brief Class which represents information about a wrapped OpenCL 
+ * Class which represents information about a wrapped OpenCL 
  * entity.
  * */
 typedef struct ccl_wrapper_info CCLWrapperInfo;
 
 /**
- * @brief Base class for all OpenCL wrappers.
+ * Base class for all OpenCL wrappers.
  * */
 typedef struct ccl_wrapper {
 
@@ -69,7 +69,7 @@ typedef struct ccl_wrapper {
 } CCLWrapper;
 
 /**
- * @brief Release the fields of the concrete wrapper implementation.
+ * Release the fields of the concrete wrapper implementation.
  * @protected @memberof ccl_wrapper
  * 
  * @param[in] wrapper A concrete wrapper implementation.
@@ -77,7 +77,7 @@ typedef struct ccl_wrapper {
 typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
 
 /**
- * @brief Release the OpenCL object wrapped by the concrete wrapper 
+ * Release the OpenCL object wrapped by the concrete wrapper 
  * implementation.
  * 
  * @private @memberof ccl_wrapper
@@ -91,29 +91,29 @@ typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
  * */
 typedef cl_int (*ccl_wrapper_release_cl_object)(void* cl_object);
 
-/** @brief Create a new wrapper object. This function is called by the
+/** Create a new wrapper object. This function is called by the
  * concrete wrapper constructors and should not be called by client
  * code. */
 CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size);
 
-/** @brief Increase the reference count of the wrapper object. */
+/** Increase the reference count of the wrapper object. */
 void ccl_wrapper_ref(CCLWrapper* wrapper);
 
-/** @brief Decrements the reference count of the wrapper object.
+/** Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed. */
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
 	ccl_wrapper_release_cl_object rel_cl_fun, GError** err);
 
-/** @brief Returns the wrapper object reference count. For debugging and 
+/** Returns the wrapper object reference count. For debugging and 
  * testing purposes only. */
 int ccl_wrapper_ref_count(CCLWrapper* wrapper);
 
-/** @brief Get the wrapped OpenCL object. */
+/** Get the wrapped OpenCL object. */
 void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 
 /**
- * @brief Generic type for OpenCL clget*Info() functions.
+ * Generic type for OpenCL clget*Info() functions.
  * 
  * @private @memberof ccl_wrapper
  * 
@@ -137,7 +137,7 @@ typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
 	size_t* param_value_size_ret);
 
 /**
- * @brief Generic type for OpenCL clget**Info() functions, in which two
+ * Generic type for OpenCL clget**Info() functions, in which two
  * OpenCL objects are involved.
  * 
  * @private @memberof ccl_wrapper
@@ -163,7 +163,7 @@ typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
 	void* param_value, size_t* param_value_size_ret);
 
 /**
- * @brief Generic function pointer for OpenCL clget**Info() functions
+ * Generic function pointer for OpenCL clget**Info() functions
  * used to point to ccl_wrapper_info_fp1() and ccl_wrapper_info_fp2()
  * concrete implementations.
  * 
@@ -174,26 +174,26 @@ typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
  * */
 typedef cl_int (*ccl_wrapper_info_fp)(void);
 
-/** @brief Debug function which checks if memory allocated by wrappers
+/** Debug function which checks if memory allocated by wrappers
  * has been properly freed. */
 cl_bool ccl_wrapper_memcheck();
 
-/** @brief Add a ::CCLWrapperInfo object to the info table of the
+/** Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper. */
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	CCLWrapperInfo* info);
 
-/** @brief Get information about any wrapped OpenCL object. */
+/** Get information about any wrapped OpenCL object. */
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
-/** @brief Get pointer to information value. */
+/** Get pointer to information value. */
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
-/** @brief Get information size. */
+/** Get information size. */
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
@@ -201,7 +201,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 /**
  * @defgroup WRAPPER_INFO Wrapper information
  *
- * @brief Wrapper information object and associated macros.
+ * Wrapper information object and associated macros.
  * 
  * Todo: detailed description of module with code examples.
  * 
@@ -209,7 +209,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
  */
 
 /**
- * @brief Class which represents information about a wrapped OpenCL 
+ * Class which represents information about a wrapped OpenCL 
  * entity.
  * */
 struct ccl_wrapper_info {
@@ -229,14 +229,14 @@ struct ccl_wrapper_info {
 };
 
 
-/** @brief Create a new CCLWrapperInfo* object with a given value size. */
+/** Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
 
-/** @brief Destroy a ::CCLWrapperInfo object. */
+/** Destroy a ::CCLWrapperInfo object. */
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
 /**
- * @brief Helper macro which returns a scalar information value casted 
+ * Helper macro which returns a scalar information value casted 
  * to specified scalar type.
  * 
  * @public @memberof ccl_wrapper_info
@@ -248,7 +248,7 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 #define ccl_info_scalar(info, type) *((type*) (info)->value)
 
 /**
- * @brief Helper macro which returns an array information value casted 
+ * Helper macro which returns an array information value casted 
  * to specified array type.
  * 
  * @public @memberof ccl_wrapper_info

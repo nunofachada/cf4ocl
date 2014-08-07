@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Prints information about an OpenCL kernel. 
+ * Prints information about an OpenCL kernel. 
  * 
  * @author Nuno Fachada
  * @date 2013
@@ -29,7 +29,7 @@
 #include "kernel_wrapper.h"
 
 /** 
- * @brief Kernel info main function.
+ * Kernel info main function.
  * 
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.

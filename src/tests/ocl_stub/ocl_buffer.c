@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL buffer stub functions.
+ * OpenCL buffer stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

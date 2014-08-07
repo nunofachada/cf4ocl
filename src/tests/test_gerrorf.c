@@ -17,7 +17,7 @@
  
 /** 
  * @file
- * @brief Tests for error framework.
+ * Tests for error framework.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -31,7 +31,7 @@
 #define TEST_GERRORF_ERROR test_gerrorf_error_quark()
 
 /**
- * @brief Test error codes.
+ * Test error codes.
  * */ 
 enum test_gerrorf_error_codes {
 	TEST_GERRORF_SUCCESS = 0,
@@ -40,7 +40,7 @@ enum test_gerrorf_error_codes {
 };
 
 /** 
- * @brief Resolves to error category identifying string, in this case an
+ * Resolves to error category identifying string, in this case an
  * error in the GErrorf tests.
  * 
  * @return A GQuark structure defined by category identifying string, 
@@ -81,7 +81,7 @@ finish:
 /* ************** */
 
 /**
- * @brief Test one level error handling.
+ * Test one level error handling.
  * */
 static void errorOneLevelTest() {
 	GError *err = NULL;
@@ -106,7 +106,7 @@ cleanup:
 }
 
 /**
- * @brief Test two level error handling.
+ * Test two level error handling.
  * */
 static void errorTwoLevelTest() {
 	GError *err = NULL;
@@ -129,7 +129,7 @@ cleanup:
 }
 
 /**
- * @brief Test no errors.
+ * Test no errors.
  * */
 static void errorNoneTest() {
 	GError *err = NULL;
@@ -151,7 +151,7 @@ cleanup:
 }
 
 /**
- * @brief Test an error without additional arguments.
+ * Test an error without additional arguments.
  * */
 static void errorNoVargsTest() {
 	GError *err = NULL;

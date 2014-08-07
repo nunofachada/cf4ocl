@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Utility to query OpenCL platforms and devices header file.
+ * Utility to query OpenCL platforms and devices header file.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -49,19 +49,19 @@ platforms and devices"
 /** Maximum length of device information output, per parameter. */
 #define CCL_DEVINFO_MAXINFOLEN 500
 
-/** @brief Parse and verify command line arguments. */
+/** Parse and verify command line arguments. */
 void ccl_device_query_args_parse(int argc, char* argv[], GError** err);
 
-/** @brief Show platform information. */
+/** Show platform information. */
 void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx);
 
-/** @brief Show all available device information. */
+/** Show all available device information. */
 void ccl_device_query_show_device_info_all(CCLDevice* d);
 
-/** @brief Show user specified device information. */
+/** Show user specified device information. */
 void ccl_device_query_show_device_info_custom(CCLDevice* d);
 
-/** @brief Show basic device information. */
+/** Show basic device information. */
 void ccl_device_query_show_device_info_basic(CCLDevice* d);
 
 #endif

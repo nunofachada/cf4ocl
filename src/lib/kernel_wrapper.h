@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL kernel wrapper.
+ * OpenCL kernel wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -41,7 +41,7 @@ typedef struct ccl_program CCLProgram;
 /**
  * @defgroup KERNEL_WRAPPER Kernel wrapper
  *
- * @brief A wrapper object for OpenCL kernels and functions to manage 
+ * A wrapper object for OpenCL kernels and functions to manage 
  * them.
  * 
  * Todo: detailed description of module with code examples.
@@ -50,7 +50,7 @@ typedef struct ccl_program CCLProgram;
  */
 
 /**
- * @brief Kernel wrapper class.
+ * Kernel wrapper class.
  * 
  * @extends ccl_wrapper
  */
@@ -61,13 +61,13 @@ typedef struct ccl_kernel CCLKernel;
 //~ typedef CCLDevSelDevices (*ccl_devsel_dep)(
 	//~ CCLDevSelDevices devices, void *data, GError **err);
 
-/** @brief Get the kernel wrapper for the given OpenCL kernel. */
+/** Get the kernel wrapper for the given OpenCL kernel. */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err);
 
-/** @brief Decrements the reference count of the kernel wrapper object. 
+/** Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed. */
 void ccl_kernel_destroy(CCLKernel* krnl);
 
@@ -83,7 +83,7 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** @brief Set kernel arguments and enqueue it for execution. */
+/** Set kernel arguments and enqueue it for execution. */
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, 
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
@@ -110,7 +110,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
  * */
 
 /**
- * @brief Get a ::CCLWrapperInfo kernel information object.
+ * Get a ::CCLWrapperInfo kernel information object.
  * 
  * @public @memberof ccl_kernel
  * 
@@ -127,7 +127,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, (err))
 
 /** 
- * @brief Macro which returns a scalar kernel information value. 
+ * Macro which returns a scalar kernel information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -150,7 +150,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 		CL_TRUE, (err)))
 
 /** 
- * @brief Macro which returns an array kernel information value. 
+ * Macro which returns an array kernel information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -173,7 +173,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 		CL_TRUE, (err))
 
 /**
- * @brief Get a ::CCLWrapperInfo kernel workgroup information object.
+ * Get a ::CCLWrapperInfo kernel workgroup information object.
  * 
  * @public @memberof ccl_kernel
  * 
@@ -192,7 +192,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 		CL_FALSE, (err))
 
 /** 
- * @brief Macro which returns a scalar kernel workgroup information 
+ * Macro which returns a scalar kernel workgroup information 
  * value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
@@ -219,7 +219,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 		CL_FALSE, (err)))
 
 /** 
- * @brief Macro which returns an array kernel workgroup information 
+ * Macro which returns an array kernel workgroup information 
  * value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
@@ -247,12 +247,12 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 
 #ifdef CL_VERSION_1_2
 
-/** @brief Get a ::CCLWrapperInfo kernel argument information object. */
+/** Get a ::CCLWrapperInfo kernel argument information object. */
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx, 
 	cl_kernel_arg_info param_name, GError** err);
 
 /** 
- * @brief Macro which returns a scalar kernel argument information 
+ * Macro which returns a scalar kernel argument information 
  * value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
@@ -280,7 +280,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	: 0)
 	
 /** 
- * @brief Macro which returns an array kernel argument information 
+ * Macro which returns an array kernel argument information 
  * value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
@@ -309,7 +309,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 #endif /* OpenCL >=1.2 */
 
 /** 
- * @brief Increase the reference count of the kernel object.
+ * Increase the reference count of the kernel object.
  * 
  * @public @memberof ccl_kernel
  * 
@@ -319,7 +319,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	ccl_wrapper_ref((CCLWrapper*) (krnl))
 
 /**
- * @brief Alias to ccl_kernel_destroy().
+ * Alias to ccl_kernel_destroy().
  * 
  * @public @memberof ccl_kernel
  * 
@@ -329,7 +329,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 #define ccl_kernel_unref(krnl) ccl_kernel_destroy(krnl)
 
 /**
- * @brief Get the OpenCL kernel object.
+ * Get the OpenCL kernel object.
  * 
  * @public @memberof ccl_kernel
  * 

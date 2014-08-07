@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Wrapper object for OpenCL platforms. Contains platform and 
+ * Wrapper object for OpenCL platforms. Contains platform and 
  * platform information.
  * 
  * @author Nuno Fachada
@@ -29,7 +29,7 @@
 #include "platform_wrapper.h"
 
 /** 
- * @brief The platform wrapper class. 
+ * The platform wrapper class. 
  * 
  * @extends ccl_dev_container
  * */
@@ -44,7 +44,7 @@ struct ccl_platform {
 };
 
 /** 
- * @brief Implementation of ccl_dev_container_get_cldevices() for the
+ * Implementation of ccl_dev_container_get_cldevices() for the
  * platform wrapper. 
  * 
  * @private @memberof ccl_platform
@@ -119,7 +119,7 @@ finish:
  */
 
 /**
- * @brief Get the platform wrapper for the given OpenCL platform.
+ * Get the platform wrapper for the given OpenCL platform.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -143,7 +143,7 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
 }
 
 /** 
- * @brief Get the platform wrapper for the given device wrapper. 
+ * Get the platform wrapper for the given device wrapper. 
  * 
  * @public @memberof ccl_platform
  * 
@@ -192,7 +192,7 @@ finish:
 }
 
 /** 
- * @brief Decrements the reference count of the platform wrapper object. 
+ * Decrements the reference count of the platform wrapper object. 
  * If it reaches 0, the platform wrapper object is destroyed.
  *
  * @public @memberof ccl_platform
@@ -208,7 +208,7 @@ void ccl_platform_destroy(CCLPlatform* platf) {
 }
 
 /** 
- * @brief Get numeric OpenCL version of platform. 
+ * Get numeric OpenCL version of platform. 
  * 
  * @param[in] platf The platform wrapper object.
  * @param[out] err Return location for a GError, or NULL if error
@@ -230,7 +230,7 @@ double ccl_platform_get_opencl_version(
 }
 
 /** 
- * @brief Get all device wrappers in platform. 
+ * Get all device wrappers in platform. 
  * 
  * This function returns the internal array containing the platform
  * device wrappers. As such, clients should not modify the returned 
@@ -252,7 +252,7 @@ CCLDevice* const* ccl_platform_get_all_devices(
 }
  
 /** 
- * @brief Get ::CCLDevice wrapper at given index. 
+ * Get ::CCLDevice wrapper at given index. 
  * 
  * @public @memberof ccl_platform
  * 
@@ -272,7 +272,7 @@ CCLDevice* ccl_platform_get_device(
 }
 
 /**
- * @brief Return number of devices in platform.
+ * Return number of devices in platform.
  * 
  * @public @memberof ccl_platform
  * 

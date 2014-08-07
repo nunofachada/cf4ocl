@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Abstract wrapper for OpenCL objects which contain a list of
+ * Abstract wrapper for OpenCL objects which contain a list of
  * devices. Extends abstract_wrapper.c.
  * 
  * @author Nuno Fachada
@@ -29,7 +29,7 @@
 #include "abstract_dev_container_wrapper.h"
 
 /**
- * @brief Initialize device list in device container.
+ * Initialize device list in device container.
  * 
  * @private @memberof ccl_dev_container
  * 
@@ -90,7 +90,7 @@ finish:
 }
 
 /**
- * @brief Release the devices held by the given ::CCLDevContainer 
+ * Release the devices held by the given ::CCLDevContainer 
  * object. Implements the ccl_wrapper_release_fields() function.
  * 
  * @protected @memberof ccl_dev_container
@@ -120,7 +120,7 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 }
 
 /** 
- * @brief Get all ::CCLDevice wrappers in device container. 
+ * Get all ::CCLDevice wrappers in device container. 
  * 
  * @protected @memberof ccl_dev_container
  * 
@@ -157,7 +157,7 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
 
 
 /** 
- * @brief Get ::CCLDevice wrapper at given index. 
+ * Get ::CCLDevice wrapper at given index. 
  * 
  * @protected @memberof ccl_dev_container
  * 
@@ -224,7 +224,7 @@ finish:
 }
 
 /**
- * @brief Return number of devices in device container.
+ * Return number of devices in device container.
  * 
  * @protected @memberof ccl_dev_container
  * 

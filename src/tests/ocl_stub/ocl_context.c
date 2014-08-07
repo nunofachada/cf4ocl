@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL context stub functions.
+ * OpenCL context stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

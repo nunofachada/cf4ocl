@@ -20,7 +20,7 @@
  
  /** 
  * @file
- * @brief OpenCL cl_mem wrapper object.
+ * OpenCL cl_mem wrapper object.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
  * */
 
 /**
- * @brief Implementation of ccl_wrapper_release_fields() function for
+ * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects.
  * 
  * @protected @memberof ccl_memobj

@@ -17,7 +17,7 @@
  
 /** 
  * @file
- * @brief Bank conflicts test example. Control the level of conflicts 
+ * Bank conflicts test example. Control the level of conflicts 
  * using the stride `-s` parameter. 
  * 
  * The frequency of bank conflicts can be increased by doubling the 
@@ -94,7 +94,7 @@ static GOptionEntry entries[] = {
 static char* kernel_files[] = {"bank_conflicts.cl"};
 
 /** 
- * @brief Bank conflicts example main function.
+ * Bank conflicts example main function.
  * 
  * The frequency of bank conflicts can be increased by doubling the 
  * stride `-s` parameter, e.g. 1, 2, 4, 16, 32. The maximum number of 

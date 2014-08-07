@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL event wrapper.
+ * OpenCL event wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "event_wrapper.h"
 
 /** 
- * @brief Event wrapper class. 
+ * Event wrapper class. 
  * 
  * @extends ccl_wrapper
  * */
@@ -62,7 +62,7 @@ struct ccl_event {
  */
 
 /**
- * @brief Get the event wrapper for the given OpenCL event.
+ * Get the event wrapper for the given OpenCL event.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -89,7 +89,7 @@ CCLEvent* ccl_event_new_wrap(cl_event event) {
 }
 
 /** 
- * @brief Decrements the reference count of the event wrapper object. 
+ * Decrements the reference count of the event wrapper object. 
  * If it reaches 0, the event wrapper object is destroyed.
  *
  * @public @memberof ccl_event
@@ -278,7 +278,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
 }
 
 /**
- * @brief Get the command type which fired the given event.
+ * Get the command type which fired the given event.
  * 
  * @public @memberof ccl_event
  * 
@@ -340,7 +340,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
 }
 
 /**
- * @brief Waits on the host thread for commands identified by events 
+ * Waits on the host thread for commands identified by events 
  * in the wait list to complete. This function is a wrapper for the
  * clWaitForEvents() OpenCL function.
  * 

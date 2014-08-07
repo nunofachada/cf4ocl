@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Matrix multiplication examples.
+ * Matrix multiplication examples.
  * 
  * The OpenCL matrix multiplication kernels 0 to 4 are based on the 
  * [CUDA best practices guide](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html). 
@@ -162,7 +162,7 @@ static GOptionEntry entries[] = {
 static char* kernel_files[] = {"matmult.cl"};
 
 /** 
- * @brief OpenCL and OpenMP matrix multiplication main function. 
+ * OpenCL and OpenMP matrix multiplication main function. 
  * 
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -655,7 +655,7 @@ cleanup:
 }
 
 /**
- * @brief Create a new matrix with random values.
+ * Create a new matrix with random values.
  * 
  * @param[in] cols Number of columns in matrix.
  * @param[in] rows Number of rows in matrix.
@@ -678,7 +678,7 @@ int* matmult_matrix_new(int cols, int rows, int* matrix_range, GRand* rng) {
 }
 
 /**
- * @brief Free's a matrix created with matmult_matrix_new().
+ * Free's a matrix created with matmult_matrix_new().
  * 
  * @param[in] matrix The matrix to free.
  * */
@@ -687,7 +687,7 @@ void matmult_matrix_free(int* matrix) {
 }
 
 /**
- * @brief Parse and verify command line arguments.
+ * Parse and verify command line arguments.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @param[out] err Return location for a GError, or NULL if error

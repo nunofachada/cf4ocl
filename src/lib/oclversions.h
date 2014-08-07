@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Header for normalizing OpenCL versions with cf4ocl.
+ * Header for normalizing OpenCL versions with cf4ocl.
  * 
  * @author Nuno Fachada
  * @date 2014

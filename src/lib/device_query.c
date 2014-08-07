@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Functions for querying OpenCL devices.
+ * Functions for querying OpenCL devices.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "device_query.h"
 
 /** 
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting unsigned integers. 
  * */
 static char* ccl_devquery_format_uint(CCLWrapperInfo* info, 
@@ -40,7 +40,7 @@ static char* ccl_devquery_format_uint(CCLWrapperInfo* info,
 }
 
 /** 
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting device information as a hexadecimal number. 
  * */
 static char* ccl_devquery_format_hex(CCLWrapperInfo* info, 
@@ -66,7 +66,7 @@ static char* ccl_devquery_format_hex(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting size_t unsigned integers. 
  * */
 static char* ccl_devquery_format_sizet(CCLWrapperInfo* info, 
@@ -78,7 +78,7 @@ static char* ccl_devquery_format_sizet(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Helper macro for format functions outputting values in bytes.
+ * Helper macro for format functions outputting values in bytes.
  * 
  * @param[in] spec A positive integer value representing bytes.
  * */
@@ -96,7 +96,7 @@ static char* ccl_devquery_format_sizet(CCLWrapperInfo* info,
 			bytes / (1024.0 * 1024 * 1024), bytes);
 
 /**
- * @brief Implementation of ccl_devquery_format() function for
+ * Implementation of ccl_devquery_format() function for
  * outputting unsigned long integers which represent bytes. 
  * */
 static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info, 
@@ -110,7 +110,7 @@ static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting unsigned integers which represent bytes. 
  * */
 static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info, 
@@ -124,7 +124,7 @@ static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting unsigned size_t integers which represent bytes. 
  * */
 static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info, 
@@ -138,7 +138,7 @@ static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting a vector of size_t integers. 
  * */
 static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info, 
@@ -162,7 +162,7 @@ static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting boolean values as a "Yes" or "No" string. 
  * */
 static char* ccl_devquery_format_yesno(CCLWrapperInfo* info, 
@@ -175,7 +175,7 @@ static char* ccl_devquery_format_yesno(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for
+ * Implementation of ccl_devquery_format() function for
  * outputting strings. 
  * */
 static char* ccl_devquery_format_char(CCLWrapperInfo* info, 
@@ -187,7 +187,7 @@ static char* ccl_devquery_format_char(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting memory addresses. 
  * */
 static char* ccl_devquery_format_ptr(CCLWrapperInfo* info, 
@@ -200,7 +200,7 @@ static char* ccl_devquery_format_ptr(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for
+ * Implementation of ccl_devquery_format() function for
  * outputting a string representing a device type. 
  * */
 static char* ccl_devquery_format_type(CCLWrapperInfo* info, 
@@ -214,7 +214,7 @@ static char* ccl_devquery_format_type(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the device floating-point (FP) configuration for a FP 
  * type. */
 static char* ccl_devquery_format_fpconfig(CCLWrapperInfo* info, 
@@ -235,7 +235,7 @@ static char* ccl_devquery_format_fpconfig(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the device execution capabilities. 
  * */
 static char* ccl_devquery_format_execcap(CCLWrapperInfo* info, 
@@ -251,7 +251,7 @@ static char* ccl_devquery_format_execcap(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting a local memory type. */
 static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info, 
 	char* out, size_t size, const char* units) {
@@ -267,7 +267,7 @@ static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the partition properties of a device. 
  * */
 static char* ccl_devquery_format_partprop(CCLWrapperInfo* info, 
@@ -313,7 +313,7 @@ static char* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the supported affinity domains for partitioning a device 
  * using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN. 
  * */
@@ -336,7 +336,7 @@ static char* ccl_devquery_format_affdom(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the supported affinity domains for partitioning a device 
  * using CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT. 
  * */
@@ -382,7 +382,7 @@ static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the cache type of a device. 
  * */
 static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info, 
@@ -399,7 +399,7 @@ static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the queue properties of a device. 
  * */
 static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info, 
@@ -416,7 +416,7 @@ static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 }
 
 /**
- * @brief Implementation of ccl_devquery_format() function for 
+ * Implementation of ccl_devquery_format() function for 
  * outputting the shared virtual memory (SVM) memory allocation
  * capabilities of the device.
  * */
@@ -435,7 +435,7 @@ static char* ccl_devquery_format_svmc(CCLWrapperInfo* info,
 }
 
 //~ /**
- //~ * @brief Implementation of ccl_devquery_format() function for debugging
+ //~ * Implementation of ccl_devquery_format() function for debugging
  //~ * purposes. 
  //~ * */
 //~ static char* ccl_devquery_format_testsize(CCLWrapperInfo* info, 
@@ -836,7 +836,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
  */
 
 /**
- * @brief Return the index of the device information map object of the
+ * Return the index of the device information map object of the
  * given parameter name.
  * 
  * @private @memberof ccl_devquery_map
@@ -883,7 +883,7 @@ static int ccl_devquery_get_index(const char* name) {
 }
 
 /**
- * @brief Get a final device info prefix in the same format as 
+ * Get a final device info prefix in the same format as 
  * kept in the ccl_devquery_info_map.
  * 
  * @public @memberof ccl_devquery_map
@@ -930,7 +930,7 @@ gchar* ccl_devquery_get_prefix_final(const char* prefix) {
 }
 
 /**
- * @brief Return a cl_device_info object given its name.
+ * Return a cl_device_info object given its name.
  * 
  * @public @memberof ccl_devquery_map
  * 
@@ -970,7 +970,7 @@ cl_device_info ccl_devquery_name(const char* name) {
 }
 
 /**
- * @brief Get a pointer to the first device information parameter which 
+ * Get a pointer to the first device information parameter which 
  * has the given prefix.
  * 
  * @public @memberof ccl_devquery_map
@@ -1059,7 +1059,7 @@ const CCLDevQueryMap* ccl_devquery_prefix(
 }
 
 /**
- * @brief Search for a device information parameter by matching part
+ * Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. 
  * 
  * @public @memberof ccl_devquery_map

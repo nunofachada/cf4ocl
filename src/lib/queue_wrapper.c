@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL Command Queue wrapper.
+ * OpenCL Command Queue wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "queue_wrapper.h"
 
 /**
- * @brief Command queue wrapper class.
+ * Command queue wrapper class.
  * 
  * @extends ccl_wrapper
  */
@@ -67,7 +67,7 @@ struct ccl_queue {
 };
 
 /**
- * @brief Implementation of ccl_wrapper_release_fields() function for
+ * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLQueue wrapper objects.
  * 
  * @private @memberof ccl_queue
@@ -99,7 +99,7 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
  */
 
 /**
- * @brief Get the command queue wrapper for the given OpenCL command 
+ * Get the command queue wrapper for the given OpenCL command 
  * queue.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
@@ -180,7 +180,7 @@ finish:
 }
 
 /** 
- * @brief Decrements the reference count of the command queue wrapper 
+ * Decrements the reference count of the command queue wrapper 
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed.
  *

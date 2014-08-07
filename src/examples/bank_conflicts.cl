@@ -17,7 +17,7 @@
  
 /** 
  * @file
- * @brief Bank conflicts test example OpenCL kernels.
+ * Bank conflicts test example OpenCL kernels.
  * 
  * @author Nuno Fachada
  * @date 2013
@@ -25,7 +25,7 @@
  * */
 
 /**
- * @brief Kernel for testing bank conflicts.
+ * Kernel for testing bank conflicts.
  * 
  * @param[in,out] globalData Pointer to global data.
  * @param[in] localData Pointer to allocated local memory.

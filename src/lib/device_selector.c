@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Functions for filtering and selecting OpenCL devices.
+ * Functions for filtering and selecting OpenCL devices.
  *
  * @author Nuno Fachada
  * @date 2014
@@ -29,7 +29,7 @@
 
 	
 /** 
- * @brief Filter type. 
+ * Filter type. 
  * */
 typedef enum ccl_devsel_filter_type {
 	
@@ -42,14 +42,14 @@ typedef enum ccl_devsel_filter_type {
 } CCLDevSelFilterType;
 
 /**
- * @brief Generic filter function pointer. Used to keep either a
+ * Generic filter function pointer. Used to keep either a
  * dependent or independent filter function in a ::CCLDevSelFilter
  * object.
  * */
 typedef void (*ccl_devsel_fp)(void);
 
 /** 
- * @brief Device filter class, includes a filter function (independent 
+ * Device filter class, includes a filter function (independent 
  * or dependent) and the respective filter data.
  * */
 typedef struct ccl_devsel_filter {
@@ -75,7 +75,7 @@ typedef struct ccl_devsel_filter {
 } CCLDevSelFilter;
 
 /**
- * @brief Add any filter to the filter set.
+ * Add any filter to the filter set.
  * 
  * This private function is used by the public ccl_devsel_add_*_filter()
  * functions.
@@ -106,7 +106,7 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
 }
 
 /** 
- * @brief Populate array of device wrapper objects with all OpenCL
+ * Populate array of device wrapper objects with all OpenCL
  * devices present in the system
  * 
  * @param[out] err Return location for a GError, or NULL if error
@@ -198,7 +198,7 @@ finish:
 }
 
 /** 
- * @brief Returns a NULL-terminated array of strings, each one
+ * Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the given device 
  * array.
  * 
@@ -265,7 +265,7 @@ finish:
 }
 
 /** 
- * @brief Private helper function, prints a list of the devices 
+ * Private helper function, prints a list of the devices 
  * specified in the given list.
  * 
  * @param[in] devices List of devices.
@@ -335,7 +335,7 @@ finish:
 }
 
 /** 
- * @brief Private helper function, asks the user to select a device 
+ * Private helper function, asks the user to select a device 
  * from a list. 
  * 
  * @param[in] devices Array of devices.
@@ -407,7 +407,7 @@ finish:
  */
 
 /** 
- * @brief Returns a NULL-terminated array of strings, each one
+ * Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the system.
  * 
  * The array of strings should be freed with the g_strfreev() function
@@ -466,7 +466,7 @@ finish:
 }
 
 /** 
- * @brief Print to stdout a device description string for each device in
+ * Print to stdout a device description string for each device in
  * the system.
  * 
  * @param[out] err Return location for a GError, or NULL if error
@@ -509,7 +509,7 @@ finish:
 }
 
 /**
- * @brief Add an independent filter to the filter set.
+ * Add an independent filter to the filter set.
  * 
  * @param[in] filters The filter set.
  * @param[in] function Indendent filter function.
@@ -523,7 +523,7 @@ void ccl_devsel_add_indep_filter(
 }
 
 /**
- * @brief Add a dependent filter to the filter set.
+ * Add a dependent filter to the filter set.
  * 
  * @param[in] filters The filter set.
  * @param[in] function Indendent filter function.
@@ -537,7 +537,7 @@ void ccl_devsel_add_dep_filter(
 }
 
 /** 
- * @brief Select one or more OpenCL devices based on the provided
+ * Select one or more OpenCL devices based on the provided
  * filters.
  * 
  * This function is internally used by the 
@@ -652,7 +652,7 @@ finish:
  */
 
 /**
- * @brief Independent filter function which accepts devices of the type
+ * Independent filter function which accepts devices of the type
  * given in the data parameter.
  * 
  * This function is used by the ccl_devsel_indep_type_*() group of
@@ -703,7 +703,7 @@ finish:
 }
 
 /**
- * @brief Independent filter function which only accepts GPU devices.
+ * Independent filter function which only accepts GPU devices.
  * 
  * @param[in] dev OpenCL device to check for GPU type.
  * @param[in] data Filter data, ignored.
@@ -726,7 +726,7 @@ cl_bool ccl_devsel_indep_type_gpu(
 }
 
 /**
- * @brief Independent filter function which only accepts CPU devices.
+ * Independent filter function which only accepts CPU devices.
  * 
  * @param[in] dev OpenCL device to check for CPU type.
  * @param[in] data Filter data, ignored.
@@ -749,7 +749,7 @@ cl_bool ccl_devsel_indep_type_cpu(
 }
 
 /**
- * @brief Independent filter function which only accepts accelerator 
+ * Independent filter function which only accepts accelerator 
  * devices.
  * 
  * @param[in] dev OpenCL device to check for accelerator type.
@@ -773,7 +773,7 @@ cl_bool ccl_devsel_indep_type_accel(
 }
 
 /**
- * @brief Independent filter which selects devices based on device name, 
+ * Independent filter which selects devices based on device name, 
  * device vendor and/or platform name.
  * 
  * @param[in] dev OpenCL device to filter by platform.
@@ -886,7 +886,7 @@ finish:
 }
 
 /**
- * @brief Independent filter function which only accepts devices of a
+ * Independent filter function which only accepts devices of a
  * specified platform.
  * 
  * @param[in] device OpenCL device to filter by platform.
@@ -953,7 +953,7 @@ finish:
  */
 
 /**
- * @brief Dependent filter function which only accepts devices of the
+ * Dependent filter function which only accepts devices of the
  * same platform (the platform to which the first device belong to).
  * 
  * @param[in] devices Currently available OpenCL devices.
@@ -1035,7 +1035,7 @@ finish:
 }
 
 /**
- * @brief Dependent filter function which presents a menu to the user
+ * Dependent filter function which presents a menu to the user
  * allowing him to select the desired device.
  * 
  * @param[in] devices List of devices.

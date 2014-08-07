@@ -18,7 +18,7 @@
 
 /**
  * @file
- * @brief Function headers of a profiling tool for OpenCL.
+ * Function headers of a profiling tool for OpenCL.
  *
  * @author Nuno Fachada
  * @date 2014
@@ -39,7 +39,7 @@
 /**
  * @defgroup PROFILER Profiler
  *
- * @brief The profiler module provides classes and methods for
+ * The profiler module provides classes and methods for
  * profiling wrapped OpenCL events and queues.
  * 
  * @warning The functions in this module are not thread-safe.
@@ -50,7 +50,7 @@
  */
 
 /** 
- * @brief Profile class, contains profiling information of OpenCL 
+ * Profile class, contains profiling information of OpenCL 
  * queues and events.
  * 
  * @warning Instances of this class are not thread-safe.
@@ -59,7 +59,7 @@
 typedef struct ccl_prof CCLProf;
 
 /**
- * @brief Sort order for the profile module iterators.
+ * Sort order for the profile module iterators.
  * */
 typedef enum {
 	/** Sort ascending (default). */
@@ -70,7 +70,7 @@ typedef enum {
 
 
 /**
- * @brief Aggregate event info.
+ * Aggregate event info.
  */
 typedef struct ccl_prof_agg {
 
@@ -98,7 +98,7 @@ typedef struct ccl_prof_agg {
 
 
 /**
- * @brief Sort criteria for aggregate event info instances.
+ * Sort criteria for aggregate event info instances.
  */
 typedef enum {
 
@@ -111,7 +111,7 @@ typedef enum {
 } CCLProfAggSort;
 
 /**
- * @brief Event profiling info. 
+ * Event profiling info. 
  * */
 typedef struct ccl_prof_info {
 
@@ -159,7 +159,7 @@ typedef struct ccl_prof_info {
 } CCLProfInfo;
 
 /**
- * @brief Sort criteria for event profiling info instances.
+ * Sort criteria for event profiling info instances.
  */
 typedef enum {
 
@@ -185,7 +185,7 @@ typedef enum {
 
 
 /**
- * @brief Type of event instant (::CCLProfInst).
+ * Type of event instant (::CCLProfInst).
  */
 typedef enum {
 	
@@ -198,7 +198,7 @@ typedef enum {
 } CCLProfInstType;
 
 /**
- * @brief Event instant.
+ * Event instant.
  */
 typedef struct ccl_prof_inst {
 
@@ -237,7 +237,7 @@ typedef struct ccl_prof_inst {
 } CCLProfInst;
 
 /**
- * @brief Sort criteria for event instants (::CCLProfInst).
+ * Sort criteria for event instants (::CCLProfInst).
  */
 typedef enum {
 	
@@ -250,7 +250,7 @@ typedef enum {
 } CCLProfInstSort;
 
 /**
- * @brief Representation of an overlap of events.
+ * Representation of an overlap of events.
  */
 typedef struct ccl_prof_overlap {
 
@@ -275,7 +275,7 @@ typedef struct ccl_prof_overlap {
 } CCLProfOverlap;
 
 /**
- * @brief Sort criteria for overlaps (::CCLProfOverlap).
+ * Sort criteria for overlaps (::CCLProfOverlap).
  */
 typedef enum {
 	
@@ -288,7 +288,7 @@ typedef enum {
 } CCLProfOverlapSort;
 
 /**
- * @brief Export options.
+ * Export options.
  * */
 typedef struct ccl_prof_export_options {
 
@@ -324,88 +324,88 @@ typedef struct ccl_prof_export_options {
 	
 }  CCLProfExportOptions;
 
-/** @brief Create a new profile object. */
+/** Create a new profile object. */
 CCLProf* ccl_prof_new();
 
-/** @brief Destroy a profile object. */
+/** Destroy a profile object. */
 void ccl_prof_destroy(CCLProf* prof);
 
-/** @brief Starts the global profiler timer. Only required if client
+/** Starts the global profiler timer. Only required if client
 * wishes to compare the effectively ellapsed time with the OpenCL
 * kernels time. */
 void ccl_prof_start(CCLProf* prof);
 
-/** @brief Stops the global profiler timer. Only required if 
+/** Stops the global profiler timer. Only required if 
  * ccl_prof_start() was called. */
 void ccl_prof_stop(CCLProf* prof);
 
-/** @brief If profiling has started but not stopped, returns the time
+/** If profiling has started but not stopped, returns the time
  * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
 double ccl_prof_time_elapsed(CCLProf* prof);
 
-/** @brief Add a command queue wrapper for profiling. */
+/** Add a command queue wrapper for profiling. */
 void ccl_prof_add_queue(
 	CCLProf* prof, const char* cq_name, CCLQueue* cq);
 
-/** @brief Determine aggregate statistics for the given profile object. */
+/** Determine aggregate statistics for the given profile object. */
 cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
 
-/** @brief Return aggregate statistics for events with the given name. */
+/** Return aggregate statistics for events with the given name. */
 const CCLProfAgg* ccl_prof_get_agg(
 	CCLProf* prof, const char* event_name);
 
-/** @brief Initialize an iterator for profiled aggregate event 
+/** Initialize an iterator for profiled aggregate event 
  * instances. */
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort);
 
-/** @brief Return the next profiled aggregate event instance. */
+/** Return the next profiled aggregate event instance. */
 const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof);
 
-/** @brief Initialize an iterator for event profiling info instances. */
+/** Initialize an iterator for event profiling info instances. */
 void ccl_prof_iter_info_init(CCLProf* prof, int sort);
 
-/** @brief Return the next event profiling info instance. */
+/** Return the next event profiling info instance. */
 const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof);
 
-/** @brief Initialize an iterator for event instant instances. */
+/** Initialize an iterator for event instant instances. */
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort);
 
-/** @brief Return the next event instant instance. */
+/** Return the next event instant instance. */
 const CCLProfInst* ccl_prof_inst_info_next(CCLProf* prof);
 
-/** @brief Initialize an iterator for overlap instances. */
+/** Initialize an iterator for overlap instances. */
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);
 
-/** @brief Return the next overlap instance. */
+/** Return the next overlap instance. */
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof);
 
-/** @brief Print a summary of the profiling info. More specifically,
+/** Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted
  * by absolute time), and a table of event overlaps (sorted by overlap
  * duration). */ 
 void ccl_prof_print_summary(CCLProf* prof);
 
-/** @brief Get a summary with the profiling info. More specifically,
+/** Get a summary with the profiling info. More specifically,
  * this function returns a string containing a table of aggregate event 
  * statistics and a table of event overlaps. The order of the returned
  * information can be specified in the function arguments. */ 
 const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort);
 
-/** @brief Export profiling info to a given stream. */
+/** Export profiling info to a given stream. */
 cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, GError** err);
 
-/** @brief Helper function which exports profiling info to a given file,
+/** Helper function which exports profiling info to a given file,
  * automatically opening and closing the file. Check the
  * ccl_prof_export_info() for more information. */
 cl_bool ccl_prof_export_info_file(
 	CCLProf* profile, const char* filename, GError** err);
 
-/** @brief Set export options using a ::CCLProfExportOptions struct. */
+/** Set export options using a ::CCLProfExportOptions struct. */
 void ccl_prof_set_export_opts(CCLProfExportOptions export_opts);
 
-/** @brief Get current export options. */
+/** Get current export options. */
 CCLProfExportOptions ccl_prof_get_export_opts();
 
 /** @} */

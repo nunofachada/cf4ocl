@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL event stub functions.
+ * OpenCL event stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

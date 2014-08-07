@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Aggregate header for cf4ocl.
+ * Aggregate header for cf4ocl.
  * 
  * @author Nuno Fachada
  * @date 2014

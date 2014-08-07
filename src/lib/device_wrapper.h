@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Wrapper object for OpenCL devices. Contains device and device
+ * Wrapper object for OpenCL devices. Contains device and device
  * information.
  * 
  * @author Nuno Fachada
@@ -43,7 +43,7 @@ typedef struct ccl_platform CCLPlatform;
 /**
  * @defgroup DEVICE_WRAPPER Device wrapper
  *
- * @brief A wrapper object for OpenCL devices and functions to manage 
+ * A wrapper object for OpenCL devices and functions to manage 
  * them.
  * 
  * Todo: detailed description of module with code examples.
@@ -52,21 +52,21 @@ typedef struct ccl_platform CCLPlatform;
  */
 
 /** 
- * @brief Device wrapper class. 
+ * Device wrapper class. 
  * 
  * @extends ccl_wrapper
  * */
 typedef struct ccl_device CCLDevice;
 
-/** @brief Decrements the reference count of the device wrapper object. 
+/** Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed. */
 void ccl_device_destroy(CCLDevice* dev);
 
-/** @brief Get the device wrapper for the given OpenCL device. */
+/** Get the device wrapper for the given OpenCL device. */
 CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 /**
- * @brief Get a ::CCLWrapperInfo device information object.
+ * Get a ::CCLWrapperInfo device information object.
  * 
  * @public @memberof ccl_device
  * 
@@ -83,7 +83,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 		(ccl_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
 
 /** 
- * @brief Macro which returns a scalar device information value. 
+ * Macro which returns a scalar device information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -106,7 +106,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 		CL_TRUE, err))
 
 /** 
- * @brief Macro which returns an array device information value. 
+ * Macro which returns an array device information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -129,7 +129,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 		CL_TRUE, err)
 
 /** 
- * @brief Increase the reference count of the device wrapper object.
+ * Increase the reference count of the device wrapper object.
  * 
  * @public @memberof ccl_device
  * 
@@ -139,7 +139,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 	ccl_wrapper_ref((CCLWrapper*) device)
 
 /**
- * @brief Alias to ccl_device_destroy().
+ * Alias to ccl_device_destroy().
  * 
  * @public @memberof ccl_device
  * 
@@ -149,7 +149,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 #define ccl_device_unref(device) ccl_device_destroy(device)
 
 /**
- * @brief Get the OpenCL device_id object.
+ * Get the OpenCL device_id object.
  * 
  * @public @memberof ccl_device
  * 

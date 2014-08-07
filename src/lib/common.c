@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Common cf4ocl definitions.
+ * Common cf4ocl definitions.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -28,7 +28,7 @@
 #include "common.h"
 
 /** 
- * @brief Resolves to error category identifying string, in this case an
+ * Resolves to error category identifying string, in this case an
  * error in cf4ocl.
  * 
  * @return A GQuark structure defined by category identifying string,

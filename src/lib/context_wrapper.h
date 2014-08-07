@@ -18,7 +18,7 @@
 
 /**
  * @file
- * @brief OpenCL context wrapper.
+ * OpenCL context wrapper.
  *
  * @author Nuno Fachada
  * @date 2014
@@ -40,7 +40,7 @@
 /**
  * @defgroup CONTEXT_WRAPPER Context wrapper
  *
- * @brief A wrapper object for OpenCL contexts and functions to manage 
+ * A wrapper object for OpenCL contexts and functions to manage 
  * them.
  * 
  * Todo: detailed description of module with code examples.
@@ -49,14 +49,14 @@
  */
  
 /**
- * @brief The context wrapper class.
+ * The context wrapper class.
  * 
  * @extends ccl_dev_container
  * */
 typedef struct ccl_context CCLContext;
 
 /** 
- * @brief A callback function used by the OpenCL implementation to 
+ * A callback function used by the OpenCL implementation to 
  * report information on errors during context creation as well as 
  * errors that occur at runtime in this context. Ignored if NULL.
  * 
@@ -71,11 +71,11 @@ typedef void (CL_CALLBACK* ccl_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
  
-/** @brief Get the context wrapper for the given OpenCL context. */
+/** Get the context wrapper for the given OpenCL context. */
 CCLContext* ccl_context_new_wrap(cl_context context);
 
 /** 
- * @brief Create a new context wrapper object selecting devices using 
+ * Create a new context wrapper object selecting devices using 
  * the given set of filters.
  * 
  * @public @memberof ccl_context
@@ -90,7 +90,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		NULL, (filters), NULL, NULL, (err))
 
 /** 
- * @brief Creates a context wrapper given an array of ::CCLDevice 
+ * Creates a context wrapper given an array of ::CCLDevice 
  * wrappers.
  * 
  * @public @memberof ccl_context
@@ -109,7 +109,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		NULL, (num_devices), (devices), NULL, NULL, (err))
 
 /** 
- * @brief Creates a context wrapper for a CPU device.
+ * Creates a context wrapper for a CPU device.
  * 
  * The first found CPU device is used. More than one CPU might be used 
  * if all CPUs belong to the same platform.
@@ -125,7 +125,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		ccl_devsel_indep_type_cpu, NULL, err)
 	
 /** 
- * @brief Creates a context wrapper for a GPU device.
+ * Creates a context wrapper for a GPU device.
  * 
  * The first found GPU device is used. More than one GPU might be used 
  * if all GPUs belong to the same platform.
@@ -141,7 +141,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		ccl_devsel_indep_type_gpu, NULL, err)
 	
 /** 
- * @brief Creates a context wrapper for an Accelerator device.
+ * Creates a context wrapper for an Accelerator device.
  * 
  * The first found Accelerator device is used. More than one Accelerator 
  * might be used if all Accelerators belong to the same platform.
@@ -157,7 +157,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		ccl_devsel_indep_type_accel, NULL, err)
 	
 /** 
- * @brief Creates a context wrapper for the fist found device(s).
+ * Creates a context wrapper for the fist found device(s).
  * 
  * The first found device is used. More than one device might be used if 
  * all devices belong to the same platform.
@@ -173,7 +173,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 
 
 /** 
- * @brief Creates a context wrapper from a device selected by the user
+ * Creates a context wrapper from a device selected by the user
  * from a menu.
  * 
  * @public @memberof ccl_context
@@ -185,13 +185,13 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 #define ccl_context_new_from_menu(err) \
 	ccl_context_new_from_menu_full(NULL, err)
 
-/** @brief Create a new context wrapper object selecting devices using 
+/** Create a new context wrapper object selecting devices using 
  * the given set of filters. */
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
 	ccl_context_callback pfn_notify, void* user_data, GError **err);
 
-/** @brief Creates a context wrapper given an array of ::CCLDevice 
+/** Creates a context wrapper given an array of ::CCLDevice 
  * wrappers and the remaining parameters required by the 
  * clCreateContext function. */
 CCLContext* ccl_context_new_from_devices_full(
@@ -199,21 +199,21 @@ CCLContext* ccl_context_new_from_devices_full(
 	CCLDevice** devices, ccl_context_callback pfn_notify,
 	void* user_data, GError** err);
 
-/** @brief Creates a context wrapper using one independent device filter 
+/** Creates a context wrapper using one independent device filter 
  * specified in the function parameters. */
 CCLContext* ccl_context_new_from_indep_filter(
 	ccl_devsel_indep filter, void* data, GError** err);
 	
-/** @brief Creates a context wrapper using a device which the user 
+/** Creates a context wrapper using a device which the user 
  * selects from a menu. */
 CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
 
-/** @brief Decrements the reference count of the context wrapper object. 
+/** Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed. */
 void ccl_context_destroy(CCLContext* ctx);
 
 /**
- * @brief Get a ::CCLWrapperInfo context information object.
+ * Get a ::CCLWrapperInfo context information object.
  * 
  * @public @memberof ccl_context
  * 
@@ -230,7 +230,7 @@ void ccl_context_destroy(CCLContext* ctx);
 		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
 
 /** 
- * @brief Macro which returns a scalar context information value. 
+ * Macro which returns a scalar context information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -253,7 +253,7 @@ void ccl_context_destroy(CCLContext* ctx);
 		CL_TRUE, err))
 
 /** 
- * @brief Macro which returns an array context information value. 
+ * Macro which returns an array context information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -275,7 +275,7 @@ void ccl_context_destroy(CCLContext* ctx);
 		NULL, param_name, (ccl_wrapper_info_fp) clGetContextInfo, \
 		CL_TRUE, err)
 /** 
- * @brief Increase the reference count of the context wrapper object.
+ * Increase the reference count of the context wrapper object.
  * 
  * @public @memberof ccl_context
  * 
@@ -285,7 +285,7 @@ void ccl_context_destroy(CCLContext* ctx);
 	ccl_wrapper_ref((CCLWrapper*) ctx)
 
 /**
- * @brief Alias to ccl_context_destroy().
+ * Alias to ccl_context_destroy().
  * 
  * @public @memberof ccl_context
  * 
@@ -296,7 +296,7 @@ void ccl_context_destroy(CCLContext* ctx);
 	ccl_context_destroy(ctx)
 
 /**
- * @brief Get the OpenCL context object.
+ * Get the OpenCL context object.
  * 
  * @public @memberof ccl_context
  * 
@@ -306,17 +306,17 @@ void ccl_context_destroy(CCLContext* ctx);
 #define ccl_context_unwrap(ctx) \
 	((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
 	
-/** @brief Get the platform associated with the context devices. */
+/** Get the platform associated with the context devices. */
 CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
 
-/** @brief Get ::CCLDevice wrapper at given index. */
+/** Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_context_get_device(
 	CCLContext* ctx, cl_uint index, GError** err);
 
-/** @brief Return number of devices in context. */
+/** Return number of devices in context. */
 cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
 
-/** @brief Get all device wrappers in context. */
+/** Get all device wrappers in context. */
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx, 
 	GError** err);
 

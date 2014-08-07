@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL program wrapper.
+ * OpenCL program wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -39,7 +39,7 @@
 /**
  * @defgroup PROGRAM_WRAPPER Program wrapper
  *
- * @brief A wrapper object for OpenCL programs and functions to manage 
+ * A wrapper object for OpenCL programs and functions to manage 
  * them.
  * 
  * Todo: detailed description of module.
@@ -48,23 +48,23 @@
  */
  
 /**
- * @brief Program wrapper class.
+ * Program wrapper class.
  * 
  * @extends ccl_dev_container
  */
 typedef struct ccl_program CCLProgram;
 
-/** @brief Represents a OpenCL binary object. */
+/** Represents a OpenCL binary object. */
 typedef struct ccl_program_binary CCLProgramBinary;
 
 typedef void (CL_CALLBACK* ccl_program_callback)(
 	cl_program program, void* user_data);
 
 /* WRAPPER API */
-/** @brief Get the program wrapper for the given OpenCL program. */
+/** Get the program wrapper for the given OpenCL program. */
 CCLProgram* ccl_program_new_wrap(cl_program program);
 
-/** @brief Decrements the reference count of the program wrapper object. 
+/** Decrements the reference count of the program wrapper object. 
  * If it reaches 0, the program wrapper object is destroyed. */
 void ccl_program_destroy(CCLProgram* prg);
 
@@ -139,7 +139,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	const char* file_prefix, const char* file_suffix, GError** err);
 
 /**
- * @brief Get a ::CCLWrapperInfo program information object. To get the 
+ * Get a ::CCLWrapperInfo program information object. To get the 
  * program binaries use the ::ccl_program_get_binary() function instead, 
  * as this macro will return NULL when the CL_PROGRAM_BINARIES parameter 
  * is requested.
@@ -162,7 +162,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
 /** 
- * @brief Macro which returns a scalar program information value. 
+ * Macro which returns a scalar program information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -188,7 +188,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		CL_TRUE, err))
 
 /** 
- * @brief Macro which returns an array program information value. To get 
+ * Macro which returns an array program information value. To get 
  * the program binaries use the ::ccl_program_get_binary() function 
  * instead, as this macro will return NULL when the CL_PROGRAM_BINARIES 
  * parameter is requested.
@@ -217,7 +217,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		CL_TRUE, err)
 
 /**
- * @brief Get a ::CCLWrapperInfo program build information object.
+ * Get a ::CCLWrapperInfo program build information object.
  * 
  * @public @memberof ccl_program
  * 
@@ -237,7 +237,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		CL_FALSE, err)
 
 /** 
- * @brief Macro which returns a scalar program build information value. 
+ * Macro which returns a scalar program build information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -262,7 +262,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		(ccl_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err))
 
 /** 
- * @brief Macro which returns an array program build information value. 
+ * Macro which returns an array program build information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -287,7 +287,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		(ccl_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err)
 
 /** 
- * @brief Increase the reference count of the program object.
+ * Increase the reference count of the program object.
  * 
  * @public @memberof ccl_program
  * 
@@ -297,7 +297,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	ccl_wrapper_ref((CCLWrapper*) prg)
 
 /**
- * @brief Alias to ccl_program_destroy().
+ * Alias to ccl_program_destroy().
  * 
  * @public @memberof ccl_program
  * 
@@ -307,7 +307,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 #define ccl_program_unref(prg) ccl_program_destroy(prg)
 
 /**
- * @brief Get the OpenCL program object.
+ * Get the OpenCL program object.
  * 
  * @public @memberof ccl_program
  * 
@@ -317,20 +317,20 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 #define ccl_program_unwrap(prg) \
 	((cl_program) ccl_wrapper_unwrap((CCLWrapper*) prg))
 
-/** @brief Get ::CCLDevice wrapper at given index. */
+/** Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_program_get_device(
 	CCLProgram* prg, cl_uint index, GError** err);
 
-/** @brief Return number of devices in program. */
+/** Return number of devices in program. */
 cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err);
 
-/** @brief Get all device wrappers in program. */
+/** Get all device wrappers in program. */
 CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg, 
 	GError** err);
 
 /** @} */
 
-/** @brief Create a new ::CCLProgramBinary object with a given value 
+/** Create a new ::CCLProgramBinary object with a given value 
  * size. */
 CCLProgramBinary* ccl_program_binary_new(
 	unsigned char* data, size_t size);
@@ -338,7 +338,7 @@ CCLProgramBinary* ccl_program_binary_new(
 #define ccl_program_binary_new_empty() \
 	ccl_program_binary_new(NULL, 0);
 
-/** @brief Destroy a ::CCLProgramBinary object. */
+/** Destroy a ::CCLProgramBinary object. */
 void ccl_program_binary_destroy(CCLProgramBinary* bin);
 
 #endif

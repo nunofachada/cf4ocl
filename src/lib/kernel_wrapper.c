@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL kernel wrapper.
+ * OpenCL kernel wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -29,7 +29,7 @@
 #include "program_wrapper.h"
 
 /**
- * @brief Kernel wrapper class.
+ * Kernel wrapper class.
  * 
  * @extends ccl_wrapper
  */
@@ -50,7 +50,7 @@ struct ccl_kernel {
 };
 
 /**
- * @brief Implementation of ccl_wrapper_release_fields() function for
+ * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLKernel wrapper objects.
  * 
  * @private @memberof ccl_kernel
@@ -75,7 +75,7 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
  */
 
 /**
- * @brief Get the kernel wrapper for the given OpenCL kernel.
+ * Get the kernel wrapper for the given OpenCL kernel.
  * 
  * If the wrapper doesn't exist, its created with a reference count 
  * of 1. Otherwise, the existing wrapper is returned and its reference 
@@ -149,7 +149,7 @@ finish:
 }
 
 /** 
- * @brief Decrements the reference count of the kernel wrapper object. 
+ * Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed.
  *
  * @public @memberof ccl_kernel
@@ -277,7 +277,7 @@ finish:
 }
 	
 /** 
- * @brief Set kernel arguments and enqueue it for execution.
+ * Set kernel arguments and enqueue it for execution.
  * 
  * @warning This function is not thread-safe. For multi-threaded 
  * execution of the same kernel function, create multiple instances of 
@@ -364,7 +364,7 @@ finish:
 #ifdef CL_VERSION_1_2
 
 /**
- * @brief Kernel argument information adapter between a
+ * Kernel argument information adapter between a
  * ccl_wrapper_info_fp() function and the clGetKernelArgInfo()
  * function.
  * 
@@ -393,7 +393,7 @@ static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
 }
 
 /**
- * @brief Get a ::CCLWrapperInfo kernel argument information object.
+ * Get a ::CCLWrapperInfo kernel argument information object.
  * 
  * @public @memberof ccl_kernel
  * @see ccl_wrapper_get_info()

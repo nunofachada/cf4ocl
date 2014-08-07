@@ -17,7 +17,7 @@
  
 /** 
  * @file
- * @brief Common includes and definitions for examples.
+ * Common includes and definitions for examples.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -40,7 +40,7 @@
 #include "buffer_wrapper.h"
 
 /**
- * @brief Parse a pair of positive integers from a string separated by a comma.
+ * Parse a pair of positive integers from a string separated by a comma.
  * 
  * @param[in] in Input string from where to extract pair of integers.
  * @param[in] out Array where to put pair of integers.
@@ -66,14 +66,14 @@
 	}
 
 
-/** @brief Print device requirements for program. */
+/** Print device requirements for program. */
 void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
 
-/** @brief Get full kernel path name. */
+/** Get full kernel path name. */
 gchar* ccl_ex_kernelpath_get(gchar* kernel_filename, char* exec_name);
 
 /**
- * @brief Error codes.
+ * Error codes.
  * */
 enum ccl_ex_error_codes {
 	/** Code for operation successful. */
@@ -86,7 +86,7 @@ enum ccl_ex_error_codes {
  * in the cf4ocl examples. */
 #define CCL_EX_ERROR ccl_ex_error_quark()
 
-/** @brief Resolves to error category identifying string, in this case
+/** Resolves to error category identifying string, in this case
  * an error in the cf4ocl examples. */
 GQuark ccl_ex_error_quark(void);
 

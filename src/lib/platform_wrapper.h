@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Wrapper object for OpenCL platforms. Contains platform and 
+ * Wrapper object for OpenCL platforms. Contains platform and 
  * platform information.
  * 
  * @author Nuno Fachada
@@ -38,7 +38,7 @@
 /**
  * @defgroup PLATFORM_WRAPPER Platform wrapper
  *
- * @brief A wrapper object for OpenCL platforms and functions to manage 
+ * A wrapper object for OpenCL platforms and functions to manage 
  * them.
  * 
  * Todo: detailed description of module.
@@ -47,28 +47,28 @@
  */
  
 /** 
- * @brief The platform wrapper class. 
+ * The platform wrapper class. 
  * 
  * @extends ccl_dev_container
  * */
 typedef struct ccl_platform CCLPlatform;
 
-/** @brief Get the platform wrapper for the given OpenCL platform. */
+/** Get the platform wrapper for the given OpenCL platform. */
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 
-/** @brief Get the platform wrapper for the given device wrapper. */
+/** Get the platform wrapper for the given device wrapper. */
 CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err);
 
-/** @brief Decrements the reference count of the platform wrapper 
+/** Decrements the reference count of the platform wrapper 
  * object. If it reaches 0, the platform wrapper object is destroyed. */
 void ccl_platform_destroy(CCLPlatform* platf);
 
-/** @brief Get numeric OpenCL version of platform. */
+/** Get numeric OpenCL version of platform. */
 double ccl_platform_get_opencl_version(
 	CCLPlatform* platf, GError** err);
 
 /**
- * @brief Get a ::CCLWrapperInfo platform information object.
+ * Get a ::CCLWrapperInfo platform information object.
  * 
  * @public @memberof ccl_platform
  * 
@@ -85,7 +85,7 @@ double ccl_platform_get_opencl_version(
 		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
 
 /** 
- * @brief Macro which returns a scalar platform information value. 
+ * Macro which returns a scalar platform information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -108,7 +108,7 @@ double ccl_platform_get_opencl_version(
 		CL_TRUE, err))
 
 /** 
- * @brief Macro which returns an array platform information value. 
+ * Macro which returns an array platform information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -131,7 +131,7 @@ double ccl_platform_get_opencl_version(
 		CL_TRUE, err)
 
 /**
- * @brief Helper macro which gets a platform information string. This 
+ * Helper macro which gets a platform information string. This 
  * macro simply wraps the ccl_platform_get_array_info() macro, because
  * (as of OpenCL 2.0) all platform information return types are char*.
  * 
@@ -149,7 +149,7 @@ double ccl_platform_get_opencl_version(
 	ccl_platform_get_array_info(platf, param_name, char*, err)
 
 /** 
- * @brief Increase the reference count of the platform wrapper object.
+ * Increase the reference count of the platform wrapper object.
  * 
  * @public @memberof ccl_platform
  * 
@@ -159,7 +159,7 @@ double ccl_platform_get_opencl_version(
 	ccl_wrapper_ref((CCLWrapper*) platform)
 
 /**
- * @brief Alias to ccl_platform_destroy().
+ * Alias to ccl_platform_destroy().
  * 
  * @public @memberof ccl_platform
  * 
@@ -169,7 +169,7 @@ double ccl_platform_get_opencl_version(
 #define ccl_platform_unref(platform) ccl_platform_destroy(platform)
 
 /**
- * @brief Get the OpenCL platform object.
+ * Get the OpenCL platform object.
  * 
  * @public @memberof ccl_platform
  * 
@@ -179,15 +179,15 @@ double ccl_platform_get_opencl_version(
 #define ccl_platform_unwrap(platform) \
 	((cl_platform) ccl_wrapper_unwrap((CCLWrapper*) platform))
 	
-/** @brief Get all device wrappers in platform. */
+/** Get all device wrappers in platform. */
 CCLDevice* const* ccl_platform_get_all_devices(
 	CCLPlatform* platf, GError** err);
  
-/** @brief Get ::CCLDevice wrapper at given index. */
+/** Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_platform_get_device(
 	CCLPlatform* platf, cl_uint index, GError** err);
 
-/** @brief Return number of devices in platform. */
+/** Return number of devices in platform. */
 cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err);
  
 /** @} */

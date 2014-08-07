@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Functions for obtaining information about OpenCL entities
+ * Functions for obtaining information about OpenCL entities
  * such as platforms, devices, contexts, queues, kernels, etc.
  * 
  * @author Nuno Fachada
@@ -35,7 +35,7 @@ static GHashTable* wrappers = NULL;
 G_LOCK_DEFINE(wrappers);
 
 /**
- * @brief Create a new ::CCLWrapper object. This function is called by 
+ * Create a new ::CCLWrapper object. This function is called by 
  * the concrete wrapper constructors and should not be called by client
  * code.
  * 
@@ -85,7 +85,7 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 }
 
 /** 
- * @brief Increase the reference count of the wrapper object.
+ * Increase the reference count of the wrapper object.
  * 
  * @protected @memberof ccl_wrapper
  * 
@@ -102,7 +102,7 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
 }
 
 /** 
- * @brief Decrements the reference count of the wrapper object.
+ * Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed.
  * 
  * @protected @memberof ccl_wrapper
@@ -181,7 +181,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 }
 
 /**
- * @brief Returns the wrapper object reference count. For debugging and 
+ * Returns the wrapper object reference count. For debugging and 
  * testing purposes only.
  * 
  * @protected @memberof ccl_wrapper
@@ -200,7 +200,7 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
 }
 
 /**
- * @brief Get the wrapped OpenCL object.
+ * Get the wrapped OpenCL object.
  * 
  * @protected @memberof ccl_wrapper
  * 
@@ -217,7 +217,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 }
 
 /**
- * @brief Add a ::CCLWrapperInfo object to the info table of the
+ * Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper.
  * 
  * @protected @memberof ccl_wrapper
@@ -249,7 +249,7 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 }
 
 /**
- * @brief Get information about any wrapped OpenCL object.
+ * Get information about any wrapped OpenCL object.
  * 
  * This function should not be called directly, but using the
  * ccl_*_info() macros instead.
@@ -354,7 +354,7 @@ finish:
 }
 
 /** 
- * @brief Get pointer to information value.
+ * Get pointer to information value.
  * 
  * @protected @memberof ccl_wrapper
  * 
@@ -390,7 +390,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 }
 
 /** 
- * @brief Get information size.
+ * Get information size.
  * 
  * @protected @memberof ccl_wrapper
  * 
@@ -425,7 +425,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 }
 
 /** 
- * @brief Debug function which checks if memory allocated by wrappers
+ * Debug function which checks if memory allocated by wrappers
  * has been properly freed.
  * 
  * @public @memberof ccl_wrapper
@@ -447,7 +447,7 @@ cl_bool ccl_wrapper_memcheck() {
  */
  
 /**
- * @brief Create a new ::CCLWrapperInfo object with a given value size.
+ * Create a new ::CCLWrapperInfo object with a given value size.
  * 
  * @public @memberof ccl_wrapper_info
  * 
@@ -469,7 +469,7 @@ CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
 }
 
 /**
- * @brief Destroy a ::CCLWrapperInfo object.
+ * Destroy a ::CCLWrapperInfo object.
  * 
  * @public @memberof ccl_wrapper_info
  * 

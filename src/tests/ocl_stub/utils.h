@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Utilities used by the OpenCL testing stub.
+ * Utilities used by the OpenCL testing stub.
  * 
  * @author Nuno Fachada
  * @date 2014

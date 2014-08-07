@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief OpenCL cl_mem wrapper object.
+ * OpenCL cl_mem wrapper object.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -35,7 +35,7 @@
 /**
  * @defgroup MEMOBJ_WRAPPER Memory object wrapper
  *
- * @brief A wrapper object for OpenCL memory objects (buffers and 
+ * A wrapper object for OpenCL memory objects (buffers and 
  * images) and functions to manage them.
  * 
  * Todo: detailed description of module with code examples.
@@ -44,7 +44,7 @@
  */
 
 /**
- * @brief Memory objects wrapper.
+ * Memory objects wrapper.
  * 
  * @extends ccl_wrapper
  * */
@@ -64,7 +64,7 @@ typedef struct ccl_memobj {
 	
 } CCLMemObj;
 
-/** @brief Implementation of ccl_wrapper_release_fields() function for
+/** Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects. */
 void ccl_memobj_release_fields(CCLMemObj* mo);
 
@@ -80,7 +80,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 #endif
 
 /**
- * @brief Get a ::CCLWrapperInfo memory object information object.
+ * Get a ::CCLWrapperInfo memory object information object.
  * 
  * @public @memberof ccl_memobj
  *  
@@ -97,7 +97,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err)
 
 /** 
- * @brief Macro which returns a scalar memory object information value. 
+ * Macro which returns a scalar memory object information value. 
  * 
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
@@ -120,7 +120,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		CL_TRUE, err))
 
 /** 
- * @brief Macro which returns an array memory object information value. 
+ * Macro which returns an array memory object information value. 
  * 
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
@@ -143,7 +143,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		CL_TRUE, err)
 
 /** 
- * @brief Increase the reference count of the cl_mem wrapper object.
+ * Increase the reference count of the cl_mem wrapper object.
  * 
  * @public @memberof ccl_memobj
  *  
@@ -153,7 +153,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 	ccl_wrapper_ref((CCLWrapper*) mo)
 
 /**
- * @brief Get the OpenCL cl_mem object.
+ * Get the OpenCL cl_mem object.
  * 
  * @public @memberof ccl_memobj
  * 

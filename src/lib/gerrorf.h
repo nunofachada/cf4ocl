@@ -18,7 +18,7 @@
  
 /** 
  * @file
- * @brief Error handling framework based on GLib's GError object.
+ * Error handling framework based on GLib's GError object.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -31,7 +31,7 @@
 #include <glib.h>
 
 /** 
- * @brief If error is detected (`error_code != no_error_code`), 
+ * If error is detected (`error_code != no_error_code`), 
  * create an error object (GError) and go to the specified label. 
  * 
  * @param[out] err GError* object.
@@ -50,7 +50,7 @@
 	}
 
 /** 
- * @brief If error is detected in `err` object (`err != NULL`),
+ * If error is detected in `err` object (`err != NULL`),
  * go to the specified label.
  * 
  * @param[in] err GError* object.
@@ -62,7 +62,7 @@
 	}
 
 /** 
- * @brief Same as gef_if_err_goto(), but rethrows error in a source
+ * Same as gef_if_err_goto(), but rethrows error in a source
  * GError to a new destination GError object.
  * 
  * @param[out] err_dest Destination GError** object.

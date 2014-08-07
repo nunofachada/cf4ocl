@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL memory object stub functions.
+ * OpenCL memory object stub functions.
  * 
  * @author Nuno Fachada
  * @date 2014

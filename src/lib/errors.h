@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Convert OpenCL error codes to readable strings (function header).
+ * Convert OpenCL error codes to readable strings (function header).
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -31,14 +31,14 @@
 /**
  * @defgroup ERRORS Errors
  *
- * @brief Readable OpenCL error codes.
+ * Readable OpenCL error codes.
  * 
  * Todo: detailed description of module with code examples.
  * 
  * @{
  */
 
-/** @brief Convert OpenCL error code to a readable string. */
+/** Convert OpenCL error code to a readable string. */
 const char* ccl_err(int code);
 
 /** @} */

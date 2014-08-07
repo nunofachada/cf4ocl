@@ -18,7 +18,7 @@
  
  /** 
  * @file
- * @brief Kernel argument wrapper.
+ * Kernel argument wrapper.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -32,7 +32,7 @@
 #include "abstract_wrapper.h"
 
 /** 
- * @brief The ::CCLArg type is an alias for ::CCLWrapper type. The value
+ * The ::CCLArg type is an alias for ::CCLWrapper type. The value
  * and size of local/private arguments is kept inside ::CCLWrapper
  * instances and manipulated by the ccl_arg_*() functions. This
  * allows client code to pass real wrappers, e.g. ::CCLBuffer, or 
@@ -41,23 +41,23 @@
  * */
 typedef CCLWrapper CCLArg;
 
-/** @brief Create a new kernel argument. */
+/** Create a new kernel argument. */
 CCLArg* ccl_arg_new(void* value, size_t size);
 
-/** @brief Destroy a kernel argument. */
+/** Destroy a kernel argument. */
 void ccl_arg_destroy(CCLArg* arg);
 
-/** @brief Get size in bytes of kernel argument. */
+/** Get size in bytes of kernel argument. */
 size_t ccl_arg_size(CCLArg* arg);
 
-/** @brief Get value of kernel argument. */
+/** Get value of kernel argument. */
 void* ccl_arg_value(CCLArg* arg);
 
 /**
  * @defgroup KERNEL_ARG Kernel argument wrappers
  * @ingroup KERNEL_WRAPPER
  *
- * @brief Wrapper objects for OpenCL kernel arguments.
+ * Wrapper objects for OpenCL kernel arguments.
  * 
  * Todo: detailed description of module with code examples.
  * 
@@ -65,7 +65,7 @@ void* ccl_arg_value(CCLArg* arg);
  */
 
 /**
- * @brief Define a private kernel argument.
+ * Define a private kernel argument.
  * 
  * The created object is automatically released when kernel is
  * enqueued.
@@ -78,7 +78,7 @@ void* ccl_arg_value(CCLArg* arg);
 	ccl_arg_new(&value, sizeof(type))
 
 /**
- * @brief Define a local kernel argument, which allocates local memory
+ * Define a local kernel argument, which allocates local memory
  * within the kernel with the specified size.
  * 
  * The created object is automatically released when kernel is
@@ -92,7 +92,7 @@ void* ccl_arg_value(CCLArg* arg);
 	ccl_arg_new(NULL, count * sizeof(type))
 
 /**
- * @brief Define a kernel argument which more control.
+ * Define a kernel argument which more control.
  * 
  * The created object is automatically released when kernel is
  * enqueued.

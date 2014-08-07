@@ -17,7 +17,7 @@
  
 /** 
  * @file
- * @brief Common implementations for examples.
+ * Common implementations for examples.
  * 
  * @author Nuno Fachada
  * @date 2014
@@ -27,7 +27,7 @@
 #include "examples_common.h"
 
 /**
- * @brief Print device requirements for program.
+ * Print device requirements for program.
  * 
  * @param[in] gws Global work size.
  * @param[in] lws Local work size.
@@ -48,7 +48,7 @@ void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 }
 
 /** 
- * @brief Get full kernel path name. 
+ * Get full kernel path name. 
  * 
  * Assumes the following:
  * * Kernel file is in the same place as executable.
@@ -90,7 +90,7 @@ gchar* ccl_ex_kernelpath_get(gchar* kernel_filename, char* exec_name) {
 }
 
 /** 
- * @brief Resolves to error category identifying string, in this case
+ * Resolves to error category identifying string, in this case
  * an error in the cf4ocl examples.
  * 
  * @return A GQuark structure defined by category identifying string,

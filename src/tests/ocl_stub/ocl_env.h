@@ -17,7 +17,7 @@
  
  /** 
  * @file
- * @brief OpenCL fake environment.
+ * OpenCL fake environment.
  * 
  * @author Nuno Fachada
  * @date 2014

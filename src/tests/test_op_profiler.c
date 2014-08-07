@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Operation (timming and correctness) tests for the profiling 
+ * Operation (timming and correctness) tests for the profiling 
  * module. Can only be performed using the OpenCL stub.
  * 
  * @author Nuno Fachada
@@ -45,7 +45,7 @@
 	)
 	
 /**
- * @brief Tests the profiling module.
+ * Tests the profiling module.
  * */
 static void operationTest() {
 	
@@ -286,7 +286,7 @@ static void operationTest() {
 }
 
 /**
- * @brief Main function.
+ * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

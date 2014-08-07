@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Create, add, destroy tests for context wrappers. Also tests
+ * Create, add, destroy tests for context wrappers. Also tests
  * device selection filters, device wrappers and platform wrappers.
  * 
  * @author Nuno Fachada
@@ -50,7 +50,7 @@ static cl_bool ccl_devsel_indep_test_true(
 }
 
 /**
- * @brief Tests creation, getting info from and destruction of 
+ * Tests creation, getting info from and destruction of 
  * context wrapper objects.
  * */
 static void context_create_info_destroy_test() {
@@ -318,7 +318,7 @@ static void context_create_info_destroy_test() {
 }
 
 /** 
- * @brief Test increasing reference count of objects which compose 
+ * Test increasing reference count of objects which compose 
  * larger objects, then destroy the larger object and verify that 
  * composing object still exists and must be freed by the function
  * which increase its reference count. This function tests the following
@@ -632,7 +632,7 @@ static void context_ref_unref_test() {
 }
 
 /**
- * @brief Main function.
+ * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

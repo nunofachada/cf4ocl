@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Create, add, destroy tests for the program wrapper. Also 
+ * Create, add, destroy tests for the program wrapper. Also 
  * tests the kernel and queue wrapper, kernel execution, and so on.
  * 
  * @author Nuno Fachada
@@ -56,7 +56,7 @@
 G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
 
 /**
- * @brief Tests creation, getting info from and destruction of 
+ * Tests creation, getting info from and destruction of 
  * program wrapper objects.
  * */
 static void program_create_info_destroy_test() {
@@ -422,7 +422,7 @@ static void program_create_info_destroy_test() {
 }
 
 /** 
- * @brief Test increasing reference count of objects which compose 
+ * Test increasing reference count of objects which compose 
  * larger objects, then destroy the larger object and verify that 
  * composing object still exists and must be freed by the function
  * which increase its reference count. This function tests the following
@@ -485,8 +485,6 @@ static void program_ref_unref_test() {
 	g_assert_no_error(err);
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) cq), ==, 1);
 	
-	/// @todo Do test for task and of native kernel
-	
 	/* Destroy remaining stuff. */
 	ccl_queue_destroy(cq);
 	ccl_program_destroy(prg);
@@ -499,7 +497,7 @@ static void program_ref_unref_test() {
 }
 
 /**
- * @brief Main function.
+ * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.
