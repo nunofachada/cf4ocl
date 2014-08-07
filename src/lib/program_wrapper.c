@@ -595,7 +595,7 @@ finish:
 		
 }
 
-CCLEvent* ccl_program_run(CCLProgram* prg, const char* kernel_name,
+CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg, const char* kernel_name,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err, ...) {
@@ -603,7 +603,7 @@ CCLEvent* ccl_program_run(CCLProgram* prg, const char* kernel_name,
 	CCLEvent* evt;
 	va_list args;
 	va_start(args, err);
-	evt = ccl_program_run_v(prg, kernel_name, cq, work_dim, 
+	evt = ccl_program_enqueue_kernel_v(prg, kernel_name, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
 		evt_wait_lst, err, args);
 	va_end(args);
@@ -611,7 +611,7 @@ CCLEvent* ccl_program_run(CCLProgram* prg, const char* kernel_name,
 
 }
 
-CCLEvent* ccl_program_run_v(CCLProgram* prg, const char* kernel_name,
+CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg, const char* kernel_name,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err, va_list args) {
@@ -625,7 +625,7 @@ CCLEvent* ccl_program_run_v(CCLProgram* prg, const char* kernel_name,
 	krnl = ccl_program_get_kernel(prg, kernel_name, err);
 	if (krnl == NULL) return NULL;
 	
-	evt = ccl_kernel_set_args_and_run_v(krnl, cq, work_dim, 
+	evt = ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
 		evt_wait_lst, err, args);
 	return evt;

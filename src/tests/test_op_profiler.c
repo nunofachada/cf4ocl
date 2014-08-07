@@ -90,21 +90,21 @@ static void operationTest() {
 	prof = ccl_prof_new();
 
 	/* Test with 5 different event names. */
-	ev1 = ccl_buffer_write(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
+	ev1 = ccl_buffer_enqueue_write(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev1, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev1);
 	ev_unwrapped->t_start = 10;
 	ev_unwrapped->t_end = 15;
 
-	ccl_buffer_map(q1, buf, CL_TRUE, CL_MAP_READ, 0, sizeof(cl_int) * 100, NULL, &ev2, &err);
+	ccl_buffer_enqueue_map(q1, buf, CL_TRUE, CL_MAP_READ, 0, sizeof(cl_int) * 100, NULL, &ev2, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev2, "Event2");
 	ev_unwrapped = ccl_event_unwrap(ev2);
 	ev_unwrapped->t_start = 16;
 	ev_unwrapped->t_end = 20;
 
-	ev3 = ccl_memobj_unmap((CCLMemObj*) buf, q1, a_bug, NULL, &err);
+	ev3 = ccl_memobj_enqueue_unmap((CCLMemObj*) buf, q1, a_bug, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev3, "Event3");
 	ev_unwrapped = ccl_event_unwrap(ev3);
@@ -115,35 +115,35 @@ static void operationTest() {
 	size_t lws = 16;
 	size_t gwo = 0;
 
-	ev4 = ccl_kernel_set_args_and_run(krnl, q3, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
+	ev4 = ccl_kernel_set_args_and_enqueue_ndrange(krnl, q3, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev4, "Event4");
 	ev_unwrapped = ccl_event_unwrap(ev4);
 	ev_unwrapped->t_start = 19;
 	ev_unwrapped->t_end = 25;
 
-	ev5 = ccl_buffer_read(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
+	ev5 = ccl_buffer_enqueue_read(q1, buf, CL_TRUE, 0, sizeof(cl_int) * 100, a_bug, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev5, "Event5");
 	ev_unwrapped = ccl_event_unwrap(ev5);
 	ev_unwrapped->t_start = 29;
 	ev_unwrapped->t_end = 40;
 
-	ev6 = ccl_buffer_write(q2, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
+	ev6 = ccl_buffer_enqueue_write(q2, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev6, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev6);
 	ev_unwrapped->t_start = 35;
 	ev_unwrapped->t_end = 45;
 
-	ev7 = ccl_kernel_set_args_and_run(krnl, q1, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
+	ev7 = ccl_kernel_set_args_and_enqueue_ndrange(krnl, q1, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev7, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev7);
 	ev_unwrapped->t_start = 68;
 	ev_unwrapped->t_end = 69;
 
-	ev8 = ccl_buffer_write(q3, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
+	ev8 = ccl_buffer_enqueue_write(q3, buf, CL_TRUE, 0, sizeof(cl_int) * 20, a_bug, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev8, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev8);

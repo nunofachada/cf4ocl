@@ -56,6 +56,11 @@ typedef struct ccl_program CCLProgram;
  */
 typedef struct ccl_kernel CCLKernel;
 
+//~ typedef void (CL_CALLBACK *ccl_kernel_callback)(void* args)
+//~ 
+//~ typedef CCLDevSelDevices (*ccl_devsel_dep)(
+	//~ CCLDevSelDevices devices, void *data, GError **err);
+
 /** @brief Get the kernel wrapper for the given OpenCL kernel. */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
@@ -73,22 +78,31 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
 void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args);
 
-CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq, 
+CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err);
 
-/** @brief Set kernel arguments and run it. */
-CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq, 
-	cl_uint work_dim, const size_t* global_work_offset, 
+/** @brief Set kernel arguments and enqueue it for execution. */
+CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, 
+	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
-CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq, 
+CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err, va_list args);
+	
+//~ CCLEvent* ccl_kernel_enqueue_native_full(CCLQueue* cq, 
+	//~ void (CL_CALLBACK *user_func)(void *), void *args, size_t cb_args,
+ 	//~ cl_uint num_mem_objects,
+ 	//~ const cl_mem *mem_list,
+ 	//~ const void **args_mem_loc,
+ 	//~ cl_uint num_events_in_wait_list,
+ 	//~ const cl_event *event_wait_list,
+ 	//~ cl_event *event) )
 
 /**
  * @brief Get a ::CCLWrapperInfo kernel information object.
@@ -104,8 +118,8 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_kernel_get_info(krnl, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) krnl, NULL, param_name, \
-		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, err)
+	ccl_wrapper_get_info((CCLWrapper*) (krnl), NULL, (param_name), \
+		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, (err))
 
 /** 
  * @brief Macro which returns a scalar kernel information value. 
@@ -126,9 +140,9 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * If an error occurs, zero is returned.
  * */
 #define ccl_kernel_get_scalar_info(krnl, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetKernelInfo, \
-		CL_TRUE, err))
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
+		NULL, (param_name), (ccl_wrapper_info_fp) clGetKernelInfo, \
+		CL_TRUE, (err)))
 
 /** 
  * @brief Macro which returns an array kernel information value. 
@@ -149,9 +163,9 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_kernel_get_array_info(krnl, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetKernelInfo, \
-		CL_TRUE, err)
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
+		NULL, (param_name), (ccl_wrapper_info_fp) clGetKernelInfo, \
+		CL_TRUE, (err))
 
 /**
  * @brief Get a ::CCLWrapperInfo kernel workgroup information object.
@@ -168,9 +182,9 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_kernel_get_workgroup_info(krnl, dev, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) krnl, (CCLWrapper*) dev, \
-		param_name, (ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
-		CL_FALSE, err)
+	ccl_wrapper_get_info((CCLWrapper*) (krnl), (CCLWrapper*) (dev), \
+		(param_name), (ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
+		CL_FALSE, (err))
 
 /** 
  * @brief Macro which returns a scalar kernel workgroup information 
@@ -194,10 +208,10 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * */
 #define ccl_kernel_get_scalar_workgroup_info(krnl, dev, param_name, \
 	param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
-		(CCLWrapper*) dev, param_name, \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
+		(CCLWrapper*) (dev), (param_name), \
 		(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
-		CL_FALSE, err))
+		CL_FALSE, (err)))
 
 /** 
  * @brief Macro which returns an array kernel workgroup information 
@@ -221,10 +235,10 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
  * */
 #define ccl_kernel_get_array_workgroup_info(krnl, dev, param_name, \
 	param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) krnl, \
-		(CCLWrapper*) dev, param_name, \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
+		(CCLWrapper*) (dev), (param_name), \
 		(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
-		CL_FALSE, err)
+		CL_FALSE, (err))
 
 #ifdef CL_VERSION_1_2
 
@@ -255,8 +269,9 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 #define ccl_kernel_get_scalar_arg_info(krnl, idx, param_name, \
 	param_type, err) \
 	(param_type) \
-	((ccl_kernel_get_arg_info(krnl, idx, param_name, err) != NULL) \
-	? **((param_type**) ccl_kernel_get_arg_info(krnl, idx, param_name, err)) \
+	((ccl_kernel_get_arg_info((krnl), (idx), (param_name), (err)) != NULL) \
+	? **((param_type**) ccl_kernel_get_arg_info( \
+		(krnl), (idx), (param_name), (err))) \
 	: 0)
 	
 /** 
@@ -281,8 +296,9 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * */
 #define ccl_kernel_get_array_arg_info(krnl, idx, param_name, \
 	param_type, err) \
-	(ccl_kernel_get_arg_info(krnl, idx, param_name, err) != NULL) \
-	? *((param_type*) ccl_kernel_get_arg_info(krnl, idx, param_name, err)) \
+	(ccl_kernel_get_arg_info((krnl), (idx), (param_name), (err)) != NULL) \
+	? *((param_type*) ccl_kernel_get_arg_info( \
+		(krnl), (idx), (param_name), (err))) \
 	: NULL
 
 #endif /* OpenCL >=1.2 */
@@ -295,7 +311,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * @param[in] krnl The kernel wrapper object. 
  * */
 #define ccl_kernel_ref(krnl) \
-	ccl_wrapper_ref((CCLWrapper*) krnl)
+	ccl_wrapper_ref((CCLWrapper*) (krnl))
 
 /**
  * @brief Alias to ccl_kernel_destroy().
@@ -316,7 +332,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * @return The OpenCL kernel object.
  * */
 #define ccl_kernel_unwrap(krnl) \
-	((cl_kernel) ccl_wrapper_unwrap((CCLWrapper*) krnl))
+	((cl_kernel) ccl_wrapper_unwrap((CCLWrapper*) (krnl)))
 
 
 /** @} */

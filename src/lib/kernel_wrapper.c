@@ -198,7 +198,7 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
 	}
 
 }
-CCLEvent* ccl_kernel_run(CCLKernel* krnl, CCLQueue* cq, 
+CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err) {
@@ -277,7 +277,7 @@ finish:
 }
 	
 /** 
- * @brief Set kernel arguments and run it. 
+ * @brief Set kernel arguments and enqueue it for execution.
  * 
  * @warning This function is not thread-safe. For multi-threaded 
  * execution of the same kernel function, create multiple instances of 
@@ -298,7 +298,7 @@ finish:
  * @param[in] ...
  * @return
  * */
-CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq, 
+CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err, ...) {
@@ -311,7 +311,7 @@ CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq,
 	
 	/* Set kernel arguments and run it. */
 	va_start(args, err);
-	evt = ccl_kernel_set_args_and_run_v(krnl, cq, work_dim, 
+	evt = ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
 		evt_wait_lst, err, args);
 	va_end(args);
@@ -321,7 +321,7 @@ CCLEvent* ccl_kernel_set_args_and_run(CCLKernel* krnl, CCLQueue* cq,
 	
 }
 
-CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq, 
+CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList evt_wait_lst, GError** err, va_list args) {
@@ -341,7 +341,7 @@ CCLEvent* ccl_kernel_set_args_and_run_v(CCLKernel* krnl, CCLQueue* cq,
 	ccl_kernel_set_args_v(krnl, args);
 	
 	/* Enqueue kernel. */
-	evt = ccl_kernel_run(krnl, cq, work_dim, global_work_offset, 
+	evt = ccl_kernel_enqueue_ndrange(krnl, cq, work_dim, global_work_offset, 
 		global_work_size, local_work_size, evt_wait_lst, &err_internal);
 	gef_if_err_propagate_goto(err, err_internal, error_handler);
 	

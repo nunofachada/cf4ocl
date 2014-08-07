@@ -51,7 +51,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * @{
  */
 
-CCLEvent* ccl_memobj_unmap(CCLMemObj* mo, CCLQueue* cq, 
+CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq, 
 	void* mapped_ptr, CCLEventWaitList evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
@@ -107,7 +107,7 @@ finish:
 	
 #ifdef CL_VERSION_1_2
 
-CCLEvent* ccl_memobj_migrate(CCLMemObj** mos, cl_uint num_mos,
+CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags, 
  	CCLEventWaitList evt_wait_lst, GError** err) {
 		

@@ -357,10 +357,10 @@ static void program_create_info_destroy_test() {
 	
 	/* Copy host data to device buffers without waiting for transfer
 	 * to terminate before continuing host program. */
-	evt_w1 = ccl_buffer_write(cq, a_w, CL_FALSE, 0, 
+	evt_w1 = ccl_buffer_enqueue_write(cq, a_w, CL_FALSE, 0, 
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
 	g_assert_no_error(err);
-	evt_w2 = ccl_buffer_write(cq, b_w, CL_FALSE, 0, 
+	evt_w2 = ccl_buffer_enqueue_write(cq, b_w, CL_FALSE, 0, 
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
 	g_assert_no_error(err);
 
@@ -371,7 +371,7 @@ static void program_create_info_destroy_test() {
 	
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
-	evt_kr = ccl_kernel_set_args_and_run(krnl, cq, 1, NULL, &gws, &lws, 
+	evt_kr = ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL, &gws, &lws, 
 		ewl, &err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 	
@@ -381,7 +381,7 @@ static void program_create_info_destroy_test() {
 	/* Read back results from host, waiting for the kernel termination
 	 * event (this will empty the event wait list) without waiting for 
 	 * transfer to terminate before continuing host program.. */
-	evt_r1 = ccl_buffer_read(cq, c_w, CL_FALSE, 0, 
+	evt_r1 = ccl_buffer_enqueue_read(cq, c_w, CL_FALSE, 0, 
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, ewl, &err);
 	g_assert_no_error(err);
 	

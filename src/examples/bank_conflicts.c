@@ -204,7 +204,7 @@ int main(int argc, char *argv[]) {
 	gef_if_err_goto(err, error_handler);
 	
 	/* Copy data from host to device. */
-	ccl_buffer_write(cq, buf_data_dev, CL_TRUE, 0, size_data_in_bytes,
+	ccl_buffer_enqueue_write(cq, buf_data_dev, CL_TRUE, 0, size_data_in_bytes,
 		data_host, NULL, &err);
 	gef_if_err_goto(err, error_handler);
 
@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
 	/*  Set kernel arguments and run kernel */
 	/* ************************************ */
 	
-	ccl_program_run(prg, "bankconf", cq, 2, NULL, gws, lws, NULL, &err,
+	ccl_program_enqueue_kernel(prg, "bankconf", cq, 2, NULL, gws, lws, NULL, &err,
 		buf_data_dev, ccl_arg_local(lws[1] * lws[0], cl_int),
 		ccl_arg_priv(stride, cl_uint), NULL);
 	gef_if_err_goto(err, error_handler);
