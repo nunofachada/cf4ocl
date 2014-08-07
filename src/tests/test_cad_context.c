@@ -184,7 +184,6 @@ static void context_create_info_destroy_test() {
 	} else { 
 		ccl_context_destroy(ctx);
 	}
-	filters = NULL;
 
 	/* 3.2. CPU device type filter. */
 
@@ -200,7 +199,6 @@ static void context_create_info_destroy_test() {
 	} else { 
 		ccl_context_destroy(ctx);
 	}
-	filters = NULL;
 
 	/* 3.3. Accel. device type filter. */
 	
@@ -217,7 +215,6 @@ static void context_create_info_destroy_test() {
 	} else { 
 		ccl_context_destroy(ctx);
 	}
-	filters = NULL;
 	
 	/* Check that at least one device type context was created. */
 	g_assert(any_device);
@@ -242,7 +239,6 @@ static void context_create_info_destroy_test() {
 	
 	/* Free context and set filters to NULL. */
 	ccl_context_destroy(ctx);
-	filters = NULL;
 	
 	/* 
 	 * 4. Test context creation by device filtering 
@@ -285,7 +281,6 @@ static void context_create_info_destroy_test() {
 	
 	/* Free context and set filters to NULL. */
 	ccl_context_destroy(ctx);
-	filters = NULL;
 
 	/* 
 	 * 5. Test context creation by device filtering 
@@ -315,7 +310,6 @@ static void context_create_info_destroy_test() {
 
 	/* Free context and set filters to NULL. */
 	ccl_context_destroy(ctx);
-	filters = NULL;
 	
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
@@ -561,8 +555,6 @@ static void context_ref_unref_test() {
 		/* Destroy device. */
 		ccl_device_destroy(d);
 	}
-	/* Set filters to NULL so we can reuse variable. */
-	filters = NULL;
 
 	/* Create a filter to get all CPUs from the same platform. */
 	ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_cpu, NULL);
@@ -597,8 +589,6 @@ static void context_ref_unref_test() {
 		/* Destroy device. */
 		ccl_device_destroy(d);
 	}
-	/* Set filters to NULL so we can reuse variable. */
-	filters = NULL;
 	
 	/* **************************************** */
 	/* **** Test context creation by menu. **** */

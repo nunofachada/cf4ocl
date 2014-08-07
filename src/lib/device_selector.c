@@ -637,6 +637,9 @@ finish:
 		
 	/* Free filter array. */
 	g_ptr_array_free(*filters, CL_TRUE);
+	
+	/* Set filters to NULL, so variable can be reused by client. */
+	*filters = NULL;
 
 	/* Return the selected devices. */
 	return devices;
