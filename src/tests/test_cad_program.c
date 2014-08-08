@@ -270,7 +270,7 @@ static void program_create_info_destroy_test() {
 		kernel_arg_type_name = ccl_kernel_get_array_arg_info(krnl, 0,
 			0 /* invalid value */, char*, &err);
 		g_assert(kernel_arg_type_name == NULL);
-		g_assert_error(err, CCL_ERROR, CCL_ERROR_OCL);
+		g_assert (err != NULL);
 		g_clear_error(&err);
 	}
 

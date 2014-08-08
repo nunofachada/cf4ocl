@@ -56,18 +56,24 @@ typedef enum ccl_error_code {
 	/** The operation is not supported by the version of the
 	 * selected OpenCL platform. */
 	CCL_ERROR_UNSUPPORTED_OCL  = 6,
-	/** OpenCL error. */
-	CCL_ERROR_OCL              = 7,
 	/** Any other errors. */
 	CCL_ERROR_OTHER            = 15
 } CCLErrorCode;
 
 /** Resolves to error category identifying string, in this case an error 
- * in the OpenCL utilities library. */
+ * in the cf4ocl. */
 #define CCL_ERROR ccl_error_quark()
 
+/** Resolves to error category identifying string, in this case an error 
+ * in the cf4ocl. */
+#define CCL_OCL_ERROR ccl_ocl_error_quark()
+
 /** Resolves to error category identifying string, in this case
- * an error in the OpenCL utilities library. */
+ * an error in cf4ocl. */
 GQuark ccl_error_quark(void);
+
+/** Resolves to error category identifying string, in this case
+ * an error in the OpenCL library. */
+GQuark ccl_ocl_error_quark(void);
 
 #endif

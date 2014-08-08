@@ -361,8 +361,8 @@ cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
 	ocl_status = clWaitForEvents(
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst));
-	gef_if_err_create_goto(*err, CCL_ERROR, 
-		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: error while waiting for events (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 	
@@ -406,8 +406,8 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 		
 		/* If so, use clEnqueueBarrier() */
 		ocl_status = clEnqueueBarrier(ccl_queue_unwrap(cq));
-		gef_if_err_create_goto(*err, CCL_ERROR, 
-			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+			CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 			"%s: error in clEnqueueBarrier() (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
@@ -417,8 +417,8 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 		ocl_status = clEnqueueWaitForEvents(ccl_queue_unwrap(cq),
 			ccl_event_wait_list_get_num_events(evt_wait_lst),
 			ccl_event_wait_list_get_clevents(evt_wait_lst));
-		gef_if_err_create_goto(*err, CCL_ERROR, 
-			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+			CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 			"%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
@@ -426,8 +426,8 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 
 	/* Enqueue a marker so we get an OpenCL event object. */
 	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
-	gef_if_err_create_goto(*err, CCL_ERROR, 
-		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 
@@ -493,8 +493,8 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 		ocl_status = clEnqueueBarrierWithWaitList(ccl_queue_unwrap(cq),
 			ccl_event_wait_list_get_num_events(evt_wait_lst),
 			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-		gef_if_err_create_goto(*err, CCL_ERROR, 
-			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+			CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 			"%s: error in clEnqueueBarrierWithWaitList() (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
@@ -564,8 +564,8 @@ static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
 
 	/* Call clEnqueueMarker() once. */
 	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
-	gef_if_err_create_goto(*err, CCL_ERROR, 
-		CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 
@@ -630,8 +630,8 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 		ocl_status = clEnqueueMarkerWithWaitList(ccl_queue_unwrap(cq),
 			ccl_event_wait_list_get_num_events(evt_wait_lst),
 			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-		gef_if_err_create_goto(*err, CCL_ERROR, 
-			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+			CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 			"%s: error in clEnqueueMarkerWithWaitList() (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
 		

@@ -38,3 +38,13 @@ GQuark ccl_error_quark() {
 	return g_quark_from_static_string("ccl-error-quark");
 }
 
+/** 
+ *  Resolves to error category identifying string, in this case
+ * an error in the OpenCL library.
+ * 
+ * @return A GQuark structure defined by category identifying string,
+ * which identifies the error as an error in the OpenCL library.
+ */
+GQuark ccl_ocl_error_quark() {
+	return g_quark_from_static_string("ccl-ocl-error-quark");
+}

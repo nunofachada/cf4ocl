@@ -129,8 +129,8 @@ static cl_context_properties* ccl_context_properties_default(
 		/* Get context platform using first device. */
 		ocl_status = clGetDeviceInfo(device, CL_DEVICE_PLATFORM, 
 			sizeof(cl_platform_id), &platform, NULL);
-		gef_if_err_create_goto(*err, CCL_ERROR, 
-			CL_SUCCESS != ocl_status, CCL_ERROR_OCL, error_handler, 
+		gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+			CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 			"%s: unable to get platform from device (OpenCL error %d: %s).", 
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
 
@@ -346,8 +346,8 @@ CCLContext* ccl_context_new_from_devices_full(
 		(const cl_context_properties*) ctx_props, num_devices, 
 		(const cl_device_id*) cl_devices, pfn_notify, user_data, 
 		&ocl_status);
-	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
-		CCL_ERROR_OCL, error_handler, 
+	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to create cl_context (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
