@@ -551,15 +551,17 @@ static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
 	/* OpenCL event object. */
 	cl_event event = NULL;
 	
-	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-	
 	/* evt_wait_lst must be NULL or empty, because getting a marker to
 	 * wait on some events is only supported in OpenCL >= 1.2. */
-	gef_if_err_create_goto(*err, CCL_ERROR, 
-		evt_wait_lst != NULL, CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
-		"%s: The selected platform OpenCL version doesn't support markers on specific events.",
-		G_STRLOC);
+	if (evt_wait_lst != NULL) {
+		g_warning("The OpenCL version of the selected platform " \
+			"doesn't support markers on specific events. The marker " \
+			"will only fire an event when all previous events have " \
+			"been completed");
+	}
 	 
+	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+
 	/* Call clEnqueueMarker() once. */
 	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
 	gef_if_err_create_goto(*err, CCL_ERROR, 

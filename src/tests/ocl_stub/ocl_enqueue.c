@@ -181,3 +181,64 @@ clEnqueueMigrateMemObjects(cl_command_queue command_queue,
 	
 	return CL_SUCCESS;
 }
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueMarker(cl_command_queue command_queue, cl_event *event) 
+	CL_API_SUFFIX__VERSION_1_0 {
+
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_MARKER);
+	return CL_SUCCESS;
+
+}
+    
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueWaitForEvents(cl_command_queue command_queue,
+	cl_uint num_events, const cl_event* event_list) 
+	CL_API_SUFFIX__VERSION_1_0 {
+
+	command_queue = command_queue;
+	num_events = num_events;
+	event_list = event_list;
+	
+	return CL_SUCCESS;
+
+}
+    
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueBarrier(cl_command_queue command_queue) 
+	CL_API_SUFFIX__VERSION_1_0 {
+	
+	command_queue = command_queue;
+	
+	return CL_SUCCESS;
+}
+
+#ifdef CL_VERSION_1_2
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueMarkerWithWaitList(cl_command_queue command_queue,
+	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
+	cl_event* event) CL_API_SUFFIX__VERSION_1_2 {
+
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_MARKER);
+	return CL_SUCCESS;
+
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueBarrierWithWaitList(cl_command_queue command_queue,
+	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
+	cl_event* event) CL_API_SUFFIX__VERSION_1_2 {
+		
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_BARRIER);
+	return CL_SUCCESS;
+
+}
+
+#endif

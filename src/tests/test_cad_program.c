@@ -376,12 +376,16 @@ static void program_create_info_destroy_test() {
 	
 	/* Add the kernel termination event to the wait list. */
 	ccl_event_wait_list_add(&ewl, evt_kr);
+
+	/* Sync. queue for events in wait list (just the kernel event in
+	 * this case) to terminate before going forward... */
+	ccl_enqueue_barrier(cq, &ewl, &err);
+	g_assert_no_error(err);
 	
-	/* Read back results from host, waiting for the kernel termination
-	 * event (this will empty the event wait list) without waiting for 
+	/* Read back results from host without waiting for 
 	 * transfer to terminate before continuing host program.. */
 	evt_r1 = ccl_buffer_enqueue_read(cq, c_w, CL_FALSE, 0, 
-		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, &ewl, &err);
+		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, NULL, &err);
 	g_assert_no_error(err);
 	
 	/* Add read back results event to wait list. */
