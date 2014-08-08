@@ -211,6 +211,10 @@ CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
  * If it reaches 0, the context wrapper object is destroyed. */
 void ccl_context_destroy(CCLContext* ctx);
 
+/** Get numeric OpenCL version of underlying platform. */
+double ccl_context_get_opencl_version(
+	CCLContext* ctx, GError** err);
+
 /**
  * Get a ::CCLWrapperInfo context information object.
  * 

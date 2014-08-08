@@ -182,7 +182,6 @@ static void program_create_info_destroy_test() {
 #ifndef OPENCL_STUB
 #ifdef CL_VERSION_1_2
 
-	CCLPlatform* platf = NULL;
 	double platf_ver;
 	cl_kernel_arg_address_qualifier kaaq;
 	char* kernel_arg_type_name;
@@ -191,9 +190,7 @@ static void program_create_info_destroy_test() {
 	/* Get kernel argument information, compare it with expected info. */
 
 	/* Make sure platform is OpenCL >= 1.2 */
-	platf = ccl_context_get_platform(ctx, &err);
-	g_assert_no_error(err);
-	platf_ver = ccl_platform_get_opencl_version(platf, &err);
+	platf_ver = ccl_context_get_opencl_version(ctx, &err);
 	g_assert_no_error(err);
 	if (platf_ver >= 1.2) {
 		

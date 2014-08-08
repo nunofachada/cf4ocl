@@ -36,7 +36,7 @@ struct ccl_buffer {
 
 	/** 
 	 * Parent wrapper object. 
-	 * @protected
+	 * @private
 	 * */
 	CCLMemObj mo;
 

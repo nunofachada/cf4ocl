@@ -501,6 +501,37 @@ void ccl_context_destroy(CCLContext* ctx) {
 }
 
 /** 
+ * Get numeric OpenCL version of underlying platform. 
+ * 
+ * @public @memberof ccl_context
+ * 
+ * @param[in] ctx The context wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return OpenCL version of the underlying platform in numeric format.
+ * If an error occurs, 0 is returned.
+ * */
+double ccl_context_get_opencl_version(
+	CCLContext* ctx, GError** err) {
+		
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, 0);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+	
+	CCLPlatform* platf;
+	double ver;
+	
+	platf = ccl_context_get_platform(ctx, err);
+	if (platf == NULL) {
+		ver = 0.0;
+	} else {
+		ver = ccl_platform_get_opencl_version(platf, err);
+	}
+	return ver;
+}
+
+/** 
  * Get the platform associated with the context devices. 
  * 
  * @public @memberof ccl_context

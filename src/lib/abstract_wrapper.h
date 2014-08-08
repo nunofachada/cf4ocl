@@ -49,19 +49,19 @@ typedef struct ccl_wrapper {
 
 	/** 
 	 * The wrapped OpenCL object. 
-	 * @protected
+	 * @private
 	 * */
 	void* cl_object;
 
 	/** 
 	 * Information about the wrapped OpenCL object. 
-	 * @protected
+	 * @private
 	 * */
 	GHashTable* info;
 
 	/** 
 	 * Reference count. 
-	 * @protected
+	 * @private
 	 * */
 	int ref_count;    
 	

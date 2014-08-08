@@ -145,15 +145,36 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 		dev = ccl_context_get_device(ctx, 0, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	}
+
+#ifdef CL_VERSION_2_0
+	/* OpenCL platform version of the given context. */
+	double platf_ver;
+
+	/* Get context platform version. */
+	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
+	/* Create and keep the OpenCL command queue object. */
+	if (platf_ver < 2.0) {
+		queue = clCreateCommandQueueWithProperties(ccl_context_unwrap(ctx), 
+			ccl_device_unwrap(dev), properties, &ocl_status);
+	} else {
+		G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+		queue = clCreateCommandQueue(ccl_context_unwrap(ctx), 
+			ccl_device_unwrap(dev), properties, &ocl_status);
+		G_GNUC_END_IGNORE_DEPRECATIONS
+	}
+#else
 	/* Create and keep the OpenCL command queue object. */
 	queue = clCreateCommandQueue(ccl_context_unwrap(ctx), 
 		ccl_device_unwrap(dev), properties, &ocl_status);
+#endif
+
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to create queue (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
-	
+
 	/* Wrap the queue. */
 	cq = ccl_queue_new_wrap(queue);
 

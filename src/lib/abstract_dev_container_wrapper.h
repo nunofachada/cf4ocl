@@ -48,13 +48,22 @@
  * */
 typedef struct ccl_dev_container {
 
-	/** Parent wrapper object. */
+	/** 
+	 * Parent wrapper object. 
+	 * @private
+	 * */
 	CCLWrapper base;
 
-	/** Number of devices in context (can be lazy initialized). */
+	/** 
+	 * Number of devices in context (can be lazy initialized). 
+	 * @private
+	 * */
 	cl_uint num_devices;
 	
-	/** Devices in context (can be lazy initialized). */
+	/** 
+	 * Devices in context (can be lazy initialized). 
+	 * @private
+	 * */
 	CCLDevice** devices;
 
 } CCLDevContainer;

@@ -52,13 +52,13 @@ typedef struct ccl_memobj {
 
 	/** 
 	 * Parent wrapper object. 
-	 * @protected
+	 * @private
 	 * */
 	CCLWrapper base;
 	
 	/** 
 	 * Context wrapper. 
-	 * @protected
+	 * @private
 	 * */
 	CCLContext* ctx;
 	

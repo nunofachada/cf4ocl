@@ -532,15 +532,12 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	 * the platform's OpenCL version for selecting the desired 
 	 * functionality. */
 	CCLContext* ctx;
-	CCLPlatform* platf;
 	double platf_ver;
 	
 	/* Get platform version. */
 	ctx = ccl_queue_get_context(cq, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	platf = ccl_context_get_platform(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	platf_ver = ccl_platform_get_opencl_version(platf, &err_internal);
+	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Proceed depending on platform version. */
@@ -669,15 +666,12 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 	 * the platform's OpenCL version for selecting the desired 
 	 * functionality. */
 	CCLContext* ctx;
-	CCLPlatform* platf;
 	double platf_ver;
 	
 	/* Get platform version. */
 	ctx = ccl_queue_get_context(cq, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	platf = ccl_context_get_platform(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	platf_ver = ccl_platform_get_opencl_version(platf, &err_internal);
+	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Proceed depending on platform version. */

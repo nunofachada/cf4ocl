@@ -36,7 +36,7 @@ struct ccl_image {
 
 	/** 
 	 * Parent wrapper object. 
-	 * @protected
+	 * @private
 	 * */
 	CCLMemObj mo;
 

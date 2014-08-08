@@ -219,6 +219,11 @@ void ccl_platform_destroy(CCLPlatform* platf) {
 double ccl_platform_get_opencl_version(
 	CCLPlatform* platf, GError** err) {
 
+	/* Make sure platf is not NULL. */
+	g_return_val_if_fail(platf != NULL, 0);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+
 	char* ver_str;
 	
 	/* Get version string which has the format "OpenCL x.x ..." */
