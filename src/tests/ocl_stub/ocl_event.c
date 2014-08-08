@@ -118,4 +118,54 @@ clWaitForEvents(cl_uint num_events, const cl_event* event_list)
 	return CL_SUCCESS;
 }
 
+CL_API_ENTRY cl_event CL_API_CALL
+clCreateUserEvent(cl_context context, cl_int* errcode_ret) 
+	CL_API_SUFFIX__VERSION_1_1 {
+	
+	cl_event event = NULL;
+	if (context == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+	} else {
+		ocl_stub_create_event(&event, NULL, CL_COMMAND_USER);
+		event->context = context;
+		seterrcode(errcode_ret, CL_SUCCESS);
+	}
+	return event;
+}
+                            
+CL_API_ENTRY cl_int CL_API_CALL
+clSetUserEventStatus(cl_event event, cl_int execution_status) 
+	CL_API_SUFFIX__VERSION_1_1 {
+	
+	cl_int status;
+	if (event == NULL) {
+		status = CL_INVALID_EVENT;
+	} else if ((event->exec_status == CL_COMPLETE) || (event->exec_status < 0)) {
+		status = CL_INVALID_OPERATION;
+	} else if ((execution_status != CL_COMPLETE) && (execution_status >= 0)) {
+		status = CL_INVALID_VALUE;
+	} else {
+		event->exec_status = execution_status;
+		status = CL_SUCCESS;
+	}
+	return status;
+}
+                     
+CL_API_ENTRY cl_int CL_API_CALL
+clSetEventCallback(cl_event event, cl_int command_exec_callback_type,
+	void (CL_CALLBACK *pfn_notify)(cl_event, cl_int, void *),
+	void* user_data) CL_API_SUFFIX__VERSION_1_1 {
+	
+	/* Not implemented. Doesn't make sense to implement in current
+	 * state of stub because created events are automatically set to
+	 * CL_COMPLETE. */
+	
+	event = event;
+	command_exec_callback_type = command_exec_callback_type;
+	pfn_notify = pfn_notify;
+	user_data = user_data;
+	
+	/* Return an error. */
+	return CL_OUT_OF_RESOURCES;
 
+}

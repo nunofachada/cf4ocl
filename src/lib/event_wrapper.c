@@ -317,6 +317,63 @@ cl_command_type ccl_event_get_command_type(
 	return ct;
 }
 
+#ifdef CL_VERSION_1_1
+
+/** 
+ * Wrapper for OpenCL clSetEventCallback() function. 
+ * 
+ * @public @memberof ccl_event
+ * 
+ * @todo Check if platform version is >= 1.1, otherwise throw error.
+ * 
+ * @param[in] evt
+ * @param[in] command_exec_callback_type
+ * @param[in] pfn_notify
+ * @param[in] user_data
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return
+ * */
+cl_bool ccl_event_set_callback(CCLEvent* evt, 
+	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
+	void *user_data, GError** err) {
+		
+	/* Make sure evt is not NULL. */
+	g_return_val_if_fail(evt != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+	
+	cl_int ocl_status;
+	cl_bool ret_status;
+	
+	ocl_status = clSetEventCallback(ccl_event_unwrap(evt),
+		command_exec_callback_type, pfn_notify, user_data);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to set event callback (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	ret_status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+	ret_status = CL_FALSE;
+	
+finish:
+
+	/* Return status. */
+	return ret_status;
+
+}
+
+#endif
+
 void ccl_event_wait_list_add(
 	CCLEventWaitList* evt_wait_lst, CCLEvent* evt) {
 		
@@ -677,6 +734,86 @@ finish:
 	
 	/* Return event. */
 	return evt;
+
+}
+
+CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
+	
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+
+	/* OpenCL status. */
+	cl_int ocl_status;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	/* OpenCL event object. */
+	cl_event event;
+	
+	/* Create user event. */
+	event = clCreateUserEvent(ccl_context_unwrap(ctx), &ocl_status);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: error creating user event (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event. */
+	evt = ccl_event_new_wrap(event);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
+	
+	/* Return event wrapper. */
+	return evt;
+
+}
+
+cl_bool ccl_user_event_set_status(
+	CCLEvent* evt, cl_int execution_status, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Make sure evt is not NULL. */
+	g_return_val_if_fail(evt != NULL, NULL);
+
+	/* OpenCL status. */
+	cl_int ocl_status;
+
+	/* Function return status. */
+	cl_bool ret_status;
+	
+	/* Set status. */
+	ocl_status = clSetUserEventStatus(
+		ccl_event_unwrap(evt), execution_status);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: error setting user event status (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	ret_status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	ret_status = CL_FALSE;
+
+finish:
+	
+	/* Return status. */
+	return ret_status;
 
 }
 

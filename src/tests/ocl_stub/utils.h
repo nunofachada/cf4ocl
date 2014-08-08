@@ -31,6 +31,9 @@
 
 guint veclen(void* vector, size_t elem_size);
 
+void ocl_stub_create_event(
+	cl_event* event, cl_command_queue queue, cl_command_type ctype);
+
 #define seterrcode(errcode_ret, errcode) \
 	if ((errcode_ret) != NULL) *(errcode_ret) = (errcode)
 

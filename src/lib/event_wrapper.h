@@ -31,6 +31,7 @@
 #include <glib.h>
 #include "oclversions.h"
 #include "abstract_wrapper.h"
+#include "context_wrapper.h"
 
 /* Forward declaration of CLLQueue. */
 typedef struct ccl_queue CCLQueue;
@@ -53,6 +54,9 @@ typedef struct ccl_queue CCLQueue;
  * */
 typedef struct ccl_event CCLEvent;
 
+typedef void (CL_CALLBACK *ccl_event_callback)(cl_event event,
+	cl_int event_command_exec_status, void *user_data);
+
 /** Get the event wrapper for the given OpenCL event. */
 CCLEvent* ccl_event_new_wrap(cl_event event);
 
@@ -69,6 +73,15 @@ const char* ccl_event_get_final_name(CCLEvent* evt);
 /** Get the command type which fired the given event. */
 cl_command_type ccl_event_get_command_type(
 	CCLEvent* evt, GError** err);
+	
+#ifdef CL_VERSION_1_1
+
+/** Wrapper for OpenCL clSetEventCallback() function. */
+cl_bool ccl_event_set_callback(CCLEvent* evt, 
+	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
+	void *user_data, GError** err);
+
+#endif
 
 /**
  * Get a ::CCLWrapperInfo event information object.
@@ -267,6 +280,11 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq, 
 	CCLEventWaitList* evt_wait_lst, GError** err);
+	
+CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err);
+
+cl_bool ccl_user_event_set_status(
+	CCLEvent* evt, cl_int execution_status, GError** err);
 
 /** @} */
 

@@ -128,7 +128,7 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	/* Make sure mo is not NULL. */
 	g_return_val_if_fail(mo != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 	
 	cl_int ocl_status;
 	cl_bool ret_status;

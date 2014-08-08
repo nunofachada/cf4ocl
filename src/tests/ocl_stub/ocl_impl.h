@@ -61,20 +61,6 @@ struct _cl_command_queue {
 	cl_command_queue_properties properties;
 };
 
-#define ocl_stub_create_event(event, queue, ctype) \
-	if (event != NULL) { \
-		*event = g_slice_new(struct _cl_event); \
-		(*event)->t_queued = g_get_real_time(); \
-		(*event)->t_submit = g_get_real_time(); \
-		(*event)->t_start = g_get_real_time(); \
-		(*event)->t_end = g_get_real_time(); \
-		(*event)->command_queue = queue; \
-		(*event)->context = queue->context; \
-		(*event)->command_type = ctype; \
-		(*event)->exec_status = CL_COMPLETE; \
-		(*event)->ref_count = 1; \
-	}
-
 struct _cl_device_id {
 	const cl_uint address_bits;
 	const cl_bool available;
