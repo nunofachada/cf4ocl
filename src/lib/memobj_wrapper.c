@@ -104,9 +104,82 @@ finish:
 
 
 }
+
+#ifdef CL_VERSION_1_1
+
+/** 
+ * Wrapper for OpenCL clSetMemObjectDestructorCallback() function. 
+ * 
+ * @public @memberof ccl_memobj
+ * 
+ * @todo Check if platform version is >= 1.2, otherwise throw error.
+ * 
+ * @param[in] mo
+ * @param[in] pfn_notify
+ * @param[in] user_data
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return
+ * */
+cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo, 
+	ccl_memobj_destructor_callback pfn_notify,
+	void *user_data, GError** err) {
+		
+	/* Make sure mo is not NULL. */
+	g_return_val_if_fail(mo != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 	
+	cl_int ocl_status;
+	cl_bool ret_status;
+	
+	ocl_status = clSetMemObjectDestructorCallback(ccl_memobj_unwrap(mo),
+		pfn_notify, user_data);
+	gef_if_err_create_goto(*err, CCL_ERROR, CL_SUCCESS != ocl_status, 
+		CCL_ERROR_OCL, error_handler, 
+		"%s: unable to set memory object destructor callback (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	ret_status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+	ret_status = CL_FALSE;
+	
+finish:
+
+	/* Return status. */
+	return ret_status;
+
+}
+
+#endif
+
+
 #ifdef CL_VERSION_1_2
 
+/**
+ * Wrapper for OpenCL clEnqueueMigrateMemObjects() function.
+ * 
+ * @public @memberof ccl_memobj
+ * 
+ * @todo Check if platform version is >= 1.2, otherwise throw error.
+ * 
+ * @param[in] mos
+ * @param[in] num_mos
+ * @param[in] cq
+ * @param[in] flags
+ * @param[in] evt_wait_lst
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return
+ * */
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags, 
  	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -164,7 +237,7 @@ error_handler:
 finish:
 
 	/* Return evt. */
-	return evt;		
+	return evt;
 
 }
 

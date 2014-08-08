@@ -27,6 +27,11 @@
 #include "ocl_env.h"
 #include "utils.h"
 
+struct cl_memobject_callbacks {
+	void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data);
+	void* user_data;
+};
+
 CL_API_ENTRY cl_int CL_API_CALL
 clRetainMemObject(cl_mem memobj) CL_API_SUFFIX__VERSION_1_0 {
 	
@@ -40,6 +45,18 @@ clReleaseMemObject(cl_mem memobj) CL_API_SUFFIX__VERSION_1_0 {
 
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&memobj->ref_count)) {
+		
+		/* Call callback functions. */
+		GSList* curr = memobj->callbacks;
+		while (curr != NULL) {
+			struct cl_memobject_callbacks* cb = 
+				(struct cl_memobject_callbacks*) curr->data;
+			cb->pfn_notify(memobj, cb->user_data);
+			curr = g_slist_next(curr);
+		}
+		
+		/* Free callback list. */
+		g_slist_free_full(memobj->callbacks, g_free);
 
 		/* Release memory object depending ontype.*/
 		if (memobj->type == CL_MEM_OBJECT_BUFFER) {
@@ -91,4 +108,32 @@ clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
 	}
 
 	return status;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clSetMemObjectDestructorCallback(cl_mem memobj,
+	void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data),
+	void* user_data) CL_API_SUFFIX__VERSION_1_1 {
+
+	cl_int status;
+
+	if (memobj == NULL) {
+		status = CL_INVALID_MEM_OBJECT;
+	} else if (pfn_notify == NULL) {
+		status = CL_INVALID_VALUE;
+	} else {
+		
+		struct cl_memobject_callbacks* cb = 
+			g_new0(struct cl_memobject_callbacks, 1);
+		
+		cb->pfn_notify = pfn_notify;
+		cb->user_data = user_data;
+			
+		memobj->callbacks = g_slist_prepend(
+			memobj->callbacks, (gpointer) cb);
+			
+		status = CL_SUCCESS;
+	}
+	return status;
+
 }

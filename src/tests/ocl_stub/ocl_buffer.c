@@ -45,6 +45,8 @@ clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 	memobj->associated_object = NULL;
 	memobj->offset = 0;
 	
+	memobj->callbacks = NULL;
+	
 	return memobj;
 }
 
@@ -70,6 +72,8 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 	memobj->offset = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
 		? ((struct _cl_buffer_region*) buffer_create_info)->origin
 		: 0;
+
+	memobj->callbacks = NULL;
 
 	return memobj;
 }

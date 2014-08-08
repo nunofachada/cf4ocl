@@ -24,6 +24,7 @@
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
+ * 
  * */
  
 #include "device_wrapper.h"
@@ -33,6 +34,8 @@
  * Device wrapper class.
  * 
  * @extends ccl_wrapper
+ * 
+ * @todo Add support for sub-devices.
  */
 struct ccl_device {
 

@@ -206,6 +206,7 @@ struct _cl_mem {
 	cl_context context;
 	cl_mem associated_object;
 	size_t offset;
+	GSList* callbacks;
 };
 
 struct _cl_image {
