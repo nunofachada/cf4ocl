@@ -362,10 +362,14 @@ CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
+	/* OpenCL function status. */
 	cl_int ocl_status;
+	/* OpenCL event object. */
 	cl_event event = NULL;
+	/* Event wrapper object. */
 	CCLEvent* evt = NULL;
 	
+	/* Copy buffer to image. */
 	ocl_status = clEnqueueCopyBufferToImage(ccl_queue_unwrap(cq), 
 		ccl_memobj_unwrap(src_buf), ccl_memobj_unwrap(dst_img),
 		src_offset, dst_origin, region,
@@ -402,89 +406,439 @@ finish:
 
 }
 
-//~ #ifdef CL_VERSION_1_1
-//~ 
-//~ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf, 
-	//~ cl_mem_flags flags, size_t origin, size_t size, GError** err) {
-//~ 
-	//~ /* Make sure buf is not NULL. */
-	//~ g_return_val_if_fail(buf != NULL, NULL);
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-//~ 
-//~ 
-//~ }
-//~ 
-//~ CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
-	//~ cl_bool blocking_read, const size_t* buffer_origin,
-	//~ const size_t* host_origin, const size_t* region, 
-	//~ size_t buffer_row_pitch, size_t buffer_slice_pitch, 
-	//~ size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
-	//~ CCLEventWaitList* evt_wait_lst, GError** err) {
-//~ 
-	//~ /* Make sure cq is not NULL. */
-	//~ g_return_val_if_fail(cq != NULL, NULL);
-	//~ /* Make sure buf is not NULL. */
-	//~ g_return_val_if_fail(buf != NULL, NULL);
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-//~ 
-//~ }
-//~ 
-//~ CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
-	//~ cl_bool blocking_write, const size_t* buffer_origin,
-	//~ const size_t* host_origin, const size_t* region, 
-	//~ size_t buffer_row_pitch, size_t buffer_slice_pitch, 
-	//~ size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
-	//~ CCLEventWaitList* evt_wait_lst, GError** err) {
-//~ 
-	//~ /* Make sure cq is not NULL. */
-	//~ g_return_val_if_fail(cq != NULL, NULL);
-	//~ /* Make sure buf is not NULL. */
-	//~ g_return_val_if_fail(buf != NULL, NULL);
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-//~ 
-//~ 
-//~ }
-//~ 
-//~ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
-	//~ CCLBuffer* dst_buf, const size_t *src_origin, 
-	//~ const size_t *dst_origin, const size_t *region, 
-	//~ size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
-	//~ size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst, 
-	//~ GError** err) {
-//~ 
-	//~ /* Make sure cq is not NULL. */
-	//~ g_return_val_if_fail(cq != NULL, NULL);
-	//~ /* Make sure src_buf is not NULL. */
-	//~ g_return_val_if_fail(src_buf != NULL, NULL);
-	//~ /* Make sure dst_buf is not NULL. */
-	//~ g_return_val_if_fail(dst_buf != NULL, NULL);
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-//~ 
-//~ 
-//~ }
-//~ 
-//~ #endif
-//~ 
-//~ #ifdef CL_VERSION_1_2
-//~ 
-//~ CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf, 
-	//~ const void *pattern, size_t pattern_size, size_t offset, 
-	//~ size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
-//~ 
-	//~ /* Make sure cq is not NULL. */
-	//~ g_return_val_if_fail(cq != NULL, NULL);
-	//~ /* Make sure buf is not NULL. */
-	//~ g_return_val_if_fail(buf != NULL, NULL);
-	//~ /* Make sure err is NULL or it is not set. */
-	//~ g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-//~ 
-//~ 
-//~ }
-//~ 
-//~ #endif
+#ifdef CL_VERSION_1_1
+
+/**
+ * Creates a sub-buffer that represents a specific region in the given
+ * buffer. This function wraps the clCreateSubBuffer() OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @todo Check if platform OpenCL version is >= 1.1
+ * 
+ * @param[in] buf A buffer wrapper object which cannot represent a
+ * sub-buffer.
+ * @param[in] flags Allocation and usage information about the 
+ * sub-buffer memory object.
+ * @param[in] origin Offset relative to the parent buffer.
+ * @param[in] size Sub-buffer size.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * */
+CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf, 
+	cl_mem_flags flags, size_t origin, size_t size, GError** err) {
+
+	/* Make sure buf is not NULL. */
+	g_return_val_if_fail(buf != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL sub-buffer object- */
+	cl_mem buffer;
+	/* Buffer wrapper. */
+	CCLBuffer* subbuf;
+	
+	/* Set options. */
+	const cl_buffer_region br = { .origin = origin, .size = size};
+	
+	/* Create the OpenCL sub-buffer. */
+	buffer = clCreateSubBuffer(ccl_memobj_unwrap(buf), flags,
+		CL_BUFFER_CREATE_TYPE_REGION, (const void*) &br, &ocl_status);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable create sub-buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap the OpenCL sub-buffer. */
+	subbuf = ccl_buffer_new_wrap(buffer);
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	subbuf = NULL;
+	
+finish:
+	
+	/* Return sub-buffer. */
+	return subbuf;
+
+}
+
+/**
+ * Read from a 2D or 3D rectangular region from a buffer object to host 
+ * memory. This function wraps the clEnqueueReadBufferRect() OpenCL
+ * function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @todo Check if platform OpenCL version is >= 1.1
+ * 
+ * @param[in] cq Command-queue wrapper object in which the read command
+ * will be queued.
+ * @param[in] buf Buffer wrapper object where to read from.
+ * @param[in] blocking_read Indicates if the read operations are 
+ * blocking or non-blocking.
+ * @param[in] buffer_origin The @f$(x, y, z)@f$ offset in the memory 
+ * region associated with buffer.
+ * @param[in] host_origin The @f$(x, y, z)@f$ offset in the memory 
+ * region pointed to by ptr.
+ * @param[in] region The (width in bytes, height in rows, depth in 
+ * slices) of the 2D or 3D rectangle being read or written.
+ * @param[in] buffer_row_pitch The length of each row in bytes to be 
+ * used for the memory region associated with buffer.
+ * @param[in] buffer_slice_pitch The length of each 2D slice in bytes 
+ * to be used for the memory region associated with buffer.
+ * @param[in] host_row_pitch The length of each row in bytes to be used
+ * for the memory region pointed to by ptr.
+ * @param[in] host_slice_pitch The length of each 2D slice in bytes to 
+ * be used for the memory region pointed to by ptr.
+ * @param[out] ptr The pointer to buffer in host memory where data is to
+ * be read into.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this read command.
+ * */
+CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
+	cl_bool blocking_read, const size_t* buffer_origin,
+	const size_t* host_origin, const size_t* region, 
+	size_t buffer_row_pitch, size_t buffer_slice_pitch, 
+	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure buf is not NULL. */
+	g_return_val_if_fail(buf != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	
+	/* Read rectangular region of buffer. */
+	ocl_status = clEnqueueReadBufferRect(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(buf), blocking_read, buffer_origin, 
+		host_origin, region, buffer_row_pitch, buffer_slice_pitch,
+		host_row_pitch, host_slice_pitch, ptr,
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to enqueue a rectangular buffer read (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
+finish:
+	
+	/* Return event. */
+	return evt;
+
+
+}
+
+/**
+ * Write a 2D or 3D rectangular region to a buffer object from host 
+ * memory. This function wraps the clEnqueueWriteBufferRect() OpenCL
+ * function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @todo Check if platform OpenCL version is >= 1.1
+ * 
+ * @param[in] cq Command-queue wrapper object in which the write command
+ * will be queued.
+ * @param[out] buf Buffer wrapper object where to write to.
+ * @param[in] blocking_write Indicates if the write operations are 
+ * blocking or non-blocking.
+ * @param[in] buffer_origin The @f$(x, y, z)@f$ offset in the memory 
+ * region associated with buffer.
+ * @param[in] host_origin The @f$(x, y, z)@f$ offset in the memory 
+ * region pointed to by ptr.
+ * @param[in] region The (width in bytes, height in rows, depth in 
+ * slices) of the 2D or 3D rectangle being read or written.
+ * @param[in] buffer_row_pitch The length of each row in bytes to be 
+ * used for the memory region associated with buffer.
+ * @param[in] buffer_slice_pitch The length of each 2D slice in bytes 
+ * to be used for the memory region associated with buffer.
+ * @param[in] host_row_pitch The length of each row in bytes to be used
+ * for the memory region pointed to by ptr.
+ * @param[in] host_slice_pitch The length of each 2D slice in bytes to 
+ * be used for the memory region pointed to by ptr.
+ * @param[in] ptr The pointer to buffer in host memory where data is to 
+ * be written from.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this write command.
+ * */
+CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
+	cl_bool blocking_write, const size_t* buffer_origin,
+	const size_t* host_origin, const size_t* region, 
+	size_t buffer_row_pitch, size_t buffer_slice_pitch, 
+	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure buf is not NULL. */
+	g_return_val_if_fail(buf != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	
+	/* Write rectangular region of buffer. */
+	ocl_status = clEnqueueWriteBufferRect(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(buf), blocking_write, buffer_origin, 
+		host_origin, region, buffer_row_pitch, buffer_slice_pitch,
+		host_row_pitch, host_slice_pitch, ptr,
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to enqueue a rectangular buffer write (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
+finish:
+	
+	/* Return event. */
+	return evt;
+
+}
+
+/**
+ * Copy a 2D or 3D rectangular region from a buffer object to another 
+ * buffer object. This function wraps the clEnqueueCopyBufferRect() 
+ * OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @todo Check if platform OpenCL version is >= 1.1
+ * 
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
+ * @param[in] src_buf Source buffer wrapper object where to read from.
+ * @param[out] dst_buf Destination buffer wrapper object where to write 
+ * to.
+ * @param[in] src_origin The @f$(x, y, z)@f$ offset in memory associated
+ * with src_buf.
+ * @param[in] dst_origin The @f$(x, y, z)@f$ offset in memory associated
+ * with dst_buf. 
+ * @param[in] region The (width in bytes, height in rows, depth in 
+ * slices) of the 2D or 3D rectangle being copied.
+ * @param[in] src_row_pitch The length of each row in bytes to be 
+ * used for the memory region associated with src_buf.
+ * @param[in] src_slice_pitch The length of each 2D slice in bytes 
+ * to be used for the memory region associated with src_buf.
+ * @param[in] dst_row_pitch The length of each row in bytes to be 
+ * used for the memory region associated with dst_buf.
+ * @param[in] dst_slice_pitch The length of each 2D slice in bytes 
+ * to be used for the memory region associated with dst_buf.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this copy command.
+ * */
+CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
+	CCLBuffer* dst_buf, const size_t *src_origin, 
+	const size_t *dst_origin, const size_t *region, 
+	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
+	size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst, 
+	GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure src_buf is not NULL. */
+	g_return_val_if_fail(src_buf != NULL, NULL);
+	/* Make sure dst_buf is not NULL. */
+	g_return_val_if_fail(dst_buf != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	
+	/* Copy rectangular region between buffers. */
+	ocl_status = clEnqueueCopyBufferRect(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(src_buf), ccl_memobj_unwrap(dst_buf), 
+		src_origin, dst_origin, region, src_row_pitch, src_slice_pitch,
+		dst_row_pitch, dst_slice_pitch,
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to enqueue a rectangular buffer copy (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
+finish:
+	
+	/* Return event. */
+	return evt;
+
+}
+
+#endif
+
+#ifdef CL_VERSION_1_2
+
+/**
+ * Fill a buffer object with a pattern of a given pattern size. This 
+ * function wraps the clEnqueueFillBuffer() OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @todo Check if platform OpenCL version is >= 1.2
+ * 
+ * @param[in] cq Command-queue wrapper object in which the fill command
+ * will be queued.
+ * @param[out] buf Buffer wrapper object to fill.
+ * @param[in] pattern A pointer to the data pattern.
+ * @param[in] pattern_size Size of data pattern in bytes.
+ * @param[in] offset The location in bytes of the region being filled in
+ * buffer and must be a multiple of pattern_size.
+ * @param[in] size he size in bytes of region being filled in buffer and
+ * must be a multiple of pattern_size.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this fill command.
+ * */
+CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf, 
+	const void *pattern, size_t pattern_size, size_t offset, 
+	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure buf is not NULL. */
+	g_return_val_if_fail(buf != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	
+	/* Fill buffer. */
+	ocl_status = clEnqueueFillBuffer(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(buf), pattern, pattern_size, offset, size,
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to enqueue a fill buffer command (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
+finish:
+	
+	/* Return event. */
+	return evt;
+
+}
+
+#endif
 
 /** @} */

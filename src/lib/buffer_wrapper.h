@@ -93,9 +93,13 @@ CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 
 #ifdef CL_VERSION_1_1
 
+/** Creates a sub-buffer that represents a specific region in the given
+ * buffer. */
 CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf, 
 	cl_mem_flags flags, size_t origin, size_t size, GError** err);
 
+/** Read from a 2D or 3D rectangular region from a buffer object to host 
+ * memory. */
 CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, const size_t* buffer_origin,
 	const size_t* host_origin, const size_t* region, 
@@ -103,6 +107,8 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
+/** Write a 2D or 3D rectangular region to a buffer object from host 
+ * memory. */
 CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, const size_t* buffer_origin,
 	const size_t* host_origin, const size_t* region, 
@@ -110,16 +116,20 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
+/** Copy a 2D or 3D rectangular region from a buffer object to another 
+ * buffer object. */
 CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, const size_t *src_origin, 
 	const size_t *dst_origin, const size_t *region, 
 	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
-	size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst, GError** err);
+	size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst, 
+	GError** err);
 
 #endif
 
 #ifdef CL_VERSION_1_2
 
+/** Fill a buffer object with a pattern of a given pattern size. */
 CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf, 
 	const void *pattern, size_t pattern_size, size_t offset, 
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);

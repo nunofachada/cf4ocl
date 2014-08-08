@@ -143,10 +143,9 @@ clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER);
-	return CL_SUCCESS;		
+	return CL_SUCCESS;
 
 }
-
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
@@ -213,7 +212,114 @@ clEnqueueBarrier(cl_command_queue command_queue)
 	return CL_SUCCESS;
 }
 
+#ifdef CL_VERSION_1_1
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueReadBufferRect(cl_command_queue command_queue, cl_mem buffer,
+	cl_bool blocking_read, const size_t* buffer_offset, 
+	const size_t* host_offset, const size_t* region, 
+	size_t buffer_row_pitch, size_t buffer_slice_pitch, 
+	size_t host_row_pitch, size_t host_slice_pitch, void* ptr,
+	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
+	cl_event* event) CL_API_SUFFIX__VERSION_1_1 {
+		
+	command_queue = command_queue;
+	buffer = buffer;
+	blocking_read = blocking_read;
+	buffer_offset = buffer_offset;
+	host_offset = host_offset;
+	region = region;
+	buffer_row_pitch = buffer_row_pitch;
+	buffer_slice_pitch = buffer_slice_pitch;
+	host_row_pitch = host_row_pitch;
+	host_slice_pitch = host_slice_pitch;
+	ptr = ptr;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+		
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER_RECT);
+	return CL_SUCCESS;
+}
+
+                            
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueWriteBufferRect(cl_command_queue command_queue, cl_mem buffer,
+	cl_bool blocking_write, const size_t* buffer_offset,
+	const size_t* host_offset, const size_t* region, 
+	size_t buffer_row_pitch, size_t buffer_slice_pitch,
+	size_t host_row_pitch, size_t host_slice_pitch, const void* ptr,
+	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
+	cl_event* event) CL_API_SUFFIX__VERSION_1_1 {
+
+	command_queue = command_queue;
+	buffer = buffer;
+	blocking_write = blocking_write;
+	buffer_offset = buffer_offset;
+	host_offset = host_offset;
+	region = region;
+	buffer_row_pitch = buffer_row_pitch;
+	buffer_slice_pitch = buffer_slice_pitch;
+	host_row_pitch = host_row_pitch;
+	host_slice_pitch = host_slice_pitch;
+	ptr = ptr;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER_RECT);
+	return CL_SUCCESS;
+}
+                            
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueCopyBufferRect(cl_command_queue command_queue, 
+	cl_mem src_buffer, cl_mem dst_buffer, const size_t* src_origin,
+	const size_t* dst_origin, const size_t* region, 
+	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
+	size_t dst_slice_pitch, cl_uint num_events_in_wait_list,
+	const cl_event* event_wait_list, cl_event* event) 
+	CL_API_SUFFIX__VERSION_1_1 {
+
+	command_queue = command_queue;
+	src_buffer = src_buffer;
+	dst_buffer = dst_buffer;
+	src_origin = src_origin;
+	dst_origin = dst_origin;
+	region = region;
+	src_row_pitch = src_row_pitch;
+	src_slice_pitch = src_slice_pitch;
+	dst_row_pitch = dst_row_pitch;
+	dst_slice_pitch = dst_slice_pitch;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+	
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_RECT);
+	return CL_SUCCESS;
+	
+}
+
+#endif
+
 #ifdef CL_VERSION_1_2
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer, 
+	const void* pattern, size_t pattern_size, size_t offset, 
+	size_t size, cl_uint num_events_in_wait_list, 
+	const cl_event* event_wait_list, cl_event* event) 
+	CL_API_SUFFIX__VERSION_1_2 {
+
+	command_queue = command_queue;
+	buffer = buffer;
+	pattern = pattern;
+	pattern_size = pattern_size;
+	offset = offset;
+	size = size;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_FILL_BUFFER);
+	return CL_SUCCESS;
+
+}
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueMarkerWithWaitList(cl_command_queue command_queue,
