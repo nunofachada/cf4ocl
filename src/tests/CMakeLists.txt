@@ -1,5 +1,5 @@
 # List of tests
-set(TESTS test_gerrorf test_cad_profiler test_cad_platforms 
+set(TESTS test_error_handling test_cad_profiler test_cad_platforms 
 	test_devquery test_cad_context test_cad_program test_op_profiler)
 	
 # Exclude tests from documentation?

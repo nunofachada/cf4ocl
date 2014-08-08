@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 	/* Parse command line options */
 	/* ************************** */
 
-	gef_if_err_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4), 
+	ccl_if_err_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4), 
 		CCL_ERROR_ARGS, error_handler, 
 		"Usage: %s <program_file> <kernel_name> [device_index]\n", 
 		argv[0]);
@@ -80,23 +80,23 @@ int main(int argc, char *argv[]) {
 		&filters, ccl_devsel_dep_menu, 
 		(dev_idx == -1) ? NULL : (void*) &dev_idx);
 	ctx = ccl_context_new_from_filters(&filters, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Get program which contains kernel. */
 	prg = ccl_program_new_from_source_file(ctx, argv[1], &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Build program. */
 	ccl_program_build(prg, NULL, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	/* Get kernel */
 	krnl = ccl_program_get_kernel(prg, argv[2], &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Get the device. */
 	dev = ccl_context_get_device(ctx, 0, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	/* *************************** */
 	/*  Get and print kernel info  */
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 	
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	g_printf("     Maximum workgroup size                  : %lu\n", 
 		(unsigned long) ccl_info_scalar(info, size_t));
 
@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
 	 * querying for CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE. */
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	g_printf("     Preferred multiple of workgroup size    : %lu\n", 
 		(unsigned long) ccl_info_scalar(info, size_t));
 		
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	g_printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n", 
 		(unsigned long) ccl_info_array(info, size_t*)[0], 
 		(unsigned long) ccl_info_array(info, size_t*)[1], 
@@ -130,13 +130,13 @@ int main(int argc, char *argv[]) {
 		
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_LOCAL_MEM_SIZE, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	g_printf("     Local memory used by kernel             : %lu bytes\n", 
 		(unsigned long) ccl_info_scalar(info, cl_ulong));
 		
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_PRIVATE_MEM_SIZE, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	g_printf("     Min. private mem. used by each workitem : %lu bytes\n", 
 		(unsigned long) ccl_info_scalar(info, cl_ulong));
 	

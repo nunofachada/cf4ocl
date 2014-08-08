@@ -607,7 +607,7 @@ GErrorF uses GLib's `GError` object for function error reporting. This
 explanation assumes some familiarity with 
 [GLib's error reporting][gliberror].
 
-GErrorF is defined by three macros in `gerrorf.h`:
+GErrorF is defined by three macros in `error_handling.h`:
 
 * `gef_if_error_create_goto` - Catches errors from non-GError aware
 functions.
@@ -624,7 +624,7 @@ functions located deeper in the call stack, can benefit from this
 approach. The general usage of GErrorF is as follows:
 
 ```c
-include "gerrorf.h";
+include "error_handling.h";
 
 ...
 

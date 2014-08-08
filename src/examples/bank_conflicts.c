@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
 	g_option_context_add_main_entries(opt_ctx, entries, NULL);
 	/* Use context to parse command line options. */
 	g_option_context_parse(opt_ctx, &argc, &argv, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* If device list was required, present list of devices and
 	 * exit. */
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 		g_printf("\n");
 		ccl_devsel_print_device_strings(&err);
 		g_printf("\n");
-		gef_if_err_goto(err, error_handler);
+		ccl_if_err_goto(err, error_handler);
 		exit(0);
 	}
 	
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 
 	/* Create a GPU context. */
 	ctx = ccl_context_new_gpu(&err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	/* Get location of kernel file, which should be in the same 
 	 * of the bank_conflicts executable. */
@@ -181,15 +181,15 @@ int main(int argc, char *argv[]) {
 	
 	/* Create program. */
 	prg = ccl_program_new_from_source_file(ctx, kernel_files[0], &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Build program. */
 	status = ccl_program_build(prg, compiler_opts, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, NULL, CL_QUEUE_PROFILING_ENABLE, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Start basic timming / profiling. */
 	ccl_prof_start(prof);
@@ -201,12 +201,12 @@ int main(int argc, char *argv[]) {
 	/* Allocate data in device */
 	buf_data_dev = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, 
 		size_data_in_bytes, NULL, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Copy data from host to device. */
 	ccl_buffer_enqueue_write(cq, buf_data_dev, CL_TRUE, 0, size_data_in_bytes,
 		data_host, NULL, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	/* ************************************************** */
 	/* Determine and print required memory and work sizes */
@@ -222,11 +222,11 @@ int main(int argc, char *argv[]) {
 	ccl_program_enqueue_kernel(prg, "bankconf", cq, 2, NULL, gws, lws, NULL, &err,
 		buf_data_dev, ccl_arg_local(lws[1] * lws[0], cl_int),
 		ccl_arg_priv(stride, cl_uint), NULL);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* Wait... */
 	ccl_queue_finish(cq, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	/* ******************** */
 	/*  Show profiling info */
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
 	ccl_prof_add_queue(prof, "Q1", cq);
 	
 	ccl_prof_calc(prof, &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 
 	ccl_prof_print_summary(prof);
 	

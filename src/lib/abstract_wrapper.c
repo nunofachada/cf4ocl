@@ -302,11 +302,11 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 				param_name, 0, NULL, &size_ret)
 			: ((ccl_wrapper_info_fp2) info_fun)(wrapper1->cl_object, 
 				wrapper2->cl_object, param_name, 0, NULL, &size_ret);
-		gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get info [size] (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
-		gef_if_err_create_goto(*err, CCL_ERROR, 
+		ccl_if_err_create_goto(*err, CCL_ERROR, 
 			size_ret == 0, CCL_ERROR_INVALID_DATA, error_handler,
 			"%s: get info [size] (size is 0).",
 			G_STRLOC);
@@ -321,7 +321,7 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 			: ((ccl_wrapper_info_fp2) info_fun)(wrapper1->cl_object, 
 				wrapper2->cl_object, param_name, size_ret, info->value, 
 				NULL);
-		gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get context info [info] (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));

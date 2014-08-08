@@ -30,7 +30,6 @@
 #define _CCL_DEVICE_WRAPPER_H_
 
 #include "common.h"
-#include "gerrorf.h"
 #include "abstract_wrapper.h"
 #include "errors.h"
 #include "oclversions.h"

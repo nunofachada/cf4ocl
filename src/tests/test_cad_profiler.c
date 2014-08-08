@@ -26,6 +26,7 @@
  * */
 
 #include "profiler.h"
+#include "common.h"
 
 /**
  * Tests creation, getting info from and destruction of 

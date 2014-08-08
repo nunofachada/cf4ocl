@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "profiler.h"
-#include "gerrorf.h"
 #include "errors.h"
 #include "program_wrapper.h"
 #include "kernel_wrapper.h"

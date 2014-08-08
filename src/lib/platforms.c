@@ -85,7 +85,7 @@ CCLPlatforms* ccl_platforms_new(GError **err) {
 	
 	/* Get number of platforms */
 	ocl_status = clGetPlatformIDs(0, NULL, &platforms->num_platfs);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: get number of platforms (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -99,7 +99,7 @@ CCLPlatforms* ccl_platforms_new(GError **err) {
 	/* Get existing platform IDs. */
 	ocl_status = clGetPlatformIDs(
 		platforms->num_platfs, platf_ids, NULL);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: get platforms IDs (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));

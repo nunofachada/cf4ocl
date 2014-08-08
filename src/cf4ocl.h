@@ -29,7 +29,6 @@
 #define CF4OCL_H
 
 #include <cf4ocl/common.h> 
-#include <cf4ocl/gerrorf.h>
 #include <cf4ocl/errors.h>
 #include <cf4ocl/manager.h>
 #include <cf4ocl/profiler.h>

@@ -17,26 +17,27 @@
  
 /** 
  * @file
- * Tests for error framework.
+ * 
+ * Tests error handling in cf4ocl.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
  
-#include "gerrorf.h"
+#include "common.h"
 
 /** Resolves to error category identifying string, in this case an error
  * in the GErrorf tests. */
-#define TEST_GERRORF_ERROR test_gerrorf_error_quark()
+#define TEST_CCL_ERROR test_error_handling_error_quark()
 
 /**
  * Test error codes.
  * */ 
-enum test_gerrorf_error_codes {
-	TEST_GERRORF_SUCCESS = 0,
-	TEST_GERRORF_ERROR_1 = -1,
-	TEST_GERRORF_ERROR_2 = -2
+enum test_error_handling_error_codes {
+	TEST_CCL_SUCCESS = 0,
+	TEST_CCL_ERROR_1 = -1,
+	TEST_CCL_ERROR_2 = -2
 };
 
 /** 
@@ -46,8 +47,8 @@ enum test_gerrorf_error_codes {
  * @return A GQuark structure defined by category identifying string, 
  * which identifies the error as a gerrof tests generated error.
  */
-GQuark test_gerrorf_error_quark() {
-	return g_quark_from_static_string("test-gerrorf-error-quark");
+GQuark test_error_handling_error_quark() {
+	return g_quark_from_static_string("test-error-handling-error-quark");
 }
 
 /* ************** */
@@ -55,8 +56,8 @@ GQuark test_gerrorf_error_quark() {
 /* ************** */
 
 int errorL2Aux(int code, const char* xtramsg, GError **err) {
-	gef_if_err_create_goto(*err, TEST_GERRORF_ERROR, 
-		code != TEST_GERRORF_SUCCESS, code, error_handler, 
+	ccl_if_err_create_goto(*err, TEST_CCL_ERROR, 
+		code != TEST_CCL_SUCCESS, code, error_handler, 
 		"Big error in level %d function: %s", 2, xtramsg);
 	goto finish;
 error_handler:
@@ -67,7 +68,7 @@ finish:
 
 int errorL1Aux(int code, GError **err) {
 	int status = errorL2Aux(code, "called by errorL1Aux", err);
-	gef_if_err_goto(*err, error_handler);
+	ccl_if_err_goto(*err, error_handler);
 	goto finish;
 error_handler:
 	g_assert(*err != NULL);
@@ -86,16 +87,16 @@ finish:
 static void errorOneLevelTest() {
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_GERRORF_ERROR_1, 
+	int status = errorL2Aux(TEST_CCL_ERROR_1, 
 		"called by errorOneLevelTest", &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	status = status; /* Avoid compiler warnings. */
 
 	g_assert_not_reached();
 	goto cleanup;
 
 error_handler:
-	g_assert_error(err, TEST_GERRORF_ERROR, TEST_GERRORF_ERROR_1);
+	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_1);
 	g_assert_cmpstr(err->message, ==, 
 		"Big error in level 2 function: called by errorOneLevelTest");
 	g_error_free(err);
@@ -111,15 +112,15 @@ cleanup:
 static void errorTwoLevelTest() {
 	GError *err = NULL;
 
-	int status = errorL1Aux(TEST_GERRORF_ERROR_2, &err);
-	gef_if_err_goto(err, error_handler);
+	int status = errorL1Aux(TEST_CCL_ERROR_2, &err);
+	ccl_if_err_goto(err, error_handler);
 	status = status; /* Avoid compiler warnings. */
 
 	g_assert_not_reached();
 	goto cleanup;
 
 error_handler:
-	g_assert_error(err, TEST_GERRORF_ERROR, TEST_GERRORF_ERROR_2);
+	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_2);
 	g_assert_cmpstr(err->message, ==, 
 		"Big error in level 2 function: called by errorL1Aux");
 	g_error_free(err);
@@ -134,9 +135,9 @@ cleanup:
 static void errorNoneTest() {
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_GERRORF_SUCCESS, 
+	int status = errorL2Aux(TEST_CCL_SUCCESS, 
 		"called by errorOneLevelTest", &err);
-	gef_if_err_goto(err, error_handler);
+	ccl_if_err_goto(err, error_handler);
 	status = status; /* Avoid compiler warnings. */
 
 	goto cleanup;
@@ -156,15 +157,15 @@ cleanup:
 static void errorNoVargsTest() {
 	GError *err = NULL;
 
-	gef_if_err_create_goto(err, TEST_GERRORF_ERROR, 1, 
-		TEST_GERRORF_ERROR_1, error_handler, 
+	ccl_if_err_create_goto(err, TEST_CCL_ERROR, 1, 
+		TEST_CCL_ERROR_1, error_handler, 
 		"I have no additional arguments");
 
 	g_assert_not_reached();
 	goto cleanup;
 
 error_handler:
-	g_assert_error(err, TEST_GERRORF_ERROR, TEST_GERRORF_ERROR_1);
+	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_1);
 	g_assert_cmpstr(err->message, ==, "I have no additional arguments");
 	g_error_free(err);
 

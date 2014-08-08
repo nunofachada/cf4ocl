@@ -204,13 +204,13 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 
 		g_file_get_contents(
 			filenames[i], &strings[i], NULL, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	}
 	
 	prg = ccl_program_new_from_sources(ctx, count, 
 		(const char**) strings, NULL, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -253,7 +253,7 @@ CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	/* Build program from sources. */
 	program = clCreateProgramWithSource(
 		ccl_context_unwrap(ctx), count, strings, lengths, &ocl_status);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to create cl_program with source (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -310,13 +310,13 @@ CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 		bins[i] = ccl_program_binary_new_empty();
 		g_file_get_contents(filenames[i], (char**) &bins[i]->data, 
 			&bins[i]->size, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 
 	/* Create program. */
 	prg = ccl_program_new_from_binaries(
 		ctx, num_devices, devs, bins, binary_status, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -379,7 +379,7 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 		num_devices, device_list, lengths, 
 		(const unsigned char**) bins_raw, 
 		binary_status, &ocl_status);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to create cl_program from binaries (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -441,7 +441,7 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 		&ocl_status);
 
 	/* Create kernel from built-in kernels. */
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to create cl_program from built-in kernels (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -503,7 +503,7 @@ cl_bool ccl_program_build_from_devices_full(CCLProgram* prg,
 	/* Build program. */
 	ocl_status = clBuildProgram(ccl_program_unwrap(prg),
 		num_devices, cl_devices, options, pfn_notify, user_data);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to build program (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -572,7 +572,7 @@ CCLKernel* ccl_program_get_kernel(
 		
 		/* Otherwise, get it from OpenCL program object.*/
 		krnl = ccl_kernel_new(prg, kernel_name, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);	
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);	
 		
 		/* Keep new kernel wrapper in table. */
 		g_hash_table_insert(prg->krnls, (gpointer) kernel_name, krnl);
@@ -652,17 +652,17 @@ static void ccl_program_load_binaries(CCLProgram* prg, GError** err) {
 	
 	/* Get number of program devices. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);	
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);	
 	num_devices = *((cl_uint*) info->value);
 	
 	/* Get program devices. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_DEVICES, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	devices = (cl_device_id*) info->value;
 		
 	/* Get binary sizes. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	binary_sizes = (size_t*) info->value;
 
 	/* Allocate memory for binaries. */
@@ -677,7 +677,7 @@ static void ccl_program_load_binaries(CCLProgram* prg, GError** err) {
 	ocl_status = clGetProgramInfo(ccl_program_unwrap(prg),
 		CL_PROGRAM_BINARIES, num_devices * sizeof(unsigned char*),
 		bins_raw, NULL);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to get binaries from program (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -734,7 +734,7 @@ CCLProgramBinary* ccl_program_get_binary(CCLProgram* prg, CCLDevice* dev,
 		
 		/* Load binaries. */
 		ccl_program_load_binaries(prg, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 	
 	/* Check if given device exists in the list of program devices. */
@@ -747,7 +747,7 @@ CCLProgramBinary* ccl_program_get_binary(CCLProgram* prg, CCLDevice* dev,
 		/* If NULL, then perform a new binary fetch on the CL program 
 		 * object... */
 		ccl_program_load_binaries(prg, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		/* ...and get it again. If it's NULL it's because binary isn't
 		 * compiled for given device. */
@@ -757,7 +757,7 @@ CCLProgramBinary* ccl_program_get_binary(CCLProgram* prg, CCLDevice* dev,
 	} else {
 		
 		/* Device does not exist in list of program devices. */
-		gef_if_err_create_goto(*err, CCL_ERROR, TRUE, 
+		ccl_if_err_create_goto(*err, CCL_ERROR, TRUE, 
 			CCL_ERROR_DEVICE_NOT_FOUND, 
 			error_handler, "%s: device is not part of program devices.",
 			G_STRLOC);
@@ -797,15 +797,15 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	CCLProgramBinary* binary = NULL;
 
 	binary = ccl_program_get_binary(prg, dev, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
-	gef_if_err_create_goto(*err, CCL_ERROR, binary->size == 0, 
+	ccl_if_err_create_goto(*err, CCL_ERROR, binary->size == 0, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: binary for given device has size 0.", G_STRLOC);
 
 	g_file_set_contents(filename, (const gchar*) binary->data,
 		binary->size, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -844,7 +844,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	
 	/* Save binaries, one per device. */
 	num_devices = ccl_program_get_num_devices(prg, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	for (guint i = 0; i < num_devices; ++i) {
 		
@@ -853,12 +853,12 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		gchar* filename;
 		
 		dev = ccl_program_get_device(prg, i, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 		file_middle = g_strdup(
 			ccl_device_get_array_info(
 				dev, CL_DEVICE_NAME, char*, &err_internal));
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		g_strcanon(file_middle, CCL_VALIDFILECHARS, '_');
 		
@@ -866,7 +866,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 			file_prefix, file_middle, i, file_suffix);
 		
 		ccl_program_save_binary(prg, dev, filename, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		g_free(filename);
 		g_free(file_middle);

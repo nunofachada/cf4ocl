@@ -30,7 +30,6 @@
 
 #include "oclversions.h"
 #include "device_selector.h"
-#include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
 #include "device_wrapper.h"

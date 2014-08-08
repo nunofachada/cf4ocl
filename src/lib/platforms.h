@@ -31,7 +31,6 @@
 
 #include "common.h"
 #include "platform_wrapper.h"
-#include "gerrorf.h"
 #include "errors.h"
 
 /**

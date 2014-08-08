@@ -31,6 +31,7 @@
 #include "device_wrapper.h"
 #include "kernel_wrapper.h"
 #include "profiler.h"
+#include "common.h"
 #include "ocl_stub/ocl_impl.h"
 
 #define ccl_test_prof_is_overlap(ev1, ev2) \

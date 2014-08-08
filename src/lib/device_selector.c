@@ -141,7 +141,7 @@ static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
 	/* Get all OpenCL platforms in system wrapped in a CCLPlatforms
 	 * object. */
 	platforms = ccl_platforms_new(&err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Determine number of platforms. */
 	num_platfs = ccl_platforms_count(platforms);
@@ -159,14 +159,14 @@ static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
 		/* Get number of devices in current platform.*/
 		guint num_devices = ccl_platform_get_num_devices(
 			platform, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		/* Cycle through devices in current platform. */
 		for (guint j = 0; j < num_devices; j++) {
 			
 			/* Get current device wrapper. */
 			device = ccl_platform_get_device(platform, j, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 			
 			/* Add device wrapper to array of device wrapper objects. */
 			g_ptr_array_add(devices, (gpointer) device);
@@ -234,12 +234,12 @@ static gchar** ccl_get_device_strings_from_array(
 		/* Get device name. */
 		gchar* name = ccl_device_get_array_info(
 				devices->pdata[i], CL_DEVICE_NAME, char*, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		/* Get device vendor. */
 		gchar* vendor = ccl_device_get_array_info(
 				devices->pdata[i], CL_DEVICE_VENDOR, char*, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 		/* Put info in string. */
 		dev_strings[i] = g_strdup_printf("%d. %s [%s]", i, name, vendor);
@@ -292,7 +292,7 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 	
 	/* Get device description strings. */
 	dev_strings = ccl_get_device_strings_from_array(devices, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	
 	/* Print menu. */
@@ -361,7 +361,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	
 	/* Print available devices */
 	ccl_devsel_dep_menu_list(devices, -1, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If only one device exists, return that one. */
 	if (devices->len == 1) {
@@ -436,12 +436,12 @@ gchar** ccl_devsel_get_device_strings(GError** err) {
 	
 	/* Get all devices present in the system. */
 	devices = ccl_devsel_get_devices(&err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Get the array of strings describing the devices. */
 	dev_strings = ccl_get_device_strings_from_array(
 		devices, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -485,7 +485,7 @@ void ccl_devsel_print_device_strings(GError** err) {
 	
 	/* Get the array of strings describing the devices. */
 	dev_strings = ccl_devsel_get_device_strings(&err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Print device list to stdout. */
 	for (guint i = 0; dev_strings[i] != NULL; ++i) {
@@ -567,7 +567,7 @@ CCLDevSelDevices ccl_devsel_select(
 	
 	/* Get all devices present in the system. */
 	devices = ccl_devsel_get_devices(&err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* *** Filter devices. *** */
 
@@ -586,7 +586,7 @@ CCLDevSelDevices ccl_devsel_select(
 			/* It's a dependent filter.*/
 			devices = ((ccl_devsel_dep) (curr_filter->function))(
 				devices, curr_filter->data, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 				
 		} else {
 			/* It's an independent filter. */
@@ -603,7 +603,7 @@ CCLDevSelDevices ccl_devsel_select(
 				cl_bool pass = 
 					((ccl_devsel_indep) curr_filter->function)(
 						curr_device, curr_filter->data, &err_internal);
-				gef_if_err_propagate_goto(
+				ccl_if_err_propagate_goto(
 					err, err_internal, error_handler);
 
 				/* If current device didn't pass current filter... */
@@ -676,7 +676,7 @@ cl_bool ccl_devsel_indep_type(
 	GError* err_internal = NULL;
 	
 	/* Make sure data is not NULL. */
-	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
+	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
@@ -686,7 +686,7 @@ cl_bool ccl_devsel_indep_type(
 	/* Get device type. */
 	cl_device_type type = ccl_device_get_scalar_info(
 		dev, CL_DEVICE_TYPE, cl_device_type, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -801,7 +801,7 @@ cl_bool ccl_devsel_indep_string(
 	gchar *complt_info, *complt_info_lowr, *part_info;
 	
 	/* Make sure data is not NULL. */
-	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
+	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
@@ -811,7 +811,7 @@ cl_bool ccl_devsel_indep_string(
 	/* Compare with device name. */
 	complt_info = ccl_device_get_array_info(
 		dev, CL_DEVICE_NAME, char*, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	complt_info_lowr = g_ascii_strdown(complt_info, -1);
 
@@ -824,7 +824,7 @@ cl_bool ccl_devsel_indep_string(
 		/* Compare with device vendor. */
 		complt_info = ccl_device_get_array_info(
 			dev, CL_DEVICE_VENDOR, char*, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 		complt_info_lowr = g_ascii_strdown(complt_info, -1);
 
@@ -839,12 +839,12 @@ cl_bool ccl_devsel_indep_string(
 			
 			/* Get device platform. */
 			platf = ccl_platform_new_from_device(dev, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 			
 			/* Get platform name. */
 			complt_info = ccl_platform_get_info_string(
 				platf, CL_PLATFORM_NAME, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 			
 			complt_info_lowr = g_ascii_strdown(complt_info, -1);
 			
@@ -915,14 +915,14 @@ cl_bool ccl_devsel_indep_platform(
 	cl_bool pass;
 
 	/* Check if data is NULL, throw error if so. */
-	gef_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
+	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL, 
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC); 
 	
 	/* Get device platform. */
 	platf = ccl_device_get_scalar_info(device, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Determine filtering result, i.e. if device platform is the same
 	 * as the specified platform. */
@@ -988,7 +988,7 @@ CCLDevSelDevices ccl_devsel_dep_platform(
 	/* Determine reference platform (i.e. platform of first device). */
 	platf_ref = ccl_device_get_scalar_info(dev, CL_DEVICE_PLATFORM,
 		cl_platform_id, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		
 	/* Check if devices belong to the reference platform, remove them if 
 	 * they don't. */
@@ -1000,7 +1000,7 @@ CCLDevSelDevices ccl_devsel_dep_platform(
 		/* Get current device platform. */
 		platf_curr = ccl_device_get_scalar_info(
 			dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* If current device doesn't belong to the reference 
 		 * platform... */
@@ -1067,7 +1067,7 @@ CCLDevSelDevices ccl_devsel_dep_menu(
 		if ((index >= 0) && (index < (cl_int) devices->len)) {
 			/* Device index is within bounds, print list with selection. */
 			ccl_devsel_dep_menu_list(devices, index, &err_internal);
-			gef_if_err_propagate_goto(err, err_internal, error_handler);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		} else {
 			/* If we get here, an invalid device index was given. */
 			g_print("\n   (!) No device at index %d!\n", index);
@@ -1078,7 +1078,7 @@ CCLDevSelDevices ccl_devsel_dep_menu(
 	/* If no proper index was given ask the user for the correct index. */
 	if (index == -1) {
 		index = ccl_devsel_dep_menu_query(devices, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 	
 	/* Remove all devices except the selected device. */

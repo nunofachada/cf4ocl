@@ -29,7 +29,6 @@
 #define _CCL_DEVICE_QUERY_H_
 
 #include "common.h"
-#include "gerrorf.h"
 #include "device_wrapper.h"
 #include "errors.h"
 #include "string.h"

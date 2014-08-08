@@ -129,7 +129,7 @@ static cl_context_properties* ccl_context_properties_default(
 		/* Get context platform using first device. */
 		ocl_status = clGetDeviceInfo(device, CL_DEVICE_PLATFORM, 
 			sizeof(cl_platform_id), &platform, NULL);
-		gef_if_err_create_goto(*err, CCL_OCL_ERROR,
+		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 			"%s: unable to get platform from device (OpenCL error %d: %s).", 
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -254,10 +254,10 @@ CCLContext* ccl_context_new_from_filters_full(
 
 	/* Get selected/filtered devices. */
 	devices = ccl_devsel_select(filters, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Check if any device was found. */
-	gef_if_err_create_goto(*err, CCL_ERROR, devices->len == 0, 
+	ccl_if_err_create_goto(*err, CCL_ERROR, devices->len == 0, 
 		CCL_ERROR_DEVICE_NOT_FOUND, error_handler, 
 		"%s: no device found for selected filters.", 
 		G_STRLOC);
@@ -266,7 +266,7 @@ CCLContext* ccl_context_new_from_filters_full(
 	ctx = ccl_context_new_from_devices_full(properties, devices->len,
 		(CCLDevice**) devices->pdata, pfn_notify, user_data, 
 		&err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -346,7 +346,7 @@ CCLContext* ccl_context_new_from_devices_full(
 		(const cl_context_properties*) ctx_props, num_devices, 
 		(const cl_device_id*) cl_devices, pfn_notify, user_data, 
 		&ocl_status);
-	gef_if_err_create_goto(*err, CCL_OCL_ERROR, 
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
 		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
 		"%s: unable to create cl_context (OpenCL error %d: %s).", 
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
@@ -417,7 +417,7 @@ CCLContext* ccl_context_new_from_indep_filter(
 	
 	/* Create a context with selected device(s). */
 	ctx = ccl_context_new_from_filters(&filters, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -466,7 +466,7 @@ CCLContext* ccl_context_new_from_menu_full(void* data, GError** err) {
 	
 	/* Create a context with selected device. */
 	ctx = ccl_context_new_from_filters(&filters, &err_internal);
-	gef_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -529,9 +529,9 @@ CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err) {
 	} else {
 		/* Get platform using device. */
 		dev = ccl_context_get_device(ctx, 0, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		platf = ccl_platform_new_from_device(dev, &err_internal);
-		gef_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		/* Keep platform. */
 		ctx->platf = platf;
 	}

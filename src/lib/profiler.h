@@ -31,7 +31,6 @@
 #include <glib.h>
 #include <string.h>
 #include "oclversions.h"
-#include "gerrorf.h"
 #include "errors.h"
 #include "common.h"
 #include "queue_wrapper.h"

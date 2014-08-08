@@ -34,7 +34,6 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include "oclversions.h"
-#include "gerrorf.h"
 #include "common.h"
 #include "errors.h"
 #include "device_wrapper.h"
