@@ -371,7 +371,7 @@ const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof);
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort);
 
 /** Return the next event instant instance. */
-const CCLProfInst* ccl_prof_inst_info_next(CCLProf* prof);
+const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof);
 
 /** Initialize an iterator for overlap instances. */
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);

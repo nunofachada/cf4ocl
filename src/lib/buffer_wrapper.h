@@ -65,8 +65,6 @@ void ccl_buffer_destroy(CCLBuffer* buf);
  * 
  * @public @memberof ccl_buffer
  *  
- * @param[in] mo Buffer wrapper object to destroy if reference count 
- * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
 	
