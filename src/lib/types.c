@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * Use and pass abstract OpenCL types in C functions.
+ * 
+ * Implementation of a class and methods to use and pass abstract OpenCL
+ * types in C functions.
  * 
  * @author Nuno Fachada
  * @date 2014

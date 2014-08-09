@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * Kernel argument wrapper.
+ * 
+ * Implementation of a wrapper type and related functions for a OpenCL 
+ * kernel arguments.
  * 
  * @author Nuno Fachada
  * @date 2014

@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * OpenCL buffer wrapper.
+ * 
+ * Definition of a wrapper class and its methods for OpenCL buffer
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

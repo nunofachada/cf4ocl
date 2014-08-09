@@ -18,8 +18,9 @@
  
 /** 
  * @file
- * Abstract wrapper for OpenCL objects which contain a list of
- * devices. Extends abstract_wrapper.c.
+ * 
+ * Implementation of an abstract wrapper class and its methods for 
+ * OpenCL objects which contain a list of devices.
  * 
  * @author Nuno Fachada
  * @date 2014

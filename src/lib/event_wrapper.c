@@ -18,8 +18,10 @@
  
  /** 
  * @file
- * OpenCL event wrapper.
  * 
+ * Implementation of a wrapper class and its methods for OpenCL event
+ * objects.
+ *  
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)

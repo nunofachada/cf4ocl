@@ -18,7 +18,8 @@
  
 /** 
  * @file
- * Functions for querying OpenCL devices.
+ * 
+ * Classes and functions to query OpenCL devices.
  * 
  * @author Nuno Fachada
  * @date 2014

@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * OpenCL event wrapper.
+ * 
+ * Definition of a wrapper class and its methods for OpenCL event
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

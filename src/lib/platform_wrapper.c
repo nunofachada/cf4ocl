@@ -18,8 +18,9 @@
  
 /** 
  * @file
- * Wrapper object for OpenCL platforms. Contains platform and 
- * platform information.
+ * 
+ * Implementation of a wrapper class and its methods for OpenCL platform
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

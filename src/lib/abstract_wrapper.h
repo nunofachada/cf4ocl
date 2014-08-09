@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * Generic OpenCL object wrapper.
+ * 
+ * Definition of an abstract wrapper class and its methods for OpenCL 
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

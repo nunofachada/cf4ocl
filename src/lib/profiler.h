@@ -18,7 +18,8 @@
 
 /**
  * @file
- * Function headers of a profiling tool for OpenCL.
+ * 
+ * Definition of classes and methods for profiling OpenCL events.
  *
  * @author Nuno Fachada
  * @date 2014

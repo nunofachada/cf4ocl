@@ -18,8 +18,9 @@
  
 /** 
  * @file
- * Functions for obtaining information about OpenCL entities
- * such as platforms, devices, contexts, queues, kernels, etc.
+ * 
+ * Implementation of an abstract wrapper class and its methods for 
+ * OpenCL objects.
  * 
  * @author Nuno Fachada
  * @date 2014

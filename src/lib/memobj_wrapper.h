@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * OpenCL cl_mem wrapper object.
+ * 
+ * Definition of a wrapper class and its methods for OpenCL memory
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

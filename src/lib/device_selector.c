@@ -18,7 +18,9 @@
  
 /** 
  * @file
- * Functions for filtering and selecting OpenCL devices.
+ * 
+ * Classes and functions for filtering and selecting OpenCL contexts
+ * and associated devices.
  *
  * @author Nuno Fachada
  * @date 2014

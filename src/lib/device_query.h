@@ -18,6 +18,7 @@
  
 /** 
  * @file
+ * 
  * Functions for querying OpenCL devices.
  * 
  * @author Nuno Fachada
@@ -37,7 +38,7 @@
 /**
  * @defgroup DEVICE_QUERY Device query
  *
- * Objects and functions to query OpenCL devices.
+ * Classes and functions to query OpenCL devices.
  * 
  * Todo: detailed description of module with code examples.
  * 

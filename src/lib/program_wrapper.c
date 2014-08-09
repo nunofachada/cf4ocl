@@ -18,7 +18,9 @@
  
  /** 
  * @file
- * OpenCL program wrapper.
+ * 
+ * Implementation of a wrapper class and its methods for OpenCL program
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

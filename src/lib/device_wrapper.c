@@ -18,8 +18,9 @@
  
 /** 
  * @file
- * Wrapper object for OpenCL devices. Contains device and device
- * information.
+ * 
+ * Implementation of a wrapper class and its methods for OpenCL device
+ * objects.
  * 
  * @author Nuno Fachada
  * @date 2014

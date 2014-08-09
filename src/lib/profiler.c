@@ -18,7 +18,8 @@
  
 /** 
  * @file
- * Function implementations of a profiling tool for OpenCL.
+ * 
+ * Implementation of classes and methods for profiling OpenCL events.
  * 
  * @author Nuno Fachada
  * @date 2014

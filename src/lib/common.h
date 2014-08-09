@@ -18,7 +18,8 @@
  
  /** 
  * @file
- * Common cf4ocl definitions.
+ * 
+ * Common _cf4ocl_ definitions.
  * 
  * @author Nuno Fachada
  * @date 2014

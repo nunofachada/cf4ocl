@@ -18,8 +18,9 @@
  
 /** 
  * @file
- * Object which represents the list of OpenCL platforms available
- * in the system and respective functions.
+ * 
+ * Implementation of a class which represents the list of OpenCL 
+ * platforms available in the system and respective methods.
  * 
  * @author Nuno Fachada
  * @date 2014
