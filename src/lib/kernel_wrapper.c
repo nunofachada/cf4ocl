@@ -361,6 +361,50 @@ finish:
 	
 }
 
+double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
+
+	/* Make sure number krnl is not NULL. */
+	g_return_val_if_fail(krnl != NULL, 0.0);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
+
+	cl_context context;
+	CCLContext* ctx;
+	GError* err_internal = NULL;
+	double ocl_ver;
+	
+	/* Get cl_context object for this kernel. */
+	context = ccl_kernel_get_scalar_info(
+		krnl, CL_KERNEL_CONTEXT, cl_context, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Get context wrapper. */
+	ctx = ccl_context_new_wrap(context);
+	
+	/* Get OpenCL version. */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Unref. the context wrapper. */
+	ccl_context_unref(ctx);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	ocl_ver = 0;
+	
+finish:
+
+	/* Return event wrapper. */
+	return ocl_ver;
+
+}
+
 #ifdef CL_VERSION_1_2
 
 /**
@@ -397,7 +441,7 @@ static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
  * 
  * @public @memberof ccl_kernel
  * @see ccl_wrapper_get_info()
- * @note OpenCL >= 1.2
+ * @note Requires OpenCL >= 1.2
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
@@ -412,13 +456,47 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	cl_kernel_arg_info param_name, GError** err) {
 	
 	CCLWrapper fake_wrapper;
+	CCLWrapperInfo* info;
+	GError* err_internal = NULL;
+	double ocl_ver;
 	
+	/* Check that context platform is >= OpenCL 1.2 */
+	ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.2, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.2, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: information about kernel arguments requires OpenCL" \
+		" version 1.2 or newer.", G_STRLOC);
+	
+	/* Wrap argument index in a fake cl_object. */
 	fake_wrapper.cl_object = GUINT_TO_POINTER(idx);
 	
-	return ccl_wrapper_get_info(
+	/* Get kernel argument info. */
+	info = ccl_wrapper_get_info(
 		(CCLWrapper*) krnl, &fake_wrapper, param_name,
 		(ccl_wrapper_info_fp) ccl_kernel_get_arg_info_adapter, 
-		CL_FALSE, err);
+		CL_FALSE, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+	/* An error occurred, return NULL to signal it. */
+	info = NULL;
+	
+finish:
+
+	/* Return argument info. */
+	return info;
+	
 }
 
 #endif /* OpenCL >=1.2 */

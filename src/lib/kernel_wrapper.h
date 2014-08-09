@@ -95,6 +95,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
 	
+double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 
 /**
  * @class ccl_kernel
