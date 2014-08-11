@@ -93,25 +93,25 @@ typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
  * */
 typedef cl_int (*ccl_wrapper_release_cl_object)(void* cl_object);
 
-/** Create a new wrapper object. This function is called by the
+/* Create a new wrapper object. This function is called by the
  * concrete wrapper constructors and should not be called by client
  * code. */
 CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size);
 
-/** Increase the reference count of the wrapper object. */
+/* Increase the reference count of the wrapper object. */
 void ccl_wrapper_ref(CCLWrapper* wrapper);
 
-/** Decrements the reference count of the wrapper object.
+/* Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed. */
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
 	ccl_wrapper_release_cl_object rel_cl_fun, GError** err);
 
-/** Returns the wrapper object reference count. For debugging and 
+/* Returns the wrapper object reference count. For debugging and 
  * testing purposes only. */
 int ccl_wrapper_ref_count(CCLWrapper* wrapper);
 
-/** Get the wrapped OpenCL object. */
+/* Get the wrapped OpenCL object. */
 void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 
 /**
@@ -176,26 +176,26 @@ typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
  * */
 typedef cl_int (*ccl_wrapper_info_fp)(void);
 
-/** Debug function which checks if memory allocated by wrappers
+/* Debug function which checks if memory allocated by wrappers
  * has been properly freed. */
 cl_bool ccl_wrapper_memcheck();
 
-/** Add a ::CCLWrapperInfo object to the info table of the
+/* Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper. */
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	CCLWrapperInfo* info);
 
-/** Get information about any wrapped OpenCL object. */
+/* Get information about any wrapped OpenCL object. */
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 	
-/** Get pointer to information value. */
+/* Get pointer to information value. */
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
-/** Get information size. */
+/* Get information size. */
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, 
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
@@ -230,11 +230,10 @@ struct ccl_wrapper_info {
 
 };
 
-
-/** Create a new CCLWrapperInfo* object with a given value size. */
+/* Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
 
-/** Destroy a ::CCLWrapperInfo object. */
+/* Destroy a ::CCLWrapperInfo object. */
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
 /**

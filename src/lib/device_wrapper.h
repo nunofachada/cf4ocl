@@ -58,11 +58,11 @@ typedef struct ccl_platform CCLPlatform;
  * */
 typedef struct ccl_device CCLDevice;
 
-/** Decrements the reference count of the device wrapper object. 
+/* Decrements the reference count of the device wrapper object. 
  * If it reaches 0, the device wrapper object is destroyed. */
 void ccl_device_destroy(CCLDevice* dev);
 
-/** Get the device wrapper for the given OpenCL device. */
+/* Get the device wrapper for the given OpenCL device. */
 CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 /**

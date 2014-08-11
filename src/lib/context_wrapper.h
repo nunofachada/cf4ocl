@@ -72,7 +72,7 @@ typedef void (CL_CALLBACK* ccl_context_callback)(
 	const char* errinfo, const void* private_info, size_t cb, 
 	void* user_data);
  
-/** Get the context wrapper for the given OpenCL context. */
+/* Get the context wrapper for the given OpenCL context. */
 CCLContext* ccl_context_new_wrap(cl_context context);
 
 /** 
@@ -186,13 +186,13 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 #define ccl_context_new_from_menu(err) \
 	ccl_context_new_from_menu_full(NULL, err)
 
-/** Create a new context wrapper object selecting devices using 
+/* Create a new context wrapper object selecting devices using 
  * the given set of filters. */
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
 	ccl_context_callback pfn_notify, void* user_data, GError **err);
 
-/** Creates a context wrapper given an array of ::CCLDevice 
+/* Creates a context wrapper given an array of ::CCLDevice 
  * wrappers and the remaining parameters required by the 
  * clCreateContext function. */
 CCLContext* ccl_context_new_from_devices_full(
@@ -200,20 +200,20 @@ CCLContext* ccl_context_new_from_devices_full(
 	CCLDevice** devices, ccl_context_callback pfn_notify,
 	void* user_data, GError** err);
 
-/** Creates a context wrapper using one independent device filter 
+/* Creates a context wrapper using one independent device filter 
  * specified in the function parameters. */
 CCLContext* ccl_context_new_from_indep_filter(
 	ccl_devsel_indep filter, void* data, GError** err);
 	
-/** Creates a context wrapper using a device which the user 
+/* Creates a context wrapper using a device which the user 
  * selects from a menu. */
 CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
 
-/** Decrements the reference count of the context wrapper object. 
+/* Decrements the reference count of the context wrapper object. 
  * If it reaches 0, the context wrapper object is destroyed. */
 void ccl_context_destroy(CCLContext* ctx);
 
-/** Get the OpenCL version of the platform associated with this 
+/* Get the OpenCL version of the platform associated with this 
  * context. */
 double ccl_context_get_opencl_version(
 	CCLContext* ctx, GError** err);
@@ -312,17 +312,17 @@ double ccl_context_get_opencl_version(
 #define ccl_context_unwrap(ctx) \
 	((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
 	
-/** Get the platform associated with the context devices. */
+/* Get the platform associated with the context devices. */
 CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
 
-/** Get ::CCLDevice wrapper at given index. */
+/* Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_context_get_device(
 	CCLContext* ctx, cl_uint index, GError** err);
 
-/** Return number of devices in context. */
+/* Return number of devices in context. */
 cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
 
-/** Get all device wrappers in context. */
+/* Get all device wrappers in context. */
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx, 
 	GError** err);
 

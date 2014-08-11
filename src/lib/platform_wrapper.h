@@ -53,17 +53,17 @@
  * */
 typedef struct ccl_platform CCLPlatform;
 
-/** Get the platform wrapper for the given OpenCL platform. */
+/* Get the platform wrapper for the given OpenCL platform. */
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 
-/** Get the platform wrapper for the given device wrapper. */
+/* Get the platform wrapper for the given device wrapper. */
 CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err);
 
-/** Decrements the reference count of the platform wrapper 
+/* Decrements the reference count of the platform wrapper 
  * object. If it reaches 0, the platform wrapper object is destroyed. */
 void ccl_platform_destroy(CCLPlatform* platf);
 
-/** Get numeric OpenCL version of platform. */
+/* Get numeric OpenCL version of platform. */
 double ccl_platform_get_opencl_version(
 	CCLPlatform* platf, GError** err);
 
@@ -179,15 +179,15 @@ double ccl_platform_get_opencl_version(
 #define ccl_platform_unwrap(platform) \
 	((cl_platform) ccl_wrapper_unwrap((CCLWrapper*) platform))
 	
-/** Get all device wrappers in platform. */
+/* Get all device wrappers in platform. */
 CCLDevice* const* ccl_platform_get_all_devices(
 	CCLPlatform* platf, GError** err);
  
-/** Get ::CCLDevice wrapper at given index. */
+/* Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_platform_get_device(
 	CCLPlatform* platf, cl_uint index, GError** err);
 
-/** Return number of devices in platform. */
+/* Return number of devices in platform. */
 cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err);
  
 /** @} */

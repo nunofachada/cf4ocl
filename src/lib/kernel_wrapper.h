@@ -63,13 +63,13 @@ typedef struct ccl_kernel CCLKernel;
 //~ typedef CCLDevSelDevices (*ccl_devsel_dep)(
 	//~ CCLDevSelDevices devices, void *data, GError **err);
 
-/** Get the kernel wrapper for the given OpenCL kernel. */
+/* Get the kernel wrapper for the given OpenCL kernel. */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err);
 
-/** Decrements the reference count of the kernel wrapper object. 
+/* Decrements the reference count of the kernel wrapper object. 
  * If it reaches 0, the kernel wrapper object is destroyed. */
 void ccl_kernel_destroy(CCLKernel* krnl);
 
@@ -85,7 +85,7 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** Set kernel arguments and enqueue it for execution. */
+/* Set kernel arguments and enqueue it for execution. */
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, 
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
@@ -97,7 +97,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
 	
-/** Get the OpenCL version of the platform associated with this 
+/* Get the OpenCL version of the platform associated with this 
  * kernel. */
 double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 
@@ -252,7 +252,7 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 
 #ifdef CL_VERSION_1_2
 
-/** Get a ::CCLWrapperInfo kernel argument information object. */
+/* Get a ::CCLWrapperInfo kernel argument information object. */
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx, 
 	cl_kernel_arg_info param_name, GError** err);
 

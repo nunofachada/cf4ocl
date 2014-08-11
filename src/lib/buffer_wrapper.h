@@ -51,14 +51,14 @@
  * */
 typedef struct ccl_buffer CCLBuffer;
 
-/** Create a ::CCLBuffer wrapper object. */
+/* Create a ::CCLBuffer wrapper object. */
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	size_t size, void *host_ptr, GError** err);
 	
-/** Get the buffer wrapper for the given OpenCL buffer. */
+/* Get the buffer wrapper for the given OpenCL buffer. */
 CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object);
 
-/** Decrements the reference count of the wrapper object. If it 
+/* Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed. */
 void ccl_buffer_destroy(CCLBuffer* buf);
 
@@ -70,29 +70,29 @@ void ccl_buffer_destroy(CCLBuffer* buf);
  * */
 #define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
 	
-/** Read from a buffer object to host memory. */
+/* Read from a buffer object to host memory. */
 CCLEvent* ccl_buffer_enqueue_read(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** Write to a buffer object from host memory. */
+/* Write to a buffer object from host memory. */
 CCLEvent* ccl_buffer_enqueue_write(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** Map a region of the buffer object given by buffer into the host 
+/* Map a region of the buffer object given by buffer into the host 
  * address space and returns a pointer to this mapped region. */
 void* ccl_buffer_enqueue_map(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
 	GError** err);
 
-/** Copy from one buffer object to another. */
+/* Copy from one buffer object to another. */
 CCLEvent* ccl_buffer_enqueue_copy(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, size_t src_offset, size_t dst_offset, 
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** Copy a buffer object to an image object. This function wraps the 
+/* Copy a buffer object to an image object. This function wraps the 
  * clEnqueueCopyBufferToImage() OpenCL function. */
 CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLImage* dst_img, size_t src_offset, const size_t *dst_origin,
@@ -100,12 +100,12 @@ CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 
 #ifdef CL_VERSION_1_1
 
-/** Creates a sub-buffer that represents a specific region in the given
+/* Creates a sub-buffer that represents a specific region in the given
  * buffer. */
 CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf, 
 	cl_mem_flags flags, size_t origin, size_t size, GError** err);
 
-/** Read from a 2D or 3D rectangular region from a buffer object to host 
+/* Read from a 2D or 3D rectangular region from a buffer object to host 
  * memory. */
 CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, const size_t* buffer_origin,
@@ -114,7 +114,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** Write a 2D or 3D rectangular region to a buffer object from host 
+/* Write a 2D or 3D rectangular region to a buffer object from host 
  * memory. */
 CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, const size_t* buffer_origin,
@@ -123,7 +123,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
-/** Copy a 2D or 3D rectangular region from a buffer object to another 
+/* Copy a 2D or 3D rectangular region from a buffer object to another 
  * buffer object. */
 CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, const size_t *src_origin, 
@@ -136,7 +136,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
 
 #ifdef CL_VERSION_1_2
 
-/** Fill a buffer object with a pattern of a given pattern size. */
+/* Fill a buffer object with a pattern of a given pattern size. */
 CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf, 
 	const void *pattern, size_t pattern_size, size_t offset, 
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);

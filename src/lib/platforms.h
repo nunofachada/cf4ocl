@@ -50,19 +50,19 @@
  */
 typedef struct ccl_platforms CCLPlatforms;
 
-/** Creates a new CCLPlatforms* object, which contains the list 
+/* Creates a new CCLPlatforms* object, which contains the list 
  * of OpenCL platforms available in the system. */
 CCLPlatforms* ccl_platforms_new(GError **err);
 
-/** Destroy a CCLPlatforms* object, including all underlying
+/* Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data. */
 void ccl_platforms_destroy(CCLPlatforms* platforms);
 
-/** Return number of OpenCL platforms found in CCLPlatforms* 
+/* Return number of OpenCL platforms found in CCLPlatforms* 
  * object. */
 cl_uint ccl_platforms_count(CCLPlatforms* platforms);
 
-/** Get CCL platform wrapper object at given index. */
+/* Get CCL platform wrapper object at given index. */
 CCLPlatform* ccl_platforms_get_platform(
 	CCLPlatforms* platforms, cl_uint index);
 

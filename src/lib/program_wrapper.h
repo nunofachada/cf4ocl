@@ -63,14 +63,16 @@ typedef void (CL_CALLBACK* ccl_program_callback)(
 	cl_program program, void* user_data);
 
 /* WRAPPER API */
-/** Get the program wrapper for the given OpenCL program. */
+
+/* Get the program wrapper for the given OpenCL program. */
 CCLProgram* ccl_program_new_wrap(cl_program program);
 
-/** Decrements the reference count of the program wrapper object. 
+/* Decrements the reference count of the program wrapper object. 
  * If it reaches 0, the program wrapper object is destroyed. */
 void ccl_program_destroy(CCLProgram* prg);
 
 /* SOURCES */
+
 CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx, 
 	cl_uint count, const char** filenames, GError** err);
 	
@@ -85,6 +87,7 @@ CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	ccl_program_new_from_sources(ctx, 1, &src, NULL, err)
 
 /* BINARIES */
+
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx, 
 	cl_uint num_devices, CCLDevice** devs, const char** filenames, 
 	cl_int *binary_status, GError** err);
@@ -101,6 +104,7 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	ccl_program_new_from_binaries(ctx, 1, &dev, &binary, bin_status, err)
 
 /* BUILT-IN KERNELS */
+
 #ifdef CL_VERSION_1_2
 
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
@@ -319,20 +323,20 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 #define ccl_program_unwrap(prg) \
 	((cl_program) ccl_wrapper_unwrap((CCLWrapper*) prg))
 
-/** Get ::CCLDevice wrapper at given index. */
+/* Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_program_get_device(
 	CCLProgram* prg, cl_uint index, GError** err);
 
-/** Return number of devices in program. */
+/* Return number of devices in program. */
 cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err);
 
-/** Get all device wrappers in program. */
+/* Get all device wrappers in program. */
 CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg, 
 	GError** err);
 
 /** @} */
 
-/** Create a new ::CCLProgramBinary object with a given value 
+/* Create a new ::CCLProgramBinary object with a given value 
  * size. */
 CCLProgramBinary* ccl_program_binary_new(
 	unsigned char* data, size_t size);
@@ -340,7 +344,7 @@ CCLProgramBinary* ccl_program_binary_new(
 #define ccl_program_binary_new_empty() \
 	ccl_program_binary_new(NULL, 0);
 
-/** Destroy a ::CCLProgramBinary object. */
+/* Destroy a ::CCLProgramBinary object. */
 void ccl_program_binary_destroy(CCLProgramBinary* bin);
 
 #endif

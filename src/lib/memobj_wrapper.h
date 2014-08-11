@@ -69,11 +69,11 @@ typedef struct ccl_memobj {
 typedef void (CL_CALLBACK *ccl_memobj_destructor_callback)(
 	cl_mem memobj, void *user_data);
 
-/** Implementation of ccl_wrapper_release_fields() function for
+/* Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects. */
 void ccl_memobj_release_fields(CCLMemObj* mo);
 
-/** Get the OpenCL version of the platform associated with this memory
+/* Get the OpenCL version of the platform associated with this memory
  * object. */
 double ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err);
 
@@ -82,7 +82,7 @@ CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
 	
 #ifdef CL_VERSION_1_1
 
-/** Wrapper for OpenCL clSetMemObjectDestructorCallback() function. */
+/* Wrapper for OpenCL clSetMemObjectDestructorCallback() function. */
 cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo, 
 	ccl_memobj_destructor_callback pfn_notify,
 	void *user_data, GError** err);

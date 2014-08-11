@@ -63,10 +63,10 @@ typedef enum {
  * */
 typedef struct ccl_type_info CCLTypeInfo;
 
-/** Return OpenCL type name. */
+/* Return OpenCL type name. */
 const char* ccl_type_name_get(CCLType type);
 
-/** Return OpenCL type size in bytes. */
+/* Return OpenCL type size in bytes. */
 int ccl_type_sizeof(CCLType type);
 
 /** @} */

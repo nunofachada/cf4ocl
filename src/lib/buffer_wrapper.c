@@ -544,6 +544,8 @@ finish:
  * @param[in] size Sub-buffer size.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
+ * @return A new buffer wrapper object which represents a specific
+ * region in the original buffer.
  * */
 CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf, 
 	cl_mem_flags flags, size_t origin, size_t size, GError** err) {

@@ -704,20 +704,28 @@ finish:
 
 }
 
-
 /**
- * Implements the functionality of the clEnqueueBarrierWithWaitList()
- * function in platforms which doesn't support it (OpenCL <= 1.1).
+ * For platforms which do not support clEnqueueBarrierWithWaitList()
+ * (OpenCL <= 1.1), this function implements the same functionality by
+ * using the deprecated clEnqueueBarrier(), clEnqueueWaitForEvents() and
+ * clEnqueueMarker() OpenCL functions.
  * 
- * If evt_wait_lst is NULL, clEnqueueBarrier() and clEnqueueMarker() ...
+ * If `evt_wait_lst` is `NULL`, clEnqueueBarrier() and clEnqueueMarker()
+ * are called in sequence; otherwise (if there are events which must be
+ * waited on), clEnqueueWaitForEvents() and clEnqueueMarker() are
+ * called in sequence. The calls on clEnqueueMarker() allow to fire
+ * a marker event (not produced by either clEnqueueBarrier() or 
+ * clEnqueueWaitForEvents()). This marker event can then be used to 
+ * queue a wait on.
  * 
- * ======================== !!!!!!!!!!!!!!!!!! =======================
+ * @see ccl_enqueue_barrier()
  * 
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
- * @return
+ * @return An OpenCL marker event (will be wrapped by the calling 
+ * function).
  * */
 static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq, 
 	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -778,10 +786,26 @@ finish:
 	
 	/* Return OpenCL event. */
 	return event;	
-		
+
 }
 
-
+/**
+ * Enqueues a barrier command on the given command queue. The barrier
+ * can wait on a given list of events, or wait until all previous 
+ * enqueued commands have completed if `evt_wait_lst` is `NULL`. A
+ * marker event is returned, which can be used to identify this barrier
+ * command later on. This function is a wrapper for the
+ * clEnqueueBarrierWithWaitList() OpenCL function (OpenCL >= 1.2).
+ * 
+ * @copydoc ccl_enqueue_barrier_deprecated()
+ * 
+ * @param[in] cq Command queue wrapper object.
+ * @param[in,out] evt_wait_lst Event wait list.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return An event wrapper object that identifies this particular 
+ * command.
+ * */
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq, 
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -870,6 +894,25 @@ finish:
 
 }
 
+/**
+ * For platforms which do not support clEnqueueMarkerWithWaitList()
+ * (OpenCL <= 1.1), this function uses the deprecated clEnqueueMarker()
+ * OpenCL function. However, in this case `evt_wait_lst` must be `NULL`,
+ * because clEnqueueMarker() does not support markers with wait lists.
+ * If `evt_wait_lst` is not `NULL`, it will be ignored (i.e. the marker
+ * will only fire an event after all commands queued before the marker
+ * command are complete) and a warning will be generated.
+ * 
+ * @see ccl_enqueue_marker()
+ * 
+ * @param[in] cq Command queue wrapper object.
+ * @param[in,out] evt_wait_lst Event wait list. Must be `NULL` or a
+ * warning will be generated.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return An OpenCL marker event (will be wrapped by the calling 
+ * function).
+ * */
 static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq, 
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 		
@@ -916,6 +959,22 @@ finish:
 		
 }
 
+/**
+ * Enqueues a marker command on the given command queue. The marker can
+ * wait on a given list of events, or wait until all previous enqueued 
+ * commands have completed if `evt_wait_lst` is `NULL`. This function
+ * is a wrapper for the clEnqueueMarkerWithWaitList() OpenCL function
+ * (OpenCL >= 1.2). 
+ * 
+ * @copydoc ccl_enqueue_marker_deprecated()
+ * 
+ * @param[in] cq Command queue wrapper object.
+ * @param[in,out] evt_wait_lst Event wait list.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return An event wrapper object that identifies this particular 
+ * command.
+ * */
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq, 
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 

@@ -38,7 +38,7 @@
  * @{
  */
 
-/** Convert OpenCL error code to a readable string. */
+/* Convert OpenCL error code to a readable string. */
 const char* ccl_err(int code);
 
 /** @} */

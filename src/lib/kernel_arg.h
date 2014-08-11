@@ -43,16 +43,16 @@
  * */
 typedef CCLWrapper CCLArg;
 
-/** Create a new kernel argument. */
+/* Create a new kernel argument. */
 CCLArg* ccl_arg_new(void* value, size_t size);
 
-/** Destroy a kernel argument. */
+/* Destroy a kernel argument. */
 void ccl_arg_destroy(CCLArg* arg);
 
-/** Get size in bytes of kernel argument. */
+/* Get size in bytes of kernel argument. */
 size_t ccl_arg_size(CCLArg* arg);
 
-/** Get value of kernel argument. */
+/* Get value of kernel argument. */
 void* ccl_arg_value(CCLArg* arg);
 
 /**

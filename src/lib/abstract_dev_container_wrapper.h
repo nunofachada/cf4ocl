@@ -87,21 +87,21 @@ typedef struct ccl_dev_container {
 typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
 	CCLDevContainer* devcon, GError** err);
 
-/** Release the devices held by the given #CCLDevContainer 
+/* Release the devices held by the given #CCLDevContainer 
  * object. */
 void ccl_dev_container_release_devices(CCLDevContainer* devcon);
 
-/** Get all ::CCLDevice wrappers in device container. */
+/* Get all ::CCLDevice wrappers in device container. */
 CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 
-/** Get ::CCLDevice wrapper at given index. */
+/* Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_dev_container_get_device(CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, 
 	cl_uint index, GError** err);
 
-/** Return number of devices in device container. */
+/* Return number of devices in device container. */
 cl_uint ccl_dev_container_get_num_devices(CCLDevContainer* devcon, 
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 

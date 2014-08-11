@@ -115,11 +115,11 @@ typedef enum ccl_error_code {
  * an error in the OpenCL library. */
 #define CCL_OCL_ERROR ccl_ocl_error_quark()
 
-/** Resolves to error category identifying string, in this case
+/* Resolves to error category identifying string, in this case
  * an error in _cf4ocl_. */
 GQuark ccl_error_quark(void);
 
-/** Resolves to error category identifying string, in this case
+/* Resolves to error category identifying string, in this case
  * an error in the OpenCL library. */
 GQuark ccl_ocl_error_quark(void);
 

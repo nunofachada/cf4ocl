@@ -55,14 +55,14 @@
  */
 typedef struct ccl_queue CCLQueue;
 
-/** Get the command queue wrapper for the given OpenCL command 
+/* Get the command queue wrapper for the given OpenCL command 
  * queue. */
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err);
 
-/** Decrements the reference count of the command queue wrapper 
+/* Decrements the reference count of the command queue wrapper 
  * object. If it reaches 0, the command queue wrapper object is 
  * destroyed. */
 void ccl_queue_destroy(CCLQueue* cq);

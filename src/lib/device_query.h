@@ -104,18 +104,18 @@ extern const int ccl_devquery_info_map_size;
  * units suffix. */
 extern const CCLDevQueryMap ccl_devquery_info_map[];
 
-/** Get a final device info prefix in the same format as 
+/* Get a final device info prefix in the same format as 
  * kept in the ccl_devquery_info_map. */
 gchar* ccl_devquery_get_prefix_final(const char* prefix);
 
-/** Return a cl_device_info object given its name. */
+/* Return a cl_device_info object given its name. */
 cl_device_info ccl_devquery_name(const char* name);
 
-/** Get a list of device information parameters which have the 
+/* Get a list of device information parameters which have the 
  * given prefix. */
 const CCLDevQueryMap* ccl_devquery_prefix(const char* prefix, int* size);
 
-/** Search for a device information parameter by matching part
+/* Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. */
 const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx);
 

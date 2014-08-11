@@ -324,88 +324,88 @@ typedef struct ccl_prof_export_options {
 	
 }  CCLProfExportOptions;
 
-/** Create a new profile object. */
+/* Create a new profile object. */
 CCLProf* ccl_prof_new();
 
-/** Destroy a profile object. */
+/* Destroy a profile object. */
 void ccl_prof_destroy(CCLProf* prof);
 
-/** Starts the global profiler timer. Only required if client
+/* Starts the global profiler timer. Only required if client
 * wishes to compare the effectively ellapsed time with the OpenCL
 * kernels time. */
 void ccl_prof_start(CCLProf* prof);
 
-/** Stops the global profiler timer. Only required if 
+/* Stops the global profiler timer. Only required if 
  * ccl_prof_start() was called. */
 void ccl_prof_stop(CCLProf* prof);
 
-/** If profiling has started but not stopped, returns the time
+/* If profiling has started but not stopped, returns the time
  * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
 double ccl_prof_time_elapsed(CCLProf* prof);
 
-/** Add a command queue wrapper for profiling. */
+/* Add a command queue wrapper for profiling. */
 void ccl_prof_add_queue(
 	CCLProf* prof, const char* cq_name, CCLQueue* cq);
 
-/** Determine aggregate statistics for the given profile object. */
+/* Determine aggregate statistics for the given profile object. */
 cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
 
-/** Return aggregate statistics for events with the given name. */
+/* Return aggregate statistics for events with the given name. */
 const CCLProfAgg* ccl_prof_get_agg(
 	CCLProf* prof, const char* event_name);
 
-/** Initialize an iterator for profiled aggregate event 
+/* Initialize an iterator for profiled aggregate event 
  * instances. */
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort);
 
-/** Return the next profiled aggregate event instance. */
+/* Return the next profiled aggregate event instance. */
 const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof);
 
-/** Initialize an iterator for event profiling info instances. */
+/* Initialize an iterator for event profiling info instances. */
 void ccl_prof_iter_info_init(CCLProf* prof, int sort);
 
-/** Return the next event profiling info instance. */
+/* Return the next event profiling info instance. */
 const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof);
 
-/** Initialize an iterator for event instant instances. */
+/* Initialize an iterator for event instant instances. */
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort);
 
-/** Return the next event instant instance. */
+/* Return the next event instant instance. */
 const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof);
 
-/** Initialize an iterator for overlap instances. */
+/* Initialize an iterator for overlap instances. */
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);
 
-/** Return the next overlap instance. */
+/* Return the next overlap instance. */
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof);
 
-/** Print a summary of the profiling info. More specifically,
+/* Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted
  * by absolute time), and a table of event overlaps (sorted by overlap
  * duration). */ 
 void ccl_prof_print_summary(CCLProf* prof);
 
-/** Get a summary with the profiling info. More specifically,
+/* Get a summary with the profiling info. More specifically,
  * this function returns a string containing a table of aggregate event 
  * statistics and a table of event overlaps. The order of the returned
  * information can be specified in the function arguments. */ 
 const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort);
 
-/** Export profiling info to a given stream. */
+/* Export profiling info to a given stream. */
 cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, GError** err);
 
-/** Helper function which exports profiling info to a given file,
+/* Helper function which exports profiling info to a given file,
  * automatically opening and closing the file. Check the
  * ccl_prof_export_info() for more information. */
 cl_bool ccl_prof_export_info_file(
 	CCLProf* profile, const char* filename, GError** err);
 
-/** Set export options using a ::CCLProfExportOptions struct. */
+/* Set export options using a ::CCLProfExportOptions struct. */
 void ccl_prof_set_export_opts(CCLProfExportOptions export_opts);
 
-/** Get current export options. */
+/* Get current export options. */
 CCLProfExportOptions ccl_prof_get_export_opts();
 
 /** @} */
