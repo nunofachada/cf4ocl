@@ -58,6 +58,8 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * Get the OpenCL version of the platform associated with this memory
  * object.
  * 
+ * @public @memberof ccl_memobj
+ *  
  * @param[in] mo A memory object wrapper object.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
@@ -232,7 +234,9 @@ finish:
  * @param[in] num_mos
  * @param[in] cq
  * @param[in] flags
- * @param[in] evt_wait_lst
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
  * @return

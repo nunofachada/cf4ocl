@@ -156,8 +156,9 @@ finish:
  * @param[in] size The size in bytes of data being read.
  * @param[out] ptr The pointer to buffer in host memory where data is to
  * be read into.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
@@ -228,8 +229,9 @@ finish:
  * @param[in] size The size in bytes of data being read.
  * @param[in] ptr The pointer to buffer in host memory where data is to 
  * be written from.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command, or
@@ -303,8 +305,9 @@ finish:
  * being mapped.
  * @param[in] size The size of the region in the buffer object that is
  * being mapped.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] evt An event wrapper object that identifies this 
  * particular map command. If NULL, no event will be returned.
  * @param[out] err Return location for a GError, or NULL if error 
@@ -382,8 +385,9 @@ finish:
  * @param[in] dst_offset The offset where to begin copying data into 
  * dst_buffer.
  * @param[in] size Size in bytes to copy.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
@@ -463,8 +467,9 @@ finish:
  * of the 2D rectangle and the number of images of a 2D image array or 
  * the @f$(width)@f$ in pixels of the 1D rectangle and the number of 
  * images of a 1D image array.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
@@ -638,8 +643,9 @@ finish:
  * be used for the memory region pointed to by ptr.
  * @param[out] ptr The pointer to buffer in host memory where data is to
  * be read into.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
@@ -748,8 +754,9 @@ finish:
  * be used for the memory region pointed to by ptr.
  * @param[in] ptr The pointer to buffer in host memory where data is to 
  * be written from.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command, or
@@ -856,8 +863,9 @@ finish:
  * used for the memory region associated with dst_buf.
  * @param[in] dst_slice_pitch The length of each 2D slice in bytes 
  * to be used for the memory region associated with dst_buf.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
@@ -958,8 +966,9 @@ finish:
  * buffer and must be a multiple of pattern_size.
  * @param[in] size he size in bytes of region being filled in buffer and
  * must be a multiple of pattern_size.
- * @param[in] evt_wait_lst List of events that need to complete before
- * this command can be executed.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.

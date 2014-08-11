@@ -66,6 +66,7 @@ typedef struct ccl_kernel CCLKernel;
 /* Get the kernel wrapper for the given OpenCL kernel. */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
+/* Create a new kernel wrapper object. */
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err);
 
@@ -73,13 +74,20 @@ CCLKernel* ccl_kernel_new(
  * If it reaches 0, the kernel wrapper object is destroyed. */
 void ccl_kernel_destroy(CCLKernel* krnl);
 
+/* Set one kernel argument. */
 void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, 
 	CCLArg* arg);
 
+/* Set all kernel arguments. This function accepts a variable list of
+ * arguments which must end with `NULL`. */
 void ccl_kernel_set_args(CCLKernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
+/* Set all kernel arguments. This function accepts a `va_list`
+ * containing the kernel arguments. Calling code must initialize and
+ * clean up the `va_list`. */
 void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args);
 
+/* Enqueues a kernel for execution on a device. */
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
@@ -92,6 +100,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl,
 	CCLEventWaitList* evt_wait_lst, GError** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
+/* Set kernel arguments and enqueue it for execution. */
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 

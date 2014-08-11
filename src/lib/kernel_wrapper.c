@@ -101,6 +101,17 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
 		
 }
 
+/**
+ * Create a new kernel wrapper object.
+ * 
+ * @public @memberof ccl_kernel
+ *  
+ * @param[in] prg A program wrapper object.
+ * @param[in] kernel_name The kernel name.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored. 
+ * @return A new kernel wrapper object.
+ * */
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err) {
 		
@@ -167,40 +178,145 @@ void ccl_kernel_destroy(CCLKernel* krnl) {
 
 }
 
+/**
+ * Set one kernel argument. The argument is not immediatly set with the
+ * clSetKernelArg() OpenCL function, but is instead kept in an argument 
+ * table for this kernel. The clSetKernelArg() function is called only
+ * before kernel execution for arguments which have not yet been set or
+ * have not been updated meanwhile. 
+ * 
+ * @warning This function is not thread-safe. For multi-threaded 
+ * access to the same kernel function, create multiple instances of 
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
+ * one for each thread. 
+ * 
+ * @public @memberof ccl_kernel
+ *  
+ * @param[in] krnl A kernel wrapper object.
+ * @param[in] arg_index Argument index.
+ * @param[in] arg Argument to set.
+ * */
 void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, 
 	CCLArg* arg) {
-		
+	
+	/* Make sure krnl is not NULL. */
 	g_return_if_fail(krnl != NULL);
 	
+	/* Initialize table of kernel arguments if necessary. */
 	if (krnl->args == NULL) {
 		krnl->args = g_hash_table_new_full(g_direct_hash,
 			g_direct_equal, NULL, (GDestroyNotify) ccl_arg_destroy);
 	}
 	
+	/* Keep argument in table. */
 	g_hash_table_replace(krnl->args, GUINT_TO_POINTER(arg_index),
 		(gpointer) arg);
 
 }
 
+/**
+ * Set all kernel arguments. This function accepts a variable list of
+ * arguments which must end with `NULL`. Each argument is individually 
+ * set using the ccl_kernel_set_arg() function.
+ * 
+ * The ccl_kernel_set_args_v() function performs the same operation
+ * but accepts a `va_list` instead.
+ * 
+ * @public @memberof ccl_kernel
+ * 
+ * @attention The variable argument list must end with `NULL`.
+ * 
+ * @warning This function is not thread-safe. For multi-threaded 
+ * access to the same kernel function, create multiple instances of 
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
+ * one for each thread. 
+ *  
+ * @param[in] krnl A kernel wrapper object.
+ * @param[in] ... A `NULL`-terminated list of arguments to set.
+ * */
 void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 	
+	/* Declare and initialize the va_list. */
 	va_list args;
 	va_start(args, krnl);
+	
+	/* Call the va_list version of this function.*/
 	ccl_kernel_set_args_v(krnl, args);
+	
+	/* Clean up the va_list. */
 	va_end(args);
 
 }
 
+/**
+ * Set all kernel arguments. This function accepts a `va_list`
+ * containing the kernel arguments. Calling code must initialize and
+ * clean up the `va_list`. Each argument is individually set using the 
+ * ccl_kernel_set_arg() function.
+ * 
+ * The ccl_kernel_set_args() function performs the same operation but
+ * accepts a `NULL`-terminated variable list of arguments instead.
+ * 
+ * @public @memberof ccl_kernel
+ * 
+ * @warning This function is not thread-safe. For multi-threaded 
+ * access to the same kernel function, create multiple instances of 
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
+ * one for each thread. 
+ * 
+ * @param[in] krnl A kernel wrapper object.
+ * @param[in] args A `NULL`-terminated list of arguments to set.
+ * */
 void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
-		
+	
+	/* Cycle through the arguments. */
 	for (cl_uint i = 0; ; i++) {
+		/* Get next argument. */
 		CCLArg* arg = va_arg(args, CCLArg*);
+		/* If argument is NULL, terminate. */
 		if (arg == NULL)
 			break;
+		/* Set the i^th kernel argument. */
 		ccl_kernel_set_arg(krnl, i, arg);
 	}
 
 }
+
+/**
+ * Enqueues a kernel for execution on a device.
+ * 
+ * Internally, this function calls the clSetKernelArg() OpenCL function
+ * for each argument defined with the ccl_kernel_set_arg() function, and
+ * the executes the kernel using the clEnqueueNDRangeKernel() OpenCL
+ * function.
+ * 
+ * @warning This function is not thread-safe. For multi-threaded 
+ * access to the same kernel function, create multiple instances of 
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
+ * one for each thread.
+ * 
+ * @public @memberof ccl_kernel
+ *  
+ * @param[in] krnl A kernel wrapper object.
+ * @param[in] cq A command queue wrapper object.
+ * @param[in] work_dim The number of dimensions used to specify the 
+ * global work-items and work-items in the work-group. 
+ * @param[in] global_work_offset Can be used to specify an array of 
+ * `work_dim` unsigned values that describe the offset used to calculate
+ * the global ID of a work-item.
+ * @param[in] global_work_size An array of `work_dim` unsigned values
+ * that describe the number of global work-items in `work_dim` 
+ * dimensions that will execute the kernel function.
+ * @param[in] local_work_size An array of `work_dim` unsigned values
+ * that describe the number of work-items that make up a work-group that
+ * will execute the specified kernel.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this command.
+ * */
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
@@ -280,26 +396,44 @@ finish:
 }
 	
 /** 
- * Set kernel arguments and enqueue it for execution.
+ * Set kernel arguments and enqueue it for execution on a device.
  * 
- * @warning This function is not thread-safe. For multi-threaded 
- * execution of the same kernel function, create multiple instances of 
- * a kernel wrapper for the given kernel function with ccl_kernel_new(),
- * one for each thread.
+ * Internally this function sets kernel arguments by calling 
+ * ccl_kernel_set_args_v(), and enqueues the kernel for execution
+ * by calling ccl_kernel_enqueue_ndrange().
+ * 
+ * The ccl_kernel_set_args_and_enqueue_ndrange_v() function performs 
+ * the same operation but accepts a `va_list` instead.
  * 
  * @public @memberof ccl_kernel
  * 
- * @param[in] krnl
- * @param[in] cq
- * @param[in] work_dim
- * @param[in] global_work_offset
- * @param[in] global_work_size
- * @param[in] local_work_size
- * @param[in,out] evt_wait_lst
- * @param[out] err Return location for a GError, or NULL if error
+ * @attention The variable argument list must end with `NULL`.
+ * 
+ * @warning This function is not thread-safe. For multi-threaded 
+ * access to the same kernel function, create multiple instances of 
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
+ * one for each thread.
+ * 
+ * @param[in] krnl A kernel wrapper object.
+ * @param[in] cq A command queue wrapper object.
+ * @param[in] work_dim The number of dimensions used to specify the 
+ * global work-items and work-items in the work-group. 
+ * @param[in] global_work_offset Can be used to specify an array of 
+ * `work_dim` unsigned values that describe the offset used to calculate
+ * the global ID of a work-item.
+ * @param[in] global_work_size An array of `work_dim` unsigned values
+ * that describe the number of global work-items in `work_dim` 
+ * dimensions that will execute the kernel function.
+ * @param[in] local_work_size An array of `work_dim` unsigned values
+ * that describe the number of work-items that make up a work-group that
+ * will execute the specified kernel.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
- * @param[in] ...
- * @return
+ * @param[in] ... A `NULL`-terminated list of arguments to set.
+ * @return Event wrapper object that identifies this command.
  * */
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
@@ -324,6 +458,45 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	
 }
 
+/** 
+ * Set kernel arguments and enqueue it for execution on a device.
+ * 
+ * Internally this function sets kernel arguments by calling 
+ * ccl_kernel_set_args_v(), and enqueues the kernel for execution
+ * by calling ccl_kernel_enqueue_ndrange().
+ * 
+ * The ccl_kernel_set_args_and_enqueue_ndrange() function performs the 
+ * same operation but accepts a `NULL`-terminated variable list of 
+ * arguments instead.
+ * 
+ * @public @memberof ccl_kernel
+ * 
+ * @warning This function is not thread-safe. For multi-threaded 
+ * access to the same kernel function, create multiple instances of 
+ * a kernel wrapper for the given kernel function with ccl_kernel_new(),
+ * one for each thread.
+ * 
+ * @param[in] krnl A kernel wrapper object.
+ * @param[in] cq A command queue wrapper object.
+ * @param[in] work_dim The number of dimensions used to specify the 
+ * global work-items and work-items in the work-group. 
+ * @param[in] global_work_offset Can be used to specify an array of 
+ * `work_dim` unsigned values that describe the offset used to calculate
+ * the global ID of a work-item.
+ * @param[in] global_work_size An array of `work_dim` unsigned values
+ * that describe the number of global work-items in `work_dim` 
+ * dimensions that will execute the kernel function.
+ * @param[in] local_work_size An array of `work_dim` unsigned values
+ * that describe the number of work-items that make up a work-group that
+ * will execute the specified kernel.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @param[in] args A `NULL`-terminated list of arguments to set.
+ * @return Event wrapper object that identifies this command.
+ * */
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
 	cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 

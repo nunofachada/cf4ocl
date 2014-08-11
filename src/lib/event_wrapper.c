@@ -659,7 +659,9 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
  * in the wait list to complete. This function is a wrapper for the
  * clWaitForEvents() OpenCL function.
  * 
- * @param[in,out] evt_wait_lst Event wait list.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
@@ -705,7 +707,6 @@ finish:
 }
 
 /**
- * @internal
  * For platforms which do not support clEnqueueBarrierWithWaitList()
  * (OpenCL <= 1.1), this function implements the same functionality by
  * using the deprecated clEnqueueBarrier(), clEnqueueWaitForEvents() and
@@ -719,6 +720,7 @@ finish:
  * clEnqueueWaitForEvents()). This marker event can then be used to 
  * queue a wait on.
  * 
+ * @internal
  * @see ccl_enqueue_barrier()
  * 
  * @param[in] cq Command queue wrapper object.
@@ -801,7 +803,9 @@ finish:
  * @copydoc ccl_enqueue_barrier_deprecated()
  * 
  * @param[in] cq Command queue wrapper object.
- * @param[in,out] evt_wait_lst Event wait list.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
  * @return An event wrapper object that identifies this particular 
@@ -896,7 +900,6 @@ finish:
 }
 
 /**
- * @internal
  * For platforms which do not support clEnqueueMarkerWithWaitList()
  * (OpenCL <= 1.1), this function uses the deprecated clEnqueueMarker()
  * OpenCL function. However, in this case `evt_wait_lst` must be `NULL`,
@@ -905,6 +908,7 @@ finish:
  * will only fire an event after all commands queued before the marker
  * command are complete) and a warning will be generated.
  * 
+ * @internal
  * @see ccl_enqueue_marker()
  * 
  * @param[in] cq Command queue wrapper object.
@@ -972,7 +976,10 @@ finish:
  * @note Requires OpenCL >= 1.2 if `evt_wait_lst` is not `NULL`.
  * 
  * @param[in] cq Command queue wrapper object.
- * @param[in,out] evt_wait_lst Event wait list.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code. Must be `NULL` if OpenCL platform
+ * version is <= 1.1.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
  * @return An event wrapper object that identifies this particular 
