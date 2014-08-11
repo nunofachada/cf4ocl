@@ -69,6 +69,7 @@ struct ccl_queue {
 };
 
 /**
+ * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLQueue wrapper objects.
  * 

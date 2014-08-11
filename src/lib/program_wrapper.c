@@ -75,6 +75,7 @@ struct ccl_program_binary {
 };
 
 /**
+ * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
  * 
@@ -112,6 +113,7 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 }
 
 /** 
+ * @internal
  * Implementation of ccl_dev_container_get_cldevices() for the
  * program wrapper. 
  * 

@@ -30,6 +30,7 @@
  * */
 
 /**
+ * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects.
  * 

@@ -30,6 +30,7 @@
 #include "abstract_dev_container_wrapper.h"
 
 /**
+ * @internal
  * Initialize device list in device container.
  * 
  * @private @memberof ccl_dev_container

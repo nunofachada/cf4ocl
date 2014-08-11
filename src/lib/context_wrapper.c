@@ -51,6 +51,7 @@ struct ccl_context {
 };
 
 /**
+ * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLContext wrapper objects.
  * 
@@ -73,6 +74,7 @@ static void ccl_context_release_fields(CCLContext* ctx) {
 }
 
 /**
+ * @internal
  * Free the default context properties if required.
  * 
  * @private @memberof ccl_context
@@ -87,6 +89,7 @@ static void ccl_context_release_fields(CCLContext* ctx) {
 		g_slice_free1(3 * sizeof(cl_context_properties), ctx_props)
 
 /**
+ * @internal
  * Create a default context properties object, if required. The 
  * only property set in the default properties object is the OpenCL 
  * cl_platform_id object.
@@ -163,6 +166,7 @@ finish:
 }
 
 /** 
+ * @internal
  * Implementation of ccl_dev_container_get_cldevices() for the
  * context wrapper. 
  * 

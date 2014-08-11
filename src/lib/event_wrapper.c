@@ -705,6 +705,7 @@ finish:
 }
 
 /**
+ * @internal
  * For platforms which do not support clEnqueueBarrierWithWaitList()
  * (OpenCL <= 1.1), this function implements the same functionality by
  * using the deprecated clEnqueueBarrier(), clEnqueueWaitForEvents() and
@@ -895,6 +896,7 @@ finish:
 }
 
 /**
+ * @internal
  * For platforms which do not support clEnqueueMarkerWithWaitList()
  * (OpenCL <= 1.1), this function uses the deprecated clEnqueueMarker()
  * OpenCL function. However, in this case `evt_wait_lst` must be `NULL`,

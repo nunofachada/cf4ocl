@@ -52,6 +52,7 @@ struct ccl_kernel {
 };
 
 /**
+ * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLKernel wrapper objects.
  * 

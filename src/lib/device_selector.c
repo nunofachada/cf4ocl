@@ -77,6 +77,7 @@ typedef struct ccl_devsel_filter {
 } CCLDevSelFilter;
 
 /**
+ * @internal
  * Add any filter to the filter set.
  * 
  * This private function is used by the public ccl_devsel_add_*_filter()
@@ -108,6 +109,7 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
 }
 
 /** 
+ * @internal
  * Populate array of device wrapper objects with all OpenCL
  * devices present in the system
  * 
@@ -200,6 +202,7 @@ finish:
 }
 
 /** 
+ * @internal
  * Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the given device 
  * array.
@@ -267,6 +270,7 @@ finish:
 }
 
 /** 
+ * @internal
  * Private helper function, prints a list of the devices 
  * specified in the given list.
  * 
@@ -337,6 +341,7 @@ finish:
 }
 
 /** 
+ * @internal
  * Private helper function, asks the user to select a device 
  * from a list. 
  * 

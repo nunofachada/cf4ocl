@@ -29,6 +29,7 @@
 #include "profiler.h"
 
 /**
+ * @internal
  * Compare two integers depending on the sort order. 
  * 
  * @param[in] x First integer to compare.
@@ -41,6 +42,7 @@
 	: (((x) < (y)) ? 1 : (((x) > (y)) ? -1 : 0)))
 
 /**
+ * @internal
  * Compare two strings depending on the sort order. 
  * 
  * @param[in] s1 First string to compare.
@@ -52,6 +54,7 @@
 	? g_strcmp0(s1, s2) : g_strcmp0(s2, s1))
 
 /**
+ * @internal
  * Get a ::CCLProfSort object from the given user data.
  * 
  * @param[in] userdata An integer representing a bitfield containing
@@ -63,6 +66,7 @@
 	{0x0F & *((int*) userdata), 0xF0 & *((int*) userdata)}
 
 /**
+ * @internal
  * Class representing a sort order (ascending or descending) and
  * the a sort criteria (context dependent).
  * */
@@ -211,6 +215,7 @@ static CCLProfExportOptions export_options = {
 };
 
 /** 
+ * @internal
  * Create new event instant.
  * 
  * @private @memberof ccl_prof_inst
@@ -242,6 +247,7 @@ static CCLProfInst* ccl_prof_inst_new(const char* event_name,
 }
 
 /**
+ * @internal
  * Free an event instant.
  * 
  * @private @memberof ccl_prof_inst
@@ -256,6 +262,7 @@ static void ccl_prof_inst_destroy(CCLProfInst* instant) {
 }
 
 /**
+ * @internal
  * Compares two event instants for sorting within a GList. It is
  * an implementation of GCompareDataFunc from GLib.
  * 
@@ -297,6 +304,7 @@ static gint ccl_prof_inst_comp(
 }
 
 /** 
+ * @internal
  * Create a new aggregate statistic for events of a given type.
  * 
  * @private @memberof ccl_prof_agg
@@ -311,6 +319,7 @@ static CCLProfAgg* ccl_prof_agg_new(const char* event_name) {
 }
 
 /** 
+ * @internal
  * Free an aggregate statistic. 
  * 
  * @private @memberof ccl_prof_agg
@@ -323,6 +332,7 @@ static void ccl_prof_agg_destroy(CCLProfAgg* agg) {
 }
 
 /**
+ * @internal
  * Compares two aggregate event data instances for sorting 
  * within a GList. It is an implementation of GCompareDataFunc from GLib.
  * 
@@ -363,6 +373,7 @@ static gint ccl_prof_agg_comp(
 }
 
 /**
+ * @internal
  * Create a new event profiling information object.
  * 
  * @private @memberof ccl_prof_info
@@ -398,6 +409,7 @@ static CCLProfInfo* ccl_prof_info_new(const char* event_name,
 }
 
 /** 
+ * @internal
  * Free an event profiling information object. 
  * 
  * @private @memberof ccl_prof_info
@@ -410,6 +422,7 @@ static void ccl_prof_info_destroy(CCLProfInfo* info) {
 }
 
 /**
+ * @internal
  * Compares two event profiling information instances for sorting 
  * within a GList. It is an implementation of GCompareDataFunc from GLib.
  * 
@@ -468,6 +481,7 @@ static gint ccl_prof_info_comp(
 }
 
 /**
+ * @internal
  * Create a new event overlap object.
  * 
  * @private @memberof ccl_prof_overlap
@@ -491,6 +505,7 @@ static CCLProfOverlap* ccl_prof_overlap_new(const char* event1_name,
 }
 
 /**
+ * @internal
  * Destroy an event overlap object.
  * 
  * @private @memberof ccl_prof_overlap
@@ -505,6 +520,7 @@ static void ccl_prof_overlap_destroy(CCLProfOverlap* ovlp) {
 }
 
 /**
+ * @internal
  * Compares two event overlap instances for sorting within a 
  * GList. It is an implementation of GCompareDataFunc from GLib.
  * 
@@ -550,6 +566,7 @@ static gint ccl_prof_overlap_comp(
 }
 
 /**
+ * @internal
  * Add event for profiling.
  * 
  * @private @memberof ccl_prof
@@ -671,6 +688,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 }
 
 /**
+ * @internal
  * Process command queues, i.e., add the respective events for 
  * profiling.
  * 
@@ -713,6 +731,7 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 }
 
 /**
+ * @internal
  * Determine aggregate event statistics.
  * 
  * @private @memberof ccl_prof
@@ -805,6 +824,7 @@ static void ccl_prof_calc_agg(CCLProf* prof) {
 }
 
 /**
+ * @internal
  * Determine event overlaps for the given profile object.
  * 
  * @private @memberof ccl_prof
