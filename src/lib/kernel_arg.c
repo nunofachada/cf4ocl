@@ -30,6 +30,7 @@
 #include "kernel_arg.h"
 
 /**
+ * @internal
  * Determine if argument is local/private.
  * 
  * @param[in] arg Kernel argument.
@@ -40,6 +41,7 @@
 	 (arg->info == (void*) &arg_local_marker)
 
 /**
+ * @internal
  * Marker which determines if argument is local/private or a 
  * real ::CCLWrapper object.
  * */
@@ -71,7 +73,8 @@ CCLArg* ccl_arg_new(void* value, size_t size) {
 	
 }
 
-/** 
+/**
+ * @internal
  * Destroy a kernel argument. 
  * 
  * Client code shouldn't directly use this function.
@@ -89,7 +92,8 @@ void ccl_arg_destroy(CCLArg* arg) {
 	}
 }
 
-/** 
+/**
+ * @internal
  * Get size in bytes of kernel argument. 
  * 
  * Client code shouldn't directly use this function.
@@ -108,6 +112,7 @@ size_t ccl_arg_size(CCLArg* arg) {
 }
 
 /** 
+ * @internal
  * Get value of kernel argument. 
  * 
  * Client code shouldn't directly use this function.

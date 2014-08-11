@@ -271,7 +271,26 @@ cl_bool ccl_user_event_set_status(
  *
  * Simple management of event wait lists.
  * 
- * @todo Detailed description of module with code examples.
+ * Client code must initialize #CCLEventWaitList variables to NULL,
+ * and can reuse them between `ccl_*_enqueue_*()` function calls. No
+ * allocation and deallocation of events and event wait list is
+ * required.
+ * 
+ * Example:
+ * 
+ * @code{.c}
+ * CCLEvent *evt1, *evt2, *evt3;
+ * CCLEventWaitList evt_wait_lst = NULL;
+ * ...
+ * evt1 = ccl_buffer_enqueue_write(cq, a_dev, CL_FALSE, 0, size, a_host, NULL, NULL);
+ * evt2 = ccl_buffer_enqueue_write(cq, b_dev, CL_FALSE, 0, size, b_host, NULL, NULL);
+ * ...
+ * ccl_event_wait_list_add(evt1, &evt_wait_lst);
+ * ccl_event_wait_list_add(evt2, &evt_wait_lst);
+ * evt3 = ccl_kernel_enqueue_ndrange(krnl, cq, dim, offset, gws, lws, &evt_wait_lst, NULL);
+ * ccl_buffer_enqueue_read(cq, c_dev, CL_TRUE, 0, size, c_host, &evt_wait_lst, NULL);
+ * ...
+ * @endcode
  * 
  * @{
  */
@@ -287,7 +306,11 @@ void ccl_event_wait_list_add(
 void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 /**
+ * @internal
  * Get number of events in the event wait list.
+ * 
+ * This macro is used by the `ccl_*_enqueue_*()` functions and will 
+ * rarely be called from client code.
  * 
  * @param[in] evt_wait_lst Event wait list.
  * @return Number of event in the event wait list.
@@ -298,7 +321,11 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 	: 0)
 
 /**
+ * @internal
  * Get an array of OpenCL cl_event objects in the event wait list.
+ * 
+ * This macro is used by the `ccl_*_enqueue_*()` functions and will 
+ * rarely be called from client code.
  * 
  * @param[in] evt_wait_lst Event wait list.
  * @return Array of OpenCL cl_event objects in the event wait list.
@@ -307,7 +334,6 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
 		? (const cl_event*) (*(evt_wait_lst))->pdata \
 		: NULL)
-
 
 /** @} */
 

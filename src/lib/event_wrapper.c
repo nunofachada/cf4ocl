@@ -967,6 +967,7 @@ finish:
  * (OpenCL >= 1.2). 
  * 
  * @copydoc ccl_enqueue_marker_deprecated()
+ * @note Requires OpenCL >= 1.2 if `evt_wait_lst` is not `NULL`.
  * 
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list.
