@@ -41,7 +41,7 @@
  * This module provides objects and functions for selecting
  * OpenCL devices for context creation.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */

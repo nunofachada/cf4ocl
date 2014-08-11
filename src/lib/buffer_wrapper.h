@@ -39,7 +39,7 @@
  * A wrapper object for OpenCL buffers and functions to manage 
  * them.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */
@@ -70,23 +70,30 @@ void ccl_buffer_destroy(CCLBuffer* buf);
  * */
 #define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
 	
+/** Read from a buffer object to host memory. */
 CCLEvent* ccl_buffer_enqueue_read(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
+/** Write to a buffer object from host memory. */
 CCLEvent* ccl_buffer_enqueue_write(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CCLEventWaitList* evt_wait_lst, GError** err);
 
+/** Map a region of the buffer object given by buffer into the host 
+ * address space and returns a pointer to this mapped region. */
 void* ccl_buffer_enqueue_map(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
 	GError** err);
 
+/** Copy from one buffer object to another. */
 CCLEvent* ccl_buffer_enqueue_copy(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, size_t src_offset, size_t dst_offset, 
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);
-	
+
+/** Copy a buffer object to an image object. This function wraps the 
+ * clEnqueueCopyBufferToImage() OpenCL function. */
 CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLImage* dst_img, size_t src_offset, const size_t *dst_origin,
 	const size_t *region, CCLEventWaitList* evt_wait_lst, GError** err);

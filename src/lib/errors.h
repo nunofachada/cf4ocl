@@ -33,7 +33,7 @@
  *
  * Readable OpenCL error codes.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */

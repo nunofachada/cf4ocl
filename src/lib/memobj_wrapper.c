@@ -53,6 +53,60 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * @{
  */
 
+/**
+ * Get the OpenCL version of the platform associated with this memory
+ * object.
+ * 
+ * @param[in] mo A memory object wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return The OpenCL version of the platform associated with this 
+ * memory object in numeric format. If an error occurs, 0 is returned.
+ * */
+double ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err) {
+
+	/* Make sure number mo is not NULL. */
+	g_return_val_if_fail(mo != NULL, 0.0);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
+
+	cl_context context;
+	CCLContext* ctx;
+	GError* err_internal = NULL;
+	double ocl_ver;
+	
+	/* Get cl_context object for this memory object. */
+	context = ccl_memobj_get_scalar_info(
+		mo, CL_MEM_CONTEXT, cl_context, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Get context wrapper. */
+	ctx = ccl_context_new_wrap(context);
+	
+	/* Get OpenCL version. */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Unref. the context wrapper. */
+	ccl_context_unref(ctx);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	ocl_ver = 0;
+	
+finish:
+
+	/* Return event wrapper. */
+	return ocl_ver;
+
+}
+
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq, 
 	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err) {
 

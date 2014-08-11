@@ -44,7 +44,7 @@
  * 
  * @warning The functions in this module are not thread-safe.
  * 
- * Todo: detailed description of module.
+ * @todo detailed description of module.
  * 
  * @{
  */

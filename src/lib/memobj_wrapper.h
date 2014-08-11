@@ -40,7 +40,7 @@
  * A wrapper object for OpenCL memory objects (buffers and 
  * images) and functions to manage them.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */
@@ -73,7 +73,10 @@ typedef void (CL_CALLBACK *ccl_memobj_destructor_callback)(
  * ::CCLMemObj wrapper objects. */
 void ccl_memobj_release_fields(CCLMemObj* mo);
 
-/** Wrapper for OpenCL clEnqueueMigrateMemObjects() function. */
+/** Get the OpenCL version of the platform associated with this memory
+ * object. */
+double ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err);
+
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq, 
 	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err);
 	

@@ -71,6 +71,7 @@ typedef struct ccl_wrapper {
 
 /**
  * Release the fields of the concrete wrapper implementation.
+ * 
  * @protected @memberof ccl_wrapper
  * 
  * @param[in] wrapper A concrete wrapper implementation.
@@ -204,7 +205,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
  *
  * Wrapper information object and associated macros.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */

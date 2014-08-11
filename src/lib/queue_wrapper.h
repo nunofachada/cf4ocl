@@ -43,7 +43,7 @@
  * A wrapper object for OpenCL command queues and functions to 
  * manage them.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */

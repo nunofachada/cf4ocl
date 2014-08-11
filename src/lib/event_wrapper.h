@@ -44,7 +44,7 @@ typedef struct ccl_queue CCLQueue;
  * A wrapper object for OpenCL events and functions to manage 
  * them.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */
@@ -56,6 +56,17 @@ typedef struct ccl_queue CCLQueue;
  * */
 typedef struct ccl_event CCLEvent;
 
+/**
+ * Prototype for user event callback functions. 
+ * 
+ * @public @memberof ccl_event
+ * 
+ * @param[in] event The OpenCL event object for which the callback 
+ * function is invoked.
+ * @param[in] event_command_exec_status Execution status of command for
+ * which this callback function is invoked.
+ * @param[in] user_data A pointer to user supplied data.
+ * */
 typedef void (CL_CALLBACK *ccl_event_callback)(cl_event event,
 	cl_int event_command_exec_status, void *user_data);
 
@@ -66,15 +77,22 @@ CCLEvent* ccl_event_new_wrap(cl_event event);
  * If it reaches 0, the event wrapper object is destroyed. */
 void ccl_event_destroy(CCLEvent* evt);
 
+/** Set event name for profiling purposes. */
 void ccl_event_set_name(CCLEvent* evt, const char* name);
 
+/** Get the event name for profiling purposes. */
 const char* ccl_event_get_name(CCLEvent* evt);
 
+/** Get the final event name for profiling purposes. */
 const char* ccl_event_get_final_name(CCLEvent* evt);
 
 /** Get the command type which fired the given event. */
 cl_command_type ccl_event_get_command_type(
 	CCLEvent* evt, GError** err);
+	
+/** Get the OpenCL version of the platform associated with this event
+ * object. */
+double ccl_event_get_opencl_version(CCLEvent* evt, GError** err);
 	
 #ifdef CL_VERSION_1_1
 
@@ -82,6 +100,13 @@ cl_command_type ccl_event_get_command_type(
 cl_bool ccl_event_set_callback(CCLEvent* evt, 
 	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
 	void *user_data, GError** err);
+
+/** Create a new user event. */
+CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err);
+
+/** Sets the execution status of a user event object. */
+cl_bool ccl_user_event_set_status(
+	CCLEvent* evt, cl_int execution_status, GError** err);
 
 #endif
 
@@ -247,23 +272,38 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
  *
  * Simple management of event wait lists.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */
 
+/** A list of event objects on which enqueued commands can wait. */
 typedef GPtrArray* CCLEventWaitList;
 
+/** Add an event wrapper object to an event wait list. */
 void ccl_event_wait_list_add(
 	CCLEventWaitList* evt_wait_lst, CCLEvent* evt);
-	
+
+/** Clears an event wait list. */
 void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
+/**
+ * Get number of events in the event wait list.
+ * 
+ * @param[in] evt_wait_lst Event wait list.
+ * @return Number of event in the event wait list.
+ * */
 #define ccl_event_wait_list_get_num_events(evt_wait_lst) \
 	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
 	? (*(evt_wait_lst))->len \
 	: 0)
-	
+
+/**
+ * Get an array of OpenCL cl_event objects in the event wait list.
+ * 
+ * @param[in] evt_wait_lst Event wait list.
+ * @return Array of OpenCL cl_event objects in the event wait list.
+ * */
 #define ccl_event_wait_list_get_clevents(evt_wait_lst) \
 	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
 		? (const cl_event*) (*(evt_wait_lst))->pdata \
@@ -272,9 +312,8 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 /** @} */
 
-/** Waits on the host thread for commands identified by events 
- * in the wait list to complete. This function is a wrapper for the
- * clWaitForEvents() OpenCL function. */ 
+/** Waits on the host thread for commands identified by events in the 
+ * wait list to complete. */ 
 cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
 
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq, 
@@ -282,11 +321,6 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq, 
 	CCLEventWaitList* evt_wait_lst, GError** err);
-	
-CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err);
-
-cl_bool ccl_user_event_set_status(
-	CCLEvent* evt, cl_int execution_status, GError** err);
 
 /** @} */
 

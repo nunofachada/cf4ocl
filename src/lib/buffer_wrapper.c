@@ -142,6 +142,26 @@ finish:
 
 }
 
+/**
+ * Read from a buffer object to host memory. This function wraps the 
+ * clEnqueueReadBuffer() OpenCL function.
+ * 
+ * @param[in] cq Command-queue wrapper object in which the read command
+ * will be queued.
+ * @param[in] buf Buffer wrapper object where to read from.
+ * @param[in] blocking_read Indicates if the read operations are 
+ * blocking or non-blocking.
+ * @param[in] offset The offset in bytes in the buffer object to read 
+ * from.
+ * @param[in] size The size in bytes of data being read.
+ * @param[out] ptr The pointer to buffer in host memory where data is to
+ * be read into.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this read command.
+ * */
 CCLEvent* ccl_buffer_enqueue_read(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -192,6 +212,29 @@ finish:
 
 }
 
+/**
+ * Write to a buffer object from host memory. This function wraps the 
+ * clEnqueueWriteBuffer() OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @param[in] cq Command-queue wrapper object in which the write command
+ * will be queued.
+ * @param[out] buf Buffer wrapper object where to write to.
+ * @param[in] blocking_write Indicates if the write operations are 
+ * blocking or non-blocking.
+ * @param[in] offset The offset in bytes in the buffer object to read 
+ * from.
+ * @param[in] size The size in bytes of data being read.
+ * @param[in] ptr The pointer to buffer in host memory where data is to 
+ * be written from.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this write command, or
+ * NULL if an error occurs.
+ * */
 CCLEvent* ccl_buffer_enqueue_write(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -242,6 +285,32 @@ finish:
 	
 }
 
+/**
+ * Map a region of the buffer object given by buffer into the host 
+ * address space and returns a pointer to this mapped region. This 
+ * function wraps the clEnqueueMapBuffer() OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @param[in] cq Command-queue wrapper object in which the map command
+ * will be queued.
+ * @param[in,out] buf Buffer wrapper object to be mapped.
+ * @param[in] blocking_map Indicates if the map operation is blocking 
+ * or non-blocking.
+ * @param[in] map_flags Flags which specify the type of mapping to
+ * perform.
+ * @param[in] offset The offset in bytes in the buffer object that is 
+ * being mapped.
+ * @param[in] size The size of the region in the buffer object that is
+ * being mapped.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] evt An event wrapper object that identifies this 
+ * particular map command. If NULL, no event will be returned.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return A pointer in the host address space for the mapped region.
+ * */
 void* ccl_buffer_enqueue_map(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
@@ -289,7 +358,6 @@ error_handler:
 
 	/* An error occurred, return NULL to signal it. */
 	ptr = NULL;
-	*evt = NULL;
 	
 finish:
 	
@@ -298,6 +366,28 @@ finish:
 
 }
 
+/**
+ * Copy from one buffer object to another. This function wraps the 
+ * clEnqueueCopyBuffer() OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
+ * @param[in] src_buf Source buffer wrapper object where to read from.
+ * @param[out] dst_buf Destination buffer wrapper object where to write 
+ * to.
+ * @param[in] src_offset The offset where to begin copying data from 
+ * src_buffer.
+ * @param[in] dst_offset The offset where to begin copying data into 
+ * dst_buffer.
+ * @param[in] size Size in bytes to copy.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this copy command.
+ * */
 CCLEvent* ccl_buffer_enqueue_copy(CCLQueue* cq, CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, size_t src_offset, size_t dst_offset, 
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -350,10 +440,39 @@ finish:
 	return evt;
 
 }
-	
-CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, CCLBuffer* src_buf,
-	CCLImage* dst_img, size_t src_offset, const size_t *dst_origin,
-	const size_t *region, CCLEventWaitList* evt_wait_lst, GError** err) {
+
+/**
+ * Copy a buffer object to an image object. This function wraps the 
+ * clEnqueueCopyBufferToImage() OpenCL function.
+ * 
+ * @public @memberof ccl_buffer
+ * 
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
+ * @param[in] src_buf Source buffer wrapper object where to read from.
+ * @param[out] dst_img Destination image wrapper object where to write 
+ * to.
+ * @param[in] src_offset The offset where to begin copying data from 
+ * src_buffer.
+ * @param[in] dst_origin Defines the @f$(x, y, z)@f$ offset in pixels in
+ * the 1D, 2D or 3D image, the @f$(x, y)@f$ offset and the image index 
+ * in the 2D image array or the @f$(x)@f$ offset and the image index in
+ * the 1D image array. 
+ * @param[in] region Defines the @f$(width, height, depth)@f$ in pixels 
+ * of the 1D, 2D or 3D rectangle, the @f$(width, height)@f$ in pixels 
+ * of the 2D rectangle and the number of images of a 2D image array or 
+ * the @f$(width)@f$ in pixels of the 1D rectangle and the number of 
+ * images of a 1D image array.
+ * @param[in] evt_wait_lst List of events that need to complete before
+ * this command can be executed.
+ * @param[out] err Return location for a GError, or NULL if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this copy command.
+ * */
+CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq, 
+	CCLBuffer* src_buf, CCLImage* dst_img, size_t src_offset, 
+	const size_t *dst_origin, const size_t *region, 
+	CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -415,8 +534,7 @@ finish:
  * buffer. This function wraps the clCreateSubBuffer() OpenCL function.
  * 
  * @public @memberof ccl_buffer
- * 
- * @todo Check if platform OpenCL version is >= 1.1
+ * @note Requires OpenCL >= 1.1
  * 
  * @param[in] buf A buffer wrapper object which cannot represent a
  * sub-buffer.
@@ -441,10 +559,25 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	cl_mem buffer;
 	/* Buffer wrapper. */
 	CCLBuffer* subbuf;
+	/* OpenCL version of the underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
 	
 	/* Set options. */
 	const cl_buffer_region br = { .origin = origin, .size = size};
 	
+	/* Check that context platform is >= OpenCL 1.1 */
+	ocl_ver = ccl_memobj_get_opencl_version(
+		(CCLMemObj*) buf, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.1, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.1, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: sub-buffers require OpenCL version 1.1 or newer.", 
+		G_STRLOC);
+
 	/* Create the OpenCL sub-buffer. */
 	buffer = clCreateSubBuffer(ccl_memobj_unwrap(buf), flags,
 		CL_BUFFER_CREATE_TYPE_REGION, (const void*) &br, &ocl_status);
@@ -480,8 +613,7 @@ finish:
  * function.
  * 
  * @public @memberof ccl_buffer
- * 
- * @todo Check if platform OpenCL version is >= 1.1
+ * @note Requires OpenCL >= 1.1
  * 
  * @param[in] cq Command-queue wrapper object in which the read command
  * will be queued.
@@ -530,7 +662,22 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_event event = NULL;
 	/* Event wrapper object. */
 	CCLEvent* evt = NULL;
+	/* OpenCL version of the underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
 	
+	/* Check that context platform is >= OpenCL 1.1 */
+	ocl_ver = ccl_memobj_get_opencl_version(
+		(CCLMemObj*) buf, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.1, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.1, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: rect. buffer reads require OpenCL version 1.1 or newer.", 
+		G_STRLOC);
+
 	/* Read rectangular region of buffer. */
 	ocl_status = clEnqueueReadBufferRect(ccl_queue_unwrap(cq), 
 		ccl_memobj_unwrap(buf), blocking_read, buffer_origin, 
@@ -576,8 +723,7 @@ finish:
  * function.
  * 
  * @public @memberof ccl_buffer
- * 
- * @todo Check if platform OpenCL version is >= 1.1
+ * @note Requires OpenCL >= 1.1
  * 
  * @param[in] cq Command-queue wrapper object in which the write command
  * will be queued.
@@ -604,7 +750,8 @@ finish:
  * this command can be executed.
  * @param[out] err Return location for a GError, or NULL if error 
  * reporting is to be ignored.
- * @return Event wrapper object that identifies this write command.
+ * @return Event wrapper object that identifies this write command, or
+ * NULL if an error occurs.
  * */
 CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_write, const size_t* buffer_origin,
@@ -626,7 +773,22 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
 	cl_event event = NULL;
 	/* Event wrapper object. */
 	CCLEvent* evt = NULL;
+	/* OpenCL version of the underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+
+	/* Check that context platform is >= OpenCL 1.1 */
+	ocl_ver = ccl_memobj_get_opencl_version(
+		(CCLMemObj*) buf, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
+	/* If OpenCL version is not >= 1.1, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.1, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: rect. buffer writes require OpenCL version 1.1 or newer.", 
+		G_STRLOC);
+
 	/* Write rectangular region of buffer. */
 	ocl_status = clEnqueueWriteBufferRect(ccl_queue_unwrap(cq), 
 		ccl_memobj_unwrap(buf), blocking_write, buffer_origin, 
@@ -671,8 +833,7 @@ finish:
  * OpenCL function.
  * 
  * @public @memberof ccl_buffer
- * 
- * @todo Check if platform OpenCL version is >= 1.1
+ * @note Requires OpenCL >= 1.1
  * 
  * @param[in] cq Command-queue wrapper object in which the copy command
  * will be queued.
@@ -721,6 +882,21 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
 	cl_event event = NULL;
 	/* Event wrapper object. */
 	CCLEvent* evt = NULL;
+	/* OpenCL version of the underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Check that context platform is >= OpenCL 1.1 */
+	ocl_ver = ccl_memobj_get_opencl_version(
+		(CCLMemObj*) src_buf, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.1, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.1, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: rect. buffer copy requires OpenCL version 1.1 or newer.", 
+		G_STRLOC);	
 	
 	/* Copy rectangular region between buffers. */
 	ocl_status = clEnqueueCopyBufferRect(ccl_queue_unwrap(cq), 
@@ -769,8 +945,7 @@ finish:
  * function wraps the clEnqueueFillBuffer() OpenCL function.
  * 
  * @public @memberof ccl_buffer
- * 
- * @todo Check if platform OpenCL version is >= 1.2
+ * @note Requires OpenCL >= 1.2
  * 
  * @param[in] cq Command-queue wrapper object in which the fill command
  * will be queued.
@@ -804,6 +979,21 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf,
 	cl_event event = NULL;
 	/* Event wrapper object. */
 	CCLEvent* evt = NULL;
+	/* OpenCL version of the underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Check that context platform is >= OpenCL 1.2 */
+	ocl_ver = ccl_memobj_get_opencl_version(
+		(CCLMemObj*) buf, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.2, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.2, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: Buffer fill requires OpenCL version 1.2 or newer.", 
+		G_STRLOC);
 	
 	/* Fill buffer. */
 	ocl_status = clEnqueueFillBuffer(ccl_queue_unwrap(cq), 

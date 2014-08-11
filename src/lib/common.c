@@ -30,7 +30,7 @@
 
 /** 
  * Resolves to error category identifying string, in this case an
- * error in cf4ocl.
+ * error in _cf4ocl_.
  * 
  * @return A GQuark structure defined by category identifying string,
  * which identifies the error as a cf4ocl generated error.

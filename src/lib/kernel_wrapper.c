@@ -363,6 +363,15 @@ finish:
 	
 }
 
+/**
+ * Get the OpenCL version of the platform associated with this kernel.
+ * 
+ * @param[in] krnl A kernel wrapper object.
+ * @param[out] err Return location for a GError, or NULL if error
+ * reporting is to be ignored.
+ * @return The OpenCL version of the platform associated with this 
+ * kernel in numeric format. If an error occurs, 0 is returned.
+ * */
 double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
 
 	/* Make sure number krnl is not NULL. */

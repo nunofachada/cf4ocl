@@ -46,7 +46,7 @@ typedef struct ccl_program CCLProgram;
  * A wrapper object for OpenCL kernels and functions to manage 
  * them.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */
@@ -97,6 +97,8 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* c
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
 	
+/** Get the OpenCL version of the platform associated with this 
+ * kernel. */
 double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 
 /**

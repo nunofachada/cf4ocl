@@ -61,7 +61,7 @@ void* ccl_arg_value(CCLArg* arg);
  *
  * Wrapper objects for OpenCL kernel arguments.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */

@@ -44,7 +44,7 @@
  * A wrapper object for OpenCL programs and functions to manage 
  * them.
  * 
- * Todo: detailed description of module.
+ * @todo detailed description of module.
  * 
  * @{
  */

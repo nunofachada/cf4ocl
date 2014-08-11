@@ -44,7 +44,7 @@
  * A wrapper object for OpenCL contexts and functions to manage 
  * them.
  * 
- * Todo: detailed description of module with code examples.
+ * @todo detailed description of module with code examples.
  * 
  * @{
  */
@@ -213,7 +213,8 @@ CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
  * If it reaches 0, the context wrapper object is destroyed. */
 void ccl_context_destroy(CCLContext* ctx);
 
-/** Get numeric OpenCL version of underlying platform. */
+/** Get the OpenCL version of the platform associated with this 
+ * context. */
 double ccl_context_get_opencl_version(
 	CCLContext* ctx, GError** err);
 
