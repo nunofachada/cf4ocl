@@ -108,7 +108,7 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
  *  
  * @param[in] prg A program wrapper object.
  * @param[in] kernel_name The kernel name.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored. 
  * @return A new kernel wrapper object.
  * */
@@ -313,7 +313,7 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or NULL if error 
+ * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -430,7 +430,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or NULL if error 
+ * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
@@ -492,7 +492,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or NULL if error 
+ * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
  * @param[in] args A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
@@ -543,7 +543,7 @@ finish:
  * @public @memberof ccl_kernel
  *  
  * @param[in] krnl A kernel wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this 
  * kernel in numeric format. If an error occurs, 0 is returned.
@@ -634,7 +634,7 @@ static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel argument information object. This 
  * object will be automatically freed when the kernel wrapper object is 

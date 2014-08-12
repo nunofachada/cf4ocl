@@ -53,7 +53,7 @@ struct ccl_platform {
  * 
  * @param[in] devcon A ::CCLPlatform wrapper, passed as a 
  * ::CCLDevContainer.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
@@ -151,7 +151,7 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
  * 
  * @param[in] dev The device wrapper from where to get a platform 
  * wrapper.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The platform wrapper for the given device wrapper or NULL in
  * case an error occurs. 
@@ -213,7 +213,7 @@ void ccl_platform_destroy(CCLPlatform* platf) {
  * Get the OpenCL version of this platform
  * 
  * @param[in] platf The platform wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return OpenCL version of platform in numeric format. If an error
  * occurs, 0 is returned.
@@ -246,10 +246,10 @@ double ccl_platform_get_opencl_version(
  * @public @memberof ccl_platform
  * 
  * @param[in] platf The platform wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
- * this platform, or NULL if an error occurs.
+ * this platform, or `NULL` if an error occurs.
  */
 CCLDevice* const* ccl_platform_get_all_devices(
 	CCLPlatform* platf, GError** err) {
@@ -265,9 +265,9 @@ CCLDevice* const* ccl_platform_get_all_devices(
  * 
  * @param[in] platf The platform wrapper object.
  * @param[in] index Index of device in platform.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return The ::CCLDevice wrapper at given index or NULL if an error 
+ * @return The ::CCLDevice wrapper at given index or `NULL` if an error 
  * occurs.
  * */
 CCLDevice* ccl_platform_get_device(
@@ -284,7 +284,7 @@ CCLDevice* ccl_platform_get_device(
  * @public @memberof ccl_platform
  * 
  * @param[in] platf The platform wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The number of devices in platform or 0 if an error occurs or 
  * is otherwise not possible to get any device.

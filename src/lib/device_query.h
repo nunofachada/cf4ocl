@@ -40,7 +40,7 @@
  *
  * Classes and functions to query OpenCL devices.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */

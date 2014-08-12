@@ -205,7 +205,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
  *
  * Wrapper information object and associated macros.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */

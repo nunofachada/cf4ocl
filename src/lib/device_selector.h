@@ -41,7 +41,7 @@
  * This module provides objects and functions for selecting
  * OpenCL devices for context creation.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */
@@ -55,7 +55,7 @@ typedef GPtrArray* CCLDevSelDevices;
  *
  * @param[in] device OpenCL device to filter.
  * @param[in] data Filter data, implementation dependent.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if filter accepts device, CL_FALSE otherwise.
  */
@@ -68,7 +68,7 @@ typedef cl_bool (*ccl_devsel_indep)(
  *
  * @param[in] devices OpenCL devices to filter.
  * @param[in] data Filter data, implementation dependent.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  */

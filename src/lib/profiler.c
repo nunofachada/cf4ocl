@@ -574,7 +574,7 @@ static gint ccl_prof_overlap_comp(
  * @param[in] prof Profile object.
  * @param[in] cq_name Command queue name.
  * @param[in] evt Event wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * */
 static void ccl_prof_add_event(CCLProf* prof, const char* cq_name, 
@@ -695,7 +695,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
  * @private @memberof ccl_prof
  * 
  * @param[in] prof Profile object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  */ 
 static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
@@ -1199,7 +1199,7 @@ void ccl_prof_add_queue(
  * @public @memberof ccl_prof
  * 
  * @param[in] prof A profile object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, or CL_FALSE
  * otherwise.
@@ -1691,7 +1691,7 @@ const char* ccl_prof_get_summary(
  * 
  * @param[in] prof Profile object.
  * @param[out] stream Stream where export info to.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
@@ -1776,7 +1776,7 @@ finish:
  * 
  * @param[in] prof Profile object.
  * @param[in] filename Name of file where information will be saved to.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.

@@ -39,7 +39,7 @@
  *
  * Objects and functions for managing sets of OpenCL platforms.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */

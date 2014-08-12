@@ -37,7 +37,7 @@
  *
  * A wrapper for handling images in OpenCL.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */

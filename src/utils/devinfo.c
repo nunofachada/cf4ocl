@@ -217,7 +217,7 @@ cleanup:
  * 
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * */
 void ccl_device_query_args_parse(int argc, char* argv[], GError** err) {

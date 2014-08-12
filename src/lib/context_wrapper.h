@@ -44,7 +44,7 @@
  * A wrapper object for OpenCL contexts and functions to manage 
  * them.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */
@@ -82,7 +82,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @public @memberof ccl_context
  *  
  * @param[in] filters Filters for selecting device.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -101,7 +101,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * @param[in] num_devices Number of cl_devices_id's in list.
  * @param[in] devices Array of ::CCLDevice wrappers.
- * @param[out] err Return location for a GError, or NULL if error 
+ * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -117,9 +117,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * @public @memberof ccl_context
  * 
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A new context wrapper object or NULL if an error occurs.
+ * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_cpu(err) \
 	ccl_context_new_from_indep_filter( \
@@ -133,9 +133,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * @public @memberof ccl_context
  * 
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A new context wrapper object or NULL if an error occurs.
+ * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_gpu(err) \
 	ccl_context_new_from_indep_filter( \
@@ -149,9 +149,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * @public @memberof ccl_context
  * 
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A new context wrapper object or NULL if an error occurs.
+ * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_accel(err) \
 	ccl_context_new_from_indep_filter( \
@@ -165,9 +165,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * @public @memberof ccl_context
  * 
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A new context wrapper object or NULL if an error occurs.
+ * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_any(err) \
 	ccl_context_new_from_indep_filter(NULL, NULL, err)
@@ -179,9 +179,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * @public @memberof ccl_context
  * 
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A new context wrapper object or NULL if an error occurs.
+ * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu(err) \
 	ccl_context_new_from_menu_full(NULL, err)
@@ -225,7 +225,7 @@ double ccl_context_get_opencl_version(
  * 
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information object. This object will
  * be automatically freed when the context wrapper object is 
@@ -247,7 +247,7 @@ double ccl_context_get_opencl_version(
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information value. This value will be 
  * automatically freed when the context wrapper object is destroyed. 
@@ -270,7 +270,7 @@ double ccl_context_get_opencl_version(
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information value. This value will be 
  * automatically freed when the context wrapper object is destroyed. 

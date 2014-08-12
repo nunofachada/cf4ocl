@@ -39,7 +39,7 @@
  * A wrapper object for OpenCL buffers and functions to manage 
  * them.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */

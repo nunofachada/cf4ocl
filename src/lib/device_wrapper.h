@@ -46,7 +46,7 @@ typedef struct ccl_platform CCLPlatform;
  * A wrapper object for OpenCL devices and functions to manage 
  * them.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */
@@ -72,7 +72,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * 
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information object. This object will
  * be automatically freed when the device wrapper object is 
@@ -94,7 +94,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be 
  * automatically freed when the device wrapper object is destroyed. 
@@ -117,7 +117,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be 
  * automatically freed when the device wrapper object is destroyed. 

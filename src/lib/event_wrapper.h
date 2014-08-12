@@ -44,7 +44,7 @@ typedef struct ccl_queue CCLQueue;
  * A wrapper object for OpenCL events and functions to manage 
  * them.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */
@@ -116,7 +116,7 @@ cl_bool ccl_user_event_set_status(
  * 
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event information object. This object will
  * be automatically freed when the event wrapper object is 
@@ -138,7 +138,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event information value. This value will be 
  * automatically freed when the event wrapper object is destroyed. 
@@ -161,7 +161,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event information value. This value will be 
  * automatically freed when the event wrapper object is destroyed. 
@@ -179,7 +179,7 @@ cl_bool ccl_user_event_set_status(
  * 
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event profiling information object. This object
  * will be automatically freed when the event wrapper object is 
@@ -201,7 +201,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event profiling information value. This value 
  * will be automatically freed when the event wrapper object is destroyed. 
@@ -224,7 +224,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event profiling information value. This value 
  * will be automatically freed when the event wrapper object is 

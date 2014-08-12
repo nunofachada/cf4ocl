@@ -79,7 +79,7 @@ typedef struct ccl_dev_container {
  * @protected @memberof ccl_dev_container
  * 
  * @param[in] devcon The device container wrapper.
- * @param[out] err Return location for a GError, or NULL if error 
+ * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
  * @return List of cl_device_id OpenCL objects in the OpenCL device 
  * container object wrapped by the given device container wrapper.

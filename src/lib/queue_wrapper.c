@@ -137,7 +137,7 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * @param[in] dev Device wrapper object, must be associated with `ctx`.
  * @param[in] properties List of properties for the command queue and 
  * their corresponding values.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLQueue wrapper for the given device and context,
  * or `NULL` if an error occurs.
@@ -244,7 +244,7 @@ void ccl_queue_destroy(CCLQueue* cq) {
  * @public @memberof ccl_queue
  * 
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The context associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
@@ -298,7 +298,7 @@ finish:
  * @public @memberof ccl_queue
  * 
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The device associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
@@ -445,7 +445,7 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
  * @public @memberof ccl_queue
  * 
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -479,7 +479,7 @@ cl_bool ccl_queue_flush(CCLQueue* cq, GError** err) {
  * @public @memberof ccl_queue
  * 
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.

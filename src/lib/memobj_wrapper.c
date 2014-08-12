@@ -61,7 +61,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * @public @memberof ccl_memobj
  *  
  * @param[in] mo A memory object wrapper object.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this 
  * memory object in numeric format. If an error occurs, 0 is returned.
@@ -124,7 +124,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -195,7 +195,7 @@ finish:
  * @param[in] pfn_notify The callback function that can be registered 
  * by the application.
  * @param[in] user_data A pointer to user supplied data.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if device if operation completes successfully, 
  * CL_FALSE otherwise.
@@ -276,7 +276,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return
  * */

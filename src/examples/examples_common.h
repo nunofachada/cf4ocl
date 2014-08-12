@@ -45,7 +45,7 @@
  * @param[in] out Array where to put pair of integers.
  * @param[in] option_name Not used.
  * @param[in] data Not used.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return TRUE if pair of numbers exists, FALSE otherwise.
  * */

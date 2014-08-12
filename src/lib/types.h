@@ -38,7 +38,7 @@
  *
  * Use and pass abstract OpenCL types in C functions.
  * 
- * @todo detailed description of module with code examples.
+ * @todo Detailed description of module with code examples.
  * 
  * @{
  */

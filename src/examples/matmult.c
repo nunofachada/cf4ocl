@@ -690,7 +690,7 @@ void matmult_matrix_free(int* matrix) {
  * Parse and verify command line arguments.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
- * @param[out] err Return location for a GError, or NULL if error
+ * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return #CCL_EX_SUCCESS if program returns with no error, or 
  * #CCL_EX_FAIL otherwise.
