@@ -59,6 +59,7 @@ typedef struct ccl_queue CCLQueue;
  * queue. */
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 
+/* Create a new command queue wrapper object. */
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
 	cl_command_queue_properties properties, GError** err);
 
@@ -67,19 +68,32 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
  * destroyed. */
 void ccl_queue_destroy(CCLQueue* cq);
 
+/* Get the context associated with the given command queue wrapper
+ * object. */
 CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err);
 
+/* Get the device associated with the given command queue wrapper
+ * object. */
 CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err);
 
+/* Create an event wrapper from a given OpenCL event object and 
+ * associate it with the command queue. */
 CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event);
 
+/* Initialize an iterator for this command queue's list of event 
+ * wrappers. */
 void ccl_queue_iter_event_init(CCLQueue* cq);
 
+/* Get the next event wrapper associated with this queue. */
 CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq);
 
-cl_int ccl_queue_flush(CCLQueue* cq, GError** err);
+/* Issues all previously queued commands in a command queue to the 
+ * associated device. */
+cl_bool ccl_queue_flush(CCLQueue* cq, GError** err);
 
-cl_int ccl_queue_finish(CCLQueue* cq, GError** err);
+/* Blocks until all previously queued OpenCL commands in a command-queue
+ * are issued to the associated device and have completed. */
+cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
 
 /**
  * Get a ::CCLWrapperInfo command queue information object.

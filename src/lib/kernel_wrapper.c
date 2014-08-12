@@ -540,6 +540,8 @@ finish:
 /**
  * Get the OpenCL version of the platform associated with this kernel.
  * 
+ * @public @memberof ccl_kernel
+ *  
  * @param[in] krnl A kernel wrapper object.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
@@ -597,6 +599,7 @@ finish:
  * ccl_wrapper_info_fp() function and the clGetKernelArgInfo()
  * function.
  * 
+ * @private @memberof ccl_kernel
  * @see ccl_wrapper_info_fp()
  * 
  * @param[in] kernel The kernel wrapper object.

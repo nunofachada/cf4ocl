@@ -351,6 +351,8 @@ cl_command_type ccl_event_get_command_type(
  * Get the OpenCL version of the platform associated with this event
  * object.
  * 
+ * @public @memberof ccl_event
+ *  
  * @param[in] evt An event wrapper object.
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
