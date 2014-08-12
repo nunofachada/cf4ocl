@@ -61,7 +61,7 @@ struct ccl_platforms {
  * 
  * @param[out] err Return location for a GError, or NULL if error
  * reporting is to be ignored.
- * @return A new CCLPlatforms* object, or NULL in case an error occurs.
+ * @return A new ::CCLPlatforms object, or NULL in case an error occurs.
  * */
 CCLPlatforms* ccl_platforms_new(GError **err) {
 
@@ -149,7 +149,7 @@ finish:
  * 
  * @public @memberof ccl_platforms
  * 
- * @param[in] platforms CCLPlatforms* object to destroy.
+ * @param[in] platforms ::CCLPlatforms object to destroy.
  * */
 void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
@@ -171,7 +171,7 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
 
 /**
- * Return number of OpenCL platforms found in CCLPlatforms* 
+ * Return number of OpenCL platforms found in ::CCLPlatforms
  * object.
  * 
  * @public @memberof ccl_platforms

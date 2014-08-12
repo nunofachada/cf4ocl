@@ -66,6 +66,15 @@ typedef struct ccl_memobj {
 	
 } CCLMemObj;
 
+/**
+ * Prototype for memory object destructor callback functions. 
+ * 
+ * @public @memberof ccl_memobj
+ * 
+ * @param[in] memobj The OpenCL memory object for which the callback 
+ * function is associated.
+ * @param[in] user_data A pointer to user supplied data.
+ * */
 typedef void (CL_CALLBACK *ccl_memobj_destructor_callback)(
 	cl_mem memobj, void *user_data);
 
@@ -77,6 +86,8 @@ void ccl_memobj_release_fields(CCLMemObj* mo);
  * object. */
 double ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err);
 
+/* Enqueues a command to unmap a previously mapped region of a memory 
+ * object. */
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq, 
 	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err);
 	
@@ -91,6 +102,8 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 
 #ifdef CL_VERSION_1_2
 
+/* Enqueues a command to indicate which device a set of memory objects 
+ * should be associated with. */
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags, 
  	CCLEventWaitList* evt_wait_lst, GError** err);
