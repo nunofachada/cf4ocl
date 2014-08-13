@@ -51,12 +51,12 @@
  * */
 typedef struct ccl_buffer CCLBuffer;
 
+/* Get the buffer wrapper for the given OpenCL buffer. */
+CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object);
+
 /* Create a ::CCLBuffer wrapper object. */
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	size_t size, void *host_ptr, GError** err);
-	
-/* Get the buffer wrapper for the given OpenCL buffer. */
-CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object);
 
 /* Decrements the reference count of the wrapper object. If it 
  * reaches 0, the wrapper object is destroyed. */
