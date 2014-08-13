@@ -33,6 +33,7 @@
 #include "profiler.h"
 #include "common.h"
 #include "ocl_stub/ocl_impl.h"
+#include <unistd.h>
 
 #define ccl_test_prof_is_overlap(ev1, ev2) \
 	( \
@@ -230,13 +231,16 @@ static void operationTest() {
 	
 	/* Export options. */
 	gchar *name_used;
-	FILE* fp = fdopen(
-		g_file_open_tmp("test_profiler_XXXXXX.txt", &name_used, NULL),
-		"wb"
-	);
-	cl_bool export_status = ccl_prof_export_info(prof, fp, NULL);
+	gint fd = g_file_open_tmp(
+		"test_profiler_XXXXXX.txt", &name_used, &err);
+	g_assert_no_error(err);
+	g_assert_cmpint(fd, !=, -1);
+	close(fd);
+	
+	cl_bool export_status = ccl_prof_export_info_file(
+		prof, name_used, &err);
+	g_assert_no_error(err);
 	g_assert(export_status);
-	fclose(fp);
 
 	/* Test if output file was correctly written. */
 	gchar* file_contents;

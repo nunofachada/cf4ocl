@@ -15,7 +15,7 @@ set(EXECS_PREFIX "ccl_")
 
 # Compiler options for GCC, add -Wno-comment if warnings about inner comments appear
 if(CMAKE_COMPILER_IS_GNUCC)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=gnu99")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=c99")
 endif()
 
 # Find required libraries
