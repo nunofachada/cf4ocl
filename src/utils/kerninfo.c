@@ -60,6 +60,8 @@ int main(int argc, char *argv[]) {
 	CCLDevSelFilters filters = NULL;
 	/* Default device index. */
 	cl_int dev_idx = -1;
+	/* OpenCL version. */
+	double ocl_ver;
 	
 	/* ************************** */
 	/* Parse command line options */
@@ -98,6 +100,10 @@ int main(int argc, char *argv[]) {
 	dev = ccl_context_get_device(ctx, 0, &err);
 	ccl_if_err_goto(err, error_handler);
 
+	/* Check platform  OpenCL version. */
+	ocl_ver = ccl_kernel_get_opencl_version(krnl, &err);
+	ccl_if_err_goto(err, error_handler);
+
 	/* *************************** */
 	/*  Get and print kernel info  */
 	/* *************************** */
@@ -109,17 +115,17 @@ int main(int argc, char *argv[]) {
 	ccl_if_err_goto(err, error_handler);
 	g_printf("     Maximum workgroup size                  : %lu\n", 
 		(unsigned long) ccl_info_scalar(info, size_t));
-
-	/**
-	 * @file kerninfo.c 
-	 * @todo Check that platform is >= OpenCL 1.1 before 
-	 * querying for CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE. */
-	info = ccl_kernel_get_workgroup_info(
-		krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
-	ccl_if_err_goto(err, error_handler);
-	g_printf("     Preferred multiple of workgroup size    : %lu\n", 
-		(unsigned long) ccl_info_scalar(info, size_t));
-		
+	
+	/* Only show info about CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE
+	 * if OpenCL version of the underlying platform is >= 1.1. */
+	if (ocl_ver >= 1.1) { 
+		info = ccl_kernel_get_workgroup_info(
+			krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
+		ccl_if_err_goto(err, error_handler);
+		g_printf("     Preferred multiple of workgroup size    : %lu\n", 
+			(unsigned long) ccl_info_scalar(info, size_t));
+	}
+	
 	info = ccl_kernel_get_workgroup_info(
 		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
 	ccl_if_err_goto(err, error_handler);
