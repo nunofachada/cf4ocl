@@ -4,7 +4,7 @@ set(SRC errors.c profiler.c types.c common.c platforms.c
 	platform_wrapper.c device_wrapper.c context_wrapper.c 
 	kernel_wrapper.c program_wrapper.c queue_wrapper.c event_wrapper.c
 	abstract_wrapper.c abstract_dev_container_wrapper.c 
-	memobj_wrapper.c buffer_wrapper.c image_wrapper.c)
+	memobj_wrapper.c buffer_wrapper.c image_wrapper.c sampler_wrapper.c)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})

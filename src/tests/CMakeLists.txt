@@ -24,7 +24,7 @@ add_library(${PROJECT_NAME}_TESTING ../lib/errors.c ../lib/profiler.c
 	../lib/event_wrapper.c
 	../lib/abstract_wrapper.c ../lib/abstract_dev_container_wrapper.c 
 	../lib/memobj_wrapper.c ../lib/buffer_wrapper.c 
-	../lib/image_wrapper.c)
+	../lib/image_wrapper.c ../lib/sampler_wrapper.c)
 
 target_link_libraries(${PROJECT_NAME}_TESTING 
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
