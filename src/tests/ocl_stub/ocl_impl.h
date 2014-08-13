@@ -164,7 +164,9 @@ struct _cl_program {
 	char* source;
 	size_t* binary_sizes;
 	unsigned char** binaries;
+#ifdef CL_VERSION_1_2
 	cl_program_binary_type* binary_type;
+#endif
 	size_t num_kernels;
 	char* kernel_names;
 	cl_build_status* build_status;
@@ -194,6 +196,21 @@ struct _cl_mem {
 	size_t offset;
 	GSList* callbacks;
 };
+
+#ifndef CL_VERSION_1_2
+typedef struct _cl_image_desc {
+    cl_mem_object_type      image_type;
+    size_t                  image_width;
+    size_t                  image_height;
+    size_t                  image_depth;
+    size_t                  image_array_size;
+    size_t                  image_row_pitch;
+    size_t                  image_slice_pitch;
+    cl_uint                 num_mip_levels;
+    cl_uint                 num_samples;
+    cl_mem                  buffer;
+} cl_image_desc;
+#endif
 
 struct _cl_image {
 	struct _cl_mem buffer;

@@ -101,8 +101,10 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 				ccl_test_basic_info(cl_context, kernel, context);
 			case CL_KERNEL_PROGRAM:
 				ccl_test_basic_info(cl_program, kernel, program);
+#ifdef CL_VERSION_1_2
 			case CL_KERNEL_ATTRIBUTES:
 				ccl_test_char_info(kernel, attributes);
+#endif
 			default:
 				status = CL_INVALID_VALUE;
 		}
@@ -112,6 +114,7 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 
 }
 
+#ifdef CL_VERSION_1_2
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
 	cl_kernel_arg_info param_name, size_t param_value_size,
@@ -128,3 +131,4 @@ clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
 	return CL_INVALID_VALUE;
 
 }
+#endif

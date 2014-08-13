@@ -366,16 +366,21 @@ double ccl_event_get_opencl_version(CCLEvent* evt, GError** err) {
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
 
+	/* OpenCL version. */
+	double ocl_ver;
+	
+#ifdef CL_VERSION_1_1
+	/* Get version from event if OpenCL >= 1.1 because CL_EVENT_CONTEXT 
+	 * isn't defined for version 1.0. */
+	 
 	cl_context context;
 	CCLContext* ctx;
 	GError* err_internal = NULL;
-	double ocl_ver;
-	
-	/* Get cl_context object for this memory object. */
+	 
 	context = ccl_event_get_scalar_info(
 		evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	
+
 	/* Get context wrapper. */
 	ctx = ccl_context_new_wrap(context);
 	
@@ -397,6 +402,13 @@ error_handler:
 	ocl_ver = 0;
 	
 finish:
+
+#else
+
+	/* It's version 1.0. */
+	ocl_ver = 1.0;
+
+#endif
 
 	/* Return event wrapper. */
 	return ocl_ver;
@@ -821,8 +833,6 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* OpenCL status. */
-	cl_int ocl_status;
 	/* Event wrapper to return. */
 	CCLEvent* evt;
 	/* OpenCL event object. */
@@ -835,8 +845,13 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	/* If library is compiled with support for OpenCL >= 1.2, then use
 	 * the platform's OpenCL version for selecting the desired 
 	 * functionality. */
+
+	/* Context associated with event. */
 	CCLContext* ctx;
+	/* OpenCL version. */
 	double platf_ver;
+	/* OpenCL status. */
+	cl_int ocl_status;
 	
 	/* Get platform version. */
 	ctx = ccl_queue_get_context(cq, &err_internal);
@@ -995,8 +1010,6 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* OpenCL status. */
-	cl_int ocl_status;
 	/* Event wrapper to return. */
 	CCLEvent* evt;
 	/* OpenCL event object. */
@@ -1009,9 +1022,14 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 	/* If library is compiled with support for OpenCL >= 1.2, then use
 	 * the platform's OpenCL version for selecting the desired 
 	 * functionality. */
+	 
+	/* Context associated with event. */
 	CCLContext* ctx;
+	/* OpenCL version. */
 	double platf_ver;
-	
+	/* OpenCL status. */
+	cl_int ocl_status;
+		
 	/* Get platform version. */
 	ctx = ccl_queue_get_context(cq, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);

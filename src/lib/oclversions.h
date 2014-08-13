@@ -57,7 +57,7 @@
 	#define CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT         0x103A
 	#define CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE        0x103B
 	#define CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF          0x103C
-	#define CL_DEVICE_OPENCL_C_VERSION                  0x103D	
+	#define CL_DEVICE_OPENCL_C_VERSION                  0x103D
 	/* cl_device_fp_config - bitfield */
 	#define CL_FP_SOFT_FLOAT                            (1 << 6)
 	/* cl_command_type */
@@ -66,6 +66,7 @@
 	#define CL_COMMAND_COPY_BUFFER_RECT                 0x1203
 	#define CL_COMMAND_USER                             0x1204
 	#define CL_COMMAND_BARRIER                          0x1205
+	#define CL_COMMAND_GL_FENCE_SYNC_OBJECT_KHR     0x200D
 	
 #endif
 
@@ -103,6 +104,7 @@
 	#define CL_DEVICE_IMAGE_PITCH_ALIGNMENT             0x104A
 	#define CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT      0x104B
 	/* cl_command_type */
+	#define CL_COMMAND_BARRIER                          0x1205
 	#define CL_COMMAND_MIGRATE_MEM_OBJECTS              0x1206
 	#define CL_COMMAND_FILL_BUFFER                      0x1207
 	#define CL_COMMAND_FILL_IMAGE                       0x1208

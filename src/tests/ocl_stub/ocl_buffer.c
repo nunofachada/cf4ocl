@@ -50,6 +50,8 @@ clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 	return memobj;
 }
 
+#ifdef CL_VERSION_1_1
+
 CL_API_ENTRY cl_mem CL_API_CALL
 clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 	cl_buffer_create_type buffer_create_type, 
@@ -77,3 +79,5 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 
 	return memobj;
 }
+
+#endif

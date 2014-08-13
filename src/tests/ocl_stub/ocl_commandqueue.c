@@ -45,13 +45,26 @@ clCreateCommandQueue(cl_context context, cl_device_id device,
 		
 }
 
+#ifdef CL_VERSION_2_0
+CL_API_ENTRY cl_command_queue CL_API_CALL
+clCreateCommandQueueWithProperties(cl_context context,
+	cl_device_id device, const cl_queue_properties* properties,
+	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_2_0 {
+		
+	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	return clCreateCommandQueue(context, device, *properties, 
+		errcode_ret);
+	G_GNUC_END_IGNORE_DEPRECATIONS
+	
+}
+#endif
+                                   
 CL_API_ENTRY cl_int CL_API_CALL
 clRetainCommandQueue(cl_command_queue command_queue) 
 	CL_API_SUFFIX__VERSION_1_0 {
 
 	g_atomic_int_inc(&command_queue->ref_count);
 	return CL_SUCCESS;
-
 
 }
 

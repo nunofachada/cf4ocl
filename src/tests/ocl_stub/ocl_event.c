@@ -68,8 +68,10 @@ clGetEventInfo(cl_event event, cl_event_info param_name,
 		switch (param_name) {
 			case CL_EVENT_COMMAND_QUEUE:
 				ccl_test_basic_info(cl_command_queue, event, command_queue);
+#ifdef CL_VERSION_1_1
 			case CL_EVENT_CONTEXT:
 				ccl_test_basic_info(cl_context, event, context);
+#endif
 			case CL_EVENT_COMMAND_TYPE:
 				ccl_test_basic_info(cl_command_type, event, command_type);
 			case CL_EVENT_COMMAND_EXECUTION_STATUS:

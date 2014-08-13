@@ -98,10 +98,12 @@ clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
 				ccl_test_basic_info(cl_uint, memobj, ref_count);
 			case CL_MEM_CONTEXT:
 				ccl_test_basic_info(cl_context, memobj, context);
+#ifdef CL_VERSION_1_1
 			case CL_MEM_ASSOCIATED_MEMOBJECT:
 				ccl_test_basic_info(cl_mem, memobj, associated_object);
 			case CL_MEM_OFFSET:
 				ccl_test_basic_info(size_t, memobj, offset);
+#endif
 			default:
 				status = CL_INVALID_VALUE;
 		}

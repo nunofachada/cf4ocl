@@ -177,7 +177,7 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	if (platf_ver < 2.0) {
 		queue = clCreateCommandQueueWithProperties(
 			ccl_context_unwrap(ctx), ccl_device_unwrap(dev), 
-			properties, &ocl_status);
+			&properties, &ocl_status);
 	} else {
 		G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		queue = clCreateCommandQueue(ccl_context_unwrap(ctx), 

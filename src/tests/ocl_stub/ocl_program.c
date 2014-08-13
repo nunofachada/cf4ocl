@@ -27,6 +27,8 @@
 #include "ocl_env.h"
 #include "utils.h"
 
+#ifdef CL_VERSION_1_2
+#endif
 
 static cl_program clCreateProgram(cl_context context, 
 	cl_uint num_devices, const cl_device_id* device_list, char* source, 
@@ -49,16 +51,20 @@ static cl_program clCreateProgram(cl_context context,
 		: g_slice_alloc0(program->num_devices * sizeof(size_t));
 	program->binaries = g_slice_alloc0(
 		program->num_devices * sizeof(unsigned char*));
+#ifdef CL_VERSION_1_2
 	program->binary_type = g_slice_alloc0(
 		program->num_devices * sizeof(cl_program_binary_type));
+#endif
 	if (binaries != NULL) {
 		for (cl_uint i = 0; i < program->num_devices; ++i) {
 			if ((binaries[i] != NULL) && (lengths[i] > 0)) {
 				program->binaries[i] = (unsigned char*)
 					g_strndup((const char*) binaries[i], lengths[i]);
+#ifdef CL_VERSION_1_2
 				program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_EXECUTABLE;
 			} else {
 				program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_NONE;
+#endif
 			}
 		}
 	}
@@ -72,8 +78,10 @@ static cl_program clCreateProgram(cl_context context,
 		program->build_status[i] = CL_BUILD_NONE;
 		program->build_options[i] = NULL;
 		program->build_log[i] = NULL;
+#ifdef CL_VERSION_1_2
 		if (binaries == NULL)
 			program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_NONE;
+#endif
 	}
 	
 	program->num_kernels = 0;
@@ -250,12 +258,14 @@ clReleaseProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
 			g_slice_free1(program->num_devices * sizeof(size_t), 
 				program->binary_sizes);
 		}
-		
+
+#ifdef CL_VERSION_1_2		
 		/* Free binary types. */
 		if (program->binary_type != NULL)
 			g_slice_free1(program->num_devices * sizeof(cl_program_binary_type), 
 				program->binary_type);
-		
+#endif
+
 		/* Free program source. */
 		if (program->source != NULL) {
 			g_free(program->source);
@@ -403,10 +413,12 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 			case CL_PROGRAM_BINARIES:
 				ccl_test_predefvector2d_info(unsigned char, program->num_devices, 
 					program, binary_sizes, binaries);
+#ifdef CL_VERSION_1_2
 			case CL_PROGRAM_NUM_KERNELS:
 				ccl_test_basic_info(size_t, program, num_kernels);
 			case CL_PROGRAM_KERNEL_NAMES:
 				ccl_test_char_info(program, kernel_names);
+#endif
 			default:
 				status = CL_INVALID_VALUE;
 		}
@@ -414,7 +426,6 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 		
 	return status;
 
-		
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -453,8 +464,10 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 				ccl_test_char_info(program, build_options[i]);
 			case CL_PROGRAM_BUILD_LOG:
 				ccl_test_char_info(program, build_log[i]);
+#ifdef CL_VERSION_1_2
 			case CL_PROGRAM_BINARY_TYPE:
 				ccl_test_basic_info(cl_program_binary_type, program, binary_type[i]);
+#endif
 			default:
 				status = CL_INVALID_VALUE;
 		}
@@ -466,7 +479,7 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 
 }
 
-
+#ifdef CL_VERSION_1_2
 CL_API_ENTRY cl_program CL_API_CALL
 clCreateProgramWithBuiltInKernels(cl_context context, 
 	cl_uint num_devices, const cl_device_id* device_list,
@@ -481,3 +494,4 @@ clCreateProgramWithBuiltInKernels(cl_context context,
 	g_error("Unimplemented.");
 		
 }
+#endif

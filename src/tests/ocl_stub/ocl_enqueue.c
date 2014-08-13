@@ -164,24 +164,6 @@ clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clEnqueueMigrateMemObjects(cl_command_queue command_queue,
-	cl_uint num_mem_objects, const cl_mem* mem_objects, 
-	cl_mem_migration_flags flags, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event) 
-	CL_API_SUFFIX__VERSION_1_2 {
-
-	command_queue = command_queue;
-	num_mem_objects = num_mem_objects;
-	mem_objects = mem_objects;
-	flags = flags;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_MIGRATE_MEM_OBJECTS);
-	
-	return CL_SUCCESS;
-}
-
-CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueMarker(cl_command_queue command_queue, cl_event *event) 
 	CL_API_SUFFIX__VERSION_1_0 {
 
@@ -299,6 +281,24 @@ clEnqueueCopyBufferRect(cl_command_queue command_queue,
 #endif
 
 #ifdef CL_VERSION_1_2
+
+CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueMigrateMemObjects(cl_command_queue command_queue,
+	cl_uint num_mem_objects, const cl_mem* mem_objects, 
+	cl_mem_migration_flags flags, cl_uint num_events_in_wait_list,
+	const cl_event* event_wait_list, cl_event* event) 
+	CL_API_SUFFIX__VERSION_1_2 {
+
+	command_queue = command_queue;
+	num_mem_objects = num_mem_objects;
+	mem_objects = mem_objects;
+	flags = flags;
+	num_events_in_wait_list = num_events_in_wait_list;
+	event_wait_list = event_wait_list;
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_MIGRATE_MEM_OBJECTS);
+	
+	return CL_SUCCESS;
+}
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer, 

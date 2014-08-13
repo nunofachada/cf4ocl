@@ -191,13 +191,13 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	CCLImage* img = NULL;
 	/* OpenCL image object. */
 	cl_mem image;
-	/* OpenCL function status. */
-	cl_int ocl_status;
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 	
 #ifdef CL_VERSION_1_2
 
+	/* OpenCL function status. */
+	cl_int ocl_status;
 	/* OpenCL platform version. */
 	double ocl_ver;
 	
@@ -212,14 +212,24 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 		/* OpenCL image descriptor. Initialize it with data from 
 		 * img_dsc (CCLImageDesc), unwrapping the wrapped buffer, if
 		 * any. */
-		const cl_image_desc image_desc = { img_dsc->image_type,
-			img_dsc->image_width, img_dsc->image_height, 
-			img_dsc->image_depth, img_dsc->image_array_size, 
-			img_dsc->image_row_pitch, img_dsc->image_slice_pitch, 
-			img_dsc->num_mip_levels, img_dsc->num_samples, 
-			(img_dsc->mo != NULL) 
-				? ccl_memobj_unwrap(img_dsc->mo) 
-				: NULL };
+		cl_mem memory_object = (img_dsc->mo != NULL) 
+			? ccl_memobj_unwrap(img_dsc->mo) : NULL;
+		const cl_image_desc image_desc = { 
+			.image_type = img_dsc->image_type,
+			.image_width = img_dsc->image_width, 
+			.image_height = img_dsc->image_height, 
+			.image_depth = img_dsc->image_depth,
+			.image_array_size = img_dsc->image_array_size, 
+			.image_row_pitch = img_dsc->image_row_pitch,
+			.image_slice_pitch = img_dsc->image_slice_pitch, 
+			.num_mip_levels = img_dsc->num_mip_levels, 
+			.num_samples = img_dsc->num_samples,
+#ifdef CL_VERSION_2_0
+			.mem_object = memory_object 
+#else
+			.buffer = memory_object 
+#endif
+		};
 		
 		/* Create image. */
 		image = clCreateImage(ccl_context_unwrap(ctx), flags, 

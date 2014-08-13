@@ -13,7 +13,7 @@ add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 # Set executables prefix
 set(EXECS_PREFIX "ccl_")
 
-# Compiler options for GCC
+# Compiler options for GCC, add -Wno-comment if warnings about inner comments appear
 if(CMAKE_COMPILER_IS_GNUCC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=gnu99")
 endif()
