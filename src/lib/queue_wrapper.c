@@ -174,7 +174,7 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Create and keep the OpenCL command queue object. */
-	if (platf_ver < 2.0) {
+	if (platf_ver >= 2.0) {
 		queue = clCreateCommandQueueWithProperties(
 			ccl_context_unwrap(ctx), ccl_device_unwrap(dev), 
 			&properties, &ocl_status);
