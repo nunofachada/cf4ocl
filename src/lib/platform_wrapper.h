@@ -70,8 +70,6 @@ double ccl_platform_get_opencl_version(
 /**
  * Get a ::CCLWrapperInfo platform information object.
  * 
- * @public @memberof ccl_platform
- * 
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -90,8 +88,6 @@ double ccl_platform_get_opencl_version(
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_platform
  * 
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -114,8 +110,6 @@ double ccl_platform_get_opencl_version(
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_platform
- * 
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -135,8 +129,6 @@ double ccl_platform_get_opencl_version(
  * macro simply wraps the ccl_platform_get_array_info() macro, because
  * (as of OpenCL 2.0) all platform information return types are char*.
  * 
- * @public @memberof ccl_platform
- * 
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -151,8 +143,6 @@ double ccl_platform_get_opencl_version(
 /** 
  * Increase the reference count of the platform wrapper object.
  * 
- * @public @memberof ccl_platform
- * 
  * @param[in] platform The platform wrapper object.
  * */
 #define ccl_platform_ref(platform) \
@@ -161,8 +151,6 @@ double ccl_platform_get_opencl_version(
 /**
  * Alias to ccl_platform_destroy().
  * 
- * @public @memberof ccl_platform
- * 
  * @param[in] platform Platform wrapper object to destroy if reference
  * count is 1, otherwise just decrement the reference count.
  * */
@@ -170,8 +158,6 @@ double ccl_platform_get_opencl_version(
 
 /**
  * Get the OpenCL platform object.
- * 
- * @public @memberof ccl_platform
  * 
  * @param[in] platform The platform wrapper object.
  * @return The OpenCL platform object.

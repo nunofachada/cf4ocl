@@ -62,14 +62,6 @@ CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
  * reaches 0, the wrapper object is destroyed. */
 void ccl_buffer_destroy(CCLBuffer* buf);
 
-/**
- * Alias to ccl_buffer_destroy().
- * 
- * @public @memberof ccl_buffer
- *  
- * */
-#define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
-	
 /* Read from a buffer object to host memory. */
 CCLEvent* ccl_buffer_enqueue_read(CCLQueue* cq, CCLBuffer* buf,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
@@ -142,6 +134,13 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf,
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);
 
 #endif
+
+/**
+ * Alias to ccl_buffer_destroy().
+ *  
+ * @param[in] buf Buffer wrapper object to unreference.
+ * */
+#define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
 
 /** @} */
 

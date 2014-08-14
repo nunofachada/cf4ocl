@@ -1,4 +1,3 @@
-
 /*   
  * This file is part of cf4ocl (C Framework for OpenCL).
  * 
@@ -71,8 +70,6 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 /**
  * Get a ::CCLWrapperInfo sampler information object.
  * 
- * @public @memberof ccl_sampler
- * 
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -91,8 +88,6 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_sampler
  * 
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -118,8 +113,6 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_sampler
- * 
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -137,17 +130,13 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 /** 
  * Increase the reference count of the sampler wrapper object.
  * 
- * @public @memberof ccl_sampler
- * 
- * @param[in] sampler The sampler wrapper object. 
+ * @param[in] smplr The sampler wrapper object. 
  * */
 #define ccl_sampler_ref(smplr) \
 	ccl_wrapper_ref((CCLWrapper*) smplr)
 
 /**
  * Alias to ccl_sampler_destroy().
- * 
- * @public @memberof ccl_sampler
  * 
  * @param[in] smplr sampler wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
@@ -156,8 +145,6 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 
 /**
  * Get the OpenCL sampler object.
- * 
- * @public @memberof ccl_sampler
  * 
  * @param[in] smplr The sampler wrapper object.
  * @return The OpenCL sampler object.

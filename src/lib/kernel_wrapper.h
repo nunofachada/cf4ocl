@@ -126,8 +126,6 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 /**
  * Get a ::CCLWrapperInfo kernel information object.
  * 
- * @public @memberof ccl_kernel
- * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -146,8 +144,6 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -170,8 +166,6 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_kernel
- * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -188,8 +182,6 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 
 /**
  * Get a ::CCLWrapperInfo kernel workgroup information object.
- * 
- * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -212,8 +204,6 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -239,8 +229,6 @@ double ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * Use with care. In case an error occurs, NULL is returned, which 
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -273,8 +261,6 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_kernel
- * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -301,8 +287,6 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_kernel
- * 
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -325,8 +309,6 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 /** 
  * Increase the reference count of the kernel object.
  * 
- * @public @memberof ccl_kernel
- * 
  * @param[in] krnl The kernel wrapper object. 
  * */
 #define ccl_kernel_ref(krnl) \
@@ -335,8 +317,6 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 /**
  * Alias to ccl_kernel_destroy().
  * 
- * @public @memberof ccl_kernel
- * 
  * @param[in] krnl Kernel wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
@@ -344,8 +324,6 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 
 /**
  * Get the OpenCL kernel object.
- * 
- * @public @memberof ccl_kernel
  * 
  * @param[in] krnl The kernel wrapper object.
  * @return The OpenCL kernel object.

@@ -78,8 +78,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /** 
  * Create a new context wrapper object selecting devices using 
  * the given set of filters.
- * 
- * @public @memberof ccl_context
  *  
  * @param[in] filters Filters for selecting device.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -93,8 +91,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /** 
  * Creates a context wrapper given an array of ::CCLDevice 
  * wrappers.
- * 
- * @public @memberof ccl_context
  * 
  * This macro simply calls ccl_context_new_from_devices_full() 
  * setting properties, callback and user data to NULL.
@@ -115,8 +111,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found CPU device is used. More than one CPU might be used 
  * if all CPUs belong to the same platform.
  * 
- * @public @memberof ccl_context
- * 
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
@@ -130,8 +124,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * 
  * The first found GPU device is used. More than one GPU might be used 
  * if all GPUs belong to the same platform.
- * 
- * @public @memberof ccl_context
  * 
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
@@ -147,8 +139,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found Accelerator device is used. More than one Accelerator 
  * might be used if all Accelerators belong to the same platform.
  * 
- * @public @memberof ccl_context
- * 
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
@@ -163,8 +153,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found device is used. More than one device might be used if 
  * all devices belong to the same platform.
  * 
- * @public @memberof ccl_context
- * 
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
@@ -176,8 +164,6 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /** 
  * Creates a context wrapper from a device selected by the user
  * from a menu.
- * 
- * @public @memberof ccl_context
  * 
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
@@ -221,8 +207,6 @@ double ccl_context_get_opencl_version(
 /**
  * Get a ::CCLWrapperInfo context information object.
  * 
- * @public @memberof ccl_context
- * 
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -241,8 +225,6 @@ double ccl_context_get_opencl_version(
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_context
  * 
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -265,8 +247,6 @@ double ccl_context_get_opencl_version(
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_context
- * 
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -283,8 +263,6 @@ double ccl_context_get_opencl_version(
 /** 
  * Increase the reference count of the context wrapper object.
  * 
- * @public @memberof ccl_context
- * 
  * @param[in] ctx The context wrapper object. 
  * */
 #define ccl_context_ref(ctx) \
@@ -292,8 +270,6 @@ double ccl_context_get_opencl_version(
 
 /**
  * Alias to ccl_context_destroy().
- * 
- * @public @memberof ccl_context
  * 
  * @param[in] ctx Context wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
@@ -303,8 +279,6 @@ double ccl_context_get_opencl_version(
 
 /**
  * Get the OpenCL context object.
- * 
- * @public @memberof ccl_context
  * 
  * @param[in] ctx The context wrapper object.
  * @return The OpenCL context object.

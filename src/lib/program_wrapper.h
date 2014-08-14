@@ -233,8 +233,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * as this macro will return NULL when the CL_PROGRAM_BINARIES parameter 
  * is requested.
  * 
- * @public @memberof ccl_program
- * 
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -256,8 +254,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -286,8 +282,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_program
- * 
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -308,17 +302,14 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 /**
  * Get a ::CCLWrapperInfo program build information object.
  * 
- * @public @memberof ccl_program
- * 
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return The reque
- * sted program build information object. This object will be 
- * automatically freed when the program wrapper object is destroyed. If 
- * an error occurs, NULL is returned.
+ * @return The requested program build information object. This object 
+ * will be automatically freed when the program wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_program_get_build_info(prg, dev, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) prg, (CCLWrapper*) dev, \
@@ -331,8 +322,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
@@ -357,8 +346,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_program
- * 
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -378,8 +365,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 /** 
  * Increase the reference count of the program object.
  * 
- * @public @memberof ccl_program
- * 
  * @param[in] prg The program wrapper object. 
  * */
 #define ccl_program_ref(prg) \
@@ -388,8 +373,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 /**
  * Alias to ccl_program_destroy().
  * 
- * @public @memberof ccl_program
- * 
  * @param[in] prg Program wrapper object to destroy if reference count 
  * is 1, otherwise just decrement the reference count.
  * */
@@ -397,8 +380,6 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 
 /**
  * Get the OpenCL program object.
- * 
- * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
  * @return The OpenCL program object.

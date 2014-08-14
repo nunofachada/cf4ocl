@@ -240,8 +240,6 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
  * Helper macro which returns a scalar information value casted 
  * to specified scalar type.
  * 
- * @public @memberof ccl_wrapper_info
- * 
  * @param[in] info ::CCLWrapperInfo information object.
  * @param[in] type Scalar type to which to cast value to.
  * @return The information value casted to the specified scalar type.
@@ -251,8 +249,6 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 /**
  * Helper macro which returns an array information value casted 
  * to specified array type.
- * 
- * @public @memberof ccl_wrapper_info
  * 
  * @param[in] info ::CCLWrapperInfo information object.
  * @param[in] type Array (pointer) type to which to cast value to.

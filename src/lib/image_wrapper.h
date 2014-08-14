@@ -148,11 +148,8 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err);
 
-#ifdef CL_VERSION_1_1
 
-/// @todo
 
-#endif
 
 #ifdef CL_VERSION_1_2
 
@@ -162,8 +159,6 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 
 /**
  * Get a ::CCLWrapperInfo image information object.
- * 
- * @public @memberof ccl_image
  * 
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get.
@@ -183,8 +178,6 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * Use with care. In case an error occurs, zero is returned, which 
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object. 
- * 
- * @public @memberof ccl_image
  * 
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -207,8 +200,6 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * might be ambiguous if NULL is a valid return value. In this case, it
  * is necessary to check the error object. 
  * 
- * @public @memberof ccl_image
- * 
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -226,17 +217,13 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 /** 
  * Increase the reference count of the image wrapper object.
  * 
- * @public @memberof ccl_image
- * 
- * @param[in] image The image wrapper object. 
+ * @param[in] img The image wrapper object. 
  * */
 #define ccl_image_ref(img) \
 	ccl_wrapper_ref((CCLWrapper*) img)
 
 /**
  * Alias to ccl_image_destroy().
- * 
- * @public @memberof ccl_image
  * 
  * @param[in] img image wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
@@ -245,8 +232,6 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 
 /**
  * Get the OpenCL image memory object.
- * 
- * @public @memberof ccl_image
  * 
  * @param[in] img The image wrapper object.
  * @return The OpenCL image memory object.
