@@ -579,10 +579,10 @@ cl_bool ccl_user_event_set_status(
 	CCLEvent* evt, cl_int execution_status, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
 	/* Make sure evt is not NULL. */
-	g_return_val_if_fail(evt != NULL, NULL);
+	g_return_val_if_fail(evt != NULL, CL_FALSE);
 
 	/* OpenCL status. */
 	cl_int ocl_status;
