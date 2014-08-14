@@ -33,7 +33,6 @@
 #include "profiler.h"
 #include "common.h"
 #include "ocl_stub/ocl_impl.h"
-#include <unistd.h>
 
 #define ccl_test_prof_is_overlap(ev1, ev2) \
 	( \
@@ -230,15 +229,14 @@ static void operationTest() {
 	ccl_prof_set_export_opts(export_options);
 	
 	/* Export options. */
-	gchar *name_used;
-	gint fd = g_file_open_tmp(
-		"test_profiler_XXXXXX.txt", &name_used, &err);
+	gchar *tmp_dir_name, *tmp_file_name;
+	tmp_dir_name = g_dir_make_tmp("test_op_profiler_XXXXXX", &err);
 	g_assert_no_error(err);
-	g_assert_cmpint(fd, !=, -1);
-	close(fd);
+	tmp_file_name = g_strconcat(
+		tmp_dir_name, G_DIR_SEPARATOR_S, "export.tsv", NULL);
 	
 	cl_bool export_status = ccl_prof_export_info_file(
-		prof, name_used, &err);
+		prof, tmp_file_name, &err);
 	g_assert_no_error(err);
 	g_assert(export_status);
 
@@ -254,11 +252,12 @@ static void operationTest() {
 		"Q3\t50\t70\tEvent1\n" \
 		"Q1\t68\t69\tEvent1\n";
 	gboolean read_flag = g_file_get_contents(
-		name_used, &file_contents, NULL, NULL);
+		tmp_file_name, &file_contents, NULL, NULL);
 	g_assert(read_flag);
 	g_assert_cmpstr(file_contents, ==, expected_contents);
 	g_free(file_contents);
-	g_free(name_used);
+	g_free(tmp_dir_name);
+	g_free(tmp_file_name);
 	
 	/* Print summary to debug output. */
 	const char* summary = ccl_prof_get_summary(prof, 

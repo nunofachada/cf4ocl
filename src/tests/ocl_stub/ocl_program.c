@@ -107,11 +107,11 @@ clCreateProgramWithSource(cl_context context, cl_uint count,
 	/* Parameter check. */
 	if (context == NULL) {
 		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
-		goto ERROR;
+		goto error_handler;
 	}
 	if ((count == 0) || (strings == NULL)) {
 		seterrcode(errcode_ret, CL_INVALID_VALUE);
-		goto ERROR;
+		goto error_handler;
 	}
 
 	/* Prepare complete source code string. */
@@ -119,7 +119,7 @@ clCreateProgramWithSource(cl_context context, cl_uint count,
 	for (cl_uint i = 0; i < count; ++i) {
 		if (strings[i] == NULL) {
 			seterrcode(errcode_ret, CL_INVALID_VALUE);
-			goto ERROR_FREE_SRC;
+			goto error_handler_free_src;
 		}
 		size_t len = (lengths != NULL) ? lengths[i] : strlen(strings[i]);
 		g_string_append_len(src, strings[i], len);
@@ -129,10 +129,10 @@ clCreateProgramWithSource(cl_context context, cl_uint count,
 	/* Create program. */
 	program = clCreateProgram(context, 0, NULL, src->str, NULL, NULL);
 
-ERROR_FREE_SRC:
+error_handler_free_src:
 	g_string_free(src, TRUE);
 	
-ERROR:
+error_handler:
 	
 	return program;
 		
@@ -152,12 +152,12 @@ clCreateProgramWithBinary(cl_context context, cl_uint num_devices,
 	/* Parameter check. */
 	if (context == NULL) {
 		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
-		goto ERROR;
+		goto error_handler;
 	}
 	if ((num_devices == 0) || (device_list == NULL) || (lengths == NULL) 
 		|| (binaries == NULL)) {
 		seterrcode(errcode_ret, CL_INVALID_VALUE);
-		goto ERROR;
+		goto error_handler;
 	}
 	for (cl_uint i = 0; i < num_devices; ++i) {
 		cl_bool found = FALSE;
@@ -167,11 +167,11 @@ clCreateProgramWithBinary(cl_context context, cl_uint num_devices,
 		}
 		if (!found) {
 			seterrcode(errcode_ret, CL_INVALID_DEVICE);
-			goto ERROR;
+			goto error_handler;
 		}
 		if ((lengths[i] == 0) || (binaries[i] == NULL)) {
 			seterrcode(errcode_ret, CL_INVALID_VALUE);
-			goto ERROR;
+			goto error_handler;
 		}
 	}
 	cl_bool ok = TRUE;
@@ -188,13 +188,13 @@ clCreateProgramWithBinary(cl_context context, cl_uint num_devices,
 			}
 		}
 	}
-	if (!ok) goto ERROR;
+	if (!ok) goto error_handler;
 	
 	/* Create program. */
 	program = clCreateProgram(context, num_devices, device_list, NULL, 
 		lengths, binaries);
 
-ERROR:
+error_handler:
 	
 	return program;
 }
@@ -296,13 +296,13 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 	/* Parameter check. */
 	if (program == NULL) {
 		status = CL_INVALID_PROGRAM;
-		goto ERROR;
+		goto error_handler;
 	}
 	if (((num_devices == 0) && (device_list != NULL)) 
 		|| ((num_devices > 0) && (device_list == NULL)) 
 		|| ((pfn_notify == NULL) && (user_data != NULL))) {
 		status = CL_INVALID_VALUE;
-		goto ERROR;
+		goto error_handler;
 	}
 	if (num_devices == 0) {
 		num_devices = program->num_devices;
@@ -318,12 +318,12 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 		}
 		if (!found) {
 			status = CL_INVALID_DEVICE;
-			goto ERROR;
+			goto error_handler;
 		}
 	}
 	if ((program->kernel_names != NULL) || (program->num_kernels > 0)) {
 		status = CL_INVALID_OPERATION;
-		goto ERROR;
+		goto error_handler;
 	}
 	
 	/* "Compile" source for given devices. If binary already exists for
@@ -357,7 +357,7 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 		
 	}
 	
-	ERROR:
+error_handler:
 	
 	return status;
 

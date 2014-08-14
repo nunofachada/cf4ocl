@@ -13,9 +13,10 @@ add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 # Set executables prefix
 set(EXECS_PREFIX "ccl_")
 
-# Compiler options for GCC, add -Wno-comment if warnings about inner comments appear
+# Compiler options for GCC
+# -Wno-comment because of comment within comment in OpenCL headers
 if(CMAKE_COMPILER_IS_GNUCC)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -std=c99")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
 endif()
 
 # Find required libraries
