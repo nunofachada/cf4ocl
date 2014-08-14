@@ -121,3 +121,32 @@ clGetContextInfo(cl_context context, cl_context_info param_name,
 	return status;
 		
 }
+
+CL_API_ENTRY cl_int CL_API_CALL
+clGetSupportedImageFormats(cl_context context, cl_mem_flags flags,
+	cl_mem_object_type image_type, cl_uint num_entries, 
+	cl_image_format* image_formats, cl_uint* num_image_formats) 
+	CL_API_SUFFIX__VERSION_1_0 {
+
+	cl_int status = CL_SUCCESS;
+	flags = flags;
+	image_type = image_type;
+
+	if (context == NULL) {
+		status = CL_INVALID_CONTEXT;
+	} else if ((num_entries == 0) && (image_formats != NULL)) {
+		status = CL_INVALID_VALUE;
+	} else {
+		if (image_formats != NULL) {
+			g_memmove(image_formats, 
+				context->devices[0]->platform_id->image_formats,
+				num_entries * sizeof(cl_image_format));
+		} 
+		if (num_image_formats != NULL) {
+			*num_image_formats = 
+				context->devices[0]->platform_id->num_image_formats;
+		}
+	}
+	return status;
+
+}

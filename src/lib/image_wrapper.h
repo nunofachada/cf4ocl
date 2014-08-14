@@ -148,9 +148,6 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err);
 
-
-
-
 #ifdef CL_VERSION_1_2
 
 /// @todo

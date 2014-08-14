@@ -143,6 +143,8 @@ struct _cl_platform_id {
 	const char* name;
 	const char* vendor;
 	const char* extensions;
+	const cl_image_format* image_formats;
+	const cl_uint num_image_formats;
 	const guint num_devices;
 	const struct _cl_device_id* devices;
 };

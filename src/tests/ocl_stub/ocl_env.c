@@ -35,6 +35,17 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 		.name = "cf4ocl test platform #0",
 		.vendor = "FakenMC p0",
 		.extensions = "cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing",
+		.image_formats = (const cl_image_format[]) {
+			{ 
+				.image_channel_order = CL_RGBA,
+				.image_channel_data_type = CL_UNORM_INT8
+			},
+			{
+				.image_channel_order = CL_INTENSITY,
+				.image_channel_data_type = CL_UNORM_INT16
+			}
+		},
+		.num_image_formats = 2,
 		.num_devices = 2,
 		.devices = (const struct _cl_device_id[]) {
 			{
@@ -195,6 +206,17 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 		.name = "cf4ocl test platform #1",
 		.vendor = "FakenMC p1",
 		.extensions = "cl_khr_byte_addressable_store cl_khr_icd",
+		.image_formats = (const cl_image_format[]) {
+			{ 
+				.image_channel_order = CL_RGBA,
+				.image_channel_data_type = CL_UNORM_INT8
+			},
+			{
+				.image_channel_order = CL_LUMINANCE,
+				.image_channel_data_type = CL_FLOAT
+			}
+		},
+		.num_image_formats = 2,
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
 			{ 
@@ -280,6 +302,13 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 		.name = "cf4ocl test platform #2",
 		.vendor = "FakenMC p2",
 		.extensions = "cl_khr_icd",
+		.image_formats = (const cl_image_format[]) {
+			{ 
+				.image_channel_order = CL_RGBA,
+				.image_channel_data_type = CL_SNORM_INT16
+			}
+		},
+		.num_image_formats = 1,
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
 			{ 

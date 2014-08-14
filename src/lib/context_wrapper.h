@@ -183,7 +183,7 @@ CCLContext* ccl_context_new_from_filters_full(
  * clCreateContext function. */
 CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, cl_uint num_devices,
-	CCLDevice** devices, ccl_context_callback pfn_notify,
+	CCLDevice* const* devices, ccl_context_callback pfn_notify,
 	void* user_data, GError** err);
 
 /* Creates a context wrapper using one independent device filter 
@@ -203,6 +203,25 @@ void ccl_context_destroy(CCLContext* ctx);
  * context. */
 double ccl_context_get_opencl_version(
 	CCLContext* ctx, GError** err);
+	
+/* Get the platform associated with the context devices. */
+CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
+
+/* Get the list of image formats supported by a given context. */
+const cl_image_format* ccl_context_get_supported_image_formats(
+	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type, 
+	GError** err);
+
+/* Get ::CCLDevice wrapper at given index. */
+CCLDevice* ccl_context_get_device(
+	CCLContext* ctx, cl_uint index, GError** err);
+
+/* Return number of devices in context. */
+cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
+
+/* Get all device wrappers in context. */
+CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx, 
+	GError** err);
 
 /**
  * Get a ::CCLWrapperInfo context information object.
@@ -285,20 +304,6 @@ double ccl_context_get_opencl_version(
  * */
 #define ccl_context_unwrap(ctx) \
 	((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
-	
-/* Get the platform associated with the context devices. */
-CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
-
-/* Get ::CCLDevice wrapper at given index. */
-CCLDevice* ccl_context_get_device(
-	CCLContext* ctx, cl_uint index, GError** err);
-
-/* Return number of devices in context. */
-cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
-
-/* Get all device wrappers in context. */
-CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx, 
-	GError** err);
 
 /** @} */
 

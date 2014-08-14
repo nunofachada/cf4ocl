@@ -631,6 +631,74 @@ static void context_ref_unref_test() {
 
 }
 
+/** 
+ * Tests the ccl_context_get_supported_image_formats() function.
+ * */
+static void context_get_supported_image_formats() {
+
+	CCLPlatforms* ps;
+	CCLPlatform* p;
+	CCLContext* c;
+	CCLDevice* const* ds;
+	cl_uint num_devs;
+	const cl_image_format* image_formats;
+	char* p_name;
+	GError* err = NULL;
+	
+	/* Get all platforms. */
+	ps = ccl_platforms_new(&err);
+	g_assert_no_error(err);
+	
+	/* Cycle through platforms. */
+	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
+		
+		/* Get current platform. */
+		p = ccl_platforms_get_platform(ps, i);
+		
+		/* Get number of devices in platform. */
+		num_devs = ccl_platform_get_num_devices(p, &err);
+		g_assert_no_error(err);
+		
+		/* Get all devices in platform. */
+		ds = ccl_platform_get_all_devices(p, &err);
+		g_assert_no_error(err);
+	
+		/* Create a context with all devices in current platform. */
+		c = ccl_context_new_from_devices(num_devs, ds, &err);
+		g_assert_no_error(err);
+		
+		/* Test the ccl_context_get_supported_image_formats() function. */
+		image_formats = ccl_context_get_supported_image_formats(c,
+			CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, &err);
+		g_assert_no_error(err);
+		
+		/* Get platform name and print it to debug output. */
+		p_name = ccl_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
+		g_assert_no_error(err);
+		g_debug("Image formats for platform '%s':", p_name);
+		
+		/* Cycle through image formats and print them to debug output. */
+		while (image_formats->image_channel_order) {
+			
+			g_debug("\t(chan_order, chan_type) = (%x, %x)", 
+				image_formats->image_channel_order, 
+				image_formats->image_channel_data_type);
+			image_formats++;
+		}
+		
+		/* Destroy context. */
+		ccl_context_destroy(c);
+	}
+	
+	/* Destroy platforms. */
+	ccl_platforms_destroy(ps);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
 /**
  * Main function.
  * @param[in] argc Number of command line arguments.
@@ -648,6 +716,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/context/ref-unref", 
 		context_ref_unref_test);
+		
+	g_test_add_func(
+		"/wrappers/context/get-supported-image-formats", 
+		context_get_supported_image_formats);
 		
 	return g_test_run();
 }
