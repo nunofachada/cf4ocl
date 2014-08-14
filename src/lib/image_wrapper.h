@@ -160,8 +160,99 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 
 #endif
 
-/// @todo We can emulate the OpenCL>1.0 functions if not available in
-/// OpenCL
+/**
+ * Get a ::CCLWrapperInfo image information object.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] img The image wrapper object.
+ * @param[in] param_name Name of information/parameter to get.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The requested image information object. This object will
+ * be automatically freed when the image wrapper object is 
+ * destroyed. If an error occurs, NULL is returned.
+ * */
+#define ccl_image_get_info(img, param_name, err) \
+	ccl_wrapper_get_info((CCLWrapper*) img, NULL, param_name, \
+		(ccl_wrapper_info_fp) clGetImageInfo, CL_TRUE, err)
+
+/** 
+ * Macro which returns a scalar image information value. 
+ * 
+ * Use with care. In case an error occurs, zero is returned, which 
+ * might be ambiguous if zero is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] img The image wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The requested image information value. This value will be 
+ * automatically freed when the image wrapper object is destroyed. 
+ * If an error occurs, zero is returned.
+ * */
+#define ccl_image_get_scalar_info(img, param_name, param_type, err) \
+	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) img, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetImageInfo, \
+		CL_TRUE, err))
+
+/** 
+ * Macro which returns an array image information value. 
+ * 
+ * Use with care. In case an error occurs, NULL is returned, which 
+ * might be ambiguous if NULL is a valid return value. In this case, it
+ * is necessary to check the error object. 
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] img The image wrapper object.
+ * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The requested image information value. This value will be 
+ * automatically freed when the image wrapper object is destroyed. 
+ * If an error occurs, NULL is returned.
+ * */
+#define ccl_image_get_array_info(img, param_name, param_type, err) \
+	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) img, \
+		NULL, param_name, (ccl_wrapper_info_fp) clGetImageInfo, \
+		CL_TRUE, err)
+
+/** 
+ * Increase the reference count of the image wrapper object.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] image The image wrapper object. 
+ * */
+#define ccl_image_ref(img) \
+	ccl_wrapper_ref((CCLWrapper*) img)
+
+/**
+ * Alias to ccl_image_destroy().
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] img image wrapper object to destroy if reference count
+ * is 1, otherwise just decrement the reference count.
+ * */
+#define ccl_image_unref(img) ccl_image_destroy(img)
+
+/**
+ * Get the OpenCL image memory object.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] img The image wrapper object.
+ * @return The OpenCL image memory object.
+ * */
+#define ccl_image_unwrap(img) \
+	((cl_mem) ccl_wrapper_unwrap((CCLWrapper*) img))
 
 /** @} */
 
