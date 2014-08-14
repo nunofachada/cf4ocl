@@ -133,31 +133,31 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * 
  * @public @memberof ccl_device
  * 
- * @param[in] device The device wrapper object. 
+ * @param[in] dev The device wrapper object. 
  * */
-#define ccl_device_ref(device) \
-	ccl_wrapper_ref((CCLWrapper*) device)
+#define ccl_device_ref(dev) \
+	ccl_wrapper_ref((CCLWrapper*) dev)
 
 /**
  * Alias to ccl_device_destroy().
  * 
  * @public @memberof ccl_device
  * 
- * @param[in] device Device wrapper object to destroy if reference count
+ * @param[in] dev Device wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
-#define ccl_device_unref(device) ccl_device_destroy(device)
+#define ccl_device_unref(dev) ccl_device_destroy(dev)
 
 /**
  * Get the OpenCL device_id object.
  * 
  * @public @memberof ccl_device
  * 
- * @param[in] device The device wrapper object.
+ * @param[in] dev The device wrapper object.
  * @return The OpenCL device_id object.
  * */
-#define ccl_device_unwrap(device) \
-	((cl_device_id) ccl_wrapper_unwrap((CCLWrapper*) device))
+#define ccl_device_unwrap(dev) \
+	((cl_device_id) ccl_wrapper_unwrap((CCLWrapper*) dev))
 	
 /** @} */
 
