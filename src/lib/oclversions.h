@@ -117,6 +117,7 @@
 #ifndef CL_VERSION_2_0
 
 	typedef cl_bitfield         cl_device_svm_capabilities;
+	typedef cl_bitfield         cl_sampler_properties;
 	/* cl_command_type */
 	#define CL_COMMAND_SVM_FREE                         0x1209
 	#define CL_COMMAND_SVM_MEMCPY                       0x120A
@@ -146,7 +147,7 @@
 	#define CL_DEVICE_SVM_FINE_GRAIN_SYSTEM             (1 << 2)
 	#define CL_DEVICE_SVM_ATOMICS                       (1 << 3)
 
-#endif	
+#endif
 
 /* Some of these query constants may not be defined in standard 
  * OpenCL headers, so we defined them here if necessary. */
