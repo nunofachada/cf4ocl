@@ -159,6 +159,13 @@ CCLEvent* ccl_image_enqueue_write(CCLQueue* cq, CCLImage* img,
 	cl_bool blocking_read, const size_t* origin, const size_t* region, 
 	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
+	
+/* Copy image objects. This function wraps the clEnqueueCopyImage() 
+ * OpenCL function. */
+CCLEvent* ccl_image_enqueue_copy(CCLQueue* cq, CCLImage* src_img,
+	CCLImage* dst_img, const size_t* src_origin, 
+	const size_t* dst_origin, const size_t* region, 
+	CCLEventWaitList* evt_wait_lst, GError** err);
 
 #ifdef CL_VERSION_1_2
 

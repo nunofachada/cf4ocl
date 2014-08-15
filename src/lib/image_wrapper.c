@@ -420,7 +420,7 @@ CCLEvent* ccl_image_enqueue_write(CCLQueue* cq, CCLImage* img,
 	
 	/* Write image to device from host. */
 	ocl_status = clEnqueueWriteImage(ccl_queue_unwrap(cq), 
-		ccl_memobj_unwrap(img), blocking_read, origin, region, 
+		ccl_memobj_unwrap(img), blocking_write, origin, region, 
 		input_row_pitch, input_slice_pitch, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
@@ -453,9 +453,95 @@ finish:
 	/* Return event. */
 	return evt;
 
-
 }
 
+/**
+ * Copy image objects. This function wraps the clEnqueueCopyImage() 
+ * OpenCL function.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
+ * @param[in] src_img Source image wrapper object.
+ * @param[out] dst_img Destination image wrapper object.
+ * @param[in] src_origin The @f$(x, y, z)@f$ offset in pixels in the 1D,
+ * 2D, or 3D image source image, the @f$(x, y)@f$ offset and the image 
+ * index in the source image array or the @f$(x)@f$ offset and the image
+ * index in the source 1D image array.
+ * @param[in] dst_origin The @f$(x, y, z)@f$ offset in pixels in the 1D,
+ * 2D, or 3D destination image, the @f$(x, y)@f$ offset and the image 
+ * index in the destination image array or the @f$(x)@f$ offset and the 
+ * image index in the 1D destination image array.
+ * @param[in] region The @f$(width, height, depth)@f$ in pixels of the 
+ * 1D, 2D or 3D rectangle, the @f$(width, height)@f$ in pixels of the 2D
+ * rectangle and the number of images of a 2D image array or the 
+ * @f$(width)@f$ in pixels of the 1D rectangle and the number of images
+ * of a 1D image array. 
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or `NULL` if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this copy command.
+ * */
+CCLEvent* ccl_image_enqueue_copy(CCLQueue* cq, CCLImage* src_img,
+	CCLImage* dst_img, const size_t* src_origin, 
+	const size_t* dst_origin, const size_t* region, 
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure src_img is not NULL. */
+	g_return_val_if_fail(src_img != NULL, NULL);
+	/* Make sure dst_img is not NULL. */
+	g_return_val_if_fail(dst_img != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	
+	/* Copy image. */
+	ocl_status = clEnqueueCopyImage(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(src_img), ccl_memobj_unwrap(dst_img),
+		src_origin, dst_origin, region, 
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to enqueue an image copy (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
+finish:
+	
+	/* Return event. */
+	return evt;
+
+}
 
 /** @} */
 
