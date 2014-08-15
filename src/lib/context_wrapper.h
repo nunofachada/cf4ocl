@@ -210,7 +210,7 @@ CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
 /* Get the list of image formats supported by a given context. */
 const cl_image_format* ccl_context_get_supported_image_formats(
 	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type, 
-	GError** err);
+	cl_uint* num_image_formats, GError** err);
 
 /* Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_context_get_device(

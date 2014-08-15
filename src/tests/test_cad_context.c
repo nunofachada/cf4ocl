@@ -642,6 +642,7 @@ static void context_get_supported_image_formats() {
 	CCLDevice* const* ds;
 	cl_uint num_devs;
 	const cl_image_format* image_formats;
+	cl_uint num_image_formats;
 	char* p_name;
 	GError* err = NULL;
 	
@@ -669,7 +670,8 @@ static void context_get_supported_image_formats() {
 		
 		/* Test the ccl_context_get_supported_image_formats() function. */
 		image_formats = ccl_context_get_supported_image_formats(c,
-			CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, &err);
+			CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, 
+			&num_image_formats, &err);
 		g_assert_no_error(err);
 		
 		/* Get platform name and print it to debug output. */
@@ -678,7 +680,7 @@ static void context_get_supported_image_formats() {
 		g_debug("Image formats for platform '%s':", p_name);
 		
 		/* Cycle through image formats and print them to debug output. */
-		while (image_formats->image_channel_order) {
+		for (guint j = 0; j < num_image_formats; ++j) {
 			
 			g_debug("\t(chan_order, chan_type) = (%x, %x)", 
 				image_formats->image_channel_order, 

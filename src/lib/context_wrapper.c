@@ -589,8 +589,7 @@ finish:
 
 /**
  * Get the list of image formats supported by a given context. This
- * function wraps the clGetSupportedImageFormats() OpenCL function. The
- * returned list is zero-terminated and doesn't need to be freed.
+ * function wraps the clGetSupportedImageFormats() OpenCL function. 
  * 
  * @public @memberof ccl_context
  * 
@@ -599,17 +598,21 @@ finish:
  * memory object being queried.
  * @param[in] image_type The image type. Acceptable values depend on the
  * OpenCL version.
+ * @param[out] num_image_formats Return location for number of image 
+ * formats in list.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A zero-terminated list of supported image formats. Doesn't
- * need to be freed, or `NULL` if an error occurs.
+ * @return A list of supported image formats, or `NULL` if an error 
+ * occurs. Doesn't need to be freed.
  * */
 const cl_image_format* ccl_context_get_supported_image_formats(
 	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type, 
-	GError** err) {
+	cl_uint* num_image_formats, GError** err) {
 		
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
+	/* Make sure num_image_formats is not NULL. */
+	g_return_val_if_fail(num_image_formats != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
@@ -621,57 +624,36 @@ const cl_image_format* ccl_context_get_supported_image_formats(
 	/* Variable to return. */
 	const cl_image_format* image_formats = NULL;
 	
-	/* Check if it is required to query OpenCL object. */
-	if (/* Perform query if info table is not yet initialized. */
-		(ctx->base.base.info == NULL)
-		/* Perform query if info table does not contain format info.  */
-		|| (!g_hash_table_contains(
-				ctx->base.base.info, GUINT_TO_POINTER(CL_IMAGE_FORMAT)))
-		) {
-
-		/* Let's query OpenCL object.*/
-		cl_int ocl_status;
-		/* Number of supported image formats. */
-		cl_uint num_image_formats;
+	/* Let's query OpenCL object.*/
+	cl_int ocl_status;
 		
-		/* Get number of image formats. */
-		ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
-			flags, image_type, 0, NULL, &num_image_formats);
-		ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
-			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: get number of supported image formats (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
-		ccl_if_err_create_goto(*err, CCL_ERROR, 
-			num_image_formats == 0, CCL_ERROR_OTHER, error_handler,
-			"%s: number of returned supported image formats is 0.",
-			G_STRLOC);
+	/* Get number of image formats. */
+	ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
+		flags, image_type, 0, NULL, num_image_formats);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler,
+		"%s: get number of supported image formats (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	ccl_if_err_create_goto(*err, CCL_ERROR, 
+		*num_image_formats == 0, CCL_ERROR_OTHER, error_handler,
+		"%s: number of returned supported image formats is 0.",
+		G_STRLOC);
+	
+	/* Allocate memory for number of image formats. */
+	info = ccl_wrapper_info_new(
+		(*num_image_formats) * sizeof(cl_image_format));
+	
+	/* Get image formats. */
+	ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
+		flags, image_type, *num_image_formats, 
+		(cl_image_format*) info->value, NULL);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler,
+		"%s: get supported image formats (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
 		
-		/* Allocate memory for number of image formats, plus the zero
-		 * terminator. The allocation guarantees everything is set to
-		 * zero initially. */
-		info = ccl_wrapper_info_new(
-			(num_image_formats + 1) * sizeof(cl_image_format));
-		
-		/* Get image formats. */
-		ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
-			flags, image_type, num_image_formats, 
-			(cl_image_format*) info->value, NULL);
-		ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
-			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: get supported image formats (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
-			
-		/* Keep information in information table. */
-		ccl_wrapper_add_info((CCLWrapper*) ctx, CL_IMAGE_FORMAT, info);
-
-	} else {
-
-		/* Requested infor is already present in the info table,
-		 * retrieve it from there. */
-		info = g_hash_table_lookup(
-			ctx->base.base.info, GUINT_TO_POINTER(CL_IMAGE_FORMAT));
-		
-	}
+	/* Keep information in information table for latter disposal. */
+	ccl_wrapper_add_info((CCLWrapper*) ctx, CL_IMAGE_FORMAT, info);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
