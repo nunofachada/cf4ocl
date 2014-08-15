@@ -32,6 +32,9 @@
 
 #include "memobj_wrapper.h"
 
+/* Forward definition of CCLBuffer. */
+typedef struct ccl_buffer CCLBuffer;
+
 /**
  * @defgroup IMAGE_WRAPPER Image wrapper
  *
@@ -167,9 +170,23 @@ CCLEvent* ccl_image_enqueue_copy(CCLQueue* cq, CCLImage* src_img,
 	const size_t* dst_origin, const size_t* region, 
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
+/* Copy an image object to a buffer object. */
+CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLQueue* cq, 
+	CCLImage* src_img, CCLBuffer* dst_buf, const size_t *src_origin, 
+	const size_t *region, size_t dst_offset,
+	CCLEventWaitList* evt_wait_lst, GError** err);
+	
+/* Map a region of the image into the host address space and return a 
+ * pointer to this mapped region. */
+void* ccl_image_enqueue_map(CCLQueue* cq, CCLImage* img,
+	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
+	const size_t* region, size_t *image_row_pitch, 
+	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
+	CCLEvent** evt, GError** err);
+
 #ifdef CL_VERSION_1_2
 
-/// @todo
+// @todo
 
 #endif
 

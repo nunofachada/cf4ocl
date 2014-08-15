@@ -28,6 +28,7 @@
  * */
 
 #include "image_wrapper.h"
+#include "buffer_wrapper.h"
 
 /** 
  * @addtogroup IMAGE_WRAPPER
@@ -540,6 +541,190 @@ finish:
 	
 	/* Return event. */
 	return evt;
+
+}
+
+/**
+ * Copy an image object to a buffer object. This function wraps the 
+ * clEnqueueCopyImageToBuffer() OpenCL function.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
+ * @param[in] src_img Source image wrapper object where to read from.
+ * @param[out] dst_buf Destination buffer wrapper object where to write
+ * to.
+ * @param[in] src_origin The @f$(x, y, z)@f$ offset in pixels in
+ * the 1D, 2D or 3D image, the @f$(x, y)@f$ offset and the image index 
+ * in the 2D image array or the @f$(x)@f$ offset and the image index in
+ * the 1D image array. 
+ * @param[in] region The @f$(width, height, depth)@f$ in pixels of the 
+ * 1D, 2D or 3D rectangle, the @f$(width, height)@f$ in pixels of the 2D
+ * rectangle and the number of images of a 2D image array or the 
+ * @f$(width)@f$ in pixels of the 1D rectangle and the number of images
+ * of a 1D image array.
+ * @param[in] dst_offset The offset where to begin copying data into 
+ * `dst_buf`.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or `NULL` if error 
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this copy command.
+ * */
+CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLQueue* cq, 
+	CCLImage* src_img, CCLBuffer* dst_buf, const size_t *src_origin, 
+	const size_t *region, size_t dst_offset,
+	CCLEventWaitList* evt_wait_lst, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure src_img is not NULL. */
+	g_return_val_if_fail(src_img != NULL, NULL);
+	/* Make sure dst_buf is not NULL. */
+	g_return_val_if_fail(dst_buf != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL function status. */
+	cl_int ocl_status;
+	/* OpenCL event object. */
+	cl_event event = NULL;
+	/* Event wrapper object. */
+	CCLEvent* evt = NULL;
+	
+	/* Copy image to buffer. */
+	ocl_status = clEnqueueCopyImageToBuffer(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(src_img), ccl_memobj_unwrap(dst_buf),
+		src_origin, region, dst_offset, 
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR, 
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to copy image to buffer (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	evt = NULL;
+	
+finish:
+	
+	/* Return event. */
+	return evt;
+
+}
+
+/**
+ * Map a region of the image into the host address space and return a 
+ * pointer to this mapped region. This function wraps the 
+ * clEnqueueMapImage() OpenCL function.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] cq Command-queue wrapper object in which the map command
+ * will be queued.
+ * @param[in,out] img Image wrapper object to be mapped.
+ * @param[in] blocking_map Indicates if the map operation is blocking 
+ * or non-blocking.
+ * @param[in] map_flags Flags which specify the type of mapping to
+ * perform.
+ * @param[in] origin The @f$(x, y, z)@f$ offset in pixels in the 1D, 2D,
+ * or 3D image, the @f$(x, y)@f$ offset and the image index in the image
+ * array or the @f$(x)@f$ offset and the image index in the 1D image 
+ * array.
+ * @param[in] region The @f$(width, height, depth)@f$ in pixels of the 
+ * 1D, 2D or 3D rectangle, the @f$(width, height)@f$ in pixels of the 2D
+ * rectangle and the number of images of a 2D image array or the 
+ * @f$(width)@f$ in pixels of the 1D rectangle and the number of images
+ * of a 1D image array.
+ * @param[out] image_row_pitch Returns the scan-line pitch in bytes for
+ * the mapped region. This must be a non-`NULL` value.
+ * @param[out] image_slice_pitch Returns the size in bytes of each 2D 
+ * slice of a 3D image or the size of each 1D or 2D image in a 1D or 2D
+ * image array for the mapped region. For a 1D and 2D image, zero is 
+ * returned if this argument is not `NULL`. For a 3D image, 1D, and 2D
+ * image array, `image_slice_pitch` must be a non-`NULL` value.
+ * @param[in,out] evt_wait_lst List of events that need to complete 
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] evt An event wrapper object that identifies this 
+ * particular map command. If NULL, no event will be returned.
+ * @param[out] err Return location for a GError, or `NULL` if error 
+ * reporting is to be ignored.
+ * @return A pointer in the host address space for the mapped region.
+ * */
+void* ccl_image_enqueue_map(CCLQueue* cq, CCLImage* img,
+	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
+	const size_t* region, size_t *image_row_pitch, 
+	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
+	CCLEvent** evt, GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure img is not NULL. */
+	g_return_val_if_fail(img != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	cl_int ocl_status;
+	cl_event event = NULL;
+	CCLEvent* evt_inner = NULL;
+	void* ptr = NULL;
+	
+	/* Perform image map. */
+	ptr = clEnqueueMapImage(ccl_queue_unwrap(cq), 
+		ccl_memobj_unwrap(img), blocking_map, map_flags, 
+		origin, region, image_row_pitch, image_slice_pitch,
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), 
+		&event, &ocl_status);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to map image (OpenCL error %d: %s).",
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+	
+	/* Wrap event and associate it with the respective command queue. 
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt_inner = ccl_queue_produce_event(cq, event);
+	if (evt != NULL)
+		*evt = evt_inner;
+	
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* An error occurred, return NULL to signal it. */
+	ptr = NULL;
+	
+finish:
+	
+	/* Return host pointer. */
+	return ptr;
 
 }
 

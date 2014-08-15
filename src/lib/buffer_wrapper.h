@@ -31,7 +31,9 @@
 #define _CCL_BUFFER_WRAPPER_H_
 
 #include "memobj_wrapper.h"
-#include "image_wrapper.h"
+
+/* Forward definition of CCLImage. */
+typedef struct ccl_image CCLImage;
 
 /**
  * @defgroup BUFFER_WRAPPER Buffer wrapper

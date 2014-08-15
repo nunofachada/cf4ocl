@@ -28,6 +28,7 @@
  * */
 
 #include "buffer_wrapper.h"
+#include "image_wrapper.h"
 
 /** 
  * Buffer wrapper class
@@ -288,9 +289,9 @@ finish:
 }
 
 /**
- * Map a region of the buffer object given by buffer into the host 
- * address space and returns a pointer to this mapped region. This 
- * function wraps the clEnqueueMapBuffer() OpenCL function.
+ * Map a region of a buffer into the host address space and return a 
+ * pointer to this mapped region. This function wraps the 
+ * clEnqueueMapBuffer() OpenCL function.
  * 
  * @public @memberof ccl_buffer
  * 
@@ -331,6 +332,7 @@ void* ccl_buffer_enqueue_map(CCLQueue* cq, CCLBuffer* buf,
 	CCLEvent* evt_inner = NULL;
 	void* ptr = NULL;
 	
+	/* Perform buffer map. */
 	ptr = clEnqueueMapBuffer(ccl_queue_unwrap(cq), 
 		ccl_memobj_unwrap(buf), blocking_map, map_flags, offset, size,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
@@ -462,11 +464,11 @@ finish:
  * the 1D, 2D or 3D image, the @f$(x, y)@f$ offset and the image index 
  * in the 2D image array or the @f$(x)@f$ offset and the image index in
  * the 1D image array. 
- * @param[in] region Defines the @f$(width, height, depth)@f$ in pixels 
- * of the 1D, 2D or 3D rectangle, the @f$(width, height)@f$ in pixels 
- * of the 2D rectangle and the number of images of a 2D image array or 
- * the @f$(width)@f$ in pixels of the 1D rectangle and the number of 
- * images of a 1D image array.
+ * @param[in] region The @f$(width, height, depth)@f$ in pixels of the 
+ * 1D, 2D or 3D rectangle, the @f$(width, height)@f$ in pixels of the 2D
+ * rectangle and the number of images of a 2D image array or the 
+ * @f$(width)@f$ in pixels of the 1D rectangle and the number of images
+ * of a 1D image array.
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
