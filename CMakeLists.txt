@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
 project(cf4ocl2)
 
+#Get current commit SHA from git
+execute_process(COMMAND git rev-parse --short HEAD OUTPUT_VARIABLE ${PROJECT_NAME}_GIT_SHA)
+
 # The version number
 set(${PROJECT_NAME}_VERSION_MAJOR 2)
 set(${PROJECT_NAME}_VERSION_MINOR 0)
-set(${PROJECT_NAME}_VERSION_PATCH 0)
+set(${PROJECT_NAME}_VERSION_PATCH "0-alpha.1")
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
 
 # Set log domain  
@@ -53,6 +56,13 @@ add_subdirectory(scripts)
 # add a target to generate API documentation with Doxygen
 if(DOXYGEN_FOUND)
 	set(DOCS_DIRECTORY "doc")
+	# Create links to OpenCL API when OpenCL functions are mentioned?
+	# This is slow and requires Bash and other command-line utilties
+	option(DOC_OPENCL_FUNCTION_URLS "Create links to OpenCL API (much slower)?" OFF)
+	if (DOC_OPENCL_FUNCTION_URLS)
+		# Add tests path to doc exclude path
+		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/docscripts/docfilter.sh")
+	endif()
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	# Convert GitHub README.md into Doxygen MD format
 	file(READ ${CMAKE_CURRENT_SOURCE_DIR}/README.md README_CONTENTS)
@@ -73,6 +83,8 @@ if(DOXYGEN_FOUND)
 	)
 	# Add documentation installation target (if the docs have been built)
 	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ DESTINATION share/${PROJECT_NAME} OPTIONAL)
+
+	
 endif()
 
 # build a CPack driven installer package
