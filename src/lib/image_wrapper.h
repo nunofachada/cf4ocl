@@ -186,7 +186,11 @@ void* ccl_image_enqueue_map(CCLQueue* cq, CCLImage* img,
 
 #ifdef CL_VERSION_1_2
 
-// @todo
+/* Fill an image object with a specified color. This function wraps the 
+ * clEnqueueFillImage() OpenCL function. */
+CCLEvent* ccl_image_enqueue_fill(CCLQueue* cq, CCLImage* img, 
+	const void *fill_color, const size_t *origin, const size_t *region,
+	CCLEventWaitList* evt_wait_lst, GError** err);
 
 #endif
 
