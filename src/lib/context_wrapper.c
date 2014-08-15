@@ -599,7 +599,7 @@ finish:
  * @param[in] image_type The image type. Acceptable values depend on the
  * OpenCL version.
  * @param[out] num_image_formats Return location for number of image 
- * formats in list.
+ * formats in list, which will be zero if an error occurs.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of supported image formats, or `NULL` if an error 
@@ -663,6 +663,7 @@ const cl_image_format* ccl_context_get_supported_image_formats(
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
+	*num_image_formats = 0;
 	
 finish:
 	
