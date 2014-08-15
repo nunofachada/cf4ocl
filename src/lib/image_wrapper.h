@@ -148,6 +148,18 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err);
 
+/* Read from an image or image array object to host memory. */
+CCLEvent* ccl_image_enqueue_read(CCLQueue* cq, CCLImage* img,
+	cl_bool blocking_read, const size_t* origin, const size_t* region, 
+	size_t row_pitch, size_t slice_pitch, void *ptr,
+	CCLEventWaitList* evt_wait_lst, GError** err);
+	
+/* Write to an image or image array object from host memory. */
+CCLEvent* ccl_image_enqueue_write(CCLQueue* cq, CCLImage* img,
+	cl_bool blocking_read, const size_t* origin, const size_t* region, 
+	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
+	CCLEventWaitList* evt_wait_lst, GError** err);
+
 #ifdef CL_VERSION_1_2
 
 /// @todo
