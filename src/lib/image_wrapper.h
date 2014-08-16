@@ -30,6 +30,9 @@
 #ifndef _CCL_IMAGE_WRAPPER_H_
 #define _CCL_IMAGE_WRAPPER_H_
 
+#ifdef USE_GDKPIXBUF
+	#include <gdk-pixbuf/gdk-pixbuf.h>
+#endif
 #include "memobj_wrapper.h"
 
 /* Forward definition of CCLBuffer. */
@@ -150,6 +153,14 @@ void ccl_image_destroy(CCLImage* img);
 CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err);
+	
+#ifdef USE_GDKPIXBUF
+
+/* Creates a new image wrapper object from an image file. */
+CCLImage* ccl_image_new_from_file(CCLContext* ctx, const char* filename, 
+	cl_mem_flags flags, GError** err);
+
+#endif
 
 /* Read from an image or image array object to host memory. */
 CCLEvent* ccl_image_enqueue_read(CCLQueue* cq, CCLImage* img,

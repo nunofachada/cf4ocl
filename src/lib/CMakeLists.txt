@@ -9,8 +9,13 @@ set(SRC errors.c profiler.c types.c common.c platforms.c
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
+if (GDK_FOUND)
+	add_definitions(-DUSE_GDKPIXBUF)
+endif()
+
 # This is required for Windows compilation
-target_link_libraries(${PROJECT_NAME} ${GLIB_LIBRARIES} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLIB_LIBRARIES} ${GLIB_LDFLAGS} 
+	${GDK_LDFLAGS} ${OPENCL_LIBRARIES})
 
 # This target is just an alias for cf4ocl
 add_custom_target(lib DEPENDS ${PROJECT_NAME})

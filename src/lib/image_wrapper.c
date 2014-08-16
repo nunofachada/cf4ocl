@@ -278,6 +278,132 @@ finish:
 
 }
 
+#ifdef USE_GDKPIXBUF
+
+/* Creates a new image wrapper object from an image file. */
+CCLImage* ccl_image_new_from_file(CCLContext* ctx, const char* filename, 
+	cl_mem_flags flags, GError** err) {
+	
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	/* Make sure CL_MEM_USE_HOST_PTR and CL_MEM_ALLOC_HOST_PTR are not
+	 * set in flags. */
+	g_return_val_if_fail(((flags & CL_MEM_ALLOC_HOST_PTR) == 0)
+		&& ((flags & CL_MEM_USE_HOST_PTR) == 0), NULL);
+
+	/* A GDK pixel buffer where to load the image to. In OpenCL 
+	 * this will be represented*/
+	GdkPixbuf* buf;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	/* Image wrapper object to create. */
+	CCLImage* img = NULL;
+	/* Image format. */
+	cl_image_format image_format;
+	/* Image description. */
+	CCLImageDesc img_dsc;
+
+	/* Load file into pixbuf. */
+	buf = gdk_pixbuf_new_from_file(filename, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Make sure image has alpha channel. */
+	if (!gdk_pixbuf_get_has_alpha(buf)) {
+		
+		/* Aux. GDK pixel buffer. */
+		GdkPixbuf* buf_aux;
+		/* Add alpha channel. */
+		buf_aux = gdk_pixbuf_add_alpha(buf, FALSE, 0, 0, 0);
+		/* Destroy original pixbuf. */
+		g_object_unref(buf);
+		/* Point buf to new pixbuf. */
+		buf = buf_aux;
+	}
+	
+	/* Set image format. */
+	image_format = { 
+		.image_channel_order = CL_RGBA,
+		.image_channel_data_type = CL_UNSIGNED_INT8
+	};
+	
+	/* Set image description. */
+	img_dsc = {
+		.image_type = CL_MEM_OBJECT_IMAGE2D,
+		.image_width = gdk_pixbuf_get_width(buf),
+		.image_height = gdk_pixbuf_get_height(buf),
+		.image_depth = 0,
+		.image_array_size = 0,
+		.image_row_pitch = gdk_pixbuf_get_rowstride(buf),
+		.image_slice_pitch = 0,
+		.num_mip_levels = 0,
+		.num_samples = 0,
+		.mo = NULL
+	};
+	
+	/* Create image wrapper object. */
+	img = ccl_image_new(ctx, flags | CL_MEM_COPY_HOST_PTR, 
+		&image_format, &img_dsc, (void*) gdk_pixbuf_get_pixels(buf), 
+		&err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Destroy pixbuf. */
+	g_object_unref(buf);
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+finish:
+
+	/* Return image wrapper. */
+	return img;
+
+}
+
+/* Saves the image represented by the wrapper object into a file. */
+cl_bool ccl_image_save_to_file(CCLImage* img, const char* filename, 
+	GError** err) {
+
+	/* Make sure img is not NULL. */
+	g_return_val_if_fail(img != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* Function return status. */
+	cl_bool status;
+	/* */
+	
+	/* Map image for reading. */
+	ccl_image_enqueue_map(
+	
+	
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	status = CL_TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	status = CL_FALSE;
+	
+finish:
+
+	/* Return function status. */
+	return status;
+}
+
+#endif
+
 /**
  * Read from an image or image array object to host memory. This 
  * function wraps the clEnqueueReadImage() OpenCL function.
