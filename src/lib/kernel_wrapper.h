@@ -101,8 +101,8 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl,
 	G_GNUC_NULL_TERMINATED;
 
 /* Set kernel arguments and enqueue it for execution. */
-CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
-	cl_uint work_dim, const size_t* global_work_offset, 
+CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, 
+	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
 	

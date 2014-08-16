@@ -476,6 +476,9 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * a kernel wrapper for the given kernel function with ccl_kernel_new(),
  * one for each thread.
  * 
+ * @todo Use an array of ::CCLArg instead of va_list. Change this
+ * for all varargs functions in ::CCLProgram and ::CCLKernel classes.
+ * 
  * @param[in] krnl A kernel wrapper object.
  * @param[in] cq A command queue wrapper object.
  * @param[in] work_dim The number of dimensions used to specify the 
@@ -497,8 +500,8 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * @param[in] args A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
  * */
-CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, CCLQueue* cq, 
-	cl_uint work_dim, const size_t* global_work_offset, 
+CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, 
+	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, va_list args) {
 
