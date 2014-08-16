@@ -36,6 +36,56 @@
 #include "buffer_wrapper.h"
 #include <glib/gstdio.h>
 
+static const char* ccl_test_channel_order_string(cl_uint co) {
+	switch(co) {
+		case 0x10B0: return "CL_R";
+		case 0x10B1: return "CL_A";
+		case 0x10B2: return "CL_RG";
+		case 0x10B3: return "CL_RA";
+		case 0x10B4: return "CL_RGB";
+		case 0x10B5: return "CL_RGBA";
+		case 0x10B6: return "CL_BGRA";
+		case 0x10B7: return "CL_ARGB";
+		case 0x10B8: return "CL_INTENSITY";
+		case 0x10B9: return "CL_LUMINANCE";
+		case 0x10BA: return "CL_Rx";
+		case 0x10BB: return "CL_RGx";
+		case 0x10BC: return "CL_RGBx";
+		case 0x10BD: return "CL_DEPTH";
+		case 0x10BE: return "CL_DEPTH_STENCIL";
+		case 0x10BF: return "CL_sRGB";
+		case 0x10C0: return "CL_sRGBx";
+		case 0x10C1: return "CL_sRGBA";
+		case 0x10C2: return "CL_sBGRA";
+		case 0x10C3: return "CL_ABGR";
+	}
+	return "Unknown";
+
+}
+
+static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
+	
+	switch (cdt) {
+		case 0x10D0: return "CL_SNORM_INT8";
+		case 0x10D1: return "CL_SNORM_INT16";
+		case 0x10D2: return "CL_UNORM_INT8";
+		case 0x10D3: return "CL_UNORM_INT16";
+		case 0x10D4: return "CL_UNORM_SHORT_565";
+		case 0x10D5: return "CL_UNORM_SHORT_555";
+		case 0x10D6: return "CL_UNORM_INT_101010";
+		case 0x10D7: return "CL_SIGNED_INT8";
+		case 0x10D8: return "CL_SIGNED_INT16";
+		case 0x10D9: return "CL_SIGNED_INT32";
+		case 0x10DA: return "CL_UNSIGNED_INT8";
+		case 0x10DB: return "CL_UNSIGNED_INT16";
+		case 0x10DC: return "CL_UNSIGNED_INT32";
+		case 0x10DD: return "CL_HALF_FLOAT";
+		case 0x10DE: return "CL_FLOAT";
+		case 0x10DF: return "CL_UNORM_INT24";
+	}
+	return "Unknown";
+}
+
 /*
  * Independent pass-all filter for testing.
  * */
@@ -682,9 +732,11 @@ static void context_get_supported_image_formats() {
 		/* Cycle through image formats and print them to debug output. */
 		for (guint j = 0; j < num_image_formats; ++j) {
 			
-			g_debug("\t(chan_order, chan_type) = (%x, %x)", 
-				image_formats->image_channel_order, 
-				image_formats->image_channel_data_type);
+			g_debug("\t(chan_order, chan_type) = (%s, %s)", 
+				ccl_test_channel_order_string(
+					image_formats->image_channel_order), 
+				ccl_test_channel_data_type_string(
+					image_formats->image_channel_data_type));
 			image_formats++;
 		}
 		
