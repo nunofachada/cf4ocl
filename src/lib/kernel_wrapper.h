@@ -82,10 +82,9 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index,
  * arguments which must end with `NULL`. */
 void ccl_kernel_set_args(CCLKernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
-/* Set all kernel arguments. This function accepts a `va_list`
- * containing the kernel arguments. Calling code must initialize and
- * clean up the `va_list`. */
-void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args);
+/* Set all kernel arguments. This function accepts a `NULL`-terminated
+ * array of kernel arguments. */
+void ccl_kernel_set_args_v(CCLKernel* krnl, CCLArg** args);
 
 /* Enqueues a kernel for execution on a device. */
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq, 
@@ -104,7 +103,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl,
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, 
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList* evt_wait_lst, GError** err, va_list args);
+	CCLEventWaitList* evt_wait_lst, CCLArg** args, GError** err);
 	
 /* Get the OpenCL version of the platform associated with this 
  * kernel. */

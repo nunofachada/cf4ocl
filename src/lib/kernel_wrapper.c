@@ -53,7 +53,7 @@ struct ccl_kernel {
 
 /**
  * @internal
- * Implementation of ccl_wrapper_release_fields() function for
+ * Implementation of ::ccl_wrapper_release_fields() function for
  * ::CCLKernel wrapper objects.
  * 
  * @private @memberof ccl_kernel
@@ -217,10 +217,10 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index,
 /**
  * Set all kernel arguments. This function accepts a variable list of
  * arguments which must end with `NULL`. Each argument is individually 
- * set using the ccl_kernel_set_arg() function.
+ * set using the ::ccl_kernel_set_arg() function.
  * 
- * The ccl_kernel_set_args_v() function performs the same operation
- * but accepts a `va_list` instead.
+ * The ::ccl_kernel_set_args_v() function performs the same operation
+ * but accepts an array of kernel arguments instead.
  * 
  * @public @memberof ccl_kernel
  * 
@@ -236,48 +236,94 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index,
  * */
 void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 	
-	/* Declare and initialize the va_list. */
-	va_list args;
-	va_start(args, krnl);
+	/* The va_list, which represents the variable argument list. */
+	va_list args_va;
+	/* Array of arguments, created from the va_list. */
+	CCLArg** args_array = NULL;
+	/* Number of arguments. */
+	guint num_args = 0;
+	/* Aux. arg. when cycling through the va_list. */
+	CCLArg* aux_arg;
 	
-	/* Call the va_list version of this function.*/
-	ccl_kernel_set_args_v(krnl, args);
+	/* Initialize the va_list. */
+	va_start(args_va, krnl);
 	
-	/* Clean up the va_list. */
-	va_end(args);
+	/* Get first argument. */
+	aux_arg = va_arg(args_va, CCLArg*);
+	
+	/* Check if any arguments are given, and if so, populate array
+	 * of arguments. */
+	if (aux_arg != NULL) {
+		
+		/* 1. Determine number of arguments. */
+		
+		while (aux_arg != NULL) {
+			num_args++;
+			aux_arg = va_arg(args_va, CCLArg*);
+		}
+		va_end(args_va);
+		
+		/* 2. Populate array of arguments. */
+		
+		args_array = g_slice_alloc((num_args + 1) * sizeof(CCLArg*));
+		va_start(args_va, krnl);
+		
+		for (guint i = 0; i < num_args; ++i) {
+			aux_arg = va_arg(args_va, CCLArg*);
+			args_array[i] = aux_arg;
+		}
+		va_end(args_va);
+		args_array[num_args] = NULL;
+		
+	}
+	
+	/* If any arguments are given... */
+	if (num_args > 0) {
+		
+		/* Call the array version of this function.*/
+		ccl_kernel_set_args_v(krnl, args_array);
+		
+		/* Free the array of arguments. */
+		g_slice_free1((num_args + 1) * sizeof(CCLArg*), args_array);
+		
+	}
 
 }
 
 /**
- * Set all kernel arguments. This function accepts a `va_list`
- * containing the kernel arguments. Calling code must initialize and
- * clean up the `va_list`. Each argument is individually set using the 
- * ccl_kernel_set_arg() function.
+ * Set all kernel arguments. This function accepts a `NULL`-terminated
+ * array of kernel arguments. Each argument is individually set using 
+ * the ::ccl_kernel_set_arg() function.
  * 
- * The ccl_kernel_set_args() function performs the same operation but
+ * The ::ccl_kernel_set_args() function performs the same operation but
  * accepts a `NULL`-terminated variable list of arguments instead.
  * 
  * @public @memberof ccl_kernel
  * 
  * @warning This function is not thread-safe. For multi-threaded 
  * access to the same kernel function, create multiple instances of 
- * a kernel wrapper for the given kernel function with ccl_kernel_new(),
- * one for each thread. 
+ * a kernel wrapper for the given kernel function with 
+ * ::ccl_kernel_new(), one for each thread. 
  * 
  * @param[in] krnl A kernel wrapper object.
- * @param[in] args A `NULL`-terminated list of arguments to set.
+ * @param[in] args A `NULL`-terminated array of arguments to set.
  * */
-void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
+void ccl_kernel_set_args_v(CCLKernel* krnl, CCLArg** args) {
 	
+	/* Make sure krnl is not NULL. */
+	g_return_if_fail(krnl != NULL);
+	/* Make sure args is not NULL. */
+	g_return_if_fail(args != NULL);
+
 	/* Cycle through the arguments. */
-	for (cl_uint i = 0; ; i++) {
+	for (guint i = 0; args[i] != NULL; ++i) {
+		
 		/* Get next argument. */
-		CCLArg* arg = va_arg(args, CCLArg*);
-		/* If argument is NULL, terminate. */
-		if (arg == NULL)
-			break;
+		CCLArg* arg = args[i];
+		
 		/* Set the i^th kernel argument. */
 		ccl_kernel_set_arg(krnl, i, arg);
+		
 	}
 
 }
@@ -286,14 +332,14 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, va_list args) {
  * Enqueues a kernel for execution on a device.
  * 
  * Internally, this function calls the clSetKernelArg() OpenCL function
- * for each argument defined with the ccl_kernel_set_arg() function, and
- * the executes the kernel using the clEnqueueNDRangeKernel() OpenCL
+ * for each argument defined with the ::ccl_kernel_set_arg() function, 
+ * and the executes the kernel using the clEnqueueNDRangeKernel() OpenCL
  * function.
  * 
  * @warning This function is not thread-safe. For multi-threaded 
  * access to the same kernel function, create multiple instances of 
- * a kernel wrapper for the given kernel function with ccl_kernel_new(),
- * one for each thread.
+ * a kernel wrapper for the given kernel function with 
+ * ::ccl_kernel_new(), one for each thread.
  * 
  * @public @memberof ccl_kernel
  *  
@@ -399,11 +445,11 @@ finish:
  * Set kernel arguments and enqueue it for execution on a device.
  * 
  * Internally this function sets kernel arguments by calling 
- * ccl_kernel_set_args_v(), and enqueues the kernel for execution
- * by calling ccl_kernel_enqueue_ndrange().
+ * ::ccl_kernel_set_args_v(), and enqueues the kernel for execution
+ * by calling ::ccl_kernel_enqueue_ndrange().
  * 
- * The ccl_kernel_set_args_and_enqueue_ndrange_v() function performs 
- * the same operation but accepts a `va_list` instead.
+ * The ::ccl_kernel_set_args_and_enqueue_ndrange_v() function performs 
+ * the same operation but accepts an array of arguments instead.
  * 
  * @public @memberof ccl_kernel
  * 
@@ -411,8 +457,8 @@ finish:
  * 
  * @warning This function is not thread-safe. For multi-threaded 
  * access to the same kernel function, create multiple instances of 
- * a kernel wrapper for the given kernel function with ccl_kernel_new(),
- * one for each thread.
+ * a kernel wrapper for the given kernel function with 
+ * ::ccl_kernel_new(), one for each thread.
  * 
  * @param[in] krnl A kernel wrapper object.
  * @param[in] cq A command queue wrapper object.
@@ -440,18 +486,68 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	const size_t* global_work_size, const size_t* local_work_size, 
 	CCLEventWaitList* evt_wait_lst, GError** err, ...) {
 
+	/* Make sure krnl is not NULL. */
+	g_return_val_if_fail(krnl != NULL, NULL);
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
 	/* Event wrapper. */
 	CCLEvent* evt;
+	/* The va_list, which represents the variable argument list. */
+	va_list args_va;
+	/* Array of arguments, to be created from the va_list. */
+	CCLArg** args_array = NULL;
+	/* Number of arguments. */
+	guint num_args = 0;
+	/* Aux. arg. when cycling through the va_list. */
+	CCLArg* aux_arg;
 	
-	/* Variable argument list. */
-	va_list args;
+	/* Initialize the va_list. */
+	va_start(args_va, err);
+	
+	/* Get first argument. */
+	aux_arg = va_arg(args_va, CCLArg*);
+	
+	/* Check if any arguments are given, and if so, populate array
+	 * of arguments. */
+	if (aux_arg != NULL) {
+		
+		/* 1. Determine number of arguments. */
+		
+		while (aux_arg != NULL) {
+			num_args++;
+			aux_arg = va_arg(args_va, CCLArg*);
+		}
+		va_end(args_va);
+		
+		/* 2. Populate array of arguments. */
+		
+		args_array = g_slice_alloc((num_args + 1) * sizeof(CCLArg*));
+		va_start(args_va, err);
+		
+		for (guint i = 0; i < num_args; ++i) {
+			aux_arg = va_arg(args_va, CCLArg*);
+			args_array[i] = aux_arg;
+		}
+		va_end(args_va);
+		args_array[num_args] = NULL;
+		
+	}
 	
 	/* Set kernel arguments and run it. */
-	va_start(args, err);
 	evt = ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
-		evt_wait_lst, err, args);
-	va_end(args);
+		evt_wait_lst, args_array, err);
+		
+	/* If any arguments are given... */
+	if (num_args > 0) {
+		
+		/* Free the array of arguments. */
+		g_slice_free1((num_args + 1) * sizeof(CCLArg*), args_array);
+		
+	}
 	
 	/* Return event wrapper. */
 	return evt;
@@ -462,10 +558,10 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * Set kernel arguments and enqueue it for execution on a device.
  * 
  * Internally this function sets kernel arguments by calling 
- * ccl_kernel_set_args_v(), and enqueues the kernel for execution
- * by calling ccl_kernel_enqueue_ndrange().
+ * ::ccl_kernel_set_args_v(), and enqueues the kernel for execution
+ * by calling ::ccl_kernel_enqueue_ndrange().
  * 
- * The ccl_kernel_set_args_and_enqueue_ndrange() function performs the 
+ * The ::ccl_kernel_set_args_and_enqueue_ndrange() function performs the 
  * same operation but accepts a `NULL`-terminated variable list of 
  * arguments instead.
  * 
@@ -475,9 +571,6 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * access to the same kernel function, create multiple instances of 
  * a kernel wrapper for the given kernel function with ccl_kernel_new(),
  * one for each thread.
- * 
- * @todo Use an array of ::CCLArg instead of va_list. Change this
- * for all varargs functions in ::CCLProgram and ::CCLKernel classes.
  * 
  * @param[in] krnl A kernel wrapper object.
  * @param[in] cq A command queue wrapper object.
@@ -495,15 +588,15 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
+ * @param[in] args A `NULL`-terminated list of arguments to set.
  * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
- * @param[in] args A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
  * */
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl, 
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset, 
 	const size_t* global_work_size, const size_t* local_work_size, 
-	CCLEventWaitList* evt_wait_lst, GError** err, va_list args) {
+	CCLEventWaitList* evt_wait_lst, CCLArg** args, GError** err) {
 
 	/* Make sure number krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);

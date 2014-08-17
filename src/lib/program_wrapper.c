@@ -945,13 +945,64 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 	const size_t* local_work_size, CCLEventWaitList* evt_wait_lst, 
 	GError** err, ...) {
 
+	/* Event wrapper. */
 	CCLEvent* evt;
-	va_list args;
-	va_start(args, err);
+	/* The va_list, which represents the variable argument list. */
+	va_list args_va;
+	/* Array of arguments, to be created from the va_list. */
+	CCLArg** args_array = NULL;
+	/* Number of arguments. */
+	guint num_args = 0;
+	/* Aux. arg. when cycling through the va_list. */
+	CCLArg* aux_arg;
+	
+	/* Initialize the va_list. */
+	va_start(args_va, err);
+	
+	/* Get first argument. */
+	aux_arg = va_arg(args_va, CCLArg*);
+	
+	/* Check if any arguments are given, and if so, populate array
+	 * of arguments. */
+	if (aux_arg != NULL) {
+		
+		/* 1. Determine number of arguments. */
+		
+		while (aux_arg != NULL) {
+			num_args++;
+			aux_arg = va_arg(args_va, CCLArg*);
+		}
+		va_end(args_va);
+		
+		/* 2. Populate array of arguments. */
+		
+		args_array = g_slice_alloc((num_args + 1) * sizeof(CCLArg*));
+		va_start(args_va, err);
+		
+		for (guint i = 0; i < num_args; ++i) {
+			aux_arg = va_arg(args_va, CCLArg*);
+			args_array[i] = aux_arg;
+		}
+		va_end(args_va);
+		args_array[num_args] = NULL;
+		
+	}
+	
+	/* Enqueue kernel using the array of arguments version of this
+	 * function. */
 	evt = ccl_program_enqueue_kernel_v(prg, kernel_name, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
-		evt_wait_lst, err, args);
-	va_end(args);
+		evt_wait_lst, args_array, err);
+
+	/* If any arguments are given... */
+	if (num_args > 0) {
+		
+		/* Free the array of arguments. */
+		g_slice_free1((num_args + 1) * sizeof(CCLArg*), args_array);
+		
+	}		
+
+	/* Return the event. */
 	return evt;
 
 }
@@ -991,16 +1042,16 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
  * @param[in,out] evt_wait_lst List of events that need to complete 
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
+ * @param[in] args A `NULL`-terminated array of arguments to set.
  * @param[out] err Return location for a GError, or `NULL` if error 
  * reporting is to be ignored.
- * @param[in] args A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
  * */
 CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg, 
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim, 
 	const size_t* global_work_offset, const size_t* global_work_size, 
 	const size_t* local_work_size, CCLEventWaitList* evt_wait_lst, 
-	GError** err, va_list args) {
+	CCLArg** args, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -1013,7 +1064,7 @@ CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
 	
 	evt = ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, work_dim, 
 		global_work_offset, global_work_size, local_work_size, 
-		evt_wait_lst, err, args);
+		evt_wait_lst, args, err);
 	return evt;
 }
 
