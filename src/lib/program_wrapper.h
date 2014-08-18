@@ -160,13 +160,32 @@ cl_bool ccl_program_build(
  * source or binary. This function wraps the clBuildProgram() OpenCL
  * function. */
 cl_bool ccl_program_build_full(CCLProgram* prg, 
-	cl_uint num_devices, CCLDevice** devices, const char *options, 
-	ccl_program_callback pfn_notify, void *user_data, GError** err);
+	cl_uint num_devices, CCLDevice** devs, const char* options, 
+	ccl_program_callback pfn_notify, void* user_data, GError** err);
 
-/**
- * @class ccl_program
- * @todo Add support for compiling and linking.
- * */
+#ifdef CL_VERSION_1_2
+
+/* Compile a program's source code. */
+cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
+	CCLDevice** devs, const char* options, cl_uint num_input_headers,
+	CCLProgram** prg_input_headers, const char** header_include_names,
+	ccl_program_callback pfn_notify, void* user_data, GError** err);
+
+/* Link a set of compiled programs. */
+CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
+	CCLDevice** devs, const char* options, cl_uint num_input_programs,
+	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
+	void* user_data, GError** err);
+	
+#endif
+
+/* ********************** */
+/* PROGRAM OPENCL VERSION */
+/* ********************** */
+
+/* Get the OpenCL version of the platform associated with this 
+ * program. */
+double ccl_program_get_opencl_version(CCLProgram* prg, GError** err);
 
 /* ******************************* */
 /* KERNEL RELATED HELPER FUNCTIONS */

@@ -480,6 +480,7 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 }
 
 #ifdef CL_VERSION_1_2
+
 CL_API_ENTRY cl_program CL_API_CALL
 clCreateProgramWithBuiltInKernels(cl_context context, 
 	cl_uint num_devices, const cl_device_id* device_list,
@@ -492,6 +493,46 @@ clCreateProgramWithBuiltInKernels(cl_context context,
 	kernel_names = kernel_names;
 	errcode_ret = errcode_ret;
 	g_error("Unimplemented.");
+}
+
+CL_API_ENTRY cl_int CL_API_CALL 
+clCompileProgram(cl_program program, cl_uint num_devices, 
+	const cl_device_id* device_list, const char* options, 
+	cl_uint num_input_headers, const cl_program* input_headers, 
+	const char** header_include_names, 
+	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
+	void* user_data) CL_API_SUFFIX__VERSION_1_2 {
+
+	program = program;
+	num_devices = num_devices;
+	device_list = device_list;
+	options = options;
+	num_input_headers = num_input_headers;
+	input_headers = input_headers;
+	header_include_names = header_include_names;
+	pfn_notify = pfn_notify;
+	user_data = user_data;
+	g_error("Unimplemented.");
+}
+
+CL_API_ENTRY cl_program CL_API_CALL
+clLinkProgram(cl_context context, cl_uint num_devices, 
+	const cl_device_id* device_list, const char* options,
+	cl_uint num_input_programs, const cl_program* input_programs,
+	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
+	void* user_data, cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_2 {
+		
+	context = context;
+	num_devices = num_devices;
+	device_list = device_list;
+	options = options;
+	num_input_programs = num_input_programs;
+	input_programs = input_programs;
+	pfn_notify = pfn_notify;
+	user_data = user_data;
+	errcode_ret = errcode_ret;
+	g_error("Unimplemented.");
 		
 }
+
 #endif

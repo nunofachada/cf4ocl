@@ -648,11 +648,17 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	/* Make sure num_devices > 0. */
 	g_return_val_if_fail(num_devices > 0, NULL);
 	
+	/* OpenCL function return status. */
 	cl_int ocl_status;
+	/* OpenCL program object. */
 	cl_program program = NULL;
+	/* Program wrapper object. */
 	CCLProgram* prg = NULL;
+	/* List of cl_device_id objects. */
 	cl_device_id* device_list = NULL;
+	/* OpenCL version of underlying platform. */
 	double ocl_ver;
+	/* Internal error handling object. */
 	GError* err_internal = NULL;
 	
 	/* Check that context platform is >= OpenCL 1.2 */
@@ -741,8 +747,8 @@ cl_bool ccl_program_build(
  * @public @memberof ccl_program
  * 
  * @param[in] prg The program wrapper object.
- * @param[in] num_devices The number of devices listed in `devices`.
- * @param[in] devices List of device wrappers associated with program. 
+ * @param[in] num_devices The number of devices listed in `devs`.
+ * @param[in] devs List of device wrappers associated with program. 
  * If `NULL`, the program executable is built for all devices 
  * associated with program for which a source or binary has been loaded. 
  * @param[in] options A null-terminated string of characters that 
@@ -758,16 +764,13 @@ cl_bool ccl_program_build(
  * otherwise.
  * */
 cl_bool ccl_program_build_full(CCLProgram* prg, 
-	cl_uint num_devices, CCLDevice** devices, const char *options, 
+	cl_uint num_devices, CCLDevice** devs, const char *options, 
 	ccl_program_callback pfn_notify, void *user_data, GError** err) {
 	
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, CL_FALSE);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
-	/* Make sure devices and num_devices are coherent. */
-	g_return_val_if_fail(((num_devices == 0) && (devices == NULL)) 
-		|| ((num_devices > 0) && (devices != NULL)), CL_FALSE);
 
 	/* Array of unwrapped devices. */
 	cl_device_id* cl_devices = NULL;
@@ -777,11 +780,11 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	cl_bool result;
 	
 	/* Check if its necessary to unwrap devices. */
-	if (devices != NULL) {
+	if ((devs != NULL) && (num_devices > 0)) {
 		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
 		/* Unwrap devices. */
-		for (guint i = 0; i < num_devices; i++)
-			cl_devices[i] = ccl_device_unwrap(devices[i]);
+		for (guint i = 0; i < num_devices; ++i)
+			cl_devices[i] = ccl_device_unwrap(devs[i]);
 	}
 
 	/* Build program. */
@@ -814,6 +817,313 @@ finish:
 
 	/* Return result of function call. */
 	return result;
+
+}
+
+#ifdef CL_VERSION_1_2
+
+/**
+ * Compile a program's source code. This function wraps the 
+ * clCompileProgram() OpenCL function.
+ * 
+ * @public @memberof ccl_program
+ * @note Requires OpenCL >= 1.2
+ * 
+ * @param[in] prg The program wrapper that holds the program to be
+ * compiled.
+ * @param[in] num_devices Number of devices in `devs`.
+ * @param[in] devs List of device wrappers associated with the program. 
+ * If `NULL`, the compile is performed for all devices associated with
+ * the program.
+ * @param[in] options A null-terminated string of characters that 
+ * describes the compilation options to be used for building the program 
+ * executable.
+ * @param[in] num_input_headers The number of programs wrappers that 
+ * describe headers in the array referenced by `prg_input_headers`.
+ * @param[in] prg_input_headers An array of program wrapper embedded
+ * headers created with any of the `ccl_program_new_from_source*()` 
+ * functions.
+ * @param[in] header_include_names An array that has a one to one 
+ * correspondence with `prg_input_headers`. Each entry specifies the 
+ * include name used by source in program that comes from an embedded 
+ * header.
+ * @param[in] pfn_notify A function pointer to a callback function that
+ * an application can register and which will be called when the program
+ * executable has been built (successfully or unsuccessfully).
+ * @param[in] user_data User supplied data for the callback function.
+ * @param[out] err Return location for a GError, or `NULL` if error 
+ * reporting is to be ignored.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
+ * otherwise.
+ * */
+cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
+	CCLDevice** devs, const char* options, cl_uint num_input_headers,
+	CCLProgram** prg_input_headers, const char** header_include_names,
+	ccl_program_callback pfn_notify, void* user_data, GError** err) {
+
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+
+	/* Array of unwrapped devices. */
+	cl_device_id* cl_devices = NULL;
+	/* Array of unwrapped programs (input headers). */
+	cl_program* input_headers = NULL;
+	/* Status of OpenCL function call. */
+	cl_int ocl_status;
+	/* Result of function call. */
+	cl_bool result;
+	/* OpenCL version of underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Check that context platform is >= OpenCL 1.2 */
+	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.2, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.2, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: Program compilation requires OpenCL version 1.2 or newer.",
+		G_STRLOC);
+
+	/* Check if its necessary to unwrap devices. */
+	if ((devs != NULL) && (num_devices > 0)) {
+		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
+		/* Unwrap devices. */
+		for (guint i = 0; i < num_devices; ++i)
+			cl_devices[i] = ccl_device_unwrap(devs[i]);
+	}
+
+	/* Check if its necessary to unwrap programs (input headers). */
+	if ((prg_input_headers != NULL) && (num_input_headers > 0)) {
+		input_headers = 
+			g_slice_alloc0(sizeof(cl_program) * num_input_headers);
+		/* Unwrap program objects. */
+		for (guint i = 0; i < num_input_headers; ++i)
+			input_headers[i] = ccl_program_unwrap(prg_input_headers[i]);
+	}
+	
+	/* Compile program. */
+	ocl_status = clCompileProgram(ccl_program_unwrap(prg), num_devices,
+		(const cl_device_id*) cl_devices, options, num_input_headers,
+		(const cl_program*) input_headers, header_include_names,
+		pfn_notify, user_data);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to compile program (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	result = CL_TRUE;
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* Bad result. */
+	result = CL_FALSE;
+	
+finish:
+
+	/* Check if necessary to release array of unwrapped devices. */
+	if (cl_devices != NULL) {
+		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
+	}
+	/* Check if necessary to release array of input headers (programs). */
+	if (input_headers != NULL) {
+		g_slice_free1(
+			sizeof(cl_program) * num_input_headers, input_headers);
+	}
+
+	/* Return result of function call. */
+	return result;
+
+}
+
+/**
+ * Link a set of compiled programs and create an executable program
+ * wrapper. The return program wrapper must be freed with 
+ * ::ccl_program_destroy(). This function wraps the clLinkProgram() 
+ * OpenCL function.
+ * 
+ * @public @memberof ccl_program
+ * @note Requires OpenCL >= 1.2
+ * 
+ * @param[in] ctx A context wrapper object.
+ * @param[in] num_devices Number of devices in `devs`.
+ * @param[in] devs List of device wrappers associated with the context. 
+ * If `NULL`, the link is performed for all devices associated with
+ * the context for which a compiled object is available.
+ * @param[in] options A null-terminated string of characters that 
+ * describes the link options to be used for building the program 
+ * executable.
+ * @param[in] num_input_programs The number of program wrapper objects 
+ * in `input_prgs`.
+ * @param[in] input_prgs An array of program wrapper objects that 
+ * contain compiled binaries or libraries that are to be linked to 
+ * create the program executable.
+ * @param[in] pfn_notify A function pointer to a callback function that
+ * an application can register and which will be called when the program
+ * executable has been built (successfully or unsuccessfully).
+ * @param[in] user_data User supplied data for the callback function.
+ * @param[out] err Return location for a GError, or `NULL` if error 
+ * reporting is to be ignored.
+ * @return A new program wrapper object, or `NULL` if an error occurs.
+ * */
+CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
+	CCLDevice** devs, const char* options, cl_uint num_input_programs,
+	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
+	void* user_data, GError** err) {
+		
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+
+	/* Array of unwrapped devices. */
+	cl_device_id* cl_devices = NULL;
+	/* Array of unwrapped input programs. */
+	cl_program* input_programs = NULL;
+	/* Status of OpenCL function call. */
+	cl_int ocl_status;
+	/* Program wrapper object to create. */
+	CCLProgram* prg = NULL;
+	/* OpenCL program object to create and wrap. */
+	cl_program program = NULL;
+	/* OpenCL version of underlying platform. */
+	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+	
+	/* Check that context platform is >= OpenCL 1.2 */
+	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* If OpenCL version is not >= 1.2, throw error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 1.2, 
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler, 
+		"%s: Program linking requires OpenCL version 1.2 or newer.",
+		G_STRLOC);
+
+	/* Check if its necessary to unwrap devices. */
+	if ((devs != NULL) && (num_devices > 0)) {
+		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
+		/* Unwrap devices. */
+		for (guint i = 0; i < num_devices; ++i)
+			cl_devices[i] = ccl_device_unwrap(devs[i]);
+	}
+
+	/* Check if its necessary to unwrap input programs. */
+	if ((input_prgs != NULL) && (num_input_programs > 0)) {
+		input_programs = 
+			g_slice_alloc0(sizeof(cl_program) * num_input_programs);
+		/* Unwrap program objects. */
+		for (guint i = 0; i < num_input_programs; ++i)
+			input_programs[i] = ccl_program_unwrap(input_prgs[i]);
+	}
+
+	/* Link program. */
+	program = clLinkProgram(ccl_context_unwrap(ctx), num_devices,
+		(const cl_device_id*) cl_devices, options, num_input_programs,
+		(const cl_program*) input_programs, pfn_notify, user_data,
+		&ocl_status);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+		CL_SUCCESS != ocl_status, ocl_status, error_handler, 
+		"%s: unable to link program (OpenCL error %d: %s).", 
+		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		
+	/* Wrap OpenCL program object. */
+	prg = ccl_program_new_wrap(program);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* Return NULL to signal error. */
+	prg = NULL;
+	
+finish:
+
+	/* Check if necessary to release array of unwrapped devices. */
+	if (cl_devices != NULL) {
+		g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
+	}
+	/* Check if necessary to release array of input programs. */
+	if (input_programs != NULL) {
+		g_slice_free1(
+			sizeof(cl_program) * num_input_programs, input_programs);
+	}
+
+	/* Return linked program wrapper. */
+	return prg;
+
+}
+
+#endif
+
+/**
+ * Get the OpenCL version of the platform associated with this program.
+ * 
+ * @public @memberof ccl_program
+ *  
+ * @param[in] krnl A program wrapper object.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The OpenCL version of the platform associated with this 
+ * program in numeric format. If an error occurs, 0 is returned.
+ * */
+double ccl_program_get_opencl_version(CCLProgram* prg, GError** err) {
+
+	/* Make sure number prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, 0.0);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
+
+	cl_context context;
+	CCLContext* ctx;
+	GError* err_internal = NULL;
+	double ocl_ver;
+	
+	/* Get cl_context object for this program. */
+	context = ccl_program_get_scalar_info(
+		prg, CL_PROGRAM_CONTEXT, cl_context, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Get context wrapper. */
+	ctx = ccl_context_new_wrap(context);
+	
+	/* Get OpenCL version. */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	
+	/* Unref. the context wrapper. */
+	ccl_context_unref(ctx);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	ocl_ver = 0;
+	
+finish:
+
+	/* Return event wrapper. */
+	return ocl_ver;
 
 }
 
