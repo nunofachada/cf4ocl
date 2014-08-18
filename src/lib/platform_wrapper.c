@@ -46,7 +46,7 @@ struct ccl_platform {
 
 /** 
  * @internal
- * Implementation of ccl_dev_container_get_cldevices() for the
+ * Implementation of ::ccl_dev_container_get_cldevices() for the
  * platform wrapper. 
  * 
  * @private @memberof ccl_platform

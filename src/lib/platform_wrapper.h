@@ -163,7 +163,7 @@ double ccl_platform_get_opencl_version(
  * @return The OpenCL platform object.
  * */
 #define ccl_platform_unwrap(platform) \
-	((cl_platform) ccl_wrapper_unwrap((CCLWrapper*) platform))
+	((cl_platform_id) ccl_wrapper_unwrap((CCLWrapper*) platform))
 	
 /* Get all device wrappers in platform. */
 CCLDevice* const* ccl_platform_get_all_devices(
