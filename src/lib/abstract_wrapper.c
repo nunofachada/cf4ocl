@@ -152,24 +152,29 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 			}
 		}
 		
+		/* Destroy remaining wrapper fields. */
+		if (rel_fields_fun != NULL)
+			rel_fields_fun(wrapper);
+		
 		/* Destroy hash table containing information. */
 		if (wrapper->info != NULL) {
 			g_hash_table_destroy(wrapper->info);
 		}
 		
 		/* Remove wrapper from static table, release static table if
-		 * empty. */
+		 * empty. Also unload compiler (OpenCL <= 1.1) for all 
+		 * platforms, presumably it won't be required again. */
 		G_LOCK(wrappers);
 		g_hash_table_remove(wrappers, wrapper->cl_object);
 		if (g_hash_table_size(wrappers) == 0) {
 			g_hash_table_destroy(wrappers);
 			wrappers = NULL;
+#ifndef CL_VERSION_1_2
+			/* Unload compiler*/
+			clUnloadCompiler();
+#endif
 		}
 		G_UNLOCK(wrappers);
-		
-		/* Destroy remaining wrapper fields. */
-		if (rel_fields_fun != NULL)
-			rel_fields_fun(wrapper);
 		
 		/* Destroy wrapper. */
 		g_slice_free1(size, wrapper);

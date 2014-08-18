@@ -44,6 +44,36 @@ struct ccl_platform {
 
 };
 
+/**
+ * @internal
+ * Implementation of ::ccl_wrapper_release_fields() function for
+ * ::CCLPlatform wrapper objects.
+ * 
+ * @private @memberof ccl_platform
+ * 
+ * @param[in] platf A ::CCLPlatform wrapper object.
+ * */
+static void ccl_platform_release_fields(CCLPlatform* platf) {
+
+	/* Make sure platform wrapper object is not NULL. */
+	g_return_if_fail(platf != NULL);
+	
+	/* Release devices wrappers. */
+	ccl_dev_container_release_devices((CCLDevContainer*) platf);
+
+#ifdef CL_VERSION_1_2
+
+	/* Unload platform compiler if underlying platform supports it. 
+	 * Ignore errors, if they occur 0 is returned, so we won't
+	 * unload platform compiler in that case. */
+	if (ccl_platform_get_opencl_version(platf, NULL) >= 1.2) {
+		clUnloadPlatformCompiler(ccl_platform_unwrap(platf));
+	}
+	
+#endif
+
+}
+
 /** 
  * @internal
  * Implementation of ::ccl_dev_container_get_cldevices() for the
@@ -204,7 +234,7 @@ finish:
 void ccl_platform_destroy(CCLPlatform* platf) {
 	
 	ccl_wrapper_unref((CCLWrapper*) platf, sizeof(CCLPlatform),
-		(ccl_wrapper_release_fields) ccl_dev_container_release_devices, 
+		(ccl_wrapper_release_fields) ccl_platform_release_fields, 
 		NULL, NULL); 
 
 }
