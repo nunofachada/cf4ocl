@@ -17,6 +17,14 @@ Library code is licensed under [LGPLv3][], while the remaining code
 Currently _cf4ocl_ 2 is alpha software. The stable 1.x branch can be
 found at https://github.com/FakenMC/cf4ocl.
 
+Features:
+=========
+
+* Wraps the verbose OpenCL C API in a object-oriented, clear and simple 
+API
+* OpenCL version independent
+* Very simple profiling
+
 Stuff to add here:
 ==================
 
@@ -25,6 +33,14 @@ Stuff to add here:
 * Dependencies
 * Downloads, installing
 * More?
+
+Not yet implemented:
+====================
+
+* OpenGL and DirectX interoperability
+* Support for sub-devices
+* clEnqueueNativeKernel()
+* Pipes and SVM (OpenCL 2.0 only)
 
 Other useful C frameworks/utilities for OpenCL
 ==============================================
