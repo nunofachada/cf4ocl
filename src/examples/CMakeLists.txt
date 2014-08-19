@@ -16,7 +16,7 @@ set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES}
 set(matmult_EXTRALIBS m)
 
 # Use OpenMP in matmult example?
-find_package(OpenMP)
+find_package(OpenMP QUIET)
 
 # Add common examples library
 add_library(examples_common examples_common.c)
