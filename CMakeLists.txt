@@ -54,7 +54,7 @@ add_subdirectory(auxbuild)
 execute_process(COMMAND ${CMAKE_BINARY_DIR}/auxbuild/get_data_path 
 	OUTPUT_VARIABLE DATA_PATH)
 # Normalize path for Windows compatibilty
-file(TO_CMAKE_PATH ${DATA_PATH} DATA_PATH)
+file(TO_CMAKE_PATH "${DATA_PATH} " DATA_PATH)
 
 # Define install subdirs
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})
