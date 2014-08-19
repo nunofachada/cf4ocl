@@ -42,7 +42,7 @@ ENDIF()
 
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/src/lib)
+	${CMAKE_SOURCE_DIR}/src/cf4ocl2 ${CMAKE_SOURCE_DIR}/src)
 	
 # Initialize doc exclude path
 set(DOC_EXCLUDE_PATHS ""  CACHE INTERNAL "")

@@ -5,7 +5,7 @@ option(BUILD_EXAMPLES "Build and install examples?" ON)
 option(BUILD_UTILS "Build and install utilities?" ON)
 
 # Library, examples and utilities are included in the ALL target
-add_subdirectory(lib)
+add_subdirectory(cf4ocl2)
 if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()

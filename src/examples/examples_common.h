@@ -31,12 +31,7 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "profiler.h"
-#include "errors.h"
-#include "program_wrapper.h"
-#include "kernel_wrapper.h"
-#include "context_wrapper.h"
-#include "buffer_wrapper.h"
+#include <cf4ocl2.h>
 
 /**
  * Parse a pair of positive integers from a string separated by a comma.

@@ -15,16 +15,19 @@ endif()
 add_subdirectory(ocl_stub)
 
 # CF4OCL library for tests
-add_library(${PROJECT_NAME}_TESTING ../lib/errors.c ../lib/profiler.c 
-	../lib/types.c ../lib/common.c ../lib/platforms.c
-	../lib/kernel_arg.c ../lib/device_query.c ../lib/device_selector.c
-	../lib/platform_wrapper.c ../lib/device_wrapper.c 
-	../lib/context_wrapper.c ../lib/kernel_wrapper.c 
-	../lib/program_wrapper.c ../lib/queue_wrapper.c 
-	../lib/event_wrapper.c
-	../lib/abstract_wrapper.c ../lib/abstract_dev_container_wrapper.c 
-	../lib/memobj_wrapper.c ../lib/buffer_wrapper.c 
-	../lib/image_wrapper.c ../lib/sampler_wrapper.c)
+set(CCL_LIB_DIR "../cf4ocl2/")
+add_library(${PROJECT_NAME}_TESTING 
+	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c 
+	${CCL_LIB_DIR}types.c ${CCL_LIB_DIR}common.c 
+	${CCL_LIB_DIR}platforms.c ${CCL_LIB_DIR}kernel_arg.c
+	${CCL_LIB_DIR}device_query.c ${CCL_LIB_DIR}device_selector.c
+	${CCL_LIB_DIR}platform_wrapper.c ${CCL_LIB_DIR}device_wrapper.c 
+	${CCL_LIB_DIR}context_wrapper.c ${CCL_LIB_DIR}kernel_wrapper.c 
+	${CCL_LIB_DIR}program_wrapper.c ${CCL_LIB_DIR}queue_wrapper.c 
+	${CCL_LIB_DIR}event_wrapper.c ${CCL_LIB_DIR}abstract_wrapper.c 
+	${CCL_LIB_DIR}abstract_dev_container_wrapper.c 
+	${CCL_LIB_DIR}memobj_wrapper.c ${CCL_LIB_DIR}buffer_wrapper.c 
+	${CCL_LIB_DIR}image_wrapper.c ${CCL_LIB_DIR}sampler_wrapper.c)
 
 target_link_libraries(${PROJECT_NAME}_TESTING 
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
