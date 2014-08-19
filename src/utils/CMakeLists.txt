@@ -16,7 +16,7 @@ set_target_properties(${UTILS} PROPERTIES
 	VERSION ${${PROJECT_NAME}_VERSION})
 
 # How to install utils
-install(TARGETS ${UTILS} RUNTIME DESTINATION bin)
+install(TARGETS ${UTILS} RUNTIME DESTINATION ${INSTALL_SUBDIR_BIN})
 
 # Add a target which builds all utilities
 add_custom_target(utils DEPENDS ${UTILS})

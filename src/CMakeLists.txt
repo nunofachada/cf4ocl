@@ -18,4 +18,5 @@ add_subdirectory(tests EXCLUDE_FROM_ALL)
 
 # Where to install aggregate header
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.h
-	DESTINATION include)
+	DESTINATION ${INSTALL_SUBDIR_INCLUDE})
+

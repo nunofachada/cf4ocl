@@ -65,11 +65,11 @@
 	}
 
 
-/** Print device requirements for program. */
+/* Print device requirements for program. */
 void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
 
-/** Get full kernel path name. */
-gchar* ccl_ex_kernelpath_get(gchar* kernel_filename, char* exec_name);
+/* Get full kernel path name. */
+gchar* ccl_ex_kernelpath_get(gchar* kernel_filename);
 
 /**
  * Error codes.
@@ -85,7 +85,7 @@ enum ccl_ex_error_codes {
  * in the cf4ocl examples. */
 #define CCL_EX_ERROR ccl_ex_error_quark()
 
-/** Resolves to error category identifying string, in this case
+/* Resolves to error category identifying string, in this case
  * an error in the cf4ocl examples. */
 GQuark ccl_ex_error_quark(void);
 

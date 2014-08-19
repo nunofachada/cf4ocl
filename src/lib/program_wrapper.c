@@ -1077,7 +1077,7 @@ finish:
  * 
  * @public @memberof ccl_program
  *  
- * @param[in] krnl A program wrapper object.
+ * @param[in] prg A program wrapper object.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this 

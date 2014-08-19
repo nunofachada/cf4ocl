@@ -50,42 +50,45 @@ void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem) {
 /** 
  * Get full kernel path name. 
  * 
- * Assumes the following:
- * * Kernel file is in the same place as executable.
- * * Argv[0] corresponds to the invocation of the executable.
- * 
  * @param[in] kernel_filename Name of file containing kernels.
- * @param[in] exec_name Name of executable (argv[0]).
- * @return The full path of the kernel file, should be freed with 
- * g_free().
+ * @return The full path of the kernel file (should be freed with 
+ * g_free()), or `NULL` if file doesn't exist.
  * */
-gchar* ccl_ex_kernelpath_get(gchar* kernel_filename, char* exec_name) {
+gchar* ccl_ex_kernelpath_get(gchar* kernel_filename) {
 	
-	/* Required variables. */
-	gchar *exec_path = NULL, *kernel_dir = NULL, *kernel_path = NULL;
 	
-	/* Get path of the executable. */
-	exec_path = g_find_program_in_path(exec_name);
+	/* System-wide data paths. */
+	const gchar* const* sdd;
+	/* Full kernel path name. */
+	gchar* fullpath;
 	
-	/* Get directory component of the path of the executable. */
-	kernel_dir = g_path_get_dirname(exec_path);
+	/* Give priority to local user path. */
+	fullpath = g_build_filename(g_get_user_data_dir(), "cf4ocl2", "cl", 
+		kernel_filename, NULL);
 	
-	/* Check if it's indeed a directory. */
-	if (!g_file_test(kernel_dir, G_FILE_TEST_IS_DIR)) {
-		/* If it's not a directory, assume current directory. */
-		g_free(kernel_dir);
-		kernel_dir = g_strdup(".");
+	/* If file doesn't exist, reset variable and try system-wide data
+	 * paths. */
+	if (!g_file_test(fullpath, G_FILE_TEST_EXISTS)) {
+		
+		g_free(fullpath);
+		sdd = g_get_system_data_dirs();
+		
+		for (int i = 0; sdd[i] != NULL; ++i) {
+			fullpath = g_build_filename(sdd[i], "cf4ocl2", "cl", 
+				kernel_filename, NULL);
+				
+			if (g_file_test(fullpath, G_FILE_TEST_EXISTS)) {
+				break;
+			}
+			
+			g_free(fullpath);
+			fullpath = NULL;
+		}
+
 	}
 	
-	/* Build full kernel file path. */
-	kernel_path = g_build_filename(kernel_dir, kernel_filename, NULL);
-	
-	/* Free stuff. */
-	g_free(exec_path);
-	g_free(kernel_dir);
-	
 	/* Return full kernel file path. */
-	return kernel_path;
+	return fullpath;
 
 }
 

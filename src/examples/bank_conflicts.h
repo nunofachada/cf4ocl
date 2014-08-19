@@ -20,7 +20,7 @@
  * Bank conflicts example: common headers and definitions.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2015
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 

@@ -47,6 +47,20 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 # Initialize doc exclude path
 set(DOC_EXCLUDE_PATHS ""  CACHE INTERNAL "")
 
+# Add installation aux. programs subdir
+add_subdirectory(auxbuild)
+
+# Determine location where to install kernels
+execute_process(COMMAND ${CMAKE_BINARY_DIR}/auxbuild/get_data_path 
+	OUTPUT_VARIABLE DATA_PATH)
+	
+# Define install subdirs
+set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})
+set(INSTALL_SUBDIR_INCLUDE include)
+set(INSTALL_SUBDIR_BIN bin)
+set(INSTALL_SUBDIR_LIB lib)
+set(INSTALL_SUBDIR_CL ${DATA_PATH}/${PROJECT_NAME}/cl)
+
 # Add src folder
 add_subdirectory(src)
 
@@ -55,13 +69,16 @@ add_subdirectory(scripts)
 
 # add a target to generate API documentation with Doxygen
 if(DOXYGEN_FOUND)
+	# Set doc directory
 	set(DOCS_DIRECTORY "doc")
+	# Install docs?
+	option(DOC_INSTALL "Install API documentation?" OFF)
 	# Create links to OpenCL API when OpenCL functions are mentioned?
 	# This is slow and requires Bash and other command-line utilties
 	option(DOC_OPENCL_FUNCTION_URLS "Create links to OpenCL API (much slower)?" OFF)
 	if (DOC_OPENCL_FUNCTION_URLS)
 		# Add tests path to doc exclude path
-		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/docscripts/docfilter.sh")
+		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
 	endif()
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	# Convert GitHub README.md into Doxygen MD format
@@ -82,9 +99,11 @@ if(DOXYGEN_FOUND)
 		${DOCS_DIRECTORY}/html/images
 	)
 	# Add documentation installation target (if the docs have been built)
-	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ DESTINATION share/${PROJECT_NAME} OPTIONAL)
+	if (${DOC_INSTALL})
+		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ 
+			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
+	endif()
 
-	
 endif()
 
 # build a CPack driven installer package

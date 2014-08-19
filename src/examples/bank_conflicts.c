@@ -26,7 +26,7 @@
  * has 16 or 32 banks of local memory.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -175,12 +175,13 @@ int main(int argc, char *argv[]) {
 	ctx = ccl_context_new_gpu(&err);
 	ccl_if_err_goto(err, error_handler);
 
-	/* Get location of kernel file, which should be in the same 
-	 * of the bank_conflicts executable. */
-	kernel_path = ccl_ex_kernelpath_get(kernel_files[0], argv[0]);
+	/* Get location of kernel file. */
+	kernel_path = ccl_ex_kernelpath_get(kernel_files[0]);
+	ccl_if_err_create_goto(err, CCL_EX_ERROR, kernel_path == NULL, 
+		CCL_EX_FAIL, error_handler, "Unable to access kernel file");
 	
 	/* Create program. */
-	prg = ccl_program_new_from_source_file(ctx, kernel_files[0], &err);
+	prg = ccl_program_new_from_source_file(ctx, kernel_path, &err);
 	ccl_if_err_goto(err, error_handler);
 	
 	/* Build program. */
