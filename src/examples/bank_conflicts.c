@@ -172,7 +172,8 @@ int main(int argc, char *argv[]) {
 	prof = ccl_prof_new();
 
 	/* Create a GPU context. */
-	ctx = ccl_context_new_gpu(&err);
+	ctx = ccl_context_new_from_menu_full(
+		dev_idx == -1 ? NULL : &dev_idx, &err);
 	ccl_if_err_goto(err, error_handler);
 
 	/* Get location of kernel file. */
