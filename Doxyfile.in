@@ -32,7 +32,7 @@ PROJECT_NAME           = "cf4ocl (C Framework for OpenCL)"
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = @cf4ocl2_VERSION@+@cf4ocl2_GIT_SHA@
+PROJECT_NUMBER         = @cf4ocl2_VERSION_STRING_FULL@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description 
 # for a project that appears at the top of each page and should give viewer 
@@ -636,6 +636,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md \
+                         @PROJECT_BINARY_DIR@/cf4ocl2/common.h \
                          @PROJECT_SOURCE_DIR@/src \
                          @PROJECT_SOURCE_DIR@/scripts \
                          
@@ -721,7 +722,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = *.in.*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 

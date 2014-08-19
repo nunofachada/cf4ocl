@@ -35,6 +35,13 @@
 #include <glib/gprintf.h>
 #include "oclversions.h"
 
+#define CCL_VERSION_MAJOR @cf4ocl2_VERSION_MAJOR@
+#define CCL_VERSION_MINOR @cf4ocl2_VERSION_MINOR@
+#define CCL_VERSION_PATCH @cf4ocl2_VERSION_PATCH@
+#define CCL_VERSION_TWEAK "@cf4ocl2_VERSION_TWEAK@"
+#define CCL_VERSION_STRING "@cf4ocl2_VERSION_STRING@"
+#define CCL_VERSION_STRING_FULL "@cf4ocl2_VERSION_STRING_FULL@"
+
 #define CCL_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGH" \
 	"IJKLMNOPQRSTUVWXYZ0123456789_."
 
@@ -114,6 +121,9 @@ typedef enum ccl_error_code {
 /** Resolves to error category identifying string, in this case
  * an error in the OpenCL library. */
 #define CCL_OCL_ERROR ccl_ocl_error_quark()
+
+/* Print executable version. */
+void ccl_common_version_print(const char* exec_name);
 
 /* Resolves to error category identifying string, in this case
  * an error in _cf4ocl_. */

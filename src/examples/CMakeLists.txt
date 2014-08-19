@@ -38,7 +38,7 @@ foreach(EXAMPLE ${EXAMPLES})
 endforeach(EXAMPLE)
 
 # Set examples version
-set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
+set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION_STRING})
 
 # Set specific matmult properties
 if (OPENMP_FOUND)

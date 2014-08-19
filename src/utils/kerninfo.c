@@ -67,6 +67,12 @@ int main(int argc, char *argv[]) {
 	/* Parse command line options */
 	/* ************************** */
 
+	/* If version was requested, output version and exit. */
+	if ((argc == 2) && (g_strcmp0("--version", argv[1]) == 0)) {
+		ccl_common_version_print("ccl_kerninfo");
+		exit(0);
+	}
+
 	ccl_if_err_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4), 
 		CCL_ERROR_ARGS, error_handler, 
 		"Usage: %s <program_file> <kernel_name> [device_index]\n", 

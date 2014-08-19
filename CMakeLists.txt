@@ -2,13 +2,16 @@ cmake_minimum_required(VERSION 2.8)
 project(cf4ocl2)
 
 #Get current commit SHA from git
-execute_process(COMMAND git rev-parse --short HEAD OUTPUT_VARIABLE ${PROJECT_NAME}_GIT_SHA)
+execute_process(COMMAND git rev-parse --short HEAD OUTPUT_VARIABLE 
+	${PROJECT_NAME}_GIT_SHA OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # The version number
 set(${PROJECT_NAME}_VERSION_MAJOR 2)
 set(${PROJECT_NAME}_VERSION_MINOR 0)
-set(${PROJECT_NAME}_VERSION_PATCH "0-alpha.1")
-set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
+set(${PROJECT_NAME}_VERSION_PATCH 0)
+set(${PROJECT_NAME}_VERSION_TWEAK "alpha.1")
+set(${PROJECT_NAME}_VERSION_STRING ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
+set(${PROJECT_NAME}_VERSION_STRING_FULL ${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_TWEAK}+${${PROJECT_NAME}_GIT_SHA})
 
 # Set log domain  
 add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
@@ -42,7 +45,8 @@ ENDIF()
 
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/src/cf4ocl2 ${CMAKE_SOURCE_DIR}/src)
+	${CMAKE_SOURCE_DIR}/src/cf4ocl2 ${CMAKE_SOURCE_DIR}/src
+	${CMAKE_BINARY_DIR})
 	
 # Initialize doc exclude path
 set(DOC_EXCLUDE_PATHS ""  CACHE INTERNAL "")
@@ -57,7 +61,8 @@ execute_process(COMMAND ${CMAKE_BINARY_DIR}/auxbuild/get_data_path
 if (${DATA_PATH})
 	file(TO_CMAKE_PATH ${DATA_PATH} DATA_PATH)
 endif()
-
+message(WARNING "DATA_PATH = ${DATA_PATH}")
+	
 # Define install subdirs
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})
 set(INSTALL_SUBDIR_INCLUDE include)

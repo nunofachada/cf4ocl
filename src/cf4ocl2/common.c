@@ -28,6 +28,20 @@
  
 #include "common.h"
 
+/**
+ * Print executable version. 
+ * 
+ * @param[in] exec_name Executable name.
+ * */
+void ccl_common_version_print(const char* exec_name) {
+	g_printf("%s %s\n\nCopyright (C) 2014 Nuno Fachada\n" \
+		"License GPLv3+: GNU GPL version 3 or later" \
+		"<http://gnu.org/licenses/gpl.html>\n" \
+		"This is free software: you are free to change and redistribute it.\n" \
+		"There is NO WARRANTY, to the extent permitted by law.\n\n" \
+		"Written by Nuno Fachada\n", exec_name, CCL_VERSION_STRING_FULL);
+}
+
 /** 
  * Resolves to error category identifying string, in this case an
  * error in _cf4ocl_.

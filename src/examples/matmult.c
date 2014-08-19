@@ -78,9 +78,9 @@
 #define SEED 0
 
 /* A description of the program. */
-#define PROG_DESCRIPTION "Program for testing matrix multiplication on \
-	a OpenCL device (GPU or CPU, although optimized for the former) \
-	and compare with OpenMP implementation on the CPU."
+#define PROG_DESCRIPTION "Program for testing matrix multiplication on " \
+	"a OpenCL device (GPU or CPU, although optimized for the former) " \
+	"and compare with OpenMP implementation on the CPU."
 
 /* Command line arguments and respective default values. */
 static int a_dim[] = {A_COLS, A_ROWS};
@@ -95,6 +95,7 @@ static int kernel_id = KERNEL_ID;
 static gboolean verbose = VERBOSE;
 static guint32 seed = SEED;
 static gchar* output_export = NULL;
+static gboolean version = FALSE;
 
 /* Callback functions to parse pairs of numbers. */
 static gboolean mm_parse_a(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
@@ -139,14 +140,14 @@ static GOptionEntry entries[] = {
 	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,
 		"Print input and output matrices to stderr",
 		NULL},
-	{"list",      'i', 0, G_OPTION_ARG_NONE,      &dev_list,
+	{"list",      'i', 0, G_OPTION_ARG_NONE,     &dev_list,
 		"List available devices (selectable with -d) and exit",
 		NULL},
 	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,
 		"Device index, auto-selects device from menu (takes priority " \
 		"over -n option)",
 		"INDEX"},
-	{"name",     'n', 0, G_OPTION_ARG_STRING,   &name,
+	{"name",     'n',  0, G_OPTION_ARG_STRING,   &name,
 		"Selects device by device, platform or vendor name",
 		"NAME"},
 	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts,
@@ -155,6 +156,9 @@ static GOptionEntry entries[] = {
 	{"output",    'o', 0, G_OPTION_ARG_FILENAME, &output_export,
 		"File where to export profiling info (default is none)",
 		"FILE"},
+	{"version",     0, 0, G_OPTION_ARG_NONE,     &version,
+		"Output version information and exit",
+		NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -239,7 +243,12 @@ int main(int argc, char *argv[]) {
 	matmult_args_parse(argc, argv, &err);
 	ccl_if_err_goto(err, error_handler);
 	
-	/* If device list was required, present list of devices and
+	/* If version was requested, output version and exit. */
+	if (version) {
+		ccl_common_version_print("cf4ocl Matmult example");
+		exit(0);
+	}
+	/* If device list was requested, present list of devices and
 	 * exit. */
 	if (dev_list) {
 		g_printf("\n");

@@ -35,6 +35,7 @@ static guint opt_dev = G_MAXUINT;
 static gboolean opt_nfound = FALSE;
 static gboolean opt_verb = FALSE;
 static gboolean opt_list = FALSE;
+static gboolean version = FALSE;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
@@ -54,6 +55,8 @@ static GOptionEntry entries[] = {
 	 "Show known parameters even if not found in device", NULL},
 	{"verbose",  'v', 0, G_OPTION_ARG_NONE,               &opt_verb,
 	 "Show description of each parameter",                NULL},
+	{"version",    0, 0, G_OPTION_ARG_NONE,               &version,
+	 "Output version information and exit",               NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
 };
 
@@ -106,6 +109,12 @@ int main(int argc, char* argv[]) {
 	/* Parse command line options. */
 	ccl_device_query_args_parse(argc, argv, &err);
 	ccl_if_err_goto(err, error_handler);
+	
+	/* If version was requested, output version and exit. */
+	if (version) {
+		ccl_common_version_print("ccl_devinfo");
+		exit(0);
+	}
 	
 	/* Check if user requested a list of known information parameters. */
 	if (opt_list) {

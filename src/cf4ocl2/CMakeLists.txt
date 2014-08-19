@@ -6,18 +6,23 @@ set(SRC errors.c profiler.c types.c common.c platforms.c
 	abstract_wrapper.c abstract_dev_container_wrapper.c 
 	memobj_wrapper.c buffer_wrapper.c image_wrapper.c sampler_wrapper.c)
 
+# Setup the configuration header
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.in.h 
+	${CMAKE_BINARY_DIR}/cf4ocl2/common.h @ONLY)
+
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
 # This is required for Windows compilation
-target_link_libraries(${PROJECT_NAME} ${GLIB_LIBRARIES} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} 
+	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
 
 # This target is just an alias for cf4ocl
 add_custom_target(lib DEPENDS ${PROJECT_NAME})
 
 # Set library version
 set_target_properties(${PROJECT_NAME} PROPERTIES 
-	VERSION ${${PROJECT_NAME}_VERSION}
+	VERSION ${${PROJECT_NAME}_VERSION_STRING}
 	SOVERSION ${${PROJECT_NAME}_VERSION_MAJOR})
 
 # Where to install lib
@@ -29,4 +34,9 @@ install(TARGETS ${PROJECT_NAME}
 # Where to install headers
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME}
-	FILES_MATCHING PATTERN "*.h")
+	FILES_MATCHING PATTERN "*.h"
+	PATTERN "*.in.h" EXCLUDE)
+
+# Install the common header
+install(FILES ${CMAKE_BINARY_DIR}/common.h
+         DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME})

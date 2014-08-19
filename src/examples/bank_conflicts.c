@@ -53,6 +53,7 @@ static gchar* compiler_opts = NULL;
 static gboolean dev_list = FALSE;
 static int dev_idx = -1;
 static int stride = STRIDE;
+static gboolean version;
 
 /* Callback functions to parse gws and lws. */
 static gboolean bct_parse_gws(const gchar *option_name, 
@@ -87,6 +88,9 @@ static GOptionEntry entries[] = {
 		"Device index (if not given and more than one device is "\
 		"available, chose device from menu)", 
 		"INDEX"},
+	{"version",     0,  0, G_OPTION_ARG_NONE,     &version,
+		"Output version information and exit",
+		NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
@@ -151,7 +155,12 @@ int main(int argc, char *argv[]) {
 	g_option_context_parse(opt_ctx, &argc, &argv, &err);
 	ccl_if_err_goto(err, error_handler);
 	
-	/* If device list was required, present list of devices and
+	/* If version was requested, output version and exit. */
+	if (version) {
+		ccl_common_version_print("cf4ocl Bankconf example");
+		exit(0);
+	}
+	/* If device list was requested, present list of devices and
 	 * exit. */
 	if (dev_list) {
 		g_printf("\n");
