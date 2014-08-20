@@ -26,8 +26,8 @@ Feeback:
 ========
 
 Clone, build and install the code, the a look at the 
-[examples][https://github.com/FakenMC/cf4ocl/tree/master/src/examples] 
-and the [v2.0.0-alpha API][http://fakenmc.github.io/cf4ocl/docs/v2.0.0-alpha].
+[examples](https://github.com/FakenMC/cf4ocl/tree/master/src/examples) 
+and the [v2.0.0-alpha API](http://fakenmc.github.io/cf4ocl/docs/v2.0.0-alpha).
 The API may change until the beta release. Any feedback is appreciated.
 
 Soon:
