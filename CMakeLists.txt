@@ -47,27 +47,12 @@ ENDIF()
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} 
 	${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src
 	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
-	
-# Initialize doc exclude path
-set(DOC_EXCLUDE_PATHS ""  CACHE INTERNAL "")
 
-# Add installation aux. programs subdir
-add_subdirectory(auxbuild)
-
-# Determine location where to install kernels
-execute_process(COMMAND ${CMAKE_BINARY_DIR}/auxbuild/get_data_path 
-	OUTPUT_VARIABLE DATA_PATH)
-# Normalize path for Windows compatibility
-if (${DATA_PATH})
-	file(TO_CMAKE_PATH ${DATA_PATH} DATA_PATH)
-endif()
-	
 # Define install subdirs
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})
 set(INSTALL_SUBDIR_INCLUDE include)
 set(INSTALL_SUBDIR_BIN bin)
 set(INSTALL_SUBDIR_LIB lib)
-set(INSTALL_SUBDIR_CL ${DATA_PATH}/${PROJECT_NAME}/cl)
 
 # Add src folder
 add_subdirectory(src)

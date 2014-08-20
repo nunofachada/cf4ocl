@@ -185,10 +185,9 @@ int main(int argc, char *argv[]) {
 		dev_idx == -1 ? NULL : &dev_idx, &err);
 	ccl_if_err_goto(err, error_handler);
 
-	/* Get location of kernel file. */
-	kernel_path = ccl_ex_kernelpath_get(kernel_files[0]);
-	ccl_if_err_create_goto(err, CCL_EX_ERROR, kernel_path == NULL, 
-		CCL_EX_FAIL, error_handler, "Unable to access kernel file");
+	/* Get location of kernel file, which should be in the same location 
+	 * of the bankconf executable. */
+	kernel_path = ccl_ex_kernelpath_get(kernel_files[0], argv[0]);
 	
 	/* Create program. */
 	prg = ccl_program_new_from_source_file(ctx, kernel_path, &err);

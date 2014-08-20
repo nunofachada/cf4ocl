@@ -292,10 +292,9 @@ int main(int argc, char *argv[]) {
 
 	g_printf("\n   == Using device '%s' from '%s'\n", dev_name, dev_vendor);
 	
-	/* Get location of kernel file. */
-	kernel_path = ccl_ex_kernelpath_get(kernel_files[0]);
-	ccl_if_err_create_goto(err, CCL_EX_ERROR, kernel_path == NULL, 
-		CCL_EX_FAIL, error_handler, "Unable to access kernel file");
+	/* Get location of kernel file, which should be in the same location 
+	 * of the matmult executable. */
+	kernel_path = ccl_ex_kernelpath_get(kernel_files[0], argv[0]);
 	
 	/* Create and build program. */
 	prg = ccl_program_new_from_source_file(ctx, kernel_path, &err);

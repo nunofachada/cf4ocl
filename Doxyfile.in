@@ -637,7 +637,9 @@ WARN_LOGFILE           =
 
 INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md \
                          @PROJECT_BINARY_DIR@/cf4ocl2/common.h \
-                         @PROJECT_SOURCE_DIR@/src \
+                         @PROJECT_SOURCE_DIR@/src/cf4ocl2 \
+                         @PROJECT_SOURCE_DIR@/src/tests \
+                         @PROJECT_SOURCE_DIR@/src/utils \
                          @PROJECT_SOURCE_DIR@/scripts \
                          
 USE_MDFILE_AS_MAINPAGE = README.doxy.md
@@ -705,10 +707,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is 
 # run.
 
-EXCLUDE                = bin \
-                         obj \
-                         doc \
-                         @DOC_EXCLUDE_PATHS@
+EXCLUDE                = @DOC_EXCLUDE_PATHS@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
@@ -991,17 +990,17 @@ DOCSET_FEEDNAME        = "Doxygen generated docs"
 # reverse domain-name style string, e.g. com.mycompany.MyDocSet. Doxygen 
 # will append .docset to the name.
 
-DOCSET_BUNDLE_ID       = org.doxygen.Project
+DOCSET_BUNDLE_ID       = com.fakenmc.cf4ocl2
 
 # When GENERATE_PUBLISHER_ID tag specifies a string that should uniquely identify 
 # the documentation publisher. This should be a reverse domain-name style 
 # string, e.g. com.mycompany.MyDocSet.documentation.
 
-DOCSET_PUBLISHER_ID    = org.doxygen.Publisher
+DOCSET_PUBLISHER_ID    = com.fakenmc
 
 # The GENERATE_PUBLISHER_NAME tag identifies the documentation publisher.
 
-DOCSET_PUBLISHER_NAME  = Publisher
+DOCSET_PUBLISHER_NAME  = FakenMC
 
 # If the GENERATE_HTMLHELP tag is set to YES, additional index files 
 # will be generated that can be used as input for tools like the 
@@ -1064,7 +1063,7 @@ QCH_FILE               =
 # Qt Help Project output. For more information please see 
 # http://doc.trolltech.com/qthelpproject.html#namespace
 
-QHP_NAMESPACE          = org.doxygen.Project
+QHP_NAMESPACE          = com.fakenmc.cf4ocl2
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 
@@ -1115,7 +1114,7 @@ GENERATE_ECLIPSEHELP   = NO
 # the directory name containing the HTML and XML files should also have 
 # this name.
 
-ECLIPSE_DOC_ID         = org.doxygen.Project
+ECLIPSE_DOC_ID         = com.fakenmc.cf4ocl2
 
 # The DISABLE_INDEX tag can be used to turn on/off the condensed index (tabs) 
 # at top of each HTML page. The value NO (the default) enables the index and 

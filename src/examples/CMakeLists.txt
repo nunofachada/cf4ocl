@@ -1,15 +1,6 @@
 # List of examples
 SET(EXAMPLES matmult bank_conflicts)
 
-# Exclude examples from documentation?
-if (DOXYGEN_FOUND) 
-	option(DOC_EXCLUDE_EXAMPLES "Exclude examples from API docs?" ON)
-	if (DOC_EXCLUDE_EXAMPLES)
-		# Add examples path to doc exclude path
-		set(DOC_EXCLUDE_PATHS "${CMAKE_CURRENT_SOURCE_DIR} ${DOC_EXCLUDE_PATHS}" CACHE INTERNAL "")
-	endif()
-endif()
-
 # Common libraries for examples
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES} 
 	examples_common)
@@ -25,24 +16,19 @@ add_library(examples_common examples_common.c)
 foreach(EXAMPLE ${EXAMPLES})
 	add_executable(${EXAMPLE} ${EXAMPLE}.c)
 	target_link_libraries(${EXAMPLE} ${COMMON_LIBS} ${${EXAMPLE}_EXTRALIBS})
-	set_target_properties(${EXAMPLE} PROPERTIES OUTPUT_NAME ${EXECS_PREFIX}${EXAMPLE})
 	# Copy the OpenCL kernel to the same location as the example executable
 	add_custom_command(TARGET ${EXAMPLE} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 		${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl
 		$<TARGET_FILE_DIR:${EXAMPLE}>
 	)
-	# How to install examples
-	install(TARGETS ${EXAMPLE} RUNTIME DESTINATION ${INSTALL_SUBDIR_BIN})
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl DESTINATION ${INSTALL_SUBDIR_CL})
 endforeach(EXAMPLE)
-
-# Set examples version
-set_target_properties(${EXAMPLES} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION_STRING})
 
 # Set specific matmult properties
 if (OPENMP_FOUND)
-	set_target_properties(matmult PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DCF4OCL_USE_OPENMP" LINK_FLAGS ${OpenMP_C_FLAGS})
+	set_target_properties(matmult PROPERTIES 
+		COMPILE_FLAGS "${OpenMP_C_FLAGS} -DCF4OCL_USE_OPENMP" 
+		LINK_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
 # Add a target which builds all examples

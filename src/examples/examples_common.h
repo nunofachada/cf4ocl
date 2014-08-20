@@ -64,7 +64,7 @@
 void ccl_ex_reqs_print(size_t* gws, size_t* lws, size_t gmem, size_t lmem);
 
 /* Get full kernel path name. */
-gchar* ccl_ex_kernelpath_get(gchar* kernel_filename);
+gchar* ccl_ex_kernelpath_get(gchar* kernel_filename, char* exec_name);
 
 /**
  * Error codes.
