@@ -5,26 +5,53 @@ The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99
 object-oriented framework for developing and benchmarking OpenCL 
 projects in the C programming language. It aims to:
 
-1. Promote the rapid development of OpenCL C programs.
+1. Promote the rapid development of OpenCL programs in C.
 2. Assist in the benchmarking of OpenCL events, such as kernel execution 
 and data transfers.
 3. Simplify the analysis of the OpenCL environment and of kernel 
 requirements.
 
-Library code is licensed under [LGPLv3][], while the remaining code
-(utilities, examples and tests) is licensed under [GPLv3][].
+Currently _cf4ocl_ 2 is alpha software. The stable 1.3.x branch can be
+found at https://github.com/FakenMC/cf4ocl/tree/v1x.
 
-Currently _cf4ocl_ 2 is alpha software. The stable 1.x branch can be
-found at https://github.com/FakenMC/cf4ocl.
+Features:
+=========
 
-Stuff to add here:
-==================
+* Wraps the verbose OpenCL C API in a object-oriented, clear and simple 
+API
+* OpenCL version independent
+* Very simple and thourough profiling
 
-* Simple and atractive example
+Feeback:
+========
+
+Clone, build and install the code, the a look at the 
+[examples][https://github.com/FakenMC/cf4ocl/tree/master/src/examples] 
+and the [v2.0.0-alpha API][http://fakenmc.github.io/cf4ocl/docs/v2.0.0-alpha].
+The API may change until the beta release. Any feedback is appreciated.
+
+Soon:
+=====
+
+* Simple and clear example
 * Links to GitHub wiki pages with other information and examples
 * Dependencies
 * Downloads, installing
 * More?
+
+Not yet implemented:
+====================
+
+* OpenGL and DirectX interoperability
+* Support for sub-devices
+* clEnqueueNativeKernel()
+* Pipes and SVM (OpenCL 2.0 only)
+
+License:
+========
+
+Library code is licensed under [LGPLv3][], while the remaining code
+(utilities, examples and tests) is licensed under [GPLv3][].
 
 Other useful C frameworks/utilities for OpenCL
 ==============================================
