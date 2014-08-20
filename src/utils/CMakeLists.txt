@@ -1,5 +1,5 @@
 # List of utilities
-set(UTILS device_query kernel_info)
+set(UTILS devinfo kerninfo)
 
 # Common libs for utilities
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
@@ -13,10 +13,10 @@ endforeach(UTIL)
 
 # Set utils version
 set_target_properties(${UTILS} PROPERTIES 
-	VERSION ${${PROJECT_NAME}_VERSION})
+	VERSION ${${PROJECT_NAME}_VERSION_STRING})
 
 # How to install utils
-install(TARGETS ${UTILS} RUNTIME DESTINATION bin)
+install(TARGETS ${UTILS} RUNTIME DESTINATION ${INSTALL_SUBDIR_BIN})
 
 # Add a target which builds all utilities
 add_custom_target(utils DEPENDS ${UTILS})

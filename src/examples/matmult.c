@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * @brief Matrix multiplication examples.
+ * Matrix multiplication examples.
  * 
  * The OpenCL matrix multiplication kernels 0 to 4 are based on the 
  * [CUDA best practices guide](http://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html). 
@@ -40,43 +40,47 @@
  * runs on the CPU.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html) 
  * */
 
 #include "matmult.h"
 
-/** Default number of columns in Matrix A. */
+/* Default number of columns in Matrix A. */
 #define A_COLS 128
-/** Default number of rows in Matrix A. */
+/* Default number of rows in Matrix A. */
 #define A_ROWS 256
-/** Default number of columns in Matrix B. */
+/* Default number of columns in Matrix B. */
 #define B_COLS 16
-/** Number of rows in matrix B must be equal to number of columns in matrix A. */
+/* Number of rows in matrix B must be equal to number of columns in 
+ * matrix A. */
 #define B_ROWS A_COLS
 
-/** Default workgroup size, dimension 0. */
+/* Default workgroup size, dimension 0. */
 #define LWS_X 32
-/** Default workgroup size, dimension 1. */
+/* Default workgroup size, dimension 1. */
 #define LWS_Y 16
 
-/** Default minimum range value (from). */
+/* Default minimum range value (from). */
 #define RANGE_MATRIX_FROM -100
 
-/** Default maximum range value (to). */
+/* Default maximum range value (to). */
 #define RANGE_MATRIX_TO 100
 
-/** Default kernel selection: 0, 1 or 2 (higher values correspond to more optimized kernels). */
+/* Default kernel selection: 0, 1 or 2 (higher values correspond to 
+ * more optimized kernels). */
 #define KERNEL_ID 0 
 
-/** Default verbose status. */
+/* Default verbose status. */
 #define VERBOSE FALSE
 
-/** Default seed. */
+/* Default seed. */
 #define SEED 0
 
-/** A description of the program. */
-#define PROG_DESCRIPTION "Program for testing matrix multiplication on a OpenCL device (GPU or CPU, although optimized for the former) and compare with OpenMP implementation on the CPU."
+/* A description of the program. */
+#define PROG_DESCRIPTION "Program for testing matrix multiplication on " \
+	"a OpenCL device (GPU or CPU, although optimized for the former) " \
+	"and compare with OpenMP implementation on the CPU."
 
 /* Command line arguments and respective default values. */
 static int a_dim[] = {A_COLS, A_ROWS};
@@ -84,97 +88,175 @@ static int b_dim[] = {B_COLS, B_ROWS};
 static size_t lws[] = {LWS_X, LWS_Y};
 static int matrix_range[] = {RANGE_MATRIX_FROM, RANGE_MATRIX_TO};
 static gchar* compiler_opts = NULL;
+static gboolean dev_list = FALSE;
 static int dev_idx = -1;
-static gchar* dev_name = NULL;
-static gchar* dev_vendor = NULL;
-static gchar* platf_name = NULL;
+static gchar* name = NULL;
 static int kernel_id = KERNEL_ID;
 static gboolean verbose = VERBOSE;
 static guint32 seed = SEED;
 static gchar* output_export = NULL;
+static gboolean version = FALSE;
 
 /* Callback functions to parse pairs of numbers. */
 static gboolean mm_parse_a(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	clexp_parse_pairs(value, a_dim, option_name, data, err);
+	ccl_ex_parse_pairs(value, a_dim, option_name, data, err);
 }
 static gboolean mm_parse_b(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	clexp_parse_pairs(value, b_dim, option_name, data, err);
+	ccl_ex_parse_pairs(value, b_dim, option_name, data, err);
 }
 static gboolean mm_parse_lws(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	clexp_parse_pairs(value, lws, option_name, data, err);
+	ccl_ex_parse_pairs(value, lws, option_name, data, err);
 }
 static gboolean mm_parse_rge(const gchar *option_name, const gchar *value, gpointer data, GError **err) {
-	clexp_parse_pairs(value, matrix_range, option_name, data, err);
+	ccl_ex_parse_pairs(value, matrix_range, option_name, data, err);
 }
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"kernel",    'k', 0, G_OPTION_ARG_INT,      &kernel_id,     "kernel selection: 0-2 (C=AB), 3-4 (C=AA^T) (default is " STR(KERNEL_ID) ")",             "ID"},
-	{"asize",     'a', 0, G_OPTION_ARG_CALLBACK, mm_parse_a,     "Size (cols,rows) of matrix A (default is " STR(A_COLS) "," STR(A_ROWS) ")",              "SIZE,SIZE"},
-	{"bsize",     'b', 0, G_OPTION_ARG_CALLBACK, mm_parse_b,     "Size (cols,rows) of matrix B (default is " STR(B_COLS) "," STR(B_ROWS) ")",              "SIZE,SIZE"},
-	{"localsize", 'l', 0, G_OPTION_ARG_CALLBACK, mm_parse_lws,   "Local work size (default is " STR(LWS_X) "," STR(LWS_Y) ")",                             "SIZE,SIZE"},
-	{"range",     'r', 0, G_OPTION_ARG_CALLBACK, mm_parse_rge,   "Matrix range of values (default is " STR(RANGE_MATRIX_FROM) "," STR(RANGE_MATRIX_TO)")", "MIN,MAX"},
-	{"seed",      's', 0, G_OPTION_ARG_INT,      &seed,          "RNG seed (default is " STR(SEED)")",                                                     "SEED"},
-	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,       "Print input and output matrices to stderr",                                              NULL},
-	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,       "Device index, auto-selects device from menu (takes priority on -n and -p options)",      "INDEX"},
-	{"dname",     'n', 0, G_OPTION_ARG_STRING,   &dev_name,      "Device name, selects device by name",                                                    "NAME"},
-	{"dvendor",   'e', 0, G_OPTION_ARG_STRING,   &dev_vendor,    "Device vendor, selects device by vendor",                                                "VENDOR"},
-	{"dplatf",    'p', 0, G_OPTION_ARG_STRING,   &platf_name,    "Platform name, selects device by platform name",                                         "NAME"},
-	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts, "Extra OpenCL compiler options",                                                          "OPTS"},
-	{"output",    'o', 0, G_OPTION_ARG_FILENAME, &output_export, "File where to export profiling info (default is none)",                                  "FILE"},
+	{"kernel",    'k', 0, G_OPTION_ARG_INT,      &kernel_id,
+		"kernel selection: 0-2 (C=AB), 3-4 (C=AA^T) (default is " \
+		G_STRINGIFY(KERNEL_ID) ")",
+		"ID"},
+	{"asize",     'a', 0, G_OPTION_ARG_CALLBACK, mm_parse_a,
+		"Size (cols,rows) of matrix A (default is " G_STRINGIFY(A_COLS) \
+		 "," G_STRINGIFY(A_ROWS) ")",
+		 "SIZE,SIZE"},
+	{"bsize",     'b', 0, G_OPTION_ARG_CALLBACK, mm_parse_b,
+		"Size (cols,rows) of matrix B (default is " G_STRINGIFY(B_COLS) \
+		"," G_STRINGIFY(B_ROWS) ")",
+		"SIZE,SIZE"},
+	{"localsize", 'l', 0, G_OPTION_ARG_CALLBACK, mm_parse_lws,
+		"Local work size (default is " G_STRINGIFY(LWS_X) "," \
+		G_STRINGIFY(LWS_Y) ")",
+		"SIZE,SIZE"},
+	{"range",     'r', 0, G_OPTION_ARG_CALLBACK, mm_parse_rge,
+		"Matrix range of values (default is " \
+		G_STRINGIFY(RANGE_MATRIX_FROM) "," \
+		G_STRINGIFY(RANGE_MATRIX_TO)")", 
+		"MIN,MAX"},
+	{"seed",      's', 0, G_OPTION_ARG_INT,      &seed,
+		"RNG seed (default is " G_STRINGIFY(SEED)")",
+		"SEED"},
+	{"verbose",   'v', 0, G_OPTION_ARG_NONE,     &verbose,
+		"Print input and output matrices to stderr",
+		NULL},
+	{"list",      'i', 0, G_OPTION_ARG_NONE,     &dev_list,
+		"List available devices (selectable with -d) and exit",
+		NULL},
+	{"device",    'd', 0, G_OPTION_ARG_INT,      &dev_idx,
+		"Device index, auto-selects device from menu (takes priority " \
+		"over -n option)",
+		"INDEX"},
+	{"name",     'n',  0, G_OPTION_ARG_STRING,   &name,
+		"Selects device by device, platform or vendor name",
+		"NAME"},
+	{"compiler",  'c', 0, G_OPTION_ARG_STRING,   &compiler_opts,
+		"Extra OpenCL compiler options",
+		"OPTS"},
+	{"output",    'o', 0, G_OPTION_ARG_FILENAME, &output_export,
+		"File where to export profiling info (default is none)",
+		"FILE"},
+	{"version",     0, 0, G_OPTION_ARG_NONE,     &version,
+		"Output version information and exit",
+		NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }	
 };
 
 /* Kernel file. */
-static char* kernelFiles[] = {"matmult.cl"};
+static char* kernel_files[] = {"matmult.cl"};
 
 /** 
- * @brief OpenCL and OpenMP matrix multiplication main function. 
+ * OpenCL and OpenMP matrix multiplication main function. 
  * 
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
- * @return #CLEXP_SUCCESS if program returns with no error, or 
- * #CLEXP_FAIL otherwise.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
+ * @return #CCL_EX_SUCCESS if program returns with no error, or 
+ * #CCL_EX_FAIL otherwise.
  * */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
 	/* ************* */
 	/* Program vars. */
 	/* ************* */
 
-	int status;                                    /* Function and program return status. */
-	CLUDeviceInfo deviceInfo;                      /* Select device by returned information strings. */
-	GError *err = NULL;                            /* Error management */
-	GRand* rng = NULL;	                           /* Random number generator. */
-	ProfCLProfile *profile_dev = NULL,             /* Profiler for OpenCL device implementation */
-		*profile_cpu = NULL;                       /* Profiler for OpenMP CPU implementation */
-	CLUZone* zone = NULL;                          /* OpenCL zone (context, platform, program, queues, etc.) */
-	cl_event events[4] = {NULL, NULL, NULL, NULL}; /* OpenCL events */
-	cl_kernel kernel_matmult = NULL;               /* Kernel object */
-	gchar* kernelName = NULL;                      /* Kernel name */
-	gchar* kernelPath = NULL;                      /* Full kernel path. */
-	cl_int *matrixA_host = NULL,                   /* Host matrix A */
-		*matrixB_host = NULL,                      /* Host matrix B */
-		*matrixC_host = NULL;                      /* Host matrix C (calcutated on OpenCL device). */
-	int *matrixC_test = NULL;                      /* Host matrix C (calculated on the CPU). */
-	cl_mem matrixA_device = NULL,                  /* Device matrix A. */
-		matrixB_device = NULL,                     /* Device matrix B. */
-		matrixC_device = NULL;                     /* Device matrix C. */
-	size_t gws[2];                                 /* Global work sizes */
-	size_t sizeMatrixAInBytes = 0,                 /* Size of matrix A in bytes. */
-		sizeMatrixBInBytes = 0,                    /* Size of matrix B in bytes. */
-		sizeMatrixCInBytes = 0;                    /* Size of matrix C in bytes. */
-	size_t globalMemSizeInBytes,                   /* Size of device global memory required. */
-		localMemSizeAInBytes,                      /* Size of local memory required by matrix A (depends on kernel id). */
-		localMemSizeBInBytes;                      /* Size of local memory required by matrix B (depends on kernel id). */
+	/* Function and program return status. */
+	int status;
+	/* Error management */
+	GError* err = NULL;
+	/* Random number generator. */
+	GRand* rng = NULL;
+	/* Profiler for OpenCL device implementation */
+	CCLProf* prof_dev = NULL;
+	/* Profiler for OpenMP CPU implementation */
+	CCLProf* prof_cpu = NULL;
+	/* Device name */
+	char* dev_name;
+	/* Device vendor. */
+	char* dev_vendor;
+	/* Context wrapper. */
+	CCLContext* ctx = NULL;
+	/* Device wrapper. */
+	CCLDevice* dev = NULL;
+	/* Program wrapper. */
+	CCLProgram* prg = NULL;
+	/* Command queue wrapper. */
+	CCLQueue* cq = NULL;
+	/* Kernel wrapper. */
+	CCLKernel* krnl = NULL;
+	/* Kernel name */
+	gchar* kernel_name = NULL;
+	/* Full kernel path. */
+	gchar* kernel_path = NULL;
+	/* Host matrix A */
+	cl_int* matrixA_host = NULL;
+	/* Host matrix B */
+	cl_int* matrixB_host = NULL;
+	/* Host matrix C (calcutated on OpenCL device). */
+	cl_int* matrixC_host = NULL;
+	/* Host matrix C (calculated on the CPU). */
+	int *matrixC_test = NULL;
+	/* Device matrix A. */
+	CCLBuffer* matrixA_dev = NULL;
+	/* Device matrix B. */
+	CCLBuffer* matrixB_dev = NULL;
+	/* Device matrix C. */
+	CCLBuffer* matrixC_dev = NULL;
+	/* Global work sizes */
+	size_t gws[2];
+	/* Size of matrix A in bytes. */
+	size_t size_matA_in_bytes = 0;
+	/* Size of matrix B in bytes. */
+	size_t size_matB_in_bytes = 0;
+	/* Size of matrix C in bytes. */
+	size_t size_matC_in_bytes = 0;
+	/* Size of device global memory required. */
+	size_t g_mem_size_in_bytes;
+	/* Size of local memory required by matrix A (depends on kernel id). */
+	size_t l_mem_sizeA_in_bytes;
+	/* Size of local memory required by matrix B (depends on kernel id). */
+	size_t l_mem_sizeB_in_bytes;
 	
 	/* ************************** */
 	/* Parse command line options */
 	/* ************************** */
 
 	matmult_args_parse(argc, argv, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	ccl_if_err_goto(err, error_handler);
+	
+	/* If version was requested, output version and exit. */
+	if (version) {
+		ccl_common_version_print("cf4ocl Matmult example");
+		exit(0);
+	}
+	/* If device list was requested, present list of devices and
+	 * exit. */
+	if (dev_list) {
+		g_printf("\n");
+		ccl_devsel_print_device_strings(&err);
+		g_printf("\n");
+		ccl_if_err_goto(err, error_handler);
+		exit(0);
+	}
 
 	/* ******************************************************* */
 	/* Initialize profiler, OpenCL variables and build program */
@@ -184,232 +266,115 @@ int main(int argc, char *argv[])
 	rng = g_rand_new_with_seed(seed);
 		
 	/* Profiling / Timmings */
-	profile_dev = profcl_profile_new();
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		profile_dev == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create device profiler object.");
-	profile_cpu = profcl_profile_new();
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		profile_cpu == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create CPU profiler object.");
+	prof_dev = ccl_prof_new();
+	prof_cpu = ccl_prof_new();
 
-	/* Get the required CL zone. */
-	if ((dev_idx != -1) || ((dev_name == NULL) && (platf_name ==NULL))) {
+	/* Create the context wrapper. */
+	if ((dev_idx != -1) || (name == NULL)) {
 		/* Select device by index or user choice. */
-		zone = clu_zone_new(
-			CL_DEVICE_TYPE_ALL, 
-			1, 
-			CL_QUEUE_PROFILING_ENABLE, 
-			clu_menu_device_selector, 
-			(dev_idx != -1 ? &dev_idx : NULL), 
-			&err);
+		ctx = ccl_context_new_from_menu_full(
+			dev_idx != -1 ? &dev_idx : NULL, &err);
 	} else {
-		/* Select device by device name and/or platform name. */
-		if (dev_name != NULL) 
-			g_strlcpy(deviceInfo.device_name, dev_name, CLU_MAX_AUX_BUFF);
-		else 
-			deviceInfo.device_name[0] = '\0';
-		if (dev_vendor != NULL) 
-			g_strlcpy(deviceInfo.device_vendor, dev_vendor, CLU_MAX_AUX_BUFF);
-		else 
-			deviceInfo.device_vendor[0] = '\0';
-		if (platf_name != NULL) 
-			g_strlcpy(deviceInfo.platform_name, platf_name, CLU_MAX_AUX_BUFF);
-		else 
-			deviceInfo.platform_name[0] = '\0';
-		zone = clu_zone_new(
-			CL_DEVICE_TYPE_ALL, 
-			1, 
-			CL_QUEUE_PROFILING_ENABLE, 
-			clu_info_device_selector, 
-			&deviceInfo, 
-			&err);
+		/* Select device by device name, platform name or vendor name. */
+		ctx = ccl_context_new_from_indep_filter(ccl_devsel_indep_string, name, &err);
 	}
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-	printf("\n   == Using device '%s' from '%s' (platform is '%s')\n", 
-		zone->device_info.device_name, 
-		zone->device_info.device_vendor, 
-		zone->device_info.platform_name);
+	ccl_if_err_goto(err, error_handler);
+	
+	/* Print information about selected device. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	ccl_if_err_goto(err, error_handler);
+
+	dev_name = ccl_device_get_array_info(dev, CL_DEVICE_NAME, char*, &err);
+	ccl_if_err_goto(err, error_handler);
+
+	dev_vendor = ccl_device_get_array_info(dev, CL_DEVICE_VENDOR, char*, &err);
+	ccl_if_err_goto(err, error_handler);
+
+	g_printf("\n   == Using device '%s' from '%s'\n", dev_name, dev_vendor);
 	
 	/* Get location of kernel file, which should be in the same location 
-	 * has the matmult executable. */
-	kernelPath = clexp_kernelpath_get(kernelFiles[0], argv[0]);
+	 * of the matmult executable. */
+	kernel_path = ccl_ex_kernelpath_get(kernel_files[0], argv[0]);
 	
-	/* Build program. */
-	status = clu_program_create(zone, &kernelPath, 1, compiler_opts, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	/* Create and build program. */
+	prg = ccl_program_new_from_source_file(ctx, kernel_path, &err);
+	ccl_if_err_goto(err, error_handler);
 	
-	/* Kernel */
-	kernelName = g_strdup_printf("matmult%d", kernel_id);
-	kernel_matmult = clCreateKernel(zone->program, kernelName, &status);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		CL_SUCCESS != status, 
-		CLEXP_FAIL, error_handler, 
-		"Unable to create '%s' kernel (OpenCL error %d: %s)", 
-		kernelName,
-		status,
-		clerror_get(status));
+	ccl_program_build(prg, compiler_opts, &err);
+	ccl_if_err_goto(err, error_handler);
+	
+	/* Determine kernel name. */
+	kernel_name = g_strdup_printf("matmult%d", kernel_id);
 
+	/* Get kernel. */
+	krnl = ccl_program_get_kernel(prg, kernel_name, &err);
+	ccl_if_err_goto(err, error_handler);
+	
+	/* Create command queue wrapper. */
+	cq = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	ccl_if_err_goto(err, error_handler);
+	
 	/* ********************************** */	
 	/* Create and initialize host buffers */
 	/* ********************************** */	
 	
 	/* Matrix A */
-	sizeMatrixAInBytes = a_dim[0] * a_dim[1] * sizeof(cl_int);
-	matrixA_host = matmult_matrix_new(a_dim[0], a_dim[1], matrix_range, rng);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		matrixA_host == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create host matrix A.");
+	size_matA_in_bytes = a_dim[0] * a_dim[1] * sizeof(cl_int);
+	matrixA_host = matmult_matrix_new(
+		a_dim[0], a_dim[1], matrix_range, rng);
 	
 	/* Matrix B */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		sizeMatrixBInBytes = b_dim[0] * b_dim[1] * sizeof(cl_int);
-		matrixB_host = matmult_matrix_new(b_dim[0], b_dim[1], matrix_range, rng);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			matrixB_host == NULL, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable to create host matrix B.");
+		size_matB_in_bytes = b_dim[0] * b_dim[1] * sizeof(cl_int);
+		matrixB_host = matmult_matrix_new(
+			b_dim[0], b_dim[1], matrix_range, rng);
 	}
 	
 	/* Matrix C (result) */
-	sizeMatrixCInBytes = b_dim[0] * a_dim[1] * sizeof(cl_int);
+	size_matC_in_bytes = b_dim[0] * a_dim[1] * sizeof(cl_int);
 	matrixC_host = matmult_matrix_new(b_dim[0], a_dim[1], NULL, NULL);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		matrixC_host == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create host matrix C.");
 
 	/* ********************* */
 	/* Create device buffers */
 	/* ********************* */
 
 	/* Matrix A */
-	matrixA_device = clCreateBuffer(
-		zone->context, 
-		CL_MEM_READ_ONLY, 
-		sizeMatrixAInBytes, 
-		NULL, 
-		&status);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create device buffer for matrix A (OpenCL error %d: %s).", 
-		status,
-		clerror_get(status));
-	
+	matrixA_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
+		size_matA_in_bytes, NULL, &err);
+	ccl_if_err_goto(err, error_handler);
+		
 	/* Matrix B */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		matrixB_device = clCreateBuffer(
-			zone->context, 
-			CL_MEM_READ_ONLY, 
-			sizeMatrixBInBytes, 
-			NULL, 
-			&status);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable to create device buffer for matrix B (OpenCL error %d: %s).", 
-			status,
-			clerror_get(status));
+		matrixB_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
+			size_matB_in_bytes, NULL, &err);
+		ccl_if_err_goto(err, error_handler);
 	}
 
 	/* Matrix C */
-	matrixC_device = clCreateBuffer(
-		zone->context, 
-		CL_MEM_WRITE_ONLY, 
-		sizeMatrixCInBytes, 
-		NULL, 
-		&status);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create device buffer for matrix C (OpenCL error %d: %s).", 
-		status,
-		clerror_get(status));
+	matrixC_dev = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY, 
+			size_matC_in_bytes, NULL, &err);
+	ccl_if_err_goto(err, error_handler);
 	
 	/* ************************* */
 	/* Initialize device buffers */
 	/* ************************* */
 	
 	/* Start basic timming / profiling. */
-	profcl_profile_start(profile_dev);
+	ccl_prof_start(prof_dev);
 	
 	/* Copy matrix A to device. */
-	status = clEnqueueWriteBuffer (	
-		zone->queues[0], 
-		matrixA_device, 
-		CL_TRUE, 
-		0, 
-		sizeMatrixAInBytes, 
-		matrixA_host, 
-		0, 
-		NULL, 
-		&(events[0]) 
-	);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to write matrix A on device (OpenCL error %d: %s).", 
-		status,
-		clerror_get(status));
+	ccl_buffer_enqueue_write(cq, matrixA_dev, CL_TRUE, 0, size_matA_in_bytes, 
+		matrixA_host, NULL, &err);
+	ccl_if_err_goto(err, error_handler);
 
 	/* Copy matrix B to device. */
 	if (!IS_AAT(kernel_id)) {
 		/* Only required if we're not multiplying the transpose. */
-		status = clEnqueueWriteBuffer (	
-			zone->queues[0], 
-			matrixB_device, 
-			CL_TRUE, 
-			0, 
-			sizeMatrixBInBytes, 
-			matrixB_host, 
-			0, 
-			NULL, 
-			&(events[1]) 
-		);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable to write matrix B on device (OpenCL error %d: %s).", 
-			status,
-			clerror_get(status));
+		ccl_buffer_enqueue_write(cq, matrixB_dev, CL_TRUE, 0, 
+			size_matB_in_bytes, matrixB_host, NULL, &err); 
+		ccl_if_err_goto(err, error_handler);
 	}
 	
 	/* ******************** */
@@ -424,287 +389,109 @@ int main(int argc, char *argv[])
 	/* ************************* */
 
 	/* Global memory requirements. */
-	globalMemSizeInBytes = 
-		sizeMatrixAInBytes + sizeMatrixBInBytes + sizeMatrixCInBytes;
+	g_mem_size_in_bytes = 
+		size_matA_in_bytes + size_matB_in_bytes + size_matC_in_bytes;
 	
 	/* Local memory requirements. Default is 0 for non-optimized kernels 0 and 3. */
-	localMemSizeAInBytes = 0;
-	localMemSizeBInBytes = 0;
+	l_mem_sizeA_in_bytes = 0;
+	l_mem_sizeB_in_bytes = 0;
 	if (kernel_id >= 1)
 		/* Optimized matrix mult. 1*/
-		localMemSizeAInBytes = a_dim[0] * lws[1] * sizeof(cl_int);
+		l_mem_sizeA_in_bytes = a_dim[0] * lws[1] * sizeof(cl_int);
 	if (kernel_id == 2)
 		/* Optimized matrix mult. 2*/
-		localMemSizeBInBytes = lws[0] * b_dim[1] * sizeof(cl_int);
+		l_mem_sizeB_in_bytes = lws[0] * b_dim[1] * sizeof(cl_int);
 	if (kernel_id == 4) {
 		/* Optimized matrix transpose mult. */
-		localMemSizeAInBytes = lws[1] * a_dim[0] * sizeof(cl_int);
-		localMemSizeBInBytes = lws[0] * a_dim[0] * sizeof(cl_int);
+		l_mem_sizeA_in_bytes = lws[1] * a_dim[0] * sizeof(cl_int);
+		l_mem_sizeB_in_bytes = lws[0] * a_dim[0] * sizeof(cl_int);
 	}
 	
 	/* ****************************** */
 	/* Print requirements information */
 	/* ****************************** */
 
-	clexp_reqs_print(gws, lws, globalMemSizeInBytes, 
-		localMemSizeAInBytes + localMemSizeBInBytes);
+	ccl_ex_reqs_print(gws, lws, g_mem_size_in_bytes, 
+		l_mem_sizeA_in_bytes + l_mem_sizeB_in_bytes);
 
 	/* *************************** */
 	/*  Set fixed kernel arguments */
 	/* *************************** */
 
-	/* Generic arguments */
-	status = clSetKernelArg(
-		kernel_matmult, 0, sizeof(cl_mem), (void *) &matrixA_device);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable set arg 0 of '%s' kernel (OpenCL error %d: %s).", 
-		kernelName,
-		status,
-		clerror_get(status));
-
 	if (!IS_AAT(kernel_id)) {
-		/* Arguments only for C=AB */
-		status = clSetKernelArg(
-			kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixB_device);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
-			kernelName, 
-			status,
-			clerror_get(status));
 
-		status = clSetKernelArg(
-			kernel_matmult, 2, sizeof(cl_mem), (void *) &matrixC_device);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
-			kernelName, 
-			status,
-			clerror_get(status));
-		
-		status = clSetKernelArg(
-			kernel_matmult, 3, sizeof(cl_int2), (void *) &a_dim);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
-			kernelName,
-			status, 
-			clerror_get(status));
-		
-		status = clSetKernelArg(
-			kernel_matmult, 4, sizeof(cl_int2), (void *) &b_dim);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).",
-			kernelName,
-			status,
-			clerror_get(status));
-		
-		if (kernel_id >= 1) {
-			status = clSetKernelArg(
-				kernel_matmult, 5, localMemSizeAInBytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 5 of '%s' kernel (OpenCL error %d: %s).", 
-				kernelName,
-				status, 
-				clerror_get(status));
+		/* Arguments for C=AB */
+		if (kernel_id == 0) {
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, ccl_arg_priv(a_dim, cl_int2), 
+				ccl_arg_priv(b_dim, cl_int2), NULL);
+		} else if (kernel_id == 1) {
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, ccl_arg_priv(a_dim, cl_int2), 
+				ccl_arg_priv(b_dim, cl_int2), 
+				ccl_arg_full(NULL, l_mem_sizeA_in_bytes), NULL);
+		} else if (kernel_id == 2) {
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixB_dev, 
+				matrixC_dev, ccl_arg_priv(a_dim, cl_int2), 
+				ccl_arg_priv(b_dim, cl_int2), 
+				ccl_arg_full(NULL, l_mem_sizeA_in_bytes),
+				ccl_arg_full(NULL, l_mem_sizeB_in_bytes), NULL);
 		}
-		if (kernel_id == 2) {
-			status = clSetKernelArg(
-				kernel_matmult, 6, localMemSizeBInBytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 6 of '%s' kernel (OpenCL error %d: %s).",
-				kernelName,
-				status, 
-				clerror_get(status));
-		}
+
 	} else {
-		/* Arguments only for C=AA^T */
-		status = clSetKernelArg(
-			kernel_matmult, 1, sizeof(cl_mem), (void *) &matrixC_device);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 1 of '%s' kernel (OpenCL error %d: %s).", 
-			kernelName, 
-			status,
-			clerror_get(status));
-		
-		status = clSetKernelArg(
-			kernel_matmult, 2, sizeof(cl_int2), (void *) &a_dim);
-		gef_if_error_create_goto(
-			err, 
-			CLEXP_ERROR, 
-			status != CL_SUCCESS, 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Unable set arg 2 of '%s' kernel (OpenCL error %d: %s).", 
-			kernelName,
-			status,
-			clerror_get(status));
-		
-		if (kernel_id == 4) {
-			status = clSetKernelArg(
-				kernel_matmult, 3, localMemSizeAInBytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 3 of '%s' kernel (OpenCL error %d: %s).", 
-				kernelName, 
-				status,
-				clerror_get(status));
-			status = clSetKernelArg(
-				kernel_matmult, 4, localMemSizeBInBytes, NULL);
-			gef_if_error_create_goto(
-				err, 
-				CLEXP_ERROR, 
-				status != CL_SUCCESS, 
-				CLEXP_FAIL, 
-				error_handler, 
-				"Unable set arg 4 of '%s' kernel (OpenCL error %d: %s).", 
-				kernelName, 
-				status,
-				clerror_get(status));
-		}
 
+		/* Arguments only for C=AA^T */
+		if (kernel_id < 4) {
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
+				ccl_arg_priv(a_dim, cl_int2), NULL);
+		} else if (kernel_id == 4) {
+			ccl_kernel_set_args(krnl, matrixA_dev, matrixC_dev, 
+				ccl_arg_priv(a_dim, cl_int2),
+				ccl_arg_full(NULL, l_mem_sizeA_in_bytes),
+				ccl_arg_full(NULL, l_mem_sizeB_in_bytes), NULL);
+		}
 	}
 	
 	/* ************ */
 	/*  Run kernel! */
 	/* ************ */
 	
-	status = clEnqueueNDRangeKernel(
-		zone->queues[0], 
-		kernel_matmult, 
-		2, 
-		NULL, 
-		gws, 
-		lws, 
-		0, 
-		NULL, 
-		&(events[2]) 
-	);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Error while executing kernel '%s' (OpenCL error %d: %s).", 
-		kernelName,
-		status, 
-		clerror_get(status));
+	ccl_kernel_enqueue_ndrange(krnl, cq, 2, NULL, gws, lws, NULL, &err);
+	ccl_if_err_goto(err, error_handler);
 
 	/* *********************** */
 	/*  Get result from device */
 	/* *********************** */
 
-	status = clEnqueueReadBuffer(
-		zone->queues[0], 
-		matrixC_device, 
-		CL_TRUE, 
-		0, 
-		sizeMatrixCInBytes, 
-		matrixC_host, 
-		0, 
-		NULL, 
-		&(events[3]) 
-	);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to read matrix C from device (OpenCL error %d: %s).", 
-		status,
-		clerror_get(status));
+	ccl_buffer_enqueue_read(cq, matrixC_dev, CL_TRUE, 0, size_matC_in_bytes, 
+		matrixC_host, NULL, &err);
+	ccl_if_err_goto(err, error_handler);
 
 	/* Finish execution. */
-	status = clFinish(zone->queues[0]); 
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		status != CL_SUCCESS, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Error on clFinish() function (OpenCL error %d: %s).", 
-		status,
-		clerror_get(status));
+	ccl_queue_finish(cq, &err);
+	ccl_if_err_goto(err, error_handler);
 
 	/* ************************************** */
 	/*  Manage profiling of OpenCL operations */
 	/* ************************************** */
 	
 	/* Stop profiler. */
-	profcl_profile_stop(profile_dev); 
+	ccl_prof_stop(prof_dev); 
 
-	profcl_profile_add(
-		profile_dev, "Transfer matrix A to device", events[0], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	/* Add queue for profiling. */
+	ccl_prof_add_queue(prof_dev, "Queue1", cq);
 
-	if (!IS_AAT(kernel_id)) {
-		profcl_profile_add(
-			profile_dev, "Transfer matrix B to device", events[1], &err);
-		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-	}
-
-	profcl_profile_add(
-		profile_dev, "Kernel execution (Matmult)", events[2], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-
-	profcl_profile_add(
-		profile_dev, "Transfer matrix C to host", events[3], &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
-
-	profcl_profile_aggregate(profile_dev, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	/* Process profiling data. */
+	ccl_prof_calc(prof_dev, &err);
+	ccl_if_err_goto(err, error_handler);
 
 	/* Show profiling info. */
-	profcl_print_info(profile_dev, PROFCL_AGGEVDATA_SORT_TIME, &err);
-	gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+	ccl_prof_print_summary(prof_dev);
 	
 	/* Export profiling info if a filename was given. */
 	if (output_export) {
-		profcl_export_info_file(profile_dev, output_export, &err);
-		gef_if_error_goto(err, CLEXP_FAIL, status, error_handler);
+		ccl_prof_export_info_file(prof_dev, output_export, &err);
+		ccl_if_err_goto(err, error_handler);
 	}
 		
 	/* ********************************************************* */
@@ -713,22 +500,14 @@ int main(int argc, char *argv[])
 
 	/* Allocate memory for a new results matrix. */
 	matrixC_test = matmult_matrix_new(b_dim[0], a_dim[1], NULL, NULL);
-	gef_if_error_create_goto(
-		err, 
-		CLEXP_ERROR, 
-		matrixC_test == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Unable to create host matrix C (OpenMP test).");
 		
-	/* Get number of processors available to OpenMP. */
-
 	/* Start basic timming / profiling. */
-	profcl_profile_start(profile_cpu);
+	ccl_prof_start(prof_cpu);
 
 	if (!IS_AAT(kernel_id)) {
 		/* C=AB */
-		/* The pragma below makes the loop parallel with threads = number of cores */
+		/* The pragma below makes the loop parallel with 
+		 * threads = number of cores */
 #ifdef CF4OCL_USE_OPENMP		
 		#pragma omp parallel for
 #endif
@@ -762,7 +541,7 @@ int main(int argc, char *argv[])
 		}	
 	}
 	/* Get finishing time */
-	profcl_profile_stop(profile_cpu);
+	ccl_prof_stop(prof_cpu);
 	
 	/* ******************************************************** */
 	/* Determine and print OpenCL/OpenMP comparison information */
@@ -782,14 +561,14 @@ int main(int argc, char *argv[])
 #else
 		"(Serial)     ",
 #endif
-		profcl_time_elapsed(profile_cpu));
+		ccl_prof_time_elapsed(prof_cpu));
 	printf("     SpeedUp (OpenCL vs. %s) : %fx\n",
 #ifdef CF4OCL_USE_OPENMP	
 		"OpenMP",
 #else
 		"1x CPU",
 #endif
-		profcl_time_elapsed(profile_cpu) / profcl_time_elapsed(profile_dev));
+		ccl_prof_time_elapsed(prof_cpu) / ccl_prof_time_elapsed(prof_dev));
 	printf("     Error (Device-CPU)          : %d\n", error);
 	printf("\n");
 	
@@ -833,20 +612,16 @@ int main(int argc, char *argv[])
 	
 	/* If we get here, no need for error treatment, jump to cleanup. */
 	g_assert(err == NULL);
-	status = CLEXP_SUCCESS;
+	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err != NULL);
-	fprintf(
-		stderr, 
-		"Error %d from domain '%s' with message: \"%s\"\n", 
-		err->code, 
-		g_quark_to_string(err->domain), 
-		err->message);
+	g_assert(err != NULL);
+	fprintf(stderr, "Error %d from domain '%s' with message: \"%s\"\n", 
+		err->code, g_quark_to_string(err->domain), err->message);
 	g_error_free(err);
-	status = CLEXP_FAIL;
+	status = CCL_EX_FAIL;
 
 cleanup:	
 
@@ -855,38 +630,27 @@ cleanup:
 	/* *********** */
 	
 	/* Free profile and cpu timer */
-	if (profile_dev) profcl_profile_free(profile_dev);
-	if (profile_cpu) profcl_profile_free(profile_cpu);
+	if (prof_dev) ccl_prof_destroy(prof_dev);
+	if (prof_cpu) ccl_prof_destroy(prof_cpu);
 	
 	/* Free string command line options. */
 	if (compiler_opts) g_free(compiler_opts);
-	if (dev_name) g_free(dev_name);
-	if (dev_vendor) g_free(dev_vendor);
-	if (platf_name) g_free(platf_name);
-	if (output_export) g_free(output_export);
+	//~ if (output_export) g_free(output_export);
 		
 	/* Free miscelaneous objects. */
-	if (kernelName) g_free(kernelName);
-	if (kernelPath) g_free(kernelPath);
+	if (kernel_name) g_free(kernel_name);
+	if (kernel_path) g_free(kernel_path);
 
 	/* Free RNG */
 	if (rng) g_rand_free(rng);
 		
-	/* Release events */
-	for (unsigned int i = 0; i < 4; i++) {
-		if (events[i]) status = clReleaseEvent(events[i]);
-	}
-
-	/* Release OpenCL kernels */
-	if (kernel_matmult) clReleaseKernel(kernel_matmult);
-	
-	/* Release OpenCL memory objects */
-	if (matrixA_device) clReleaseMemObject(matrixA_device);
-	if (matrixB_device) clReleaseMemObject(matrixB_device);
-	if (matrixC_device) clReleaseMemObject(matrixC_device);
-
-	/* Free OpenCL zone */
-	if (zone) clu_zone_free(zone);
+	/* Release wrappers. */
+	if (matrixC_dev) ccl_buffer_destroy(matrixC_dev);
+	if (matrixB_dev) ccl_buffer_destroy(matrixB_dev);
+	if (matrixA_dev) ccl_buffer_destroy(matrixA_dev);
+	if (prg) ccl_program_destroy(prg);
+	if (cq) ccl_queue_destroy(cq);
+	if (ctx) ccl_context_destroy(ctx);
 
 	/* Free host resources */
 	if (matrixA_host) matmult_matrix_free(matrixA_host);
@@ -900,42 +664,45 @@ cleanup:
 }
 
 /**
- * @brief Create a new matrix with random values.
+ * Create a new matrix with random values.
  * 
- * @param cols Number of columns in matrix.
- * @param rows Number of rows in matrix.
- * @param matrix_range Array containing the min. and max. matrix values; if NULL, matrix is only allocated.
- * @param rng Random number generator; can be NULL if `matrix_range` is NULL.
+ * @param[in] cols Number of columns in matrix.
+ * @param[in] rows Number of rows in matrix.
+ * @param[in] matrix_range Array containing the min. and max. matrix 
+ * values;
+ * if NULL, matrix is only allocated.
+ * @param[in] rng Random number generator; can be NULL if `matrix_range` 
+ * is NULL.
  * @return The new matrix or NULL if memory allocation failed.
  * */
 int* matmult_matrix_new(int cols, int rows, int* matrix_range, GRand* rng) {
-	int *matrix = (int*) malloc(cols * rows * sizeof(int));
-	if ((matrix != NULL) && (matrix_range != NULL)) {
-		g_assert(rng != NULL);
+	int *matrix = (int*) g_malloc(cols * rows * sizeof(int));
+	if (matrix_range != NULL) {
 		for (int i = 0; i < cols * rows; i++) {
-			matrix[i] = g_rand_int_range(rng, matrix_range[0], matrix_range[1]);
+			matrix[i] = g_rand_int_range(
+				rng, matrix_range[0], matrix_range[1]);
 		}
 	}
 	return matrix;
 }
 
 /**
- * @brief Free's a matrix created with matmult_matrix_new().
+ * Free's a matrix created with matmult_matrix_new().
  * 
- * @param matrix The matrix to free.
+ * @param[in] matrix The matrix to free.
  * */
 void matmult_matrix_free(int* matrix) {
-	g_assert(matrix != NULL);
-	free(matrix);
+	g_free(matrix);
 }
 
 /**
- * @brief Parse and verify command line arguments.
- * @param argc Number of command line arguments.
- * @param argv Command line arguments.
- * @param err GLib error object for error reporting.
- * @return #CLEXP_SUCCESS if program returns with no error, or 
- * #CLEXP_FAIL otherwise.
+ * Parse and verify command line arguments.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return #CCL_EX_SUCCESS if program returns with no error, or 
+ * #CCL_EX_FAIL otherwise.
  * */
 int matmult_args_parse(int argc, char* argv[], GError** err) {
 	
@@ -947,12 +714,8 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Create parsing context. */
 	context = g_option_context_new (" - " PROG_DESCRIPTION);
-	gef_if_error_create_goto(
-		*err, 
-		CLEXP_ERROR, 
-		context == NULL, 
-		CLEXP_FAIL, 
-		error_handler, 
+	ccl_if_err_create_goto(*err, CCL_EX_ERROR, context == NULL, 
+		CCL_EX_FAIL, error_handler, 
 		"Unable to create command line parsing context.");
 	
 	/* Add acceptable command line options to context. */ 
@@ -960,48 +723,48 @@ int matmult_args_parse(int argc, char* argv[], GError** err) {
 	
 	/* Use context to parse command line options. */
 	g_option_context_parse(context, &argc, &argv, err);
-	gef_if_error_goto(*err, CLEXP_FAIL, status, error_handler);
+	ccl_if_err_goto(*err, error_handler);
 	
-	/* Make checks which depend if the multiplication is AB or AA^T (transpose) */
+	/* Make checks which depend if the multiplication is AB or AA^T 
+	 * (transpose) */
 	if (!IS_AAT(kernel_id)) {
-		/* Check if number of rows in B is the same as the number of columns in A. */
-		gef_if_error_create_goto(
-			*err, 
-			CLEXP_ERROR, 
-			(b_dim[1] != a_dim[0]), 
-			CLEXP_FAIL, 
-			error_handler, 
-			"Number of rows in B must the same as the number of columns in A.");	
+		/* Check if number of rows in B is the same as the number of 
+		 * columns in A. */
+		ccl_if_err_create_goto(*err, CCL_EX_ERROR, 
+			(b_dim[1] != a_dim[0]), CCL_EX_FAIL, error_handler, 
+			"Number of rows in B must the same as the number of columns in A.");
 	} else {
-		/* In this case (transpose multiplication), dimensions of B are considered to be of dimensions of A^T. */
+		/* In this case (transpose multiplication), dimensions of B are 
+		 * considered to be of dimensions of A^T. */
 		b_dim[0] = a_dim[1];
 		b_dim[1] = a_dim[0];
 	}
 
 	/* Check if kernel ID is within 0 to 4. */
-	gef_if_error_create_goto(
-		*err, 
-		CLEXP_ERROR, 
-		((kernel_id < 0) || (kernel_id > 4)), 
-		CLEXP_FAIL, 
-		error_handler, 
-		"Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 (for C=AA^T kernels).");	
+	ccl_if_err_create_goto(*err, CCL_EX_ERROR, 
+		((kernel_id < 0) || (kernel_id > 4)), CCL_EX_FAIL, error_handler, 
+		"Kernel selection must be 0, 1, 2 (for C=AB kernels), 3 or 4 \
+		(for C=AA^T kernels).");
 
 	/* If we get here, no need for error treatment, jump to cleanup. */
-	g_assert (err == NULL || *err == NULL);
-	status = CLEXP_SUCCESS;
+	g_assert(err == NULL || *err == NULL);
+	status = CCL_EX_SUCCESS;
 	goto cleanup;
 	
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
-	g_assert (err == NULL || *err != NULL);
-	status = CLEXP_FAIL;
+	g_assert(err == NULL || *err != NULL);
+	status = CCL_EX_FAIL;
 
-cleanup:	
+cleanup:
 
 	/* Free context. */
 	if (context) g_option_context_free(context);
 	
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_EX_FAIL);
+
 	/* Return function status. */
 	return status;
 

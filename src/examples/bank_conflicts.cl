@@ -17,22 +17,23 @@
  
 /** 
  * @file
- * @brief Bank conflicts test example OpenCL kernels.
+ * Bank conflicts test example OpenCL kernels.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 /**
- * @brief Kernel for testing bank conflicts.
+ * Kernel for testing bank conflicts.
  * 
- * @param globalData Pointer to global data.
- * @param localData Pointer to allocated local memory.
- * @param stride Control level of bank conflicts.
+ * @param[in,out] globalData Pointer to global data.
+ * @param[in] localData Pointer to allocated local memory.
+ * @param[in] stride Control level of bank conflicts.
  * */
-__kernel void bankconf(__global int * globalData, __local int * localData, __private uint stride)
-{
+__kernel void bankconf(__global int* globalData, __local int* localData,
+	__private uint stride) {
+		
 	/* Data position for this work-item */
 	uint gRow = get_global_id(1); 
 	uint gCol = get_global_id(0);
@@ -58,7 +59,7 @@ __kernel void bankconf(__global int * globalData, __local int * localData, __pri
 		uint idx = lIndex * stride + i;
 		/* If index bigger than local memory size, wrap around. */
 		if (idx >= lTotElems)
-			idx = idx - lTotElems;
+			idx = idx - (idx / lTotElems) * lTotElems;
 		/* Perform sum. */
 		sum += localData[idx];
 	}

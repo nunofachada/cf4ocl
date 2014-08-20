@@ -32,33 +32,38 @@ import matplotlib.ticker as ticker
 # Load profiling info in file given as first cli argument
 pdat = numpy.genfromtxt(sys.argv[1], delimiter='\t', dtype=None, names=('queue','t_start','t_end','event'))
 
+# Get queues
+queues = numpy.unique(pdat['queue']).tolist()
+# Determine number of queues
+num_queues = len(queues)
+
 # Create matplotlib figure
 plt.figure()
 # Set relative dimensions of plotting area
 ax = plt.axes([0.1, 0.1, 0.71, 0.8])
-# Set Y axis (queues) as integers
-ax.get_yaxis().set_major_locator(ticker.MaxNLocator(integer=True))
 # Set a vertical grid
 plt.grid(True, axis='x')
 # Set axis absolute dimensions of plotting area (depends on profiling info)
-plt.axis([min(pdat['t_start']), max(pdat['t_end']), min(pdat['queue'])-0.5, max(pdat['queue'])+0.5])
+plt.axis([min(pdat['t_start']), max(pdat['t_end']), -0.5, num_queues - 0.5])
+# Set ticks to queue names
+plt.yticks(range(num_queues), queues, size='small')
 
-# Determine unique semantic events
+# Determine event names
 uniq_evts = numpy.unique(pdat['event']).tolist()
-# Determine number of unique semantic events
+# Determine number of event names
 num_uniq_evts = len(uniq_evts)
-# Associate a different color with each unique semantic event
+# Associate a different color with each event name
 cmap = pylab.cm.get_cmap('spectral')
 uniq_colors = [x*cmap.N/num_uniq_evts for x in range(num_uniq_evts)]
 
-# Create legend handles (one for each unique semantic event)
+# Create legend handles (one for each event name)
 handles = []
 for uniq_evt in uniq_evts:
-    # Determine index of current unique semantic event
+    # Determine index of current event name
     uei = uniq_evts.index(uniq_evt)
-    # Get color associated with current unique semantic event
+    # Get color associated with current event name
     color = cmap(uniq_colors[uei])
-    # Create a color patch for the legend of the current unique semantic event
+    # Create a color patch for the legend of the current event name
     ptch = patches.Patch(edgecolor='black', facecolor=color, linestyle='solid', fill=True)
     # Add patch to legend handles
     handles.append(ptch)
@@ -67,11 +72,11 @@ for uniq_evt in uniq_evts:
 for event in pdat:
     # Determine plotting locations for current event
     x = event['t_start']
-    y = event['queue'] - 0.4
+    y = queues.index(event['queue']) - 0.4
     width = event['t_end'] - event['t_start']
-    # Determine index of unique semantic event of which current event is an instance of
+    # Determine index of event name of which current event is an instance of
     uei = uniq_evts.index(event['event'])
-    # Determine the color for current event (which is the same for the associated unique semantic event)
+    # Determine the color for current event (which is the same for the associated event name)
     color = cmap(uniq_colors[uei])
     # Plot event 
     rect = patches.Rectangle((x, y), width, 0.8, edgecolor='none', facecolor=color, fill=True)

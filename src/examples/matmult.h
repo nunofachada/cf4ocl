@@ -17,39 +17,39 @@
  
 /** 
  * @file
- * @brief Matrix multiplication examples: common headers and definitions.
+ * Matrix multiplication examples: common headers and definitions.
  * 
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#ifndef MATMULT_H
-#define MATMULT_H
+#ifndef _CCL_EXAMPLES_MATMULT_H_
+#define _CCL_EXAMPLES_MATMULT_H_
 
 #ifdef CF4OCL_USE_OPENMP
 #include <omp.h>
 #endif
 
-#include "exp_common.h"
+#include "examples_common.h"
 
 /**
- * @brief Check if the multiplication is @f$C=AA^T@f$ (matrix A and its 
+ * Check if the multiplication is @f$C=AA^T@f$ (matrix A and its 
  * transpose).
  * 
- * @param kid Kernel ID.
+ * @param[in] kid Kernel ID.
  * @return Logical true if multiplication is @f$C=AA^T@f$, or logical
  * false if multiplication is @f$C=AB@f$.
  * */
 #define IS_AAT(kid) ((kid > 2 && kid < 5)) 
 
-/** @brief Create a new matrix with random values. */
+/** Create a new matrix with random values. */
 int* matmult_matrix_new(int cols, int rows, int* matrix_range, GRand* rng);
 
-/** @brief Free's a matrix created with matmult_matrix_new(). */
+/** Free's a matrix created with matmult_matrix_new(). */
 void matmult_matrix_free(int* matrix);
 
-/** @brief Parse and verify command line arguments. */
+/** Parse and verify command line arguments. */
 int matmult_args_parse(int argc, char* argv[], GError** err);
 
 #endif
