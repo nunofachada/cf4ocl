@@ -45,8 +45,8 @@ ENDIF()
 
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/src/cf4ocl2 ${CMAKE_SOURCE_DIR}/src
-	${CMAKE_BINARY_DIR})
+	${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src
+	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 	
 # Initialize doc exclude path
 set(DOC_EXCLUDE_PATHS ""  CACHE INTERNAL "")
@@ -61,7 +61,6 @@ execute_process(COMMAND ${CMAKE_BINARY_DIR}/auxbuild/get_data_path
 if (${DATA_PATH})
 	file(TO_CMAKE_PATH ${DATA_PATH} DATA_PATH)
 endif()
-message(WARNING "DATA_PATH = ${DATA_PATH}")
 	
 # Define install subdirs
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})

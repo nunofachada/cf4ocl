@@ -38,5 +38,5 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	PATTERN "*.in.h" EXCLUDE)
 
 # Install the common header
-install(FILES ${CMAKE_BINARY_DIR}/common.h
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/common.h
          DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME})
