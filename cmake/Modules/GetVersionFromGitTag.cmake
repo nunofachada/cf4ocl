@@ -3,8 +3,8 @@
 # variables by analysing the git tag and commit history. It expects git 
 # tags defined with semantic versioning 2.0.0 (http://semver.org/).
 #
-# The module expects the PROJECT_NAME variable to be set, and once done 
-# will define the following variables:
+# The module expects the PROJECT_NAME and GIT_EXECUTABLE variables to be
+# set, and once done will define the following variables:
 #
 # ${PROJECT_NAME}_VERSION_STRING - Version string without metadata
 # such as "v2.0.0" or "v.1.2.41-beta.1". This should correspond to the
@@ -22,18 +22,26 @@
 #
 # Author: Nuno Fachada
 
+# Don't use this module without calling FindGit first
+if (NOT ${GIT_FOUND})
+	message(FATAL_ERROR "This script requires Git")
+endif()
+
 # Get last tag from git
-execute_process(COMMAND git describe --abbrev=0 --tags 
+execute_process(COMMAND ${GIT_EXECUTABLE} describe --abbrev=0 --tags 
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
-	
+
 #How many commits since last tag
-execute_process(COMMAND git rev-list master v2.0.0-alpha.1^..HEAD --count
+execute_process(COMMAND ${GIT_EXECUTABLE} rev-list master ${${PROJECT_NAME}_VERSION_STRING}^..HEAD --count
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
 	OUTPUT_STRIP_TRAILING_WHITESPACE)	
 
 # Get current commit SHA from git
-execute_process(COMMAND git rev-parse --short HEAD 
+execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD 
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA 
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
