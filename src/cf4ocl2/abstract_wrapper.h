@@ -91,7 +91,8 @@ typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
  * @return Returns CL_SUCCESS if the function is executed successfully
  * or an OpenCL error code otherwise.
  * */
-typedef cl_int (*ccl_wrapper_release_cl_object)(void* cl_object);
+typedef CL_API_ENTRY cl_int 
+	(CL_API_CALL* ccl_wrapper_release_cl_object)(void* cl_object);
 
 /* Create a new wrapper object. This function is called by the
  * concrete wrapper constructors and should not be called by client
