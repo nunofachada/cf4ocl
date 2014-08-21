@@ -332,7 +332,7 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 
 	} else {
 
-		/* Requested infor is already present in the info table,
+		/* Requested info is already present in the info table,
 		 * retrieve it from there. */
 		info = g_hash_table_lookup(
 			wrapper1->info, GUINT_TO_POINTER(param_name));

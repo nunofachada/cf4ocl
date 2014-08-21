@@ -134,9 +134,9 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
-typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
-	cl_uint param_name, size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret);
+typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp1)(
+	void* cl_object, cl_uint param_name, size_t param_value_size, 
+	void* param_value, size_t* param_value_size_ret);
 
 /**
  * Generic type for OpenCL clget**Info() functions, in which two
@@ -160,9 +160,10 @@ typedef cl_int (*ccl_wrapper_info_fp1)(void* cl_object,
  * @return Returns CL_SUCCESS if the function is executed successfully,
  * or an error code otherwise.
  * */
-typedef cl_int (*ccl_wrapper_info_fp2)(void* cl_object1,
-	void* cl_object2, cl_uint param_name, size_t param_value_size, 
-	void* param_value, size_t* param_value_size_ret);
+typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp2)(
+	void* cl_object1, void* cl_object2, cl_uint param_name, 
+	size_t param_value_size, void* param_value, 
+	size_t* param_value_size_ret);
 
 /**
  * Generic function pointer for OpenCL clget**Info() functions
