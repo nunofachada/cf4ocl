@@ -22,16 +22,16 @@ API
 * OpenCL version independent
 * Very simple and thourough profiling
 
-Feeback:
-========
+Feeback
+=======
 
 Clone, build and install the code, the a look at the 
 [examples](https://github.com/FakenMC/cf4ocl/tree/master/src/examples) 
 and the [v2.0.0-alpha API](http://fakenmc.github.io/cf4ocl/docs/v2.0.0-alpha).
 The API may change until the beta release. Any feedback is appreciated.
 
-Soon:
-=====
+Soon
+====
 
 * Simple and clear example
 * Links to GitHub wiki pages with other information and examples
@@ -39,16 +39,16 @@ Soon:
 * Downloads, installing
 * More?
 
-Not yet implemented:
-====================
+Not yet implemented
+===================
 
 * OpenGL and DirectX interoperability
 * Support for sub-devices
 * clEnqueueNativeKernel()
 * Pipes and SVM (OpenCL 2.0 only)
 
-License:
-========
+License
+=======
 
 Library code is licensed under [LGPLv3][], while the remaining code
 (utilities, examples and tests) is licensed under [GPLv3][].
