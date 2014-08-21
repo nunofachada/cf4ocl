@@ -48,7 +48,7 @@
 /**
  * Tests the profiling module.
  * */
-static void operationTest() {
+static void operation_test() {
 	
 	/* Aux vars. */
 	CCLContext* ctx;
@@ -297,7 +297,7 @@ static void operationTest() {
  * */
 int main(int argc, char** argv) {
 	g_test_init(&argc, &argv, NULL);
-	g_test_add_func("/profiler/operation", operationTest);
+	g_test_add_func("/profiler/operation", operation_test);
 	return g_test_run();
 }
 

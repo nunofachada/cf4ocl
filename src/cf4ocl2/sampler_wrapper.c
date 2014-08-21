@@ -238,15 +238,17 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 
 	/* OpenCL platform version. */
 	double ocl_ver;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
 	
 	/* Get context platform version. */
-	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	
 	/* Create the OpenCL sampler object. */
-	if (platf_ver >= 2.0) {
+	if (ocl_ver >= 2.0) {
 		/* Platform is OpenCL >= 2.0, use "new" API. */
-		queue = clCreateSamplerWithProperties(
+		sampler = clCreateSamplerWithProperties(
 			ccl_context_unwrap(ctx), sampler_properties, &ocl_status);
 	} else {
 		/* Platform is OpenCL <= 1.2, use "old" API. */
