@@ -250,7 +250,7 @@ static void buffer_copy() {
 	g_assert_no_error(err);
 	
 	/* Read data back to host from the second buffer. */
-	ccl_buffer_enqueue_read(q, b2, CL_TRUE, buf_size / 2, buf_size,h2, 
+	ccl_buffer_enqueue_read(q, b2, CL_TRUE, buf_size / 2, buf_size, h2, 
 		NULL, &err);
 	g_assert_no_error(err);
 	
@@ -270,6 +270,90 @@ static void buffer_copy() {
 	g_assert(ccl_wrapper_memcheck());
 
 }
+
+#ifdef CL_VERSION_1_2
+
+/**
+ * Tests buffer fill.
+ * */
+static void buffer_fill() {
+
+	/* Test variables. */
+	CCLPlatforms* ps;
+	CCLPlatform* p;
+	CCLContext* ctx = NULL;
+	CCLDevice* d = NULL;
+	CCLBuffer* b = NULL;
+	CCLQueue* q;
+	cl_char8 h[CCL_TEST_BUFFER_SIZE];
+	cl_char8 pattern = {{ 1, -1, 5, 4, -12, 3, 7, -20 }};
+	size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
+	GError* err = NULL;
+	
+	/* Get a context which supports OpenCL 1.2, if possible. */
+	ps = ccl_platforms_new(&err);
+	g_assert_no_error(err);
+	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
+		p = ccl_platforms_get_platform(ps, i);
+		double ocl_ver = ccl_platform_get_opencl_version(p, &err);
+		if (ocl_ver >= 1.2) {
+			ctx = ccl_context_new_from_devices(
+				ccl_platform_get_num_devices(p, NULL),
+				ccl_platform_get_all_devices(p, NULL),
+				&err);
+			g_assert_no_error(err);
+			break;
+		}
+	}
+	
+	/* If not possible to find a 1.2 or better context, finish this
+	 * test. */
+	if (ctx == NULL) {
+		ccl_platforms_destroy(ps);
+		g_test_message("'%s' test not performed because no platform " \
+			"with OpenCL 1.2 support was found", __func__);
+		return;
+	}
+	
+	/* Get first device in context. */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+	
+	/* Create a command queue. */
+	q = ccl_queue_new(ctx, d, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create regular buffer. */
+	b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, buf_size, NULL, &err);
+	g_assert_no_error(err);
+	
+	/* Fill buffer with pattern. */
+	ccl_buffer_enqueue_fill(
+		q, b, &pattern, sizeof(cl_char8), 0, buf_size, NULL, &err);
+	g_assert_no_error(err);
+	
+	/* Read data back to host. */
+	ccl_buffer_enqueue_read(q, b, CL_TRUE, 0, buf_size, h, NULL, &err);
+	g_assert_no_error(err);
+	
+	/* Check data is OK. */
+	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
+		for (guint j = 0; j < 8; ++j)
+			g_assert_cmpuint(h[i].s[j], ==, pattern.s[j]);
+	
+	/* Free stuff. */
+	ccl_buffer_destroy(b);
+	ccl_queue_destroy(q);
+	ccl_context_destroy(ctx);
+	ccl_platforms_destroy(ps);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+#endif
 
 /**
  * Main function.
@@ -296,7 +380,13 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/buffer/copy", 
 		buffer_copy);
-	
+
+#ifdef CL_VERSION_1_2
+	g_test_add_func(
+		"/wrappers/buffer/fill", 
+		buffer_fill);
+#endif
+
 	return g_test_run();
 }
 

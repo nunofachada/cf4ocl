@@ -14,7 +14,7 @@
 
 # Get all cf4ocl functions
 macros_to_ignore=G_GNUC_NULL_TERMINATED
-ccl_functions=`LC_ALL=C ctags -I $macros_to_ignore -x --c-kinds=pd ../src/cf4ocl2/* | cut -f1 -d " " | grep '^[^A-Z_]'`
+ccl_functions=`LC_ALL=C ctags -I $macros_to_ignore -x --c-kinds=pd ../src/cf4ocl2/*.h | cut -f1 -d " " | grep '^[^A-Z_]'`
 
 # Get all tests source files
 test_srcs=`find ../src/tests/ -type f -iname "*test*"`

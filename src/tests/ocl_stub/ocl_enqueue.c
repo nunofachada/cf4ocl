@@ -422,19 +422,36 @@ clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer,
 	const cl_event* event_wait_list, cl_event* event) 
 	CL_API_SUFFIX__VERSION_1_2 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (buffer == NULL) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (offset + size > buffer->size) {
+		return CL_INVALID_VALUE;
+	} else if ((pattern == NULL) || (pattern_size == 0)
+		|| ((pattern_size&(pattern_size-1)) != 0) || (pattern_size > 128)) {
+		return CL_INVALID_VALUE;
+	} else if ((offset % pattern_size != 0) || (size % pattern_size != 0)) {
+		return CL_INVALID_VALUE;
+	}
 	
-	command_queue = command_queue;
-	buffer = buffer;
-	pattern = pattern;
-	pattern_size = pattern_size;
-	offset = offset;
-	size = size;
+	/* These are ignored. */
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_FILL_BUFFER);
+	
+	/* Fill buffer. */
+	for (guint i = 0; i < size; i += pattern_size) {
+		g_memmove(buffer->mem + offset + i, pattern, pattern_size);
+	}
+	
+	/* All good. */
 	return CL_SUCCESS;
 
 }
