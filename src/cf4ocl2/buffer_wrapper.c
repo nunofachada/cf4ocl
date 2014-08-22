@@ -106,7 +106,7 @@ void ccl_buffer_destroy(CCLBuffer* buf) {
  * @return A new wrapper object.
  * */
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
-	size_t size, void *host_ptr, GError** err) {
+	size_t size, void* host_ptr, GError** err) {
 		
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
