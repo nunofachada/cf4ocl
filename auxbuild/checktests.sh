@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #
 # Scrape the cf4ocl code, get all public functions and macros, check 
-# what is tested and what is not.
+# what is tested (and where) and what is not.
+#
+# Tested functions (and the test functions which call them) are printed 
+# to stdout. Untested functions are printed to stderr.
 #
 # Requires: ctags cut grep awk find cflow
 # Author: Nuno Fachada <faken@fakenmc.com>
@@ -14,7 +17,7 @@ macros_to_ignore=G_GNUC_NULL_TERMINATED
 ccl_functions=`LC_ALL=C ctags -I $macros_to_ignore -x --c-kinds=pd ../src/cf4ocl2/* | cut -f1 -d " " | grep '^[^A-Z_]'`
 
 # Get all tests source files
-test_srcs=`find ../src/tests/ -type f -iname test*`
+test_srcs=`find ../src/tests/ -type f -iname "*test*"`
 
 # For each cf4ocl function, get test functions which call it
 declare -A fun_table
