@@ -63,7 +63,7 @@ clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 		} else if (flags & CL_MEM_USE_HOST_PTR) {
 			memobj->mem = host_ptr;
 		} else {
-			memobj->mem = NULL;
+			memobj->mem = g_malloc(size);
 		}
 	}
 	return memobj;

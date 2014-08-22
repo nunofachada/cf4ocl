@@ -34,6 +34,7 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 
+	/* These are ignored. */
 	command_queue = command_queue;
 	kernel = kernel;
 	work_dim = work_dim;
@@ -42,8 +43,11 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 	local_work_size = local_work_size;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
+	
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_NDRANGE_KERNEL);
 	
+	/* All good. */
 	return CL_SUCCESS;
 }
 
@@ -53,23 +57,32 @@ clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 		
+	/* Error check. */
 	if (command_queue == NULL) {
 		return CL_INVALID_COMMAND_QUEUE;
 	} else if (buffer == NULL) {
 		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
 	} else if (ptr == NULL) {
 		return CL_INVALID_VALUE;
 	} else if (offset + size > buffer->size) {
 		return CL_INVALID_VALUE;
 	}
 
+	/* These are ignored. */
 	blocking_read = blocking_read;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
+	
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER);
 
+	/* Read buffer. */
 	g_memmove(ptr, buffer->mem + offset, size);
 
+	/* All good. */
 	return CL_SUCCESS;
 }
                             
@@ -79,23 +92,32 @@ clEnqueueWriteBuffer(cl_command_queue command_queue, cl_mem buffer,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list, 
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 
+	/* Error check. */
 	if (command_queue == NULL) {
 		return CL_INVALID_COMMAND_QUEUE;
 	} else if (buffer == NULL) {
 		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
 	} else if (ptr == NULL) {
 		return CL_INVALID_VALUE;
 	} else if (offset + size > buffer->size) {
 		return CL_INVALID_VALUE;
 	}
 
+	/* These are ignored. */
 	blocking_write = blocking_write;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
+	
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER);
 
+	/* Write to buffer. */
 	g_memmove(buffer->mem + offset, ptr, size);
 
+	/* All good. */
 	return CL_SUCCESS;
 }
 
@@ -106,6 +128,7 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 		
+	/* These are ignored. */
 	command_queue = command_queue;
 	src_buffer = src_buffer;
 	dst_image = dst_image;
@@ -114,6 +137,8 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
 	region = region;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
+	
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_TO_IMAGE);
 
 	/* Unimplemented. */
@@ -130,20 +155,37 @@ clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
 	const cl_event* event_wait_list, cl_event* event,
 	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	void* map_ptr = NULL;
 	
-	command_queue = command_queue;
-	buffer = buffer;
+	/* Error check. */
+	if (command_queue == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_COMMAND_QUEUE);
+	} else if (buffer == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_MEM_OBJECT);
+	} else if (buffer->context != command_queue->context) {
+		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+		/* Not testing if events in wait list belong to this context. */
+	} else if (offset + size > buffer->size) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else {
+
+		/* Set event. */
+		ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_BUFFER);
+		seterrcode(errcode_ret, CL_SUCCESS);
+		
+		/* Just return a pointer to the memory region. */
+		map_ptr = buffer->mem + offset;
+		buffer->map_count++;
+	}
+
+	/* These are ignored. */
 	blocking_map = blocking_map;
 	map_flags = map_flags;
-	offset = offset;
-	size = size;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_BUFFER);
-	seterrcode(errcode_ret, CL_SUCCESS);
-	return NULL;		
+
+	/* Return the mapped pointer. */
+	return map_ptr;
 
 }
 
@@ -176,16 +218,33 @@ clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
 	const cl_event* event_wait_list, cl_event* event) 
 	CL_API_SUFFIX__VERSION_1_0 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (memobj == NULL) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (memobj->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (mapped_ptr == NULL) {
+		return CL_INVALID_VALUE;
+	} else if ((mapped_ptr < memobj->mem) 
+		|| (mapped_ptr >= memobj->mem + memobj->size) 
+		|| (memobj->map_count == 0)) {
+		return CL_INVALID_VALUE;
+	}
 	
-	command_queue = command_queue;
-	memobj = memobj;
-	mapped_ptr = mapped_ptr;
+	/* These are ignored. */
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
+
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_UNMAP_MEM_OBJECT);
 	
+	/* Decrement map count. */
+	memobj->map_count--;
+	
+	/* All good. */
 	return CL_SUCCESS;
 }
 
@@ -203,6 +262,7 @@ clEnqueueWaitForEvents(cl_command_queue command_queue,
 	cl_uint num_events, const cl_event* event_list) 
 	CL_API_SUFFIX__VERSION_1_0 {
 
+	/* These are ignored. */
 	command_queue = command_queue;
 	num_events = num_events;
 	event_list = event_list;
