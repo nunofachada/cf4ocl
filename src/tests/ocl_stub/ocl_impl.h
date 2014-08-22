@@ -187,7 +187,6 @@ struct _cl_kernel {
 
 struct _cl_mem {
 	cl_uint ref_count;
-	void (*release)(cl_mem);
 	cl_mem_object_type type;
 	cl_mem_flags flags;
 	size_t size;
@@ -197,6 +196,7 @@ struct _cl_mem {
 	cl_mem associated_object;
 	size_t offset;
 	GSList* callbacks;
+	void* mem;
 };
 
 #ifndef CL_VERSION_1_2

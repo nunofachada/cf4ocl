@@ -57,7 +57,11 @@ clReleaseMemObject(cl_mem memobj) CL_API_SUFFIX__VERSION_1_0 {
 		
 		/* Free callback list. */
 		g_slist_free_full(memobj->callbacks, g_free);
-
+		
+		/* Destroy allocated memory. */
+		if ((memobj->mem != NULL) && !(memobj->flags & CL_MEM_USE_HOST_PTR))
+			g_free(memobj->mem);
+		
 		/* Release memory object depending ontype.*/
 		if (memobj->type == CL_MEM_OBJECT_BUFFER) {
 			/* It's a buffer. */

@@ -31,22 +31,41 @@
 CL_API_ENTRY cl_mem CL_API_CALL
 clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 	void* host_ptr, cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	
+	cl_mem memobj = NULL;
+	
+	if (context == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+	} else if ((flags & CL_MEM_COPY_HOST_PTR & flags & CL_MEM_USE_HOST_PTR) 
+		|| (flags & CL_MEM_ALLOC_HOST_PTR & flags & CL_MEM_USE_HOST_PTR)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if (((host_ptr == NULL) && (flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))
+		|| ((host_ptr != NULL) && !(flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))) {
+		seterrcode(errcode_ret, CL_INVALID_HOST_PTR);
+	} /* Not checking for CL_INVALID_BUFFER_SIZE */
+	else {
+		seterrcode(errcode_ret, CL_SUCCESS);
 		
-	seterrcode(errcode_ret, CL_SUCCESS);
-	cl_mem memobj = g_slice_new(struct _cl_mem);
-	
-	memobj->ref_count = 1;
-	memobj->type = CL_MEM_OBJECT_BUFFER;
-	memobj->flags = flags;
-	memobj->size = size;
-	memobj->host_ptr = host_ptr;
-	memobj->map_count = 0;
-	memobj->context = context;
-	memobj->associated_object = NULL;
-	memobj->offset = 0;
-	
-	memobj->callbacks = NULL;
-	
+		memobj = g_slice_new(struct _cl_mem);
+		
+		memobj->ref_count = 1;
+		memobj->type = CL_MEM_OBJECT_BUFFER;
+		memobj->flags = flags;
+		memobj->size = size;
+		memobj->host_ptr = host_ptr;
+		memobj->map_count = 0;
+		memobj->context = context;
+		memobj->associated_object = NULL;
+		memobj->offset = 0;
+		memobj->callbacks = NULL;
+		if (flags & CL_MEM_COPY_HOST_PTR) {
+			memobj->mem = g_memdup(host_ptr, size);
+		} else if (flags & CL_MEM_USE_HOST_PTR) {
+			memobj->mem = host_ptr;
+		} else {
+			memobj->mem = NULL;
+		}
+	}
 	return memobj;
 }
 
