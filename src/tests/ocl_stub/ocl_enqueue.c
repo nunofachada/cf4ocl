@@ -196,18 +196,35 @@ clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 	const cl_event* event_wait_list, cl_event* event) 
 	CL_API_SUFFIX__VERSION_1_0 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((src_buffer == NULL) || (dst_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if ((src_buffer->context != command_queue->context)
+		|| (dst_buffer->context != command_queue->context)) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if ((src_offset + size > src_buffer->size)
+		|| (dst_offset + size > dst_buffer->size)) {
+		return CL_INVALID_VALUE;
+	} else if (src_buffer == dst_buffer) {
+		/* For now just don't allow copies within the same buffer,
+		 * although OCL allows it if they don't overlap. */
+		return CL_INVALID_VALUE;
+	}
 	
-	command_queue = command_queue;
-	src_buffer = src_buffer;
-	dst_buffer = dst_buffer;
-	src_offset = src_offset;
-	dst_offset = dst_offset;
-	size = size;
+	/* These are ignored. */
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
+	
+	/* Perform copy. */
+	g_memmove(dst_buffer->mem + dst_offset, src_buffer->mem + src_offset, size);
+
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER);
+
+	/* All good. */
 	return CL_SUCCESS;
 
 }

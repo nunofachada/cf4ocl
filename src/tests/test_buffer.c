@@ -203,6 +203,75 @@ static void buffer_read_write() {
 }
 
 /**
+ * Tests copy operations from one buffer to another.
+ * */
+static void buffer_copy() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* d = NULL;
+	CCLBuffer* b1 = NULL;
+	CCLBuffer* b2 = NULL;
+	CCLQueue* q;
+	cl_long h1[CCL_TEST_BUFFER_SIZE];
+	cl_long h2[CCL_TEST_BUFFER_SIZE];
+	size_t buf_size = sizeof(cl_long) * CCL_TEST_BUFFER_SIZE;
+	GError* err = NULL;
+	
+	/* Create a host array, put some stuff in it. */
+	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
+		h1[i] = i % 16;
+	
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+	
+	/* Get first device in context. */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+	
+	/* Create a command queue. */
+	q = ccl_queue_new(ctx, d, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create regular buffer and write data from the host buffer. */
+	b1 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
+		buf_size, h1, &err);
+	g_assert_no_error(err);
+	
+	/* Create another buffer, double the size. */
+	b2 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, 2 * buf_size, NULL, &err);
+	g_assert_no_error(err);
+	
+	/* Copy data from first buffer to second buffer, using an offset on
+	 * the second buffer. */
+	ccl_buffer_enqueue_copy(
+		q, b1, b2, 0, buf_size / 2, buf_size, NULL, &err);
+	g_assert_no_error(err);
+	
+	/* Read data back to host from the second buffer. */
+	ccl_buffer_enqueue_read(q, b2, CL_TRUE, buf_size / 2, buf_size,h2, 
+		NULL, &err);
+	g_assert_no_error(err);
+	
+	/* Check data is OK. */
+	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
+		g_assert_cmpuint(h1[i], ==, h2[i]);
+	
+		
+	/* Free stuff. */
+	ccl_buffer_destroy(b1);
+	ccl_buffer_destroy(b2);
+	ccl_queue_destroy(q);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -224,6 +293,10 @@ int main(int argc, char** argv) {
 		"/wrappers/buffer/read-write", 
 		buffer_read_write);
 
+	g_test_add_func(
+		"/wrappers/buffer/copy", 
+		buffer_copy);
+	
 	return g_test_run();
 }
 
