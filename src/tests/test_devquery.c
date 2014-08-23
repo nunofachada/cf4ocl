@@ -17,18 +17,14 @@
 
 /** 
  * @file
- * Tests for devquery module.
+ * Tests for device query module.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "platforms.h"
-#include "platform_wrapper.h"
-#include "device_wrapper.h"
-#include "device_query.h"
-#include "common.h"
+#include <cf4ocl2.h>
 
 #define CCL_TEST_DEVQUERY_MAXINFOLEN 500
 

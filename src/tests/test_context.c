@@ -17,7 +17,7 @@
 
 /** 
  * @file
- * Create, add, destroy tests for context wrappers. Also tests
+ * Test the context wrapper class and its methods. Also tests
  * device selection filters, device wrappers and platform wrappers.
  * 
  * @author Nuno Fachada
@@ -25,15 +25,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "platforms.h"
-#include "platform_wrapper.h"
-#include "device_wrapper.h"
-#include "device_query.h"
-#include "context_wrapper.h"
-#include "common.h"
-#include "program_wrapper.h"
-#include "memobj_wrapper.h"
-#include "buffer_wrapper.h"
+#include <cf4ocl2.h>
 #include <glib/gstdio.h>
 
 static const char* ccl_test_channel_order_string(cl_uint co) {

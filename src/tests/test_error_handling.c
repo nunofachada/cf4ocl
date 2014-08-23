@@ -18,14 +18,14 @@
 /** 
  * @file
  * 
- * Tests error handling in cf4ocl.
+ * Tests error handling in _cf4ocl_.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
  
-#include "common.h"
+#include <cf4ocl2.h>
 
 /** Resolves to error category identifying string, in this case an error
  * in the GErrorf tests. */

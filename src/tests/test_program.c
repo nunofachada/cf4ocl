@@ -17,23 +17,14 @@
 
 /** 
  * @file
- * Create, add, destroy tests for the program wrapper. Also 
- * tests the kernel and queue wrapper, kernel execution, and so on.
+ * Test the program class. Also tests the kernel class.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "platforms.h"
-#include "platform_wrapper.h"
-#include "device_wrapper.h"
-#include "device_query.h"
-#include "context_wrapper.h"
-#include "common.h"
-#include "program_wrapper.h"
-#include "memobj_wrapper.h"
-#include "buffer_wrapper.h"
+#include <cf4ocl2.h>
 #include <glib/gstdio.h>
 
 #define CCL_TEST_PROGRAM_SUM "sum"

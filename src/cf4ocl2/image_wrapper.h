@@ -61,7 +61,7 @@ typedef struct ccl_image_desc {
 	
 	/** 
 	 * The type of image, must be supported by the underlying OpenCL
-	 * version. Only `CL_MEM_OBJECT_IMAGE2D`and `CL_MEM_OBJECT_IMAGE3D`
+	 * version. Only `CL_MEM_OBJECT_IMAGE2D` and `CL_MEM_OBJECT_IMAGE3D`
 	 * are supported in all OpenCL versions. 
 	 * @public
 	 * */

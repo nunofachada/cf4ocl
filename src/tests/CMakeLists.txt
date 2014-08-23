@@ -1,6 +1,6 @@
 # List of tests
 set(TESTS test_error_handling test_profiler test_platforms test_buffer
-	test_devquery test_context test_program test_profiler_op)
+	test_devquery test_context test_program test_profiler_op test_image)
 	
 # Exclude tests from documentation?
 if (DOXYGEN_FOUND) 
@@ -50,6 +50,7 @@ set(test_program_LIBS ${LIB_OPT})
 set(test_platforms_LIBS ${LIB_OPT})
 set(test_devquery_LIBS ${LIB_OPT})
 set(test_buffer_LIBS ${LIB_OPT}) #${PROJECT_NAME} ${OPENCL_LIBRARIES}
+set(test_image_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES})
 set(test_error_handling_LIBS ${PROJECT_NAME}_TESTING)
 
 # Add a target for each test

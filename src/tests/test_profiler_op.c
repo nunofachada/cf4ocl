@@ -25,13 +25,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "buffer_wrapper.h"
-#include "program_wrapper.h"
-#include "context_wrapper.h"
-#include "device_wrapper.h"
-#include "kernel_wrapper.h"
-#include "profiler.h"
-#include "common.h"
+#include <cf4ocl2.h>
 #include "ocl_stub/ocl_impl.h"
 
 #define ccl_test_prof_is_overlap(ev1, ev2) \

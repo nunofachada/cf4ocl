@@ -17,16 +17,14 @@
 
 /** 
  * @file
- * Tests creation, addition, destruction (CAD) for profiling 
- * framework objects.
+ * Test the profiling module.
  * 
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "profiler.h"
-#include "common.h"
+#include <cf4ocl2.h>
 
 /**
  * Tests creation, getting info from and destruction of 
