@@ -148,10 +148,6 @@ static void image_ref_unref_test(
 	//~ size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 	user_data = user_data;
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
-	CCLImageDesc image_desc = ccl_image_desc_init();
-	image_desc.image_width = CCL_TEST_IMAGE_WIDTH;
-	image_desc.image_height = CCL_TEST_IMAGE_HEIGHT;
-	image_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
 	
 	/* Get a context with an image-supporting device. */
 	ctx = ccl_context_new_from_devices(
@@ -159,8 +155,12 @@ static void image_ref_unref_test(
 	g_assert_no_error(err);
 
 	/* Create 2D image. */
-	img = ccl_image_new(ctx, CL_MEM_READ_WRITE, &image_format, 
-		&image_desc, NULL, &err);
+	img = ccl_image_new(
+		ctx, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+		"image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
+		"image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
+		NULL);
 	g_assert_no_error(err);
 	
 	/* Increase image reference count. */

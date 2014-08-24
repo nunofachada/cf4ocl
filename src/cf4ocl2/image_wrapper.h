@@ -45,6 +45,16 @@ typedef struct ccl_buffer CCLBuffer;
  * @{
  */
 
+/**
+ * This macro can be used to set a ::CCLImageDesc object to all zeros.
+ * For example:
+ * 
+ * @code{.c}
+ * CCLImageDesc image_desc = CCL_IMAGE_DESC_BLANK;
+ * @endcode
+ * */
+#define CCL_IMAGE_DESC_BLANK {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
+
 /** 
  * Image wrapper class
  * 
@@ -55,7 +65,7 @@ typedef struct ccl_image CCLImage;
 /**
  * Describes the type and dimensions of the image or image array
  * independently of the OpenCL version. Should be initialized with the
- * ccl_image_desc_init() macro.
+ * ::CCL_IMAGE_DESC_BLANK macro.
  * */
 typedef struct ccl_image_desc {
 	
@@ -127,17 +137,9 @@ typedef struct ccl_image_desc {
 	 * 2D image). 
 	 * @public
 	 * */
-	CCLMemObj* mo;
+	CCLMemObj* memobj;
 
 } CCLImageDesc;
-
-/**
- * This macro initializes a ::CCLImageDesc object. Usage:
- * @code{.c}
- * CCLImageDesc img_dsc = ccl_image_desc_init();
- * @endcode
- * */
-#define ccl_image_desc_init() {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
 
 /* Get the image wrapper for the given OpenCL image. */
 CCLImage* ccl_image_new_wrap(cl_mem mem_object);
@@ -147,9 +149,15 @@ CCLImage* ccl_image_new_wrap(cl_mem mem_object);
 void ccl_image_destroy(CCLImage* img);
 
 /* Creates a new image wrapper object. */
-CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
+CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err);
+
+/* Creates a new image wrapper object using a variable list of key-value
+ * pairs which describe the image.  */
+CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
+	const cl_image_format* image_format, void* host_ptr, GError** err,
+	...);
 
 /* Read from an image or image array object to host memory. */
 CCLEvent* ccl_image_enqueue_read(CCLQueue* cq, CCLImage* img,

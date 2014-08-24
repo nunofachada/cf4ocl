@@ -154,7 +154,23 @@ void ccl_image_destroy(CCLImage* img) {
 }
 
 /** 
- * Creates a new image wrapper object.
+ * Creates a new image wrapper object. The type and dimensions of the
+ * image are defined in the `img_dsc` parameter.
+ * 
+ * **Usage example**
+ * 
+ * @code{.c}
+ * ...
+ * CCLImage* img;
+ * ...
+ * CCLImageDesc image_desc = CCL_IMAGE_DESC_BLANK;
+ * image_desc.image_width = 1024;
+ * image_desc.image_height = 512;
+ * image_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
+ * ...
+ * img = ccl_image_new_v(
+ *     ctx, flags, image_format, img_dsc, NULL, NULL);
+ * @endcode
  * 
  * The underlying OpenCL image object is created using the
  * clCreateImage2D() and clCreateImage3D() if the platform's OpenCL 
@@ -177,7 +193,7 @@ void ccl_image_destroy(CCLImage* img) {
  * reporting is to be ignored.
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
-CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
+CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err) {
 
@@ -213,8 +229,8 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 		/* OpenCL image descriptor. Initialize it with data from 
 		 * img_dsc (CCLImageDesc), unwrapping the wrapped buffer, if
 		 * any. */
-		cl_mem memory_object = (img_dsc->mo != NULL) 
-			? ccl_memobj_unwrap(img_dsc->mo) : NULL;
+		cl_mem memory_object = (img_dsc->memobj != NULL) 
+			? ccl_memobj_unwrap(img_dsc->memobj) : NULL;
 		const cl_image_desc image_desc = { 
 			.image_type = img_dsc->image_type,
 			.image_width = img_dsc->image_width, 
@@ -275,6 +291,129 @@ finish:
 
 	/* Return image wrapper. */
 	return img;
+
+}
+
+/** 
+ * Creates a new image wrapper object using a variable list of key-value
+ * pairs which describe the image. The keys are assumed to be of type
+ * `const char*`, while the type of each corresponding value depends on
+ * the key, as defined in the table bellow (see the ::ccl_image_desc 
+ * struct for a detailed description of each key or parameter). The list
+ * must end with `NULL`.
+ * 
+ * **Keys and corresponding types**
+ * 
+ * Key                 | Value type         
+ * --------------------|--------------------
+ * "image_type"        | cl_mem_object_type 
+ * "image_width"       | size_t             
+ * "image_height"      | size_t             
+ * "image_depth"       | size_t             
+ * "image_array_size"  | size_t             
+ * "image_row_pitch"   | size_t             
+ * "image_slice_pitch" | size_t             
+ * "num_mip_levels"    | cl_uint            
+ * "num_samples"       | cl_uint            
+ * "memobj"            | ::CCLMemObj*       
+ * 
+ * **Usage example**
+ * 
+ * @code{.c}
+ * ...
+ * CCLImage* img;
+ * ...
+ * img = ccl_image_new(ctx, flags, image_format, NULL, NULL,
+ *     "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D
+ *     "image_width", (size_t) 1024, 
+ *     "image_height", (size_t) 512,
+ *     NULL);
+ * @endcode 
+ * 
+ * @attention Make sure the values passed in the variable argument list
+ * are of the expected type (as defined by the corresponding key). This
+ * requires the use of casts when passing values directly (as in the
+ * example above).
+ * @attention The variable argument list must end with `NULL`.
+ * 
+ * The underlying OpenCL image object is created using the
+ * clCreateImage2D() and clCreateImage3D() if the platform's OpenCL 
+ * version is 1.1 or lower, or the clCreateImage() function otherwise.
+ * 
+ * @public @memberof ccl_image
+ * 
+ * @param[in] ctx A context wrapper object on which the image wrapper
+ * object is to be created.
+ * @param[in] flags Specifies allocation and usage information about the
+ * image wrapper object being created.
+ * @param[in] image_format A pointer to the OpenCL cl_image_format
+ * structure, which describes format properties of the image to be
+ * allocated.
+ * @param[in] host_ptr A pointer to the image data that may already be 
+ * allocated by the application.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @param[in] ... A `NULL`-terminated list of key-value pairs which
+ * describe the type and dimensions of the image to be allocated.
+ * @return A new image wrapper object or `NULL` if an error occurs.
+ * */
+CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
+	const cl_image_format* image_format, void* host_ptr, GError** err,
+	...) { 
+
+	/* Make sure ctx is not NULL. */
+	g_return_val_if_fail(ctx != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+	
+	/* The va_list, which represents the variable argument list. */
+	va_list args_va;
+	/* A key. */
+	const char* key;
+	/* The image description object, initialized to zeros. */
+	CCLImageDesc image_dsc = CCL_IMAGE_DESC_BLANK;
+	
+	/* Initialize the va_list. */
+	va_start(args_va, err);
+	
+	/* Check if any arguments are given, and if so, populate 
+	 * image_dsc. */
+	while ((key = va_arg(args_va, const char*)) != NULL) {
+		
+		if (g_strcmp0(key, "image_type") == 0) {
+			image_dsc.image_type = va_arg(args_va, cl_mem_object_type);
+		} else if (g_strcmp0(key, "image_width") == 0) {
+			image_dsc.image_width = va_arg(args_va, size_t);
+		} else if (g_strcmp0(key, "image_height") == 0) {
+			image_dsc.image_height = va_arg(args_va, size_t);
+		} else if (g_strcmp0(key, "image_depth") == 0) {
+			image_dsc.image_depth = va_arg(args_va, size_t);
+		} else if (g_strcmp0(key, "image_array_size") == 0) {
+			image_dsc.image_array_size = va_arg(args_va, size_t);
+		} else if (g_strcmp0(key, "image_row_pitch") == 0) {
+			image_dsc.image_row_pitch = va_arg(args_va, size_t);
+		} else if (g_strcmp0(key, "image_slice_pitch") == 0) {
+			image_dsc.image_slice_pitch = va_arg(args_va, size_t);
+		} else if (g_strcmp0(key, "num_mip_levels") == 0) {
+			image_dsc.num_mip_levels = va_arg(args_va, cl_uint);
+		} else if (g_strcmp0(key, "num_samples") == 0) {
+			image_dsc.num_samples = va_arg(args_va, cl_uint);
+		} else if (g_strcmp0(key, "memobj") == 0) {
+			image_dsc.memobj = va_arg(args_va, CCLMemObj*);
+		} else {
+			g_set_error(err, CCL_ERROR, CCL_ERROR_ARGS, 
+				"%s: unknown key '%s'", G_STRLOC, key);
+			va_end(args_va);
+			return NULL;
+		}
+	}
+	
+	/* Close the va_list. */
+	va_end(args_va);
+	
+	/* Create the image using the vector version of this function. */
+	return ccl_image_new_v(ctx, flags, image_format, 
+		(const CCLImageDesc*) &image_dsc, host_ptr, err);
 
 }
 
