@@ -185,20 +185,6 @@ struct _cl_kernel {
 	const char* attributes;
 };
 
-struct _cl_mem {
-	cl_uint ref_count;
-	cl_mem_object_type type;
-	cl_mem_flags flags;
-	size_t size;
-	void* host_ptr;
-	cl_uint map_count;
-	cl_context context;
-	cl_mem associated_object;
-	size_t offset;
-	GSList* callbacks;
-	void* mem;
-};
-
 #ifndef CL_VERSION_1_2
 typedef struct _cl_image_desc {
     cl_mem_object_type      image_type;
@@ -214,9 +200,22 @@ typedef struct _cl_image_desc {
 } cl_image_desc;
 #endif
 
-struct _cl_image {
-	struct _cl_mem buffer;
-	struct _cl_image_desc desc;
+struct _cl_mem {
+	cl_uint ref_count;
+	cl_mem_object_type type;
+	cl_mem_flags flags;
+	size_t size;
+	void* host_ptr;
+	cl_uint map_count;
+	cl_context context;
+	cl_mem associated_object;
+	size_t offset;
+	GSList* callbacks;
+	void* mem;
+	/* Image only. */
+	struct _cl_image_format image_format;
+	struct _cl_image_desc image_desc;
+	size_t image_elem_size;
 };
 
 #endif

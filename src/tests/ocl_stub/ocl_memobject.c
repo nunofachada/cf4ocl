@@ -62,15 +62,8 @@ clReleaseMemObject(cl_mem memobj) CL_API_SUFFIX__VERSION_1_0 {
 		if ((memobj->mem != NULL) && !(memobj->flags & CL_MEM_USE_HOST_PTR))
 			g_free(memobj->mem);
 		
-		/* Release memory object depending ontype.*/
-		if (memobj->type == CL_MEM_OBJECT_BUFFER) {
-			/* It's a buffer. */
-			g_slice_free(struct _cl_mem, memobj);
-		} else {
-			/* It's an image. */
-			g_slice_free(struct _cl_image, (struct _cl_image*) memobj);
-		}
-	
+		/* Release memory object.*/
+		g_slice_free(struct _cl_mem, memobj);
 	}
 	
 	return CL_SUCCESS;

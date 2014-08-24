@@ -180,6 +180,12 @@ static void image_create_info_destroy_test(
 	g_assert_cmpuint(img_fmt.image_channel_data_type, ==, 
 		image_format.image_channel_data_type);
 
+	size_t elem_size;
+	elem_size = ccl_image_get_scalar_info(
+		img, CL_IMAGE_ELEMENT_SIZE, size_t, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(elem_size, ==, 4); /* Four channels of 1 byte each. */
+
 	size_t width;
 	width = ccl_image_get_scalar_info(
 		img, CL_IMAGE_WIDTH, size_t, &err);
