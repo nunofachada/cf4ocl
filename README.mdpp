@@ -12,10 +12,11 @@ and data transfers.
 requirements.
 
 Currently _cf4ocl_ 2 is alpha software. The stable 1.3.x branch can be
-found at https://github.com/FakenMC/cf4ocl/tree/v1x.
+found [here](https://github.com/FakenMC/cf4ocl/tree/v1x), although it
+is much more limited in scope than the current 2.x series.
 
-Features:
-=========
+Features
+========
 
 * Wraps the verbose OpenCL C API in a object-oriented, clear and simple 
 API
