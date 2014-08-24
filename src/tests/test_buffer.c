@@ -309,9 +309,10 @@ static void buffer_fill() {
 	/* If not possible to find a 1.2 or better context, finish this
 	 * test. */
 	if (ctx == NULL) {
-		ccl_platforms_destroy(ps);
+		g_test_fail();
 		g_test_message("'%s' test not performed because no platform " \
 			"with OpenCL 1.2 support was found", __func__);
+		ccl_platforms_destroy(ps);
 		return;
 	}
 	
