@@ -1,5 +1,8 @@
 # Build examples?
-option(BUILD_EXAMPLES "Build and install examples?" ON)
+option(BUILD_EXAMPLES "Build examples?" ON)
+
+# Build samples?
+option(BUILD_SAMPLES "Build samples?" ON)
 
 # Build utils?
 option(BUILD_UTILS "Build and install utilities?" ON)
@@ -8,6 +11,9 @@ option(BUILD_UTILS "Build and install utilities?" ON)
 add_subdirectory(cf4ocl2)
 if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
+endif()
+if (BUILD_SAMPLES)
+	add_subdirectory(samples)
 endif()
 if (BUILD_UTILS)
 	add_subdirectory(utils)

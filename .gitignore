@@ -11,3 +11,4 @@ build/
 CMakeFiles/
 CMakeCache*
 auxbuild/*.txt
+src/samples/stb*.h
