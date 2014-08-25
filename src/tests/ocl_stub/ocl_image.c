@@ -112,13 +112,16 @@ CL_API_SUFFIX__VERSION_1_2
 			//~ case CL_MEM_OBJECT_IMAGE1D_BUFFER:
 			//~ case CL_MEM_OBJECT_IMAGE1D_ARRAY:
 			case CL_MEM_OBJECT_IMAGE2D:
-				size = image_desc->image_row_pitch *
-					image_desc->image_height;
+				size = image_desc->image_width *
+					image_desc->image_height *
+					image_elem_size(*image_format);
+				((cl_image_desc*) image_desc)->image_depth = 1;
 				break;
 			//~ case CL_MEM_OBJECT_IMAGE2D_ARRAY:
 			case CL_MEM_OBJECT_IMAGE3D:
-				size = image_desc->image_slice_pitch *
-					image_desc->image_depth;
+				size = image_desc->image_width *
+					image_desc->image_height * image_desc->image_depth *
+					image_elem_size(*image_format);
 				break;
 			default:
 				seterrcode(errcode_ret, CL_INVALID_IMAGE_DESCRIPTOR);

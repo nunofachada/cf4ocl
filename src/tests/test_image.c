@@ -26,8 +26,8 @@
 
 #include <cf4ocl2.h>
 
-#define CCL_TEST_IMAGE_WIDTH 512
-#define CCL_TEST_IMAGE_HEIGHT 512
+#define CCL_TEST_IMAGE_WIDTH 64
+#define CCL_TEST_IMAGE_HEIGHT 64
 
 /**
  * Setup image tests by creating a context with an image-supporting

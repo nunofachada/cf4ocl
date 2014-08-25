@@ -273,23 +273,54 @@ clEnqueueReadImage(cl_command_queue command_queue, cl_mem image,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (image == NULL) { /* Not checking if memobject is image. */
+		return CL_INVALID_MEM_OBJECT;
+	} else if (image->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (ptr == NULL) {
+		return CL_INVALID_VALUE;
+	} else if ((origin[0] + region[0] > image->image_desc.image_width)
+		|| (origin[1] + region[1] > image->image_desc.image_height)
+		|| (origin[2] + region[2] > image->image_desc.image_depth)) {
+		return CL_INVALID_VALUE;
+	}
 
-	command_queue = command_queue;
-	image = image;
+	/* These are ignored. */
 	blocking_read = blocking_read;
-	origin = origin;
-	region = region;
-	row_pitch = row_pitch;
-	slice_pitch = slice_pitch;
-	ptr = ptr;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_IMAGE);
-	return CL_SUCCESS;
 
+	/* Determine effective row and slice pitches. */
+	if (row_pitch == 0)
+		row_pitch = image->image_elem_size * region[1];
+	if (slice_pitch == 0)
+		slice_pitch = row_pitch * region[2];
+
+	/* Get image width and height to more readeable variables. */
+	size_t w = image->image_desc.image_width;
+	size_t h = image->image_desc.image_height;
+
+	/* Read image. */
+	for (size_t z = 0; z < region[2]; z++) {
+		size_t slice_pitch_index = z * slice_pitch;
+		for (size_t y = 0; y < region[1]; y++) {
+			size_t row_pitch_index = y * row_pitch;
+			g_memmove(
+				ptr + slice_pitch_index + row_pitch_index,
+				image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
+				region[0] * image->image_elem_size);
+		}
+	}
+
+	/* All good. */
+	return CL_SUCCESS;
 
 }
 
@@ -300,21 +331,53 @@ clEnqueueWriteImage(cl_command_queue command_queue, cl_mem image,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (image == NULL) { /* Not checking if memobject is image. */
+		return CL_INVALID_MEM_OBJECT;
+	} else if (image->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (ptr == NULL) {
+		return CL_INVALID_VALUE;
+	} else if ((origin[0] + region[0] > image->image_desc.image_width)
+		|| (origin[1] + region[1] > image->image_desc.image_height)
+		|| (origin[2] + region[2] > image->image_desc.image_depth)) {
+		return CL_INVALID_VALUE;
+	}
 
-	command_queue = command_queue;
-	image = image;
+	/* These are ignored. */
 	blocking_write = blocking_write;
-	origin = origin;
-	region = region;
-	input_row_pitch = input_row_pitch;
-	input_slice_pitch = input_slice_pitch;
-	ptr = ptr;
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_IMAGE);
+
+	/* Determine effective row and slice pitches. */
+	if (input_row_pitch == 0)
+		input_row_pitch = image->image_elem_size * region[1];
+	if (input_slice_pitch == 0)
+		input_slice_pitch = input_row_pitch * region[2];
+
+	/* Get image width and height to more readeable variables. */
+	size_t w = image->image_desc.image_width;
+	size_t h = image->image_desc.image_height;
+
+	/* Write image. */
+	for (size_t z = 0; z < region[2]; z++) {
+		size_t slice_pitch_index = z * input_slice_pitch;
+		for (size_t y = 0; y < region[1]; y++) {
+			size_t row_pitch_index = y * input_row_pitch;
+			g_memmove(
+				image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
+				ptr + slice_pitch_index + row_pitch_index,
+				region[0] * image->image_elem_size);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 
 }
@@ -326,21 +389,52 @@ clEnqueueCopyImage(cl_command_queue command_queue, cl_mem src_image,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((src_image == NULL) || (dst_image == NULL)) { /* Not checking if memobject are images. */
+		return CL_INVALID_MEM_OBJECT;
+	} else if ((src_image->context != command_queue->context)
+		|| (dst_image->context != command_queue->context)) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if ((src_image->image_format.image_channel_data_type != dst_image->image_format.image_channel_data_type)
+		|| (src_image->image_format.image_channel_order != dst_image->image_format.image_channel_order)) {
+		return CL_IMAGE_FORMAT_MISMATCH;
+	} else if ((src_origin[0] + region[0] > src_image->image_desc.image_width)
+		|| (src_origin[1] + region[1] > src_image->image_desc.image_height)
+		|| (src_origin[2] + region[2] > src_image->image_desc.image_depth)
+		|| (dst_origin[0] + region[0] > dst_image->image_desc.image_width)
+		|| (dst_origin[1] + region[1] > dst_image->image_desc.image_height)
+		|| (dst_origin[2] + region[2] > dst_image->image_desc.image_depth)) {
+		return CL_INVALID_VALUE;
+	}
 
-	command_queue = command_queue;
-	src_image = src_image;
-	dst_image = dst_image;
-	src_origin = src_origin;
-	dst_origin = dst_origin;
-	region = region;
+	/* These are ignored. */
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_IMAGE);
-	return CL_SUCCESS;
 
+	/* Get images width and height to more readeable variables. */
+	size_t src_w = src_image->image_desc.image_width;
+	size_t src_h = src_image->image_desc.image_height;
+	size_t dst_w = dst_image->image_desc.image_width;
+	size_t dst_h = dst_image->image_desc.image_height;
+
+	/* Copy image. */
+	for (size_t z = 0; z < region[2]; z++) {
+		for (size_t y = 0; y < region[1]; y++) {
+			g_memmove(
+				dst_image->mem + ((z + dst_origin[2]) * dst_w * dst_h + (y + dst_origin[1]) * dst_w + dst_origin[0]) * dst_image->image_elem_size,
+				src_image->mem + ((z + src_origin[2]) * src_w * src_h + (y + src_origin[1]) * src_w + src_origin[0]) * src_image->image_elem_size,
+				region[0] * dst_image->image_elem_size);
+		}
+	}
+
+	/* All good. */
+	return CL_SUCCESS;
 
 }
 
@@ -656,18 +750,46 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) CL_API_SUFFIX__VERSION_1_2 {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (image == NULL) { /* Not checking if memobject is image. */
+		return CL_INVALID_MEM_OBJECT;
+	} else if (image->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (fill_color == NULL) {
+		return CL_INVALID_VALUE;
+	} else if ((origin[0] + region[0] > image->image_desc.image_width)
+		|| (origin[1] + region[1] > image->image_desc.image_height)
+		|| (origin[2] + region[2] > image->image_desc.image_depth)) {
+		return CL_INVALID_VALUE;
+	}
 
-	command_queue = command_queue;
-	image = image;
-	fill_color = fill_color;
-	origin = origin;
-	region = region;
+	/* These are ignored. */
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
 
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_FILL_IMAGE);
+
+	/* Get image width and height to more readeable variables. */
+	size_t w = image->image_desc.image_width;
+	size_t h = image->image_desc.image_height;
+
+	/* Fill image region. */
+	for (size_t z = 0; z < region[2]; z++) {
+		for (size_t y = 0; y < region[1]; y++) {
+			for (size_t x = 0; x < region[0]; x++) {
+				g_memmove(
+					image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + (x + origin[0])) * image->image_elem_size,
+					fill_color,
+					image->image_elem_size);
+			}
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 
 }
