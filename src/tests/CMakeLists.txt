@@ -51,7 +51,7 @@ set(test_program_LIBS ${LIB_OPT})
 set(test_platforms_LIBS ${LIB_OPT})
 set(test_devquery_LIBS ${LIB_OPT})
 set(test_buffer_LIBS ${LIB_OPT}) #${PROJECT_NAME} ${OPENCL_LIBRARIES}
-set(test_image_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES})
+set(test_image_LIBS ${LIB_OPT})
 set(test_sampler_LIBS ${LIB_OPT})
 set(test_error_handling_LIBS ${PROJECT_NAME}_TESTING)
 
