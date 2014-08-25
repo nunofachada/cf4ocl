@@ -129,6 +129,7 @@ CL_API_SUFFIX__VERSION_1_2
 		image->image_elem_size = image_elem_size(*image_format);
 		image->image_format = *image_format;
 		image->image_desc = *image_desc;
+		image->type = image_desc->image_type;
 	}
 	return image;
 }
