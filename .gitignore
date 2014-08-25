@@ -3,9 +3,11 @@
 .nfs*
 *.[oa]
 *.tsv
+cf4ocl
 doc/
 bin/
 obj/
 build/
 CMakeFiles/
 CMakeCache*
+auxbuild/*.txt
