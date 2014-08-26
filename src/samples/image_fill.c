@@ -44,6 +44,8 @@
 #define HANDLE_ERROR(err) \
 	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
 
+#ifdef CL_VERSION_1_2
+
 /**
  * Image fill main function.
  * */
@@ -160,4 +162,10 @@ int main(int argc, char* argv[]) {
 
 }
 
+#else
+int main() {
+	fprintf(stderr, "This sample requires OpenCL 1.2\n");
+	return -1;
+}
+#endif
 

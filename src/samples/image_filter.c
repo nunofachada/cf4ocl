@@ -92,21 +92,25 @@ static void get_global_and_local_worksizes(CCLKernel* krnl,
 	CCLDevice* dev, int width, int height, size_t* gws, size_t* lws) {
 
 	/* The preferred workgroup size. */
-	size_t wg_size_mult;
+	size_t wg_size_mult = 0;
 	size_t wg_size_max;
 
 	/* Error handling object. */
 	GError* err = NULL;
 
-	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
-	wg_size_mult = ccl_kernel_get_scalar_workgroup_info(krnl, dev,
-		CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, size_t, &err);
-	HANDLE_ERROR(err);
-
 	/* Determine maximum workgroup size. */
 	wg_size_max = ccl_kernel_get_scalar_workgroup_info(krnl, dev,
 		CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
 	HANDLE_ERROR(err);
+
+#ifdef CL_VERSION_1_1
+	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
+	wg_size_mult = ccl_kernel_get_scalar_workgroup_info(krnl, dev,
+		CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, size_t, &err);
+	HANDLE_ERROR(err);
+#else
+	wg_size_mult = wg_size_max;
+#endif
 
 	/* Try to find a mostly square local worksize. */
 	lws[0] = wg_size_mult;

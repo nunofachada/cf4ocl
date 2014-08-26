@@ -61,13 +61,17 @@ static size_t image_elem_size(cl_image_format image_format) {
 
 	switch (image_format.image_channel_order) {
 		case CL_R:
+#ifdef CL_VERSION_1_1
 		case CL_Rx:
+#endif
 		case CL_A:
 		case CL_INTENSITY:
 		case CL_LUMINANCE:
 			num_channels = 1; break;
 		case CL_RG:
+#ifdef CL_VERSION_1_1
 		case CL_RGx:
+#endif
 		case CL_RA:
 			num_channels = 2; break;
 		case CL_RGBA:
@@ -99,8 +103,10 @@ CL_API_SUFFIX__VERSION_1_2
 	/* Lots of errors are not checked! */
 	if (image_format == NULL) {
 		seterrcode(errcode_ret, CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
+#ifdef CL_VERSION_1_2
 	} else if (image_desc == NULL) {
 		seterrcode(errcode_ret, CL_INVALID_IMAGE_DESCRIPTOR);
+#endif
 	} else { /* No error, create image. */
 
 		/* Determine image size. */
@@ -124,7 +130,7 @@ CL_API_SUFFIX__VERSION_1_2
 					image_elem_size(*image_format);
 				break;
 			default:
-				seterrcode(errcode_ret, CL_INVALID_IMAGE_DESCRIPTOR);
+				seterrcode(errcode_ret, CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
 				return NULL;
 		}
 		image = clCreateBuffer(
@@ -194,12 +200,14 @@ clGetImageInfo(cl_mem image, cl_image_info param_name,
 				ccl_test_basic_info(size_t, image, image_desc.image_height);
 			case CL_IMAGE_DEPTH:
 				ccl_test_basic_info(size_t, image, image_desc.image_array_size);
+#ifdef CL_VERSION_1_2
 			case CL_IMAGE_ARRAY_SIZE:
 				ccl_test_basic_info(size_t, image, image_desc.image_depth);
 			case CL_IMAGE_NUM_MIP_LEVELS:
 				ccl_test_basic_info(cl_uint, image, image_desc.num_mip_levels);
 			case CL_IMAGE_NUM_SAMPLES:
 				ccl_test_basic_info(cl_uint, image, image_desc.num_samples);
+#endif
 			default:
 				status = CL_INVALID_VALUE;
 		}
