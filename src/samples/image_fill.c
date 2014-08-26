@@ -38,8 +38,11 @@
 #define IMAGE_HEIGHT 128
 #define IMAGE_FILE "out.png"
 
+#define ERROR_MSG_AND_EXIT(msg) \
+	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
+
 #define HANDLE_ERROR(err) \
-	if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
+	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
 
 /**
  * Image fill main function.
@@ -60,6 +63,9 @@ int main(int argc, char* argv[]) {
 
 	/* Error handling object (must be initialized to NULL). */
 	GError* err = NULL;
+
+	/* Does selected device support images? */
+	cl_bool image_ok;
 
 	/* Image data in host. */
 	cl_uchar4 base_color = {{255, 255, 255, 255}}; /* White. */
@@ -97,6 +103,13 @@ int main(int argc, char* argv[]) {
 	dev = ccl_context_get_device(ctx, 0, &err);
 	HANDLE_ERROR(err);
 
+	/* Ask device if it supports images. */
+	image_ok = ccl_device_get_scalar_info(
+		dev, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
+	HANDLE_ERROR(err);
+	if (!image_ok)
+		ERROR_MSG_AND_EXIT("Selected device doesn't support images.");
+
 	/* Create a command queue. */
 	queue = ccl_queue_new(ctx, dev, 0, &err);
 	HANDLE_ERROR(err);
@@ -133,8 +146,7 @@ int main(int argc, char* argv[]) {
 	if (file_write_status) {
 		fprintf(stdout, "\nImage saved in file '" IMAGE_FILE "'\n");
 	} else {
-		fprintf(stderr, "\nUnable to save image in file.\n");
-		exit(-2);
+		ERROR_MSG_AND_EXIT("Unable to save image in file.");
 	}
 
 	/* Release wrappers. */
