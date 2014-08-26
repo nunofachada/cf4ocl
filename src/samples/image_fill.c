@@ -17,7 +17,8 @@
 
 /**
  * @file
- * Sample code which demonstrates image fills.
+ * Sample code which demonstrates image fills. User can pass the device
+ * index in the first argument.
  *
  * @note Requires OpenCL >= 1.2.
  *
@@ -43,7 +44,7 @@
 /**
  * Image fill main function.
  * */
-int main() {
+int main(int argc, char* argv[]) {
 
 	/* Wrappers for OpenCL objects. */
 	CCLContext* ctx;
@@ -53,6 +54,9 @@ int main() {
 
 	/* Image file write status. */
 	int file_write_status;
+
+	/* Device selected specified in the command line. */
+	int dev_idx = -1;
 
 	/* Error handling object (must be initialized to NULL). */
 	GError* err = NULL;
@@ -80,8 +84,13 @@ int main() {
 	size_t c2_region[3] = { IMAGE_WIDTH / 2,  IMAGE_HEIGHT / 2, 1};
 	cl_uint4 c2_color = {{ 0, 255, 0, 255 }}; /* This should be green. */
 
+	/* Check if a device was specified in the command line. */
+	if (argc >= 2) {
+		dev_idx = atoi(argv[1]);
+	}
+
 	/* Create context using device selected from menu. */
-	ctx = ccl_context_new_from_menu(&err);
+	ctx = ccl_context_new_from_menu_full(&dev_idx, &err);
 	HANDLE_ERROR(err);
 
 	/* Get first device in context. */
@@ -121,10 +130,12 @@ int main() {
 		IMAGE_HEIGHT, 4, img_host, IMAGE_WIDTH * 4);
 
 	/* Give feedback. */
-	if (file_write_status)
+	if (file_write_status) {
 		fprintf(stdout, "\nImage saved in file '" IMAGE_FILE "'\n");
-	else
+	} else {
 		fprintf(stderr, "\nUnable to save image in file.\n");
+		exit(-2);
+	}
 
 	/* Release wrappers. */
 	ccl_image_destroy(img);
