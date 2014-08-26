@@ -30,17 +30,32 @@
 #define _CCL_OCLVERSIONS_H_
 
 #if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-	#ifdef CL_VERSION_1_2
-		#include <OpenCL/cl_dx9_media_sharing.h>
-	#endif
+	#include <OpenCL/opencl.h>
 #else
-    #include <CL/opencl.h>
+	#include <CL/opencl.h>
 	#ifdef CL_VERSION_1_2
 		#include <CL/cl_dx9_media_sharing.h>
 	#endif
 #endif
 
+/* Define stuff not defined in Apple's headers. */
+#if defined(__APPLE__) || defined(__MACOSX)
+	#define CL_DEVICE_PROFILING_TIMER_OFFSET_AMD        0x4036
+	typedef cl_ulong cl_device_partition_property_ext;
+	#define CL_DEVICE_PARTITION_EQUALLY_EXT             0x4050
+	#define CL_DEVICE_PARTITION_BY_COUNTS_EXT           0x4051
+	#define CL_DEVICE_PARTITION_BY_NAMES_EXT            0x4052
+	#define CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT  0x4053
+	#define CL_AFFINITY_DOMAIN_L1_CACHE_EXT             0x1
+	#define CL_AFFINITY_DOMAIN_L2_CACHE_EXT             0x2
+	#define CL_AFFINITY_DOMAIN_L3_CACHE_EXT             0x3
+	#define CL_AFFINITY_DOMAIN_L4_CACHE_EXT             0x4
+	#define CL_AFFINITY_DOMAIN_NUMA_EXT                 0x10
+	#define CL_AFFINITY_DOMAIN_NEXT_FISSIONABLE_EXT     0x100
+        #define CL_PROPERTIES_LIST_END_EXT                  ((cl_device_partition_property_ext) 0)
+	#define CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR        0x202B
+	#define CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR        0x202C
+#endif
 
 /* Define stuff for OpenCL implementations lower than 1.1 */
 #ifndef CL_VERSION_1_1
