@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Sample code which demonstrates a image fills.
+ * Sample code which demonstrates image fills.
  *
  * @note Requires OpenCL >= 1.2.
  *
@@ -73,12 +73,12 @@ int main() {
 	/* Origin and region for color 1. */
 	size_t c1_origin[3] = { 0, 0, 0 };
 	size_t c1_region[3] = {  IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 1 };
-	cl_uchar4 c1_color = {{ 255, 0, 0, 255 }}; /* This should be red. */
+	cl_uint4 c1_color = {{ 255, 0, 0, 255 }}; /* This should be red. */
 
 	/* Origin and region for color 2. */
 	size_t c2_origin[3] = { IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 0 };
 	size_t c2_region[3] = { IMAGE_WIDTH / 2,  IMAGE_HEIGHT / 2, 1};
-	cl_uchar4 c2_color = {{ 0, 255, 0, 255 }}; /* This should be green. */
+	cl_uint4 c2_color = {{ 0, 255, 0, 255 }}; /* This should be green. */
 
 	/* Create context using device selected from menu. */
 	ctx = ccl_context_new_from_menu(&err);

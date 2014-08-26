@@ -427,11 +427,17 @@ static void image_fill(
 	CCLQueue* q;
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 	gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
-	gint32 color;
 	const size_t origin[3] = {0, 0, 0};
 	const size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
 	GError* err = NULL;
 	user_data = user_data;
+	/* Create a random color 4-channel 8-bit color (i.e. color has 32
+	 * bits). */
+	gint32 rc = g_test_rand_int();
+	cl_uint4 color = {{ rc & 0xFF,
+			(rc >> 8) & 0xFF,
+			(rc >> 16) & 0xFF,
+			(rc >> 24) & 0xFF }};
 
 	/* Check that a context is set. */
 	if (*ctx_fixt == NULL) {
@@ -448,10 +454,6 @@ static void image_fill(
 	/* Create a command queue. */
 	q = ccl_queue_new(*ctx_fixt, d, 0, &err);
 	g_assert_no_error(err);
-
-	/* Create a random color 4-channel 8-bit color (i.e. color has 32
-	 * bits). */
-	color = g_test_rand_int();
 
 	/* Create 2D image. */
 	img = ccl_image_new(
@@ -472,10 +474,9 @@ static void image_fill(
 		himg_out, NULL, &err);
 	g_assert_no_error(err);
 
-	/* OpenCL implementations don't do a very good job of filling
-	 * the image, so we won't compare the expected color output. */
-	/* for (guint i = 0; i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
-		g_assert_cmphex(color, ==, himg_out[i]); */
+	/* Check if data is Ok. */
+	for (guint i = 0; i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
+		g_assert_cmphex(rc, ==, himg_out[i]);
 
 	/* Free stuff. */
 	ccl_image_destroy(img);

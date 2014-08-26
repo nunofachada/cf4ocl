@@ -766,6 +766,29 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 		return CL_INVALID_VALUE;
 	}
 
+	/* Convert fill color to RGBA format, the only one supported in this
+	 * stub. This will only work in little-endian. */
+	void* final_color = g_malloc0(image->image_elem_size);
+	if (image->image_elem_size == 16) {
+		/* 16 bytes, 4 bytes (32 bits) per component. */
+		g_memmove(final_color, fill_color, 16);
+	} else if (image->image_elem_size == 8) {
+		/* 8 bytes, 2 bytes (16 bits) per component. */
+		g_memmove(final_color, fill_color + 0, 2);
+		g_memmove(final_color + 2, fill_color + 4, 2);
+		g_memmove(final_color + 4, fill_color + 8, 2);
+		g_memmove(final_color + 6, fill_color + 12, 2);
+	} else if (image->image_elem_size == 4) {
+		/* 4 bytes, 1 byte (8 bits) per component. */
+		g_memmove(final_color, fill_color + 0, 1);
+		g_memmove(final_color + 1, fill_color + 4, 1);
+		g_memmove(final_color + 2, fill_color + 8, 1);
+		g_memmove(final_color + 3, fill_color + 12, 1);
+	} else {
+		/* Others are unsupported. */
+		g_assert_not_reached();
+	}
+
 	/* These are ignored. */
 	num_events_in_wait_list = num_events_in_wait_list;
 	event_wait_list = event_wait_list;
@@ -783,12 +806,12 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 			for (size_t x = 0; x < region[0]; x++) {
 				g_memmove(
 					image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + (x + origin[0])) * image->image_elem_size,
-					fill_color,
+					final_color,
 					image->image_elem_size);
 			}
 		}
 	}
-
+	g_free(final_color);
 	/* All good. */
 	return CL_SUCCESS;
 
