@@ -1,14 +1,14 @@
 Summary
 =======
 
-The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99 
-object-oriented framework for developing and benchmarking OpenCL 
+The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99
+object-oriented framework for developing and benchmarking OpenCL
 projects in the C programming language. It aims to:
 
 1. Promote the rapid development of OpenCL programs in C.
-2. Assist in the benchmarking of OpenCL events, such as kernel execution 
+2. Assist in the benchmarking of OpenCL events, such as kernel execution
 and data transfers.
-3. Simplify the analysis of the OpenCL environment and of kernel 
+3. Simplify the analysis of the OpenCL environment and of kernel
 requirements.
 
 Currently _cf4ocl_ 2 is alpha software. The stable 1.3.x branch can be
@@ -18,16 +18,19 @@ is much more limited in scope than the current 2.x series.
 Features
 ========
 
-* Wraps the verbose OpenCL C API in a object-oriented, clear and simple 
-API
+* Object-oriented interface to the OpenCL API
+  * New/destroy functions, no direct memory alloc/free
+  * Easy (and extensible) device selection
+  * Simple event dependency management
+  * User-friendly error management
 * OpenCL version independent
-* Very simple and thourough profiling
+* Integrated profiling
 
 Feeback
 =======
 
-Clone, build and install the code, the a look at the 
-[examples](https://github.com/FakenMC/cf4ocl/tree/master/src/examples) 
+Clone, build and install the code, the a look at the
+[examples](https://github.com/FakenMC/cf4ocl/tree/master/src/examples)
 and the [v2.0.0-alpha API](http://fakenmc.github.io/cf4ocl/docs/v2.0.0-alpha).
 The API may change until the beta release. Any feedback is appreciated.
 
