@@ -42,9 +42,9 @@ static void context_with_image_support_setup(
 	GError* err = NULL;
 	cl_uint num_devs;
 	*ctx_fixt = NULL;
-	double min_ocl_ver = 0;
+	cl_uint min_ocl_ver = 0;
 	if (user_data != NULL)
-		min_ocl_ver = *((double*) user_data);
+		min_ocl_ver = *((cl_uint*) user_data);
 
 	/* Get all OpenCL platforms in system. */
 	ps = ccl_platforms_new(&err);
@@ -57,10 +57,10 @@ static void context_with_image_support_setup(
 		p = ccl_platforms_get_platform(ps, i);
 
 		/* Check if a minimum OpenCL version was set. */
-		if (min_ocl_ver > 0.0) {
+		if (min_ocl_ver > 0) {
 			/* If so make sure current platform has the required
 			 * OpenCL version. */
-			double p_ocl_ver = ccl_platform_get_opencl_version(p, &err);
+			cl_uint p_ocl_ver = ccl_platform_get_opencl_version(p, &err);
 			g_assert_no_error(err);
 			if (p_ocl_ver < min_ocl_ver) {
 				/* If not, go to next platform. */
@@ -93,6 +93,7 @@ static void context_with_image_support_setup(
 			}
 		}
 	}
+	ccl_platforms_destroy(ps);
 }
 
 /**
@@ -521,7 +522,7 @@ int main(int argc, char** argv) {
 		context_with_image_support_teardown);
 
 #ifdef CL_VERSION_1_2
-	double ocl_min_ver = 1.2;
+	cl_uint ocl_min_ver = 120;
 	g_test_add(
 		"/wrappers/image/fill",
 		CCLContext*, &ocl_min_ver, context_with_image_support_setup,
