@@ -657,7 +657,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
 	cl_uint ocl_ver;
 
 	/* Get cl_context object for this kernel. */
-	context = ccl_kernel_get_scalar_info(
+	context = ccl_kernel_get_info_scalar(
 		krnl, CL_KERNEL_CONTEXT, cl_context, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 

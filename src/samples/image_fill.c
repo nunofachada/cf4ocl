@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	/* Ask device if it supports images. */
-	image_ok = ccl_device_get_scalar_info(
+	image_ok = ccl_device_get_info_scalar(
 		dev, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
 	HANDLE_ERROR(err);
 	if (!image_ok)

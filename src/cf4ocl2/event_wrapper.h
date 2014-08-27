@@ -140,7 +140,7 @@ cl_bool ccl_user_event_set_status(
  * automatically freed when the event wrapper object is destroyed.
  * If an error occurs, zero is returned.
  * */
-#define ccl_event_get_scalar_info(evt, param_name, param_type, err) \
+#define ccl_event_get_info_scalar(evt, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetEventInfo, \
 		CL_FALSE, err))
@@ -161,7 +161,7 @@ cl_bool ccl_user_event_set_status(
  * automatically freed when the event wrapper object is destroyed.
  * If an error occurs, NULL is returned.
  * */
-#define ccl_event_get_array_info(evt, param_name, param_type, err) \
+#define ccl_event_get_info_array(evt, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetEventInfo, \
 		CL_FALSE, err)
@@ -197,7 +197,7 @@ cl_bool ccl_user_event_set_status(
  * will be automatically freed when the event wrapper object is destroyed.
  * If an error occurs, zero is returned.
  * */
-#define ccl_event_get_scalar_profiling_info(evt, param_name, param_type, err) \
+#define ccl_event_get_profiling_info_scalar(evt, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetEventProfilingInfo, \
 		CL_FALSE, err))
@@ -218,7 +218,7 @@ cl_bool ccl_user_event_set_status(
  * will be automatically freed when the event wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define ccl_event_get_array_profiling_info(evt, param_name, param_type, err) \
+#define ccl_event_get_profiling_info_array(evt, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetEventProfilingInfo, \
 		CL_FALSE, err)

@@ -1096,7 +1096,7 @@ cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err) {
 	cl_uint ocl_ver;
 
 	/* Get cl_context object for this program. */
-	context = ccl_program_get_scalar_info(
+	context = ccl_program_get_info_scalar(
 		prg, CL_PROGRAM_CONTEXT, cl_context, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -1670,7 +1670,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 		/* Determine the variable part of current filename. */
 		file_middle = g_strdup(
-			ccl_device_get_array_info(
+			ccl_device_get_info_array(
 				dev, CL_DEVICE_NAME, char*, &err_internal));
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 

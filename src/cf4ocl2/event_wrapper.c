@@ -377,7 +377,7 @@ cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err) {
 	CCLContext* ctx;
 	GError* err_internal = NULL;
 
-	context = ccl_event_get_scalar_info(
+	context = ccl_event_get_info_scalar(
 		evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 

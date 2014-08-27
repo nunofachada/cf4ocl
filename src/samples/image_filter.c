@@ -99,13 +99,13 @@ static void get_global_and_local_worksizes(CCLKernel* krnl,
 	GError* err = NULL;
 
 	/* Determine maximum workgroup size. */
-	wg_size_max = ccl_kernel_get_scalar_workgroup_info(krnl, dev,
+	wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
 		CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
 	HANDLE_ERROR(err);
 
 #ifdef CL_VERSION_1_1
 	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
-	wg_size_mult = ccl_kernel_get_scalar_workgroup_info(krnl, dev,
+	wg_size_mult = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
 		CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, size_t, &err);
 	HANDLE_ERROR(err);
 #else
@@ -199,7 +199,7 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	/* Ask device if it supports images. */
-	image_ok = ccl_device_get_scalar_info(
+	image_ok = ccl_device_get_info_scalar(
 		dev, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
 	HANDLE_ERROR(err);
 	if (!image_ok)

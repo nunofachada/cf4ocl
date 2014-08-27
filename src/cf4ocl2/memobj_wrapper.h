@@ -141,7 +141,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  * automatically freed when the memory object wrapper object is destroyed.
  * If an error occurs, zero is returned.
  * */
-#define ccl_memobj_get_scalar_info(mo, param_name, param_type, err) \
+#define ccl_memobj_get_info_scalar(mo, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetMemObjectInfo, \
 		CL_TRUE, err))
@@ -162,7 +162,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  * automatically freed when the memory object wrapper object is destroyed.
  * If an error occurs, NULL is returned.
  * */
-#define ccl_memobj_get_array_info(mo, param_name, param_type, err) \
+#define ccl_memobj_get_info_array(mo, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetMemObjectInfo, \
 		CL_TRUE, err)

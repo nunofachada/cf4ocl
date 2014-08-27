@@ -284,7 +284,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * If an error occurs or if the CL_PROGRAM_BINARIES parameter is
  * requested, zero is returned.
  * */
-#define ccl_program_get_scalar_info(prg, param_name, param_type, err) \
+#define ccl_program_get_info_scalar(prg, param_name, param_type, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? (param_type) 0 \
 	: *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
@@ -311,7 +311,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * If an error occurs or if the CL_PROGRAM_BINARIES parameter is
  * requested, NULL is returned.
  * */
-#define ccl_program_get_array_info(prg, param_name, param_type, err) \
+#define ccl_program_get_info_array(prg, param_name, param_type, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
 	: (param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
@@ -352,7 +352,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * will be automatically freed when the program wrapper object is
  * destroyed. If an error occurs, zero is returned.
  * */
-#define ccl_program_get_scalar_build_info(prg, dev, param_name, \
+#define ccl_program_get_build_info_scalar(prg, dev, param_name, \
 	param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
 		(CCLWrapper*) dev, param_name, \
@@ -375,7 +375,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * will be automatically freed when the program wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define ccl_program_get_array_build_info(prg, dev, param_name, \
+#define ccl_program_get_build_info_array(prg, dev, param_name, \
 	param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
 		(CCLWrapper*) dev, param_name, \

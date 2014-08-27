@@ -50,30 +50,30 @@ static void buffer_create_info_destroy_test() {
 
 	/* Get some info and check if the return value is as expected. */
 	cl_mem_object_type mot;
-	mot = ccl_memobj_get_scalar_info(
+	mot = ccl_memobj_get_info_scalar(
 		b, CL_MEM_TYPE, cl_mem_object_type, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(mot, ==, CL_MEM_OBJECT_BUFFER);
 
 	cl_mem_flags flags;
-	flags = ccl_memobj_get_scalar_info(
+	flags = ccl_memobj_get_info_scalar(
 		b, CL_MEM_FLAGS, cl_mem_flags, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(flags, ==, CL_MEM_READ_WRITE);
 
 	size_t mem_size;
-	mem_size = ccl_memobj_get_scalar_info(b, CL_MEM_SIZE, size_t, &err);
+	mem_size = ccl_memobj_get_info_scalar(b, CL_MEM_SIZE, size_t, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(mem_size, ==, buf_size);
 
 	void* host_ptr;
-	host_ptr = ccl_memobj_get_scalar_info(
+	host_ptr = ccl_memobj_get_info_scalar(
 		b, CL_MEM_HOST_PTR, void*, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
 
 	cl_context context;
-	context = ccl_memobj_get_scalar_info(
+	context = ccl_memobj_get_info_scalar(
 		b, CL_MEM_CONTEXT, cl_context, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));

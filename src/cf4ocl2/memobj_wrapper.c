@@ -79,7 +79,7 @@ cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err) {
 	cl_uint ocl_ver;
 
 	/* Get cl_context object for this memory object. */
-	context = ccl_memobj_get_scalar_info(
+	context = ccl_memobj_get_info_scalar(
 		mo, CL_MEM_CONTEXT, cl_context, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 

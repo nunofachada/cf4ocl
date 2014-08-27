@@ -48,25 +48,25 @@ static void sampler_create_info_destroy_test() {
 
 	/* Get some info and check if the return value is as expected. */
 	cl_addressing_mode am;
-	am = ccl_sampler_get_scalar_info(
+	am = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_ADDRESSING_MODE, cl_addressing_mode, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(am, ==, CL_ADDRESS_NONE);
 
 	cl_filter_mode fm;
-	fm = ccl_sampler_get_scalar_info(
+	fm = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_FILTER_MODE, cl_filter_mode, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(fm, ==, CL_FILTER_NEAREST);
 
 	cl_bool nc;
-	nc = ccl_sampler_get_scalar_info(
+	nc = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_NORMALIZED_COORDS, cl_bool, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(nc, ==, CL_TRUE);
 
 	cl_context context;
-	context = ccl_sampler_get_scalar_info(
+	context = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_CONTEXT, cl_context, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));
@@ -108,25 +108,25 @@ static void sampler_create_full_info_destroy_test() {
 
 	/* Get some info and check if the return value is as expected. */
 	cl_addressing_mode am;
-	am = ccl_sampler_get_scalar_info(
+	am = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_ADDRESSING_MODE, cl_addressing_mode, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(am, ==, CL_ADDRESS_CLAMP_TO_EDGE);
 
 	cl_filter_mode fm;
-	fm = ccl_sampler_get_scalar_info(
+	fm = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_FILTER_MODE, cl_filter_mode, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(fm, ==, CL_FILTER_NEAREST);
 
 	cl_bool nc;
-	nc = ccl_sampler_get_scalar_info(
+	nc = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_NORMALIZED_COORDS, cl_bool, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(nc, ==, CL_FALSE);
 
 	cl_context context;
-	context = ccl_sampler_get_scalar_info(
+	context = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_CONTEXT, cl_context, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));

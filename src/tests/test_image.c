@@ -79,7 +79,7 @@ static void context_with_image_support_setup(
 			d = ccl_platform_get_device(p, j, &err);
 			g_assert_no_error(err);
 			/* Check if current device supports images. */
-			cl_bool image_support = ccl_device_get_scalar_info(
+			cl_bool image_support = ccl_device_get_info_scalar(
 				d, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
 			g_assert_no_error(err);
 			if (image_support) {
@@ -147,25 +147,25 @@ static void image_create_info_destroy_test(
 
 	/* Generic memory object queries. */
 	cl_mem_object_type mot;
-	mot = ccl_memobj_get_scalar_info(
+	mot = ccl_memobj_get_info_scalar(
 		img, CL_MEM_TYPE, cl_mem_object_type, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex(mot, ==, CL_MEM_OBJECT_IMAGE2D);
 
 	cl_mem_flags flags;
-	flags = ccl_memobj_get_scalar_info(
+	flags = ccl_memobj_get_info_scalar(
 		img, CL_MEM_FLAGS, cl_mem_flags, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex(flags, ==, CL_MEM_READ_WRITE);
 
 	void* host_ptr;
-	host_ptr = ccl_memobj_get_scalar_info(
+	host_ptr = ccl_memobj_get_info_scalar(
 		img, CL_MEM_HOST_PTR, void*, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
 
 	cl_context context;
-	context = ccl_memobj_get_scalar_info(
+	context = ccl_memobj_get_info_scalar(
 		img, CL_MEM_CONTEXT, cl_context, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex((gulong) context, ==,
@@ -173,7 +173,7 @@ static void image_create_info_destroy_test(
 
 	/* Specific image queries. */
 	cl_image_format img_fmt;
-	img_fmt = ccl_image_get_scalar_info(
+	img_fmt = ccl_image_get_info_scalar(
 		img, CL_IMAGE_FORMAT, cl_image_format, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex(img_fmt.image_channel_order, ==,
@@ -182,19 +182,19 @@ static void image_create_info_destroy_test(
 		image_format.image_channel_data_type);
 
 	size_t elem_size;
-	elem_size = ccl_image_get_scalar_info(
+	elem_size = ccl_image_get_info_scalar(
 		img, CL_IMAGE_ELEMENT_SIZE, size_t, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(elem_size, ==, 4); /* Four channels of 1 byte each. */
 
 	size_t width;
-	width = ccl_image_get_scalar_info(
+	width = ccl_image_get_info_scalar(
 		img, CL_IMAGE_WIDTH, size_t, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(width, ==, CCL_TEST_IMAGE_WIDTH);
 
 	size_t height;
-	height = ccl_image_get_scalar_info(
+	height = ccl_image_get_info_scalar(
 		img, CL_IMAGE_HEIGHT, size_t, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(height, ==, CCL_TEST_IMAGE_HEIGHT);
@@ -412,7 +412,6 @@ static void image_copy(
 	ccl_queue_destroy(q);
 
 }
-
 
 #ifdef CL_VERSION_1_2
 

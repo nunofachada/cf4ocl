@@ -254,7 +254,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * automatically freed when the context wrapper object is destroyed.
  * If an error occurs, zero is returned.
  * */
-#define ccl_context_get_scalar_info(ctx, param_name, param_type, err) \
+#define ccl_context_get_info_scalar(ctx, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetContextInfo, \
 		CL_TRUE, err))
@@ -275,7 +275,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * automatically freed when the context wrapper object is destroyed.
  * If an error occurs, NULL is returned.
  * */
-#define ccl_context_get_array_info(ctx, param_name, param_type, err) \
+#define ccl_context_get_info_array(ctx, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetContextInfo, \
 		CL_TRUE, err)

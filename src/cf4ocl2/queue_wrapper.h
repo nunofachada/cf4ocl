@@ -1,32 +1,32 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with cf4ocl. If not, see 
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with cf4ocl. If not, see
  * <http://www.gnu.org/licenses/>.
  * */
- 
- /** 
+
+ /**
  * @file
- * 
+ *
  * Definition of a wrapper class and its methods for OpenCL queue
  * objects.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
+
 #ifndef _CCL_CQUEUE_WRAPPER_H_
 #define _CCL_CQUEUE_WRAPPER_H_
 
@@ -40,31 +40,31 @@
 /**
  * @defgroup QUEUE_WRAPPER Command queue wrapper
  *
- * A wrapper object for OpenCL command queues and functions to 
+ * A wrapper object for OpenCL command queues and functions to
  * manage them.
- * 
+ *
  * @todo Detailed description of module with code examples.
- * 
+ *
  * @{
  */
 
 /**
  * Command queue wrapper class.
- * 
+ *
  * @extends ccl_wrapper
  */
 typedef struct ccl_queue CCLQueue;
 
-/* Get the command queue wrapper for the given OpenCL command 
+/* Get the command queue wrapper for the given OpenCL command
  * queue. */
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 
 /* Create a new command queue wrapper object. */
-CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev, 
+CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	cl_command_queue_properties properties, GError** err);
 
-/* Decrements the reference count of the command queue wrapper 
- * object. If it reaches 0, the command queue wrapper object is 
+/* Decrements the reference count of the command queue wrapper
+ * object. If it reaches 0, the command queue wrapper object is
  * destroyed. */
 void ccl_queue_destroy(CCLQueue* cq);
 
@@ -76,18 +76,18 @@ CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err);
  * object. */
 CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err);
 
-/* Create an event wrapper from a given OpenCL event object and 
+/* Create an event wrapper from a given OpenCL event object and
  * associate it with the command queue. */
 CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event);
 
-/* Initialize an iterator for this command queue's list of event 
+/* Initialize an iterator for this command queue's list of event
  * wrappers. */
 void ccl_queue_iter_event_init(CCLQueue* cq);
 
 /* Get the next event wrapper associated with this queue. */
 CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq);
 
-/* Issues all previously queued commands in a command queue to the 
+/* Issues all previously queued commands in a command queue to the
  * associated device. */
 cl_bool ccl_queue_flush(CCLQueue* cq, GError** err);
 
@@ -97,26 +97,26 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
 
 /**
  * Get a ::CCLWrapperInfo command queue information object.
- * 
+ *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested command queue information object. This object
- * will be automatically freed when the command queue wrapper object is 
+ * will be automatically freed when the command queue wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_queue_get_info(cq, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, \
 		(ccl_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
-/** 
- * Macro which returns a scalar command queue information value. 
- * 
- * Use with care. In case an error occurs, zero is returned, which 
+/**
+ * Macro which returns a scalar command queue information value.
+ *
+ * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
- * is necessary to check the error object. 
- * 
+ * is necessary to check the error object.
+ *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
@@ -126,18 +126,18 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
  * will be automatically freed when the command queue wrapper object is
  * destroyed. If an error occurs, zero is returned.
  * */
-#define ccl_queue_get_scalar_info(cq, param_name, param_type, err) \
+#define ccl_queue_get_info_scalar(cq, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetCommandQueueInfo, \
 		CL_TRUE, err))
 
-/** 
- * Macro which returns an array command queue information value. 
- * 
- * Use with care. In case an error occurs, NULL is returned, which 
+/**
+ * Macro which returns an array command queue information value.
+ *
+ * Use with care. In case an error occurs, NULL is returned, which
  * might be ambiguous if NULL is a valid return value. In this case, it
- * is necessary to check the error object. 
- * 
+ * is necessary to check the error object.
+ *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
@@ -147,22 +147,22 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
  * will be automatically freed when the command queue wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define ccl_queue_get_array_info(cq, param_name, param_type, err) \
+#define ccl_queue_get_info_array(cq, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetCommandQueueInfo, \
 		CL_TRUE, err)
 
-/** 
+/**
  * Increase the reference count of the command queue object.
- * 
- * @param[in] cq The command queue wrapper object. 
+ *
+ * @param[in] cq The command queue wrapper object.
  * */
 #define ccl_queue_ref(cq) \
 	ccl_wrapper_ref((CCLWrapper*) cq)
 
 /**
  * Alias to ccl_queue_destroy().
- * 
+ *
  * @param[in] cq Command queue wrapper object to destroy if reference
  * count is 1, otherwise just decrement the reference count.
  * */
@@ -170,7 +170,7 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
 
 /**
  * Get the OpenCL command queue object.
- * 
+ *
  * @param[in] cq The command queue wrapper object.
  * @return The OpenCL command queue object.
  * */

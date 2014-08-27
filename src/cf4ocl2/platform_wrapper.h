@@ -98,7 +98,7 @@ cl_uint ccl_platform_get_opencl_version(
  * automatically freed when the platform wrapper object is destroyed.
  * If an error occurs, zero is returned.
  * */
-#define ccl_platform_get_scalar_info(platf, param_name, param_type, err) \
+#define ccl_platform_get_info_scalar(platf, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetPlatformInfo, \
 		CL_TRUE, err))
@@ -119,14 +119,14 @@ cl_uint ccl_platform_get_opencl_version(
  * automatically freed when the platform wrapper object is destroyed.
  * If an error occurs, NULL is returned.
  * */
-#define ccl_platform_get_array_info(platf, param_name, param_type, err) \
+#define ccl_platform_get_info_array(platf, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
 		NULL, param_name, (ccl_wrapper_info_fp) clGetPlatformInfo, \
 		CL_TRUE, err)
 
 /**
  * Helper macro which gets a platform information string. This
- * macro simply wraps the ccl_platform_get_array_info() macro, because
+ * macro simply wraps the ccl_platform_get_info_array() macro, because
  * (as of OpenCL 2.0) all platform information return types are char*.
  *
  * @param[in] platf The platform wrapper object.
@@ -138,7 +138,7 @@ cl_uint ccl_platform_get_opencl_version(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info_string(platf, param_name, err) \
-	ccl_platform_get_array_info(platf, param_name, char*, err)
+	ccl_platform_get_info_array(platf, param_name, char*, err)
 
 /**
  * Increase the reference count of the platform wrapper object.

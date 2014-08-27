@@ -171,7 +171,7 @@ CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err) {
 	GError* err_internal = NULL;
 
 	/* Get OpenCL platform_id object from device. */
-	platform_id = ccl_device_get_scalar_info(
+	platform_id = ccl_device_get_info_scalar(
 		dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 

@@ -153,7 +153,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * automatically freed when the kernel wrapper object is destroyed.
  * If an error occurs, zero is returned.
  * */
-#define ccl_kernel_get_scalar_info(krnl, param_name, param_type, err) \
+#define ccl_kernel_get_info_scalar(krnl, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		NULL, (param_name), (ccl_wrapper_info_fp) clGetKernelInfo, \
 		CL_TRUE, (err)))
@@ -174,7 +174,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * automatically freed when the kernel wrapper object is destroyed.
  * If an error occurs, NULL is returned.
  * */
-#define ccl_kernel_get_array_info(krnl, param_name, param_type, err) \
+#define ccl_kernel_get_info_array(krnl, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		NULL, (param_name), (ccl_wrapper_info_fp) clGetKernelInfo, \
 		CL_TRUE, (err))
@@ -214,7 +214,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * will be automatically freed when the kernel wrapper object is
  * destroyed. If an error occurs, zero is returned.
  * */
-#define ccl_kernel_get_scalar_workgroup_info(krnl, dev, param_name, \
+#define ccl_kernel_get_workgroup_info_scalar(krnl, dev, param_name, \
 	param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		(CCLWrapper*) (dev), (param_name), \
@@ -239,7 +239,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * will be automatically freed when the kernel wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define ccl_kernel_get_array_workgroup_info(krnl, dev, param_name, \
+#define ccl_kernel_get_workgroup_info_array(krnl, dev, param_name, \
 	param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		(CCLWrapper*) (dev), (param_name), \
@@ -270,7 +270,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * will be automatically freed when the kernel wrapper object is
  * destroyed. If an error occurs, zero is returned.
  * */
-#define ccl_kernel_get_scalar_arg_info(krnl, idx, param_name, \
+#define ccl_kernel_get_arg_info_scalar(krnl, idx, param_name, \
 	param_type, err) \
 	(param_type) \
 	((ccl_kernel_get_arg_info((krnl), (idx), (param_name), (err)) != NULL) \
@@ -296,7 +296,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * will be automatically freed when the kernel wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
-#define ccl_kernel_get_array_arg_info(krnl, idx, param_name, \
+#define ccl_kernel_get_arg_info_array(krnl, idx, param_name, \
 	param_type, err) \
 	(ccl_kernel_get_arg_info((krnl), (idx), (param_name), (err)) != NULL) \
 	? *((param_type*) ccl_kernel_get_arg_info( \

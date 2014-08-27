@@ -283,10 +283,10 @@ int main(int argc, char *argv[]) {
 	dev = ccl_context_get_device(ctx, 0, &err);
 	ccl_if_err_goto(err, error_handler);
 
-	dev_name = ccl_device_get_array_info(dev, CL_DEVICE_NAME, char*, &err);
+	dev_name = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
 	ccl_if_err_goto(err, error_handler);
 
-	dev_vendor = ccl_device_get_array_info(dev, CL_DEVICE_VENDOR, char*, &err);
+	dev_vendor = ccl_device_get_info_array(dev, CL_DEVICE_VENDOR, char*, &err);
 	ccl_if_err_goto(err, error_handler);
 
 	g_printf("\n   == Using device '%s' from '%s'\n", dev_name, dev_vendor);
