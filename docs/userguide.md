@@ -29,13 +29,45 @@ requirements.
 
 ## Basics {#ug_basics}
 
-### Library organization
+### Framework organization
 
-* Wrappers, which wrap OpenCL objects and functions, and provide some
-utility functions.
-* Profiler
-* Device selector - an extension to the Context wrapper
-* Device query - used by ccl_devinfo util
+The _cf4ocl_ library offers an object-oriented interface to the OpenCL
+API using wrapper classes and methods (or structs and functions, in C
+terms). Each type of OpenCL object is wrapped in a _cf4ocl_ class, as
+shown in the following table:
+
+| Class         | [OpenCL type]    | _cf4ocl_ wrapper |
+| ------------- | ---------------- | ---------------- |
+| Platform      | cl_platform_id   | ::CCLPlatform*   |
+| Device        | cl_device_id     | ::CCLDevice*     |
+| Context       | cl_context       | ::CCLContext*    |
+| Command queue | cl_command_queue | ::CCLQueue*      |
+| Program       | cl_program       | ::CCLProgram*    |
+| Kernel        | cl_kernel        | ::CCLKernel*     |
+| Event         | cl_event         | ::CCLEvent*      |
+| MemObject     | cl_mem           | ::CCLMemObj*     |
+| Buffer        | cl_mem           | ::CCLBuffer*     |
+| Image         | cl_mem           | ::CCLImage*      |
+| Sampler       | cl_sampler       | ::CCLSampler*    |
+
+Each wrapper class has several methods (functions). Some of these
+directly wrap OpenCL functions (::ccl_buffer_enqueue_copy()), while
+others perform a number of OpenCL operations (e.g.
+::ccl_kernel_set_args_and_enqueue_ndrange()).
+
+The device and context wrappers classes are augmented by the
+@ref DEVICE_SELECTOR "device selector module", which allows to
+automatically select devices using selected filters.
+
+_cf4ocl_ also provides a fully integrated profiling class, ::CCLProf.
+When the OpenCL computations are over, the command queues (i.e., their
+wrapper objects) used in the computation can be added to the profiling
+object, and a complete profiling analysis can be performed.
+
+Finally, the framework also provides two utilities:
+
+* `ccl_devinfo`
+* `ccl_kerninfo`
 
 ### The new/destroy rule {#ug_new_destroy}
 
@@ -169,7 +201,7 @@ functions, each of them associated with distinct error codes:
 | --------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
 | ::CCL_ERROR     | ::ccl_error_code enum                                             | Error in _cf4ocl_ not related with external libraries |
 | ::CCL_OCL_ERROR | [cl.h](http://www.khronos.org/registry/cl/api/2.0/cl.h)           | Error in OpenCL function calls                        |
-| A Glib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent | Error in GLib function call (file open/save, etc).    |
+| A Glib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent | Error in GLib function call (file open/save, etc)     |
 
 For example, if client code wants to act on different OpenCL error
 codes, it still can:
@@ -271,3 +303,4 @@ CMake style.
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
+[OpenCL type]: http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/abstractDataTypes.html "OpenCL types"
