@@ -7,9 +7,9 @@ User guide
 
 The C Framework for OpenCL, cf4ocl, is a cross-platform pure C99
 object-oriented framework for developing and benchmarking OpenCL
-projects in the C programming language. It aims to:
+projects in C and C++. It aims to:
 
-* Promote the rapid development of OpenCL programs in C.
+* Promote the rapid development of OpenCL programs in C and C++.
 * Assist in the benchmarking of OpenCL events, such as kernel execution
 and data transfers.
 * Simplify the analysis of the OpenCL environment and of kernel
@@ -114,17 +114,16 @@ ccl_device_destroy(dev);
 
 ### Error handling {#ug_errorhandle}
 
-Error throwing _cf4ocl_ functions provide two methods for client-side
+Error-reporting _cf4ocl_ functions provide two methods for client-side
 error handling:
 
-1. Using the return value.
-2. Passing a pointer to a
-[GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
-object.
+1. The return value.
+2. [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)-based
+error reporting.
 
 The first method consists of analysing the return value of a function.
 Error throwing functions which return a pointer will return `NULL` if
-an error occurs. The remaining error throwing functions return
+an error occurs. The remaining error-reporting functions return
 `CL_FALSE` if an error occurs (or `CL_TRUE` otherwise). Client code can
 check for errors by looking for `NULL` or `CL_FALSE` return values,
 depending on the function. This error handling method does not provide
@@ -133,20 +132,94 @@ information on which exact error occured. For example:
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
 CCLProgram* prg;
-cl_bool ret_status;
 ...
-ret_status = ccl_program_new_from_source_file(ctx, "program.cl", NULL);
-if (!ret_status) {
-	fprintf(stderr, "An error ocurred");
-	exit(-1);
+prg = ccl_program_new_from_source_file(ctx, "program.cl", NULL);
+if (!prg) {
+    fprintf(stderr, "An error ocurred");
+    exit(-1);
 }
 ~~~~~~~~~~~~~~~
 
-The second method is more flexible. The `GError` object should be
-initialized to `NULL`, and is then passed as the last argument to the
-function.
+The second method uses the [GLib Error Reporting](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html)
+approach and is more flexible. A `GError` object is initialized to
+`NULL`, and a pointer to it is passed as the last argument to the
+function being called. If the `GError` object is still `NULL` after the
+function call, no error has occurred. Otherwise, an error occurred
+and it is possible to get a user-friendly error message:
 
-TO DO
+~~~~~~~~~~~~~~~{.c}
+CCLContext* ctx;
+CCLProgram* prg;
+GError* err = NULL;
+...
+prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
+if (err) {
+    fprintf(stderr, "%s", err->message);
+    exit(-1);
+}
+~~~~~~~~~~~~~~~
+
+An error domain and error code are also available in the `GError`
+object. The domain indicates the module the error-reporting function is
+located in, while code indicates the specific error that occurred.
+Three kinds of domain can be returned by error-reporting _cf4ocl_
+functions, each of them associated with distinct error codes:
+
+| Domain          | Codes                                                             | Description                                           |
+| --------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
+| ::CCL_ERROR     | ::ccl_error_code enum                                             | Error in _cf4ocl_ not related with external libraries |
+| ::CCL_OCL_ERROR | [cl.h](http://www.khronos.org/registry/cl/api/2.0/cl.h)           | Error in OpenCL function calls                        |
+| A Glib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent | Error in GLib function call (file open/save, etc).    |
+
+For example, if client code wants to act on different OpenCL error
+codes, it still can:
+
+~~~~~~~~~~~~~~~{.c}
+CCLContext* ctx;
+CCLBuffer* buf;
+GError* err = NULL;
+...
+buf = ccl_buffer_new(ctx, flags, size, host_ptr, &err);
+if (err) {
+    if (err->domain == CCL_OCL_ERROR) {
+        /* Check if it's OpenCL error. */
+        switch (err->code) {
+            /* Do different things depending on OpenCL error code. */
+            case CL_INVALID_VALUE:
+                ...
+            case CL_INVALID_BUFFER_SIZE:
+                ...
+            case CL_INVALID_HOST_PTR:
+                ...
+            ...
+        }
+    } else {
+        ...
+    }
+}
+~~~~~~~~~~~~~~~
+
+Finally, if client code wants to continue execution after an error was
+caught, it is mandatory to use the [g_clear_error()] function to free
+the error object and reset its value to `NULL`. Not doing so is a bug,
+especially if more error-reporting functions are to be called moving
+forward. For example:
+
+~~~~~~~~~~~~~~~{.c}
+CCLContext* ctx;
+CCLProgram* prg;
+GError* err = NULL;
+...
+prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
+if (err) {
+    /* Print the error message, but don't terminate program. */
+    fprintf(stderr, "%s", err->message);
+    g_clear_error(&err);
+}
+~~~~~~~~~~~~~~~
+
+Even if the program terminates due to an error, the [g_clear_error()]
+can be still be called to destroy the error object.
 
 ## Wrapper objects {#ug_wrappers}
 
@@ -195,3 +268,6 @@ One-to-one.
 ## Build and install from source {#ug_buildinstall}
 
 CMake style.
+
+[GLib]: https://developer.gnome.org/glib/ "GLib"
+[g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
