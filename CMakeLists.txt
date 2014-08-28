@@ -9,7 +9,7 @@ find_package(Git REQUIRED)
 # Determine version from Git
 include(GetVersionFromGitTag)
 
-# Set log domain  
+# Set log domain
 add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 
 # Set executables prefix
@@ -32,14 +32,14 @@ option(USE_LOCAL_OPENCL_HEADERS "Use local OpenCL headers?" OFF)
 
 SET(LOCAL_OPENCL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
 
-SET_PROPERTY(CACHE LOCAL_OPENCL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0") 
+SET_PROPERTY(CACHE LOCAL_OPENCL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
 
 IF (USE_LOCAL_OPENCL_HEADERS)
 	SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${LOCAL_OPENCL_HEADERS}")
 ENDIF()
 
 # Library include directories
-include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS} 
+include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src
 	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
@@ -80,15 +80,15 @@ if(DOXYGEN_FOUND)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
-	# Copy images to doc directory 
+	# Copy images to doc directory
 	add_custom_command(TARGET doc POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_SOURCE_DIR}/images 
+		${CMAKE_CURRENT_SOURCE_DIR}/images
 		${DOCS_DIRECTORY}/html/images
 	)
 	# Add documentation installation target (if the docs have been built)
 	if (${DOC_INSTALL})
-		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/ 
+		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
 	endif()
 
