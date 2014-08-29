@@ -54,7 +54,7 @@ static void context_with_image_support_setup(
 	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
 
 		/* Get next platform. */
-		p = ccl_platforms_get_platform(ps, i);
+		p = ccl_platforms_get(ps, i);
 
 		/* Check if a minimum OpenCL version was set. */
 		if (min_ocl_ver > 0) {

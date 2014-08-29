@@ -354,7 +354,7 @@ static void buffer_fill() {
 	ps = ccl_platforms_new(&err);
 	g_assert_no_error(err);
 	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
-		p = ccl_platforms_get_platform(ps, i);
+		p = ccl_platforms_get(ps, i);
 		double ocl_ver = ccl_platform_get_opencl_version(p, &err);
 		if (ocl_ver >= 120) {
 			ctx = ccl_context_new_from_devices(

@@ -1,4 +1,4 @@
-User guide
+User guide {#ug}
 ==========
 
 [TOC]
@@ -7,9 +7,9 @@ User guide
 
 The C Framework for OpenCL, cf4ocl, is a cross-platform pure C99
 object-oriented framework for developing and benchmarking OpenCL
-projects in C and C++. It aims to:
+projects in C/C++. It aims to:
 
-* Promote the rapid development of OpenCL programs in C and C++.
+* Promote the rapid development of OpenCL programs in C/C++.
 * Assist in the benchmarking of OpenCL events, such as kernel execution
 and data transfers.
 * Simplify the analysis of the OpenCL environment and of kernel
@@ -20,7 +20,7 @@ requirements.
 * Object-oriented interface to the OpenCL API
   * New/destroy functions, no direct memory alloc/free
   * Easy (and extensible) device selection
-  * Simple event dependency management
+  * Simple event dependency mechanism
   * User-friendly error management
 * OpenCL version independent
 * Integrated profiling
@@ -29,7 +29,7 @@ requirements.
 
 ## Basics {#ug_basics}
 
-### Framework organization
+### Library organization {#ug_forg}
 
 The _cf4ocl_ library offers an object-oriented interface to the OpenCL
 API using wrapper classes and methods (or structs and functions, in C
@@ -51,7 +51,7 @@ shown in the following table:
 | Sampler       | cl_sampler       | ::CCLSampler*    |
 
 Each wrapper class has several methods (functions). Some of these
-directly wrap OpenCL functions (::ccl_buffer_enqueue_copy()), while
+directly wrap OpenCL functions (e.g. ::ccl_buffer_enqueue_copy()), while
 others perform a number of OpenCL operations (e.g.
 ::ccl_kernel_set_args_and_enqueue_ndrange()).
 
@@ -63,11 +63,6 @@ _cf4ocl_ also provides a fully integrated profiling class, ::CCLProf.
 When the OpenCL computations are over, the command queues (i.e., their
 wrapper objects) used in the computation can be added to the profiling
 object, and a complete profiling analysis can be performed.
-
-Finally, the framework also provides two utilities:
-
-* `ccl_devinfo`
-* `ccl_kerninfo`
 
 ### The new/destroy rule {#ug_new_destroy}
 
@@ -97,7 +92,7 @@ dev = ccl_context_get_device(ctx, 0, NULL);
 
 The returned device wrapper object will be freed when the context
 wrapper object is destroyed; as such, there is no need to free the
-device wrapper object:
+former:
 
 ~~~~~~~~~~~~~~~{.c}
 ccl_context_destroy(ctx);
@@ -151,15 +146,15 @@ error handling:
 
 1. The return value.
 2. [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)-based
-error reporting.
+error-reporting.
 
 The first method consists of analysing the return value of a function.
-Error throwing functions which return a pointer will return `NULL` if
+Error-throwing functions which return a pointer will return `NULL` if
 an error occurs. The remaining error-reporting functions return
 `CL_FALSE` if an error occurs (or `CL_TRUE` otherwise). Client code can
 check for errors by looking for `NULL` or `CL_FALSE` return values,
 depending on the function. This error handling method does not provide
-information on which exact error occured. For example:
+additional information about the reported error. For example:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
@@ -201,10 +196,10 @@ functions, each of them associated with distinct error codes:
 | --------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
 | ::CCL_ERROR     | ::ccl_error_code enum                                             | Error in _cf4ocl_ not related with external libraries |
 | ::CCL_OCL_ERROR | [cl.h](http://www.khronos.org/registry/cl/api/2.0/cl.h)           | Error in OpenCL function calls                        |
-| A Glib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent | Error in GLib function call (file open/save, etc)     |
+| A GLib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent | Error in GLib function call (file open/save, etc)     |
 
-For example, if client code wants to act on different OpenCL error
-codes, it still can:
+For example, it is possible for client code to act on different OpenCL
+errors:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;

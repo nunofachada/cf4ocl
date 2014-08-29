@@ -93,7 +93,7 @@ static void platforms_create_info_destroy_test() {
 	for (guint i = 0; i < num_platfs; i++) {
 
 		/* Get current platform. */
-		p = ccl_platforms_get_platform(platfs, i);
+		p = ccl_platforms_get(platfs, i);
 		g_debug(">> Platform %d:", i);
 
 		/* Get platform profile. */
@@ -519,7 +519,7 @@ static void platforms_create_info_destroy_test() {
 
 	/* Test get_all_devices method of platform module. */
 	for (guint i = 0; i < ccl_platforms_count(platfs); i++) {
-		p = ccl_platforms_get_platform(platfs, i);
+		p = ccl_platforms_get(platfs, i);
 		ds = ccl_platform_get_all_devices(p, &err);
 		g_assert_no_error(err);
 		for (guint j = 0; j < ccl_platform_get_num_devices(p, &err); j++) {
@@ -559,7 +559,7 @@ static void platforms_ref_unref_test() {
 	g_assert_no_error(err);
 
 	/* Use first device of first platform. */
-	p = ccl_platforms_get_platform(platfs, 0);
+	p = ccl_platforms_get(platfs, 0);
 
 	d = ccl_platform_get_device(p, 0, &err);
 	g_assert_no_error(err);

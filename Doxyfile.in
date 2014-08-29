@@ -38,7 +38,7 @@ PROJECT_NUMBER         = @cf4ocl2_VERSION_STRING_FULL@
 # for a project that appears at the top of each page and should give viewer
 # a quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Object-oriented framework for developing and benchmarking OpenCL projects in C and C++"
+PROJECT_BRIEF          = "Object-oriented framework for developing and benchmarking OpenCL projects in C/C++"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is
 # included in the documentation. The maximum height of the logo should not
@@ -641,7 +641,7 @@ INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md \
                          @PROJECT_SOURCE_DIR@/src/tests \
                          @PROJECT_SOURCE_DIR@/src/utils \
                          @PROJECT_SOURCE_DIR@/scripts \
-                         @PROJECT_SOURCE_DIR@/docs \
+                         @PROJECT_SOURCE_DIR@/docs
 
 USE_MDFILE_AS_MAINPAGE = README.doxy.md
 

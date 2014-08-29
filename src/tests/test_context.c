@@ -122,7 +122,7 @@ static void context_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Get first platform wrapper from platforms object. */
-	p = ccl_platforms_get_platform(ps, 0);
+	p = ccl_platforms_get(ps, 0);
 	g_assert(p != NULL);
 
 	/* Get first device wrapper from platform wrapper. */
@@ -397,7 +397,7 @@ static void context_ref_unref_test() {
 	for (cl_uint i = 0; i < ccl_platforms_count(ps); ++i) {
 
 		/* Get current platform. */
-		p = ccl_platforms_get_platform(ps, i);
+		p = ccl_platforms_get(ps, i);
 		g_assert(p != NULL);
 
 		/* Cycle through devices available in platform. */
@@ -696,7 +696,7 @@ static void context_get_supported_image_formats() {
 	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
 
 		/* Get current platform. */
-		p = ccl_platforms_get_platform(ps, i);
+		p = ccl_platforms_get(ps, i);
 
 		/* Get number of devices in platform. */
 		num_devs = ccl_platform_get_num_devices(p, &err);

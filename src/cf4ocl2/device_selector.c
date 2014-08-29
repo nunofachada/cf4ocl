@@ -158,7 +158,7 @@ static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
 	for (guint i = 0; i < num_platfs; i++) {
 
 		/* Get next platform wrapper. */
-		platform = ccl_platforms_get_platform(platforms, i);
+		platform = ccl_platforms_get(platforms, i);
 
 		/* Get number of devices in current platform.*/
 		guint num_devices = ccl_platform_get_num_devices(
