@@ -18,7 +18,7 @@
 
 /**
  * @file
- * 
+ *
  * Classes and functions for filtering and selecting OpenCL contexts
  * and associated devices.
  *
@@ -38,11 +38,11 @@
 /**
  * @defgroup DEVICE_SELECTOR Device selector
  *
- * This module provides objects and functions for selecting
+ * This module provides classes and functions for selecting
  * OpenCL devices for context creation.
- * 
+ *
  * @todo Detailed description of module with code examples.
- * 
+ *
  * @{
  */
 
@@ -50,7 +50,7 @@
 typedef GPtrArray* CCLDevSelDevices;
 
 /**
- * Independent filter function: Abstract function for filtering 
+ * Independent filter function: Abstract function for filtering
  * one OpenCL device at a time.
  *
  * @param[in] device OpenCL device to filter.
@@ -61,9 +61,9 @@ typedef GPtrArray* CCLDevSelDevices;
  */
 typedef cl_bool (*ccl_devsel_indep)(
 	CCLDevice* device, void *data, GError **err);
-	
+
 /**
- * Dependent filter function: Abstract function for filtering 
+ * Dependent filter function: Abstract function for filtering
  * several OpenCL devices depending on the available device choices.
  *
  * @param[in] devices OpenCL devices to filter.
@@ -77,20 +77,20 @@ typedef CCLDevSelDevices (*ccl_devsel_dep)(
 
 /**
  * A set of independent and dependent device filters.
- * 
+ *
  * Use the ccl_devsel_add_indep_filter() function to add independent
  * filters and the ccl_devsel_add_dep_filter() function to add dependent
  * device filters.
- * 
+ *
  * This object should be initialized to NULL:
- * 
+ *
  *     CCLDevSelFilters filters = NULL;
- * 
- * And its location should be passed to the ccl_devsel_add_*_filter() 
+ *
+ * And its location should be passed to the ccl_devsel_add_*_filter()
  * functions:
- * 
+ *
  *     ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_cpu, NULL);
- * 
+ *
  * Filters are processed in the order they are added to the set.
  * */
 typedef GPtrArray* CCLDevSelFilters;
@@ -99,7 +99,7 @@ typedef GPtrArray* CCLDevSelFilters;
  * containing the name and vendor of each device in the system. */
 gchar** ccl_devsel_get_device_strings(GError** err);
 
-/* Print to stdout a device description string for each device 
+/* Print to stdout a device description string for each device
  * in the system. */
 void ccl_devsel_print_device_strings(GError** err);
 
@@ -121,7 +121,7 @@ CCLDevSelDevices ccl_devsel_select(
  *
  * @{
  */
- 
+
 /* Independent filter function which accepts devices of the type
  * given in the data parameter. */
 cl_bool ccl_devsel_indep_type(
@@ -135,12 +135,12 @@ cl_bool ccl_devsel_indep_type_gpu(
 cl_bool ccl_devsel_indep_type_cpu(
 	CCLDevice* device, void *data, GError **err);
 
-/* Independent filter function which only accepts accelerator 
+/* Independent filter function which only accepts accelerator
  * devices. */
 cl_bool ccl_devsel_indep_type_accel(
 	CCLDevice* device, void *data, GError **err);
-	
-/* Independent filter which selects devices based on device 
+
+/* Independent filter which selects devices based on device
  * name, device vendor and/or platform name. */
 cl_bool ccl_devsel_indep_string(
 	CCLDevice* dev, void *data, GError **err);
@@ -162,7 +162,7 @@ cl_bool ccl_devsel_indep_platform(
  * same platform (the platform to which the first device belong to). */
 CCLDevSelDevices ccl_devsel_dep_platform(
 	CCLDevSelDevices devices, void *data, GError **err);
-	
+
 /* Dependent filter function which presents a menu to the user
  * allowing him to select the desired device. */
 CCLDevSelDevices ccl_devsel_dep_menu(

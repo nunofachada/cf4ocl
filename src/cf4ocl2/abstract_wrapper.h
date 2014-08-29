@@ -214,35 +214,29 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 
 /**
  * Class which represents information about a wrapped OpenCL
- * entity.
+ * object.
  * */
 struct ccl_wrapper_info {
 
 	/**
-	 * Device information.
+	 * Object information.
 	 * @public
 	 * */
 	void* value;
 
 	/**
-	 * Size in bytes of device information.
+	 * Size in bytes of object information.
 	 * @public
 	 * */
 	size_t size;
 
 };
 
-/* Create a new CCLWrapperInfo* object with a given value size. */
-CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
-
-/* Destroy a ::CCLWrapperInfo object. */
-void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
-
 /**
  * Helper macro which returns a scalar information value casted
  * to specified scalar type.
  *
- * @param[in] info ::CCLWrapperInfo information object.
+ * @param[in] info ::CCLWrapperInfo* information object.
  * @param[in] type Scalar type to which to cast value to.
  * @return The information value casted to the specified scalar type.
  * */
@@ -252,7 +246,7 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
  * Helper macro which returns an array information value casted
  * to specified array type.
  *
- * @param[in] info ::CCLWrapperInfo information object.
+ * @param[in] info ::CCLWrapperInfo* information object.
  * @param[in] type Array (pointer) type to which to cast value to.
  * @return The information value casted to the specified array (pointer)
  * type.
@@ -260,6 +254,12 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 #define ccl_info_array(info, type) ((type) (info)->value)
 
 /** @} */
+
+/* Create a new CCLWrapperInfo* object with a given value size. */
+CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
+
+/* Destroy a ::CCLWrapperInfo object. */
+void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
 #endif
 

@@ -37,7 +37,8 @@
 /**
  * @defgroup PLATFORMS Platforms
  *
- * Objects and functions for managing sets of OpenCL platforms.
+ * Objects and functions for managing the OpenCL platforms available
+ * in the system.
  *
  * @todo Detailed description of module with code examples.
  *

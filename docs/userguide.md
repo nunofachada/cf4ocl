@@ -1,6 +1,8 @@
 User guide {#ug}
 ==========
 
+@brief _cf4ocl_ user guide.
+
 [TOC]
 
 # Overview {#ug_overview}
@@ -33,36 +35,40 @@ requirements.
 
 The _cf4ocl_ library offers an object-oriented interface to the OpenCL
 API using wrapper classes and methods (or structs and functions, in C
-terms). Each type of OpenCL object is wrapped in a _cf4ocl_ class, as
-shown in the following table:
+terms), grouped in modules of the same name, as shown in the following
+table:
 
-| Class         | [OpenCL type]    | _cf4ocl_ wrapper |
-| ------------- | ---------------- | ---------------- |
-| Platform      | cl_platform_id   | ::CCLPlatform*   |
-| Device        | cl_device_id     | ::CCLDevice*     |
-| Context       | cl_context       | ::CCLContext*    |
-| Command queue | cl_command_queue | ::CCLQueue*      |
-| Program       | cl_program       | ::CCLProgram*    |
-| Kernel        | cl_kernel        | ::CCLKernel*     |
-| Event         | cl_event         | ::CCLEvent*      |
-| MemObject     | cl_mem           | ::CCLMemObj*     |
-| Buffer        | cl_mem           | ::CCLBuffer*     |
-| Image         | cl_mem           | ::CCLImage*      |
-| Sampler       | cl_sampler       | ::CCLSampler*    |
+| _cf4ocl_ module                         | _cf4ocl_ wrapper class | Wrapped OpenCL type |
+| --------------------------------------- | ---------------------- | ------------------- |
+| @ref PLATFORM_WRAPPER "Platform module" | ::CCLPlatform*         | cl_platform_id      |
+| @ref DEVICE_WRAPPER "Device module"     | ::CCLDevice*           | cl_device_id        |
+| @ref CONTEXT_WRAPPER "Context module"   | ::CCLContext*          | cl_context          |
+| @ref QUEUE_WRAPPER "Queue module"       | ::CCLQueue*            | cl_command_queue    |
+| @ref PROGRAM_WRAPPER "Program module"   | ::CCLProgram*          | cl_program          |
+| @ref KERNEL_WRAPPER "Kernel module"     | ::CCLKernel*           | cl_kernel           |
+| @ref EVENT_WRAPPER "Event module"       | ::CCLEvent*            | cl_event            |
+| @ref MEMOBJ_WRAPPER "MemObj module"     | ::CCLMemObj*           | cl_mem              |
+| @ref BUFFER_WRAPPER "Buffer module"     | ::CCLBuffer*           | cl_mem              |
+| @ref IMAGE_WRAPPER "Image module"       | ::CCLImage*            | cl_mem              |
+| @ref SAMPLER_WRAPPER "Sampler module"   | ::CCLSampler*          | cl_sampler          |
 
-Each wrapper class has several methods (functions). Some of these
-directly wrap OpenCL functions (e.g. ::ccl_buffer_enqueue_copy()), while
-others perform a number of OpenCL operations (e.g.
-::ccl_kernel_set_args_and_enqueue_ndrange()).
+Some of the provided methods directly wrap OpenCL functions (e.g.
+::ccl_buffer_enqueue_copy()), while others perform a number of OpenCL
+operations in one function call
+(e.g. ::ccl_kernel_set_args_and_enqueue_ndrange()). The wrapper classes
+are organized in a hierarchical @ref ug_classtree "class tree".
 
-The device and context wrappers classes are augmented by the
-@ref DEVICE_SELECTOR "device selector module", which allows to
-automatically select devices using selected filters.
+Additional modules are also available:
 
-_cf4ocl_ also provides a fully integrated profiling class, ::CCLProf.
-When the OpenCL computations are over, the command queues (i.e., their
-wrapper objects) used in the computation can be added to the profiling
-object, and a complete profiling analysis can be performed.
+| _cf4ocl_ module                                | Description                                                                                        |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| @ref DEVICE_SELECTOR "Device selector module"  | Automatically select devices using filters.                                                        |
+| @ref DEVICE_QUERY "Device query module"        | Helpers for querying device information, mainly used by the @ref ug_devinfo "ccl_devinfo" program. |
+| @ref ERRORS "Errors module"                    | Convert OpenCL error codes into human-readable strings.                                            |
+| @ref PLATFORMS "Platforms module"              | Management of the OpencL platforms available in the system.                                        |
+| @ref PROFILER "Profiler module"                | Simple, convenient and thorough profiling of OpenCL events.                                        |
+| @ref TYPES "Types module"                      | Use and pass OpenCL types as function arguments.                                                   |
+| @ref WRAPPER_INFO "Wrapper information module" | Macros and functions to obtain information about OpenCL objects.                                   |
 
 ### The new/destroy rule {#ug_new_destroy}
 
@@ -78,24 +84,26 @@ obtained using other (non-constructor) methods during the course of a
 program. These objects are automatically released and should not be
 destroyed by client code.
 
-For example, it is possible to get a device belonging to a context
-using the ::ccl_context_get_device() function:
+For example, it is possible to get a kernel belonging to a program
+using the ::ccl_program_get_kernel() function:
 
 ~~~~~~~~~~~~~~~{.c}
-CCLContext* ctx;
-CCLDevice* dev;
-...
-ctx = ccl_context_new_any(NULL);
-...
-dev = ccl_context_get_device(ctx, 0, NULL);
+CCLProgram* prg;
+CCLKernel* krnl;
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
+prg = ccl_program_new_from_source_file(ctx, "myprog.cl", NULL);
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
+krnl = ccl_program_get_kernel(prg, "someKernel", NULL);
 ~~~~~~~~~~~~~~~
 
-The returned device wrapper object will be freed when the context
-wrapper object is destroyed; as such, there is no need to free the
-former:
+The returned kernel wrapper object will be freed when the program
+is destroyed; as such, there is no need to free the former. Destroying
+the program will suffice:
 
 ~~~~~~~~~~~~~~~{.c}
-ccl_context_destroy(ctx);
+ccl_program_destroy(prg);
 ~~~~~~~~~~~~~~~
 
 ### Getting info about OpenCL objects {#ug_getinfo}
@@ -112,7 +120,8 @@ For example, to get the name and the number of compute cores on a device:
 CCLDevice* dev;
 char* name;
 cl_uint n_cores;
-...
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
 name = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, NULL);
 n_cores = ccl_device_get_info_scalar(dev, CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, NULL);
 ~~~~~~~~~~~~~~~
@@ -128,7 +137,9 @@ field.
 
 To use the value, a cast should be performed on the `value` field to
 convert it to the required type (which is what the
-`ccl_<object>_get_info_<scalar|array>()` macros do).
+`ccl_<object>_get_info_<scalar|array>()` macros automatically do). The
+::ccl_info_scalar() and ::ccl_info_array() macros perform this cast
+directly on ::CCLWrapperInfo* objects.
 
 The values and objects returned by these macros are automatically
 released when the respective wrapper object is destroyed and should
@@ -159,7 +170,8 @@ additional information about the reported error. For example:
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
 CCLProgram* prg;
-...
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
 prg = ccl_program_new_from_source_file(ctx, "program.cl", NULL);
 if (!prg) {
     fprintf(stderr, "An error ocurred");
@@ -178,7 +190,8 @@ and it is possible to get a user-friendly error message:
 CCLContext* ctx;
 CCLProgram* prg;
 GError* err = NULL;
-...
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
 prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
 if (err) {
     fprintf(stderr, "%s", err->message);
@@ -205,7 +218,8 @@ errors:
 CCLContext* ctx;
 CCLBuffer* buf;
 GError* err = NULL;
-...
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
 buf = ccl_buffer_new(ctx, flags, size, host_ptr, &err);
 if (err) {
     if (err->domain == CCL_OCL_ERROR) {
@@ -213,15 +227,17 @@ if (err) {
         switch (err->code) {
             /* Do different things depending on OpenCL error code. */
             case CL_INVALID_VALUE:
-                ...
+                /* Handle invalid values */
             case CL_INVALID_BUFFER_SIZE:
-                ...
+                /* Handle invalid buffer sizes */
             case CL_INVALID_HOST_PTR:
-                ...
-            ...
+                /* Handle invalid host pointer */
+
+            /* Handle other OpenCL errors */
+
         }
     } else {
-        ...
+        /* Handle other errors */
     }
 }
 ~~~~~~~~~~~~~~~
@@ -236,7 +252,8 @@ forward. For example:
 CCLContext* ctx;
 CCLProgram* prg;
 GError* err = NULL;
-...
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~{.c}
 prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
 if (err) {
     /* Print the error message, but don't terminate program. */
@@ -250,50 +267,148 @@ can be still be called to destroy the error object.
 
 ## Wrapper objects {#ug_wrappers}
 
-* Platforms
-* Devices
-* Contexts
-* Command queues
-* Memory objects
-  * Buffer objects
-  * Image objects
-* Sampler objects
-* Program objects
-* Kernel objects
-* Event objects
+### Platform {#ug_platform}
+
+@copydoc PLATFORM_WRAPPER
+
+### Device {#ug_device}
+
+@copydoc DEVICE_WRAPPER
+
+### Context {#ug_context}
+
+@copydoc CONTEXT_WRAPPER
+
+### Command queue {#ug_queue}
+
+@copydoc QUEUE_WRAPPER
+
+### Memory object {#ug_memobj}
+
+@copydoc MEMOBJ_WRAPPER
+
+#### Buffer {#ug_buffer}
+
+@copydoc BUFFER_WRAPPER
+
+#### Image {#ug_image}
+
+@copydoc IMAGE_WRAPPER
+
+### Sampler  {#ug_sampler}
+
+@copydoc SAMPLER_WRAPPER
+
+### Program {#ug_program}
+
+@copydoc PROGRAM_WRAPPER
+
+### Kernel  {#ug_kernel}
+
+@copydoc KERNEL_WRAPPER
+
+#### Kernel arguments {#ug_kernel_args}
+
+@copydoc KERNEL_ARG
+
+### Event {#ug_event}
+
+@copydoc EVENT_WRAPPER
+
+#### Event wait lists  {#ug_event_wait_lists}
+
+@copydoc EVENT_WAIT_LIST
 
 ## Device/context selection {#ug_devsel}
 
-Using filters.
+@copydoc DEVICE_SELECTOR
+
+## Device query {#ug_devquery}
+
+@copydoc DEVICE_QUERY
+
+## Error messages {#ug_errors}
+
+@copydoc ERRORS
+
+## Platform management {#ug_platforms}
+
+@copydoc PLATFORMS
 
 ## Profiling {#ug_profiling}
 
-Very easy.
+@copydoc PROFILER
+
+## Passing OpenCL types as function arguments {#ug_types}
+
+@copydoc TYPES
+
+## Wrapper information
+
+@copydoc WRAPPER_INFO
 
 # Using the utilities {#ug_utils}
 
 ## ccl_devinfo {#ug_devinfo}
 
-Man page here.
+@copydetails devinfo
 
 ## ccl_kerninfo {#ug_kerninfo}
 
-Man page here.
+@copydetails kerninfo
 
 # Advanced {#ug_advanced}
 
 ## Architecture {#ug_architecture}
 
-### Class tree {#ug_classtree}
+### Wrapper class tree {#ug_classtree}
 
 Show the class tree, maybe a dia diagram or own Doxygen diagram.
+
+@dot
+digraph cf4ocl {
+	rankdir=BT;
+	node [shape=record, fontname=Helvetica, fontsize=10];
+	wrapper [ label="CCLWrapper*" URL="@ref ccl_wrapper"];
+	devcon [ label="CCLDevContainer*" URL="@ref ccl_dev_container"];
+	ctx [ label="CCLContext*" URL="@ref ccl_context"];
+	prg [ label="CCLProgram*" URL="@ref ccl_program"];
+	platf [ label="CCLPlatform*" URL="@ref ccl_platform"];
+	memobj [ label="CCLMemObj*" URL="@ref ccl_memobj"];
+	buf [ label="CCLBuffer*" URL="@ref ccl_buffer"];
+	img [ label="CCLImage*" URL="@ref ccl_image"];
+	dev [ label="CCLDevice*" URL="@ref ccl_device"];
+	evt [ label="CCLEvent*" URL="@ref ccl_event"];
+	krnl [ label="CCLKernel*" URL="@ref ccl_kernel"];
+	queue [ label="CCLQueue*" URL="@ref ccl_queue"];
+	smplr [ label="CCLSampler*" URL="@ref ccl_sampler"];
+	devcon -> wrapper;
+	ctx -> devcon;
+	prg -> devcon;
+	platf -> devcon;
+	buf -> memobj;
+	img -> memobj;
+	dev -> wrapper;
+	evt -> wrapper;
+	krnl -> wrapper;
+	queue -> wrapper;
+	smplr -> wrapper;
+}
+@enddot
 
 ### OpenCL object/cf4ocl wrapper uniqueness {#ug_unique}
 
 One-to-one.
 
+The ccl_<object>_wrap API.
+
+Ref counting.
+
+Mem-check when exit.
+
 ## Build and install from source {#ug_buildinstall}
 
+Dependencies.
 CMake style.
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"

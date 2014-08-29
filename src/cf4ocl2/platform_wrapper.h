@@ -38,10 +38,62 @@
 /**
  * @defgroup PLATFORM_WRAPPER Platform wrapper
  *
- * A wrapper object for OpenCL platforms and functions to manage
- * them.
+ * The platform wrapper module provides functionality for simple
+ * handling of OpenCL platform objects.
  *
- * @todo detailed description of module.
+ * Platform wrappers can be obtain in two ways:
+ *
+ * 1. From a given ::CCLDevice* device wrapper, using the
+ * ::ccl_platform_new_from_device() function (in which case, the object
+ * must be destroyed with ::ccl_platform_destroy(), following the
+ * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule).
+ * 2. From a ::CCLPlatforms* object (which contains the list of platforms
+ * in the system), using the ::ccl_platforms_get() function. In this
+ * case the platform wrapper is automatically destroyed when the
+ * ::CCLPlatforms* object is freed; as such, client code should not
+ * directly destroy the platform wrapper. See the
+ * @ref PLATFORMS "platforms module" for more details.
+ *
+ * The provided functions allow to get the device wrappers associated
+ * with the given platform wrapper, as well as to obtain the supported
+ * OpenCL version of the underlying OpenCL platform object.
+ *
+ * Information about platform objects can be fetched using the
+ * platform @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_platform_get_info_scalar()
+ * * ::ccl_platform_get_info_array()
+ * * ::ccl_platform_get_info()
+ *
+ * However, because the platform info return type is always `char*`,
+ * _cf4ocl_ provides an additional helper macro for platform wrappers,
+ * ::ccl_platform_get_info_string(), which is simpler to use.
+ *
+ * _Usage example:_
+ *
+ * @code{.c}
+ * CCLPlatform* platf;
+ * CCLDevice* dev;
+ * char* platf_name;
+ * cl_uint platf_ver;
+ * @endcode
+ * @code{.c}
+ * platf = ccl_platform_new_from_device(dev, NULL);
+ * @endcode
+ * @code{.c}
+ * platf_name =
+ *     ccl_platform_get_info_string(platf, CL_PLATFORM_NAME, NULL);
+ * @endcode
+ * @code{.c}
+ * platf_ver = ccl_platform_get_opencl_version(platf, NULL);
+ * @endcode
+ * @code{.c}
+ * printf("Platform name is %s\n: ", platf_name);
+ * printf("Platform version is %f\n: ", platf_ver / 100.0f);
+ * @endcode
+ * @code{.c}
+ * ccl_platform_destroy(platf);
+ * @endcode
  *
  * @{
  */

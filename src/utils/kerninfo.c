@@ -20,10 +20,17 @@
  * Prints information about an OpenCL kernel.
  *
  * @author Nuno Fachada
- * @date 2013
+ * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  *
  */
+
+/**
+ * @page kerninfo ccl_kerninfo
+ *
+ * Man page here.
+ *
+ * */
 
 #include "program_wrapper.h"
 #include "kernel_wrapper.h"

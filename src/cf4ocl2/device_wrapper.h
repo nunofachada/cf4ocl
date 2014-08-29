@@ -43,13 +43,39 @@ typedef struct ccl_platform CCLPlatform;
 /**
  * @defgroup DEVICE_WRAPPER Device wrapper
  *
- * A wrapper object for OpenCL devices and functions to manage
- * them.
+ * The device wrapper module provides functionality for simple
+ * handling of OpenCL device objects.
  *
- * @todo Detailed description of module with code examples.
+ * In most cases, device wrapper objects should not be directly
+ * instanced by client code. They are usually fetched from
+ * @ref CCLDevContainer "device container" objects such as
+ * ::CCLPlatform* or ::CCLContext* instances. As such, and in accordance
+ * with the _cf4ocl_ @ref ug_new_destroy "new/destroy" rule, the
+ * ::ccl_device_destroy() destructor function will also be rarely used.
+ *
+ * Information about device objects can be fetched using the
+ * device @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_device_get_info_scalar()
+ * * ::ccl_device_get_info_array()
+ * * ::ccl_device_get_info()
+ *
+ * _Example: getting the first device in a context_
+ *
+ * @code{.c}
+ * CCLContext* ctx;
+ * CCLDevice* dev;
+ * @endcode
+ * @code{.c}
+ * dev = ccl_context_get_device(ctx, 0, NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_context_destroy(ctx);
+ * @endcode
  *
  * @{
  */
+
 
 /**
  * Device wrapper class.

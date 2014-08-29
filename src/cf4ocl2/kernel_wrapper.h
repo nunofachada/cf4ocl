@@ -58,11 +58,6 @@ typedef struct ccl_program CCLProgram;
  */
 typedef struct ccl_kernel CCLKernel;
 
-//~ typedef void (CL_CALLBACK *ccl_kernel_callback)(void* args)
-//~
-//~ typedef CCLDevSelDevices (*ccl_devsel_dep)(
-	//~ CCLDevSelDevices devices, void *data, GError **err);
-
 /* Get the kernel wrapper for the given OpenCL kernel. */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 

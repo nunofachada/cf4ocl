@@ -38,8 +38,8 @@ typedef struct ccl_image CCLImage;
 /**
  * @defgroup BUFFER_WRAPPER Buffer wrapper
  *
- * A wrapper object for OpenCL buffers and functions to manage
- * them.
+ * The buffer wrapper module provides functionality for simple
+ * handling of OpenCL buffer objects.
  *
  * All the functions in this module are direct wrappers of the
  * respective OpenCL buffer functions, except for the
@@ -48,37 +48,38 @@ typedef struct ccl_image CCLImage;
  * specific region in the original buffer (which is the only sub-buffer
  * type, up to OpenCL 2.0).
  *
- * Information about buffer objects can be fetched using the `info`
- * macros from the @ref MEMOBJ_WRAPPER "memory object module":
+ * Information about buffer objects can be fetched using the
+ * @ref ug_getinfo "info macros" from the
+ * @ref MEMOBJ_WRAPPER "memory object module":
  *
- * * ::ccl_memobj_get_info()
  * * ::ccl_memobj_get_info_scalar()
  * * ::ccl_memobj_get_info_array()
+ * * ::ccl_memobj_get_info()
  *
  * Instantiation and destruction of buffer wrappers follows the
  * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule.
  *
- * **Usage example:**
+ * _Usage example:_
  *
  * @code{.c}
- * ...
  * CCLBuffer* buf;
  * cl_float host_data[BSIZE];
  * size_t buf_size = BSIZE * sizeof(cl_float);
- * ...
+ * @endcode
+ * @code{.c}
  * buf = ccl_buffer_new(
  *     context, CL_MEM_READ_WRITE, buf_size, NULL, NULL);
- * ...
+ * @endcode
+ * @code{.c}
  * ccl_buffer_enqueue_write(queue, buf, CL_TRUE, 0, buf_size,
  *     host_data, NULL, NULL);
- * ...
- * ... run some kernel ...
- * ...
+ * @endcode
+ * @code{.c}
  * ccl_buffer_enqueue_read(queue, buf, CL_TRUE, 0, buf_size,
  *     host_data, NULL, NULL);
- * ...
+ * @endcode
+ * @code{.c}
  * ccl_buffer_destroy(buf);
- * ...
  * @endcode
  *
  * @{

@@ -194,7 +194,7 @@ SEPARATE_MEMBER_PAGES  = NO
 # The TAB_SIZE tag can be used to set the number of spaces in a tab.
 # Doxygen uses this value to replace tabs by spaces in code fragments.
 
-TAB_SIZE               = 8
+TAB_SIZE               = 4
 
 # This tag can be used to specify a number of aliases that acts
 # as commands in the documentation. An alias has the form "name=value".
@@ -642,6 +642,9 @@ INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md \
                          @PROJECT_SOURCE_DIR@/src/utils \
                          @PROJECT_SOURCE_DIR@/scripts \
                          @PROJECT_SOURCE_DIR@/docs
+
+#                         @PROJECT_SOURCE_DIR@/src/samples \
+#                         @PROJECT_SOURCE_DIR@/src/examples \
 
 USE_MDFILE_AS_MAINPAGE = README.doxy.md
 

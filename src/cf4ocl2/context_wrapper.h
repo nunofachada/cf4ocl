@@ -41,10 +41,70 @@
 /**
  * @defgroup CONTEXT_WRAPPER Context wrapper
  *
- * A wrapper object for OpenCL contexts and functions to manage
- * them.
+ * The context wrapper module provides functionality for simple
+ * handling of OpenCL context objects.
  *
- * @todo Detailed description of module with code examples.
+ * Context wrappers can be created using three different approaches:
+ *
+ * 1. From a list of ::CCLDevice* device wrappers, using the
+ * ::ccl_context_new_from_devices_full() function or the
+ * ::ccl_context_new_from_devices() macro. This is the approach usually
+ * followed when using the clCreateContext() OpenCL function directly.
+ * 2. From a list of ::CCLDevSelFilters* device filters, using the
+ * ccl_context_new_from_filters_full() function or the
+ * ccl_context_new_from_filters() macro. This is a very flexible
+ * mechanism, which is explained in detail in the
+ * @ref DEVICE_SELECTOR "device selection module" section.
+ * 3. Using one of the several convenience constructors, which contain
+ * predefined filters, such as ::ccl_context_new_gpu(),
+ * ::ccl_context_new_any or ::ccl_context_new_from_menu().
+ *
+ * Instantiation and destruction of context wrappers follows the
+ * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule; as such, context
+ * wrapper objects must be released with the ::ccl_context_destroy()
+ * function.
+ *
+ * Additional functions allow to get the device wrappers associated
+ * with the the context wrapper object, as well as to obtain the
+ * OpenCL version supported by the underlying OpenCL platform.
+ *
+ * Information about context objects can be fetched using the
+ * context @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_context_get_info_scalar()
+ * * ::ccl_context_get_info_array()
+ * * ::ccl_context_get_info()
+ *
+ * _Example: using all devices in a platform_
+ *
+ * @code{.c}
+ * CCLPlatform* platf;
+ * CCLContext* ctx;
+ * const* CCLDevice* devs;
+ * cl_uint num_devs;
+ * @endcode
+ * @code{.c}
+ * devs = ccl_platform_get_all_devices(platf, NULL);
+ * num_devs = ccl_platform_get_num_devices(platf, NULL);
+ * @endcode
+ * @code{.c}
+ * ctx = ccl_context_new_from_devices(num_devs, devs, NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_context_destroy(ctx);
+ * @endcode
+ *
+ * _Example: select device from menu_
+ *
+ * @code{.c}
+ * CCLContext* ctx;
+ * @endcode
+ * @code{.c}
+ * ctx = ccl_context_new_from_menu(NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_context_destroy(ctx);
+ * @endcode
  *
  * @{
  */

@@ -24,6 +24,13 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
+/**
+ * @page devinfo ccl_devinfo
+ *
+ * Man page will be placed here.
+ *
+ * */
+
 #include "devinfo.h"
 
 /* Command line arguments and respective default values. */
@@ -107,7 +114,7 @@ int main(int argc, char* argv[]) {
 	gint status;
 
 	/* Parse command line options. */
-	ccl_device_query_args_parse(argc, argv, &err);
+	ccl_devinfo_args_parse(argc, argv, &err);
 	ccl_if_err_goto(err, error_handler);
 
 	/* If version was requested, output version and exit. */
@@ -155,7 +162,7 @@ int main(int argc, char* argv[]) {
 			p = ccl_platforms_get(platforms, i);
 
 			/* Show platform information. */
-			ccl_device_query_show_platform_info(p, i);
+			ccl_devinfo_show_platform_info(p, i);
 
 			/* Get number of devices. */
 			num_devs = ccl_platform_get_num_devices(p, &err);
@@ -183,11 +190,11 @@ int main(int argc, char* argv[]) {
 					"\n\t[ Device #%d: %s ]\n\n",
 					j, dev_name);
 				if (opt_all)
-					ccl_device_query_show_device_info_all(d);
+					ccl_devinfo_show_device_info_all(d);
 				else if (opt_custom)
-					ccl_device_query_show_device_info_custom(d);
+					ccl_devinfo_show_device_info_custom(d);
 				else
-					ccl_device_query_show_device_info_basic(d);
+					ccl_devinfo_show_device_info_basic(d);
 
 			}
 			g_fprintf(CCL_DEVINFO_OUT,	"\n");
@@ -229,7 +236,7 @@ cleanup:
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * */
-void ccl_device_query_args_parse(int argc, char* argv[], GError** err) {
+void ccl_devinfo_args_parse(int argc, char* argv[], GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail(err == NULL || *err == NULL);
@@ -272,7 +279,7 @@ cleanup:
  * @param[in] p Platform wrapper object.
  * @param[in] idx Platform index.
  * */
-void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
+void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
 
 	/* Platform info variables. */
 	gchar *profile, *version, *name, *vendor;
@@ -316,7 +323,7 @@ void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
 	return;
 }
 
-#define ccl_device_query_output_device_info(key, value, desc) \
+#define ccl_devinfo_output_device_info(key, value, desc) \
 	if (opt_verb) { \
 		g_fprintf(CCL_DEVINFO_OUT, \
 			"\t\t   Parameter : %s\n" \
@@ -335,7 +342,7 @@ void ccl_device_query_show_platform_info(CCLPlatform* p, guint idx) {
  *
  * @param[in] d Device wrapper object.
  * */
-void ccl_device_query_show_device_info_all(CCLDevice* d) {
+void ccl_devinfo_show_device_info_all(CCLDevice* d) {
 
 	/* Parameter value and size. */
 	CCLWrapperInfo* param_value;
@@ -357,7 +364,7 @@ void ccl_device_query_show_device_info_all(CCLDevice* d) {
 		if (err == NULL) {
 
 			/* If no error, show current parameter value... */
-			ccl_device_query_output_device_info(
+			ccl_devinfo_output_device_info(
 				ccl_devquery_info_map[k].param_name,
 				ccl_devquery_info_map[k].format(
 					param_value, param_value_str,
@@ -372,7 +379,7 @@ void ccl_device_query_show_device_info_all(CCLDevice* d) {
 			if (opt_nfound) {
 				/* ...and show that parameter is not available, if user
 				 * requested so. */
-				ccl_device_query_output_device_info(
+				ccl_devinfo_output_device_info(
 					ccl_devquery_info_map[k].param_name,
 					CCL_DEVINFO_NA,
 					ccl_devquery_info_map[k].description);
@@ -387,7 +394,7 @@ void ccl_device_query_show_device_info_all(CCLDevice* d) {
  *
  * @param[in] d Device wrapper object.
  * */
-void ccl_device_query_show_device_info_custom(CCLDevice* d) {
+void ccl_devinfo_show_device_info_custom(CCLDevice* d) {
 
 	/* A row of the device info_map. */
 	const CCLDevQueryMap* info_row;
@@ -430,7 +437,7 @@ void ccl_device_query_show_device_info_custom(CCLDevice* d) {
 			if (err == NULL) {
 
 				/* If no error, show current parameter value... */
-				ccl_device_query_output_device_info(
+				ccl_devinfo_output_device_info(
 					info_row->param_name,
 					info_row->format(
 						param_value, param_value_str,
@@ -447,7 +454,7 @@ void ccl_device_query_show_device_info_custom(CCLDevice* d) {
 				if (opt_nfound) {
 					/* ...and show that parameter is not available, if user
 					* requested so. */
-					ccl_device_query_output_device_info(
+					ccl_devinfo_output_device_info(
 						info_row->param_name,
 						CCL_DEVINFO_NA,
 						info_row->description);
@@ -471,7 +478,7 @@ void ccl_device_query_show_device_info_custom(CCLDevice* d) {
  *
  * @param[in] d Device wrapper object.
  * */
-void ccl_device_query_show_device_info_basic(CCLDevice* d) {
+void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
 
 	/* A row of the device info_map. */
 	const CCLDevQueryMap* info_row;
@@ -502,7 +509,7 @@ void ccl_device_query_show_device_info_basic(CCLDevice* d) {
 		if (err == NULL) {
 
 			/* If no error, show current parameter value... */
-			ccl_device_query_output_device_info(
+			ccl_devinfo_output_device_info(
 				info_row->param_name,
 				info_row->format(
 					param_value, param_value_str,
@@ -517,7 +524,7 @@ void ccl_device_query_show_device_info_basic(CCLDevice* d) {
 			if (opt_nfound) {
 				/* ...and show that parameter is not available, if user
 				 * requested so. */
-				ccl_device_query_output_device_info(
+				ccl_devinfo_output_device_info(
 					info_row->param_name,
 					CCL_DEVINFO_NA,
 					info_row->description);

@@ -263,15 +263,16 @@ cl_bool ccl_user_event_set_status(
  * @code{.c}
  * CCLEvent *evt1, *evt2, *evt3;
  * CCLEventWaitList evt_wait_lst = NULL;
- * ...
+ * @endcode
+ * @code{.c}
  * evt1 = ccl_buffer_enqueue_write(cq, a_dev, CL_FALSE, 0, size, a_host, NULL, NULL);
  * evt2 = ccl_buffer_enqueue_write(cq, b_dev, CL_FALSE, 0, size, b_host, NULL, NULL);
- * ...
- * ccl_event_wait_list_add(evt1, &evt_wait_lst);
- * ccl_event_wait_list_add(evt2, &evt_wait_lst);
+ * @endcode
+ * @code{.c}
+ * ccl_event_wait_list_add(&evt_wait_lst, evt1);
+ * ccl_event_wait_list_add(&evt_wait_lst, evt2);
  * evt3 = ccl_kernel_enqueue_ndrange(krnl, cq, dim, offset, gws, lws, &evt_wait_lst, NULL);
  * ccl_buffer_enqueue_read(cq, c_dev, CL_TRUE, 0, size, c_host, &evt_wait_lst, NULL);
- * ...
  * @endcode
  *
  * @{
