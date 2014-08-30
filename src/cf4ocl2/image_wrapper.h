@@ -38,9 +38,74 @@ typedef struct ccl_buffer CCLBuffer;
 /**
  * @defgroup IMAGE_WRAPPER Image wrapper
  *
- * A wrapper for handling images in OpenCL.
+ * The image wrapper module provides functionality for simple
+ * handling of OpenCL image objects.
  *
- * @todo Detailed description of module with code examples.
+ * All the functions in this module are direct wrappers of the
+ * respective OpenCL image functions. The ::ccl_image_new() constructor
+ * accepts a variable list of arguments which describe the image to be
+ * created. There is also the ::ccl_image_new_v(), which accepts the
+ * image description arguments given in a ::CCLImageDesc* object. Both
+ * constructors will automatically use the old style
+ * clCreateImage2D()/clCreateImage3D() constructors if the underlying
+ * platform OpenCL version is less or equal than 1.1, or the new
+ * clCreateImage() constructor otherwise. Instantiation and destruction
+ * of image wrappers follows the _cf4ocl_
+ * @ref ug_new_destroy "new/destroy" rule; as such, images should be
+ * freed with the ::ccl_image_destroy() destructor.
+ *
+ * Information about image objects can be fetched using the
+ * @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_image_get_info_scalar()
+ * * ::ccl_image_get_info_array()
+ * * ::ccl_image_get_info()
+ *
+ * If the information to be fetched is relative to the memory object
+ * super-class (e.g. `CL_MEM_TYPE` or `CL_MEM_FLAGS`), then the
+ * @ref MEMOBJ_WRAPPER "memory object module" info macros should be used
+ * instead:
+ *
+ * * ::ccl_memobj_get_info_scalar()
+ * * ::ccl_memobj_get_info_array()
+ * * ::ccl_memobj_get_info()
+ *
+ * _Example:_
+ *
+ * @code{.c}
+ * CCLQueue* queue;
+ * CCLImage* img_in;
+ * CCLImage* img_out;
+ * cl_uchar4 host_img[IMG_X * IMG_Y];
+ * cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
+ * size_t origin[3] = { 0, 0, 0 };
+ * size_t region[3] = { IMG_X, IMG_Y, 1 };
+ * @endcode
+ * @code{.c}
+ * img_in = ccl_image_new(ctx, CL_MEM_READ_ONLY, &image_format, NULL, &err,
+ *     "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+ *     "image_width", (size_t) IMG_X,
+ *     "image_height", (size_t) IMG_Y,
+ *     NULL);
+ * img_out = ccl_image_new(ctx, CL_MEM_WRITE_ONLY, &image_format, NULL, &err,
+ *     "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+ *     "image_width", (size_t) IMG_X,
+ *     "image_height", (size_t) IMG_Y,
+ *     NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_image_enqueue_write(queue, img_in, CL_TRUE, origin, region,
+ *     0, 0, host_img, NULL, NULL);
+ * @endcode
+ * _enqueue some image processing kernel..._
+ * @code{.c}
+ * ccl_image_enqueue_read(queue, img_out, CL_TRUE, origin, region,
+ *     0, 0, host_img, NULL, NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_image_destroy(img_in);
+ * ccl_image_destroy(img_out);
+ * @endcode
  *
  * @{
  */

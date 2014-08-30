@@ -59,7 +59,7 @@ typedef struct ccl_image CCLImage;
  * Instantiation and destruction of buffer wrappers follows the
  * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule.
  *
- * _Usage example:_
+ * _Example:_
  *
  * @code{.c}
  * CCLBuffer* buf;

@@ -37,11 +37,36 @@
 /**
  * @defgroup PLATFORMS Platforms
  *
- * Objects and functions for managing the OpenCL platforms available
- * in the system.
+ * The platforms module provides functionality for managing the OpenCL
+ * platforms available in the system.
  *
- * @todo Detailed description of module with code examples.
+ * The ::ccl_platforms_new() function returns the set of platforms
+ * available in the system. The ::ccl_platforms_count() can be used to
+ * get the number of platforms in that set, while the
+ * ::ccl_platforms_get() will return the @f$i^{th}@f$ platform in the
+ * system.
  *
+ *  _Example:_
+ *
+ * @dontinclude list.c
+ * @skipline cf4ocl objects
+ * @until CCLPlatform* platf;
+ *
+ * @skipline Other variables
+ * @until cl_uint num_platfs;
+ * @skipline GError* err = NULL;
+ *
+ * @skipline Get all platforms in system
+ * @until platf_set = ccl_platforms_new(&err);
+ *
+ * @skipline Get number of platforms in system
+ * @until num_platfs = ccl_platforms_count(platf_set);
+ *
+ * @skipline Cycle through platforms
+ * @until platf = ccl_platforms_get(platf_set, i);
+ *
+ * @skipline Cycle platforms
+ * @until ccl_platforms_destroy
  * @{
  */
 

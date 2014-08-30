@@ -212,6 +212,8 @@ void ccl_platform_destroy(CCLPlatform* platf) {
 /**
  * Get the OpenCL version of this platform
  *
+ * @public @memberof ccl_platform
+ *
  * @param[in] platf The platform wrapper object.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.

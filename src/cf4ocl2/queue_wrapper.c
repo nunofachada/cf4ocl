@@ -600,6 +600,7 @@ finish:
  * command later on. This function is a wrapper for the
  * clEnqueueBarrierWithWaitList() OpenCL function (OpenCL >= 1.2).
  *
+ * @public @memberof ccl_queue
  * @copydoc ccl_enqueue_barrier_deprecated()
  *
  * @param[in] cq Command queue wrapper object.
@@ -775,6 +776,7 @@ finish:
  * is a wrapper for the clEnqueueMarkerWithWaitList() OpenCL function
  * (OpenCL >= 1.2).
  *
+ * @public @memberof ccl_queue
  * @copydoc ccl_enqueue_marker_deprecated()
  * @note Requires OpenCL >= 1.2 if `evt_wait_lst` is not `NULL`.
  *

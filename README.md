@@ -3,7 +3,7 @@ Summary
 
 The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99
 object-oriented framework for developing and benchmarking OpenCL
-projects in C and C++. It aims to:
+projects in C/C++. It aims to:
 
 1. Promote the rapid development of OpenCL programs in C/C++.
 2. Assist in the benchmarking of OpenCL events, such as kernel execution

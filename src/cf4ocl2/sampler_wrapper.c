@@ -160,6 +160,8 @@ void ccl_sampler_destroy(CCLSampler* smplr) {
  * Create a new sampler wrapper object by specifying a basic set of
  * sampler properties.
  *
+ * @public @memberof ccl_sampler
+ *
  * This function mimicks the style of the classic sampler constructor,
  * clCreateSampler(), but can be used with any version of OpenCL. This
  * function calls the ccl_sampler_new_full() function for actual

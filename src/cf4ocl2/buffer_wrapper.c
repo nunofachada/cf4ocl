@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  * */
 
- /**
+/**
  * @file
  *
  * Implementation of a wrapper class and its methods for OpenCL buffer
@@ -146,6 +146,8 @@ finish:
 /**
  * Read from a buffer object to host memory. This function wraps the
  * clEnqueueReadBuffer() OpenCL function.
+ *
+ * @public @memberof ccl_buffer
  *
  * @param[in] cq Command-queue wrapper object in which the read command
  * will be queued.

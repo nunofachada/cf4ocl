@@ -43,10 +43,73 @@ typedef struct ccl_program CCLProgram;
 /**
  * @defgroup KERNEL_WRAPPER Kernel wrapper
  *
- * A wrapper object for OpenCL kernels and functions to manage
- * them.
+ * The kernel wrapper module provides functionality for simple
+ * handling of OpenCL kernel objects.
  *
- * @todo Detailed description of module with code examples.
+ * Kernel wrappers can be obtained using two approaches:
+ *
+ * 1. Using the ::ccl_program_get_kernel() function. This function
+ * always returns the same kernel wrapper object (with the same
+ * underlying OpenCL kernel object) associated with a program. The
+ * returned object is automatically freed when the program wrapper
+ * object is destroyed; as such, client code should not call
+ * ::ccl_kernel_destroy().
+ * 2. Using the ::ccl_kernel_new() constructor. The created kernel
+ * wrapper should be released with the ::ccl_kernel_destroy() function,
+ * in accordance with the _cf4ocl_ @ref ug_new_destroy "new/destroy"
+ * rule.
+ *
+ * While the first approach might be more convenient in many situations,
+ * it will not work properly if the same kernel function is to be
+ * handled and executed by different threads. In these cases, use the
+ * second approach to create distinct kernel wrapper instances (wrapping
+ * distinct OpenCL kernel objects) for the same kernel function, one for
+ * each thread.
+ *
+ * This module offers several functions which simplify kernel execution.
+ * For example, the ccl_kernel_set_args_and_enqueue_ndrange() function
+ * can set all kernel arguments and execute the kernel in one call.
+ *
+ * Information about kernel objects can be fetched using the kernel
+ * @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_kernel_get_info_scalar()
+ * * ::ccl_kernel_get_info_array()
+ * * ::ccl_kernel_get_info()
+ *
+ * Six additional macros are provided for getting kernel workgroup info
+ * and kernel argument info (the later is only available from OpenCL
+ * 1.2 onwards). These work in the same way as the regular info macros:
+ *
+ * * ::ccl_kernel_get_workgroup_info_scalar()
+ * * ::ccl_kernel_get_workgroup_info_array()
+ * * ::ccl_kernel_get_workgroup_info()
+ * * ::ccl_kernel_get_arg_info_scalar()
+ * * ::ccl_kernel_get_arg_info_array()
+ * * ::ccl_kernel_get_arg_info()
+ *
+ * _Example: getting a kernel wrapper from a program wrapper_
+ *
+ * @code{.c}
+ * CCLProgram* prg;
+ * CCLKernel* krnl;
+ * @endcode
+ * @code{.c}
+ * krnl = ccl_program_get_kernel(prg, "some_kernel", NULL);
+ * @endcode
+ *
+ * _Example: creating a kernel wrapper_
+ *
+ * @code{.c}
+ * CCLProgram* prg;
+ * CCLKernel* krnl;
+ * @endcode
+ * @code{.c}
+ * krnl = ccl_kernel_new(prg, "some_kernel", NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_kernel_destroy(krnl);
+ * @endcode
  *
  * @{
  */

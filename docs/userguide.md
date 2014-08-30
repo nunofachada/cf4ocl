@@ -265,85 +265,85 @@ if (err) {
 Even if the program terminates due to an error, the [g_clear_error()]
 can be still be called to destroy the error object.
 
-## Wrapper objects {#ug_wrappers}
+## Wrapper modules {#ug_wrappers}
 
-### Platform {#ug_platform}
+### Platform module {#ug_platform}
 
 @copydoc PLATFORM_WRAPPER
 
-### Device {#ug_device}
+### Device module {#ug_device}
 
 @copydoc DEVICE_WRAPPER
 
-### Context {#ug_context}
+### Context module {#ug_context}
 
 @copydoc CONTEXT_WRAPPER
 
-### Command queue {#ug_queue}
+### Command queue module {#ug_queue}
 
 @copydoc QUEUE_WRAPPER
 
-### Memory object {#ug_memobj}
+### Memory object module {#ug_memobj}
 
 @copydoc MEMOBJ_WRAPPER
 
-#### Buffer {#ug_buffer}
+### Buffer module {#ug_buffer}
 
 @copydoc BUFFER_WRAPPER
 
-#### Image {#ug_image}
+### Image module {#ug_image}
 
 @copydoc IMAGE_WRAPPER
 
-### Sampler  {#ug_sampler}
+### Sampler module {#ug_sampler}
 
 @copydoc SAMPLER_WRAPPER
 
-### Program {#ug_program}
+### Program module {#ug_program}
 
 @copydoc PROGRAM_WRAPPER
 
-### Kernel  {#ug_kernel}
+### Kernel module {#ug_kernel}
 
 @copydoc KERNEL_WRAPPER
 
-#### Kernel arguments {#ug_kernel_args}
+#### Kernel arguments module {#ug_kernel_args}
 
 @copydoc KERNEL_ARG
 
-### Event {#ug_event}
+### Event module {#ug_event}
 
 @copydoc EVENT_WRAPPER
 
-#### Event wait lists  {#ug_event_wait_lists}
+#### Event wait lists module {#ug_event_wait_lists}
 
 @copydoc EVENT_WAIT_LIST
 
-## Device/context selection {#ug_devsel}
+## Device selector module {#ug_devsel}
 
 @copydoc DEVICE_SELECTOR
 
-## Device query {#ug_devquery}
+## Device query module {#ug_devquery}
 
 @copydoc DEVICE_QUERY
 
-## Error messages {#ug_errors}
+## Errors module {#ug_errors}
 
 @copydoc ERRORS
 
-## Platform management {#ug_platforms}
+## Platforms module {#ug_platforms}
 
 @copydoc PLATFORMS
 
-## Profiling {#ug_profiling}
+## Profiler module {#ug_profiling}
 
 @copydoc PROFILER
 
-## Passing OpenCL types as function arguments {#ug_types}
+## Types module {#ug_types}
 
 @copydoc TYPES
 
-## Wrapper information
+## Wrapper information module {#ug_winfo}
 
 @copydoc WRAPPER_INFO
 
