@@ -95,6 +95,14 @@ cl_bool ccl_queue_flush(CCLQueue* cq, GError** err);
  * are issued to the associated device and have completed. */
 cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
 
+/* Enqueues a barrier command on the given command queue. */
+CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
+	CCLEventWaitList* evt_wait_lst, GError** err);
+
+/* Enqueues a marker command on the given command queue. */
+CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
+	CCLEventWaitList* evt_wait_lst, GError** err);
+
 /**
  * Get a ::CCLWrapperInfo command queue information object.
  *

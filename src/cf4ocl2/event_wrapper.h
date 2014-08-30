@@ -41,10 +41,42 @@ typedef struct ccl_queue CCLQueue;
 /**
  * @defgroup EVENT_WRAPPER Event wrapper
  *
- * A wrapper object for OpenCL events and functions to manage
- * them.
+ * The event wrapper module provides functionality for simple
+ * handling of OpenCL event objects.
  *
- * @todo Detailed description of module with code examples.
+ * Typical event wrappers are not directly created by client code. They
+ * are returned by several functions which wrap OpenCL code which fires
+ * events (such as ::ccl_image_enqueue_write(), which wraps the
+ * clEnqueueWriteImage() OpenCL function). As such, and in accordance
+ * with the @ref ug_new_destroy "new/destroy" rule, regular event
+ * wrappers objects should not be destroyed by client code. They are
+ * automatically released when the command queue wrapper where the event
+ * took place is destroyed. The only exception is with user events
+ * (OpenCL >= 1.1), created with the ::ccl_user_event_new() constructor.
+ * These are special events which allow applications to enqueue commands
+ * that wait on user-controlled scenarios before the command is executed
+ * by the device. These events should be destroyed with
+ * ::ccl_event_destroy().
+ *
+ * The @ref EVENT_WAIT_LIST "event wait list module" provides additional
+ * information on how to use events to synchronize the execution of
+ * OpenCL commands. Events are also used by the
+ * @ref PROFILER "profiler module", although indirectly via ::CCLQueue*
+ * wrappers, to profile and benchmark applications.
+ *
+ * Information about event objects can be fetched using the respective
+ * @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_event_get_info_scalar()
+ * * ::ccl_event_get_info_array()
+ * * ::ccl_event_get_info()
+ *
+ * Three additional macros are provided for getting event profiling
+ * info. These work in the same way as the regular info macros:
+ *
+ * * ::ccl_event_get_profiling_info_scalar()
+ * * ::ccl_event_get_profiling_info_array()
+ * * ::ccl_event_get_profiling_info()
  *
  * @{
  */
@@ -251,14 +283,14 @@ cl_bool ccl_user_event_set_status(
 /**
  * @defgroup EVENT_WAIT_LIST Event wait lists
  *
- * Simple management of event wait lists.
+ * This module provides simple management of event wait lists.
  *
  * Client code must initialize #CCLEventWaitList variables to NULL,
  * and can reuse them between `ccl_*_enqueue_*()` function calls. No
- * allocation and deallocation of events and event wait list is
+ * allocation and deallocation of events and event wait lists is
  * required.
  *
- * Example:
+ * _Example:_
  *
  * @code{.c}
  * CCLEvent *evt1, *evt2, *evt3;
@@ -323,14 +355,6 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 /* Waits on the host thread for commands identified by events in the
  * wait list to complete. */
 cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
-
-/* Enqueues a barrier command on the given command queue. */
-CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err);
-
-/* Enqueues a marker command on the given command queue. */
-CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err);
 
 /** @} */
 
