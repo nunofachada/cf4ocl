@@ -48,7 +48,7 @@
  *
  *  _Example:_
  *
- * @dontinclude list.c
+ * @dontinclude list_devices.c
  * @skipline cf4ocl objects
  * @until CCLPlatform* platf;
  *
@@ -67,6 +67,8 @@
  *
  * @skipline Cycle platforms
  * @until ccl_platforms_destroy
+ * 
+ * @example list_devices.c
  * @{
  */
 

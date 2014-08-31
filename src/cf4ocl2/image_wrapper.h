@@ -53,6 +53,10 @@ typedef struct ccl_buffer CCLBuffer;
  * of image wrappers follows the _cf4ocl_
  * @ref ug_new_destroy "new/destroy" rule; as such, images should be
  * freed with the ::ccl_image_destroy() destructor.
+ * 
+ * Image wrapper objects can be directly pass as kernel arguments to
+ * functions such as ::ccl_program_enqueue_kernel() or
+ * ::ccl_kernel_set_arg(). 
  *
  * Information about image objects can be fetched using the
  * @ref ug_getinfo "info macros":
@@ -106,6 +110,9 @@ typedef struct ccl_buffer CCLBuffer;
  * ccl_image_destroy(img_in);
  * ccl_image_destroy(img_out);
  * @endcode
+ * 
+ * @example image_filter.c
+ * @example image_fill.c
  *
  * @{
  */

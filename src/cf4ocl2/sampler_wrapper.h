@@ -36,9 +36,50 @@
 /**
  * @defgroup SAMPLER_WRAPPER Sampler wrapper
  *
- * A wrapper for handling samplers in OpenCL.
+ * The sampler wrapper module provides functionality for simple
+ * handling of OpenCL sampler objects.
  *
- * @todo Detailed description of module with code examples.
+ * Sampler wrapper objects can be instanced with two constructors:
+ * 
+ * * ccl_sampler_new()
+ * * ccl_sampler_new_full()
+ * 
+ * The former follows the constructor format in OpenCL 1.0-1.2, where
+ * three main sampler properties are directly given as constructor
+ * arguments, namely the normalized coordinates flag, the addressing
+ * mode and the filter mode. The later uses the OpenCL 2.0 constructor
+ * format, in which sampler properties are given in a zero-terminated 
+ * array of `cl_sampler_properties`. Both formats can be used without
+ * concern for the underlying platform's OpenCL version, because 
+ * _cf4ocl_ will automatically select the most adequate OpenCL 
+ * constructor.
+ * 
+ * Sampler wrapper objects should be freed with the 
+ * ::ccl_sampler_destroy() function, in accordance with the
+ * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule.
+ * 
+ * Sampler wrapper objects can be directly pass as kernel arguments to
+ * functions such as ::ccl_kernel_set_args_and_enqueue_ndrange() or
+ * ::ccl_kernel_set_args().
+ *
+ * Information about sampler objects can be fetched using the
+ * sampler @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_sampler_get_info_scalar()
+ * * ::ccl_sampler_get_info_array()
+ * * ::ccl_sampler_get_info()
+ *
+ * _Example:_
+ * 
+ * @dontinclude image_filter.c
+ * @skipline CCLContext*
+ * @skipline CCLSampler*
+ * @skipline GError*
+ * 
+ * @skipline smplr =
+ * @until CL_FILTER_NEAREST,
+ * 
+ * @skipline ccl_sampler_destroy
  *
  * @{
  */
