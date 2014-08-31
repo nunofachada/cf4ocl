@@ -1,5 +1,5 @@
 # List of examples
-SET(SAMPLES image_fill image_filter list_devices)
+SET(SAMPLES image_fill image_filter list_devices cellular_automata)
 
 # Add a target for each example
 foreach(SAMPLE ${SAMPLES})
