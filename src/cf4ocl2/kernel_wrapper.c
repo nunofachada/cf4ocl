@@ -688,6 +688,119 @@ finish:
 
 }
 
+/**
+ * Suggest appropriate global and local worksizes for the given real
+ * work size, based on device and kernel characteristics.
+ *
+ * The returned global worksize may be larger than the real work size
+ * in order to better fit the kernel preferred multiple worksize. As
+ * such, kernels enqueued with worksizes given by this function should
+ * check if their global ID is within `real_worksize`.
+ *
+ * @public @memberof ccl_kernel
+ *
+ * @param[in] krnl Kernel wrapper object.
+ * @param[in] dev Device wrapper object.
+ * @param[in] dims The number of dimensions used to specify the global
+ * work-items and work-items in the work-group.
+ * @param[in] real_worksize The real worksize.
+ * @param[out] gws A "nice" global worksize for the given kernel and
+ * device, which must be equal or larger than the `real_worksize` and a
+ * multiple of `lws`. This memory location should be pre-allocated with
+ * space for `dims` size_t values.
+ * @param[out] lws A "nice" local worksize, which is based and respects
+ * the limits of the given kernel and device. This memory location
+ * should be pre-allocated with space for `dims` size_t values.
+ * @return `CL_TRUE` if function returns successfully, `CL_FALSE`
+ * otherwise.
+ * */
+cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
+	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
+	GError** err) {
+
+	/* The preferred workgroup size. */
+	size_t wg_size_mult = 0;
+	size_t wg_size_max;
+	size_t wg_size = 1;
+	size_t* max_wi_sizes;
+	cl_uint dev_dims;
+	cl_bool ret_status;
+
+	/* Error handling object. */
+	GError* err_internal = NULL;
+
+	/* Check if device supports the requested dims. */
+	dev_dims = ccl_device_get_info_scalar(
+		dev, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, cl_uint, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	ccl_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: device only supports a max. of %d dimension, but %d where requested.",
+		G_STRLOC, dev_dims, dims);
+
+	/* Determine maximum workgroup size. */
+	wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+		CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+#ifdef CL_VERSION_1_1
+	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
+	cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	if (ocl_ver >= 110) {
+		wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
+			krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+			size_t, &err_internal);
+	} else {
+		wg_size_mult = wg_size_max;
+	}
+#else
+	wg_size_mult = wg_size_max;
+#endif
+
+	/* Get max. work item sizes for device. */
+	max_wi_sizes = ccl_device_get_info_array(
+		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* Try to find a mostly square local worksize. */
+	for (cl_uint i = 0; i < dims; ++i) {
+		lws[i] = MIN(wg_size_mult, max_wi_sizes[i]);
+		wg_size *= lws[i];
+	}
+	while (wg_size > wg_size_max) {
+		for (int i = dims - 1; i >= 0; --i) {
+			lws[i] /= 2;
+			wg_size /= 2;
+			if (wg_size <= wg_size_max) break;
+		}
+	}
+
+	/* Now get a global worksize which is a multiple of the local
+	 * worksize and is big enough to handle the image dimensions. */
+	for (cl_uint i = 0; i < dims; ++i) {
+		gws[i] = ((real_worksize[i] / lws[i])
+			+ (real_worksize[i] % lws[i])) * lws[i];
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	ret_status = CL_TRUE;
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	ret_status = CL_FALSE;
+
+finish:
+
+	/* Return status. */
+	return ret_status;
+
+}
+
 #ifdef CL_VERSION_1_2
 
 /**

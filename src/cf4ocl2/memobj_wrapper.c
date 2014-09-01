@@ -197,8 +197,8 @@ finish:
  * @param[in] user_data A pointer to user supplied data.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if device if operation completes successfully,
- * CL_FALSE otherwise.
+ * @return `CL_TRUE` if device if operation completes successfully,
+ * `CL_FALSE` otherwise.
  * */
 cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	ccl_memobj_destructor_callback pfn_notify,

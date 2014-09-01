@@ -84,52 +84,7 @@ __kernel void do_filter(__read_only image2d_t input_img,\n\
 }"
 
 /**
- * Helper function which determines good global and local worksize
- * values for the given image dimensions and the given kernel and
- * device.
- * */
-static void get_global_and_local_worksizes(CCLKernel* krnl,
-	CCLDevice* dev, int width, int height, size_t* gws, size_t* lws) {
-
-	/* The preferred workgroup size. */
-	size_t wg_size_mult = 0;
-	size_t wg_size_max;
-
-	/* Error handling object. */
-	GError* err = NULL;
-
-	/* Determine maximum workgroup size. */
-	wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
-		CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
-	HANDLE_ERROR(err);
-
-#ifdef CL_VERSION_1_1
-	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
-	wg_size_mult = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
-		CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, size_t, &err);
-	HANDLE_ERROR(err);
-#else
-	wg_size_mult = wg_size_max;
-#endif
-
-	/* Try to find a mostly square local worksize. */
-	lws[0] = wg_size_mult;
-	lws[1] = wg_size_mult;
-	while (lws[0] * lws[1] > wg_size_max) {
-		lws[1] /= 2;
-		if (lws[0] * lws[1] < wg_size_max) break;
-		lws[0] /= 2;
-	}
-
-	/* Now get a global worksize which is a multiple of the local
-	 * worksize and is big enough to handle the image dimensions. */
-	gws[0] = ((width / lws[0]) + (width % lws[0])) * lws[0];
-	gws[1] = ((height / lws[1]) + (height % lws[1])) * lws[1];
-
-}
-
-/**
- * Image fill main function.
+ * Image filter main function.
  * */
 int main(int argc, char* argv[]) {
 
@@ -169,6 +124,9 @@ int main(int argc, char* argv[]) {
 	size_t origin[3] = { 0, 0, 0 };
 	size_t region[3];
 
+	/* Real worksize. */
+	size_t real_ws[2];
+
 	/* Global and local worksizes. */
 	size_t gws[2];
 	size_t lws[2];
@@ -186,6 +144,7 @@ int main(int argc, char* argv[]) {
 	if (!input_image) ERROR_MSG_AND_EXIT(stbi_failure_reason());
 
 	printf("\n * Image size: %d x %d, %d channels\n", width, height, n_channels);
+	real_ws[0] = width; real_ws[1] = height;
 
 	/* Set image region. */
 	region[0] = width; region[1] = height; region[2] = 1;
@@ -239,7 +198,9 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	/* Determine nice local and global worksizes. */
-	get_global_and_local_worksizes(krnl, dev, width, height, gws, lws);
+	ccl_kernel_suggest_worksizes(krnl, dev, 2, real_ws, gws, lws, &err);
+	HANDLE_ERROR(err);
+
 	printf(" * Global work-size: (%d, %d)\n", (int) gws[0], (int) gws[1]);
 	printf(" * Local work-size: (%d, %d)\n", (int) lws[0], (int) lws[1]);
 

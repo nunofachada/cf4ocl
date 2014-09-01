@@ -96,51 +96,6 @@ __kernel void ca(__read_only image2d_t in_img, __write_only image2d_t out_img) {
 }"
 
 /**
- * Helper function which determines good global and local worksize
- * values for the given image dimensions and the given kernel and
- * device.
- * */
-static void get_global_and_local_worksizes(CCLKernel* krnl,
-	CCLDevice* dev, int width, int height, size_t* gws, size_t* lws) {
-
-	/* The preferred workgroup size. */
-	size_t wg_size_mult = 0;
-	size_t wg_size_max;
-
-	/* Error handling object. */
-	GError* err = NULL;
-
-	/* Determine maximum workgroup size. */
-	wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
-		CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
-	HANDLE_ERROR(err);
-
-#ifdef CL_VERSION_1_1
-	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
-	wg_size_mult = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
-		CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, size_t, &err);
-	HANDLE_ERROR(err);
-#else
-	wg_size_mult = wg_size_max;
-#endif
-
-	/* Try to find a mostly square local worksize. */
-	lws[0] = wg_size_mult;
-	lws[1] = wg_size_mult;
-	while (lws[0] * lws[1] > wg_size_max) {
-		lws[1] /= 2;
-		if (lws[0] * lws[1] < wg_size_max) break;
-		lws[0] /= 2;
-	}
-
-	/* Now get a global worksize which is a multiple of the local
-	 * worksize and is big enough to handle the image dimensions. */
-	gws[0] = ((width / lws[0]) + (width % lws[0])) * lws[0];
-	gws[1] = ((height / lws[1]) + (height % lws[1])) * lws[1];
-
-}
-
-/**
  * Cellular automata sample main function.
  * */
 int main(int argc, char* argv[]) {
@@ -182,6 +137,8 @@ int main(int argc, char* argv[]) {
 	size_t origin[3] = { 0, 0, 0 };
 	/* Region of sim space. */
 	size_t region[3] = { CA_WIDTH, CA_HEIGHT, 1 };
+	/* Real worksize. */
+	size_t real_ws[] = { CA_WIDTH, CA_HEIGHT };
 	/* Global and local worksizes. */
 	size_t gws[2];
 	size_t lws[2];
@@ -265,7 +222,9 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	/* Determine nice local and global worksizes. */
-	get_global_and_local_worksizes(krnl, dev, CA_WIDTH, CA_HEIGHT, gws, lws);
+	ccl_kernel_suggest_worksizes(krnl, dev, 2, real_ws, gws, lws, &err);
+	HANDLE_ERROR(err);
+
 	printf("\n * Global work-size: (%d, %d)\n", (int) gws[0], (int) gws[1]);
 	printf(" * Local work-size: (%d, %d)\n", (int) lws[0], (int) lws[1]);
 
