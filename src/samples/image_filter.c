@@ -284,8 +284,10 @@ int main(int argc, char* argv[]) {
 	ccl_sampler_destroy(smplr);
 	ccl_program_destroy(prg);
 	ccl_queue_destroy(queue);
-	ccl_device_destroy(dev);
 	ccl_context_destroy(ctx);
+
+	/* Check all wrappers have been destroyed. */
+	g_assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
 	return 0;

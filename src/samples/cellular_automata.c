@@ -19,10 +19,16 @@
  * @file
  * Sample code which runs a cellular automata simulation (Conway's
  * Game of Life) in OpenCL using _cf4ocl_. This code demonstrates the
- * use of images, several command queues and profiling.
+ * use of double-buffering using images, multiple command queues and
+ * profiling.
  *
  * A series of images will be saved in the folder where this program
  * runs.
+ *
+ * The program accepts two command-line arguments:
+ *
+ * 1. Device index
+ * 2. RNG seed
  *
  * @author Nuno Fachada
  * @date 2014
@@ -49,13 +55,13 @@
 
 #define CA_WIDTH 128
 #define CA_HEIGHT 128
-#define CA_ITERS 12
+#define CA_ITERS 64
 
 #define CA_KERNEL "\
 \n\
-__constant uint2 neighbors[] = { \n\
-	(uint2) (-1,-1), (uint2) (0,-1), (uint2) (1,-1), (uint2) (1,0), \n\
-	(uint2) (1,1), (uint2) (0,1), (uint2) (-1,1), (uint2) (-1,0)};\n\
+__constant int2 neighbors[] = { \n\
+	(int2) (-1,-1), (int2) (0,-1), (int2) (1,-1), (int2) (1,0), \n\
+	(int2) (1,1), (int2) (0,1), (int2) (-1,1), (int2) (-1,0)};\n\
 \n\
 __constant uint2 live_rule = (uint2) (2, 3);\n\
 __constant uint2 dead_rule = (uint2) (3, 3);\n\
@@ -64,28 +70,28 @@ __constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | 
 \n\
 __kernel void ca(__read_only image2d_t in_img, __write_only image2d_t out_img) {\n\
 \n\
-	uint2 imdim = convert_uint2(get_image_dim(in_img));\n\
-	size_t x = get_global_id(0);\n\
-	size_t y = get_global_id(1);\n\
-	if ((x < imdim.x) && (y < imdim.y)) {\n\
-		uint4 neighs_state = { 0, 0, 0, 0 };\n\
-		uint neighs_alive;\n\
+	int2 imdim = get_image_dim(in_img);\n\
+	int2 coord = (int2) (get_global_id(0), get_global_id(1));\n\
+	if (all(coord < imdim)) {\n\
+		uint4 neighs_state;\n\
+		uint neighs_alive = 0;\n\
 		uint4 state;\n\
 		uint alive;\n\
-		uint4 new_state = {0, 0, 0, 1};\n\
+		uint4 new_state = { 0xFF, 0, 0, 1};\n\
 		for(int i = 0; i < 8; ++i) {\n\
-			uint2 n = ((uint2) (x, y)) + neighbors[i]; \n\
+			int2 n = coord + neighbors[i]; \n\
 			n = select(n, n - imdim, n >= imdim); \n\
-			neighs_state += read_imageui(in_img, sampler, convert_int2(n));\n\
+			n = select(n, imdim - 1, n < 0); \n\
+			neighs_state = read_imageui(in_img, sampler, n);\n\
+			if (neighs_state.x == 0x0) neighs_alive++; \n\
 		}\n\
-		neighs_alive = neighs_state.x / 0xFF;\n\
-		state = read_imageui(in_img, sampler, (int2) (x, y));\n\
-		alive = state.x / 0xFF;\n\
-		if ((alive & ((neighs_alive < live_rule.s0) || (neighs_alive > live_rule.s1))) \n\
-			|| (!alive & (neighs_alive >= dead_rule.s0) && (neighs_alive <= dead_rule.s1))) {\n\
-			new_state.x = 0xFF;\n\
+		state = read_imageui(in_img, sampler, coord);\n\
+		alive = (state.x == 0x0);\n\
+		if ((alive && (neighs_alive >= live_rule.s0) && (neighs_alive <= live_rule.s1)) \n\
+			|| (!alive && (neighs_alive >= dead_rule.s0) && (neighs_alive <= dead_rule.s1))) {\n\
+			new_state.x = 0x00;\n\
 		}\n\
-		write_imageui(out_img, (int2) (x, y), new_state);\n\
+		write_imageui(out_img, coord, new_state);\n\
 	}\n\
 }"
 
@@ -135,7 +141,7 @@ static void get_global_and_local_worksizes(CCLKernel* krnl,
 }
 
 /**
- * Image fill main function.
+ * Cellular automata sample main function.
  * */
 int main(int argc, char* argv[]) {
 
@@ -150,37 +156,32 @@ int main(int argc, char* argv[]) {
 	CCLProgram* prg;
 	CCLKernel* krnl;
 	CCLEvent* evt_iter;
-
+	/* Other variables. */
 	CCLEventWaitList ewl = NULL;
-
+	/* Profiler object. */
+	CCLProf* prof;
+	/* Output images filename. */
 	char* filename;
-
-	/* Device selected specified in the command line. */
+	/* Selected device, may be given in command line. */
 	int dev_idx = -1;
-
-	/* Error handling object (must be initialized to NULL). */
+	/* Error handling object (must be NULL). */
 	GError* err = NULL;
-
 	/* Does selected device support images? */
 	cl_bool image_ok;
-
-	/* Image data in host. */
+	/* Initial sim state. */
 	unsigned char* input_image;
+	/* Simulation states. */
 	unsigned char** output_images;
-
-	/* RNG seed. */
+	/* RNG seed, may be given in command line. */
 	unsigned int seed;
-
 	/* Image file write status. */
 	int file_write_status;
-
-	/* Image parameters. */
+	/* Image format. */
 	cl_image_format image_format = { CL_R, CL_UNSIGNED_INT8 };
-
-	/* Origin and region of complete image. */
+	/* Origin of sim space. */
 	size_t origin[3] = { 0, 0, 0 };
+	/* Region of sim space. */
 	size_t region[3] = { CA_WIDTH, CA_HEIGHT, 1 };
-
 	/* Global and local worksizes. */
 	size_t gws[2];
 	size_t lws[2];
@@ -204,12 +205,12 @@ int main(int argc, char* argv[]) {
 	input_image = (unsigned char*)
 		malloc(CA_WIDTH * CA_HEIGHT * sizeof(unsigned char));
 	for (cl_uint i = 0; i < CA_WIDTH * CA_HEIGHT; ++i)
-		input_image[i] = rand() & 0x1 ? 0xFF : 0x0;
+		input_image[i] = (rand() & 0x3) ? 0xFF : 0x00;
 
 	/* Allocate space for simulation results. */
 	output_images = (unsigned char**)
 		malloc((CA_ITERS + 1) * sizeof(unsigned char*));
-	for (cl_uint i = 0; i < CA_WIDTH * CA_HEIGHT; ++i)
+	for (cl_uint i = 0; i < CA_ITERS + 1; ++i)
 		output_images[i] = (unsigned char*)
 			malloc(CA_WIDTH * CA_HEIGHT * sizeof(unsigned char));
 
@@ -235,8 +236,8 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	/* Create 2D image using random CA data. */
-	img1 = ccl_image_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		&image_format, input_image, &err,
+	img1 = ccl_image_new(ctx, CL_MEM_READ_WRITE,
+		&image_format, NULL, &err,
 		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
 		"image_width", (size_t) CA_WIDTH,
 		"image_height", (size_t) CA_HEIGHT,
@@ -257,11 +258,6 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	ccl_program_build(prg, NULL, &err);
-
-	if (err != NULL) {
-		char* build_log = ccl_program_get_build_info_array(prg, dev, CL_PROGRAM_BUILD_LOG, char*, NULL);
-		fprintf(stderr, "\n***** BUILD LOG *****\n\n%s\n\n*********************", build_log);
-	}
 	HANDLE_ERROR(err);
 
 	/* Get kernel wrapper. */
@@ -270,62 +266,90 @@ int main(int argc, char* argv[]) {
 
 	/* Determine nice local and global worksizes. */
 	get_global_and_local_worksizes(krnl, dev, CA_WIDTH, CA_HEIGHT, gws, lws);
-	printf(" * Global work-size: (%d, %d)\n", (int) gws[0], (int) gws[1]);
+	printf("\n * Global work-size: (%d, %d)\n", (int) gws[0], (int) gws[1]);
 	printf(" * Local work-size: (%d, %d)\n", (int) lws[0], (int) lws[1]);
 
-	//~ /* Run CA_ITERS iterations of the CA. */
-	//~ for (cl_uint i = 0; i < CA_ITERS; ++i) {
-//~
-		//~ /* Read result of last iteration. On first run it the initial
-		 //~ * state. */
-		//~ ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
-			//~ origin, region, 0, 0, output_images[i], &ewl, &err);
-		//~ HANDLE_ERROR(err);
-//~
-		//~ /* Process iteration. */
-		//~ evt_iter = ccl_kernel_set_args_and_enqueue_ndrange(
-			//~ krnl, queue_exec, 2, NULL, gws, lws, NULL, &err,
-			//~ img1, img2, NULL);
-		//~ HANDLE_ERROR(err);
-//~
-		//~ /* Can't start new read until this iteration is over. */
-		//~ ccl_event_wait_list_add(&ewl, evt_iter);
-//~
-		//~ /* Swap buffers. */
-		//~ img_aux = img1;
-		//~ img1 = img2;
-		//~ img2 = img_aux;
-//~
-	//~ }
+	/* Start profiling. */
+	prof = ccl_prof_new();
+	ccl_prof_start(prof);
+
+	/* Write initial state. */
+	ccl_image_enqueue_write(queue_comm, img1, CL_TRUE,
+		origin, region, 0, 0, input_image, NULL, &err);
+	HANDLE_ERROR(err);
+
+	/* Run CA_ITERS iterations of the CA. */
+	for (cl_uint i = 0; i < CA_ITERS; ++i) {
+
+		/* Read result of last iteration. On first run it the initial
+		 * state. */
+		ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
+			origin, region, 0, 0, output_images[i], &ewl, &err);
+		HANDLE_ERROR(err);
+
+		/* Process iteration. */
+		evt_iter = ccl_kernel_set_args_and_enqueue_ndrange(
+			krnl, queue_exec, 2, NULL, gws, lws, NULL, &err,
+			img1, img2, NULL);
+		HANDLE_ERROR(err);
+
+		/* Can't start new read until this iteration is over. */
+		ccl_event_wait_list_add(&ewl, evt_iter);
+
+		/* Swap buffers. */
+		img_aux = img1;
+		img1 = img2;
+		img2 = img_aux;
+
+	}
 
 	/* Read result of last iteration. */
 	ccl_image_enqueue_read(queue_comm, img1, CL_TRUE,
 		origin, region, 0, 0, output_images[CA_ITERS], &ewl, &err);
 	HANDLE_ERROR(err);
 
-	//~ filename = (char*) malloc(
-		//~ (strlen(IMAGE_FILE_PREFIX ".png") + IMAGE_FILE_NUM_DIGITS + 1) * sizeof(char));
-	//~ /* Write results to image files. */
-	//~ for (cl_uint i = 0; i < CA_ITERS; ++i) {
-//~
-		//~ sprintf(filename, "%s%0" G_STRINGIFY(IMAGE_FILE_NUM_DIGITS) "d.png", IMAGE_FILE_PREFIX, i);
-//~
-		//~ file_write_status = stbi_write_png(filename, CA_WIDTH, CA_HEIGHT, 1,
-			//~ output_images[i], CA_WIDTH);
-//~
-		//~ /* Give feedback. */
-		//~ if (!file_write_status) {
-			//~ ERROR_MSG_AND_EXIT("Unable to save image in file.");
-		//~ }
-	//~ }
-//~
-//~
-	//~ /* Release host buffers. */
-	//~ free(filename);
+	/* Stop profiling timer and add queues for analysis. */
+	ccl_prof_stop(prof);
+	ccl_prof_add_queue(prof, "Comms", queue_comm);
+	ccl_prof_add_queue(prof, "Exec", queue_exec);
+
+	/* Allocate space for base filename. */
+	filename = (char*) malloc(
+		(strlen(IMAGE_FILE_PREFIX ".png") + IMAGE_FILE_NUM_DIGITS + 1) * sizeof(char));
+
+	/* Write results to image files. */
+	for (cl_uint i = 0; i < CA_ITERS; ++i) {
+
+		/* Determine next filename. */
+		sprintf(filename, "%s%0" G_STRINGIFY(IMAGE_FILE_NUM_DIGITS) "d.png", IMAGE_FILE_PREFIX, i);
+
+		/* Save next image. */
+		file_write_status = stbi_write_png(filename, CA_WIDTH, CA_HEIGHT, 1,
+			output_images[i], CA_WIDTH);
+
+		/* Give feedback if unable to save image. */
+		if (!file_write_status) {
+			ERROR_MSG_AND_EXIT("Unable to save image in file.");
+		}
+	}
+
+	/* Process profiling info. */
+	ccl_prof_calc(prof, &err);
+	HANDLE_ERROR(err);
+
+	/* Print profiling info. */
+	ccl_prof_print_summary(prof);
+
+	/* Save profiling info. */
+	ccl_prof_export_info_file(prof, IMAGE_FILE_PREFIX ".tsv", &err);
+	HANDLE_ERROR(err);
+
+	/* Release host buffers. */
+	free(filename);
 	free(input_image);
-	//~ for (cl_uint i = 0; i < CA_WIDTH * CA_HEIGHT; ++i)
-		//~ free(output_images[i]);
-	//~ free(output_images);
+	for (cl_uint i = 0; i < CA_ITERS + 1; ++i)
+		free(output_images[i]);
+	free(output_images);
 
 	/* Release wrappers. */
 	ccl_image_destroy(img1);
@@ -333,8 +357,13 @@ int main(int argc, char* argv[]) {
 	ccl_program_destroy(prg);
 	ccl_queue_destroy(queue_comm);
 	ccl_queue_destroy(queue_exec);
-	ccl_device_destroy(dev);
 	ccl_context_destroy(ctx);
+
+	/* Destroy profiler. */
+	ccl_prof_destroy(prof);
+
+	/* Check all wrappers have been destroyed. */
+	g_assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
 	return 0;

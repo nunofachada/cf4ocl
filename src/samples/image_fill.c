@@ -153,9 +153,11 @@ int main(int argc, char* argv[]) {
 
 	/* Release wrappers. */
 	ccl_image_destroy(img);
-	ccl_device_destroy(dev);
 	ccl_queue_destroy(queue);
 	ccl_context_destroy(ctx);
+
+	/* Check all wrappers have been destroyed. */
+	g_assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
 	return 0;
