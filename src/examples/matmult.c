@@ -56,11 +56,6 @@
  * matrix A. */
 #define B_ROWS A_COLS
 
-/* Default workgroup size, dimension 0. */
-#define LWS_X 32
-/* Default workgroup size, dimension 1. */
-#define LWS_Y 16
-
 /* Default minimum range value (from). */
 #define RANGE_MATRIX_FROM -100
 
@@ -85,7 +80,7 @@
 /* Command line arguments and respective default values. */
 static int a_dim[] = {A_COLS, A_ROWS};
 static int b_dim[] = {B_COLS, B_ROWS};
-static size_t lws[] = {LWS_X, LWS_Y};
+static size_t lws[] = {0, 0};
 static int matrix_range[] = {RANGE_MATRIX_FROM, RANGE_MATRIX_TO};
 static gchar* compiler_opts = NULL;
 static gboolean dev_list = FALSE;
@@ -126,8 +121,7 @@ static GOptionEntry entries[] = {
 		"," G_STRINGIFY(B_ROWS) ")",
 		"SIZE,SIZE"},
 	{"localsize", 'l', 0, G_OPTION_ARG_CALLBACK, mm_parse_lws,
-		"Local work size (default is " G_STRINGIFY(LWS_X) "," \
-		G_STRINGIFY(LWS_Y) ")",
+		"Local work size (default depends on device)",
 		"SIZE,SIZE"},
 	{"range",     'r', 0, G_OPTION_ARG_CALLBACK, mm_parse_rge,
 		"Matrix range of values (default is " \
@@ -223,6 +217,7 @@ int main(int argc, char *argv[]) {
 	CCLBuffer* matrixC_dev = NULL;
 	/* Global work sizes */
 	size_t gws[2];
+	size_t real_ws[2];
 	/* Size of matrix A in bytes. */
 	size_t size_matA_in_bytes = 0;
 	/* Size of matrix B in bytes. */
@@ -380,8 +375,18 @@ int main(int argc, char *argv[]) {
 	/*  Determine worksizes */
 	/* ******************** */
 
-	gws[0] = lws[0]* ceil(((float) b_dim[0]) / lws[0]);
-	gws[1] = lws[1] * ceil(((float) a_dim[1]) / lws[1]);
+	if (lws[0] == 0) {
+		/* If user didn't specify local worsize, use suggest function
+		 * from cf4ocl. */
+		real_ws[0] = b_dim[0]; real_ws[1] = a_dim[1];
+		ccl_kernel_suggest_worksizes(krnl, dev, 2, real_ws, gws, lws, &err);
+		ccl_if_err_goto(err, error_handler);
+	} else {
+		/* If user specify local worksize, adjust global worksize
+		 * accordingly. */
+		gws[0] = lws[0]* ceil(((float) b_dim[0]) / lws[0]);
+		gws[1] = lws[1] * ceil(((float) a_dim[1]) / lws[1]);
+	}
 
 	/* ************************* */
 	/* Determine required memory */

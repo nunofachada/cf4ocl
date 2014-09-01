@@ -725,6 +725,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	size_t* max_wi_sizes;
 	cl_uint dev_dims;
 	cl_bool ret_status;
+	size_t real_ws = 1;
 
 	/* Error handling object. */
 	GError* err_internal = NULL;
@@ -767,12 +768,19 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	for (cl_uint i = 0; i < dims; ++i) {
 		lws[i] = MIN(wg_size_mult, max_wi_sizes[i]);
 		wg_size *= lws[i];
+		real_ws *= real_worksize[i];
 	}
-	while (wg_size > wg_size_max) {
+	while ((wg_size > wg_size_max) || (wg_size > real_ws)) {
+		for (cl_uint i = 0; i < dims; ++i) {
+			while (lws[i] > real_worksize[i]) {
+				lws[i] /= 2;
+				wg_size /= 2;
+			}
+		}
 		for (int i = dims - 1; i >= 0; --i) {
+			if ((wg_size <= wg_size_max) && (wg_size <= real_ws)) break;
 			lws[i] /= 2;
 			wg_size /= 2;
-			if (wg_size <= wg_size_max) break;
 		}
 	}
 
