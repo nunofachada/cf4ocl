@@ -110,7 +110,8 @@ int main(int argc, char* argv[]) {
 	CCLQueue* queue_comm;
 	CCLProgram* prg;
 	CCLKernel* krnl;
-	CCLEvent* evt_iter;
+	CCLEvent* evt_comm;
+	CCLEvent* evt_exec;
 	/* Other variables. */
 	CCLEventWaitList ewl = NULL;
 	/* Profiler object. */
@@ -239,22 +240,27 @@ int main(int argc, char* argv[]) {
 
 	/* Run CA_ITERS iterations of the CA. */
 	for (cl_uint i = 0; i < CA_ITERS; ++i) {
-
+		
 		/* Read result of last iteration. On first run it the initial
 		 * state. */
-		ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
-			origin, region, 0, 0, output_images[i], &ewl, &err);
+		evt_comm = ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
+			origin, region, 0, 0, output_images[i], NULL, &err);
 		HANDLE_ERROR(err);
 
 		/* Process iteration. */
-		evt_iter = ccl_kernel_set_args_and_enqueue_ndrange(
+		evt_exec = ccl_kernel_set_args_and_enqueue_ndrange(
 			krnl, queue_exec, 2, NULL, gws, lws, NULL, &err,
 			img1, img2, NULL);
 		HANDLE_ERROR(err);
 
 		/* Can't start new read until this iteration is over. */
-		ccl_event_wait_list_add(&ewl, evt_iter);
+		ccl_event_wait_list_add(&ewl, evt_comm);
+		ccl_event_wait_list_add(&ewl, evt_exec);
 
+		/* Wait for*/
+		ccl_event_wait(&ewl, &err);
+		HANDLE_ERROR(err);
+		
 		/* Swap buffers. */
 		img_aux = img1;
 		img1 = img2;
