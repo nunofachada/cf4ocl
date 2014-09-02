@@ -691,7 +691,7 @@ int* matmult_matrix_new(int cols, int rows, int* matrix_range, GRand* rng) {
 }
 
 /**
- * Free's a matrix created with matmult_matrix_new().
+ * Frees a matrix created with matmult_matrix_new().
  *
  * @param[in] matrix The matrix to free.
  * */

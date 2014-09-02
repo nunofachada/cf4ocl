@@ -764,31 +764,43 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Try to find a mostly square local worksize. */
+	/* Try to find an appropriate local worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
+		/* Each lws component is at most the preferred workgroup
+		 * multiple or the maximum size of that component in device. */
 		lws[i] = MIN(wg_size_mult, max_wi_sizes[i]);
+		/* Update total workgroup size. */
 		wg_size *= lws[i];
+		/* Update total real worksize. */
 		real_ws *= real_worksize[i];
 	}
-	while ((wg_size > wg_size_max) || (wg_size > real_ws)) {
-		for (cl_uint i = 0; i < dims; ++i) {
-			while (lws[i] > real_worksize[i]) {
-				lws[i] /= 2;
-				wg_size /= 2;
-			}
-		}
-		for (int i = dims - 1; i >= 0; --i) {
-			if ((wg_size <= wg_size_max) && (wg_size <= real_ws)) break;
+
+	/* Don't let each component of the local worksize to be 
+	 * higher than the respective component of the real 
+	 * worksize. */
+	for (cl_uint i = 0; i < dims; ++i) {
+		while (lws[i] > real_worksize[i]) {
 			lws[i] /= 2;
 			wg_size /= 2;
 		}
 	}
 
+	/* The total workgroup size can't be higher than the maximum
+	 * supported by the device. */
+	while (wg_size > wg_size_max) {
+		for (int i = dims - 1; i >= 0; --i) {
+			lws[i] /= 2;
+			wg_size /= 2;
+			if (wg_size <= wg_size_max) break;
+		}
+	}
+
 	/* Now get a global worksize which is a multiple of the local
-	 * worksize and is big enough to handle the image dimensions. */
+	 * worksize and is big enough to handle the real worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
 		gws[i] = ((real_worksize[i] / lws[i])
-			+ (real_worksize[i] % lws[i])) * lws[i];
+			+ (((real_worksize[i] % lws[i]) > 0) ? 1 : 0)) 
+			* lws[i];
 	}
 
 	/* If we got here, everything is OK. */
