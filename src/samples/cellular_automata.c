@@ -19,7 +19,7 @@
  * @file
  * Sample code which runs a cellular automata simulation (Conway's
  * Game of Life) in OpenCL using _cf4ocl_. This code demonstrates the
- * use of double-buffering using images, multiple command queues and
+ * use of double-buffering with images, multiple command queues and
  * profiling.
  *
  * A series of images will be saved in the folder where this program
@@ -240,7 +240,7 @@ int main(int argc, char* argv[]) {
 
 	/* Run CA_ITERS iterations of the CA. */
 	for (cl_uint i = 0; i < CA_ITERS; ++i) {
-		
+
 		/* Read result of last iteration. On first run it the initial
 		 * state. */
 		evt_comm = ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
@@ -260,7 +260,7 @@ int main(int argc, char* argv[]) {
 		/* Wait for*/
 		ccl_event_wait(&ewl, &err);
 		HANDLE_ERROR(err);
-		
+
 		/* Swap buffers. */
 		img_aux = img1;
 		img1 = img2;

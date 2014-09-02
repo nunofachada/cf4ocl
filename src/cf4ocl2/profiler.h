@@ -18,14 +18,14 @@
 
 /**
  * @file
- * 
+ *
  * Definition of classes and methods for profiling OpenCL events.
  *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
+
 #ifndef _CCL_PROFILER_H_
 #define _CCL_PROFILER_H_
 
@@ -41,85 +41,99 @@
  *
  * The profiler module provides classes and methods for
  * profiling wrapped OpenCL events and queues.
- * 
+ *
  * @warning The functions in this module are not thread-safe.
- * 
+ *
  * The profiling module offers two methods for obtaining information
  * about the performed computations:
- * 
- * 1. Detailed profiling of OpenCL events using the 
+ *
+ * 1. Detailed profiling of OpenCL events using the
  * ::ccl_prof_add_queue() function.
  * 2. Simple (and optional) timming of the performed computations using
  * the ::ccl_prof_start() and ::ccl_prof_stop() functions. If this
- * timming is performed it will be taken into account by the 
+ * timming is performed it will be taken into account by the
  * `ccl_prof_*_summary()` functions.
- * 
+ *
  * In order to perform a detailed profiling analysis of the OpenCL
  * computations, the `CL_QUEUE_PROFILING_ENABLE` property should be
- * specified when creating command queue wrappers with 
+ * specified when creating command queue wrappers with
  * ::ccl_queue_new().
- * 
+ *
  * After the computations take place, when all queues are finished,
- * they are passed to the profiler using the ::ccl_prof_add_queue() 
- * function. Then the ccl_prof_calc() function can then be called to
+ * they are passed to the profiler using the ::ccl_prof_add_queue()
+ * function. The ccl_prof_calc() function can then be called to
  * perform the required analysis.
- * 
- * At this stage, different types of profiling information are made
+ *
+ * At this stage, different types of profiling information are
  * available, and can be iterated over:
- * 
- * 1. Aggregate event information: absolute and relative durations of 
+ *
+ * 1. _Aggregate event information_: absolute and relative durations of
  * all events with same name, represented by the ::CCLProfAgg* class. If
  * an event name is not set during the course of the computation, the
- * aggregation is performed by event type, i.e., by events which 
- * represent the same command. A sequence of ::CCLProfAgg* objects can 
- * be iterated over using the ::ccl_prof_iter_agg_init() and 
+ * aggregation is performed by event type, i.e., by events which
+ * represent the same command. A sequence of ::CCLProfAgg* objects can
+ * be iterated over using the ::ccl_prof_iter_agg_init() and
  * ::ccl_prof_iter_agg_next() functions. A specific aggregate event
  * can be obtained by name using the ::ccl_prof_get_agg() function.
- * 2. Event info, non-aggregate: event-wise information, represented by
- * the ::CCLProfInfo* class, such as event name (or type, if no name is
- * given), the queue the event is associated with, and submit, queued,
- * start and end instants. A sequence of ::CCLProfInfo* objects can be
- * iterated over using the ::ccl_prof_iter_info_init() and
- * ::ccl_prof_iter_info_next() functions.
- * 3. Event instants: specific start and end event instants, represented
- * by the ::CCLProfInst* class. A sequence of ::CCLProfInst* objects can 
+ * 2. _Non-aggregate event information_: event-specific information,
+ * represented by the ::CCLProfInfo* class, such as event name (or type,
+ * if no name is given), the queue the event is associated with, and
+ * submit, queued, start and end instants. A sequence of ::CCLProfInfo*
+ * objects can be iterated over using the ::ccl_prof_iter_info_init()
+ * and ::ccl_prof_iter_info_next() functions.
+ * 3. _Event instants_: specific start and end event instants, represented
+ * by the ::CCLProfInst* class. A sequence of ::CCLProfInst* objects can
  * be iterated over using the ::ccl_prof_iter_inst_init() and
  * ::ccl_prof_iter_inst_next() functions.
- * 4. Event overlaps: information about event overlaps, represented by
+ * 4. _Event overlaps_: information about event overlaps, represented by
  * the ::CCLProfOverlap* class. Event overlaps can only occur when more
- * than one queue is used on the same device. A sequence of 
- * ::CCLProfOverlap* objects can be iterated over using the 
- * ::ccl_prof_iter_overlap_init() and ::ccl_prof_iter_overlap_next() 
+ * than one queue is used on the same device. A sequence of
+ * ::CCLProfOverlap* objects can be iterated over using the
+ * ::ccl_prof_iter_overlap_init() and ::ccl_prof_iter_overlap_next()
  * functions.
- * 
- * While this information can be subject to different types of 
- * examination by client code, the profiler module also offers some 
- * functionality which allows for a more instant interpretation of 
+ *
+ * While this information can be subject to different types of
+ * examination by client code, the profiler module also offers some
+ * functionality which allows for a more instant interpretation of
  * results:
- *  
- * 1. A summary of the profiling analysis can be obtained or printed 
- * with the ::ccl_prof_get_summary() or ::ccl_prof_print_summary() 
+ *
+ * 1. A summary of the profiling analysis can be obtained or printed
+ * with the ::ccl_prof_get_summary() or ::ccl_prof_print_summary()
  * functions, respectively.
  * 2. An exported list of ::CCLProfInfo* data, namely queue name, start
  * instant, end instant and event name, sorted by start instant, can be
- * opened by the @ref plot_events "plot events" script to plot a 
- * Gantt-like chart of the performed computation. Such list can be 
- * exported with the ::ccl_prof_export_info() or 
- * ::ccl_prof_export_info_file() functions, using the default export 
+ * opened by the @ref plot_events "plot events" script to plot a
+ * Gantt-like chart of the performed computation. Such list can be
+ * exported with the ::ccl_prof_export_info() or
+ * ::ccl_prof_export_info_file() functions, using the default export
  * options.
- * 
+ *
  * _Example:_
- * 
- * 
+ *
+ * @dontinclude cellular_automata.c
+ * @skipline Wrappers for
+ * @until evt_exec
+ * @skipline CCLEventWaitList
+ * @skipline CCLProf
+ * @skipline Initial sim
+ * @until output_images
+ * @skipline Image format
+ * @until size_t region
+ * @skipline Global
+ * @until lws
+ *
+ * @skipline Create command queues
+ * @skipline queue_exec
+ * @skipline queue_comm
  * @{
  */
 
-/** 
- * Profile class, contains profiling information of OpenCL 
+/**
+ * Profile class, contains profiling information of OpenCL
  * queues and events.
- * 
+ *
  * @warning Instances of this class are not thread-safe.
- * 
+ *
  * */
 typedef struct ccl_prof CCLProf;
 
@@ -139,26 +153,26 @@ typedef enum {
  */
 typedef struct ccl_prof_agg {
 
-	/** 
-	 * Name of event which the instant refers to. 
+	/**
+	 * Name of event which the instant refers to.
 	 * @public
 	 * */
 	const char* event_name;
-	
-	/** 
-	 * Total (absolute) time of events with name equal to 
-	 * ::CCLProfAgg::event_name. 
+
+	/**
+	 * Total (absolute) time of events with name equal to
+	 * ::CCLProfAgg::event_name.
 	 * @public
 	 * */
 	cl_ulong absolute_time;
-	
-	/** 
-	 * Relative time of events with name equal to 
-	 * ::CCLProfAgg::event_name. 
+
+	/**
+	 * Relative time of events with name equal to
+	 * ::CCLProfAgg::event_name.
 	 * @public
 	 * */
 	double relative_time;
-	
+
 } CCLProfAgg;
 
 
@@ -169,54 +183,54 @@ typedef enum {
 
 	 /** Sort aggregate event data instances by name. */
 	CCL_PROF_AGG_SORT_NAME = 0x00,
-	
+
 	/** Sort aggregate event data instances by time. */
 	CCL_PROF_AGG_SORT_TIME = 0x10
 
 } CCLProfAggSort;
 
 /**
- * Event profiling info. 
+ * Event profiling info.
  * */
 typedef struct ccl_prof_info {
 
-	/** 
-	 * Name of event. 
+	/**
+	 * Name of event.
 	 * @public
 	 * */
 	const char* event_name;
-	
-	/** 
-	 * Name of command queue which generated this event. 
+
+	/**
+	 * Name of command queue which generated this event.
 	 * @public
 	 * */
 	const char* queue_name;
 
-	/** 
-	 * Device time in nanoseconds when the command identified by event 
-	 * is enqueued in a command-queue by the host. 
+	/**
+	 * Device time in nanoseconds when the command identified by event
+	 * is enqueued in a command-queue by the host.
 	 * @public
 	 * */
 	cl_ulong t_queued;
 
-	/** 
-	 * Device time counter in nanoseconds when the command identified 
-	 * by event that has been enqueued is submitted by the host to the 
-	 * device associated with the command-queue. 
+	/**
+	 * Device time counter in nanoseconds when the command identified
+	 * by event that has been enqueued is submitted by the host to the
+	 * device associated with the command-queue.
 	 * @public
 	 * */
 	cl_ulong t_submit;
 
-	/** 
+	/**
 	 * Device time in nanoseconds when the command identified by event
-	 * starts execution on the device. 
+	 * starts execution on the device.
 	 * @public
 	 * */
 	cl_ulong t_start;
 
-	/** 
+	/**
 	 * Device time in nanoseconds when the command identified by event
-	 * has finished execution on the device. 
+	 * has finished execution on the device.
 	 * @public
 	 * */
 	cl_ulong t_end;
@@ -253,13 +267,13 @@ typedef enum {
  * Type of event instant (::CCLProfInst).
  */
 typedef enum {
-	
+
 	/** Start event instant. */
 	CCL_PROF_INST_TYPE_START,
 
 	/** End event instant. */
 	CCL_PROF_INST_TYPE_END
-	
+
 } CCLProfInstType;
 
 /**
@@ -267,34 +281,34 @@ typedef enum {
  */
 typedef struct ccl_prof_inst {
 
-	 /** 
-	  * Name of event which the instant refers to. 
+	 /**
+	  * Name of event which the instant refers to.
 	 * @public
 	  * */
 	const char* event_name;
 
-	/** 
-	 * Name of command queue associated with event. 
+	/**
+	 * Name of command queue associated with event.
 	 * @public
 	 * */
 	const char* queue_name;
 
-	/** 
-	 * Event instant ID. 
+	/**
+	 * Event instant ID.
 	 * @public
 	 * */
 	guint id;
 
-	/** 
-	 * Event instant in nanoseconds from current device time counter. 
+	/**
+	 * Event instant in nanoseconds from current device time counter.
 	 * @public
 	 * */
 	cl_ulong instant;
 
-	/** 
-	 * Type of event instant 
-	 * (CCLProfInstType::CCL_PROF_INST_TYPE_START or 
-	 * CCLProfInstType::CCL_PROF_INST_TYPE_END). 
+	/**
+	 * Type of event instant
+	 * (CCLProfInstType::CCL_PROF_INST_TYPE_START or
+	 * CCLProfInstType::CCL_PROF_INST_TYPE_END).
 	 * @public
 	 * */
 	CCLProfInstType type;
@@ -305,7 +319,7 @@ typedef struct ccl_prof_inst {
  * Sort criteria for event instants (::CCLProfInst).
  */
 typedef enum {
-	
+
 	/** Sort event instants by instant. */
 	CCL_PROF_INST_SORT_INSTANT = 0x80,
 
@@ -319,20 +333,20 @@ typedef enum {
  */
 typedef struct ccl_prof_overlap {
 
-	/** 
-	 * Name of first overlapping event. 
+	/**
+	 * Name of first overlapping event.
 	 * @public
 	 * */
 	const char* event1_name;
 
-	/** 
-	 * Name of second overlapping event. 
+	/**
+	 * Name of second overlapping event.
 	 * @public
 	 * */
 	const char* event2_name;
 
-	/** 
-	 * Overlap duration in nanoseconds. 
+	/**
+	 * Overlap duration in nanoseconds.
 	 * @public
 	 * */
 	cl_ulong duration;
@@ -343,7 +357,7 @@ typedef struct ccl_prof_overlap {
  * Sort criteria for overlaps (::CCLProfOverlap).
  */
 typedef enum {
-	
+
 	/** Sort overlaps by event name. */
 	CCL_PROF_OVERLAP_SORT_NAME     = 0xa0,
 
@@ -357,36 +371,36 @@ typedef enum {
  * */
 typedef struct ccl_prof_export_options {
 
-	/** 
-	 * Field separator, defaults to tab (\\t). 
+	/**
+	 * Field separator, defaults to tab (\\t).
 	 * @public
 	 * */
 	const char* separator;
 
-	/** 
-	 * Newline character, Defaults to Unix newline (\\n). 
+	/**
+	 * Newline character, Defaults to Unix newline (\\n).
 	 * @public
 	 * */
 	const char* newline;
 
-	/** 
-	 * Queue name delimiter, defaults to empty string. 
+	/**
+	 * Queue name delimiter, defaults to empty string.
 	 * @public
 	 * */
 	const char* queue_delim;
 
-	/** 
-	 * Event name delimiter, defaults to empty string. 
+	/**
+	 * Event name delimiter, defaults to empty string.
 	 * @public
 	 * */
 	const char* evname_delim;
 
-	/** Start at instant 0 (TRUE, default), or start at oldest instant 
-	 * returned by OpenCL (FALSE). 
+	/** Start at instant 0 (TRUE, default), or start at oldest instant
+	 * returned by OpenCL (FALSE).
 	 * @public
 	 * */
 	cl_bool zero_start;
-	
+
 }  CCLProfExportOptions;
 
 /* Create a new profile object. */
@@ -400,7 +414,7 @@ void ccl_prof_destroy(CCLProf* prof);
 * kernels time. */
 void ccl_prof_start(CCLProf* prof);
 
-/* Stops the global profiler timer. Only required if 
+/* Stops the global profiler timer. Only required if
  * ccl_prof_start() was called. */
 void ccl_prof_stop(CCLProf* prof);
 
@@ -420,7 +434,7 @@ cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
 const CCLProfAgg* ccl_prof_get_agg(
 	CCLProf* prof, const char* event_name);
 
-/* Initialize an iterator for profiled aggregate event 
+/* Initialize an iterator for profiled aggregate event
  * instances. */
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort);
 
@@ -448,13 +462,13 @@ const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof);
 /* Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted
  * by absolute time), and a table of event overlaps (sorted by overlap
- * duration). */ 
+ * duration). */
 void ccl_prof_print_summary(CCLProf* prof);
 
 /* Get a summary with the profiling info. More specifically,
- * this function returns a string containing a table of aggregate event 
+ * this function returns a string containing a table of aggregate event
  * statistics and a table of event overlaps. The order of the returned
- * information can be specified in the function arguments. */ 
+ * information can be specified in the function arguments. */
 const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort);
 
