@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
 	queue_comm = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	HANDLE_ERROR(err);
 
-	/* Create 2D image using random CA data. */
+	/* Create 2D image for initial state. */
 	img1 = ccl_image_new(ctx, CL_MEM_READ_WRITE,
 		&image_format, NULL, &err,
 		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
@@ -247,7 +247,7 @@ int main(int argc, char* argv[]) {
 			origin, region, 0, 0, output_images[i], NULL, &err);
 		HANDLE_ERROR(err);
 
-		/* Process iteration. */
+		/* Execute iteration. */
 		evt_exec = ccl_kernel_set_args_and_enqueue_ndrange(
 			krnl, queue_exec, 2, NULL, gws, lws, NULL, &err,
 			img1, img2, NULL);
@@ -306,7 +306,7 @@ int main(int argc, char* argv[]) {
 	ccl_prof_print_summary(prof);
 
 	/* Save profiling info. */
-	ccl_prof_export_info_file(prof, IMAGE_FILE_PREFIX ".tsv", &err);
+	ccl_prof_export_info_file(prof, "prof.tsv", &err);
 	HANDLE_ERROR(err);
 
 	/* Release host buffers. */

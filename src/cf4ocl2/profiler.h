@@ -112,19 +112,84 @@
  *
  * @dontinclude cellular_automata.c
  * @skipline Wrappers for
- * @until evt_exec
- * @skipline CCLEventWaitList
+ * @skipline queue_exec
+ * @until queue_comm
  * @skipline CCLProf
- * @skipline Initial sim
- * @until output_images
- * @skipline Image format
- * @until size_t region
- * @skipline Global
- * @until lws
+ * @skipline Error handling
+ * @until GError*
  *
  * @skipline Create command queues
  * @skipline queue_exec
  * @skipline queue_comm
+ *
+ * @skipline Start profiling
+ * @until origin,
+ *
+ * @skipline Run CA_ITERS
+ * @until origin,
+ *
+ * @skipline Execute
+ * @until NULL)
+ *
+ * @skipline }
+ * @until origin,
+ *
+ * @skipline Stop profiling
+ * @until queue_exec);
+ *
+ * @skipline Process profiling
+ * @until ccl_prof_calc
+ *
+ * @skipline Print
+ * @until ccl_prof_export_info
+ *
+ * @skipline Release wrappers
+ * @skipline ccl_queue_destroy(queue_comm)
+ * @until ccl_queue_destroy(queue_exec)
+ *
+ * @skipline Destroy profiler
+ * @until ccl_prof_destroy
+ *
+ * The output of ::ccl_prof_print_summary() will be something like:
+ *
+ * @verbatim
+    =========================== Timming/Profiling ===========================
+
+    Aggregate times by event  :
+      ------------------------------------------------------------------
+      | Event name                     | Rel. time (%) | Abs. time (s) |
+      ------------------------------------------------------------------
+      | NDRANGE_KERNEL                 |       97.2742 |    3.7468e-02 |
+      | READ_IMAGE                     |        2.6747 |    1.0303e-03 |
+      | WRITE_IMAGE                    |        0.0511 |    1.9690e-05 |
+      ------------------------------------------------------------------
+                                       |         Total |    3.8518e-02 |
+                                       ---------------------------------
+    Event overlaps            :
+      ------------------------------------------------------------------
+      | Event 1                | Event2                 | Overlap (s)  |
+      ------------------------------------------------------------------
+      | READ_IMAGE             | NDRANGE_KERNEL         |   1.3618e-04 |
+      ------------------------------------------------------------------
+                               |                  Total |   1.3618e-04 |
+                               -----------------------------------------
+    Tot. of all events (eff.) : 3.838198e-02s
+    Total ellapsed time       : 4.295200e-02s
+    Time spent in device      : 89.36%
+    Time spent in host        : 10.64%
+ @endverbatim
+ *
+ * The @ref plot_events script can be used to plot a Gantt-like chart
+ * of the events which took place in the queues. Running the following
+ * command...
+ *
+ *     $ python ccl_plot_events.py prof.tsv
+ *
+ * ...will produce an image of this kind:
+ *
+ * @image html images/gantt_ca.svg
+ *
+ * @example cellular_automata.c
  * @{
  */
 
