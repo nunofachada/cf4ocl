@@ -1212,6 +1212,8 @@ cl_bool ccl_prof_calc(CCLProf* prof, GError** err) {
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 	/* Calculations can only be performed once. */
 	g_return_val_if_fail(prof->calc == FALSE, CL_FALSE);
+	/* There must be some queues to process. */
+	g_return_val_if_fail(prof->queues != NULL, CL_FALSE);
 
 	/* Internal error handling object. */
 	GError* err_internal = NULL;

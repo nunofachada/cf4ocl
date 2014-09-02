@@ -16,11 +16,11 @@
 # along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-""" plot_events.py
-
-Plots a Gantt-like chart of OpenCL events using the profilling info
-exported by CFProfiler.
-"""
+## @file
+# Plots a Gantt-like chart of OpenCL events using the profiling info
+# exported using the @ref PROFILER "profiler module".
+#
+# Usage: ccl_plot_events.py file.tsv
 
 import sys
 import numpy

@@ -44,7 +44,72 @@
  * 
  * @warning The functions in this module are not thread-safe.
  * 
- * @todo detailed description of module.
+ * The profiling module offers two methods for obtaining information
+ * about the performed computations:
+ * 
+ * 1. Detailed profiling of OpenCL events using the 
+ * ::ccl_prof_add_queue() function.
+ * 2. Simple (and optional) timming of the performed computations using
+ * the ::ccl_prof_start() and ::ccl_prof_stop() functions. If this
+ * timming is performed it will be taken into account by the 
+ * `ccl_prof_*_summary()` functions.
+ * 
+ * In order to perform a detailed profiling analysis of the OpenCL
+ * computations, the `CL_QUEUE_PROFILING_ENABLE` property should be
+ * specified when creating command queue wrappers with 
+ * ::ccl_queue_new().
+ * 
+ * After the computations take place, when all queues are finished,
+ * they are passed to the profiler using the ::ccl_prof_add_queue() 
+ * function. Then the ccl_prof_calc() function can then be called to
+ * perform the required analysis.
+ * 
+ * At this stage, different types of profiling information are made
+ * available, and can be iterated over:
+ * 
+ * 1. Aggregate event information: absolute and relative durations of 
+ * all events with same name, represented by the ::CCLProfAgg* class. If
+ * an event name is not set during the course of the computation, the
+ * aggregation is performed by event type, i.e., by events which 
+ * represent the same command. A sequence of ::CCLProfAgg* objects can 
+ * be iterated over using the ::ccl_prof_iter_agg_init() and 
+ * ::ccl_prof_iter_agg_next() functions. A specific aggregate event
+ * can be obtained by name using the ::ccl_prof_get_agg() function.
+ * 2. Event info, non-aggregate: event-wise information, represented by
+ * the ::CCLProfInfo* class, such as event name (or type, if no name is
+ * given), the queue the event is associated with, and submit, queued,
+ * start and end instants. A sequence of ::CCLProfInfo* objects can be
+ * iterated over using the ::ccl_prof_iter_info_init() and
+ * ::ccl_prof_iter_info_next() functions.
+ * 3. Event instants: specific start and end event instants, represented
+ * by the ::CCLProfInst* class. A sequence of ::CCLProfInst* objects can 
+ * be iterated over using the ::ccl_prof_iter_inst_init() and
+ * ::ccl_prof_iter_inst_next() functions.
+ * 4. Event overlaps: information about event overlaps, represented by
+ * the ::CCLProfOverlap* class. Event overlaps can only occur when more
+ * than one queue is used on the same device. A sequence of 
+ * ::CCLProfOverlap* objects can be iterated over using the 
+ * ::ccl_prof_iter_overlap_init() and ::ccl_prof_iter_overlap_next() 
+ * functions.
+ * 
+ * While this information can be subject to different types of 
+ * examination by client code, the profiler module also offers some 
+ * functionality which allows for a more instant interpretation of 
+ * results:
+ *  
+ * 1. A summary of the profiling analysis can be obtained or printed 
+ * with the ::ccl_prof_get_summary() or ::ccl_prof_print_summary() 
+ * functions, respectively.
+ * 2. An exported list of ::CCLProfInfo* data, namely queue name, start
+ * instant, end instant and event name, sorted by start instant, can be
+ * opened by the @ref plot_events "plot events" script to plot a 
+ * Gantt-like chart of the performed computation. Such list can be 
+ * exported with the ::ccl_prof_export_info() or 
+ * ::ccl_prof_export_info_file() functions, using the default export 
+ * options.
+ * 
+ * _Example:_
+ * 
  * 
  * @{
  */

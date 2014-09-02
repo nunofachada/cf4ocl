@@ -711,6 +711,8 @@ finish:
  * @param[out] lws A "nice" local worksize, which is based and respects
  * the limits of the given kernel and device. This memory location
  * should be pre-allocated with space for `dims` size_t values.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
  * @return `CL_TRUE` if function returns successfully, `CL_FALSE`
  * otherwise.
  * */

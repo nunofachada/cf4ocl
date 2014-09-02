@@ -357,6 +357,12 @@ can be still be called to destroy the error object.
 
 @copydetails kerninfo
 
+## ccl_plot_events.py {#ug_plot_events}
+
+@copybrief plot_events.py
+
+@copydetails plot_events.py
+
 # Advanced {#ug_advanced}
 
 ## Architecture {#ug_architecture}

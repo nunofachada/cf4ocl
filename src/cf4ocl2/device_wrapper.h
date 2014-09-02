@@ -69,9 +69,6 @@ typedef struct ccl_platform CCLPlatform;
  * @code{.c}
  * dev = ccl_context_get_device(ctx, 0, NULL);
  * @endcode
- * @code{.c}
- * ccl_context_destroy(ctx);
- * @endcode
  *
  * @{
  */
