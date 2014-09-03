@@ -51,20 +51,19 @@
  * ::ccl_prof_add_queue() function.
  * 2. Simple (and optional) timming of the performed computations using
  * the ::ccl_prof_start() and ::ccl_prof_stop() functions. If this
- * timming is performed it will be taken into account by the
+ * timming is measured it will be taken into account by the
  * `ccl_prof_*_summary()` functions.
  *
- * In order to perform a detailed profiling analysis of the OpenCL
- * computations, the `CL_QUEUE_PROFILING_ENABLE` property should be
- * specified when creating command queue wrappers with
- * ::ccl_queue_new().
+ * In order to use the first method, the `CL_QUEUE_PROFILING_ENABLE`
+ * property should be specified when creating command queue wrappers
+ * with ::ccl_queue_new().
  *
- * After the computations take place, when all queues are finished,
- * they are passed to the profiler using the ::ccl_prof_add_queue()
+ * After the computations take place, all the (finished) queue wrappers
+ * are passed to the profiler using the ::ccl_prof_add_queue()
  * function. The ccl_prof_calc() function can then be called to
  * perform the required analysis.
  *
- * At this stage, different types of profiling information are
+ * At this stage, different types of profiling information become
  * available, and can be iterated over:
  *
  * 1. _Aggregate event information_: absolute and relative durations of
@@ -108,7 +107,8 @@
  * ::ccl_prof_export_info_file() functions, using the default export
  * options.
  *
- * _Example:_
+ * _Example: Conway's game of life using double-buffered images_
+ * (@ref cellular_automata.c "complete code")
  *
  * @dontinclude cellular_automata.c
  * @skipline Wrappers for
@@ -179,13 +179,21 @@
     Time spent in host        : 10.64%
  @endverbatim
  *
+ * Instead of the default command-based event names such as
+ * `NDRANGE_KERNEL`, specific names can be set with the
+ * ::ccl_event_set_name() function. This allows to: (a) separate the
+ * aggregation of events of the same type (e.g., differentiate between
+ * the execution of two different kernels); and, (b) aggregate events
+ * of different types (e.g., aggregate reads and writes into a single
+ * "comms" event).
+ *
  * The @ref plot_events script can be used to plot a Gantt-like chart
  * of the events which took place in the queues. Running the following
  * command...
  *
  *     $ python ccl_plot_events.py prof.tsv
  *
- * ...will produce an image of this kind:
+ * ...will produce the folllowing image:
  *
  * @image html images/gantt_ca.svg
  *

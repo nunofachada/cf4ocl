@@ -241,7 +241,7 @@ int main(int argc, char* argv[]) {
 	/* Run CA_ITERS iterations of the CA. */
 	for (cl_uint i = 0; i < CA_ITERS; ++i) {
 
-		/* Read result of last iteration. On first run it the initial
+		/* Read result of last iteration. On first run it is the initial
 		 * state. */
 		evt_comm = ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
 			origin, region, 0, 0, output_images[i], NULL, &err);
