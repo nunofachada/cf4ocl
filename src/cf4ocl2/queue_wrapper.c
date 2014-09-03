@@ -127,23 +127,32 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
 }
 
 /**
- * Create a new command queue wrapper object. This function wraps the
- * OpenCL clCreateCommandQueue() (OpenCL <= 1.2) or the
- * clCreateCommandQueueWithProperties() (OpenCL >= 2.0) functions.
+ * Create a new on-host command queue wrapper object.
+ *
+ * This function accepts a zero-terminated list of `cl_queue_properties`
+ * (instead of the `cl_command_queue_properties` bitfield used in the
+ * ::ccl_queue_new() constructor), following the behavior of the
+ * clCreateCommandQueueWithProperties() function (OpenCL >= 2.0). The
+ * exact OpenCL constructor used is automatically selected based on the
+ * OpenCL version of the underlying platform (i.e.
+ * clCreateCommandQueue() if OpenCL <= 1.2, or
+ * clCreateCommandQueueWithProperties() for OpenCL >= 2.0). However, if
+ * "OpenCL 2.0 only" features are specified and the underlying platform
+ * is OpenCL <= 1.2, a warning will be logged, and the queue will be
+ * created with OpenCL <= 1.2 properties only.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] ctx Context wrapper object.
  * @param[in] dev Device wrapper object, must be associated with `ctx`.
- * @param[in] properties List of properties for the command queue and
- * their corresponding values.
+ * @param[in] prop_full A zero-terminated list of `cl_queue_properties`.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLQueue wrapper for the given device and context,
  * or `NULL` if an error occurs.
  * */
-CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-	cl_command_queue_properties properties, GError** err) {
+CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
+	const cl_queue_properties* prop_full, GError** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -158,6 +167,27 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	CCLQueue* cq = NULL;
 	/* Internal error object. */
 	GError* err_internal = NULL;
+	/* Old-school properties. */
+	cl_command_queue_properties properties = 0;
+	/* Any new-school properties? */
+	cl_bool prop_other = CL_FALSE;
+
+	/* Extract old-school properties and flag indicating if any
+	 * new-school properties are passed. */
+	if (prop_full != NULL) {
+		for (cl_uint i = 0; prop_full[i] != 0; ++i) {
+			if (prop_full[i] == CL_QUEUE_PROPERTIES)
+				properties = prop_full[i + 1];
+			else
+				prop_other = CL_TRUE;
+			++i;
+		}
+		if ((properties &
+			~(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+			CL_QUEUE_PROFILING_ENABLE)) != 0) {
+			prop_other = CL_TRUE;
+		}
+	}
 
 	/* If dev is NULL, get first device in context. */
 	if (dev == NULL) {
@@ -177,8 +207,15 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	if (platf_ver >= 200) {
 		queue = clCreateCommandQueueWithProperties(
 			ccl_context_unwrap(ctx), ccl_device_unwrap(dev),
-			&properties, &ocl_status);
+			prop_full, &ocl_status);
 	} else {
+		if (prop_other) {
+			g_warning("OpenCL 2.0 queue properties are not supported by "\
+				"the selected OpenCL platform and will be ignored.");
+			properties = properties &
+				(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+				CL_QUEUE_PROFILING_ENABLE);
+		}
 		G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
 			ccl_device_unwrap(dev), properties, &ocl_status);
@@ -186,6 +223,13 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	}
 #else
 	/* Create and keep the OpenCL command queue object. */
+	if (prop_other) {
+		g_warning("OpenCL 2.0 queue properties are not supported by "\
+			"the selected OpenCL platform and will be ignored.");
+		properties = properties &
+			(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+			CL_QUEUE_PROFILING_ENABLE);
+	}
 	queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
 		ccl_device_unwrap(dev), properties, &ocl_status);
 #endif
@@ -217,6 +261,40 @@ finish:
 
 	/* Return the new command queue wrapper object. */
 	return cq;
+
+}
+
+/**
+ * Create a new on-host command queue wrapper object.
+ *
+ * This function accepts a `cl_command_queue_properties` bitfield  of
+ * command queue properties, mimicking the behavior of the OpenCL
+ * clCreateCommandQueue() constructor (deprecated in OpenCL 2.0). The
+ * exact OpenCL constructor used is automatically selected based on
+ * the OpenCL version of the underlying platform (i.e.
+ * clCreateCommandQueue() if OpenCL <= 1.2, or
+ * clCreateCommandQueueWithProperties() for OpenCL >= 2.0).
+ *
+ * To specify OpenCL 2.0 only features, such as on-device queue size,
+ * use the ::ccl_queue_new_full() constructor.
+ *
+ * @public @memberof ccl_queue
+ *
+ * @param[in] ctx Context wrapper object.
+ * @param[in] dev Device wrapper object, must be associated with `ctx`.
+ * @param[in] properties Bitfield of command queue properties.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The ::CCLQueue wrapper for the given device and context,
+ * or `NULL` if an error occurs.
+ * */
+CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
+	cl_command_queue_properties properties, GError** err) {
+
+	const cl_queue_properties prop_full[] =
+		{ CL_QUEUE_PROPERTIES, properties, 0 };
+
+	return ccl_queue_new_full(ctx, dev, prop_full, err);
 
 }
 

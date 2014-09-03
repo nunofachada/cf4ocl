@@ -1,31 +1,31 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with cf4ocl. If not, see 
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with cf4ocl. If not, see
  * <http://www.gnu.org/licenses/>.
  * */
- 
-/** 
+
+/**
  * @file
- * 
+ *
  * Header for normalizing OpenCL versions within _cf4ocl_.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
+
 #ifndef _CCL_OCLVERSIONS_H_
 #define _CCL_OCLVERSIONS_H_
 
@@ -82,7 +82,7 @@
 	#define CL_COMMAND_USER                             0x1204
 	#define CL_COMMAND_BARRIER                          0x1205
 	#define CL_COMMAND_GL_FENCE_SYNC_OBJECT_KHR     0x200D
-	
+
 #endif
 
 /* Define stuff for OpenCL implementations lower than 1.2 */
@@ -124,15 +124,16 @@
 	#define CL_COMMAND_FILL_BUFFER                      0x1207
 	#define CL_COMMAND_FILL_IMAGE                       0x1208
 	#define CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR        0x202B
-	#define CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR        0x202C	
-	
-#endif	
+	#define CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR        0x202C
+
+#endif
 
 /* Define stuff for OpenCL implementations lower than 2.0 */
 #ifndef CL_VERSION_2_0
 
 	typedef cl_bitfield         cl_device_svm_capabilities;
 	typedef cl_bitfield         cl_sampler_properties;
+	typedef cl_bitfield         cl_queue_properties;
 	/* cl_command_type */
 	#define CL_COMMAND_SVM_FREE                         0x1209
 	#define CL_COMMAND_SVM_MEMCPY                       0x120A
@@ -164,7 +165,7 @@
 
 #endif
 
-/* Some of these query constants may not be defined in standard 
+/* Some of these query constants may not be defined in standard
  * OpenCL headers, so we defined them here if necessary. */
 #ifndef CL_DEVICE_TERMINATE_CAPABILITY_KHR
 	#define CL_DEVICE_TERMINATE_CAPABILITY_KHR          0x200F
@@ -210,7 +211,7 @@
 #endif
 #ifndef CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR
 	#define CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR         0x4021
-#endif 
+#endif
 #ifndef CL_DEVICE_MAX_ATOMIC_COUNTERS_EXT
 	#define CL_DEVICE_MAX_ATOMIC_COUNTERS_EXT           0x4032
 #endif
@@ -272,7 +273,7 @@
 	#define CL_DEVICE_PARTITION_STYLE_EXT               0x4058
 #endif
 #ifndef CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM
-	#define CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM   0x40A0      
+	#define CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM   0x40A0
 #endif
 #ifndef CL_DEVICE_PAGE_SIZE_QCOM
 	#define CL_DEVICE_PAGE_SIZE_QCOM                  0x40A1

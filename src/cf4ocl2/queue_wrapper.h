@@ -40,10 +40,45 @@
 /**
  * @defgroup QUEUE_WRAPPER Command queue wrapper
  *
- * A wrapper object for OpenCL command queues and functions to
- * manage them.
+ * The command queue wrapper module provides functionality for simple
+ * handling of OpenCL command queue objects.
  *
- * @todo Detailed description of module with code examples.
+ * Queue wrappers can be instantiated with the ::ccl_queue_new() and
+ * ::ccl_queue_new_full() constructors. While both constructors can be
+ * used with any OpenCL version, the later is targeted for OpenCL 2.0,
+ * exposing OpenCL 2.0 features, such as on-device queues, to client
+ * code. If "OpenCL 2.0 only" features are requested for platforms with
+ * OpenCL version <= 2.0, a warning will be logged and the queue will be
+ * created without the unsupported features.
+ *
+ * Instantiation and destruction of queue wrappers follows the _cf4ocl_
+ * @ref ug_new_destroy "new/destroy" rule; as such, queues should be
+ * freed with the ::ccl_queue_destroy() destructor.
+ *
+ * Queue wrappers created with the `CL_QUEUE_PROFILING_ENABLE`
+ * property can be automatically profiled with the
+ * @ref PROFILER "profiler module".
+ *
+ * Information about queue objects can be fetched using the
+ * @ref ug_getinfo "info macros":
+ *
+ * * ::ccl_queue_get_info_scalar()
+ * * ::ccl_queue_get_info_array()
+ * * ::ccl_queue_get_info()
+ *
+ * _Example:_
+ *
+ * @dontinclude image_filter.c
+ * @skipline Wrappers for
+ * @skipline CCLQueue*
+ * @skipline Error handling
+ * @skipline GError*
+ *
+ * @skipline Create a command queue
+ * @skipline queue =
+ *
+ * @skipline Release wrappers
+ * @skipline ccl_queue_destroy
  *
  * @{
  */
@@ -58,6 +93,10 @@ typedef struct ccl_queue CCLQueue;
 /* Get the command queue wrapper for the given OpenCL command
  * queue. */
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
+
+/* Create a new command queue wrapper object. */
+CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
+	const cl_queue_properties* prop_full, GError** err);
 
 /* Create a new command queue wrapper object. */
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
