@@ -19,7 +19,7 @@ add_subdirectory(ocl_stub)
 set(CCL_LIB_DIR "../cf4ocl2/")
 add_library(${PROJECT_NAME}_TESTING
 	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c
-	${CCL_LIB_DIR}types.c ${CCL_LIB_DIR}common.c
+	${CCL_LIB_DIR}common.c
 	${CCL_LIB_DIR}platforms.c ${CCL_LIB_DIR}kernel_arg.c
 	${CCL_LIB_DIR}device_query.c ${CCL_LIB_DIR}device_selector.c
 	${CCL_LIB_DIR}platform_wrapper.c ${CCL_LIB_DIR}device_wrapper.c

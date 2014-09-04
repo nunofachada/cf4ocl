@@ -1,5 +1,5 @@
 # Sources required for building library
-set(SRC errors.c profiler.c types.c common.c platforms.c
+set(SRC errors.c profiler.c common.c platforms.c
 	kernel_arg.c device_query.c device_selector.c
 	platform_wrapper.c device_wrapper.c context_wrapper.c
 	kernel_wrapper.c program_wrapper.c queue_wrapper.c event_wrapper.c

@@ -53,7 +53,6 @@ extern "C" {
 #include <cf4ocl2/program_wrapper.h>
 #include <cf4ocl2/queue_wrapper.h>
 #include <cf4ocl2/sampler_wrapper.h>
-#include <cf4ocl2/types.h>
 
 #ifdef __cplusplus
 }
