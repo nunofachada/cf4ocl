@@ -201,7 +201,7 @@ if (err) {
 
 An error domain and error code are also available in the `GError`
 object. The domain indicates the module the error-reporting function is
-located in, while code indicates the specific error that occurred.
+located in, while the code indicates the specific error that occurred.
 Three kinds of domain can be returned by error-reporting _cf4ocl_
 functions, each of them associated with distinct error codes:
 

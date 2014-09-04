@@ -108,7 +108,7 @@
  * options.
  *
  * _Example: Conway's game of life using double-buffered images_
- * (@ref cellular_automata.c "complete code")
+ * (@ref cellular_automata.c "complete example")
  *
  * @dontinclude cellular_automata.c
  * @skipline Wrappers for

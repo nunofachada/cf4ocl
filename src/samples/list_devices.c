@@ -101,6 +101,9 @@ int main() {
 	 * platform wrappers, device wrappers and the requested info. */
 	ccl_platforms_destroy(platf_set);
 
+	/* Check all wrappers have been destroyed. */
+	g_assert(ccl_wrapper_memcheck());
+
 	/* Bye. */
 	return 0;
 
