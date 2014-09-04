@@ -203,16 +203,6 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /**
- * @defgroup WRAPPER_INFO Wrapper information
- *
- * Wrapper information object and associated macros.
- *
- * @todo Detailed description of module with code examples.
- *
- * @{
- */
-
-/**
  * Class which represents information about a wrapped OpenCL
  * object.
  * */
@@ -252,8 +242,6 @@ struct ccl_wrapper_info {
  * type.
  * */
 #define ccl_info_array(info, type) ((type) (info)->value)
-
-/** @} */
 
 /* Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size);

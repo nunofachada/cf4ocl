@@ -67,7 +67,6 @@ Additional modules are also available:
 | @ref ERRORS "Errors module"                    | Convert OpenCL error codes into human-readable strings.                                            |
 | @ref PLATFORMS "Platforms module"              | Management of the OpencL platforms available in the system.                                        |
 | @ref PROFILER "Profiler module"                | Simple, convenient and thorough profiling of OpenCL events.                                        |
-| @ref WRAPPER_INFO "Wrapper information module" | Macros and functions to obtain information about OpenCL objects.                                   |
 
 ### The new/destroy rule {#ug_new_destroy}
 
@@ -337,10 +336,6 @@ can be still be called to destroy the error object.
 ## Profiler module {#ug_profiling}
 
 @copydoc PROFILER
-
-## Wrapper information module {#ug_winfo}
-
-@copydoc WRAPPER_INFO
 
 # Using the utilities {#ug_utils}
 
