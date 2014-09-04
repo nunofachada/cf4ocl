@@ -265,6 +265,52 @@ can be still be called to destroy the error object.
 
 ## Wrapper modules {#ug_wrappers}
 
+Each [OpenCL class](http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/classDiagram.html)
+is associated with a _cf4ocl_ module which provides functionality to
+simplify its handling. At the most basic level, each module offers a
+wrapper class and functions which wrap or map their OpenCL equivalents.
+This, in itself, already simplifies working with OpenCL in C, because
+the _cf4ocl_ wrapper classes internally manage directly related objects,
+strings or variables created during the course of a program. As such,
+client code just needs to follow the @ref ug_new_destroy "new/destroy"
+rule for directly created objects, thus not having to worry with memory
+allocation/deallocation of all the other intermediate objects.
+
+In most cases, however, each _cf4ocl_ module also provides methods for
+other common or not-so-common OpenCL host code patterns, allowing the
+programmer to avoid the verbosity in these patterns and focus on OpenCL
+device code.
+
+All _cf4ocl_ wrapper classes extend the ::CCLWrapper abstract
+wrapper class. The properties and methods of this class, which are
+concerned with reference counts, wrapping/unwrapping of OpenCL objects
+and getting object information, are essentially of internal use by other
+_cf4ocl_ classes. This functionality is also available to client code
+which requires a more advanced integration with _cf4ocl_, as explained
+in the @ref ug_advanced "advanced" section.
+
+Several OpenCL objects, namely `cl_platform_id`, `cl_context` and
+`cl_program`, have a direct relationship with a set of `cl_device_id`
+objects. In order to map this relationship, _cf4ocl_ provides the
+::CCLDevContainer class, which is an intermediate class between the
+::CCLWrapper parent class and the ::CCLPlatform, ::CCLContext and
+::CCLProgram wrappers. The ::CCLDevContainer class implements
+functionality for managing a set of ::CCLDevice* wrapper instances, and
+provides three abstract methods for accessing the associated set of
+::CCLDevice* wrappers, namely:
+
+* ::ccl_dev_container_get_all_devices(): get all ::CCLDevice* wrappers
+in device container object.
+* ::ccl_dev_container_get_device(): get ::CCLDevice* wrapper at given
+index.
+* ::ccl_dev_container_get_num_devices(): return number of devices in
+device container object.
+
+Client code should use the respective wrapper implementations. For
+example, for the ::CCLContext class, client code should use the
+::ccl_context_get_all_devices(), ::ccl_context_get_device() and
+::ccl_context_get_num_devices() functions.
+
 ### Platform module {#ug_platform}
 
 @copydoc PLATFORM_WRAPPER
