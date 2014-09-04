@@ -44,7 +44,47 @@
  * A wrapper object for OpenCL programs and functions to manage
  * them.
  *
- * @todo detailed description of module.
+ * List of ::CCLProgram* constructors:
+ *
+ * * ::ccl_program_new_from_source_file()
+ * * ::ccl_program_new_from_source_files()
+ * * ::ccl_program_new_from_source()
+ * * ::ccl_program_new_from_sources()
+ * * ::ccl_program_new_from_binary_file()
+ * * ::ccl_program_new_from_binary_files()
+ * * ::ccl_program_new_from_binary()
+ * * ::ccl_program_new_from_binaries()
+ * * ::ccl_program_new_from_built_in_kernels(), OCL >= 1.2
+ *
+ * Then, discuss the build, build full, compile and link functions:
+ *
+ * * ::ccl_program_build()
+ * * ::ccl_program_build_full()
+ * * ::ccl_program_compile(), OCL >= 1.2
+ * * ::ccl_program_link(), OCL >= 1.2
+ *
+ * Discuss the binary handling functions:
+ *
+ * * ::ccl_program_get_binary()
+ * * ::ccl_program_save_binary()
+ * * ::ccl_program_save_all_binaries()
+ *
+ * Discuss the kernel handling functions and their limitations:
+ *
+ * * ::ccl_program_get_kernel()
+ * * ::ccl_program_enqueue_kernel()
+ * * ::ccl_program_enqueue_kernel_v()
+ *
+ * Discuss the info macros, and the specific case of (not) getting
+ * binaries with ccl_program_get_info*() macros:
+ *
+ * * ::ccl_program_get_info_scalar()
+ * * ::ccl_program_get_info_array()
+ * * ::ccl_program_get_info()
+ *
+ * * ::ccl_program_get_build_info_scalar()
+ * * ::ccl_program_get_build_info_array()
+ * * ::ccl_program_get_build_info()
  *
  * @{
  */
