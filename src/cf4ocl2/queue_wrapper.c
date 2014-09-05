@@ -503,7 +503,8 @@ void ccl_queue_iter_event_init(CCLQueue* cq) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @return The next event wrapper associated with this queue.
+ * @return The next event wrapper associated with this queue, or `NULL`
+ * if no more event wrappers are available.
  * */
 CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
 
