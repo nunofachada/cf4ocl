@@ -19,7 +19,7 @@
  * @file
  * Cannonical example of how to use _cf4ocl_. Perform an element-wise
  * sum of two vectors, also adding a constant.
- * 
+ *
  * Optional command-line arguments:
  * 1. Device index
  * 2. Buffer size
@@ -58,23 +58,23 @@
  * Canonical example main function.
  * */
 int main(int argc, char** argv) {
-	
+
 	/* Number of elements in buffer. */
 	cl_uint buf_n = DEF_BUF_N;
-	
+
 	/* Device selected specified in the command line. */
 	int dev_idx = -1;
-	
+
 	/* Check if a device was specified in the command line. */
 	if (argc >= 2) {
 		dev_idx = atoi(argv[1]);
 	}
-	
+
 	/* Check if a new buffer size was specified in the command line. */
 	if (argc >= 3) {
 		buf_n = atoi(argv[2]);
 	}
-	
+
 	/* Wrappers. */
 	CCLContext* ctx = NULL;
 	CCLProgram* prg = NULL;
@@ -88,6 +88,9 @@ int main(int argc, char** argv) {
 	CCLEvent* evt_exec;
 	CCLEventWaitList ewl = NULL;
 
+	/* Profiler. */
+	CCLProf* prof;
+
 	/* Global and local worksizes. */
 	size_t gws;
 	size_t lws;
@@ -97,17 +100,17 @@ int main(int argc, char** argv) {
 	cl_uint b_host[buf_n];
 	cl_uint c_host[buf_n];
 	cl_uint d_host;
-	
+
 	/* Error reporting object. */
 	GError* err = NULL;
-	
+
 	/* Check results flag. */
 	cl_bool check_result;
 
 	/* Create a context with device selected from menu. */
 	ctx = ccl_context_new_from_menu_full(&dev_idx, &err);
 	HANDLE_ERROR(err);
-	
+
 	/* Get the selected device. */
 	dev = ccl_context_get_device(ctx, 0, &err);
 	HANDLE_ERROR(err);
@@ -131,7 +134,11 @@ int main(int argc, char** argv) {
 	lws = MIN(buf_n, lws);
 
 	/* Get global worksize, make it a multiple of local worksize. */
-	gws = lws * ((lws / buf_n) + ((lws % buf_n) > 0));
+	gws = lws * ((buf_n / lws) + ((buf_n % lws) > 0));
+	printf("\n");
+	printf(" * Global worksize: %d\n", (int) gws);
+	printf(" * Local worksize : %d\n", (int) lws);
+	printf("\n");
 
 	/* Fill host buffers. */
 	for (cl_uint i = 0; i < buf_n; ++i) {
@@ -141,7 +148,7 @@ int main(int argc, char** argv) {
 	d_host = buf_n / 4;
 
 	/* Create device buffers. */
-	a_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, 
+	a_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
 		buf_n * sizeof(cl_uint), NULL, &err);
 	HANDLE_ERROR(err);
 	b_dev = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
@@ -167,8 +174,8 @@ int main(int argc, char** argv) {
 	/* Execute program kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
 	evt_exec = ccl_program_enqueue_kernel(prg, KERNEL_NAME, queue, 1,
-		NULL, &gws, &lws, &ewl, &err, a_dev, b_dev, c_dev, 
-		ccl_arg_priv(d_host, cl_uint), ccl_arg_priv(buf_n, cl_uint), 
+		NULL, &gws, &lws, &ewl, &err, a_dev, b_dev, c_dev,
+		ccl_arg_priv(d_host, cl_uint), ccl_arg_priv(buf_n, cl_uint),
 		NULL);
 	HANDLE_ERROR(err);
 
@@ -180,7 +187,7 @@ int main(int argc, char** argv) {
 	ccl_enqueue_barrier(queue, &ewl, &err);
 	HANDLE_ERROR(err);
 
-	/* Read back results from host waiting for transfer to terminate 
+	/* Read back results from host waiting for transfer to terminate
 	 * before continuing host program. */
 	ccl_buffer_enqueue_read(queue, c_dev, CL_TRUE, 0,
 		buf_n * sizeof(cl_uint), c_host, NULL, &err);
@@ -195,11 +202,20 @@ int main(int argc, char** argv) {
 		}
 	}
 	if (check_result)
-		fprintf(stdout, 
+		fprintf(stdout,
 			"Kernel execution produced the expected results.\n");
 	else
-		fprintf(stderr, 
+		fprintf(stderr,
 			"Kernel execution failed to produce the expected results.\n");
+
+	/* Perform profiling. */
+	prof = ccl_prof_new();
+	ccl_prof_add_queue(prof, "queue1", queue);
+	HANDLE_ERROR(err);
+	ccl_prof_calc(prof, &err);
+	HANDLE_ERROR(err);
+	ccl_prof_print_summary(prof);
+	ccl_prof_destroy(prof);
 
 	/* Destroy wrappers. */
 	ccl_buffer_destroy(a_dev);
