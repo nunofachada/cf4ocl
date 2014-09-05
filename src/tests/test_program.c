@@ -362,7 +362,7 @@ static void program_create_info_destroy_test() {
 	}
 	d_h = CCL_TEST_PROGRAM_CONST;
 
-	/* Create host buffers. */
+	/* Create device buffers. */
 	a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
 	g_assert_no_error(err);

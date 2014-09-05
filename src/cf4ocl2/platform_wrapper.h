@@ -68,6 +68,14 @@
  * However, because the platform info return type is always `char*`,
  * _cf4ocl_ provides an additional helper macro for platform wrappers,
  * ::ccl_platform_get_info_string(), which is simpler to use.
+ * 
+ * The ::CCLPlatform* class extends the ::CCLDevContainer* class; as 
+ * such, it provides methods for handling a list of devices associated
+ * with the platform:
+ * 
+ * * ::ccl_platform_get_all_devices()
+ * * ::ccl_platform_get_device()
+ * * ::ccl_platform_get_num_devices() 
  *
  * _Usage example:_
  *

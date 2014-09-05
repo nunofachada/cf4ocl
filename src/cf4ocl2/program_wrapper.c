@@ -1467,7 +1467,7 @@ error_handler:
 }
 
 /**
- * Get the program's binary object for the the specified device.
+ * Get the program binary object for the specified device.
  *
  * @public @memberof ccl_program
  *
@@ -1549,7 +1549,7 @@ finish:
 }
 
 /**
- * Save the program's binary code for a specified device to a file.
+ * Save the program binary code for a specified device to a file.
  *
  * @public @memberof ccl_program
  *

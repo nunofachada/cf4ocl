@@ -74,7 +74,15 @@
  * * ::ccl_context_get_info_scalar()
  * * ::ccl_context_get_info_array()
  * * ::ccl_context_get_info()
- *
+ * 
+ * The ::CCLContext* class extends the ::CCLDevContainer* class; as 
+ * such, it provides methods for handling a list of devices associated
+ * with the context:
+ * 
+ * * ::ccl_context_get_all_devices()
+ * * ::ccl_context_get_device()
+ * * ::ccl_context_get_num_devices()
+ * 
  * _Example: using all devices in a platform_
  *
  * @code{.c}

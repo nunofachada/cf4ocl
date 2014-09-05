@@ -257,7 +257,7 @@ int main(int argc, char* argv[]) {
 		ccl_event_wait_list_add(&ewl, evt_comm);
 		ccl_event_wait_list_add(&ewl, evt_exec);
 
-		/* Wait for*/
+		/* Wait for events. */
 		ccl_event_wait(&ewl, &err);
 		HANDLE_ERROR(err);
 
