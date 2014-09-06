@@ -594,13 +594,10 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	/* Specific event ID. */
 	guint event_id;
 	/* Event instants. */
-	cl_ulong instant, instant_aux;
+	cl_ulong instant_queued, instant_submit, instant_start, instant_end;
 	/* Event instant objects. */
 	CCLProfInst* evinst_start;
 	CCLProfInst* evinst_end;
-
-	/* Info object. */
-	CCLWrapperInfo* info;
 
 	/* Event name. */
 	const char* event_name;
@@ -608,12 +605,33 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	/* Get event name. */
 	event_name = ccl_event_get_final_name(evt);
 
-	/* Update number of events, and get an ID for the given event. */
-	event_id = ++prof->num_events;
+	/* Get event queued instant. */
+	instant_queued = ccl_event_get_profiling_info_scalar(
+		evt, CL_PROFILING_COMMAND_QUEUED, cl_ulong, err);
+	if (*err != NULL)
+		return;
 
-	/* ***************************************************** */
-	/* *** 1 - Check event against table of event names. * ***/
-	/* ***************************************************** */
+	/* Get event submit instant. */
+	instant_submit = ccl_event_get_profiling_info_scalar(
+		evt, CL_PROFILING_COMMAND_SUBMIT,cl_ulong, err);
+	if (*err != NULL)
+		return;
+
+	/* Get event start instant. */
+	instant_start = ccl_event_get_profiling_info_scalar(
+		evt, CL_PROFILING_COMMAND_START, cl_ulong, err);
+	if (*err != NULL)
+		return;
+
+	/* Get event end instant. */
+	instant_end = ccl_event_get_profiling_info_scalar(
+		evt, CL_PROFILING_COMMAND_END, cl_ulong, err);
+	if (*err != NULL)
+		return;
+
+	/* If we get here, update number of profilable events, and get an ID
+	 * for the given event. */
+	event_id = ++prof->num_events;
 
 	/* Check if event name is already registered in the table of event
 	 * names... */
@@ -627,63 +645,37 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 			(gpointer) event_name_id);
 	}
 
-	/* ******************************************************* */
-	/* *** 2 - Check event against list of event instants. *** */
-	/* ******************************************************* */
+	/* If end instant occurs after start instant... */
+	if (instant_end > instant_start) {
 
-	/* Get event start instant. */
-	info = ccl_event_get_profiling_info(
-		evt, CL_PROFILING_COMMAND_START, err);
-	if (*err != NULL)
-		return;
-	instant = *((cl_ulong*) info->value);
+		/* Add event start instant to list of event instants. */
+		evinst_start = ccl_prof_inst_new(event_name, cq_name, event_id,
+			instant_start, CCL_PROF_INST_TYPE_START);
+		prof->instants = g_list_prepend(
+			prof->instants, (gpointer) evinst_start);
 
-	/* Check if start instant is the oldest instant. If so, keep it. */
-	if (instant < prof->t_start)
-		prof->t_start = instant;
+		/* Add event end instant to list of event instants. */
+		evinst_end = ccl_prof_inst_new(event_name, cq_name, event_id,
+			instant_end, CCL_PROF_INST_TYPE_END);
+		prof->instants = g_list_prepend(
+			prof->instants, (gpointer) evinst_end);
 
-	/* Add event start instant to list of event instants. */
-	evinst_start = ccl_prof_inst_new(event_name, cq_name, event_id,
-		instant, CCL_PROF_INST_TYPE_START);
-	prof->instants = g_list_prepend(
-		prof->instants, (gpointer) evinst_start);
+		/* Check if start instant is the oldest instant. If so, keep it. */
+		if (instant_start < prof->t_start)
+			prof->t_start = instant_start;
+		
+	} else {
+		
+		g_warning("Event '%s' did not use device time. As such its "\
+			"start and end instants will not be added to the list of "\
+			"event instants.", event_name);
+		
+	}
 
-	/* Get event end instant. */
-	info = ccl_event_get_profiling_info(
-		evt, CL_PROFILING_COMMAND_END, err);
-	if (*err != NULL)
-		return;
-	instant = *((cl_ulong*) info->value);
-
-	/* Add event end instant to list of event instants. */
-	evinst_end = ccl_prof_inst_new(event_name, cq_name, event_id,
-		instant, CCL_PROF_INST_TYPE_END);
-	prof->instants = g_list_prepend(
-		prof->instants, (gpointer) evinst_end);
-
-	/* *********************************************** */
-	/* *** 3 - Check event against list of events. *** */
-	/* *********************************************** */
-
-	/* Get event queued instant. */
-	info = ccl_event_get_profiling_info(
-		evt, CL_PROFILING_COMMAND_QUEUED, err);
-	if (*err != NULL)
-		return;
-	instant = *((cl_ulong*) info->value);
-
-	/* Get event submit instant. */
-	info = ccl_event_get_profiling_info(
-		evt, CL_PROFILING_COMMAND_SUBMIT, err);
-	if (*err != NULL)
-		return;
-	instant_aux = *((cl_ulong*) info->value);
-
-	/* Add event information to list of events.*/
+	/* Add event information to list of event information..*/
 	prof->infos = g_list_prepend(prof->infos,
 		(gpointer) ccl_prof_info_new(event_name, cq_name,
-			instant, instant_aux, evinst_start->instant,
-			evinst_end->instant));
+			instant_queued, instant_submit, instant_start, instant_end));
 
 }
 
@@ -744,7 +736,7 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 				 * provide profiling info. Don't stop profiling,
 				 * ignore this specific event, but log a message
 				 * saying so. */
-				g_warning(
+				g_message(
 					"The '%s' event does not have profiling info",
 					ccl_event_get_final_name(evt));
 				g_clear_error(&err_internal);

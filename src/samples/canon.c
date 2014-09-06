@@ -214,7 +214,12 @@ int main(int argc, char** argv) {
 	HANDLE_ERROR(err);
 	ccl_prof_calc(prof, &err);
 	HANDLE_ERROR(err);
+	/* Show profiling info. */
 	ccl_prof_print_summary(prof);
+	/* Export profiling info. */
+	ccl_prof_export_info_file(prof, "out.tsv", &err);
+	HANDLE_ERROR(err);
+	/* Destroy profiler object. */
 	ccl_prof_destroy(prof);
 
 	/* Destroy wrappers. */
