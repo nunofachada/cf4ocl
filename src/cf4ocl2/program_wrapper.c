@@ -53,6 +53,12 @@ struct ccl_program {
 	 * @private
 	 * */
 	GHashTable* krnls;
+	
+	/**
+	 * Build log of most recent build.
+	 * @private
+	 * */
+	char* build_log;
 
 };
 
@@ -109,6 +115,14 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 		/*...free it and the included binaries. */
 		g_hash_table_destroy(prg->binaries);
 
+	}
+	
+	/* If there is a build log... */
+	if (prg->build_log != NULL) {
+		
+		/*...free it. */
+		g_free(prg->build_log);
+		
 	}
 
 }
@@ -790,6 +804,45 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	/* Build program. */
 	ocl_status = clBuildProgram(ccl_program_unwrap(prg),
 		num_devices, cl_devices, options, pfn_notify, user_data);
+	/* Get build log, if possible. */
+	if ((ocl_status == CL_SUCCESS) 
+		|| (ocl_status == CL_BUILD_PROGRAM_FAILURE)) {
+			
+		/* Number of devices. */
+		cl_uint real_num_devs = (num_devices != 0) ? num_devices : ccl_program_get_num_devices(prg, NULL);
+		/* Device list. */
+		CCLDevice** real_devs = (devs != NULL) ? devs : ccl_program_get_all_devices(prg, NULL);
+		
+		/* Build log for current device.*/
+		char* build_log_dev;
+		/* Complete build log string object. */
+		GString* build_log_obj = g_string_new("");
+		/* Device name. */
+		char* dev_name;
+		
+		/* Get build log for each device. */
+		for (cl_uint i = 0; i < real_num_devs; ++i) {
+			build_log_dev = ccl_program_get_build_info_array(
+				prg, real_devs[i], CL_PROGRAM_BUILD_LOG, char*, NULL);
+			if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
+				dev_name = ccl_device_get_info_array(
+					real_devs[i], CL_DEVICE_NAME, char*, NULL);
+				g_string_append_printf(build_log_obj, "\n*** Build log "\
+					"for device '%s' ****\n\n%s\n\n********************"\
+					"**************\n", dev_name, build_log_dev);
+			}
+			printf(">>> Build log for %s: %s\n", dev_name, build_log_dev);
+		}
+		prg->build_log = build_log_obj->str;
+		g_string_free(build_log_obj, FALSE);
+		
+		/* Check if build log is not empty. */
+		if ((prg->build_log != NULL) && (strlen(prg->build_log) > 0)) {
+			g_message("Build log is not empty");
+		}
+		
+	}
+	/* Check for any other errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to build program (OpenCL error %d: %s).",

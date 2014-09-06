@@ -613,7 +613,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 
 	/* Get event submit instant. */
 	instant_submit = ccl_event_get_profiling_info_scalar(
-		evt, CL_PROFILING_COMMAND_SUBMIT,cl_ulong, err);
+		evt, CL_PROFILING_COMMAND_SUBMIT, cl_ulong, err);
 	if (*err != NULL)
 		return;
 
