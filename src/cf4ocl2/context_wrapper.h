@@ -74,15 +74,15 @@
  * * ::ccl_context_get_info_scalar()
  * * ::ccl_context_get_info_array()
  * * ::ccl_context_get_info()
- * 
- * The ::CCLContext* class extends the ::CCLDevContainer* class; as 
+ *
+ * The ::CCLContext* class extends the ::CCLDevContainer* class; as
  * such, it provides methods for handling a list of devices associated
  * with the context:
- * 
+ *
  * * ::ccl_context_get_all_devices()
  * * ::ccl_context_get_device()
  * * ::ccl_context_get_num_devices()
- * 
+ *
  * _Example: using all devices in a platform_
  *
  * @code{.c}
@@ -303,7 +303,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_context_get_info(ctx, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) ctx, NULL, param_name, \
+	ccl_wrapper_get_info((CCLWrapper*) ctx, NULL, param_name, 0, \
 		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
 
 /**
@@ -324,8 +324,8 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * */
 #define ccl_context_get_info_scalar(ctx, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetContextInfo, \
-		CL_TRUE, err))
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err))
 
 /**
  * Macro which returns an array context information value.
@@ -345,8 +345,8 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * */
 #define ccl_context_get_info_array(ctx, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetContextInfo, \
-		CL_TRUE, err)
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
 /**
  * Increase the reference count of the context wrapper object.
  *

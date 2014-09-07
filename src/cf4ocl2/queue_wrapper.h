@@ -154,7 +154,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_queue_get_info(cq, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, \
+	ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, 0, \
 		(ccl_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
 /**
@@ -175,8 +175,8 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * */
 #define ccl_queue_get_info_scalar(cq, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetCommandQueueInfo, \
-		CL_TRUE, err))
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err))
 
 /**
  * Macro which returns an array command queue information value.
@@ -196,8 +196,8 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * */
 #define ccl_queue_get_info_array(cq, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetCommandQueueInfo, \
-		CL_TRUE, err)
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetCommandQueueInfo, CL_TRUE, err)
 
 /**
  * Increase the reference count of the command queue object.
