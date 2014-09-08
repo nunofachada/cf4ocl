@@ -261,9 +261,36 @@ if (err) {
 Even if the program terminates due to an error, the [g_clear_error()]
 can be still be called to destroy the error object.
 
-### Log messages
+### Log messages {#ug_log}
 
-@todo Describe how to redirection log messages
+_cf4ocl_ uses the [GLib message logging framework](https://developer.gnome.org/glib/stable/glib-Message-Logging.html)
+to log messages and warnings. _cf4ocl_ log output is handled by
+[GLib's default log handler](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-default-handler),
+which outputs warnings and messages to `stderr`. If client code wishes
+to redirect this output, it can do so by specifying another
+[log function](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#GLogFunc)
+for the `cf4ocl2` log domain with
+[g_log_set_handler()](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-set-handler).
+For example:
+
+@code{.c}
+/* Log function which outputs messages to a stream specified in user_data. */
+void my_log_function(const gchar *log_domain, GLogLevelFlags log_level,
+	const gchar *message, gpointer user_data) {
+
+	g_fprintf((FILE*) user_data, "[%s](%d)>%s\n",
+		log_domain, log_level, message);
+
+}
+@endcode
+@code{.c}
+FILE* my_file;
+@endcode
+@code{.c}
+/* Add log handler for all messages from cf4ocl. */
+g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
+	my_log_function, my_file);
+@endcode
 
 ## Wrapper modules {#ug_wrappers}
 
