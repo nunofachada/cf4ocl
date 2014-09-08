@@ -261,6 +261,8 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * @param[in] wrapper2 A second wrapper object, required in some
  * queries.
  * @param[in] param_name Name of information/parameter to get.
+ * @param[in] min_size Minimum size of returned information object in
+ * case of error.
  * @param[in] info_fun OpenCL clGet*Info function.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
@@ -268,10 +270,11 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * reporting is to be ignored.
  * @return The requested information object. This object will
  * be automatically freed when the respective wrapper object is
- * destroyed. If an error occurs, NULL is returned.
+ * destroyed. If an error occurs, either `NULL` (if `min_size` == 0), or
+ * a `min_size`d information object is returned (if `min_size` > 0).
  * */
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name,
+	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -346,7 +349,13 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
-	info = NULL;
+
+	/* In case of error, return an all-zeros info if min_size is > 0. */
+	if (min_size > 0) {
+		if (info != NULL) ccl_wrapper_info_destroy(info);
+		info = ccl_wrapper_info_new(min_size);
+		ccl_wrapper_add_info(wrapper1, param_name, info);
+	}
 
 finish:
 
@@ -363,6 +372,7 @@ finish:
  * @param[in] wrapper2 A second wrapper object, required in some
  * queries.
  * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] min_size Minimum size of returned value in case of error.
  * @param[in] info_fun OpenCL clGet*Info function.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
@@ -370,10 +380,11 @@ finish:
  * reporting is to be ignored.
  * @return A pointer to the requested information value. This
  * value will be automatically freed when the wrapper object is
- * destroyed. If an error occurs, NULL is returned.
+ * destroyed. If an error occurs, either `NULL` (if `min_size` == 0), or
+ * a pointer to a `min_size`d zero value is returned (if `min_size` > 0).
  * */
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name,
+	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -384,7 +395,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
-		param_name, info_fun, use_cache, err);
+		param_name, min_size, info_fun, use_cache, err);
 
 	/* Return value if information object is not NULL. */
 	return diw != NULL ? diw->value : NULL;
@@ -399,16 +410,17 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @param[in] wrapper2 A second wrapper object, required in some
  * queries.
  * @param[in] param_name Name of information/parameter to get value of.
+ * @param[in] min_size Minimum size returned in case of error.
  * @param[in] info_fun OpenCL clGet*Info function.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return The requested information size. If an error occurs,
- * a size of 0 is returned.
+ * @return The requested information size. If an error occurs, a size of
+ * `min_size` is returned.
  * */
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name,
+	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -419,7 +431,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
-		param_name, info_fun, use_cache, err);
+		param_name, min_size, info_fun, use_cache, err);
 
 	/* Return value if information object is not NULL. */
 	return diw != NULL ? diw->size : 0;

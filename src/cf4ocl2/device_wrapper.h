@@ -100,7 +100,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_device_get_info(dev, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) dev, NULL, param_name, \
+	ccl_wrapper_get_info((CCLWrapper*) dev, NULL, param_name, 0, \
 		(ccl_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
 
 /**
@@ -121,8 +121,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * */
 #define ccl_device_get_info_scalar(dev, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetDeviceInfo, \
-		CL_TRUE, err))
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err))
 
 /**
  * Macro which returns an array device information value.
@@ -142,8 +142,8 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
  * */
 #define ccl_device_get_info_array(dev, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetDeviceInfo, \
-		CL_TRUE, err)
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetDeviceInfo, CL_TRUE, err)
 
 /**
  * Increase the reference count of the device wrapper object.

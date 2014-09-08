@@ -68,14 +68,14 @@
  * However, because the platform info return type is always `char*`,
  * _cf4ocl_ provides an additional helper macro for platform wrappers,
  * ::ccl_platform_get_info_string(), which is simpler to use.
- * 
- * The ::CCLPlatform* class extends the ::CCLDevContainer* class; as 
+ *
+ * The ::CCLPlatform* class extends the ::CCLDevContainer* class; as
  * such, it provides methods for handling a list of devices associated
  * with the platform:
- * 
+ *
  * * ::ccl_platform_get_all_devices()
  * * ::ccl_platform_get_device()
- * * ::ccl_platform_get_num_devices() 
+ * * ::ccl_platform_get_num_devices()
  *
  * _Usage example:_
  *
@@ -139,7 +139,7 @@ cl_uint ccl_platform_get_opencl_version(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info(platf, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) platf, NULL, param_name, \
+	ccl_wrapper_get_info((CCLWrapper*) platf, NULL, param_name, 0, \
 		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
 
 /**
@@ -160,8 +160,8 @@ cl_uint ccl_platform_get_opencl_version(
  * */
 #define ccl_platform_get_info_scalar(platf, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetPlatformInfo, \
-		CL_TRUE, err))
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err))
 
 /**
  * Macro which returns an array platform information value.
@@ -181,8 +181,8 @@ cl_uint ccl_platform_get_opencl_version(
  * */
 #define ccl_platform_get_info_array(platf, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetPlatformInfo, \
-		CL_TRUE, err)
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
 
 /**
  * Helper macro which gets a platform information string. This

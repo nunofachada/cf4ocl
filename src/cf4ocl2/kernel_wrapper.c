@@ -777,8 +777,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		real_ws *= real_worksize[i];
 	}
 
-	/* Don't let each component of the local worksize to be 
-	 * higher than the respective component of the real 
+	/* Don't let each component of the local worksize to be
+	 * higher than the respective component of the real
 	 * worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
 		while (lws[i] > real_worksize[i]) {
@@ -801,7 +801,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	 * worksize and is big enough to handle the real worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
 		gws[i] = ((real_worksize[i] / lws[i])
-			+ (((real_worksize[i] % lws[i]) > 0) ? 1 : 0)) 
+			+ (((real_worksize[i] % lws[i]) > 0) ? 1 : 0))
 			* lws[i];
 	}
 
@@ -894,7 +894,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 
 	/* Get kernel argument info. */
 	info = ccl_wrapper_get_info(
-		(CCLWrapper*) krnl, &fake_wrapper, param_name,
+		(CCLWrapper*) krnl, &fake_wrapper, param_name, 0,
 		(ccl_wrapper_info_fp) ccl_kernel_get_arg_info_adapter,
 		CL_FALSE, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);

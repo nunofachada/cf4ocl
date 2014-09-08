@@ -189,17 +189,17 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 
 /* Get information about any wrapped OpenCL object. */
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name,
+	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /* Get pointer to information value. */
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name,
+	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /* Get information size. */
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name,
+	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
 
 /**

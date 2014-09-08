@@ -48,77 +48,77 @@
  * data or from built-in kernels using the clCreateProgramWithSource(),
  * clCreateProgramWithBinary() or clCreateProgramWithBuiltInKernels(),
  * respectively (the later requires OpenCL >= 1.2). _cf4ocl_ provides a
- * set of ::CCLProgram* program wrapper constructors which not only map 
+ * set of ::CCLProgram* program wrapper constructors which not only map
  * the native OpenCL program constructors, but also extend some of their
  * functionality.
- * 
+ *
  * For creating programs from source code, _cf4ocl_ provides the
  * following constructors:
- * 
+ *
  * * ::ccl_program_new_from_source_file() - Create a new program wrapper
  * object from a source file.
- * * ::ccl_program_new_from_source_files() - Create a new program 
+ * * ::ccl_program_new_from_source_files() - Create a new program
  * wrapper object from several source files.
  * * ::ccl_program_new_from_source() - Create a new program wrapper
  * object from a null-terminated source string.
- * * ::ccl_program_new_from_sources() - Create a new program wrapper 
+ * * ::ccl_program_new_from_sources() - Create a new program wrapper
  * object from several source code strings.
- * 
+ *
  * Program constructors which use binary data follow the same pattern as
  * their source code counterparts:
- * 
+ *
  * * ::ccl_program_new_from_binary_file() - Create a new program wrapper
- * object from a file containing binary code executable on a specific 
+ * object from a file containing binary code executable on a specific
  * device.
- * * ::ccl_program_new_from_binary_files() - Create a new program 
- * wrapper object from files containing binary code executable on the 
+ * * ::ccl_program_new_from_binary_files() - Create a new program
+ * wrapper object from files containing binary code executable on the
  * given device list, one file per device.
- * * ::ccl_program_new_from_binary() - Create a new program wrapper 
+ * * ::ccl_program_new_from_binary() - Create a new program wrapper
  * object from binary code executable on a specific device.
- * * ::ccl_program_new_from_binaries() - Create a new program wrapper 
- * object from a list of binary code strings executable on the given 
+ * * ::ccl_program_new_from_binaries() - Create a new program wrapper
+ * object from a list of binary code strings executable on the given
  * device list, one binary string per device.
- * 
+ *
  * The ::ccl_program_new_from_built_in_kernels() constructor directly
- * wraps the native OpenCL clCreateProgramWithBuiltInKernels() 
- * function, allowing to create programs from built-in kernels. This 
- * method is only available for platforms which support OpenCL version 
+ * wraps the native OpenCL clCreateProgramWithBuiltInKernels()
+ * function, allowing to create programs from built-in kernels. This
+ * method is only available for platforms which support OpenCL version
  * 1.2 or higher.
- * 
+ *
  * Like most _cf4ocl_ wrapper objects, program wrapper objects follow
  * the @ref ug_new_destroy "new/destroy" rule, and should be released
  * with the ::ccl_program_destroy() destructor.
  *
- * The ::ccl_program_build() and ::ccl_program_build_full() methods 
- * allow to build a program executable from the program source or 
- * binary. While the later directly maps the native clBuildProgram() 
- * OpenCL function, the former provides a simpler interface which will 
+ * The ::ccl_program_build() and ::ccl_program_build_full() methods
+ * allow to build a program executable from the program source or
+ * binary. While the later directly maps the native clBuildProgram()
+ * OpenCL function, the former provides a simpler interface which will
  * be useful in many situations.
- * 
+ *
  * Compilation and linking (which require OpenCL >= 1.2) are provided
  * by the ::ccl_program_compile() and ::ccl_program_link()
  * functions.
- * 
+ *
  * Information about program objects can be obtained using the
- * program module @ref ug_getinfo "info macros": 
+ * program module @ref ug_getinfo "info macros":
  *
  * * ::ccl_program_get_info_scalar()
  * * ::ccl_program_get_info_array()
  * * ::ccl_program_get_info()
- * 
- * However, program binaries cannot be retrieved using these macros. 
- * Consequently, _cf4ocl_ provides a specific and straightforward API 
+ *
+ * However, program binaries cannot be retrieved using these macros.
+ * Consequently, _cf4ocl_ provides a specific and straightforward API
  * for handling them:
  *
- * * ::ccl_program_get_binary() - Return the program binary object for 
+ * * ::ccl_program_get_binary() - Return the program binary object for
  * the specified device.
- * * ::ccl_program_save_binary() - Save the program binary code for a 
+ * * ::ccl_program_save_binary() - Save the program binary code for a
  * specified device to a file.
- * * ::ccl_program_save_all_binaries() - Save the program binaries for 
+ * * ::ccl_program_save_all_binaries() - Save the program binaries for
  * all associated devices to files, one file per device.
- * 
+ *
  * Program build information can be obtained using a specific set of
- * @ref ug_getinfo "info macros": 
+ * @ref ug_getinfo "info macros":
  *
  * * ::ccl_program_get_build_info_scalar()
  * * ::ccl_program_get_build_info_array()
@@ -130,56 +130,56 @@
  * * ::ccl_program_get_kernel() - Get the kernel wrapper object for the
  * given program kernel function.
  * * ::ccl_program_enqueue_kernel() - Enqueues a program kernel function
- * for execution on a device, accepting kernel arguments as 
+ * for execution on a device, accepting kernel arguments as
  * `NULL`-terminated variable list of parameters.
- * * ::ccl_program_enqueue_kernel_v() - Enqueues a program kernel 
+ * * ::ccl_program_enqueue_kernel_v() - Enqueues a program kernel
  * function for execution on a device, accepting kernel arguments as
  * `NULL`-terminated array of parameters.
- * 
- * Program wrapper objects only keep one kernel wrapper instance per 
- * kernel function; as such, for a given kernel function, these 
+ *
+ * Program wrapper objects only keep one kernel wrapper instance per
+ * kernel function; as such, for a given kernel function, these
  * methods will always use the same  kernel wrapper instance (and
  * consequently, the same OpenCL kernel object). While this will work
  * for single-threaded host code, it will fail if the same kernel
  * wrapper is invoked from different threads. In such cases, use the
  * @ref KERNEL_WRAPPER "kernel wrapper module" API for handling kernel
  * wrapper objects.
- * 
- * The ::CCLProgram* class extends the ::CCLDevContainer* class; as 
+ *
+ * The ::CCLProgram* class extends the ::CCLDevContainer* class; as
  * such, it provides methods for handling a list of devices associated
  * with the program:
- * 
+ *
  * * ::ccl_program_get_all_devices()
  * * ::ccl_program_get_device()
  * * ::ccl_program_get_num_devices()
- * 
+ *
  * _Example:_
- * 
+ *
  * @dontinclude canon.c
  * @skipline Wrappers.
  * @until c_dev
  * @skipline CCLEvent* evt_exec
- * 
+ *
  * @skipline Global and local
  * @until lws
- * 
+ *
  * @skipline Error reporting
  * @until GError
- * 
+ *
  * @skipline Create a new program
- * @until prg = 
- * 
+ * @until prg =
+ *
  * @skipline Build program
  * @until ccl_program_build
- * 
+ *
  * @skipline evt_exec =
  * @until NULL);
- * 
+ *
  * @skipline Destroy wrappers
  * @skipline ccl_program_destroy
- * 
+ *
  * @example canon.c
- * 
+ *
  * @{
  */
 
@@ -398,7 +398,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 #define ccl_program_get_info(prg, param_name, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
-	: ccl_wrapper_get_info((CCLWrapper*) prg, NULL, param_name, \
+	: ccl_wrapper_get_info((CCLWrapper*) prg, NULL, param_name, 0, \
 		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
 /**
@@ -422,8 +422,8 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	(param_name == CL_PROGRAM_BINARIES) \
 	? (param_type) 0 \
 	: *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetProgramInfo, \
-		CL_TRUE, err))
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err))
 
 /**
  * Macro which returns an array program information value. To get
@@ -449,8 +449,8 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
 	: (param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetProgramInfo, \
-		CL_TRUE, err)
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
 
 /**
  * Get a ::CCLWrapperInfo program build information object.
@@ -466,7 +466,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * */
 #define ccl_program_get_build_info(prg, dev, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) prg, (CCLWrapper*) dev, \
-		param_name, (ccl_wrapper_info_fp) clGetProgramBuildInfo, \
+		param_name, 0, (ccl_wrapper_info_fp) clGetProgramBuildInfo, \
 		CL_FALSE, err)
 
 /**
@@ -489,7 +489,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 #define ccl_program_get_build_info_scalar(prg, dev, param_name, \
 	param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
-		(CCLWrapper*) dev, param_name, \
+		(CCLWrapper*) dev, param_name, sizeof(param_type), \
 		(ccl_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err))
 
 /**
@@ -512,7 +512,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 #define ccl_program_get_build_info_array(prg, dev, param_name, \
 	param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
-		(CCLWrapper*) dev, param_name, \
+		(CCLWrapper*) dev, param_name, sizeof(param_type), \
 		(ccl_wrapper_info_fp) clGetProgramBuildInfo, CL_FALSE, err)
 
 /**

@@ -53,10 +53,10 @@ typedef struct ccl_buffer CCLBuffer;
  * of image wrappers follows the _cf4ocl_
  * @ref ug_new_destroy "new/destroy" rule; as such, images should be
  * freed with the ::ccl_image_destroy() destructor.
- * 
+ *
  * Image wrapper objects can be directly pass as kernel arguments to
  * functions such as ::ccl_program_enqueue_kernel() or
- * ::ccl_kernel_set_arg(). 
+ * ::ccl_kernel_set_arg().
  *
  * Information about image objects can be fetched using the
  * @ref ug_getinfo "info macros":
@@ -110,7 +110,7 @@ typedef struct ccl_buffer CCLBuffer;
  * ccl_image_destroy(img_in);
  * ccl_image_destroy(img_out);
  * @endcode
- * 
+ *
  * @example image_filter.c
  * @example image_fill.c
  *
@@ -286,7 +286,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLQueue* cq, CCLImage* img,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_image_get_info(img, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) img, NULL, param_name, \
+	ccl_wrapper_get_info((CCLWrapper*) img, NULL, param_name, 0, \
 		(ccl_wrapper_info_fp) clGetImageInfo, CL_TRUE, err)
 
 /**
@@ -307,8 +307,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLQueue* cq, CCLImage* img,
  * */
 #define ccl_image_get_info_scalar(img, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) img, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetImageInfo, \
-		CL_TRUE, err))
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetImageInfo, CL_TRUE, err))
 
 /**
  * Macro which returns an array image information value.
@@ -328,8 +328,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLQueue* cq, CCLImage* img,
  * */
 #define ccl_image_get_info_array(img, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) img, \
-		NULL, param_name, (ccl_wrapper_info_fp) clGetImageInfo, \
-		CL_TRUE, err)
+		NULL, param_name, sizeof(param_type), \
+		(ccl_wrapper_info_fp) clGetImageInfo, CL_TRUE, err)
 
 /**
  * Increase the reference count of the image wrapper object.
