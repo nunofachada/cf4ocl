@@ -666,7 +666,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 		
 	} else {
 		
-		g_warning("Event '%s' did not use device time. As such its "\
+		g_message("Event '%s' did not use device time. As such its "\
 			"start and end instants will not be added to the list of "\
 			"event instants.", event_name);
 		

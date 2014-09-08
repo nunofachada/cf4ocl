@@ -253,7 +253,7 @@ CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
 /* Create a new program wrapper object from files containing binary
  * code executable on the given device list, one file per device. */
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
-	cl_uint num_devices, CCLDevice** devs, const char** filenames,
+	cl_uint num_devices, CCLDevice* const* devs, const char** filenames,
 	cl_int *binary_status, GError** err);
 
 /* Create a new program wrapper object from binary code executable on a
@@ -265,7 +265,7 @@ CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
  * strings executable on the given device list, one binary string per
  * device. */
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
-	cl_uint num_devices, CCLDevice** devs, CCLProgramBinary** bins,
+	cl_uint num_devices, CCLDevice* const* devs, CCLProgramBinary** bins,
 	cl_int *binary_status, GError** err);
 
 /* ******************************** */
@@ -276,7 +276,7 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 
 /* Create a new program wrapper object from device built-in kernels. */
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
-	cl_uint num_devices, CCLDevice** devs, const char *kernel_names,
+	cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
 	GError** err);
 
 #endif
@@ -294,20 +294,23 @@ cl_bool ccl_program_build(
  * source or binary. This function wraps the clBuildProgram() OpenCL
  * function. */
 cl_bool ccl_program_build_full(CCLProgram* prg,
-	cl_uint num_devices, CCLDevice** devs, const char* options,
+	cl_uint num_devices, CCLDevice* const* devs, const char* options,
 	ccl_program_callback pfn_notify, void* user_data, GError** err);
+	
+/* Get build log for most recent build, compile or link. */
+const char* ccl_program_get_build_log(CCLProgram* prg);
 
 #ifdef CL_VERSION_1_2
 
 /* Compile a program's source code. */
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
-	CCLDevice** devs, const char* options, cl_uint num_input_headers,
+	CCLDevice* const* devs, const char* options, cl_uint num_input_headers,
 	CCLProgram** prg_input_headers, const char** header_include_names,
 	ccl_program_callback pfn_notify, void* user_data, GError** err);
 
 /* Link a set of compiled programs. */
 CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
-	CCLDevice** devs, const char* options, cl_uint num_input_programs,
+	CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
 	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
 	void* user_data, GError** err);
 

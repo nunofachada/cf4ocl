@@ -462,7 +462,7 @@ CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
-	cl_uint num_devices, CCLDevice** devs, const char** filenames,
+	cl_uint num_devices, CCLDevice* const* devs, const char** filenames,
 	cl_int *binary_status, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -565,7 +565,7 @@ CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
-	cl_uint num_devices, CCLDevice** devs, CCLProgramBinary** bins,
+	cl_uint num_devices, CCLDevice* const* devs, CCLProgramBinary** bins,
 	cl_int *binary_status, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -652,7 +652,7 @@ finish:
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
-	cl_uint num_devices, CCLDevice** devs, const char *kernel_names,
+	cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
 	GError** err) {
 
 	/* Make sure ctx is not NULL. */
@@ -778,7 +778,7 @@ cl_bool ccl_program_build(
  * otherwise.
  * */
 cl_bool ccl_program_build_full(CCLProgram* prg,
-	cl_uint num_devices, CCLDevice** devs, const char *options,
+	cl_uint num_devices, CCLDevice* const* devs, const char *options,
 	ccl_program_callback pfn_notify, void *user_data, GError** err) {
 
 	/* Make sure prg is not NULL. */
@@ -809,14 +809,20 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 		|| (ocl_status == CL_BUILD_PROGRAM_FAILURE)) {
 			
 		/* Number of devices. */
-		cl_uint real_num_devs = (num_devices != 0) ? num_devices : ccl_program_get_num_devices(prg, NULL);
+		cl_uint real_num_devs = (num_devices != 0) 
+			? num_devices 
+			: ccl_program_get_num_devices(prg, NULL);
 		/* Device list. */
-		CCLDevice** real_devs = (devs != NULL) ? devs : ccl_program_get_all_devices(prg, NULL);
+		CCLDevice* const* real_devs = (devs != NULL) 
+			? devs 
+			: ccl_program_get_all_devices(prg, NULL);
 		
 		/* Build log for current device.*/
 		char* build_log_dev;
+		
 		/* Complete build log string object. */
 		GString* build_log_obj = g_string_new("");
+		
 		/* Device name. */
 		char* dev_name;
 		
@@ -831,7 +837,6 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 					"for device '%s' ****\n\n%s\n\n********************"\
 					"**************\n", dev_name, build_log_dev);
 			}
-			printf(">>> Build log for %s: %s\n", dev_name, build_log_dev);
 		}
 		prg->build_log = build_log_obj->str;
 		g_string_free(build_log_obj, FALSE);
@@ -873,6 +878,26 @@ finish:
 
 }
 
+/** 
+ * Get build log for most recent build, compile or link.
+ * 
+ * The build log is returned for all devices associated with the
+ * program. 
+ * 
+ * @param[in] prg Program wrapper object.
+ * @return The build log for most recent build, compile or link. May
+ * be `NULL` or an empty string if no build, compile or link was
+ * performed, or if no build log is available. 
+ * */
+const char* ccl_program_get_build_log(CCLProgram* prg) {
+
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, CL_FALSE);
+
+	/* Return build log. */
+	return (const char*) prg->build_log;
+}
+
 #ifdef CL_VERSION_1_2
 
 /**
@@ -910,7 +935,7 @@ finish:
  * otherwise.
  * */
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
-	CCLDevice** devs, const char* options, cl_uint num_input_headers,
+	CCLDevice* const* devs, const char* options, cl_uint num_input_headers,
 	CCLProgram** prg_input_headers, const char** header_include_names,
 	ccl_program_callback pfn_notify, void* user_data, GError** err) {
 
@@ -1030,7 +1055,7 @@ finish:
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
-	CCLDevice** devs, const char* options, cl_uint num_input_programs,
+	CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
 	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
 	void* user_data, GError** err) {
 
