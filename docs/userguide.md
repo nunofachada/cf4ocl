@@ -135,9 +135,7 @@ field.
 
 To use the value, a cast should be performed on the `value` field to
 convert it to the required type (which is what the
-`ccl_<object>_get_info_<scalar|array>()` macros automatically do). The
-::ccl_info_scalar() and ::ccl_info_array() macros perform this cast
-directly on ::CCLWrapperInfo* objects.
+`ccl_<object>_get_info_<scalar|array>()` macros automatically do).
 
 The values and objects returned by these macros are automatically
 released when the respective wrapper object is destroyed and should

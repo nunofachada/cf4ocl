@@ -222,27 +222,6 @@ struct ccl_wrapper_info {
 
 };
 
-/**
- * Helper macro which returns a scalar information value casted
- * to specified scalar type.
- *
- * @param[in] info ::CCLWrapperInfo* information object.
- * @param[in] type Scalar type to which to cast value to.
- * @return The information value casted to the specified scalar type.
- * */
-#define ccl_info_scalar(info, type) *((type*) (info)->value)
-
-/**
- * Helper macro which returns an array information value casted
- * to specified array type.
- *
- * @param[in] info ::CCLWrapperInfo* information object.
- * @param[in] type Array (pointer) type to which to cast value to.
- * @return The information value casted to the specified array (pointer)
- * type.
- * */
-#define ccl_info_array(info, type) ((type) (info)->value)
-
 /* Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
 

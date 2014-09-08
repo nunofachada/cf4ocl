@@ -61,14 +61,18 @@ int main(int argc, char *argv[]) {
 	CCLKernel* krnl = NULL;
 	/* Device wrapper. */
 	CCLDevice* dev = NULL;
-	/* Kernel information. */
-	CCLWrapperInfo* info = NULL;
 	/* Device filters. */
 	CCLDevSelFilters filters = NULL;
 	/* Default device index. */
 	cl_int dev_idx = -1;
 	/* OpenCL version. */
 	double ocl_ver;
+	/* Kernel workgroup info variables. */
+	size_t k_wg_size;
+	size_t k_pref_wg_size_mult;
+	size_t* k_compile_wg_size;
+	cl_ulong k_loc_mem_size;
+	cl_ulong k_priv_mem_size;
 
 	/* ************************** */
 	/* Parse command line options */
@@ -123,41 +127,39 @@ int main(int argc, char *argv[]) {
 
 	g_printf("\n   ======================== Static Kernel Information =======================\n\n");
 
-	info = ccl_kernel_get_workgroup_info(
-		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, &err);
+	k_wg_size = ccl_kernel_get_workgroup_info_scalar(
+		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
 	ccl_if_err_goto(err, error_handler);
 	g_printf("     Maximum workgroup size                  : %lu\n",
-		(unsigned long) ccl_info_scalar(info, size_t));
+		k_wg_size);
 
 	/* Only show info about CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE
 	 * if OpenCL version of the underlying platform is >= 1.1. */
 	if (ocl_ver >= 110) {
-		info = ccl_kernel_get_workgroup_info(
-			krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &err);
+		k_pref_wg_size_mult = ccl_kernel_get_workgroup_info_scalar(krnl,
+			dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, size_t, &err);
 		ccl_if_err_goto(err, error_handler);
 		g_printf("     Preferred multiple of workgroup size    : %lu\n",
-			(unsigned long) ccl_info_scalar(info, size_t));
+			k_pref_wg_size_mult);
 	}
 
-	info = ccl_kernel_get_workgroup_info(
-		krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, &err);
+	k_compile_wg_size = ccl_kernel_get_workgroup_info_array(krnl, dev,
+		CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t*, &err);
 	ccl_if_err_goto(err, error_handler);
 	g_printf("     WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n",
-		(unsigned long) ccl_info_array(info, size_t*)[0],
-		(unsigned long) ccl_info_array(info, size_t*)[1],
-		(unsigned long) ccl_info_array(info, size_t*)[2]);
+		k_compile_wg_size[0], k_compile_wg_size[1], k_compile_wg_size[2]);
 
-	info = ccl_kernel_get_workgroup_info(
-		krnl, dev, CL_KERNEL_LOCAL_MEM_SIZE, &err);
+	k_loc_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+		CL_KERNEL_LOCAL_MEM_SIZE, cl_ulong, &err);
 	ccl_if_err_goto(err, error_handler);
 	g_printf("     Local memory used by kernel             : %lu bytes\n",
-		(unsigned long) ccl_info_scalar(info, cl_ulong));
+		k_loc_mem_size);
 
-	info = ccl_kernel_get_workgroup_info(
-		krnl, dev, CL_KERNEL_PRIVATE_MEM_SIZE, &err);
+	k_priv_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+		CL_KERNEL_PRIVATE_MEM_SIZE, cl_ulong, &err);
 	ccl_if_err_goto(err, error_handler);
 	g_printf("     Min. private mem. used by each workitem : %lu bytes\n",
-		(unsigned long) ccl_info_scalar(info, cl_ulong));
+		k_priv_mem_size);
 
 	g_printf("\n");
 

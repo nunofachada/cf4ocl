@@ -53,7 +53,7 @@ struct ccl_program {
 	 * @private
 	 * */
 	GHashTable* krnls;
-	
+
 	/**
 	 * Build log of most recent build.
 	 * @private
@@ -116,13 +116,13 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 		g_hash_table_destroy(prg->binaries);
 
 	}
-	
+
 	/* If there is a build log... */
 	if (prg->build_log != NULL) {
-		
+
 		/*...free it. */
 		g_free(prg->build_log);
-		
+
 	}
 
 }
@@ -805,27 +805,27 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	ocl_status = clBuildProgram(ccl_program_unwrap(prg),
 		num_devices, cl_devices, options, pfn_notify, user_data);
 	/* Get build log, if possible. */
-	if ((ocl_status == CL_SUCCESS) 
+	if ((ocl_status == CL_SUCCESS)
 		|| (ocl_status == CL_BUILD_PROGRAM_FAILURE)) {
-			
+
 		/* Number of devices. */
-		cl_uint real_num_devs = (num_devices != 0) 
-			? num_devices 
+		cl_uint real_num_devs = (num_devices != 0)
+			? num_devices
 			: ccl_program_get_num_devices(prg, NULL);
 		/* Device list. */
-		CCLDevice* const* real_devs = (devs != NULL) 
-			? devs 
+		CCLDevice* const* real_devs = (devs != NULL)
+			? devs
 			: ccl_program_get_all_devices(prg, NULL);
-		
+
 		/* Build log for current device.*/
 		char* build_log_dev;
-		
+
 		/* Complete build log string object. */
 		GString* build_log_obj = g_string_new("");
-		
+
 		/* Device name. */
 		char* dev_name;
-		
+
 		/* Get build log for each device. */
 		for (cl_uint i = 0; i < real_num_devs; ++i) {
 			build_log_dev = ccl_program_get_build_info_array(
@@ -840,12 +840,12 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 		}
 		prg->build_log = build_log_obj->str;
 		g_string_free(build_log_obj, FALSE);
-		
+
 		/* Check if build log is not empty. */
 		if ((prg->build_log != NULL) && (strlen(prg->build_log) > 0)) {
 			g_message("Build log is not empty");
 		}
-		
+
 	}
 	/* Check for any other errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
@@ -878,16 +878,16 @@ finish:
 
 }
 
-/** 
+/**
  * Get build log for most recent build, compile or link.
- * 
+ *
  * The build log is returned for all devices associated with the
- * program. 
- * 
+ * program.
+ *
  * @param[in] prg Program wrapper object.
  * @return The build log for most recent build, compile or link. May
  * be `NULL` or an empty string if no build, compile or link was
- * performed, or if no build log is available. 
+ * performed, or if no build log is available.
  * */
 const char* ccl_program_get_build_log(CCLProgram* prg) {
 
