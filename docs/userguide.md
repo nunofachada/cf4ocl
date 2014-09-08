@@ -261,6 +261,10 @@ if (err) {
 Even if the program terminates due to an error, the [g_clear_error()]
 can be still be called to destroy the error object.
 
+### Log messages
+
+@todo Describe how to redirection log messages
+
 ## Wrapper modules {#ug_wrappers}
 
 Each [OpenCL class](http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/classDiagram.html)

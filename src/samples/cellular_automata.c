@@ -254,8 +254,7 @@ int main(int argc, char* argv[]) {
 		HANDLE_ERROR(err);
 
 		/* Can't start new read until this iteration is over. */
-		ccl_event_wait_list_add(&ewl, evt_comm);
-		ccl_event_wait_list_add(&ewl, evt_exec);
+		ccl_event_wait_list_add(&ewl, evt_comm, evt_exec, NULL);
 
 		/* Wait for events. */
 		ccl_event_wait(&ewl, &err);

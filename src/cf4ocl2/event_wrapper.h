@@ -289,7 +289,10 @@ cl_bool ccl_user_event_set_status(
  * Client code must initialize #CCLEventWaitList variables to NULL,
  * and can reuse them between `ccl_*_enqueue_*()` function calls. No
  * allocation and deallocation of events and event wait lists is
- * required.
+ * required if populated event wait lists are consumed by
+ * `ccl_*_enqueue_*()` functions; otherwise, unused non-empty event
+ * wait lists should be freed with the ::ccl_event_wait_list_clear()
+ * function.
  *
  * _Example:_
  *
@@ -302,9 +305,9 @@ cl_bool ccl_user_event_set_status(
  * evt2 = ccl_buffer_enqueue_write(cq, b_dev, CL_FALSE, 0, size, b_host, NULL, NULL);
  * @endcode
  * @code{.c}
- * ccl_event_wait_list_add(&evt_wait_lst, evt1);
- * ccl_event_wait_list_add(&evt_wait_lst, evt2);
+ * ccl_event_wait_list_add(&evt_wait_lst, evt1, evt2, NULL);
  * evt3 = ccl_kernel_enqueue_ndrange(krnl, cq, dim, offset, gws, lws, &evt_wait_lst, NULL);
+ * ccl_event_wait_list_add(&evt_wait_lst, evt3, NULL);
  * ccl_buffer_enqueue_read(cq, c_dev, CL_TRUE, 0, size, c_host, &evt_wait_lst, NULL);
  * @endcode
  *
@@ -314,11 +317,16 @@ cl_bool ccl_user_event_set_status(
 /** A list of event objects on which enqueued commands can wait. */
 typedef GPtrArray* CCLEventWaitList;
 
-/** Add an event wrapper object to an event wait list. */
+/* Add event wrapper objects to an event wait list (variable argument
+ * list version). */
 void ccl_event_wait_list_add(
-	CCLEventWaitList* evt_wait_lst, CCLEvent* evt);
+	CCLEventWaitList* evt_wait_lst, ...) G_GNUC_NULL_TERMINATED;
 
-/** Clears an event wait list. */
+/* Add event wrapper objects to an event wait list (array version). */
+void ccl_event_wait_list_add_v(
+	CCLEventWaitList* evt_wait_lst, CCLEvent** evt);
+
+/* Clears an event wait list. */
 void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 /**

@@ -168,8 +168,7 @@ int main(int argc, char** argv) {
 	HANDLE_ERROR(err);
 
 	/* Initialize event wait list and add the two transfer events. */
-	ccl_event_wait_list_add(&ewl, evt_write1);
-	ccl_event_wait_list_add(&ewl, evt_write2);
+	ccl_event_wait_list_add(&ewl, evt_write1, evt_write2, NULL);
 
 	/* Execute program kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
@@ -180,7 +179,7 @@ int main(int argc, char** argv) {
 	HANDLE_ERROR(err);
 
 	/* Add the kernel termination event to the wait list. */
-	ccl_event_wait_list_add(&ewl, evt_exec);
+	ccl_event_wait_list_add(&ewl, evt_exec, NULL);
 
 	/* Sync. queue for events in wait list (just the execute event in
 	 * this case) to terminate before going forward... */

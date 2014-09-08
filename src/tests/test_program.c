@@ -383,8 +383,7 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Initialize event wait list and add the two transfer events. */
-	ccl_event_wait_list_add(&ewl, evt_w1);
-	ccl_event_wait_list_add(&ewl, evt_w2);
+	ccl_event_wait_list_add(&ewl, evt_w1, evt_w2, NULL);
 
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
@@ -393,7 +392,7 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Add the kernel termination event to the wait list. */
-	ccl_event_wait_list_add(&ewl, evt_kr);
+	ccl_event_wait_list_add(&ewl, evt_kr, NULL);
 
 	/* Sync. queue for events in wait list (just the kernel event in
 	 * this case) to terminate before going forward... */
@@ -407,7 +406,7 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Add read back results event to wait list. */
-	ccl_event_wait_list_add(&ewl, evt_r1);
+	ccl_event_wait_list_add(&ewl, evt_r1, NULL);
 
 	/* Wait for all events in wait list to terminate (this will empty
 	 * the wait list). */

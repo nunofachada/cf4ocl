@@ -631,23 +631,77 @@ finish:
 #endif
 
 /**
- * Add an event wrapper object to an event wait list.
+ * Add event wrapper objects to an event wait list (variable argument
+ * list version).
  *
  * @param[out] evt_wait_lst Event wait list.
- * @param[in] evt Event wrapper object.
+ * @param[in] ... A `NULL`-terminated list of event wrapper objects.
  * */
 void ccl_event_wait_list_add(
-	CCLEventWaitList* evt_wait_lst, CCLEvent* evt) {
+	CCLEventWaitList* evt_wait_lst, ...) {
 
 	/* Check that evt_wait_lst is not NULL. */
 	g_return_if_fail(evt_wait_lst != NULL);
+
+	/* Variable argument list. */
+	va_list al;
+
+	/* Current event wrapper object. */
+	CCLEvent* evt;
+
+	/* Array of event wrapper objects. */
+	GPtrArray* evts = g_ptr_array_new();
+
+	/* Initialize variable argument list. */
+	va_start(al, evt_wait_lst);
+
+	/* Get arguments (i.e. event wrapper objects). */
+	while ((evt = va_arg(al, CCLEvent*)) != NULL) {
+
+		/* Add event wrapper to array. */
+		g_ptr_array_add(evts, evt);
+
+	}
+
+	/* Add NULL to the end of array of event wrapper objects. */
+	g_ptr_array_add(evts, NULL);
+
+	/* Add to wait list using the array version of this function. */
+	ccl_event_wait_list_add_v(evt_wait_lst, (CCLEvent**) evts->pdata);
+
+	/* Destroy the array of event wrapper objects. */
+	g_ptr_array_free(evts, TRUE);
+}
+
+/**
+ * Add event wrapper objects to an event wait list (array version).
+ *
+ * @param[out] evt_wait_lst Event wait list.
+ * @param[in] evts `NULL`-terminated array of event wrapper objects.
+ * */
+void ccl_event_wait_list_add_v(
+	CCLEventWaitList* evt_wait_lst, CCLEvent** evts) {
+
+	/* Check that evt_wait_lst is not NULL. */
+	g_return_if_fail(evt_wait_lst != NULL);
+
+	/* Check that events array is not NULL. */
+	g_return_if_fail(evts != NULL);
+
+	/* Check that events array contains events. */
+	g_return_if_fail(evts[0] != NULL);
 
 	/* Initialize list if required. */
 	if (*evt_wait_lst == NULL)
 		*evt_wait_lst = g_ptr_array_new();
 
-	/* Add wrapped cl_event to array. */
-	g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evt));
+	/* Cycle through array of event wrapper objects. */
+	for (guint i = 0; evts[i] != NULL; ++i) {
+
+		/* Add wrapped cl_event to array. */
+		g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evts[i]));
+
+	}
 
 }
 
