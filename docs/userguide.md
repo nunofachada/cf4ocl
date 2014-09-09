@@ -430,7 +430,7 @@ example, for the ::CCLContext class, client code should use the
 
 # Advanced {#ug_advanced}
 
-## Architecture {#ug_architecture}
+## Wrapper architecture {#ug_architecture}
 
 The wrapper classes, which wrap OpenCL types, are implemented using an
 object-oriented approach in C, as described in the following inheritance
@@ -438,7 +438,7 @@ diagram:
 
 @dot
 digraph cf4ocl {
-	rankdir=BT;
+	rankdir=RL;
 	node [shape=record, fontname=Helvetica, fontsize=10];
 	wrapper [ label="CCLWrapper*" URL="@ref ccl_wrapper"];
 	devcon [ label="CCLDevContainer*" URL="@ref ccl_dev_container"];
@@ -478,20 +478,35 @@ relationship between wrapped objects and wrapper objects
 * Information handling (i.e., handling of data returned by the several
 `clGet*Info()` OpenCL functions)
 
-device container bla bla
+The intermediate ::CCLDevContainer* class provides functionality for
+managing a set of ::CCLDevice* wrapper instances, abstracting code
+common to the ::CCLPlatform*, ::CCLContext* and ::CCLProgram* classes,
+all of which internally keep a set of devices. This functionality
+if further described in the @ref ug_wrappers "wrapper modules" section.
 
-other non-wrapper classes and functionality
+The relationship between the ::CLLMemObj* class and the ::CCLBuffer* and
+::CCLImage* classes follows that of the respective [OpenCL types](http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/classDiagram.html).
+In other words, both OpenCL images and buffers are memory objects with
+common functionality, and _cf4ocl_ directly maps this relationship with
+the respective wrappers.
 
-## The ::CCLWrapper* base class in detail
-
-Describe each point in detail.
-
-## Using low-level _cf4ocl_
+## Using low-level cf4ocl {#ug_low_level}
 
 * Wrap/unwrap
 * Examples of uniqueness (one-on-one)
 * ref counting
 * Info stuffing example
+
+OpenCL objects are wrapped using the `ccl_*_new_wrap()` functions
+which in turn use the ::ccl_wrapper_new() function to allocate memory.
+The  `ccl_*_new_wrap()` functions are always called by the respective
+constructors, and are not usually directly used by client code. However,
+for minimal use of _cf4ocl_ (just to use some of its functions),
+the  `ccl_*_new_wrap()` allows to wrap a user created OpenCL object.
+If the  `ccl_*_new_wrap()`  function is used for a pre-existing
+
+The ::CCLWrapper* class maintains a static table of OpenCL object to
+_cf4ocl_ wrapper association.
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
