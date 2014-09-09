@@ -56,7 +56,7 @@ Some of the provided methods directly wrap OpenCL functions (e.g.
 ::ccl_buffer_enqueue_copy()), while others perform a number of OpenCL
 operations in one function call
 (e.g. ::ccl_kernel_set_args_and_enqueue_ndrange()). The wrapper classes
-are organized in a hierarchical @ref ug_classtree "class tree".
+are organized in a hierarchical @ref ug_architecture "inheritance tree".
 
 Additional modules are also available:
 
@@ -432,9 +432,9 @@ example, for the ::CCLContext class, client code should use the
 
 ## Architecture {#ug_architecture}
 
-### Wrapper class tree {#ug_classtree}
-
-Show the class tree, maybe a dia diagram or own Doxygen diagram.
+The wrapper classes, which wrap OpenCL types, are implemented using an
+object-oriented approach in C, as described in the following inheritance
+diagram:
 
 @dot
 digraph cf4ocl {
@@ -457,6 +457,7 @@ digraph cf4ocl {
 	ctx -> devcon;
 	prg -> devcon;
 	platf -> devcon;
+	memobj->wrapper;
 	buf -> memobj;
 	img -> memobj;
 	dev -> wrapper;
@@ -467,20 +468,30 @@ digraph cf4ocl {
 }
 @enddot
 
-### OpenCL object/cf4ocl wrapper uniqueness {#ug_unique}
+The ::CCLWrapper* base class holds several low-level responsibilities
+for wrapper objects:
 
-One-to-one.
+* Wrapping/unwrapping of OpenCL objects and maintaining a one-to-one
+relationship between wrapped objects and wrapper objects
+* Low-level memory management (allocation and deallocation)
+* Reference counting
+* Information handling (i.e., handling of data returned by the several
+`clGet*Info()` OpenCL functions)
 
-The ccl_<object>_wrap API.
+device container bla bla
 
-Ref counting.
+other non-wrapper classes and functionality
 
-Mem-check when exit.
+## The ::CCLWrapper* base class in detail
 
-## Build and install from source {#ug_buildinstall}
+Describe each point in detail.
 
-Dependencies.
-CMake style.
+## Using low-level _cf4ocl_
+
+* Wrap/unwrap
+* Examples of uniqueness (one-on-one)
+* ref counting
+* Info stuffing example
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
