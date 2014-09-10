@@ -310,7 +310,7 @@ other common or not-so-common OpenCL host code patterns, allowing the
 programmer to avoid the verbosity in these patterns and focus on OpenCL
 device code.
 
-All _cf4ocl_ wrapper classes extend the ::CCLWrapper abstract
+All _cf4ocl_ wrapper classes extend the ::CCLWrapper* abstract
 wrapper class. The properties and methods of this class, which are
 concerned with reference counts, wrapping/unwrapping of OpenCL objects
 and getting object information, are essentially of internal use by other
@@ -433,7 +433,83 @@ example, for the ::CCLContext class, client code should use the
 ## Wrapper architecture {#ug_architecture}
 
 The wrapper classes, which wrap OpenCL types, are implemented using an
-object-oriented approach in C, as described in the following inheritance
+object-oriented (OO) approach in C. While C does not directly provide
+OO constructs, it is possible to implement features such as inheritance,
+polymorphism or encapsulation. Using this approach, _cf4ocl_ is able to
+offer a clean and logical class system, while being available in a form
+which can be directly or indirectly invoked from other programming
+languages.
+
+Each _cf4ocl_ wrapper class is defined by a source (.c) file and a
+header (.h) file. The former contains the private class properties and
+the method implementations, while the later defines its public API. The
+class body is implemented in the source file as a C `struct`; the header
+file provides an opaque pointer to it, which is the public side of the
+class from a client code perspective. The only exceptions are the
+::CCLWrapper* and ::CCLDevContainer* abstract classes, which have the
+respective `struct` body publicly available in the header file. This is
+required due to the way inheritance is implemented in _cf4ocl_,
+i.e., by including a member representing the parent class `struct` in
+the body of a child class `struct`. This way, instances of the child
+class can be cast to its parent type when required. The child class
+`struct` effectively extends the parent class `struct`. An example of
+this approach can be shown with the definitions of the abstract
+::CCLWrapper* class and of the concrete ::CCLEvent* class, which extends
+::CCLWrapper*:
+
+_In abstract_wrapper.h:_
+@code{.c}
+/* Base class for all OpenCL wrappers. */
+typedef struct ccl_wrapper {
+
+	/* The wrapped OpenCL object. */
+	void* cl_object;
+
+	/* Information about the wrapped OpenCL object. */
+	GHashTable* info;
+
+	/* Reference count. */
+	int ref_count;
+
+} CCLWrapper;
+@endcode
+
+_In event_wrapper.h:_
+
+@code{.c}
+/* Event wrapper class type declaration. */
+typedef struct ccl_event CCLEvent;
+@endcode
+
+_In event_wrapper.c:_
+
+@code{.c}
+/* Event wrapper class, extends CCLWrapper */
+struct ccl_event {
+
+	/* Parent wrapper object. */
+	CCLWrapper base;
+
+	/* Event name, for profiling purposes only. */
+	const char* name;
+
+};
+@endcode
+
+The cost to this flexibility is that encapsulation for the two abstract
+classes is lost. However, the properties and functionality of these
+classes are private, in the sense that they should not be directly
+handled by client code. They are not part of the _de jure_ public API,
+which minimizes the issue of lost encapsulation, keeping the
+architecture simple while guaranteeing an implementation of inheritance
+in C.
+
+polymorphism is not used directly, but indirectly as most of functionality
+is implemented in "abstract" methods.
+
+methods accept class as first argument namely method prototypes, helper macros .
+
+as described in the following inheritance
 diagram:
 
 @dot
@@ -484,7 +560,7 @@ common to the ::CCLPlatform*, ::CCLContext* and ::CCLProgram* classes,
 all of which internally keep a set of devices. This functionality
 if further described in the @ref ug_wrappers "wrapper modules" section.
 
-The relationship between the ::CLLMemObj* class and the ::CCLBuffer* and
+The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
 ::CCLImage* classes follows that of the respective [OpenCL types](http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/classDiagram.html).
 In other words, both OpenCL images and buffers are memory objects with
 common functionality, and _cf4ocl_ directly maps this relationship with
