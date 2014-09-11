@@ -504,12 +504,15 @@ which minimizes the issue of lost encapsulation, keeping the
 architecture simple while guaranteeing an implementation of inheritance
 in C.
 
-polymorphism is not used directly, but indirectly as most of functionality
-is implemented in "abstract" methods.
+Methods are implemented as functions which accept the object on which
+they operate as the first parameter. When useful, function-like macros
+are also used as objects methods, such as the case of the
+@ref ug_getinfo "info macros". Polymorphism is not used, as the so
+called "abstract" methods are just functions which provide common
+operations to the concrete classes, and are called by the concrete
+methods.
 
-methods accept class as first argument namely method prototypes, helper macros .
-
-as described in the following inheritance
+The _cf4ocl_ class hierarchy is shown in the following inheritance
 diagram:
 
 @dot
@@ -568,21 +571,67 @@ the respective wrappers.
 
 ## Using low-level cf4ocl {#ug_low_level}
 
-* Wrap/unwrap
-* Examples of uniqueness (one-on-one)
-* ref counting
-* Info stuffing example
+Wrapper constructors create the OpenCL object to be wrapped, but
+delegate memory allocation to the special `ccl_<class>_new_wrap()`
+functions. These accept the OpenCL object, and in turn call the
+::ccl_wrapper_new() function, passing it not only the object, but also
+the size in bytes of the wrapper to be created. The ::ccl_wrapper_new()
+function allocates memory for the wrapper (initializing this memory
+to zero), and keeps the OpenCL object (wrapping it) in the created
+wrapper instance. For example, the ::ccl_kernel_new() creates the
+`cl_kernel` object with the clCreateKernel() OpenCL function, then
+relying on the ::ccl_kernel_new_wrap() function for allocation and
+initialization of the new ::CCLKernel* wrapper object memory.
 
-OpenCL objects are wrapped using the `ccl_*_new_wrap()` functions
-which in turn use the ::ccl_wrapper_new() function to allocate memory.
-The  `ccl_*_new_wrap()` functions are always called by the respective
-constructors, and are not usually directly used by client code. However,
-for minimal use of _cf4ocl_ (just to use some of its functions),
-the  `ccl_*_new_wrap()` allows to wrap a user created OpenCL object.
-If the  `ccl_*_new_wrap()`  function is used for a pre-existing
+The destruction of wrapper objects and respective memory deallocation
+is performed in a similar fashion. Each wrapper class has its own
+`ccl_<class>_destroy()` method, but this method delegates actual
+object release to the "abstract" ::ccl_wrapper_unref() function. This
+function accepts the wrapper to be destroyed, its size in bytes, and
+two function pointers: the first, with prototype defined by
+::ccl_wrapper_release_fields), is a wrapper specific function for
+releasing internal wrapper objects, which the super class has no
+knowledge of; the second is the OpenCL object destructor function, with
+prototype defined by ::ccl_wrapper_release_cl_object. Continuing on the
+kernel example, the ::ccl_kernel_destroy() method delegates kernel
+wrapper destruction to ::ccl_wrapper_unref() passing it the kernel
+wrapper object, its size (i.e. `sizeof(CCLKernel)`, the private (static
+in C) `ccl_kernel_release_fields()` function for destroying kernel
+::CCLArg kernel argument objects, and the clReleaseKernel() OpenCL
+kernel destructor function.
 
-The ::CCLWrapper* class maintains a static table of OpenCL object to
-_cf4ocl_ wrapper association.
+As such, all _cf4ocl_ wrapper objects use a common memory allocation and
+deallocation strategy, implemented in the ::CCLWrapper* super class.
+
+The `ccl_<class>_new_wrap()` special constructors respect the
+@ref ug_new_destroy "new/destroy" rule, because if client code creates
+wrappers in this way, they must be released with the respective
+`ccl_<class>_destroy()` function. This allows client code to create
+OpenCL objects directly with OpenCL functions, and then wrap the objects
+to take advantage of _cf4ocl_ functionality and features. The OpenCL
+object can be retrieve from its wrapper at all times through the
+respective `ccl_<class>_unwrap` method.
+
+If `ccl_<class>_new_wrap()` functions are passed an OpenCL object which
+is already wrapped, a new wrapper will not be created. Instead, the
+existing wrapper is returned, with its reference count increased by 1.
+Thus, there is always a one-to-one relationship between wrapped OpenCL
+objects and their respective wrappers. In reality, the
+`ccl_<class>_destroy()` functions decrease the reference count of the
+respective wrapper, only destroying it if the reference count reaches
+zero. Client code can increase and decrease the reference count of a
+wrapper object using the associated `ccl_<class>_ref()` and
+`ccl_<class>_unref()` macros. The `ccl_<class>_ref()` call the
+::ccl_wrapper_ref() "abstract" function, casting the wrapper to its
+base class (::CCLWrapper*), while the `ccl_<class>_unref()` macros are
+just aliases for the respective `ccl_<class>_destroy()` functions.
+
+The ::CCLWrapper* class maintains a static hash table which associates
+OpenCL objects (keys) to _cf4ocl_ wrappers (value). Access to this
+table is thread-safe and performed by the ::ccl_wrapper_new() and
+::ccl_wrapper_unref() functions.
+
+@todo Explain how the get info system works
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
