@@ -82,7 +82,7 @@ typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
  * Release the OpenCL object wrapped by the concrete wrapper
  * implementation.
  *
- * @private @memberof ccl_wrapper
+ * @protected @memberof ccl_wrapper
  *
  * Concrete implementations of this function are provided by the OpenCL
  * implementation.
@@ -171,7 +171,7 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp2)(
  * used to point to ccl_wrapper_info_fp1() and ccl_wrapper_info_fp2()
  * concrete implementations.
  *
- * @private @memberof ccl_wrapper
+ * @protected @memberof ccl_wrapper
  *
  * Concrete implementations of this function are provided by the OpenCL
  * implementation.

@@ -392,23 +392,25 @@ example, for the ::CCLContext class, client code should use the
 
 @copydoc EVENT_WAIT_LIST
 
-## Device selector module {#ug_devsel}
+## Other modules {#ug_othermodules}
+
+### Device selector module {#ug_devsel}
 
 @copydoc DEVICE_SELECTOR
 
-## Device query module {#ug_devquery}
+### Device query module {#ug_devquery}
 
 @copydoc DEVICE_QUERY
 
-## Errors module {#ug_errors}
+### Errors module {#ug_errors}
 
 @copydoc ERRORS
 
-## Platforms module {#ug_platforms}
+### Platforms module {#ug_platforms}
 
 @copydoc PLATFORMS
 
-## Profiler module {#ug_profiling}
+### Profiler module {#ug_profiling}
 
 @copydoc PROFILER
 
@@ -547,6 +549,8 @@ digraph cf4ocl {
 }
 @enddot
 
+## The CCLWrapper base class {#ug_cclwrapper}
+
 The ::CCLWrapper* base class holds several low-level responsibilities
 for wrapper objects:
 
@@ -556,20 +560,6 @@ relationship between wrapped objects and wrapper objects
 * Reference counting
 * Information handling (i.e., handling of data returned by the several
 `clGet*Info()` OpenCL functions)
-
-The intermediate ::CCLDevContainer* class provides functionality for
-managing a set of ::CCLDevice* wrapper instances, abstracting code
-common to the ::CCLPlatform*, ::CCLContext* and ::CCLProgram* classes,
-all of which internally keep a set of devices. This functionality
-if further described in the @ref ug_wrappers "wrapper modules" section.
-
-The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
-::CCLImage* classes follows that of the respective [OpenCL types](http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/classDiagram.html).
-In other words, both OpenCL images and buffers are memory objects with
-common functionality, and _cf4ocl_ directly maps this relationship with
-the respective wrappers.
-
-## Using low-level cf4ocl {#ug_low_level}
 
 Wrapper constructors create the OpenCL object to be wrapped, but
 delegate memory allocation to the special `ccl_<class>_new_wrap()`
@@ -631,7 +621,55 @@ OpenCL objects (keys) to _cf4ocl_ wrappers (value). Access to this
 table is thread-safe and performed by the ::ccl_wrapper_new() and
 ::ccl_wrapper_unref() functions.
 
-@todo Explain how the get info system works
+The management of OpenCL object information is also handled by the
+::CCLWrapper* class. The ::ccl_wrapper_get_info() method accepts
+two wrapper objects, the first being the object to query; the second is
+an auxiliary object required by some lower-level OpenCl info functions,
+e.g. clGetKernelWorkGroupInfo(), which requires a device object besides
+the kernel object. ::ccl_wrapper_get_info() also requires a pointer to
+a OpenCL `clGet*Info()` function (typedefed as ::ccl_wrapper_info_fp) in
+order to perform the desired query. ::ccl_wrapper_get_info() returns
+a ::CCLWrapperInfo* object, which contains two public properties: the
+queried value and its size. To be useful, the value must be cast to the
+correct type. The ::ccl_wrapper_get_info_value() and
+::ccl_wrapper_get_info_size() methods call ::ccl_wrapper_get_info(),
+but directly return value and size of the ::CCLWrapper* object,
+respectively.
+
+The requested information is kept in the information table of the
+respective wrapper object. When the wrapper object is destroyed, all the
+information objects are also released. As such, client code does not
+need to worry about freeing objects returned by the
+`ccl_wrapper_get_info*()` methods. These also accept a `use_cache`
+boolean argument, which if true, causes the methods to first search
+for the information in the wrappers information table, in case it has
+already been requested; if not, they proceed with the query as normal.
+
+Client code will usually use the @ref ug_getinfo "info macros" of each
+wrapper in order to fetch information about the underlying OpenCL
+objects. These macros expand into the `ccl_wrapper_get_info*()` methods,
+automatically casting objects and values to the appropriate type,
+selecting the correct `clGet*Info()` function and setting the cache as
+appropriate for the object being queried. For example, platform object
+queries can always be cached, as the returned information will never
+change.
+
+## The CCLDevContainer class {#ug_ccldevcontainer}
+
+The intermediate ::CCLDevContainer* class provides functionality for
+managing a set of ::CCLDevice* wrapper instances, abstracting code
+common to the ::CCLPlatform*, ::CCLContext* and ::CCLProgram* classes,
+all of which internally keep a set of devices. This functionality
+if further described in the @ref ug_wrappers "wrapper modules" section.
+
+## The CCLMemObj class {#ug_cclmemobj}
+
+The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
+::CCLImage* classes follows that of the respective [OpenCL types](http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/classDiagram.html).
+In other words, both OpenCL images and buffers are memory objects with
+common functionality, and _cf4ocl_ directly maps this relationship with
+the respective wrappers.
+
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
