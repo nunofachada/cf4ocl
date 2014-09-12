@@ -59,12 +59,11 @@ typedef struct ccl_program CCLProgram;
  * in accordance with the _cf4ocl_ @ref ug_new_destroy "new/destroy"
  * rule.
  *
- * While the first approach might be more convenient in many situations,
- * it will not work properly if the same kernel function is to be
- * handled and executed by different threads. In these cases, use the
- * second approach to create distinct kernel wrapper instances (wrapping
- * distinct OpenCL kernel objects) for the same kernel function, one for
- * each thread.
+ * While the first approach might be more convenient, it will not work
+ * properly if the same kernel function is to be handled and executed by
+ * different threads. In these cases, use the second approach to create
+ * distinct kernel wrapper instances (wrapping distinct OpenCL kernel
+ * objects) for the same kernel function, one for each thread.
  *
  * This module offers several functions which simplify kernel execution.
  * For example, the ccl_kernel_set_args_and_enqueue_ndrange() function

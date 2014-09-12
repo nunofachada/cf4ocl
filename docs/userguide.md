@@ -7,7 +7,7 @@ User guide {#ug}
 
 # Overview {#ug_overview}
 
-The C Framework for OpenCL, cf4ocl, is a cross-platform pure C99
+The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99
 object-oriented framework for developing and benchmarking OpenCL
 projects in C/C++. It aims to:
 
@@ -35,7 +35,7 @@ requirements.
 
 The _cf4ocl_ library offers an object-oriented interface to the OpenCL
 API using wrapper classes and methods (or structs and functions, in C
-terms), grouped in modules of the same name, as shown in the following
+terms), grouped into modules of the same name, as shown in the following
 table:
 
 | _cf4ocl_ module                         | _cf4ocl_ wrapper class | Wrapped OpenCL type |
@@ -97,8 +97,8 @@ krnl = ccl_program_get_kernel(prg, "someKernel", NULL);
 ~~~~~~~~~~~~~~~
 
 The returned kernel wrapper object will be freed when the program
-is destroyed; as such, there is no need to free the former. Destroying
-the program will suffice:
+is destroyed; as such, there is no need to free it. Destroying the program will
+suffice:
 
 ~~~~~~~~~~~~~~~{.c}
 ccl_program_destroy(prg);
@@ -106,13 +106,14 @@ ccl_program_destroy(prg);
 
 ### Getting info about OpenCL objects {#ug_getinfo}
 
-The `ccl_<object>_get_info_<scalar|array>()` macros can be used to get
+The `ccl_<class>_get_info_<scalar|array>()` macros can be used to get
 information about OpenCL objects. Use the `array` version when the
 expected return value is a pointer or array, or the `scalar` version
 otherwise (e.g. when the expected return value is primitive or scalar
 type).
 
-For example, to get the name and the number of compute cores on a device:
+For example, to get the name and the number of compute cores on a
+device:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLDevice* dev;
@@ -124,27 +125,22 @@ name = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, NULL);
 n_cores = ccl_device_get_info_scalar(dev, CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, NULL);
 ~~~~~~~~~~~~~~~
 
-The `ccl_<object>_get_info()` macros serve more specific scenarios, and
+The `ccl_<class>_get_info()` macros serve more specific scenarios, and
 are likely to be used less often. These macros return a
 ::CCLWrapperInfo* object, which contains two public fields:
 
 * `value` - A pointer to the requested value as returned by the OpenCL
-clGet<Object>Info() functions.
+`clGet*Info()` functions.
 * `size` - The size in bytes of the value pointed to by the `value`
 field.
 
 To use the value, a cast should be performed on the `value` field to
 convert it to the required type (which is what the
-`ccl_<object>_get_info_<scalar|array>()` macros automatically do).
+`ccl_<class>_get_info_<scalar|array>()` macros automatically do).
 
 The values and objects returned by these macros are automatically
 released when the respective wrapper object is destroyed and should
-never be directly freed by client code. In the previous example,
-destroying the device wrapper will also destroy any requested info:
-
-~~~~~~~~~~~~~~~{.c}
-ccl_device_destroy(dev);
-~~~~~~~~~~~~~~~
+never be directly freed by client code.
 
 ### Error handling {#ug_errorhandle}
 
@@ -295,20 +291,19 @@ g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RE
 ## Wrapper modules {#ug_wrappers}
 
 Each [OpenCL class](http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/classDiagram.html)
-is associated with a _cf4ocl_ module which provides functionality to
-simplify its handling. At the most basic level, each module offers a
-wrapper class and functions which wrap or map their OpenCL equivalents.
-This, in itself, already simplifies working with OpenCL in C, because
-the _cf4ocl_ wrapper classes internally manage directly related objects,
-strings or variables created during the course of a program. As such,
-client code just needs to follow the @ref ug_new_destroy "new/destroy"
-rule for directly created objects, thus not having to worry with memory
-allocation/deallocation of all the other intermediate objects.
+is associated with a _cf4ocl_ module. At the most basic level, each
+module offers a wrapper class and functions which wrap or map their
+OpenCL equivalents. This, in itself, already simplifies working with
+OpenCL in C, because the _cf4ocl_ wrapper classes internally manages
+directly related objects, which may be created during the course of a
+program. As such, client code just needs to follow the
+@ref ug_new_destroy "new/destroy" rule for directly created objects,
+thus not having to worry with memory allocation/deallocation of
+intermediate objects.
 
 In most cases, however, each _cf4ocl_ module also provides methods for
-other common or not-so-common OpenCL host code patterns, allowing the
-programmer to avoid the verbosity in these patterns and focus on OpenCL
-device code.
+other common and not-so-common OpenCL host code patterns, allowing the
+programmer to avoid their verbosity and focus on OpenCL device code.
 
 All _cf4ocl_ wrapper classes extend the ::CCLWrapper* abstract
 wrapper class. The properties and methods of this class, which are
@@ -316,29 +311,19 @@ concerned with reference counts, wrapping/unwrapping of OpenCL objects
 and getting object information, are essentially of internal use by other
 _cf4ocl_ classes. This functionality is also available to client code
 which requires a more advanced integration with _cf4ocl_, as explained
-in the @ref ug_advanced "advanced" section.
+in the @ref ug_cclwrapper "advanced" section.
 
 Several OpenCL objects, namely `cl_platform_id`, `cl_context` and
 `cl_program`, have a direct relationship with a set of `cl_device_id`
 objects. In order to map this relationship, _cf4ocl_ provides the
-::CCLDevContainer class, which is an intermediate class between the
-::CCLWrapper parent class and the ::CCLPlatform, ::CCLContext and
-::CCLProgram wrappers. The ::CCLDevContainer class implements
-functionality for managing a set of ::CCLDevice* wrapper instances, and
-provides three abstract methods for accessing the associated set of
-::CCLDevice* wrappers, namely:
-
-* ::ccl_dev_container_get_all_devices(): get all ::CCLDevice* wrappers
-in device container object.
-* ::ccl_dev_container_get_device(): get ::CCLDevice* wrapper at given
-index.
-* ::ccl_dev_container_get_num_devices(): return number of devices in
-device container object.
-
-Client code should use the respective wrapper implementations. For
-example, for the ::CCLContext class, client code should use the
+::CCLDevContainer* class, which is an intermediate class between the
+::CCLWrapper* parent class and the ::CCLPlatform*, ::CCLContext* and
+::CCLProgram* wrappers. The ::CCLDevContainer* class implements
+functionality for managing a set of ::CCLDevice* wrapper instances.
+This functionality is exposed to client code through concrete wrapper
+methods. For example, the ::CCLContext* class provides the
 ::ccl_context_get_all_devices(), ::ccl_context_get_device() and
-::ccl_context_get_num_devices() functions.
+::ccl_context_get_num_devices() methods for this purpose.
 
 ### Platform module {#ug_platform}
 
@@ -439,7 +424,7 @@ object-oriented (OO) approach in C. While C does not directly provide
 OO constructs, it is possible to implement features such as inheritance,
 polymorphism or encapsulation. Using this approach, _cf4ocl_ is able to
 offer a clean and logical class system, while being available in a form
-which can be directly or indirectly invoked from other programming
+(C) which can be directly or indirectly invoked from other programming
 languages.
 
 Each _cf4ocl_ wrapper class is defined by a source (.c) file and a
@@ -449,10 +434,10 @@ class body is implemented in the source file as a C `struct`; the header
 file provides an opaque pointer to it, which is the public side of the
 class from a client code perspective. The only exceptions are the
 ::CCLWrapper* and ::CCLDevContainer* abstract classes, which have the
-respective `struct` body publicly available in the header file. This is
-required due to the way inheritance is implemented in _cf4ocl_,
+respective `struct` body publicly available in their header files. This
+is required due to the way inheritance is implemented in _cf4ocl_,
 i.e., by including a member representing the parent class `struct` in
-the body of a child class `struct`. This way, instances of the child
+the body of the child class `struct`. This way, instances of the child
 class can be cast to its parent type when required. The child class
 `struct` effectively extends the parent class `struct`. An example of
 this approach can be shown with the definitions of the abstract
@@ -508,11 +493,14 @@ in C.
 
 Methods are implemented as functions which accept the object on which
 they operate as the first parameter. When useful, function-like macros
-are also used as objects methods, such as the case of the
+are also used as object methods, such as the case of the
 @ref ug_getinfo "info macros". Polymorphism is not used, as the so
 called "abstract" methods are just functions which provide common
-operations to the concrete classes, and are called by the concrete
-methods.
+operations to concrete methods, named differently for each concrete
+class. For example, the ::ccl_dev_container_get_device() abstract method
+is called by the ::ccl_context_get_device(), ::ccl_platform_get_device()
+and ::ccl_program_get_device() concrete methods, for which it provides
+common functionality.
 
 The _cf4ocl_ class hierarchy is shown in the following inheritance
 diagram:
@@ -569,9 +557,10 @@ the size in bytes of the wrapper to be created. The ::ccl_wrapper_new()
 function allocates memory for the wrapper (initializing this memory
 to zero), and keeps the OpenCL object (wrapping it) in the created
 wrapper instance. For example, the ::ccl_kernel_new() creates the
-`cl_kernel` object with the clCreateKernel() OpenCL function, then
-relying on the ::ccl_kernel_new_wrap() function for allocation and
-initialization of the new ::CCLKernel* wrapper object memory.
+`cl_kernel` object with the clCreateKernel() OpenCL function, but then
+relies on the ::ccl_kernel_new_wrap() function (and thus, on
+::ccl_wrapper_new()) for allocation and initialization of the new
+::CCLKernel* wrapper object memory.
 
 The destruction of wrapper objects and respective memory deallocation
 is performed in a similar fashion. Each wrapper class has its own
@@ -579,27 +568,27 @@ is performed in a similar fashion. Each wrapper class has its own
 object release to the "abstract" ::ccl_wrapper_unref() function. This
 function accepts the wrapper to be destroyed, its size in bytes, and
 two function pointers: the first, with prototype defined by
-::ccl_wrapper_release_fields), is a wrapper specific function for
+::ccl_wrapper_release_fields(), is a wrapper specific function for
 releasing internal wrapper objects, which the super class has no
 knowledge of; the second is the OpenCL object destructor function, with
-prototype defined by ::ccl_wrapper_release_cl_object. Continuing on the
-kernel example, the ::ccl_kernel_destroy() method delegates kernel
-wrapper destruction to ::ccl_wrapper_unref() passing it the kernel
-wrapper object, its size (i.e. `sizeof(CCLKernel)`, the private (static
-in C) `ccl_kernel_release_fields()` function for destroying kernel
-::CCLArg kernel argument objects, and the clReleaseKernel() OpenCL
-kernel destructor function.
+prototype defined by ::ccl_wrapper_release_cl_object(). Continuing on
+the kernel example, the ::ccl_kernel_destroy() method delegates kernel
+wrapper destruction to ::ccl_wrapper_unref(), passing it the kernel
+wrapper object, its size (i.e. `sizeof(` ::CCLKernel `)`), the "private"
+(static in C) `ccl_kernel_release_fields()` function for destroying
+kernel internal objects, and the clReleaseKernel() OpenCL kernel
+destructor function.
 
 As such, all _cf4ocl_ wrapper objects use a common memory allocation and
 deallocation strategy, implemented in the ::CCLWrapper* super class.
 
 The `ccl_<class>_new_wrap()` special constructors respect the
-@ref ug_new_destroy "new/destroy" rule, because if client code creates
-wrappers in this way, they must be released with the respective
+@ref ug_new_destroy "new/destroy" rule. Wrappers created with their
+special constructor must be released with the respective
 `ccl_<class>_destroy()` function. This allows client code to create
 OpenCL objects directly with OpenCL functions, and then wrap the objects
 to take advantage of _cf4ocl_ functionality and features. The OpenCL
-object can be retrieve from its wrapper at all times through the
+object can be retrieved from its wrapper at all times with the
 respective `ccl_<class>_unwrap` method.
 
 If `ccl_<class>_new_wrap()` functions are passed an OpenCL object which
@@ -607,34 +596,34 @@ is already wrapped, a new wrapper will not be created. Instead, the
 existing wrapper is returned, with its reference count increased by 1.
 Thus, there is always a one-to-one relationship between wrapped OpenCL
 objects and their respective wrappers. In reality, the
-`ccl_<class>_destroy()` functions decrease the reference count of the
+`ccl_<class>_destroy()` functions decreases the reference count of the
 respective wrapper, only destroying it if the reference count reaches
 zero. Client code can increase and decrease the reference count of a
 wrapper object using the associated `ccl_<class>_ref()` and
-`ccl_<class>_unref()` macros. The `ccl_<class>_ref()` call the
+`ccl_<class>_unref()` macros. The `ccl_<class>_ref()` macros call the
 ::ccl_wrapper_ref() "abstract" function, casting the wrapper to its
 base class (::CCLWrapper*), while the `ccl_<class>_unref()` macros are
 just aliases for the respective `ccl_<class>_destroy()` functions.
 
 The ::CCLWrapper* class maintains a static hash table which associates
-OpenCL objects (keys) to _cf4ocl_ wrappers (value). Access to this
+OpenCL objects (keys) to _cf4ocl_ wrappers (values). Access to this
 table is thread-safe and performed by the ::ccl_wrapper_new() and
 ::ccl_wrapper_unref() functions.
 
 The management of OpenCL object information is also handled by the
 ::CCLWrapper* class. The ::ccl_wrapper_get_info() method accepts
 two wrapper objects, the first being the object to query; the second is
-an auxiliary object required by some lower-level OpenCl info functions,
-e.g. clGetKernelWorkGroupInfo(), which requires a device object besides
+an auxiliary object required by some lower-level OpenCL info functions,
+such clGetKernelWorkGroupInfo(), which requires a device object besides
 the kernel object. ::ccl_wrapper_get_info() also requires a pointer to
-a OpenCL `clGet*Info()` function (typedefed as ::ccl_wrapper_info_fp) in
-order to perform the desired query. ::ccl_wrapper_get_info() returns
-a ::CCLWrapperInfo* object, which contains two public properties: the
-queried value and its size. To be useful, the value must be cast to the
-correct type. The ::ccl_wrapper_get_info_value() and
-::ccl_wrapper_get_info_size() methods call ::ccl_wrapper_get_info(),
-but directly return value and size of the ::CCLWrapper* object,
-respectively.
+a OpenCL `clGet*Info()` function (with type defined as
+::ccl_wrapper_info_fp) in order to perform the desired query.
+::ccl_wrapper_get_info() returns a ::CCLWrapperInfo* object, which
+contains two public properties: the queried value and its size. To be
+useful, the value must be cast to the correct type. The
+::ccl_wrapper_get_info_value() and ::ccl_wrapper_get_info_size() methods
+call ::ccl_wrapper_get_info(), but directly return the value and size of
+the ::CCLWrapper* object, respectively.
 
 The requested information is kept in the information table of the
 respective wrapper object. When the wrapper object is destroyed, all the
@@ -647,20 +636,34 @@ already been requested; if not, they proceed with the query as normal.
 
 Client code will usually use the @ref ug_getinfo "info macros" of each
 wrapper in order to fetch information about the underlying OpenCL
-objects. These macros expand into the `ccl_wrapper_get_info*()` methods,
+object. These macros expand into the `ccl_wrapper_get_info*()` methods,
 automatically casting objects and values to the appropriate type,
-selecting the correct `clGet*Info()` function and setting the cache as
-appropriate for the object being queried. For example, platform object
-queries can always be cached, as the returned information will never
-change.
+selecting the correct `clGet*Info()` function and setting the cache flag
+as appropriate for the object being queried. For example, platform
+object queries can always be cached, as the returned information will
+never change.
 
 ## The CCLDevContainer class {#ug_ccldevcontainer}
 
 The intermediate ::CCLDevContainer* class provides functionality for
 managing a set of ::CCLDevice* wrapper instances, abstracting code
 common to the ::CCLPlatform*, ::CCLContext* and ::CCLProgram* classes,
-all of which internally keep a set of devices. This functionality
-if further described in the @ref ug_wrappers "wrapper modules" section.
+all of which internally keep a set of devices. The ::CCLDevContainer*
+class contains three "abstract" methods for accessing the associated set
+of ::CCLDevice* wrappers, namely:
+
+* ::ccl_dev_container_get_all_devices(): get all ::CCLDevice* wrappers
+in device container object.
+* ::ccl_dev_container_get_device(): get ::CCLDevice* wrapper at given
+index.
+* ::ccl_dev_container_get_num_devices(): return number of devices in
+device container object.
+
+Client code should use the respective wrapper implementations. For
+example, in the case of ::CCLProgram* objects, client code should use
+the ::ccl_program_get_all_devices(), ::ccl_program_get_device() and
+::ccl_program_get_num_devices() methods to manage the set of devices
+associated with the program.
 
 ## The CCLMemObj class {#ug_cclmemobj}
 

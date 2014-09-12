@@ -57,16 +57,12 @@
  * @ref DEVICE_SELECTOR "device selection module" section.
  * 3. Using one of the several convenience constructors, which contain
  * predefined filters, such as ::ccl_context_new_gpu(),
- * ::ccl_context_new_any or ::ccl_context_new_from_menu().
+ * ::ccl_context_new_any() or ::ccl_context_new_from_menu().
  *
  * Instantiation and destruction of context wrappers follows the
  * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule; as such, context
  * wrapper objects must be released with the ::ccl_context_destroy()
  * function.
- *
- * Additional functions allow to get the device wrappers associated
- * with the the context wrapper object, as well as to obtain the
- * OpenCL version supported by the underlying OpenCL platform.
  *
  * Information about context objects can be fetched using the
  * context @ref ug_getinfo "info macros":
@@ -216,7 +212,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		ccl_devsel_indep_type_accel, NULL, err)
 
 /**
- * Creates a context wrapper for the fist found device(s).
+ * Creates a context wrapper for the first found device(s).
  *
  * The first found device is used. More than one device might be used if
  * all devices belong to the same platform.

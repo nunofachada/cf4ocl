@@ -156,6 +156,9 @@
  * _Example:_
  *
  * @dontinclude canon.c
+ * @skipline #define KERNEL_NAME
+ * @until "}\n"
+ *
  * @skipline Wrappers.
  * @until c_dev
  * @skipline CCLEvent* evt_exec
@@ -296,7 +299,7 @@ cl_bool ccl_program_build(
 cl_bool ccl_program_build_full(CCLProgram* prg,
 	cl_uint num_devices, CCLDevice* const* devs, const char* options,
 	ccl_program_callback pfn_notify, void* user_data, GError** err);
-	
+
 /* Get build log for most recent build, compile or link. */
 const char* ccl_program_get_build_log(CCLProgram* prg);
 

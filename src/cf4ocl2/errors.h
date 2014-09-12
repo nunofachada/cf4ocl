@@ -33,18 +33,20 @@
  *
  * This module offers a function to convert OpenCL error codes into
  * human-readable strings. It is widely used by other _cf4ocl_
- * modules, but may also be useful to client code.
+ * modules, but may also be useful to client code which directly uses
+ * OpenCL functions.
  *
  * _Example:_
  *
  * @code{.c}
- *
- * buf = ccl_buffer_new(ctx, flags, size, host_ptr, &err);
- * if ((err) && (err->domain == CCL_OCL_ERROR)) {
- *     fprintf(
- *         stderr, "OpenCL error %d: %s", err->code, cl_err(err->code));
+ * cl_int status;
+ * cl_event event;
+ * @endcode
+ * @code{.c}
+ * status = clWaitForEvents(1, &event);
+ * if (status != CL_SUCCESS) {
+ *     fprintf(stderr, "OpenCL error %d: %s", status, ccl_err(status));
  * }
- *
  * @endcode
  *
  * @{

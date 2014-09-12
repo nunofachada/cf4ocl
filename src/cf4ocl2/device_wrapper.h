@@ -51,7 +51,7 @@ typedef struct ccl_platform CCLPlatform;
  * @ref CCLDevContainer "device container" objects such as
  * ::CCLPlatform* or ::CCLContext* instances. As such, and in accordance
  * with the _cf4ocl_ @ref ug_new_destroy "new/destroy" rule, the
- * ::ccl_device_destroy() destructor function will also be rarely used.
+ * ::ccl_device_destroy() destructor function will rarely be used.
  *
  * Information about device objects can be fetched using the
  * device @ref ug_getinfo "info macros":

@@ -26,22 +26,20 @@ Features
 * OpenCL version independent
 * Integrated profiling
 
+Documentation
+=============
+
+* [Examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
+* [User guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/)
+* [Download, build and install](https://github.com/FakenMC/cf4ocl/wiki/Download,-build-and-install)
+
 Feeback
 =======
 
-Clone, build and install the code, the a look at the
-[examples](https://github.com/FakenMC/cf4ocl/tree/master/src/examples)
-and the [v2.0.0-alpha API](http://fakenmc.github.io/cf4ocl/docs/v2.0.0-alpha).
+Clone, build and install the code, take a look at the
+[examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
+and the [user guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/).
 The API may change until the beta release. Any feedback is appreciated.
-
-Soon
-====
-
-* Simple and clear example
-* Links to GitHub wiki pages with other information and examples
-* Dependencies
-* Downloads, installing
-* More?
 
 Not yet implemented
 ===================

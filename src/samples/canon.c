@@ -173,7 +173,9 @@ int main(int argc, char** argv) {
 	/* Execute program kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
 	evt_exec = ccl_program_enqueue_kernel(prg, KERNEL_NAME, queue, 1,
-		NULL, &gws, &lws, &ewl, &err, a_dev, b_dev, c_dev,
+		NULL, &gws, &lws, &ewl, &err,
+		/* Kernel arguments. */ 
+		a_dev, b_dev, c_dev, 
 		ccl_arg_priv(d_host, cl_uint), ccl_arg_priv(buf_n, cl_uint),
 		NULL);
 	HANDLE_ERROR(err);

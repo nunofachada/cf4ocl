@@ -47,10 +47,10 @@ typedef struct ccl_image CCLImage;
  * clCreateSubBuffer() but assumes that the sub-buffer will represent a
  * specific region in the original buffer (which is the only sub-buffer
  * type, up to OpenCL 2.0).
- * 
- * Buffer wrapper objects can be directly pass as kernel arguments to
+ *
+ * Buffer wrapper objects can be directly passed as kernel arguments to
  * functions such as ::ccl_kernel_set_args_and_enqueue_ndrange() or
- * ::ccl_kernel_set_args_v(). 
+ * ::ccl_kernel_set_args_v().
  *
  * Information about buffer objects can be fetched using the
  * @ref ug_getinfo "info macros" from the
@@ -70,18 +70,22 @@ typedef struct ccl_image CCLImage;
  * cl_float host_data[BSIZE];
  * size_t buf_size = BSIZE * sizeof(cl_float);
  * @endcode
+ *
  * @code{.c}
  * buf = ccl_buffer_new(
  *     context, CL_MEM_READ_WRITE, buf_size, NULL, NULL);
  * @endcode
+ *
  * @code{.c}
  * ccl_buffer_enqueue_write(queue, buf, CL_TRUE, 0, buf_size,
  *     host_data, NULL, NULL);
  * @endcode
+ *
  * @code{.c}
  * ccl_buffer_enqueue_read(queue, buf, CL_TRUE, 0, buf_size,
  *     host_data, NULL, NULL);
  * @endcode
+ *
  * @code{.c}
  * ccl_buffer_destroy(buf);
  * @endcode

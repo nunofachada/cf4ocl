@@ -45,22 +45,22 @@ typedef struct ccl_queue CCLQueue;
  * handling of OpenCL event objects.
  *
  * Typical event wrappers are not directly created by client code. They
- * are returned by several functions which wrap OpenCL code which fires
- * events (such as ::ccl_image_enqueue_write(), which wraps the
- * clEnqueueWriteImage() OpenCL function). As such, and in accordance
- * with the @ref ug_new_destroy "new/destroy" rule, regular event
- * wrappers objects should not be destroyed by client code. They are
+ * are returned by event producing functions (such as
+ * ::ccl_image_enqueue_write(), which wraps the clEnqueueWriteImage()
+ * OpenCL function). As such, and in accordance with the
+ * @ref ug_new_destroy "new/destroy" rule, regular event wrappers
+ * objects should not be destroyed by client code. They are
  * automatically released when the command queue wrapper where the event
- * took place is destroyed. The only exception is with user events
- * (OpenCL >= 1.1), created with the ::ccl_user_event_new() constructor.
- * These are special events which allow applications to enqueue commands
- * that wait on user-controlled scenarios before the command is executed
- * by the device. These events should be destroyed with
+ * took place is destroyed. User events (OpenCL >= 1.1), created with
+ * the ::ccl_user_event_new() constructor, are the only exception. These
+ * are special events which allow applications to enqueue commands that
+ * wait on user-controlled situations before the command is executed by
+ * the device. These events should be destroyed with
  * ::ccl_event_destroy().
  *
- * The @ref EVENT_WAIT_LIST "event wait list module" provides additional
- * information on how to use events to synchronize the execution of
- * OpenCL commands. Events are also used by the
+ * The @ref EVENT_WAIT_LIST "event wait list section" provides
+ * additional information on how to use events to synchronize the
+ * execution of OpenCL commands. Events are also used by the
  * @ref PROFILER "profiler module", although indirectly via ::CCLQueue*
  * wrappers, to profile and benchmark applications.
  *

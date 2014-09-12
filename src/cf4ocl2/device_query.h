@@ -38,9 +38,9 @@
 /**
  * @defgroup DEVICE_QUERY Device query
  *
- * Classes and functions to facilitate the querying of OpenCL devices.
- * This module primarily supports the @ref devinfo utility, but may
- * also be of use to client code.
+ * This module facilitates the querying of OpenCL devices. It primarily
+ * supports the @ref devinfo utility, but may also be of use to client
+ * code.
  *
  * @{
  */

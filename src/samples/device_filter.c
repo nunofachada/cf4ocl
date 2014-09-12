@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 	ccl_devsel_add_indep_filter(
 		&filters, ccl_devsel_indep_type_cpu, NULL);
 
-	/* Add same platform dependent filter. This filter should always
+	/* Add "same platform" dependent filter. This filter should always
 	 * be added (usually in last position) for context creation, because
 	 * all devices in a context must belong to the same platform. */
 	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);

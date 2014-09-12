@@ -45,7 +45,7 @@
  * The ::ccl_context_new_from_filters_full() context wrapper constructor
  * (and the ::ccl_context_new_from_filters() macro) accepts a
  * ::CCLDevSelFilters object containing a set of filters. These filters
- * define which devices will be used in the context. Instances of
+ * define which devices can be used in the context. Instances of
  * ::CCLDevSelFilters must be initialized to NULL:
  *
  * @dontinclude device_filter.c

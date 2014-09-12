@@ -58,7 +58,7 @@
  * ::ccl_sampler_destroy() function, in accordance with the
  * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule.
  *
- * Sampler wrapper objects can be directly pass as kernel arguments to
+ * Sampler wrapper objects can be directly passed as kernel arguments to
  * functions such as ::ccl_kernel_set_args_and_enqueue_ndrange() or
  * ::ccl_kernel_set_args().
  *

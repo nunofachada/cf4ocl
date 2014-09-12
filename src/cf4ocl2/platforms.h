@@ -40,11 +40,10 @@
  * The platforms module provides functionality for managing the OpenCL
  * platforms available in the system.
  *
- * The ::ccl_platforms_new() function returns the set of platforms
+ * The ::ccl_platforms_new() function returns a list of platforms
  * available in the system. The ::ccl_platforms_count() can be used to
- * get the number of platforms in that set, while the
- * ::ccl_platforms_get() will return the @f$i^{th}@f$ platform in the
- * system.
+ * get the number of platforms in the list, while the
+ * ::ccl_platforms_get() will return the @f$i^{th}@f$ platform.
  *
  *  _Example:_
  *
@@ -57,17 +56,17 @@
  * @skipline GError* err = NULL;
  *
  * @skipline Get all platforms in system
- * @until platf_set = ccl_platforms_new(&err);
+ * @until platf_list = ccl_platforms_new(&err);
  *
  * @skipline Get number of platforms in system
- * @until num_platfs = ccl_platforms_count(platf_set);
+ * @until num_platfs = ccl_platforms_count
  *
  * @skipline Cycle through platforms
- * @until platf = ccl_platforms_get(platf_set, i);
+ * @until platf = ccl_platforms_get
  *
  * @skipline Cycle platforms
  * @until ccl_platforms_destroy
- * 
+ *
  * @example list_devices.c
  * @{
  */

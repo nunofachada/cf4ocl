@@ -54,11 +54,11 @@ typedef struct ccl_buffer CCLBuffer;
  * @ref ug_new_destroy "new/destroy" rule; as such, images should be
  * freed with the ::ccl_image_destroy() destructor.
  *
- * Image wrapper objects can be directly pass as kernel arguments to
+ * Image wrapper objects can be directly passed as kernel arguments to
  * functions such as ::ccl_program_enqueue_kernel() or
  * ::ccl_kernel_set_arg().
  *
- * Information about image objects can be fetched using the
+ * Information about image objects can be fetched using the image
  * @ref ug_getinfo "info macros":
  *
  * * ::ccl_image_get_info_scalar()
@@ -66,7 +66,7 @@ typedef struct ccl_buffer CCLBuffer;
  * * ::ccl_image_get_info()
  *
  * If the information to be fetched is relative to the memory object
- * super-class (e.g. `CL_MEM_TYPE` or `CL_MEM_FLAGS`), then the
+ * parent class (e.g. `CL_MEM_TYPE` or `CL_MEM_FLAGS`), then the
  * @ref MEMOBJ_WRAPPER "memory object module" info macros should be used
  * instead:
  *
