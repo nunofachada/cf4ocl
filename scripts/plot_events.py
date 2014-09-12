@@ -23,11 +23,24 @@
 # Usage: ccl_plot_events.py file.tsv
 
 import sys
+import os.path
 import numpy
 import pylab
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.ticker as ticker
+
+# Check command-line arguments
+if len(sys.argv) < 2:
+	print 'Usage: ' + sys.argv[0] + ' <file.tsv>\n'
+	exit(-1)
+elif sys.argv[1] == '--version':
+	print 'ccl_plot_events.py v2.0.0\n'
+	exit(0)
+elif not os.path.isfile(sys.argv[1]):
+	print "File not found: '" + sys.argv[1] + "'\n"
+	exit(-2)
+
 
 # Load profiling info in file given as first cli argument
 pdat = numpy.genfromtxt(sys.argv[1], delimiter='\t', dtype=None, names=('queue','t_start','t_end','event'))

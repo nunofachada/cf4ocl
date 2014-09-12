@@ -446,11 +446,9 @@ The `ccl_plot_events.py` script accepts a single parameter indicating
 a file containing profiling info exported using the
 @ref PROFILER "profiler module".
 
-This script depends on the [Matplotlib](http://matplotlib.org/)
-and [NumPy](http://www.numpy.org/) libraries.
-
-<!-- @copybrief plot_events.py
-@copydetails plot_events.py -->
+This script requires a [Python](https://www.python.org/) installation,
+and depends on the [Matplotlib](http://matplotlib.org/) and
+[NumPy](http://www.numpy.org/) libraries.
 
 # Advanced {#ug_advanced}
 
@@ -709,7 +707,6 @@ The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
 In other words, both OpenCL images and buffers are memory objects with
 common functionality, and _cf4ocl_ directly maps this relationship with
 the respective wrappers.
-
 
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
