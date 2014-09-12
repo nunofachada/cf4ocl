@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
 
 				/* Show device information. */
 				g_fprintf(CCL_DEVINFO_OUT,
-					"\n\t[ Device #%d: %s ]\n\n",
+					"\n    [ Device #%d: %s ]\n\n",
 					j, dev_name);
 				if (opt_all)
 					ccl_devinfo_show_device_info_all(d);
@@ -332,7 +332,7 @@ void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
 			key, desc, value); \
 	} else { \
 		g_fprintf(CCL_DEVINFO_OUT, \
-			"\t\t %-40.40s | %s\n", \
+			"        %-36.36s | %s\n", \
 			key, value); \
 	}
 

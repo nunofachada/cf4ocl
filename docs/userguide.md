@@ -403,17 +403,54 @@ methods. For example, the ::CCLContext* class provides the
 
 ## ccl_devinfo {#ug_devinfo}
 
-@copydetails devinfo
+The `ccl_devinfo` program prints information about the OpenCL platforms
+and devices available on the system. By default, only basic device
+information, such as type, vendor or OpenCL version, is shown, allowing
+the user to quickly assess what platforms and devices are available.
+
+All the available device information can be shown with the `-a` or
+`--all` options. The `-c <param>` option, or its long variant,
+`--custom=<param>`, allows the user to specify a partial or complete
+`cl_device_info` parameter name. All matching parameters will be
+printed. This option can be used several times.
+
+The `-n` or `--notfound` flags will force the program to shown known
+parameters even if the respective information is not found in the
+device. The `-l` flag, or its long variant `--list`, tells `ccl_devinfo`
+to list all known device information parameters.
+
+Additional information about each listed parameter can be shown with
+the `-v` or `--verbose` flags.
+
+The `ccl_devinfo` utility can also narrow down information to specific
+platforms and devices with the `-p` and `-d` options, respectively
+(or their long variants, `--platform` and `--device`). These options
+accept the platform index or the (platform-wise) device index to perform
+the selection.
 
 ## ccl_kerninfo {#ug_kerninfo}
 
-@copydetails kerninfo
+The `ccl_kerninfo` program performs static analysis of OpenCL kernels.
+It accepts three parameters:
+
+1. Kernel source code
+2. Kernel name
+3. System-wise device index (optional)
+
+If the device index is not given, the user should then select a device
+from a menu.
 
 ## ccl_plot_events.py {#ug_plot_events}
 
-@copybrief plot_events.py
+The `ccl_plot_events.py` script accepts a single parameter indicating
+a file containing profiling info exported using the
+@ref PROFILER "profiler module".
 
-@copydetails plot_events.py
+This script depends on the [Matplotlib](http://matplotlib.org/)
+and [NumPy](http://www.numpy.org/) libraries.
+
+<!-- @copybrief plot_events.py
+@copydetails plot_events.py -->
 
 # Advanced {#ug_advanced}
 

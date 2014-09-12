@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-#   
+#
 # This file is part of cf4ocl (C Framework for OpenCL).
-# 
+#
 # cf4ocl is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
-# cf4ocl is distributed in the hope that it will be useful, 
+#
+# cf4ocl is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -68,7 +68,7 @@ for uniq_evt in uniq_evts:
     # Add patch to legend handles
     handles.append(ptch)
 
-# Plot events 
+# Plot events
 for event in pdat:
     # Determine plotting locations for current event
     x = event['t_start']
@@ -78,11 +78,11 @@ for event in pdat:
     uei = uniq_evts.index(event['event'])
     # Determine the color for current event (which is the same for the associated event name)
     color = cmap(uniq_colors[uei])
-    # Plot event 
+    # Plot event
     rect = patches.Rectangle((x, y), width, 0.8, edgecolor='none', facecolor=color, fill=True)
     plt.gca().add_patch(rect)
 
-# Add legend    
+# Add legend
 plt.legend(handles, uniq_evts, borderaxespad=0, bbox_to_anchor=(1.02, 1), loc=2, prop={'size':'x-small'})
 
 # Label axes
