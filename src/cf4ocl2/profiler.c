@@ -663,13 +663,13 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 		/* Check if start instant is the oldest instant. If so, keep it. */
 		if (instant_start < prof->t_start)
 			prof->t_start = instant_start;
-		
+
 	} else {
-		
+
 		g_message("Event '%s' did not use device time. As such its "\
 			"start and end instants will not be added to the list of "\
 			"event instants.", event_name);
-		
+
 	}
 
 	/* Add event information to list of event information..*/

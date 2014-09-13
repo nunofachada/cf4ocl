@@ -1,6 +1,6 @@
 # List of examples
-SET(EXAMPLES image_fill image_filter list_devices cellular_automata
-	device_filter canon)
+SET(EXAMPLES image_fill image_filter list_devices ca ca_mt device_filter
+	canon)
 
 # Add a target for each example
 foreach(EXAMPLE ${EXAMPLES})

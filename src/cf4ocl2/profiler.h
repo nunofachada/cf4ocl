@@ -108,9 +108,9 @@
  * options.
  *
  * _Example: Conway's game of life using double-buffered images_
- * (@ref cellular_automata.c "complete example")
+ * (@ref ca.c "complete example")
  *
- * @dontinclude cellular_automata.c
+ * @dontinclude ca.c
  * @skipline Wrappers for
  * @skipline queue_exec
  * @until queue_comm
@@ -197,7 +197,8 @@
  *
  * @image html images/gantt_ca.svg
  *
- * @example cellular_automata.c
+ * @example ca.c
+ * @example ca_mt.c
  * @{
  */
 
