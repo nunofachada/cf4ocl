@@ -29,9 +29,9 @@ Features
 Documentation
 =============
 
-* [Examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 * [User guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/)
-* [Download, build and install from source](https://github.com/FakenMC/cf4ocl/wiki/Download,%20build%20and%20install%20from%20source)
+* [Wiki](https://github.com/FakenMC/cf4ocl/wiki)
+* [Examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 
 Feeback
 =======
