@@ -636,17 +636,14 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @PROJECT_BINARY_DIR@/README.doxy.md \
-                         @PROJECT_BINARY_DIR@/cf4ocl2/common.h \
+INPUT                  = @PROJECT_BINARY_DIR@/cf4ocl2/common.h \
                          @PROJECT_SOURCE_DIR@/src/cf4ocl2 \
                          @PROJECT_SOURCE_DIR@/src/tests \
                          @PROJECT_SOURCE_DIR@/src/utils \
                          @PROJECT_SOURCE_DIR@/scripts \
                          @PROJECT_SOURCE_DIR@/docs
 
-#                         @PROJECT_SOURCE_DIR@/src/examples \
-
-USE_MDFILE_AS_MAINPAGE = README.doxy.md
+USE_MDFILE_AS_MAINPAGE = @PROJECT_SOURCE_DIR@/docs/userguide.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

@@ -57,35 +57,38 @@ add_subdirectory(scripts)
 
 # add a target to generate API documentation with Doxygen
 if(DOXYGEN_FOUND)
+
 	# Set doc directory
 	set(DOCS_DIRECTORY "doc")
+
 	# Install docs?
 	option(DOC_INSTALL "Install API documentation?" OFF)
+
 	# Create links to OpenCL API when OpenCL functions are mentioned?
 	# This is slow and requires Bash and other command-line utilties
 	option(DOC_OPENCL_FUNCTION_URLS "Create links to OpenCL API (much slower)?" OFF)
 	if (DOC_OPENCL_FUNCTION_URLS)
-		# Add tests path to doc exclude path
+		# Create those links
 		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
 	endif()
+
+	# Copy and configure doxigen configuration file
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	# Convert GitHub README.md into Doxygen MD format
-	file(READ ${CMAKE_CURRENT_SOURCE_DIR}/README.md README_CONTENTS)
-	string(REPLACE "```c" "~~~~~~~~~~~~~~~{.c}" README_CONTENTS_MOD1 ${README_CONTENTS})
-	string(REPLACE "```" "~~~~~~~~~~~~~~~" README_CONTENTS_MOD2 ${README_CONTENTS_MOD1})
-	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.doxy.md ${README_CONTENTS_MOD2})
+
 	# Add a build docs target
 	add_custom_target(doc
 		${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
+
 	# Copy images to doc directory
 	add_custom_command(TARGET doc POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
 		${CMAKE_CURRENT_SOURCE_DIR}/images
 		${DOCS_DIRECTORY}/html/images
 	)
+
 	# Add documentation installation target (if the docs have been built)
 	if (${DOC_INSTALL})
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/
