@@ -165,7 +165,7 @@ static void buffer_read_write() {
 	g_assert_no_error(err);
 
 	/* Read data back to host. */
-	ccl_buffer_enqueue_read(q, b, CL_TRUE, 0, buf_size, (void*) h_out,
+	ccl_buffer_enqueue_read(b, q, CL_TRUE, 0, buf_size, (void*) h_out,
 		NULL, &err);
 	g_assert_no_error(err);
 
@@ -178,12 +178,12 @@ static void buffer_read_write() {
 		h_in[i] = g_test_rand_int();
 
 	/* Write it explicitly to buffer. */
-	ccl_buffer_enqueue_write(q, b, CL_TRUE, 0, buf_size, (void*) h_in,
+	ccl_buffer_enqueue_write(b, q, CL_TRUE, 0, buf_size, (void*) h_in,
 		NULL, &err);
 	g_assert_no_error(err);
 
 	/* Read new data to host. */
-	ccl_buffer_enqueue_read(q, b, CL_TRUE, 0, buf_size, (void*) h_out,
+	ccl_buffer_enqueue_read(b, q, CL_TRUE, 0, buf_size, (void*) h_out,
 		NULL, &err);
 	g_assert_no_error(err);
 
@@ -246,11 +246,11 @@ static void buffer_copy() {
 	/* Copy data from first buffer to second buffer, using an offset on
 	 * the second buffer. */
 	ccl_buffer_enqueue_copy(
-		q, b1, b2, 0, buf_size / 2, buf_size, NULL, &err);
+		b1, b2, q, 0, buf_size / 2, buf_size, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Read data back to host from the second buffer. */
-	ccl_buffer_enqueue_read(q, b2, CL_TRUE, buf_size / 2, buf_size, h2,
+	ccl_buffer_enqueue_read(b2, q, CL_TRUE, buf_size / 2, buf_size, h2,
 		NULL, &err);
 	g_assert_no_error(err);
 
@@ -308,7 +308,7 @@ static void buffer_map_unmap() {
 	g_assert_no_error(err);
 
 	/* Map buffer onto host memory. */
-	h_out = ccl_buffer_enqueue_map(q, b, CL_TRUE, CL_MAP_READ, 0,
+	h_out = ccl_buffer_enqueue_map(b, q, CL_TRUE, CL_MAP_READ, 0,
 		buf_size, NULL, NULL, &err);
 	g_assert_no_error(err);
 
@@ -390,11 +390,11 @@ static void buffer_fill() {
 
 	/* Fill buffer with pattern. */
 	ccl_buffer_enqueue_fill(
-		q, b, &pattern, sizeof(cl_char8), 0, buf_size, NULL, &err);
+		b, q, &pattern, sizeof(cl_char8), 0, buf_size, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Read data back to host. */
-	ccl_buffer_enqueue_read(q, b, CL_TRUE, 0, buf_size, h, NULL, &err);
+	ccl_buffer_enqueue_read(b, q, CL_TRUE, 0, buf_size, h, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Check data is OK. */

@@ -83,7 +83,7 @@ void* ccl_arg_value(CCLArg* arg);
  * _Host code:_
  * @code{.c}
  * #define LOC_SIZE 16
- * #define PI 3.1415
+ * const cl_float pi=3.1415;
  * @endcode
  * @code{.c}
  * CCLProgram* prg;
@@ -93,7 +93,7 @@ void* ccl_arg_value(CCLArg* arg);
  * @code{.c}
  * krnl = ccl_program_get_kernel(prg, "my_kernel", NULL);
  * ccl_kernel_set_args(krnl, buf, ccl_arg_local(LOC_SIZE, cl_int),
- *     ccl_arg_priv(PI, cl_float), NULL);
+ *     ccl_arg_priv(pi, cl_float), NULL);
  * @endcode
  * @{
  */
@@ -104,7 +104,8 @@ void* ccl_arg_value(CCLArg* arg);
  * The created object is automatically released when kernel is
  * enqueued.
  *
- * @param[in] value Argument value.
+ * @param[in] value Argument value. Must be a variable, not a literal
+ * value.
  * @param[in] type Argument scalar type, such as cl_int, cl_float, etc.
  * @return A private kernel argument.
  * */
@@ -112,7 +113,7 @@ void* ccl_arg_value(CCLArg* arg);
 	ccl_arg_new(&value, sizeof(type))
 
 /**
- * Define a local kernel argument, which allocates local memory
+ * Defines a local kernel argument, which allocates local memory
  * within the kernel with the specified size.
  *
  * The created object is automatically released when kernel is
@@ -126,7 +127,7 @@ void* ccl_arg_value(CCLArg* arg);
 	ccl_arg_new(NULL, count * sizeof(type))
 
 /**
- * Define a kernel argument which more control.
+ * Defines a kernel argument which more control.
  *
  * The created object is automatically released when kernel is
  * enqueued.

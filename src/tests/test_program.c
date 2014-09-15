@@ -375,10 +375,10 @@ static void program_create_info_destroy_test() {
 
 	/* Copy host data to device buffers without waiting for transfer
 	 * to terminate before continuing host program. */
-	evt_w1 = ccl_buffer_enqueue_write(cq, a_w, CL_FALSE, 0,
+	evt_w1 = ccl_buffer_enqueue_write(a_w, cq, CL_FALSE, 0,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
 	g_assert_no_error(err);
-	evt_w2 = ccl_buffer_enqueue_write(cq, b_w, CL_FALSE, 0,
+	evt_w2 = ccl_buffer_enqueue_write(b_w, cq, CL_FALSE, 0,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
 	g_assert_no_error(err);
 
@@ -401,7 +401,7 @@ static void program_create_info_destroy_test() {
 
 	/* Read back results from host without waiting for
 	 * transfer to terminate before continuing host program.. */
-	evt_r1 = ccl_buffer_enqueue_read(cq, c_w, CL_FALSE, 0,
+	evt_r1 = ccl_buffer_enqueue_read(c_w, cq, CL_FALSE, 0,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, NULL, &err);
 	g_assert_no_error(err);
 

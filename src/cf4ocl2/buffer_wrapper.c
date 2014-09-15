@@ -149,9 +149,9 @@ finish:
  *
  * @public @memberof ccl_buffer
  *
+ * @param[in] buf Buffer wrapper object where to read from.
  * @param[in] cq Command-queue wrapper object in which the read command
  * will be queued.
- * @param[in] buf Buffer wrapper object where to read from.
  * @param[in] blocking_read Indicates if the read operations are
  * blocking or non-blocking.
  * @param[in] offset The offset in bytes in the buffer object to read
@@ -166,7 +166,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
-CCLEvent* ccl_buffer_enqueue_read(CCLQueue* cq, CCLBuffer* buf,
+CCLEvent* ccl_buffer_enqueue_read(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -222,9 +222,9 @@ finish:
  *
  * @public @memberof ccl_buffer
  *
+ * @param[out] buf Buffer wrapper object where to write to.
  * @param[in] cq Command-queue wrapper object in which the write command
  * will be queued.
- * @param[out] buf Buffer wrapper object where to write to.
  * @param[in] blocking_write Indicates if the write operations are
  * blocking or non-blocking.
  * @param[in] offset The offset in bytes in the buffer object to read
@@ -240,7 +240,7 @@ finish:
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
  * */
-CCLEvent* ccl_buffer_enqueue_write(CCLQueue* cq, CCLBuffer* buf,
+CCLEvent* ccl_buffer_enqueue_write(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -297,9 +297,9 @@ finish:
  *
  * @public @memberof ccl_buffer
  *
+ * @param[in,out] buf Buffer wrapper object to be mapped.
  * @param[in] cq Command-queue wrapper object in which the map command
  * will be queued.
- * @param[in,out] buf Buffer wrapper object to be mapped.
  * @param[in] blocking_map Indicates if the map operation is blocking
  * or non-blocking.
  * @param[in] map_flags Flags which specify the type of mapping to
@@ -317,7 +317,7 @@ finish:
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
-void* ccl_buffer_enqueue_map(CCLQueue* cq, CCLBuffer* buf,
+void* ccl_buffer_enqueue_map(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
 	GError** err) {
@@ -379,11 +379,11 @@ finish:
  *
  * @public @memberof ccl_buffer
  *
- * @param[in] cq Command-queue wrapper object in which the copy command
- * will be queued.
  * @param[in] src_buf Source buffer wrapper object where to read from.
  * @param[out] dst_buf Destination buffer wrapper object where to write
  * to.
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
  * @param[in] src_offset The offset where to begin copying data from
  * src_buffer.
  * @param[in] dst_offset The offset where to begin copying data into
@@ -396,9 +396,10 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
-CCLEvent* ccl_buffer_enqueue_copy(CCLQueue* cq, CCLBuffer* src_buf,
-	CCLBuffer* dst_buf, size_t src_offset, size_t dst_offset,
-	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
+CCLEvent* ccl_buffer_enqueue_copy(CCLBuffer* src_buf,
+	CCLBuffer* dst_buf, CCLQueue* cq, size_t src_offset,
+	size_t dst_offset, size_t size, CCLEventWaitList* evt_wait_lst,
+	GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -455,11 +456,11 @@ finish:
  *
  * @public @memberof ccl_buffer
  *
- * @param[in] cq Command-queue wrapper object in which the copy command
- * will be queued.
  * @param[in] src_buf Source buffer wrapper object where to read from.
  * @param[out] dst_img Destination image wrapper object where to write
  * to.
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
  * @param[in] src_offset The offset where to begin copying data from
  * src_buffer.
  * @param[in] dst_origin Defines the @f$(x, y, z)@f$ offset in pixels in
@@ -478,8 +479,8 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
-CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLQueue* cq,
-	CCLBuffer* src_buf, CCLImage* dst_img, size_t src_offset,
+CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer* src_buf,
+	CCLImage* dst_img, CCLQueue* cq, size_t src_offset,
 	const size_t *dst_origin, const size_t *region,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -626,9 +627,9 @@ finish:
  * @public @memberof ccl_buffer
  * @note Requires OpenCL >= 1.1
  *
+ * @param[in] buf Buffer wrapper object where to read from.
  * @param[in] cq Command-queue wrapper object in which the read command
  * will be queued.
- * @param[in] buf Buffer wrapper object where to read from.
  * @param[in] blocking_read Indicates if the read operations are
  * blocking or non-blocking.
  * @param[in] buffer_origin The @f$(x, y, z)@f$ offset in the memory
@@ -654,7 +655,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
-CCLEvent* ccl_buffer_enqueue_read_rect(CCLQueue* cq, CCLBuffer* buf,
+CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* buffer_origin,
 	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
@@ -737,9 +738,9 @@ finish:
  * @public @memberof ccl_buffer
  * @note Requires OpenCL >= 1.1
  *
+ * @param[out] buf Buffer wrapper object where to write to.
  * @param[in] cq Command-queue wrapper object in which the write command
  * will be queued.
- * @param[out] buf Buffer wrapper object where to write to.
  * @param[in] blocking_write Indicates if the write operations are
  * blocking or non-blocking.
  * @param[in] buffer_origin The @f$(x, y, z)@f$ offset in the memory
@@ -766,7 +767,7 @@ finish:
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
  * */
-CCLEvent* ccl_buffer_enqueue_write_rect(CCLQueue* cq, CCLBuffer* buf,
+CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_write, const size_t* buffer_origin,
 	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
@@ -848,11 +849,11 @@ finish:
  * @public @memberof ccl_buffer
  * @note Requires OpenCL >= 1.1
  *
- * @param[in] cq Command-queue wrapper object in which the copy command
- * will be queued.
  * @param[in] src_buf Source buffer wrapper object where to read from.
  * @param[out] dst_buf Destination buffer wrapper object where to write
  * to.
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
  * @param[in] src_origin The @f$(x, y, z)@f$ offset in memory associated
  * with src_buf.
  * @param[in] dst_origin The @f$(x, y, z)@f$ offset in memory associated
@@ -874,8 +875,8 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
-CCLEvent* ccl_buffer_enqueue_copy_rect(CCLQueue* cq, CCLBuffer* src_buf,
-	CCLBuffer* dst_buf, const size_t *src_origin,
+CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
+	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *dst_origin, const size_t *region,
 	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
 	size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst,
@@ -961,9 +962,9 @@ finish:
  * @public @memberof ccl_buffer
  * @note Requires OpenCL >= 1.2
  *
+ * @param[out] buf Buffer wrapper object to fill.
  * @param[in] cq Command-queue wrapper object in which the fill command
  * will be queued.
- * @param[out] buf Buffer wrapper object to fill.
  * @param[in] pattern A pointer to the data pattern.
  * @param[in] pattern_size Size of data pattern in bytes.
  * @param[in] offset The location in bytes of the region being filled in
@@ -977,7 +978,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */
-CCLEvent* ccl_buffer_enqueue_fill(CCLQueue* cq, CCLBuffer* buf,
+CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	const void *pattern, size_t pattern_size, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
 

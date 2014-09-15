@@ -160,10 +160,10 @@ int main(int argc, char** argv) {
 
 	/* Copy host data to device buffers without waiting for transfer
 	 * to terminate before continuing host program. */
-	evt_write1 = ccl_buffer_enqueue_write(queue, a_dev, CL_FALSE, 0,
+	evt_write1 = ccl_buffer_enqueue_write(a_dev, queue, CL_FALSE, 0,
 		buf_n * sizeof(cl_uint), a_host, NULL, &err);
 	HANDLE_ERROR(err);
-	evt_write2 = ccl_buffer_enqueue_write(queue, b_dev, CL_FALSE, 0,
+	evt_write2 = ccl_buffer_enqueue_write(b_dev, queue, CL_FALSE, 0,
 		buf_n * sizeof(cl_uint), b_host, NULL, &err);
 	HANDLE_ERROR(err);
 
@@ -174,8 +174,8 @@ int main(int argc, char** argv) {
 	 * to terminate (this will empty the event wait list). */
 	evt_exec = ccl_program_enqueue_kernel(prg, KERNEL_NAME, queue, 1,
 		NULL, &gws, &lws, &ewl, &err,
-		/* Kernel arguments. */ 
-		a_dev, b_dev, c_dev, 
+		/* Kernel arguments. */
+		a_dev, b_dev, c_dev,
 		ccl_arg_priv(d_host, cl_uint), ccl_arg_priv(buf_n, cl_uint),
 		NULL);
 	HANDLE_ERROR(err);
@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
 
 	/* Read back results from host waiting for transfer to terminate
 	 * before continuing host program. */
-	ccl_buffer_enqueue_read(queue, c_dev, CL_TRUE, 0,
+	ccl_buffer_enqueue_read(c_dev, queue, CL_TRUE, 0,
 		buf_n * sizeof(cl_uint), c_host, NULL, &err);
 	HANDLE_ERROR(err);
 

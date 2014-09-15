@@ -147,7 +147,7 @@ static gpointer comm_func(gpointer data) {
 
 		/* Read result of last iteration. On first run it is the initial
 		 * state. */
-		evt_comm = ccl_image_enqueue_read(queue_comm, img1, CL_FALSE,
+		evt_comm = ccl_image_enqueue_read(img1, queue_comm, CL_FALSE,
 			origin, region, 0, 0, td->output_images[i], NULL, &err);
 		HANDLE_ERROR(err);
 
@@ -359,7 +359,7 @@ int main(int argc, char* argv[]) {
 	ccl_prof_start(prof);
 
 	/* Write initial state. */
-	ccl_image_enqueue_write(queue_comm, img1, CL_TRUE,
+	ccl_image_enqueue_write(img1, queue_comm, CL_TRUE,
 		origin, region, 0, 0, input_image, NULL, &err);
 	HANDLE_ERROR(err);
 

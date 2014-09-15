@@ -423,9 +423,9 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  *
  * @public @memberof ccl_image
  *
+ * @param[in] img Image wrapper object where to read from.
  * @param[in] cq Command-queue wrapper object in which the read command
  * will be queued.
- * @param[in] img Image wrapper object where to read from.
  * @param[in] blocking_read Indicates if the read operation is
  * blocking or non-blocking.
  * @param[in] origin The @f$(x, y, z)@f$ offset in pixels in the 1D, 2D,
@@ -450,7 +450,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
-CCLEvent* ccl_image_enqueue_read(CCLQueue* cq, CCLImage* img,
+CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t row_pitch, size_t slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -512,9 +512,9 @@ finish:
  *
  * @public @memberof ccl_image
  *
+ * @param[out] img Image wrapper object where to write to.
  * @param[in] cq Command-queue wrapper object in which the write command
  * will be queued.
- * @param[out] img Image wrapper object where to write to.
  * @param[in] blocking_write Indicates if the write operation is
  * blocking or non-blocking.
  * @param[in] origin The @f$(x, y, z)@f$ offset in pixels in the 1D, 2D,
@@ -539,7 +539,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command.
  * */
-CCLEvent* ccl_image_enqueue_write(CCLQueue* cq, CCLImage* img,
+CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_write, const size_t* origin, const size_t* region,
 	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -601,10 +601,10 @@ finish:
  *
  * @public @memberof ccl_image
  *
- * @param[in] cq Command-queue wrapper object in which the copy command
- * will be queued.
  * @param[in] src_img Source image wrapper object.
  * @param[out] dst_img Destination image wrapper object.
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
  * @param[in] src_origin The @f$(x, y, z)@f$ offset in pixels in the 1D,
  * 2D, or 3D image source image, the @f$(x, y)@f$ offset and the image
  * index in the source image array or the @f$(x)@f$ offset and the image
@@ -625,10 +625,10 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
-CCLEvent* ccl_image_enqueue_copy(CCLQueue* cq, CCLImage* src_img,
-	CCLImage* dst_img, const size_t* src_origin,
-	const size_t* dst_origin, const size_t* region,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
+	CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
+	const size_t* region, CCLEventWaitList* evt_wait_lst,
+	GError** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -689,11 +689,11 @@ finish:
  *
  * @public @memberof ccl_image
  *
- * @param[in] cq Command-queue wrapper object in which the copy command
- * will be queued.
  * @param[in] src_img Source image wrapper object where to read from.
  * @param[out] dst_buf Destination buffer wrapper object where to write
  * to.
+ * @param[in] cq Command-queue wrapper object in which the copy command
+ * will be queued.
  * @param[in] src_origin The @f$(x, y, z)@f$ offset in pixels in
  * the 1D, 2D or 3D image, the @f$(x, y)@f$ offset and the image index
  * in the 2D image array or the @f$(x)@f$ offset and the image index in
@@ -712,8 +712,8 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
-CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLQueue* cq,
-	CCLImage* src_img, CCLBuffer* dst_buf, const size_t *src_origin,
+CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
+	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *region, size_t dst_offset,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -777,9 +777,9 @@ finish:
  *
  * @public @memberof ccl_image
  *
+ * @param[in,out] img Image wrapper object to be mapped.
  * @param[in] cq Command-queue wrapper object in which the map command
  * will be queued.
- * @param[in,out] img Image wrapper object to be mapped.
  * @param[in] blocking_map Indicates if the map operation is blocking
  * or non-blocking.
  * @param[in] map_flags Flags which specify the type of mapping to
@@ -809,7 +809,7 @@ finish:
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
-void* ccl_image_enqueue_map(CCLQueue* cq, CCLImage* img,
+void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
 	const size_t* region, size_t *image_row_pitch,
 	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
@@ -876,9 +876,9 @@ finish:
  * @public @memberof ccl_image
  * @note Requires OpenCL >= 1.2
  *
+ * @param[out] img Image wrapper object to fill.
  * @param[in] cq Command-queue wrapper object in which the fill command
  * will be queued.
- * @param[out] img Image wrapper object to fill.
  * @param[in] fill_color The fill color.
  * @param[in] origin The @f$(x, y, z)@f$ offset in pixels in the 1D, 2D,
  * or 3D image, the @f$(x, y)@f$ offset and the image index in the image
@@ -896,7 +896,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */
-CCLEvent* ccl_image_enqueue_fill(CCLQueue* cq, CCLImage* img,
+CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	const void *fill_color, const size_t *origin, const size_t *region,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 

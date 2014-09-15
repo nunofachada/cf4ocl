@@ -220,7 +220,7 @@ int main(int argc, char* argv[]) {
 		malloc(width * height * 4 * sizeof(unsigned char));
 
 	/* Read image data back to host. */
-	ccl_image_enqueue_read(queue, img_out, CL_TRUE, origin, region,
+	ccl_image_enqueue_read(img_out, queue, CL_TRUE, origin, region,
 		0, 0, output_image, NULL, &err);
 	HANDLE_ERROR(err);
 

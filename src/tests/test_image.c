@@ -299,7 +299,7 @@ static void image_read_write(
 	g_assert_no_error(err);
 
 	/* Read image data back to host. */
-	ccl_image_enqueue_read(q, img, CL_TRUE, origin, region, 0, 0,
+	ccl_image_enqueue_read(img, q, CL_TRUE, origin, region, 0, 0,
 		himg_out, NULL, &err);
 	g_assert_no_error(err);
 
@@ -312,12 +312,12 @@ static void image_read_write(
 		himg_in[i] = g_test_rand_int();
 
 	/* Write it explicitly to device image. */
-	ccl_image_enqueue_write(q, img, CL_TRUE, origin, region, 0, 0,
+	ccl_image_enqueue_write(img, q, CL_TRUE, origin, region, 0, 0,
 		himg_in, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Read new image data to host. */
-	ccl_image_enqueue_read(q, img, CL_TRUE, origin, region, 0, 0,
+	ccl_image_enqueue_read(img, q, CL_TRUE, origin, region, 0, 0,
 		himg_out, NULL, &err);
 	g_assert_no_error(err);
 
@@ -394,11 +394,11 @@ static void image_copy(
 	/* Copy data from first image to second image, using an offset on
 	 * the second image. */
 	ccl_image_enqueue_copy(
-		q, img1, img2, src_origin, dst_origin, region, NULL, &err);
+		img1, img2, q, src_origin, dst_origin, region, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Read image data back to host. */
-	ccl_image_enqueue_read(q, img2, CL_TRUE, dst_origin, region, 0, 0,
+	ccl_image_enqueue_read(img2, q, CL_TRUE, dst_origin, region, 0, 0,
 		himg_out, NULL, &err);
 	g_assert_no_error(err);
 
@@ -466,11 +466,11 @@ static void image_fill(
 
 	/* Fill image with color. */
 	ccl_image_enqueue_fill(
-		q, img, &color, origin, region, NULL, &err);
+		img, q, &color, origin, region, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Read image data back to host. */
-	ccl_image_enqueue_read(q, img, CL_TRUE, origin, region, 0, 0,
+	ccl_image_enqueue_read(img, q, CL_TRUE, origin, region, 0, 0,
 		himg_out, NULL, &err);
 	g_assert_no_error(err);
 

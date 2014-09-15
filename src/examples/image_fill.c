@@ -126,17 +126,17 @@ int main(int argc, char* argv[]) {
 	HANDLE_ERROR(err);
 
 	/* Fill image with color 1. */
-	ccl_image_enqueue_fill(queue, img, &c1_color, c1_origin, c1_region,
+	ccl_image_enqueue_fill(img, queue, &c1_color, c1_origin, c1_region,
 		NULL, &err);
 	HANDLE_ERROR(err);
 
 	/* Fill image with color 2. */
-	ccl_image_enqueue_fill(queue, img, &c2_color, c2_origin, c2_region,
+	ccl_image_enqueue_fill(img, queue, &c2_color, c2_origin, c2_region,
 		NULL, &err);
 	HANDLE_ERROR(err);
 
 	/* Read image data back to host. */
-	ccl_image_enqueue_read(queue, img, CL_TRUE, origin, region,
+	ccl_image_enqueue_read(img, queue, CL_TRUE, origin, region,
 		0, 0, img_host, NULL, &err);
 	HANDLE_ERROR(err);
 
