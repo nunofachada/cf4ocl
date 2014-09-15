@@ -194,10 +194,10 @@ void ccl_kernel_destroy(CCLKernel* krnl) {
  *
  * @param[in] krnl A kernel wrapper object.
  * @param[in] arg_index Argument index.
- * @param[in] arg Argument to set.
+ * @param[in] arg Argument to set. Arguments must be of type ::CCLArg*,
+ * ::CCLBuffer*, ::CCLImage* or ::CCLSampler*.
  * */
-void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index,
-	CCLArg* arg) {
+void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_if_fail(krnl != NULL);
@@ -233,23 +233,25 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index,
  *
  * @param[in] krnl A kernel wrapper object.
  * @param[in] ... A `NULL`-terminated list of arguments to set.
+ * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
+ * ::CCLSampler*.
  * */
 void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 
 	/* The va_list, which represents the variable argument list. */
 	va_list args_va;
 	/* Array of arguments, created from the va_list. */
-	CCLArg** args_array = NULL;
+	void** args_array = NULL;
 	/* Number of arguments. */
 	guint num_args = 0;
 	/* Aux. arg. when cycling through the va_list. */
-	CCLArg* aux_arg;
+	void* aux_arg;
 
 	/* Initialize the va_list. */
 	va_start(args_va, krnl);
 
 	/* Get first argument. */
-	aux_arg = va_arg(args_va, CCLArg*);
+	aux_arg = va_arg(args_va, void*);
 
 	/* Check if any arguments are given, and if so, populate array
 	 * of arguments. */
@@ -259,17 +261,17 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 
 		while (aux_arg != NULL) {
 			num_args++;
-			aux_arg = va_arg(args_va, CCLArg*);
+			aux_arg = va_arg(args_va, void*);
 		}
 		va_end(args_va);
 
 		/* 2. Populate array of arguments. */
 
-		args_array = g_slice_alloc((num_args + 1) * sizeof(CCLArg*));
+		args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
 		va_start(args_va, krnl);
 
 		for (guint i = 0; i < num_args; ++i) {
-			aux_arg = va_arg(args_va, CCLArg*);
+			aux_arg = va_arg(args_va, void*);
 			args_array[i] = aux_arg;
 		}
 		va_end(args_va);
@@ -284,7 +286,7 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 		ccl_kernel_set_args_v(krnl, args_array);
 
 		/* Free the array of arguments. */
-		g_slice_free1((num_args + 1) * sizeof(CCLArg*), args_array);
+		g_slice_free1((num_args + 1) * sizeof(void*), args_array);
 
 	}
 
@@ -307,8 +309,10 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
  *
  * @param[in] krnl A kernel wrapper object.
  * @param[in] args A `NULL`-terminated array of arguments to set.
+ * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
+ * ::CCLSampler*.
  * */
-void ccl_kernel_set_args_v(CCLKernel* krnl, CCLArg** args) {
+void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_if_fail(krnl != NULL);
@@ -498,17 +502,17 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	/* The va_list, which represents the variable argument list. */
 	va_list args_va;
 	/* Array of arguments, to be created from the va_list. */
-	CCLArg** args_array = NULL;
+	void** args_array = NULL;
 	/* Number of arguments. */
 	guint num_args = 0;
 	/* Aux. arg. when cycling through the va_list. */
-	CCLArg* aux_arg;
+	void* aux_arg;
 
 	/* Initialize the va_list. */
 	va_start(args_va, err);
 
 	/* Get first argument. */
-	aux_arg = va_arg(args_va, CCLArg*);
+	aux_arg = va_arg(args_va, void*);
 
 	/* Check if any arguments are given, and if so, populate array
 	 * of arguments. */
@@ -518,17 +522,17 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 
 		while (aux_arg != NULL) {
 			num_args++;
-			aux_arg = va_arg(args_va, CCLArg*);
+			aux_arg = va_arg(args_va, void*);
 		}
 		va_end(args_va);
 
 		/* 2. Populate array of arguments. */
 
-		args_array = g_slice_alloc((num_args + 1) * sizeof(CCLArg*));
+		args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
 		va_start(args_va, err);
 
 		for (guint i = 0; i < num_args; ++i) {
-			aux_arg = va_arg(args_va, CCLArg*);
+			aux_arg = va_arg(args_va, void*);
 			args_array[i] = aux_arg;
 		}
 		va_end(args_va);
@@ -545,7 +549,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	if (num_args > 0) {
 
 		/* Free the array of arguments. */
-		g_slice_free1((num_args + 1) * sizeof(CCLArg*), args_array);
+		g_slice_free1((num_args + 1) * sizeof(void*), args_array);
 
 	}
 
@@ -589,6 +593,8 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
  * @param[in] args A `NULL`-terminated list of arguments to set.
+ * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
+ * ::CCLSampler*.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
@@ -596,7 +602,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, CCLArg** args, GError** err) {
+	CCLEventWaitList* evt_wait_lst, void** args, GError** err) {
 
 	/* Make sure number krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
