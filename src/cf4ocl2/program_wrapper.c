@@ -844,6 +844,7 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 		/* Check if build log is not empty. */
 		if ((prg->build_log != NULL) && (strlen(prg->build_log) > 0)) {
 			g_message("Build log is not empty");
+			g_debug("%s", prg->build_log);
 		}
 
 	}
@@ -879,15 +880,16 @@ finish:
 }
 
 /**
- * Get build log for most recent build, compile or link.
+ * Get build log for most recent build. Compile and link do not
+ * produce this automatic build log.
  *
  * The build log is returned for all devices associated with the
  * program.
  *
  * @param[in] prg Program wrapper object.
- * @return The build log for most recent build, compile or link. May
- * be `NULL` or an empty string if no build, compile or link was
- * performed, or if no build log is available.
+ * @return The build log for most recent build. May be `NULL` or an
+ * empty string if no build, compile or link was performed, or if no
+ * build log is available.
  * */
 const char* ccl_program_get_build_log(CCLProgram* prg) {
 
