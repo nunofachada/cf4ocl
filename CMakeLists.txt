@@ -5,7 +5,8 @@ project(cf4ocl2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 # Find git
-find_package(Git REQUIRED)
+find_package(Git QUIET)
+
 # Determine version from Git
 include(GetVersionFromGitTag)
 
