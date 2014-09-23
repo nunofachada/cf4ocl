@@ -1,31 +1,31 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with cf4ocl. If not, see 
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with cf4ocl. If not, see
  * <http://www.gnu.org/licenses/>.
  * */
- 
- /** 
+
+ /**
  * @file
- * 
+ *
  * Common _cf4ocl_ definitions.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
+
 #ifndef _CCL_COMMON_H_
 #define _CCL_COMMON_H_
 
@@ -71,10 +71,10 @@ typedef enum ccl_error_code {
 } CCLErrorCode;
 
 
-/** 
- * If error is detected (`error_code != no_error_code`), 
- * create an error object (GError) and go to the specified label. 
- * 
+/**
+ * If error is detected (`error_code != no_error_code`),
+ * create an error object (GError) and go to the specified label.
+ *
  * @param[out] err GError* object.
  * @param[in] quark Quark indicating the error domain.
  * @param[in] error_condition Must result to true in order to create
@@ -82,7 +82,7 @@ typedef enum ccl_error_code {
  * @param[in] error_code Error code to set.
  * @param[in] label Label to goto if error is detected.
  * @param[in] msg Error message in case of error.
- * @param[in] ... Extra parameters for error message. 
+ * @param[in] ... Extra parameters for error message.
  * */
 #define ccl_if_err_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
 	if (error_condition) { \
@@ -90,33 +90,35 @@ typedef enum ccl_error_code {
 		goto label; \
 	}
 
-/** 
+/**
  * If error is detected in `err` object (`err != NULL`),
  * go to the specified label.
- * 
+ *
  * @param[in] err GError* object.
  * @param[in] label Label to goto if error is detected.
  * */
 #define ccl_if_err_goto(err, label)	\
 	if ((err) != NULL) { \
+		g_debug(G_STRLOC); \
 		goto label; \
 	}
 
-/** 
+/**
  * Same as ccl_if_err_goto(), but rethrows error in a source
  * GError to a new destination GError object.
- * 
+ *
  * @param[out] err_dest Destination GError** object.
  * @param[in] err_src Source GError* object.
  * @param[in] label Label to goto if error is detected.
  * */
 #define ccl_if_err_propagate_goto(err_dest, err_src, label) \
 	if ((err_src) != NULL) { \
+		g_debug(G_STRLOC); \
 		g_propagate_error(err_dest, err_src); \
 		goto label; \
 	}
 
-/** Resolves to error category identifying string, in this case an error 
+/** Resolves to error category identifying string, in this case an error
  * in _cf4ocl_. */
 #define CCL_ERROR ccl_error_quark()
 
