@@ -33,55 +33,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cf4ocl2.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-#define STBI_NO_HDR
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#define IMAGE_FILE "out.png"
-
-#define ERROR_MSG_AND_EXIT(msg) \
-	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
-
-#define HANDLE_ERROR(err) \
-	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
-
-#define FILTER_KERNEL "\
-__constant float filter[9] = { \n\
-	1.0f/9, 1.0f/9, 1.0f/9,\n\
-	1.0f/9, 1.0f/9, 1.0f/9,\n\
-	1.0f/9, 1.0f/9, 1.0f/9 };\n\
-\n\
-__constant int filter_size = 3;\n\
-\n\
-__kernel void do_filter(__read_only image2d_t input_img,\n\
-	__write_only image2d_t output_img, sampler_t sampler) {\n\
-\n\
-	int2 imdim = get_image_dim(input_img);\n\
-	size_t x = get_global_id(0);\n\
-	size_t y = get_global_id(1);\n\
-	if ((x < imdim.x) && (y < imdim.y)) {\n\
-		int half_filter = filter_size / 2;\n\
-		uint4 px_val;\n\
-		float4 px_filt = { 0.0f, 0.0f, 0.0f, 0.0f };\n\
-		uint4 px_filt_int;\n\
-		int i, j, filter_i, filter_j;\n\
-	\n\
-		for(i = -half_filter, filter_i = 0; i <= half_filter; i++, filter_i++) {\n\
-			for(j = -half_filter, filter_j = 0; j <= half_filter; j++, filter_j++) {\n\
-				px_val = read_imageui(input_img, sampler, (int2) (x + i, y + j));\n\
-				px_filt += filter[filter_i * filter_size + filter_j] * convert_float4(px_val);\n\
-			}\n\
-		}\n\
-		px_filt_int = convert_uint4(px_filt);\n\
-		write_imageui(output_img, (int2)(x, y), px_filt_int);\n\
-	}\n\
-}"
+#include "image_filter.h"
 
 /**
  * Image filter main function.

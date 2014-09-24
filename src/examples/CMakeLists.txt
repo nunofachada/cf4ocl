@@ -2,6 +2,22 @@
 SET(EXAMPLES image_fill image_filter list_devices ca ca_mt device_filter
 	canon)
 
+# List of headers to be configured with OpenCL source code
+SET(HEADERS image_filter ca canon)
+
+# Configure headers
+foreach(HEADER ${HEADERS})
+
+	file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}.cl ${HEADER}_RAW HEX)
+	string(REGEX REPLACE "(..)" "\\\\x\\1" ${HEADER}_KERNEL_SRC ${${HEADER}_RAW})
+
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}.in.h
+		${CMAKE_BINARY_DIR}/${HEADER}.h @ONLY)
+
+endforeach()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # Add a target for each example
 foreach(EXAMPLE ${EXAMPLES})
 	add_executable(${EXAMPLE} ${EXAMPLE}.c)

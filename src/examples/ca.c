@@ -35,20 +35,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <cf4ocl2.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-
-#define ERROR_MSG_AND_EXIT(msg) \
-	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
-
-#define HANDLE_ERROR(err) \
-	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
-
+#include "ca.h"
 
 #define IMAGE_FILE_PREFIX "out"
 #define IMAGE_FILE_NUM_DIGITS 5
@@ -56,44 +43,6 @@
 #define CA_WIDTH 128
 #define CA_HEIGHT 128
 #define CA_ITERS 64
-
-#define CA_KERNEL "\
-\n\
-__constant int2 neighbors[] = { \n\
-	(int2) (-1,-1), (int2) (0,-1), (int2) (1,-1), (int2) (1,0), \n\
-	(int2) (1,1), (int2) (0,1), (int2) (-1,1), (int2) (-1,0)};\n\
-\n\
-__constant uint2 live_rule = (uint2) (2, 3);\n\
-__constant uint2 dead_rule = (uint2) (3, 3);\n\
-\n\
-__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_NEAREST; \n\
-\n\
-__kernel void ca(__read_only image2d_t in_img, __write_only image2d_t out_img) {\n\
-\n\
-	int2 imdim = get_image_dim(in_img);\n\
-	int2 coord = (int2) (get_global_id(0), get_global_id(1));\n\
-	if (all(coord < imdim)) {\n\
-		uint4 neighs_state;\n\
-		uint neighs_alive = 0;\n\
-		uint4 state;\n\
-		uint alive;\n\
-		uint4 new_state = { 0xFF, 0, 0, 1};\n\
-		for(int i = 0; i < 8; ++i) {\n\
-			int2 n = coord + neighbors[i]; \n\
-			n = select(n, n - imdim, n >= imdim); \n\
-			n = select(n, imdim - 1, n < 0); \n\
-			neighs_state = read_imageui(in_img, sampler, n);\n\
-			if (neighs_state.x == 0x0) neighs_alive++; \n\
-		}\n\
-		state = read_imageui(in_img, sampler, coord);\n\
-		alive = (state.x == 0x0);\n\
-		if ((alive && (neighs_alive >= live_rule.s0) && (neighs_alive <= live_rule.s1)) \n\
-			|| (!alive && (neighs_alive >= dead_rule.s0) && (neighs_alive <= dead_rule.s1))) {\n\
-			new_state.x = 0x00;\n\
-		}\n\
-		write_imageui(out_img, coord, new_state);\n\
-	}\n\
-}"
 
 /**
  * Cellular automata sample main function.

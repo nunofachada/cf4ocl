@@ -29,30 +29,7 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include <cf4ocl2.h>
-
-#define KERNEL_NAME "sum"
-
-#define KERNEL_SRC \
-	"__kernel void " KERNEL_NAME "(\n" \
-	"		__global const uint *a,\n" \
-	"		__global const uint *b,\n" \
-	"		__global uint *c,\n"\
-	"		uint d,\n"\
-	"		uint buf_size)\n" \
-	"{\n" \
-	"	uint gid = get_global_id(0);\n" \
-	"   if (gid < buf_size)\n"\
-	"		c[gid] = a[gid] + b[gid] + d;\n" \
-	"}\n"
-
-#define DEF_BUF_N 16;
-
-#define ERROR_MSG_AND_EXIT(msg) \
-	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
-
-#define HANDLE_ERROR(err) \
-	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
+#include "canon.h"
 
 /**
  * Canonical example main function.
