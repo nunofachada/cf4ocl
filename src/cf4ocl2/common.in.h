@@ -86,6 +86,7 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
 	if (error_condition) { \
+		g_debug(G_STRLOC); \
 		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
 		goto label; \
 	}
