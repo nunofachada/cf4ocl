@@ -379,6 +379,7 @@ static gint ccl_prof_agg_comp(
  * @private @memberof ccl_prof_info
  *
  * @param[in] event_name Name of event.
+ * @param[in] command_type Type of command which produced the event.
  * @param[in] queue_name Name of command queue which generated this
  * event.
  * @param[in] t_queued Device time in nanoseconds when the command
@@ -393,12 +394,14 @@ static gint ccl_prof_agg_comp(
  * @return A new event profiling information object.
  * */
 static CCLProfInfo* ccl_prof_info_new(const char* event_name,
-	const char* queue_name, cl_ulong t_queued, cl_ulong t_submit,
-	cl_ulong t_start, cl_ulong t_end) {
+	cl_command_type command_type, const char* queue_name,
+	cl_ulong t_queued, cl_ulong t_submit, cl_ulong t_start,
+	cl_ulong t_end) {
 
 	CCLProfInfo* info = g_slice_new(CCLProfInfo);
 
 	info->event_name = event_name;
+	info->command_type = command_type;
 	info->queue_name = queue_name;
 	info->t_queued = t_queued;
 	info->t_submit = t_submit;
@@ -595,6 +598,8 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	guint event_id;
 	/* Event instants. */
 	cl_ulong instant_queued, instant_submit, instant_start, instant_end;
+	/* Type of command which produced the event. */
+	cl_command_type command_type;
 	/* Event instant objects. */
 	CCLProfInst* evinst_start;
 	CCLProfInst* evinst_end;
@@ -626,6 +631,12 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	/* Get event end instant. */
 	instant_end = ccl_event_get_profiling_info_scalar(
 		evt, CL_PROFILING_COMMAND_END, cl_ulong, err);
+	if (*err != NULL)
+		return;
+
+	/* Get command type. */
+	command_type = ccl_event_get_info_scalar(
+		evt, CL_EVENT_COMMAND_TYPE, cl_command_type, err);
 	if (*err != NULL)
 		return;
 
@@ -674,7 +685,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 
 	/* Add event information to list of event information..*/
 	prof->infos = g_list_prepend(prof->infos,
-		(gpointer) ccl_prof_info_new(event_name, cq_name,
+		(gpointer) ccl_prof_info_new(event_name, command_type, cq_name,
 			instant_queued, instant_submit, instant_start, instant_end));
 
 }
@@ -745,6 +756,9 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 		}
+
+		/* Release queue events. */
+		ccl_queue_gc((CCLQueue*) cq);
 	}
 
 	/* If we got here, everything is OK. */
@@ -1560,6 +1574,50 @@ const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
 
 	/* Return the overlap instance. */
 	return (const CCLProfOverlap*) ovlp;
+}
+
+/**
+ * Get duration of all events in nanoseconds.
+ *
+ * @public @memberof ccl_prof
+ *
+ * @param[in] prof Profile object.
+ * @return The duration of all events in nanoseconds.
+ * */
+cl_ulong ccl_prof_get_duration(CCLProf* prof) {
+
+	/* Make sure prof is not NULL. */
+	g_return_if_fail(prof != NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_if_fail(prof->calc == TRUE);
+
+	/* Return requested data. */
+	return prof->total_events_time;
+
+}
+
+/**
+ * Get effective duration of all events in nanoseconds, i.e. the
+ * duration of all events minus event overlaps.
+ *
+ * If no overlaps occur, this function will return the same value as
+ * ::ccl_prof_get_duration().
+ *
+ * @public @memberof ccl_prof
+ *
+ * @param[in] prof Profile object.
+ * @return The effective duration of all events in nanoseconds, i.e. the
+ * duration of all events minus event overlaps.
+ * */
+cl_ulong ccl_prof_get_eff_duration(CCLProf* prof) {
+
+	/* Make sure prof is not NULL. */
+	g_return_if_fail(prof != NULL);
+	/* This function can only be called after calculations are made. */
+	g_return_if_fail(prof->calc == TRUE);
+
+	/* Return requested data. */
+	return prof->total_events_eff_time;
 }
 
 /**

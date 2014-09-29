@@ -275,6 +275,12 @@ typedef struct ccl_prof_info {
 	const char* event_name;
 
 	/**
+	 * Type of command which produced the event.
+	 * @public
+	 * */
+	cl_command_type command_type;
+
+	/**
 	 * Name of command queue which generated this event.
 	 * @public
 	 * */
@@ -532,6 +538,13 @@ void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);
 
 /* Return the next overlap instance. */
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof);
+
+/* Get duration of all events in nanoseconds. */
+cl_ulong ccl_prof_get_duration(CCLProf* prof);
+
+/* Get effective duration of all events in nanoseconds, i.e. the
+ * duration of all events minus event overlaps. */
+cl_ulong ccl_prof_get_eff_duration(CCLProf* prof);
 
 /* Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted
