@@ -134,6 +134,9 @@ cl_bool ccl_queue_flush(CCLQueue* cq, GError** err);
  * are issued to the associated device and have completed. */
 cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
 
+/* Release all events associated with the command queue. */
+void ccl_queue_gc(CCLQueue* cq);
+
 /* Enqueues a barrier command on the given command queue. */
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	CCLEventWaitList* evt_wait_lst, GError** err);

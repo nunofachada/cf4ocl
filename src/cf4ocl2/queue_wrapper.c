@@ -93,7 +93,6 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
 	if (cq->evts != NULL) {
 		g_hash_table_destroy(cq->evts);
 	}
-
 }
 
 /**
@@ -582,6 +581,35 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err) {
 
 	/* Return status. */
 	return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
+
+}
+
+/**
+ * Release all events associated with the command queue.
+ *
+ * _cf4ocl_ command queue wrappers internally keep events for profiling
+ * purposes and simpler handling of event associated memory. However,
+ * a very large number of events can have an impact on utilized memory.
+ * In such cases, this function can be used to periodically release
+ * these events.
+ *
+ * This function is also called by the ::ccl_prof_calc() function,
+ * i.e., the queue events are released after the profiling analysis is
+ * performed.
+ *
+ * @public @memberof ccl_queue
+ *
+ * @param[in] cq The command queue wrapper object.
+ * */
+void ccl_queue_gc(CCLQueue* cq) {
+
+	/* Make sure cq is not NULL. */
+	g_return_if_fail(cq != NULL);
+
+	/* Release events. */
+	if (cq->evts != NULL) {
+		g_hash_table_remove_all(cq->evts);
+	}
 
 }
 
