@@ -1587,9 +1587,9 @@ const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
 cl_ulong ccl_prof_get_duration(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
-	g_return_if_fail(prof != NULL);
+	g_return_val_if_fail(prof != NULL, 0);
 	/* This function can only be called after calculations are made. */
-	g_return_if_fail(prof->calc == TRUE);
+	g_return_val_if_fail(prof->calc == TRUE, 0);
 
 	/* Return requested data. */
 	return prof->total_events_time;
@@ -1612,9 +1612,9 @@ cl_ulong ccl_prof_get_duration(CCLProf* prof) {
 cl_ulong ccl_prof_get_eff_duration(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
-	g_return_if_fail(prof != NULL);
+	g_return_val_if_fail(prof != NULL, 0);
 	/* This function can only be called after calculations are made. */
-	g_return_if_fail(prof->calc == TRUE);
+	g_return_val_if_fail(prof->calc == TRUE, 0);
 
 	/* Return requested data. */
 	return prof->total_events_eff_time;
