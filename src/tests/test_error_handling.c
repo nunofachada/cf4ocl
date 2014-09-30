@@ -1,30 +1,30 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
- 
-/** 
+
+/**
  * @file
- * 
+ *
  * Tests error handling in _cf4ocl_.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
- 
+
 #include <cf4ocl2.h>
 
 /** Resolves to error category identifying string, in this case an error
@@ -33,18 +33,18 @@
 
 /**
  * Test error codes.
- * */ 
+ * */
 enum test_error_handling_error_codes {
 	TEST_CCL_SUCCESS = 0,
 	TEST_CCL_ERROR_1 = -1,
 	TEST_CCL_ERROR_2 = -2
 };
 
-/** 
+/**
  * Resolves to error category identifying string, in this case an
  * error in the GErrorf tests.
- * 
- * @return A GQuark structure defined by category identifying string, 
+ *
+ * @return A GQuark structure defined by category identifying string,
  * which identifies the error as a gerrof tests generated error.
  */
 GQuark test_error_handling_error_quark() {
@@ -56,8 +56,8 @@ GQuark test_error_handling_error_quark() {
 /* ************** */
 
 int errorL2Aux(int code, const char* xtramsg, GError **err) {
-	ccl_if_err_create_goto(*err, TEST_CCL_ERROR, 
-		code != TEST_CCL_SUCCESS, code, error_handler, 
+	ccl_if_err_create_goto(*err, TEST_CCL_ERROR,
+		code != TEST_CCL_SUCCESS, code, error_handler,
 		"Big error in level %d function: %s", 2, xtramsg);
 	goto finish;
 error_handler:
@@ -87,23 +87,23 @@ finish:
 static void errorOneLevelTest() {
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_CCL_ERROR_1, 
+	int status = errorL2Aux(TEST_CCL_ERROR_1,
 		"called by errorOneLevelTest", &err);
 	ccl_if_err_goto(err, error_handler);
-	status = status; /* Avoid compiler warnings. */
+	CCL_UNUSED(status); /* Avoid compiler warnings. */
 
 	g_assert_not_reached();
 	goto cleanup;
 
 error_handler:
 	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_1);
-	g_assert_cmpstr(err->message, ==, 
+	g_assert_cmpstr(err->message, ==,
 		"Big error in level 2 function: called by errorOneLevelTest");
 	g_error_free(err);
 
 cleanup:
 	return;
-	
+
 }
 
 /**
@@ -114,14 +114,14 @@ static void errorTwoLevelTest() {
 
 	int status = errorL1Aux(TEST_CCL_ERROR_2, &err);
 	ccl_if_err_goto(err, error_handler);
-	status = status; /* Avoid compiler warnings. */
+	CCL_UNUSED(status); /* Avoid compiler warnings. */
 
 	g_assert_not_reached();
 	goto cleanup;
 
 error_handler:
 	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_2);
-	g_assert_cmpstr(err->message, ==, 
+	g_assert_cmpstr(err->message, ==,
 		"Big error in level 2 function: called by errorL1Aux");
 	g_error_free(err);
 
@@ -135,10 +135,10 @@ cleanup:
 static void errorNoneTest() {
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_CCL_SUCCESS, 
+	int status = errorL2Aux(TEST_CCL_SUCCESS,
 		"called by errorOneLevelTest", &err);
 	ccl_if_err_goto(err, error_handler);
-	status = status; /* Avoid compiler warnings. */
+	CCL_UNUSED(status); /* Avoid compiler warnings. */
 
 	goto cleanup;
 
@@ -157,8 +157,8 @@ cleanup:
 static void errorNoVargsTest() {
 	GError *err = NULL;
 
-	ccl_if_err_create_goto(err, TEST_CCL_ERROR, 1, 
-		TEST_CCL_ERROR_1, error_handler, 
+	ccl_if_err_create_goto(err, TEST_CCL_ERROR, 1,
+		TEST_CCL_ERROR_1, error_handler,
 		"I have no additional arguments");
 
 	g_assert_not_reached();

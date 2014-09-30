@@ -84,9 +84,9 @@ static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
 static cl_bool ccl_devsel_indep_test_true(
 	CCLDevice* device, void *data, GError **err) {
 
-	device = device;
-	data = data;
-	err = err;
+	CCL_UNUSED(device);
+	CCL_UNUSED(data);
+	CCL_UNUSED(err);
 	return CL_TRUE;
 
 }

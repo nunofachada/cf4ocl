@@ -32,9 +32,6 @@
 
 #include "memobj_wrapper.h"
 
-/* Forward definition of CCLImage. */
-typedef struct ccl_image CCLImage;
-
 /**
  * @defgroup BUFFER_WRAPPER Buffer wrapper
  *
@@ -92,13 +89,6 @@ typedef struct ccl_image CCLImage;
  *
  * @{
  */
-
-/**
- * Buffer wrapper class
- *
- * @extends ccl_memobj
- * */
-typedef struct ccl_buffer CCLBuffer;
 
 /* Get the buffer wrapper for the given OpenCL buffer. */
 CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object);

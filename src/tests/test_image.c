@@ -102,7 +102,7 @@ static void context_with_image_support_setup(
 static void context_with_image_support_teardown(
 	CCLContext** ctx_fixt, gconstpointer user_data) {
 
-	user_data = user_data;
+	CCL_UNUSED(user_data);
 
 	/* If context was created, release it. */
 	if (*ctx_fixt != NULL)
@@ -123,7 +123,7 @@ static void image_create_info_destroy_test(
 	/* Test variables. */
 	CCLImage* img = NULL;
 	GError* err = NULL;
-	user_data = user_data;
+	CCL_UNUSED(user_data);
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 
 	/* Check that a context is set. */
@@ -213,7 +213,7 @@ static void image_ref_unref_test(
 	/* Test variables. */
 	CCLImage* img = NULL;
 	GError* err = NULL;
-	user_data = user_data;
+	CCL_UNUSED(user_data);
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 
 	/* Check that a context is set. */
@@ -266,7 +266,7 @@ static void image_read_write(
 	size_t origin[3] = {0, 0, 0};
 	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
 	GError* err = NULL;
-	user_data = user_data;
+	CCL_UNUSED(user_data);
 
 	/* Check that a context is set. */
 	if (*ctx_fixt == NULL) {
@@ -350,7 +350,7 @@ static void image_copy(
 		{CCL_TEST_IMAGE_WIDTH / 2, CCL_TEST_IMAGE_WIDTH / 2, 0};
 	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
 	GError* err = NULL;
-	user_data = user_data;
+	CCL_UNUSED(user_data);
 
 	/* Check that a context is set. */
 	if (*ctx_fixt == NULL) {
@@ -430,7 +430,7 @@ static void image_fill(
 	const size_t origin[3] = {0, 0, 0};
 	const size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
 	GError* err = NULL;
-	user_data = user_data;
+	CCL_UNUSED(user_data);
 	/* Create a random color 4-channel 8-bit color (i.e. color has 32
 	 * bits). */
 	gint32 rc = g_test_rand_int();

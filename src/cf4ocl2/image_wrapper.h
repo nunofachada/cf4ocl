@@ -32,9 +32,6 @@
 
 #include "memobj_wrapper.h"
 
-/* Forward definition of CCLBuffer. */
-typedef struct ccl_buffer CCLBuffer;
-
 /**
  * @defgroup IMAGE_WRAPPER Image wrapper
  *
@@ -126,13 +123,6 @@ typedef struct ccl_buffer CCLBuffer;
  * @endcode
  * */
 #define CCL_IMAGE_DESC_BLANK {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
-
-/**
- * Image wrapper class
- *
- * @extends ccl_memobj
- * */
-typedef struct ccl_image CCLImage;
 
 /**
  * Describes the type and dimensions of the image or image array

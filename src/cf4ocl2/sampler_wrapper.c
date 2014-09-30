@@ -256,11 +256,11 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 		/* Platform is OpenCL <= 1.2, use "old" API. */
 		struct ccl_sampler_basic_properties sbp =
 			ccl_sampler_get_basic_properties(sampler_properties);
-		G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+		CCL_BEGIN_IGNORE_DEPRECATIONS
 		sampler = clCreateSampler(ccl_context_unwrap(ctx),
 			sbp.normalized_coords, sbp.addressing_mode, sbp.filter_mode,
 			&ocl_status);
-		G_GNUC_END_IGNORE_DEPRECATIONS
+		CCL_END_IGNORE_DEPRECATIONS
 	}
 
 #else

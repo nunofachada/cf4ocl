@@ -35,9 +35,6 @@
 #include "abstract_wrapper.h"
 #include "context_wrapper.h"
 
-/* Forward declaration of CLLQueue. */
-typedef struct ccl_queue CCLQueue;
-
 /**
  * @defgroup EVENT_WRAPPER Event wrapper
  *
@@ -80,13 +77,6 @@ typedef struct ccl_queue CCLQueue;
  *
  * @{
  */
-
-/**
- * Event wrapper class.
- *
- * @extends ccl_wrapper
- * */
-typedef struct ccl_event CCLEvent;
 
 /**
  * Prototype for user event callback functions.

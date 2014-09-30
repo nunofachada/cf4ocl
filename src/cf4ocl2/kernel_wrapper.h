@@ -37,9 +37,6 @@
 #include "event_wrapper.h"
 #include "queue_wrapper.h"
 
-/* Forward declaration of CCLProgram. */
-typedef struct ccl_program CCLProgram;
-
 /**
  * @defgroup KERNEL_WRAPPER Kernel wrapper
  *
@@ -112,13 +109,6 @@ typedef struct ccl_program CCLProgram;
  *
  * @{
  */
-
-/**
- * Kernel wrapper class.
- *
- * @extends ccl_wrapper
- */
-typedef struct ccl_kernel CCLKernel;
 
 /* Get the kernel wrapper for the given OpenCL kernel. */
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);

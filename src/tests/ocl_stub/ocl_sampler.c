@@ -27,10 +27,6 @@
 #include "ocl_env.h"
 #include "utils.h"
 
-#ifndef CL_VERSION_2_0
-typedef cl_bitfield cl_sampler_properties;
-#endif
-
 CL_API_ENTRY cl_sampler CL_API_CALL
 clCreateSamplerWithProperties(cl_context context,
 	const cl_sampler_properties* sampler_properties, cl_int* errcode_ret)

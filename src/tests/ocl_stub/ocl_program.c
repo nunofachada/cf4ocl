@@ -1,49 +1,49 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
- 
- /** 
+
+ /**
  * @file
  * OpenCL program stub functions.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
- 
+
 #include "ocl_env.h"
 #include "utils.h"
 
 #ifdef CL_VERSION_1_2
 #endif
 
-static cl_program clCreateProgram(cl_context context, 
-	cl_uint num_devices, const cl_device_id* device_list, char* source, 
+static cl_program clCreateProgram(cl_context context,
+	cl_uint num_devices, const cl_device_id* device_list, char* source,
 	const size_t* lengths, const unsigned char** binaries) {
 
 	/* Allocate memory for program. */
 	cl_program program = g_slice_new(struct _cl_program);
-	
+
 	program->ref_count = 1;
 	program->context = context;
 	program->num_devices = (num_devices > 0)
 		? num_devices
 		: context->num_devices;
 	program->devices = g_slice_copy(
-		program->num_devices * sizeof(cl_device_id), 
+		program->num_devices * sizeof(cl_device_id),
 		(device_list != NULL) ? device_list : context->devices);
 	program->source = g_strdup(source);
 	program->binary_sizes = (lengths != NULL)
@@ -70,7 +70,7 @@ static cl_program clCreateProgram(cl_context context,
 	}
 	program->build_status =
 		g_slice_alloc(program->num_devices * sizeof(cl_build_status));
-	program->build_log = 
+	program->build_log =
 		g_slice_alloc(program->num_devices * sizeof(char**));
 	program->build_options =
 		g_slice_alloc(program->num_devices * sizeof(char**));
@@ -83,24 +83,24 @@ static cl_program clCreateProgram(cl_context context,
 			program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_NONE;
 #endif
 	}
-	
+
 	program->num_kernels = 0;
 	program->kernel_names = NULL;
-	
+
 	return program;
 
 }
 
 CL_API_ENTRY cl_program CL_API_CALL
-clCreateProgramWithSource(cl_context context, cl_uint count, 
-	const char** strings, const size_t* lengths, 
+clCreateProgramWithSource(cl_context context, cl_uint count,
+	const char** strings, const size_t* lengths,
 	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
 
 	seterrcode(errcode_ret, CL_SUCCESS);
-	
+
 	/* New program. */
 	cl_program program = NULL;
-	
+
 	/* Complete source code string. */
 	GString* src = NULL;
 
@@ -125,17 +125,17 @@ clCreateProgramWithSource(cl_context context, cl_uint count,
 		g_string_append_len(src, strings[i], len);
 	}
 	g_string_append(src, "\0");
-	
+
 	/* Create program. */
 	program = clCreateProgram(context, 0, NULL, src->str, NULL, NULL);
 
 error_handler_free_src:
 	g_string_free(src, TRUE);
-	
+
 error_handler:
-	
+
 	return program;
-		
+
 }
 
 CL_API_ENTRY cl_program CL_API_CALL
@@ -148,13 +148,13 @@ clCreateProgramWithBinary(cl_context context, cl_uint num_devices,
 
 	/* New program. */
 	cl_program program = NULL;
-	
+
 	/* Parameter check. */
 	if (context == NULL) {
 		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
 		goto error_handler;
 	}
-	if ((num_devices == 0) || (device_list == NULL) || (lengths == NULL) 
+	if ((num_devices == 0) || (device_list == NULL) || (lengths == NULL)
 		|| (binaries == NULL)) {
 		seterrcode(errcode_ret, CL_INVALID_VALUE);
 		goto error_handler;
@@ -189,13 +189,13 @@ clCreateProgramWithBinary(cl_context context, cl_uint num_devices,
 		}
 	}
 	if (!ok) goto error_handler;
-	
+
 	/* Create program. */
-	program = clCreateProgram(context, num_devices, device_list, NULL, 
+	program = clCreateProgram(context, num_devices, device_list, NULL,
 		lengths, binaries);
 
 error_handler:
-	
+
 	return program;
 }
 
@@ -210,14 +210,14 @@ clRetainProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
 
 CL_API_ENTRY cl_int CL_API_CALL
 clReleaseProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
-	
+
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&program->ref_count)) {
-		
+
 		/* Free kernel names string. */
 		if (program->kernel_names != NULL)
 			g_free(program->kernel_names);
-		
+
 		/* Free build information. */
 		if (program->build_status != NULL) {
 			g_slice_free1(
@@ -249,20 +249,20 @@ clReleaseProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
 					g_free(program->binaries[i]);
 			}
 			g_slice_free1(
-				program->num_devices * sizeof(unsigned char*), 
+				program->num_devices * sizeof(unsigned char*),
 				program->binaries);
 		}
-		
+
 		/* Free binary lengths. */
 		if (program->binary_sizes != NULL) {
-			g_slice_free1(program->num_devices * sizeof(size_t), 
+			g_slice_free1(program->num_devices * sizeof(size_t),
 				program->binary_sizes);
 		}
 
-#ifdef CL_VERSION_1_2		
+#ifdef CL_VERSION_1_2
 		/* Free binary types. */
 		if (program->binary_type != NULL)
-			g_slice_free1(program->num_devices * sizeof(cl_program_binary_type), 
+			g_slice_free1(program->num_devices * sizeof(cl_program_binary_type),
 				program->binary_type);
 #endif
 
@@ -270,18 +270,18 @@ clReleaseProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
 		if (program->source != NULL) {
 			g_free(program->source);
 		}
-		
+
 		/* Free device list. */
 		if (program->devices != NULL) {
-			g_slice_free1(program->num_devices * sizeof(cl_device_id), 
+			g_slice_free1(program->num_devices * sizeof(cl_device_id),
 				program->devices);
 		}
 
 		/* Free program object. */
 		g_slice_free(struct _cl_program, program);
-		
+
 	}
-	
+
 	return CL_SUCCESS;
 }
 
@@ -292,14 +292,14 @@ clBuildProgram(cl_program program, cl_uint num_devices,
     void* user_data) CL_API_SUFFIX__VERSION_1_0 {
 
 	cl_int status = CL_SUCCESS;
-	
+
 	/* Parameter check. */
 	if (program == NULL) {
 		status = CL_INVALID_PROGRAM;
 		goto error_handler;
 	}
-	if (((num_devices == 0) && (device_list != NULL)) 
-		|| ((num_devices > 0) && (device_list == NULL)) 
+	if (((num_devices == 0) && (device_list != NULL))
+		|| ((num_devices > 0) && (device_list == NULL))
 		|| ((pfn_notify == NULL) && (user_data != NULL))) {
 		status = CL_INVALID_VALUE;
 		goto error_handler;
@@ -325,7 +325,7 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 		status = CL_INVALID_OPERATION;
 		goto error_handler;
 	}
-	
+
 	/* "Compile" source for given devices. If binary already exists for
 	 * device, simply mark build status as CL_BUILD_SUCCESS. */
 	for (cl_uint i = 0; i < num_devices; ++i) {
@@ -344,7 +344,7 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 			program->build_status[j] = CL_BUILD_SUCCESS;
 			program->build_options[j] = g_strdup(options);
 			program->build_log[j] = g_strdup_printf(
-				"Compilation successful for device '%s'", 
+				"Compilation successful for device '%s'",
 				program->devices[j]->name);
 			/* Do some bogus compilation of source code. */
 			if (program->binaries[j] == NULL) {
@@ -354,20 +354,20 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 				program->binary_sizes[j] = strlen((const char*) program->binaries[j]);
 			}
 		}
-		
+
 	}
-	
+
 error_handler:
-	
+
 	return status;
 
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetProgramInfo(cl_program program, cl_program_info param_name,
-	size_t param_value_size, void* param_value, 
+	size_t param_value_size, void* param_value,
 	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
-		
+
 	cl_int status = CL_SUCCESS;
 
 	if (program == NULL) {
@@ -387,7 +387,7 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 			case CL_PROGRAM_BINARY_SIZES:
 				ccl_test_predefvector_info(size_t, program->num_devices, program, binary_sizes);
 			case CL_PROGRAM_BINARIES:
-				ccl_test_predefvector2d_info(unsigned char, program->num_devices, 
+				ccl_test_predefvector2d_info(unsigned char, program->num_devices,
 					program, binary_sizes, binaries);
 #ifdef CL_VERSION_1_2
 			case CL_PROGRAM_NUM_KERNELS:
@@ -399,7 +399,7 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 				status = CL_INVALID_VALUE;
 		}
 	}
-		
+
 	return status;
 
 }
@@ -407,13 +407,13 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetProgramBuildInfo(cl_program program, cl_device_id device,
 	cl_program_build_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret) 
+	void* param_value, size_t* param_value_size_ret)
 	CL_API_SUFFIX__VERSION_1_0 {
-		
+
 	cl_int status = CL_SUCCESS;
 	cl_bool found = CL_FALSE;
 	cl_uint i;
-	
+
 	if (program == NULL) {
 		status = CL_INVALID_PROGRAM;
 	} else if (device == NULL) {
@@ -427,11 +427,11 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 			}
 		}
 	}
-		
+
 	if (!found) {
 		status = CL_INVALID_DEVICE;
 	} else {
-		
+
 		/* Get info. */
 		switch (param_name) {
 			case CL_PROGRAM_BUILD_STATUS:
@@ -448,10 +448,10 @@ clGetProgramBuildInfo(cl_program program, cl_device_id device,
 				status = CL_INVALID_VALUE;
 		}
 	}
-		
+
 	return status;
 
-	
+
 
 }
 
@@ -461,7 +461,7 @@ clUnloadCompiler(void)
 #else
 CL_API_ENTRY cl_int CL_API_CALL
 clUnloadCompiler(void) CL_API_SUFFIX__VERSION_1_0
-#endif 
+#endif
 {
 	return CL_SUCCESS;
 }
@@ -470,64 +470,70 @@ clUnloadCompiler(void) CL_API_SUFFIX__VERSION_1_0
 #ifdef CL_VERSION_1_2
 
 CL_API_ENTRY cl_program CL_API_CALL
-clCreateProgramWithBuiltInKernels(cl_context context, 
+clCreateProgramWithBuiltInKernels(cl_context context,
 	cl_uint num_devices, const cl_device_id* device_list,
-	const char* kernel_names, cl_int* errcode_ret) 
+	const char* kernel_names, cl_int* errcode_ret)
 	CL_API_SUFFIX__VERSION_1_2 {
-	
-	context = context;
-	num_devices = num_devices;
-	device_list = device_list;
-	kernel_names = kernel_names;
-	errcode_ret = errcode_ret;
+
+	(void)(context);
+	(void)(num_devices);
+	(void)(device_list);
+	(void)(kernel_names);
+	(void)(errcode_ret);
 	g_error("Unimplemented.");
+
+	return NULL;
 }
 
-CL_API_ENTRY cl_int CL_API_CALL 
-clCompileProgram(cl_program program, cl_uint num_devices, 
-	const cl_device_id* device_list, const char* options, 
-	cl_uint num_input_headers, const cl_program* input_headers, 
-	const char** header_include_names, 
+CL_API_ENTRY cl_int CL_API_CALL
+clCompileProgram(cl_program program, cl_uint num_devices,
+	const cl_device_id* device_list, const char* options,
+	cl_uint num_input_headers, const cl_program* input_headers,
+	const char** header_include_names,
 	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
 	void* user_data) CL_API_SUFFIX__VERSION_1_2 {
 
-	program = program;
-	num_devices = num_devices;
-	device_list = device_list;
-	options = options;
-	num_input_headers = num_input_headers;
-	input_headers = input_headers;
-	header_include_names = header_include_names;
-	pfn_notify = pfn_notify;
-	user_data = user_data;
+	(void)(program);
+	(void)(num_devices);
+	(void)(device_list);
+	(void)(options);
+	(void)(num_input_headers);
+	(void)(input_headers);
+	(void)(header_include_names);
+	(void)(pfn_notify);
+	(void)(user_data);
 	g_error("Unimplemented.");
+
+	return CL_SUCCESS;
 }
 
 CL_API_ENTRY cl_program CL_API_CALL
-clLinkProgram(cl_context context, cl_uint num_devices, 
+clLinkProgram(cl_context context, cl_uint num_devices,
 	const cl_device_id* device_list, const char* options,
 	cl_uint num_input_programs, const cl_program* input_programs,
 	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
 	void* user_data, cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_2 {
-		
-	context = context;
-	num_devices = num_devices;
-	device_list = device_list;
-	options = options;
-	num_input_programs = num_input_programs;
-	input_programs = input_programs;
-	pfn_notify = pfn_notify;
-	user_data = user_data;
-	errcode_ret = errcode_ret;
+
+	(void)(context);
+	(void)(num_devices);
+	(void)(device_list);
+	(void)(options);
+	(void)(num_input_programs);
+	(void)(input_programs);
+	(void)(pfn_notify);
+	(void)(user_data);
+	(void)(errcode_ret);
 	g_error("Unimplemented.");
-	
+
+	return NULL;
+
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clUnloadPlatformCompiler(cl_platform_id platform) 
+clUnloadPlatformCompiler(cl_platform_id platform)
 	CL_API_SUFFIX__VERSION_1_2 {
-		
-	platform = platform;
+
+	(void)(platform);
 	return CL_SUCCESS;
 
 }

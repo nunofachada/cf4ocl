@@ -49,10 +49,10 @@ CL_API_ENTRY cl_int CL_API_CALL
 clSetKernelArg(cl_kernel kernel, cl_uint arg_index, size_t arg_size,
 	const void* arg_value) CL_API_SUFFIX__VERSION_1_0 {
 
-	kernel = kernel;
-	arg_index = arg_index;
-	arg_size = arg_size;
-	arg_value = arg_value;
+	(void)(kernel);
+	(void)(arg_index);
+	(void)(arg_size);
+	(void)(arg_value);
 
 	return CL_SUCCESS;
 }
@@ -157,12 +157,12 @@ clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
 	void* param_value, size_t* param_value_size_ret)
 	CL_API_SUFFIX__VERSION_1_2 {
 
-	kernel = kernel;
-	arg_indx = arg_indx;
-	param_name = param_name;
-	param_value_size = param_value_size;
-	param_value = param_value;
-	param_value_size_ret = param_value_size_ret;
+	(void)(kernel);
+	(void)(arg_indx);
+	(void)(param_name);
+	(void)(param_value_size);
+	(void)(param_value);
+	(void)(param_value_size_ret);
 
 	return CL_INVALID_VALUE;
 

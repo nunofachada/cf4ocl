@@ -81,7 +81,7 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 	/* OpenCL function status. */
 	cl_int ocl_status;
 
-	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	CCL_BEGIN_IGNORE_DEPRECATIONS
 
 	/* Check what type of image to create. */
 	if (img_dsc->image_type == CL_MEM_OBJECT_IMAGE2D) {
@@ -107,7 +107,7 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 			img_dsc->image_type);
 	}
 
-	G_GNUC_END_IGNORE_DEPRECATIONS
+	CCL_END_IGNORE_DEPRECATIONS
 
 	/* Return OpenCL image object. */
 	return image;

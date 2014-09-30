@@ -36,10 +36,6 @@
 #include "oclversions.h"
 #include <string.h>
 
-/* Forward declaration of CCLPlatform, as we can't include platform.h
- * here due to circular dependency. */
-typedef struct ccl_platform CCLPlatform;
-
 /**
  * @defgroup DEVICE_WRAPPER Device wrapper
  *
@@ -72,14 +68,6 @@ typedef struct ccl_platform CCLPlatform;
  *
  * @{
  */
-
-
-/**
- * Device wrapper class.
- *
- * @extends ccl_wrapper
- * */
-typedef struct ccl_device CCLDevice;
 
 /* Decrements the reference count of the device wrapper object.
  * If it reaches 0, the device wrapper object is destroyed. */

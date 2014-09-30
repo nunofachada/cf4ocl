@@ -215,10 +215,10 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 				(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
 				CL_QUEUE_PROFILING_ENABLE);
 		}
-		G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+		CCL_BEGIN_IGNORE_DEPRECATIONS
 		queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
 			ccl_device_unwrap(dev), properties, &ocl_status);
-		G_GNUC_END_IGNORE_DEPRECATIONS
+		CCL_END_IGNORE_DEPRECATIONS
 	}
 #else
 	/* Create and keep the OpenCL command queue object. */
@@ -645,7 +645,7 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 	/* OpenCL event object. */
 	cl_event event = NULL;
 
-	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	CCL_BEGIN_IGNORE_DEPRECATIONS
 
 	/* Exact OpenCL function to use depends on whether evt_wait_lst
 	 * is NULL or empty. */
@@ -679,7 +679,7 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 
-	G_GNUC_END_IGNORE_DEPRECATIONS
+	CCL_END_IGNORE_DEPRECATIONS
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -847,7 +847,7 @@ static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
 			"been completed");
 	}
 
-	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	CCL_BEGIN_IGNORE_DEPRECATIONS
 
 	/* Call clEnqueueMarker() once. */
 	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
@@ -856,7 +856,7 @@ static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
 		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
 
-	G_GNUC_END_IGNORE_DEPRECATIONS
+	CCL_END_IGNORE_DEPRECATIONS
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);

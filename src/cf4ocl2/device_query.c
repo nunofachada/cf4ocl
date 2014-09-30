@@ -108,7 +108,7 @@ static char* ccl_devquery_format_sizet(CCLWrapperInfo* info,
 static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	unsigned long bytes = (unsigned long) *((cl_ulong*) info->value);
 	ccl_devquery_format_bytes("lu");
 	return out;
@@ -123,7 +123,7 @@ static char* ccl_devquery_format_ulongbytes(CCLWrapperInfo* info,
 static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	unsigned int bytes = (unsigned int) *((cl_uint*) info->value);
 	ccl_devquery_format_bytes("u");
 	return out;
@@ -138,7 +138,7 @@ static char* ccl_devquery_format_uintbytes(CCLWrapperInfo* info,
 static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	unsigned long bytes = (unsigned long) *((size_t*) info->value);
 	ccl_devquery_format_bytes("lu");
 	return out;
@@ -153,7 +153,7 @@ static char* ccl_devquery_format_sizetbytes(CCLWrapperInfo* info,
 static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	GString* str = g_string_new("(");
 	size_t* vec = (size_t*) info->value;
 	guint count = info->size / sizeof(gsize);
@@ -178,7 +178,7 @@ static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 static char* ccl_devquery_format_yesno(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	g_snprintf(out, size, "%s", *((cl_bool*) info->value) ? "Yes" : "No");
 	return out;
 
@@ -205,7 +205,7 @@ static char* ccl_devquery_format_char(CCLWrapperInfo* info,
 static char* ccl_devquery_format_ptr(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	g_snprintf(out, size, "%p", *((void**) info->value));
 	return out;
 
@@ -219,7 +219,7 @@ static char* ccl_devquery_format_ptr(CCLWrapperInfo* info,
 static char* ccl_devquery_format_type(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	g_snprintf(out, size, "%s",
 		ccl_devquery_type2str(*((cl_device_type*) info->value)));
 	return out;
@@ -234,7 +234,7 @@ static char* ccl_devquery_format_type(CCLWrapperInfo* info,
 static char* ccl_devquery_format_fpconfig(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_fp_config fpc = *((cl_device_fp_config*) info->value);
 	g_snprintf(out, size, "%s%s%s%s%s%s%s",
 		fpc & CL_FP_DENORM ? "DENORM " : "",
@@ -256,7 +256,7 @@ static char* ccl_devquery_format_fpconfig(CCLWrapperInfo* info,
 static char* ccl_devquery_format_execcap(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_exec_capabilities exc =
 		*((cl_device_exec_capabilities*) info->value);
 	g_snprintf(out, size, "%s%s",
@@ -272,7 +272,7 @@ static char* ccl_devquery_format_execcap(CCLWrapperInfo* info,
 static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_local_mem_type lmt =
 		*((cl_device_local_mem_type*) info->value);
 	g_snprintf(out, size, "%s%s%s",
@@ -290,7 +290,7 @@ static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info,
 static char* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_partition_property* pp =
 		(cl_device_partition_property*) info->value;
 	GString* str = g_string_new("");
@@ -338,7 +338,7 @@ static char* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 static char* ccl_devquery_format_affdom(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_affinity_domain ad =
 		*((cl_device_affinity_domain*) info->value);
 	g_snprintf(out, size, "%s%s%s%s%s%s",
@@ -362,7 +362,7 @@ static char* ccl_devquery_format_affdom(CCLWrapperInfo* info,
 static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_partition_property_ext* ade =
 		(cl_device_partition_property_ext*) info->value;
 	GString* str = g_string_new("");
@@ -408,7 +408,7 @@ static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info,
 static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_mem_cache_type mct =
 		*((cl_device_mem_cache_type*) info->value);
 	g_snprintf(out, size, "%s%s%s",
@@ -426,7 +426,7 @@ static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info,
 static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_command_queue_properties qp =
 		*((cl_command_queue_properties*) info->value);
 	g_snprintf(out, size, "%s%s",
@@ -445,7 +445,7 @@ static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 static char* ccl_devquery_format_svmc(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	units = units;
+	CCL_UNUSED(units);
 	cl_device_svm_capabilities svmc =
 		*((cl_device_svm_capabilities*) info->value);
 	g_snprintf(out, size, "%s%s%s%s",

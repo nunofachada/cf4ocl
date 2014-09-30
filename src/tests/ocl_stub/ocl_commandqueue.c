@@ -26,6 +26,7 @@
 
 #include "ocl_env.h"
 #include "utils.h"
+#include "common.h"
 
 
 CL_API_ENTRY cl_command_queue CL_API_CALL
@@ -52,10 +53,10 @@ clCreateCommandQueueWithProperties(cl_context context,
 	cl_device_id device, const cl_queue_properties* properties,
 	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_2_0 {
 
-	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	CCL_BEGIN_IGNORE_DEPRECATIONS
 	return clCreateCommandQueue(context, device, *properties,
 		errcode_ret);
-	G_GNUC_END_IGNORE_DEPRECATIONS
+	CCL_END_IGNORE_DEPRECATIONS
 
 }
 #endif
@@ -115,12 +116,12 @@ clGetCommandQueueInfo(cl_command_queue command_queue,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clFlush(cl_command_queue command_queue) CL_API_SUFFIX__VERSION_1_0 {
-	command_queue = command_queue;
+	(void)(command_queue);
 	return CL_SUCCESS;
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clFinish(cl_command_queue command_queue) CL_API_SUFFIX__VERSION_1_0 {
-	command_queue = command_queue;
+	(void)(command_queue);
 	return CL_SUCCESS;
 }

@@ -47,6 +47,103 @@
 #define CCL_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGH" \
 	"IJKLMNOPQRSTUVWXYZ0123456789_."
 
+#define CCL_UNUSED(x) (void)(x)
+
+/* These deprecation macros are copied from GLib latest version in
+ * order to support Clang. */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
+#define CCL_BEGIN_IGNORE_DEPRECATIONS \
+	_Pragma ("GCC diagnostic push") \
+	_Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define CCL_END_IGNORE_DEPRECATIONS \
+	_Pragma ("GCC diagnostic pop")
+#elif defined (_MSC_VER) && (_MSC_VER >= 1500)
+#define CCL_BEGIN_IGNORE_DEPRECATIONS \
+	__pragma (warning (push)) \
+	__pragma (warning (disable : 4996))
+#define CCL_END_IGNORE_DEPRECATIONS \
+	__pragma (warning (pop))
+#elif defined (__clang__)
+#define CCL_BEGIN_IGNORE_DEPRECATIONS \
+	_Pragma("clang diagnostic push") \
+	_Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#define CCL_END_IGNORE_DEPRECATIONS \
+	_Pragma("clang diagnostic pop")
+#else
+#define CCL_BEGIN_IGNORE_DEPRECATIONS
+#define CCL_END_IGNORE_DEPRECATIONS
+#endif
+
+/**
+ * Buffer wrapper class
+ *
+ * @extends ccl_memobj
+ * */
+typedef struct ccl_buffer CCLBuffer;
+
+/**
+ * Context wrapper class.
+ *
+ * @extends ccl_dev_container
+ * */
+typedef struct ccl_context CCLContext;
+
+/**
+ * Device wrapper class.
+ *
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_device CCLDevice;
+
+/**
+ * Event wrapper class.
+ *
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_event CCLEvent;
+
+/**
+ * Image wrapper class
+ *
+ * @extends ccl_memobj
+ * */
+typedef struct ccl_image CCLImage;
+
+/**
+ * Kernel wrapper class.
+ *
+ * @extends ccl_wrapper
+ */
+typedef struct ccl_kernel CCLKernel;
+
+/**
+ * Platform wrapper class.
+ *
+ * @extends ccl_dev_container
+ * */
+typedef struct ccl_platform CCLPlatform;
+
+/**
+ * Program wrapper class.
+ *
+ * @extends ccl_dev_container
+ */
+typedef struct ccl_program CCLProgram;
+
+/**
+ * Sampler wrapper class
+ *
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_sampler CCLSampler;
+
+/**
+ * Command queue wrapper class.
+ *
+ * @extends ccl_wrapper
+ */
+typedef struct ccl_queue CCLQueue;
+
 /**
  * Error codes.
  * */

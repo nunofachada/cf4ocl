@@ -16,9 +16,10 @@ add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 # Set executables prefix
 set(EXECS_PREFIX "ccl_")
 
-# Compiler options for GCC
+# Compiler options for GCC/Clang
 # -Wno-comment because of comment within comment in OpenCL headers
-if(CMAKE_COMPILER_IS_GNUCC)
+if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
 endif()
 
@@ -29,15 +30,19 @@ find_package(Doxygen 1.8.3 QUIET)
 pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Use provided OpenCL headers or system OpenCL headers?
-option(USE_LOCAL_OPENCL_HEADERS "Use local OpenCL headers?" OFF)
+if (NOT APPLE) # Not for Apple, which handles these headers differently
 
-SET(LOCAL_OPENCL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
+	option(USE_LOCAL_OPENCL_HEADERS "Use local OpenCL headers?" OFF)
 
-SET_PROPERTY(CACHE LOCAL_OPENCL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
+	SET(LOCAL_OPENCL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
 
-IF (USE_LOCAL_OPENCL_HEADERS)
-	SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${LOCAL_OPENCL_HEADERS}")
-ENDIF()
+	SET_PROPERTY(CACHE LOCAL_OPENCL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
+
+	if (USE_LOCAL_OPENCL_HEADERS)
+		SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${LOCAL_OPENCL_HEADERS}")
+	endif()
+
+endif()
 
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}

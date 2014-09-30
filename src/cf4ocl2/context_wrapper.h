@@ -114,13 +114,6 @@
  */
 
 /**
- * The context wrapper class.
- *
- * @extends ccl_dev_container
- * */
-typedef struct ccl_context CCLContext;
-
-/**
  * A callback function used by the OpenCL implementation to
  * report information on errors during context creation as well as
  * errors that occur at runtime in this context. Ignored if NULL.

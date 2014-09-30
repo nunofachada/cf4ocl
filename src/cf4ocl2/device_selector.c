@@ -734,7 +734,7 @@ cl_bool ccl_devsel_indep_type_gpu(
 	cl_device_type type_to_check = CL_DEVICE_TYPE_GPU;
 
 	/* Data not used, ignore compiler warnings. */
-	data = data;
+	CCL_UNUSED(data);
 
 	/* Return result. */
 	return ccl_devsel_indep_type(dev, (void*) &type_to_check, err);
@@ -757,7 +757,7 @@ cl_bool ccl_devsel_indep_type_cpu(
 	cl_device_type type_to_check = CL_DEVICE_TYPE_CPU;
 
 	/* Data not used, ignore compiler warnings. */
-	data = data;
+	CCL_UNUSED(data);
 
 	/* Return result. */
 	return ccl_devsel_indep_type(dev, (void*) &type_to_check, err);
@@ -781,7 +781,7 @@ cl_bool ccl_devsel_indep_type_accel(
 	cl_device_type type_to_check = CL_DEVICE_TYPE_ACCELERATOR;
 
 	/* Data not used, ignore compiler warnings. */
-	data = data;
+	CCL_UNUSED(data);
 
 	/* Return result. */
 	return ccl_devsel_indep_type(dev, (void*) &type_to_check, err);
@@ -996,7 +996,7 @@ CCLDevSelDevices ccl_devsel_dep_platform(
 	GError *err_internal = NULL;
 
 	/* Filter data is ignored by this filter. */
-	data = data;
+	CCL_UNUSED(data);
 
 	/* Get first device, which will determine the reference platform. */
 	dev = (CCLDevice*) g_ptr_array_index(devices, 0);

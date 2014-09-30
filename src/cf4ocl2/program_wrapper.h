@@ -186,13 +186,6 @@
  * @{
  */
 
-/**
- * Program wrapper class.
- *
- * @extends ccl_dev_container
- */
-typedef struct ccl_program CCLProgram;
-
 /** Class which represents a binary object associated with a program
  * and a device. */
 typedef struct ccl_program_binary CCLProgramBinary;

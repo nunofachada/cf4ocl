@@ -106,13 +106,6 @@
  * @{
  */
 
-/**
- * The platform wrapper class.
- *
- * @extends ccl_dev_container
- * */
-typedef struct ccl_platform CCLPlatform;
-
 /* Get the platform wrapper for the given OpenCL platform. */
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 

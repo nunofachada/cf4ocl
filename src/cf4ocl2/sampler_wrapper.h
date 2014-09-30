@@ -84,13 +84,6 @@
  * @{
  */
 
-/**
- * Sampler wrapper class
- *
- * @extends ccl_wrapper
- * */
-typedef struct ccl_sampler CCLSampler;
-
 /* Get the sampler wrapper for the given OpenCL sampler. */
 CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler);
 
