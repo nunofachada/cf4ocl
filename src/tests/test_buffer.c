@@ -66,10 +66,10 @@ static void buffer_create_info_destroy_test() {
 	g_assert_no_error(err);
 	g_assert_cmpuint(mem_size, ==, buf_size);
 
-	void* host_ptr;
+	void* host_ptr = NULL;
 	host_ptr = ccl_memobj_get_info_scalar(
 		b, CL_MEM_HOST_PTR, void*, &err);
-	g_assert_no_error(err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
 	g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
 
 	cl_context context;

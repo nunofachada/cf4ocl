@@ -154,7 +154,7 @@ typedef enum ccl_error_code {
 	CCL_ERROR_OPENFILE         = 1,
 	/** Invalid program arguments. */
 	CCL_ERROR_ARGS             = 2,
-	/** Invalid data passed to a function. */
+	/** Invalid data passed to a function or returned from function. */
 	CCL_ERROR_INVALID_DATA     = 3,
 	/** Error writing to a stream. */
 	CCL_ERROR_STREAM_WRITE     = 4,
@@ -163,6 +163,8 @@ typedef enum ccl_error_code {
 	/** The operation is not supported by the version of the
 	 * selected OpenCL platform. */
 	CCL_ERROR_UNSUPPORTED_OCL  = 6,
+	/** Object information is unavailable. */
+	CCL_ERROR_INFO_UNAVAILABLE_OCL = 7,
 	/** Any other errors. */
 	CCL_ERROR_OTHER            = 15
 } CCLErrorCode;

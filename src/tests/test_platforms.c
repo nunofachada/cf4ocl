@@ -50,7 +50,7 @@ static void ccl_test_platforms_check_error(GError** err) {
 	if  (*err == NULL) {
 		status = TRUE;
 	} else if (((*err)->domain == CCL_ERROR)
-			&& ((*err)->code == CCL_ERROR_INVALID_DATA)) {
+			&& ((*err)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) {
 		status = TRUE;
 	} else if (((*err)->domain == CCL_OCL_ERROR)
 			&& ((*err)->code == CL_INVALID_VALUE)) {

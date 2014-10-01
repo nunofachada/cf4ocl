@@ -310,9 +310,9 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get info [size] (OpenCL error %d: %s).",
 			G_STRLOC, ocl_status, ccl_err(ocl_status));
-		ccl_if_err_create_goto(*err, CCL_ERROR,
-			size_ret == 0, CCL_ERROR_INVALID_DATA, error_handler,
-			"%s: get info [size] (size is 0).",
+		ccl_if_err_create_goto(*err, CCL_ERROR, size_ret == 0,
+			CCL_ERROR_INFO_UNAVAILABLE_OCL, error_handler,
+			"%s: the requested info is unavailable (info size is 0).",
 			G_STRLOC);
 
 		/* Allocate memory for information. */
