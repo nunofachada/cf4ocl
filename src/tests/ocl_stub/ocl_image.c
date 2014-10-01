@@ -89,11 +89,7 @@ CL_API_ENTRY cl_mem CL_API_CALL
 clCreateImage(cl_context context, cl_mem_flags flags,
 	const cl_image_format* image_format,
 	const cl_image_desc* image_desc, void* host_ptr,
-	cl_int* errcode_ret)
-#ifdef CL_VERSION_1_2
-CL_API_SUFFIX__VERSION_1_2
-#endif
-{
+	cl_int* errcode_ret) {
 
 	/* Very basic, only support 2D and 3D images and no image-buffer
 	 * auto mapping.*/
@@ -146,7 +142,7 @@ CL_API_SUFFIX__VERSION_1_2
 CL_API_ENTRY cl_mem CL_API_CALL clCreateImage2D(cl_context context,
 	cl_mem_flags flags, const cl_image_format* image_format,
 	size_t image_width, size_t image_height, size_t image_row_pitch,
-	void* host_ptr, cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	void* host_ptr, cl_int* errcode_ret) {
 
 	cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL};
 	img_dsc.image_width = image_width;
@@ -161,8 +157,7 @@ CL_API_ENTRY cl_mem CL_API_CALL
 clCreateImage3D(cl_context context, cl_mem_flags flags,
 	const cl_image_format* image_format, size_t image_width,
 	size_t image_height, size_t image_depth, size_t image_row_pitch,
-	size_t image_slice_pitch, void* host_ptr, cl_int* errcode_ret)
-	CL_API_SUFFIX__VERSION_1_0 {
+	size_t image_slice_pitch, void* host_ptr, cl_int* errcode_ret) {
 
 	cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL};
 	img_dsc.image_width = image_width;
@@ -178,7 +173,7 @@ clCreateImage3D(cl_context context, cl_mem_flags flags,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetImageInfo(cl_mem image, cl_image_info param_name,
 	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
+	size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 

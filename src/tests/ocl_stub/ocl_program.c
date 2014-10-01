@@ -94,7 +94,7 @@ static cl_program clCreateProgram(cl_context context,
 CL_API_ENTRY cl_program CL_API_CALL
 clCreateProgramWithSource(cl_context context, cl_uint count,
 	const char** strings, const size_t* lengths,
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	cl_int* errcode_ret) {
 
 	seterrcode(errcode_ret, CL_SUCCESS);
 
@@ -142,7 +142,7 @@ CL_API_ENTRY cl_program CL_API_CALL
 clCreateProgramWithBinary(cl_context context, cl_uint num_devices,
 	const cl_device_id* device_list, const size_t* lengths,
 	const unsigned char** binaries, cl_int* binary_status,
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	cl_int* errcode_ret) {
 
 	seterrcode(errcode_ret, CL_SUCCESS);
 
@@ -201,7 +201,7 @@ error_handler:
 
 
 CL_API_ENTRY cl_int CL_API_CALL
-clRetainProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
+clRetainProgram(cl_program program) {
 
 	g_atomic_int_inc(&program->ref_count);
 	return CL_SUCCESS;
@@ -209,7 +209,7 @@ clRetainProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clReleaseProgram(cl_program program) CL_API_SUFFIX__VERSION_1_0 {
+clReleaseProgram(cl_program program) {
 
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&program->ref_count)) {
@@ -289,7 +289,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clBuildProgram(cl_program program, cl_uint num_devices,
 	const cl_device_id* device_list, const char* options,
 	void (CL_CALLBACK* pfn_notify)(cl_program, void*),
-    void* user_data) CL_API_SUFFIX__VERSION_1_0 {
+    void* user_data) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -366,7 +366,7 @@ error_handler:
 CL_API_ENTRY cl_int CL_API_CALL
 clGetProgramInfo(cl_program program, cl_program_info param_name,
 	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
+	size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -407,8 +407,7 @@ clGetProgramInfo(cl_program program, cl_program_info param_name,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetProgramBuildInfo(cl_program program, cl_device_id device,
 	cl_program_build_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret)
-	CL_API_SUFFIX__VERSION_1_0 {
+	void* param_value, size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 	cl_bool found = CL_FALSE;
@@ -460,7 +459,7 @@ CL_API_ENTRY CL_EXT_PREFIX__VERSION_1_1_DEPRECATED cl_int CL_API_CALL
 clUnloadCompiler(void)
 #else
 CL_API_ENTRY cl_int CL_API_CALL
-clUnloadCompiler(void) CL_API_SUFFIX__VERSION_1_0
+clUnloadCompiler(void)
 #endif
 {
 	return CL_SUCCESS;
@@ -472,8 +471,7 @@ clUnloadCompiler(void) CL_API_SUFFIX__VERSION_1_0
 CL_API_ENTRY cl_program CL_API_CALL
 clCreateProgramWithBuiltInKernels(cl_context context,
 	cl_uint num_devices, const cl_device_id* device_list,
-	const char* kernel_names, cl_int* errcode_ret)
-	CL_API_SUFFIX__VERSION_1_2 {
+	const char* kernel_names, cl_int* errcode_ret) {
 
 	(void)(context);
 	(void)(num_devices);
@@ -491,7 +489,7 @@ clCompileProgram(cl_program program, cl_uint num_devices,
 	cl_uint num_input_headers, const cl_program* input_headers,
 	const char** header_include_names,
 	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
-	void* user_data) CL_API_SUFFIX__VERSION_1_2 {
+	void* user_data) {
 
 	(void)(program);
 	(void)(num_devices);
@@ -512,7 +510,7 @@ clLinkProgram(cl_context context, cl_uint num_devices,
 	const cl_device_id* device_list, const char* options,
 	cl_uint num_input_programs, const cl_program* input_programs,
 	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
-	void* user_data, cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_2 {
+	void* user_data, cl_int* errcode_ret) {
 
 	(void)(context);
 	(void)(num_devices);
@@ -530,8 +528,7 @@ clLinkProgram(cl_context context, cl_uint num_devices,
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clUnloadPlatformCompiler(cl_platform_id platform)
-	CL_API_SUFFIX__VERSION_1_2 {
+clUnloadPlatformCompiler(cl_platform_id platform) {
 
 	(void)(platform);
 	return CL_SUCCESS;

@@ -30,7 +30,7 @@
 CL_API_ENTRY cl_int CL_API_CALL
 clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
 	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
+	size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -58,7 +58,7 @@ clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetEventInfo(cl_event event, cl_event_info param_name,
 	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
+	size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -89,7 +89,7 @@ clGetEventInfo(cl_event event, cl_event_info param_name,
 
 
 CL_API_ENTRY cl_int CL_API_CALL
-clRetainEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
+clRetainEvent(cl_event event) {
 
 	g_atomic_int_inc(&event->ref_count);
 	return CL_SUCCESS;
@@ -97,7 +97,7 @@ clRetainEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clReleaseEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
+clReleaseEvent(cl_event event) {
 
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&event->ref_count)) {
@@ -111,8 +111,7 @@ clReleaseEvent(cl_event event) CL_API_SUFFIX__VERSION_1_0 {
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clWaitForEvents(cl_uint num_events, const cl_event* event_list)
-	CL_API_SUFFIX__VERSION_1_0 {
+clWaitForEvents(cl_uint num_events, const cl_event* event_list) {
 
 	(void)(num_events);
 	(void)(event_list);
@@ -121,8 +120,7 @@ clWaitForEvents(cl_uint num_events, const cl_event* event_list)
 }
 
 CL_API_ENTRY cl_event CL_API_CALL
-clCreateUserEvent(cl_context context, cl_int* errcode_ret)
-	CL_API_SUFFIX__VERSION_1_1 {
+clCreateUserEvent(cl_context context, cl_int* errcode_ret) {
 
 	cl_event event = NULL;
 	if (context == NULL) {
@@ -136,8 +134,7 @@ clCreateUserEvent(cl_context context, cl_int* errcode_ret)
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clSetUserEventStatus(cl_event event, cl_int execution_status)
-	CL_API_SUFFIX__VERSION_1_1 {
+clSetUserEventStatus(cl_event event, cl_int execution_status) {
 
 	cl_int status;
 	if (event == NULL) {
@@ -156,7 +153,7 @@ clSetUserEventStatus(cl_event event, cl_int execution_status)
 CL_API_ENTRY cl_int CL_API_CALL
 clSetEventCallback(cl_event event, cl_int command_exec_callback_type,
 	void (CL_CALLBACK *pfn_notify)(cl_event, cl_int, void *),
-	void* user_data) CL_API_SUFFIX__VERSION_1_1 {
+	void* user_data) {
 
 	/* Not implemented. Doesn't make sense to implement in current
 	 * state of stub because created events are automatically set to
