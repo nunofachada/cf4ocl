@@ -161,9 +161,6 @@ static void platforms_create_info_destroy_test() {
 			ccl_test_platforms_msg("...... Name :", "%s",
 				ccl_info_array(info, char*));
 
-			g_debug("...... Memory location : %p",
-				*((void**) ccl_device_unwrap(d)));
-
 			info = ccl_device_get_info(d, CL_DEVICE_ADDRESS_BITS, &err);
 			ccl_test_platforms_check_error(&err);
 			ccl_test_platforms_msg("...... Address bits :", "%u",

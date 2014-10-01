@@ -71,6 +71,7 @@ static void buffer_create_info_destroy_test() {
 		b, CL_MEM_HOST_PTR, void*, &err);
 	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
 	g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
+    g_clear_error(&err);
 
 	cl_context context;
 	context = ccl_memobj_get_info_scalar(

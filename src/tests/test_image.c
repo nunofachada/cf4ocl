@@ -161,8 +161,9 @@ static void image_create_info_destroy_test(
 	void* host_ptr;
 	host_ptr = ccl_memobj_get_info_scalar(
 		img, CL_MEM_HOST_PTR, void*, &err);
-	g_assert_no_error(err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
 	g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
+    g_clear_error(&err);
 
 	cl_context context;
 	context = ccl_memobj_get_info_scalar(
