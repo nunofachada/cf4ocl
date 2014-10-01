@@ -91,6 +91,12 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 			image_format, img_dsc->image_width, img_dsc->image_height,
 			img_dsc->image_row_pitch, host_ptr, &ocl_status);
 
+		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+			CL_SUCCESS != ocl_status, ocl_status, error_handler,
+			"%s: unable to create image with clCreateImage2D() " \
+			"(OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, ccl_err(ocl_status));
+
 	} else if (img_dsc->image_type == CL_MEM_OBJECT_IMAGE3D) {
 
 		/* Create a 3D image. */
@@ -99,15 +105,34 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 			img_dsc->image_depth, img_dsc->image_row_pitch,
 			img_dsc->image_slice_pitch, host_ptr, &ocl_status);
 
+		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+			CL_SUCCESS != ocl_status, ocl_status, error_handler,
+			"%s: unable to create image with clCreateImage3D() " \
+			"(OpenCL error %d: %s).",
+			G_STRLOC, ocl_status, ccl_err(ocl_status));
+
 	} else {
 
 		/* Unknown or unsupported image type. */
-		*err = g_error_new(CCL_ERROR, CCL_ERROR_UNSUPPORTED_OCL,
+		ccl_if_err_create_goto(*err, CCL_ERROR, CL_TRUE,
+			CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 			"%s: unknown or unsuported image type (%x)", G_STRLOC,
 			img_dsc->image_type);
+
 	}
 
 	CCL_END_IGNORE_DEPRECATIONS
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
 
 	/* Return OpenCL image object. */
 	return image;
