@@ -603,6 +603,8 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	/* Event instant objects. */
 	CCLProfInst* evinst_start;
 	CCLProfInst* evinst_end;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
 
 	/* Event name. */
 	const char* event_name;
@@ -612,33 +614,28 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 
 	/* Get event queued instant. */
 	instant_queued = ccl_event_get_profiling_info_scalar(
-		evt, CL_PROFILING_COMMAND_QUEUED, cl_ulong, err);
-	if (*err != NULL)
-		return;
+		evt, CL_PROFILING_COMMAND_QUEUED, cl_ulong, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get event submit instant. */
 	instant_submit = ccl_event_get_profiling_info_scalar(
-		evt, CL_PROFILING_COMMAND_SUBMIT, cl_ulong, err);
-	if (*err != NULL)
-		return;
+		evt, CL_PROFILING_COMMAND_SUBMIT, cl_ulong, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get event start instant. */
 	instant_start = ccl_event_get_profiling_info_scalar(
-		evt, CL_PROFILING_COMMAND_START, cl_ulong, err);
-	if (*err != NULL)
-		return;
+		evt, CL_PROFILING_COMMAND_START, cl_ulong, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get event end instant. */
 	instant_end = ccl_event_get_profiling_info_scalar(
-		evt, CL_PROFILING_COMMAND_END, cl_ulong, err);
-	if (*err != NULL)
-		return;
+		evt, CL_PROFILING_COMMAND_END, cl_ulong, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get command type. */
 	command_type = ccl_event_get_info_scalar(
-		evt, CL_EVENT_COMMAND_TYPE, cl_command_type, err);
-	if (*err != NULL)
-		return;
+		evt, CL_EVENT_COMMAND_TYPE, cl_command_type, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we get here, update number of profilable events, and get an ID
 	 * for the given event. */
@@ -687,7 +684,19 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	prof->infos = g_list_prepend(prof->infos,
 		(gpointer) ccl_prof_info_new(event_name, command_type, cq_name,
 			instant_queued, instant_submit, instant_start, instant_end));
-
+	
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+	
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	
+finish:
+	
+	/* Return. */
+	return;
 }
 
 /**
@@ -741,7 +750,11 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 			ccl_prof_add_event(
 				prof, (const char*) cq_name, evt, &err_internal);
 			if ((err_internal != NULL) &&
-				(err_internal->code == CL_PROFILING_INFO_NOT_AVAILABLE)) {
+				(((err_internal->domain == CCL_OCL_ERROR) &&
+                 (err_internal->code == CL_PROFILING_INFO_NOT_AVAILABLE))
+                ||
+                 ((err_internal->domain == CCL_ERROR) &&
+                 (err_internal->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)))) {
 
 				/* Some types of events in certain platforms don't
 				 * provide profiling info. Don't stop profiling,

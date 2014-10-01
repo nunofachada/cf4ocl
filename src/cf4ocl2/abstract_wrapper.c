@@ -306,6 +306,14 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 				param_name, 0, NULL, &size_ret)
 			: ((ccl_wrapper_info_fp2) info_fun)(wrapper1->cl_object,
 				wrapper2->cl_object, param_name, 0, NULL, &size_ret);
+		
+		/* Avoid bug in Apple OpenCL implementation. */
+#if defined(__APPLE__) || defined(__MACOSX)
+		if ((ocl_status == CL_INVALID_VALUE)
+			&& (info_fun == (ccl_wrapper_info_fp) clGetEventProfilingInfo))
+			ocl_status = CL_SUCCESS;
+#endif
+		
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get info [size] (OpenCL error %d: %s).",
