@@ -39,6 +39,12 @@
 		(g_strcmp0(o->event2_name, ev1) == 0) \
 	)
 
+#ifdef G_OS_WIN32
+	#define CCL_TEST_NEWLINE "\r\n"
+#else
+	#define CCL_TEST_NEWLINE "\n"
+#endif
+
 #define CCL_TEST_MAXBUF 512
 /**
  * Tests the profiling module.
@@ -239,14 +245,14 @@ static void operation_test() {
 	/* Test if output file was correctly written. */
 	gchar* file_contents;
 	gchar* expected_contents =
-		"Q1\t10\t15\tEvent1\n" \
-		"Q1\t16\t20\tEvent2\n" \
-		"Q1\t17\t30\tEvent3\n" \
-		"Q3\t19\t25\tEvent4\n" \
-		"Q1\t29\t40\tEvent5\n" \
-		"Q2\t35\t45\tEvent1\n" \
-		"Q3\t50\t70\tEvent1\n" \
-		"Q1\t68\t69\tEvent1\n";
+		"Q1\t10\t15\tEvent1" CCL_TEST_NEWLINE \
+		"Q1\t16\t20\tEvent2" CCL_TEST_NEWLINE \
+		"Q1\t17\t30\tEvent3" CCL_TEST_NEWLINE \
+		"Q3\t19\t25\tEvent4" CCL_TEST_NEWLINE \
+		"Q1\t29\t40\tEvent5" CCL_TEST_NEWLINE \
+		"Q2\t35\t45\tEvent1" CCL_TEST_NEWLINE \
+		"Q3\t50\t70\tEvent1" CCL_TEST_NEWLINE \
+		"Q1\t68\t69\tEvent1" CCL_TEST_NEWLINE;
 	gboolean read_flag = g_file_get_contents(
 		tmp_file_name, &file_contents, NULL, NULL);
 	g_assert(read_flag);
