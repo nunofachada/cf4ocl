@@ -44,8 +44,8 @@ __kernel void do_filter(__read_only image2d_t input_img,
 	__write_only image2d_t output_img, sampler_t sampler) {
 
 	int2 imdim = get_image_dim(input_img);
-	size_t x = get_global_id(0);
-	size_t y = get_global_id(1);
+	int x = get_global_id(0);
+	int y = get_global_id(1);
 	if ((x < imdim.x) && (y < imdim.y)) {
 		int half_filter = filter_size / 2;
 		uint4 px_val;
