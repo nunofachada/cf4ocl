@@ -51,7 +51,7 @@ struct thread_data {
 	CCLImage* img2;
 	size_t* gws;
 	size_t* lws;
-	unsigned char** output_images;
+	cl_uchar4** output_images;
 };
 
 /* Origin of sim space. */
@@ -183,15 +183,15 @@ int main(int argc, char* argv[]) {
 	/* Does selected device support images? */
 	cl_bool image_ok;
 	/* Initial sim state. */
-	unsigned char* input_image;
+	cl_uchar4* input_image;
 	/* Simulation states. */
-	unsigned char** output_images;
+	cl_uchar4** output_images;
 	/* RNG seed, may be given in command line. */
 	unsigned int seed;
 	/* Image file write status. */
 	int file_write_status;
 	/* Image format. */
-	cl_image_format image_format = { CL_R, CL_UNSIGNED_INT8 };
+	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 	/* Thread data. */
 	struct thread_data td;
 
@@ -218,17 +218,19 @@ int main(int argc, char* argv[]) {
 	srand(seed);
 
 	/* Create random initial state. */
-	input_image = (unsigned char*)
-		malloc(CA_WIDTH * CA_HEIGHT * sizeof(unsigned char));
-	for (cl_uint i = 0; i < CA_WIDTH * CA_HEIGHT; ++i)
-		input_image[i] = (rand() & 0x3) ? 0xFF : 0x00;
+	input_image = (cl_uchar4*)
+		malloc(CA_WIDTH * CA_HEIGHT * sizeof(cl_uchar4));
+	for (cl_uint i = 0; i < CA_WIDTH * CA_HEIGHT; ++i) {
+		cl_uchar state = (rand() & 0x3) ? 0xFF : 0x00;
+		input_image[i] = (cl_uchar4) {{ state, state, state, 0xFF }};
+	}
 
 	/* Allocate space for simulation results. */
-	output_images = (unsigned char**)
-		malloc((CA_ITERS + 1) * sizeof(unsigned char*));
+	output_images = (cl_uchar4**)
+		malloc((CA_ITERS + 1) * sizeof(cl_uchar4*));
 	for (cl_uint i = 0; i < CA_ITERS + 1; ++i)
-		output_images[i] = (unsigned char*)
-			malloc(CA_WIDTH * CA_HEIGHT * sizeof(unsigned char));
+		output_images[i] = (cl_uchar4*)
+			malloc(CA_WIDTH * CA_HEIGHT * sizeof(cl_uchar4));
 
 	/* Create context using device selected from menu. */
 	ctx = ccl_context_new_from_menu_full(&dev_idx, &err);
@@ -372,8 +374,8 @@ int main(int argc, char* argv[]) {
 		sprintf(filename, "%s%0" G_STRINGIFY(IMAGE_FILE_NUM_DIGITS) "d.png", IMAGE_FILE_PREFIX, i);
 
 		/* Save next image. */
-		file_write_status = stbi_write_png(filename, CA_WIDTH, CA_HEIGHT, 1,
-			output_images[i], CA_WIDTH);
+		file_write_status = stbi_write_png(filename, CA_WIDTH, CA_HEIGHT, 4,
+			output_images[i], CA_WIDTH * sizeof(cl_uchar4));
 
 		/* Give feedback if unable to save image. */
 		if (!file_write_status) {
