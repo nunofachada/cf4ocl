@@ -105,11 +105,28 @@ endif()
 
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+
+set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${${PROJECT_NAME}_VERSION_PATCH}")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A cross-platform pure C99 object-oriented framework for developing and benchmarking OpenCL projects in C/C++")
+set(CPACK_RESOURCE_VENDOR "FakenMC")
+
+if(WIN32)
+	set(CPACK_GENERATOR "NSIS" "ZIP")
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
+	set(CPACK_NSIS_URL_INFO_ABOUT "http://fakenmc.github.io/cf4ocl/" )
+elseif(APPLE)
+elseif(UNIX)
+	set(CPACK_GENERATOR "DEB;TGZ;TZ")
+	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nuno Fachada <faken@fakenmc.com>")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libglib2.0-0 (>= 2.32.1), ocl-icd-libopencl1 (>= 1.3)")
+	set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "ocl-icd-opencl-dev (>= 1.3), opencl-headers (>= 1.0)")
+endif()
+
 include (CPack)
 
 
