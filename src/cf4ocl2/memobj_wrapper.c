@@ -69,9 +69,9 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
 cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err) {
 
 	/* Make sure number mo is not NULL. */
-	g_return_val_if_fail(mo != NULL, 0.0);
+	g_return_val_if_fail(mo != NULL, 0);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
 	cl_context context;
 	CCLContext* ctx;
@@ -304,7 +304,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 	/* Array of OpenCL memory objects. */
-	cl_mem mem_objects[num_mos];
+	cl_mem* mem_objects = NULL;
 
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_memobj_get_opencl_version(mos[0], &err_internal);
@@ -316,6 +316,9 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		"%s: memory object migration requires OpenCL version 1.2 or " \
 		"newer.",
 		G_STRLOC);
+
+	/* Allocate mmemory for memory objects. */
+	mem_objects = (cl_mem*)g_slice_alloc(sizeof(cl_mem) * num_mos);
 
 	/* Gather OpenCL memory objects in a array. */
 	for (cl_uint i = 0; i < num_mos; ++i) {
@@ -353,6 +356,9 @@ error_handler:
 	evt = NULL;
 
 finish:
+
+	/* Release stuff. */
+	if (mem_objects) g_slice_free1(sizeof(cl_mem) * num_mos, mem_objects);
 
 	/* Return evt. */
 	return evt;

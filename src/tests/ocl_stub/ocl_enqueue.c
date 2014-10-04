@@ -80,7 +80,7 @@ clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER);
 
 	/* Read buffer. */
-	g_memmove(ptr, buffer->mem + offset, size);
+	g_memmove(ptr, ((cl_uchar*)buffer->mem) + offset, size);
 
 	/* All good. */
 	return CL_SUCCESS;
@@ -115,7 +115,7 @@ clEnqueueWriteBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER);
 
 	/* Write to buffer. */
-	g_memmove(buffer->mem + offset, ptr, size);
+	g_memmove(((cl_uchar*) buffer->mem) + offset, ptr, size);
 
 	/* All good. */
 	return CL_SUCCESS;
@@ -174,7 +174,7 @@ clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
 		seterrcode(errcode_ret, CL_SUCCESS);
 
 		/* Just return a pointer to the memory region. */
-		map_ptr = buffer->mem + offset;
+		map_ptr = ((cl_uchar*)buffer->mem) + offset;
 		buffer->map_count++;
 	}
 
@@ -218,7 +218,8 @@ clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 	(void)(event_wait_list);
 
 	/* Perform copy. */
-	g_memmove(dst_buffer->mem + dst_offset, src_buffer->mem + src_offset, size);
+	g_memmove(((cl_uchar*) dst_buffer->mem) + dst_offset,
+		((cl_uchar*) src_buffer->mem) + src_offset, size);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER);
@@ -244,7 +245,7 @@ clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
 	} else if (mapped_ptr == NULL) {
 		return CL_INVALID_VALUE;
 	} else if ((mapped_ptr < memobj->mem)
-		|| (mapped_ptr >= memobj->mem + memobj->size)
+		|| ((cl_uchar*)mapped_ptr >= ((cl_uchar*)memobj->mem) + memobj->size)
 		|| (memobj->map_count == 0)) {
 		return CL_INVALID_VALUE;
 	}
@@ -311,8 +312,8 @@ clEnqueueReadImage(cl_command_queue command_queue, cl_mem image,
 		for (size_t y = 0; y < region[1]; y++) {
 			size_t row_pitch_index = y * row_pitch;
 			g_memmove(
-				ptr + slice_pitch_index + row_pitch_index,
-				image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
+				((cl_uchar*)ptr) + slice_pitch_index + row_pitch_index,
+				((cl_uchar*)image->mem) + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
 				region[0] * image->image_elem_size);
 		}
 	}
@@ -369,8 +370,8 @@ clEnqueueWriteImage(cl_command_queue command_queue, cl_mem image,
 		for (size_t y = 0; y < region[1]; y++) {
 			size_t row_pitch_index = y * input_row_pitch;
 			g_memmove(
-				image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
-				ptr + slice_pitch_index + row_pitch_index,
+				((cl_uchar*)image->mem) + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
+				((cl_uchar*)ptr) + slice_pitch_index + row_pitch_index,
 				region[0] * image->image_elem_size);
 		}
 	}
@@ -425,8 +426,8 @@ clEnqueueCopyImage(cl_command_queue command_queue, cl_mem src_image,
 	for (size_t z = 0; z < region[2]; z++) {
 		for (size_t y = 0; y < region[1]; y++) {
 			g_memmove(
-				dst_image->mem + ((z + dst_origin[2]) * dst_w * dst_h + (y + dst_origin[1]) * dst_w + dst_origin[0]) * dst_image->image_elem_size,
-				src_image->mem + ((z + src_origin[2]) * src_w * src_h + (y + src_origin[1]) * src_w + src_origin[0]) * src_image->image_elem_size,
+				((cl_uchar*)dst_image->mem) + ((z + dst_origin[2]) * dst_w * dst_h + (y + dst_origin[1]) * dst_w + dst_origin[0]) * dst_image->image_elem_size,
+				((cl_uchar*)src_image->mem) + ((z + src_origin[2]) * src_w * src_h + (y + src_origin[1]) * src_w + src_origin[0]) * src_image->image_elem_size,
 				region[0] * dst_image->image_elem_size);
 		}
 	}
@@ -701,8 +702,8 @@ clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer,
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_FILL_BUFFER);
 
 	/* Fill buffer. */
-	for (guint i = 0; i < size; i += pattern_size) {
-		g_memmove(buffer->mem + offset + i, pattern, pattern_size);
+	for (guint i = 0; i < size; i += (guint) pattern_size) {
+		g_memmove(((cl_uchar*)buffer->mem) + offset + i, pattern, pattern_size);
 	}
 
 	/* All good. */
@@ -767,16 +768,16 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 		g_memmove(final_color, fill_color, 16);
 	} else if (image->image_elem_size == 8) {
 		/* 8 bytes, 2 bytes (16 bits) per component. */
-		g_memmove(final_color, fill_color + 0, 2);
-		g_memmove(final_color + 2, fill_color + 4, 2);
-		g_memmove(final_color + 4, fill_color + 8, 2);
-		g_memmove(final_color + 6, fill_color + 12, 2);
+		g_memmove(((cl_uchar*)final_color), ((cl_uchar*)fill_color) + 0, 2);
+		g_memmove(((cl_uchar*)final_color) + 2, ((cl_uchar*)fill_color) + 4, 2);
+		g_memmove(((cl_uchar*)final_color) + 4, ((cl_uchar*)fill_color) + 8, 2);
+		g_memmove(((cl_uchar*)final_color) + 6, ((cl_uchar*)fill_color) + 12, 2);
 	} else if (image->image_elem_size == 4) {
 		/* 4 bytes, 1 byte (8 bits) per component. */
-		g_memmove(final_color, fill_color + 0, 1);
-		g_memmove(final_color + 1, fill_color + 4, 1);
-		g_memmove(final_color + 2, fill_color + 8, 1);
-		g_memmove(final_color + 3, fill_color + 12, 1);
+		g_memmove(((cl_uchar*)final_color), ((cl_uchar*)fill_color) + 0, 1);
+		g_memmove(((cl_uchar*)final_color) + 1, ((cl_uchar*)fill_color) + 4, 1);
+		g_memmove(((cl_uchar*)final_color) + 2, ((cl_uchar*)fill_color) + 8, 1);
+		g_memmove(((cl_uchar*)final_color) + 3, ((cl_uchar*)fill_color) + 12, 1);
 	} else {
 		/* Others are unsupported. */
 		g_assert_not_reached();
@@ -798,7 +799,7 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 		for (size_t y = 0; y < region[1]; y++) {
 			for (size_t x = 0; x < region[0]; x++) {
 				g_memmove(
-					image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + (x + origin[0])) * image->image_elem_size,
+					((cl_uchar*)image->mem) + ((z + origin[2]) * w * h + (y + origin[1]) * w + (x + origin[0])) * image->image_elem_size,
 					final_color,
 					image->image_elem_size);
 			}

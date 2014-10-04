@@ -327,7 +327,7 @@ CCLContext* ccl_context_new_from_devices_full(
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	/* Array of unwrapped devices. */
-	cl_device_id cl_devices[num_devices];
+	cl_device_id* cl_devices = NULL;
 	/* Context properties, in case the properties parameter is NULL. */
 	cl_context_properties* ctx_props = NULL;
 	/* Return status of OpenCL function calls. */
@@ -338,6 +338,9 @@ CCLContext* ccl_context_new_from_devices_full(
 	CCLContext* ctx = NULL;
 	/* Error reporting object. */
 	GError* err_internal = NULL;
+
+	/* Allocate memory for devices. */
+	cl_devices = (cl_device_id*) g_slice_alloc(sizeof(cl_device_id) * num_devices);
 
 	/* Unwrap devices. */
 	for (guint i = 0; i < num_devices; i++)
@@ -376,6 +379,7 @@ finish:
 
 	/* Free stuff. */
 	ccl_context_properties_default_free(properties, ctx_props);
+	g_slice_free1(sizeof(cl_device_id) * num_devices, cl_devices);
 
 	/* Return result of function call. */
 	return ctx;

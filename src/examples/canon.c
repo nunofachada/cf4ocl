@@ -73,9 +73,9 @@ int main(int argc, char** argv) {
 	size_t lws;
 
 	/* Host buffers. */
-	cl_uint a_host[buf_n];
-	cl_uint b_host[buf_n];
-	cl_uint c_host[buf_n];
+	cl_uint* a_host = NULL;
+	cl_uint* b_host = NULL;
+	cl_uint* c_host = NULL;
 	cl_uint d_host;
 
 	/* Error reporting object. */
@@ -116,6 +116,11 @@ int main(int argc, char** argv) {
 	printf(" * Global worksize: %d\n", (int) gws);
 	printf(" * Local worksize : %d\n", (int) lws);
 	printf("\n");
+
+	/* Initialize host buffers. */
+	a_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
+	b_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
+	c_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
 
 	/* Fill host buffers. */
 	for (cl_uint i = 0; i < buf_n; ++i) {
@@ -197,8 +202,14 @@ int main(int argc, char** argv) {
 	/* Export profiling info. */
 	ccl_prof_export_info_file(prof, "out.tsv", &err);
 	HANDLE_ERROR(err);
+
 	/* Destroy profiler object. */
 	ccl_prof_destroy(prof);
+
+	/* Destroy host buffers. */
+	free(a_host);
+	free(b_host);
+	free(c_host);
 
 	/* Destroy wrappers. */
 	ccl_buffer_destroy(a_dev);
