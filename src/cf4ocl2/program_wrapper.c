@@ -1183,9 +1183,9 @@ CCL_EXPORT
 cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err) {
 
 	/* Make sure number prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, 0.0);
+	g_return_val_if_fail(prg != NULL, 0);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
 	cl_context context;
 	CCLContext* ctx;

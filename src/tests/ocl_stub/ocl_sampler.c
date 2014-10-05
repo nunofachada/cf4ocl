@@ -51,11 +51,11 @@ clCreateSamplerWithProperties(cl_context context,
 			sp_value = sampler_properties[i];
 			switch (sp_key) {
 				case CL_SAMPLER_NORMALIZED_COORDS:
-					sampler->normalized_coords = sp_value; break;
+					sampler->normalized_coords = (cl_bool) sp_value; break;
 				case CL_SAMPLER_ADDRESSING_MODE:
-					sampler->addressing_mode = sp_value; break;
+					sampler->addressing_mode = (cl_addressing_mode) sp_value; break;
 				case CL_SAMPLER_FILTER_MODE:
-					sampler->filter_mode = sp_value; break;
+					sampler->filter_mode = (cl_filter_mode) sp_value; break;
 				default:
 					seterrcode(errcode_ret, CL_INVALID_VALUE);
 					clReleaseSampler(sampler);

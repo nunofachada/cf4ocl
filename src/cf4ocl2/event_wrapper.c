@@ -369,9 +369,9 @@ CCL_EXPORT
 cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err) {
 
 	/* Make sure number evt is not NULL. */
-	g_return_val_if_fail(evt != NULL, 0.0);
+	g_return_val_if_fail(evt != NULL, 0);
 	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0.0);
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
 	/* OpenCL version. */
 	cl_uint ocl_ver;

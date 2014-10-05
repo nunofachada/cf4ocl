@@ -62,7 +62,7 @@ static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Determine number of devices. */
-	devcon->num_devices = info_devs->size / sizeof(cl_device_id);
+	devcon->num_devices = (cl_uint) (info_devs->size / sizeof(cl_device_id));
 
 	/* Allocate memory for array of device wrapper objects. */
 	devcon->devices = g_slice_alloc(

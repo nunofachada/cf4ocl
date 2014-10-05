@@ -59,7 +59,7 @@ clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 		memobj->offset = 0;
 		memobj->callbacks = NULL;
 		if (flags & CL_MEM_COPY_HOST_PTR) {
-			memobj->mem = g_memdup(host_ptr, size);
+			memobj->mem = g_memdup(host_ptr, (guint) size);
 		} else if (flags & CL_MEM_USE_HOST_PTR) {
 			memobj->mem = host_ptr;
 		} else {

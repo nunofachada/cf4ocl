@@ -99,13 +99,13 @@ static struct ccl_sampler_basic_properties
 			/* Check if property is a basic known property. */
 			switch (sampler_properties[i]) {
 				case CL_SAMPLER_NORMALIZED_COORDS:
-					sbp.normalized_coords = sampler_properties[i + 1];
+					sbp.normalized_coords = (cl_bool) sampler_properties[i + 1];
 					break;
 				case CL_SAMPLER_ADDRESSING_MODE:
-					sbp.addressing_mode = sampler_properties[i + 1];
+					sbp.addressing_mode = (cl_addressing_mode) sampler_properties[i + 1];
 					break;
 				case CL_SAMPLER_FILTER_MODE:
-					sbp.filter_mode = sampler_properties[i + 1];
+					sbp.filter_mode = (cl_filter_mode) sampler_properties[i + 1];
 					break;
 			}
 			/* Skip to next property. */
