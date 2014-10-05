@@ -1855,7 +1855,7 @@ cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
 	while ((curr_ev = ccl_prof_iter_info_next(prof)) != NULL) {
 
 		/* Write to stream. */
-		write_status = g_fprintf(stream, "%s%s%s%s%lu%s%lu%s%s%s%s%s",
+		write_status = fprintf(stream, "%s%s%s%s%lu%s%lu%s%s%s%s%s",
 			export_options.queue_delim,
 			curr_ev->queue_name,
 			export_options.queue_delim,
