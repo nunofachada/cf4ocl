@@ -25,10 +25,10 @@ if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
 	# Clang and GCC flags
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
-	# Search for glib if using clang or GCC
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
-elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+endif()
+
+# Visual studio hacks
+if(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 	# PkgConfig doesnt work well with Visual Studio, so make user
 	# specify location of GLib stuff
 	find_library(GLIB_LIBRARIES glib-2.0)
@@ -39,6 +39,10 @@ elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 	add_definitions("-Dinline=__inline")
 	# And this avoids some warnings
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+else()
+	# Search for glib with pkg-config if not using Visual Studio
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 endif()
 
 # Find required libraries
