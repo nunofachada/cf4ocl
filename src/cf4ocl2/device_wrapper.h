@@ -71,11 +71,11 @@
 
 /* Decrements the reference count of the device wrapper object.
  * If it reaches 0, the device wrapper object is destroyed. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_device_destroy(CCLDevice* dev);
 
 /* Get the device wrapper for the given OpenCL device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 /**

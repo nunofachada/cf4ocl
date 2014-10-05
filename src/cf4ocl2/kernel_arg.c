@@ -58,7 +58,7 @@ static char arg_local_marker;
  * @param[in] size Argument size.
  * @return A new kernel argument.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLArg* ccl_arg_new(void* value, size_t size) {
 
 	/* Make sure size is > 0. */
@@ -82,7 +82,7 @@ CCLArg* ccl_arg_new(void* value, size_t size) {
  *
  * @param[in] arg Argument to destroy.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_arg_destroy(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
@@ -103,7 +103,7 @@ void ccl_arg_destroy(CCLArg* arg) {
  * @param[in] arg Argument to get size of.
  * @return Argument size in bytes.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 size_t ccl_arg_size(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
@@ -123,7 +123,7 @@ size_t ccl_arg_size(CCLArg* arg) {
  * @param[in] arg Argument to get value of.
  * @return Argument value.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void* ccl_arg_value(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */

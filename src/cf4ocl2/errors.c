@@ -114,7 +114,7 @@ static const int ccl_errors_count = 71;
  * @param[in] code OpenCL error code.
  * @return A readable string.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_err(int code) {
 	int index = -1 * code;
 	return (index >= 0) || (index < ccl_errors_count)

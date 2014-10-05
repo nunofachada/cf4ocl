@@ -111,42 +111,42 @@
  */
 
 /* Get the kernel wrapper for the given OpenCL kernel. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 
 /* Create a new kernel wrapper object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err);
 
 /* Decrements the reference count of the kernel wrapper object.
  * If it reaches 0, the kernel wrapper object is destroyed. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_destroy(CCLKernel* krnl);
 
 /* Set one kernel argument. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg);
 
 /* Set all kernel arguments. This function accepts a variable list of
  * arguments which must end with `NULL`. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_set_args(CCLKernel* krnl, ...) G_GNUC_NULL_TERMINATED;
 
 /* Set all kernel arguments. This function accepts a `NULL`-terminated
  * array of kernel arguments. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_set_args_v(CCLKernel* krnl, void** args);
 
 /* Enqueues a kernel for execution on a device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
 /* Set kernel arguments and enqueue it for execution. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
@@ -154,7 +154,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl,
 	G_GNUC_NULL_TERMINATED;
 
 /* Set kernel arguments and enqueue it for execution. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
@@ -162,12 +162,12 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 
 /* Get the OpenCL version of the platform associated with this
  * kernel. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
 
 /* Suggest appropriate global and local worksizes for the given real
  * work size, based on device and kernel characteristics. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
 	GError** err);
@@ -312,7 +312,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 #ifdef CL_VERSION_1_2
 
 /* Get a ::CCLWrapperInfo kernel argument information object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	cl_kernel_arg_info param_name, GError** err);
 

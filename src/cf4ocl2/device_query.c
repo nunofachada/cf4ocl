@@ -89,15 +89,15 @@ static char* ccl_devquery_format_sizet(CCLWrapperInfo* info,
  * */
 #define ccl_devquery_format_bytes(spec) \
 	if (bytes < 1024) \
-		g_snprintf(out, size, "%" spec " bytes", bytes); \
+		g_snprintf(out, (gulong) size, "%" spec " bytes", bytes); \
 	else if (bytes < 1048576) \
-		g_snprintf(out, size, "%.1lf KiB (%" spec " bytes)", \
+		g_snprintf(out, (gulong) size, "%.1lf KiB (%" spec " bytes)", \
 			bytes / 1024.0, bytes); \
 	else if (bytes < 1073741824) \
-		g_snprintf(out, size, "%.1lf MiB (%" spec " bytes)", \
+		g_snprintf(out, (gulong) size, "%.1lf MiB (%" spec " bytes)", \
 			bytes / (1024.0 * 1024), bytes); \
 	else \
-		g_snprintf(out, size, "%.1lf GiB (%" spec " bytes)", \
+		g_snprintf(out, (gulong) size, "%.1lf GiB (%" spec " bytes)", \
 			bytes / (1024.0 * 1024 * 1024), bytes);
 
 /**
@@ -156,7 +156,7 @@ static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	GString* str = g_string_new("(");
 	size_t* vec = (size_t*) info->value;
-	guint count = info->size / sizeof(gsize);
+	guint count = (guint) (info->size / sizeof(gsize));
 
 	for (guint i = 0; i < count; i++) {
 		if (i > 0) g_string_append(str, ", ");
@@ -165,7 +165,7 @@ static char* ccl_devquery_format_sizetvec(CCLWrapperInfo* info,
 
 	g_string_append(str, ")");
 
-	g_snprintf(out, size, "%s", str->str);
+	g_snprintf(out, (gulong) size, "%s", str->str);
 	g_string_free(str, TRUE);
 	return out;
 }
@@ -179,7 +179,7 @@ static char* ccl_devquery_format_yesno(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
 	CCL_UNUSED(units);
-	g_snprintf(out, size, "%s", *((cl_bool*) info->value) ? "Yes" : "No");
+	g_snprintf(out, (gulong) size, "%s", *((cl_bool*)info->value) ? "Yes" : "No");
 	return out;
 
 }
@@ -192,7 +192,7 @@ static char* ccl_devquery_format_yesno(CCLWrapperInfo* info,
 static char* ccl_devquery_format_char(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	g_snprintf(out, size, "%s %s", (gchar*) info->value, units);
+	g_snprintf(out, (gulong) size, "%s %s", (gchar*)info->value, units);
 	return out;
 
 }
@@ -206,7 +206,7 @@ static char* ccl_devquery_format_ptr(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
 	CCL_UNUSED(units);
-	g_snprintf(out, size, "%p", *((void**) info->value));
+	g_snprintf(out, (gulong) size, "%p", *((void**)info->value));
 	return out;
 
 }
@@ -220,7 +220,7 @@ static char* ccl_devquery_format_type(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
 	CCL_UNUSED(units);
-	g_snprintf(out, size, "%s",
+	g_snprintf(out, (gulong) size, "%s",
 		ccl_devquery_type2str(*((cl_device_type*) info->value)));
 	return out;
 
@@ -236,7 +236,7 @@ static char* ccl_devquery_format_fpconfig(CCLWrapperInfo* info,
 
 	CCL_UNUSED(units);
 	cl_device_fp_config fpc = *((cl_device_fp_config*) info->value);
-	g_snprintf(out, size, "%s%s%s%s%s%s%s",
+	g_snprintf(out, (gulong) size, "%s%s%s%s%s%s%s",
 		fpc & CL_FP_DENORM ? "DENORM " : "",
 		fpc & CL_FP_INF_NAN  ? "INF_NAN " : "",
 		fpc & CL_FP_ROUND_TO_NEAREST ? "ROUND_TO_NEAREST " : "",
@@ -259,7 +259,7 @@ static char* ccl_devquery_format_execcap(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_exec_capabilities exc =
 		*((cl_device_exec_capabilities*) info->value);
-	g_snprintf(out, size, "%s%s",
+	g_snprintf(out, (gulong) size, "%s%s",
 		exc & CL_EXEC_KERNEL ? "KERNEL " : "",
 		exc & CL_EXEC_NATIVE_KERNEL ? "NATIVE_KERNEL " : "");
 	return out;
@@ -275,7 +275,7 @@ static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_local_mem_type lmt =
 		*((cl_device_local_mem_type*) info->value);
-	g_snprintf(out, size, "%s%s%s",
+	g_snprintf(out, (gulong) size, "%s%s%s",
 		lmt & CL_LOCAL ? "LOCAL" : "",
 		lmt & CL_GLOBAL ? "GLOBAL" : "",
 		lmt & CL_NONE ? "NONE" : "");
@@ -294,7 +294,7 @@ static char* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 	cl_device_partition_property* pp =
 		(cl_device_partition_property*) info->value;
 	GString* str = g_string_new("");
-	guint count = info->size / sizeof(cl_device_partition_property);
+	guint count = (guint) (info->size / sizeof(cl_device_partition_property));
 	for (guint i = 0; i < count; i++) {
 		switch (pp[i]) {
 			case CL_DEVICE_PARTITION_EQUALLY:
@@ -323,7 +323,7 @@ static char* ccl_devquery_format_partprop(CCLWrapperInfo* info,
 					(unsigned long) pp[i]);
 		}
 	}
-	g_snprintf(out, size, "%s", str->str);
+	g_snprintf(out, (gulong) size, "%s", str->str);
 	g_string_free(str, TRUE);
 	return out;
 
@@ -341,7 +341,7 @@ static char* ccl_devquery_format_affdom(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_affinity_domain ad =
 		*((cl_device_affinity_domain*) info->value);
-	g_snprintf(out, size, "%s%s%s%s%s%s",
+	g_snprintf(out, (gulong) size, "%s%s%s%s%s%s",
 		ad & CL_DEVICE_AFFINITY_DOMAIN_NUMA ? "NUMA " : "",
 		ad & CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE ? "L4_CACHE " : "",
 		ad & CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE ? "L3_CACHE " : "",
@@ -366,7 +366,7 @@ static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info,
 	cl_device_partition_property_ext* ade =
 		(cl_device_partition_property_ext*) info->value;
 	GString* str = g_string_new("");
-	guint count = info->size / sizeof(cl_device_partition_property_ext);
+	guint count = (guint) (info->size / sizeof(cl_device_partition_property_ext));
 	for (guint i = 0; i < count; i++) {
 		switch (ade[i]) {
 			case CL_AFFINITY_DOMAIN_L1_CACHE_EXT:
@@ -394,7 +394,7 @@ static char* ccl_devquery_format_affdom_ext(CCLWrapperInfo* info,
 					(unsigned long) ade[i]);
 		}
 	}
-	g_snprintf(out, size, "%s", str->str);
+	g_snprintf(out, (gulong) size, "%s", str->str);
 	g_string_free(str, TRUE);
 	return out;
 
@@ -411,7 +411,7 @@ static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_mem_cache_type mct =
 		*((cl_device_mem_cache_type*) info->value);
-	g_snprintf(out, size, "%s%s%s",
+	g_snprintf(out, (gulong) size, "%s%s%s",
 		mct & CL_READ_ONLY_CACHE ? "READ_ONLY" : "",
 		mct & CL_READ_WRITE_CACHE ? "READ_WRITE" : "",
 		mct & CL_NONE ? "NONE" : "");
@@ -429,7 +429,7 @@ static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_command_queue_properties qp =
 		*((cl_command_queue_properties*) info->value);
-	g_snprintf(out, size, "%s%s",
+	g_snprintf(out, (gulong) size, "%s%s",
 		qp & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ? "OUT_OF_ORDER_EXEC_MODE_ENABLE " : "",
 		qp & CL_QUEUE_PROFILING_ENABLE ? "PROFILING_ENABLE " : "");
 	return out;
@@ -448,7 +448,7 @@ static char* ccl_devquery_format_svmc(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_svm_capabilities svmc =
 		*((cl_device_svm_capabilities*) info->value);
-	g_snprintf(out, size, "%s%s%s%s",
+	g_snprintf(out, (gulong) size, "%s%s%s%s",
 		svmc & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER ? "COARSE_GRAIN_BUFFER " : "",
 		svmc & CL_DEVICE_SVM_FINE_GRAIN_BUFFER ? "FINE_GRAIN_BUFFER " : "",
 		svmc & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM ? "FINE_GRAIN_SYSTEM " : "",
@@ -470,13 +470,13 @@ static char* ccl_devquery_format_svmc(CCLWrapperInfo* info,
 //~ }
 
 /* Size of parameter information map. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const int ccl_devquery_info_map_size = 123;
 
 /* Map of parameter name strings to respective cl_device_info
  * bitfields, long description string, format output function and a
  * units suffix. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLDevQueryMap ccl_devquery_info_map[] = {
 
 	{"ADDRESS_BITS", CL_DEVICE_ADDRESS_BITS,
@@ -922,7 +922,7 @@ static int ccl_devquery_get_index(const char* name) {
  * kept in the ::ccl_devquery_info_map, or `NULL` if given prefix is not
  * valid. Should be freed with g_free() function from GLib.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 gchar* ccl_devquery_get_prefix_final(const char* prefix) {
 
 	/* Make sure prefix is not NULL. */
@@ -968,7 +968,7 @@ gchar* ccl_devquery_get_prefix_final(const char* prefix) {
  * @return A `cl_device_info` object given its name or 0 if no suitable
  * `cl_device_info` is found for the given name.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_device_info ccl_devquery_name(const char* name) {
 
 	/* Make sure name is not NULL. */
@@ -1010,7 +1010,7 @@ cl_device_info ccl_devquery_name(const char* name) {
  * @return pointer to the first device information parameter which
  * has the given prefix or `NULL` if nothing found.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLDevQueryMap* ccl_devquery_prefix(
 	const char* prefix, int* size) {
 
@@ -1034,7 +1034,7 @@ const CCLDevQueryMap* ccl_devquery_prefix(
 	prefix_final = ccl_devquery_get_prefix_final(prefix);
 
 	/* Determine prefix size. */
-	len_prefix_final = strlen(prefix_final);
+	len_prefix_final = (gint) strlen(prefix_final);
 
 	/* Binary search. */
 	idx_middle = ccl_devquery_get_index(prefix_final);
@@ -1098,7 +1098,7 @@ const CCLDevQueryMap* ccl_devquery_prefix(
  * the function updates within calls.
  * @return A matching ::CCLDevQueryMap*, or `NULL` if search is over.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx) {
 
 	/* Make sure substr is not NULL. */

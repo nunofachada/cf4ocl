@@ -34,7 +34,7 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include "oclversions.h"
-#include "cf4ocl2_export.h"
+#include "ccl_export.h"
 
 #define CCL_VERSION_MAJOR @cf4ocl2_VERSION_MAJOR@
 #define CCL_VERSION_MINOR @cf4ocl2_VERSION_MINOR@
@@ -228,17 +228,17 @@ typedef enum ccl_error_code {
 #define CCL_OCL_ERROR ccl_ocl_error_quark()
 
 /* Print executable version. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_common_version_print(const char* exec_name);
 
 /* Resolves to error category identifying string, in this case
  * an error in _cf4ocl_. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 GQuark ccl_error_quark(void);
 
 /* Resolves to error category identifying string, in this case
  * an error in the OpenCL library. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 GQuark ccl_ocl_error_quark(void);
 
 #endif

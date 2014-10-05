@@ -159,27 +159,27 @@ typedef GPtrArray* CCLDevSelFilters;
 
 /* Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the system. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 gchar** ccl_devsel_get_device_strings(GError** err);
 
 /* Print to stdout a device description string for each device
  * in the system. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_devsel_print_device_strings(GError** err);
 
 /* Add a independent device filter to the filter set. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_devsel_add_indep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_indep filter, void* data);
 
 /* Add a dependent device filter to the filter set. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_devsel_add_dep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_dep filter, void* data);
 
 /* Select one or more OpenCL devices based on the provided
  * filters.  */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevSelDevices ccl_devsel_select(
 	CCLDevSelFilters* filters, GError **err);
 
@@ -204,35 +204,35 @@ CCLDevSelDevices ccl_devsel_select(
 
 /* Independent filter function which accepts devices of the type
  * given in the data parameter. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_devsel_indep_type(
 	CCLDevice* device, void* data, GError **err);
 
 /* Independent filter function which only accepts GPU devices. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_devsel_indep_type_gpu(
 	CCLDevice* device, void *data, GError **err);
 
 /* Independent filter function which only accepts CPU devices. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_devsel_indep_type_cpu(
 	CCLDevice* device, void *data, GError **err);
 
 /* Independent filter function which only accepts accelerator
  * devices. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_devsel_indep_type_accel(
 	CCLDevice* device, void *data, GError **err);
 
 /* Independent filter which selects devices based on device
  * name, device vendor and/or platform name. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_devsel_indep_string(
 	CCLDevice* dev, void *data, GError **err);
 
 /* Independent filter function which only accepts devices of a
  * specified platform. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_devsel_indep_platform(
 	CCLDevice* device, void *data, GError **err);
 
@@ -260,13 +260,13 @@ cl_bool ccl_devsel_indep_platform(
 
 /* Dependent filter function which only accepts devices of the
  * same platform (the platform to which the first device belong to). */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevSelDevices ccl_devsel_dep_platform(
 	CCLDevSelDevices devices, void *data, GError **err);
 
 /* Dependent filter function which presents a menu to the user
  * allowing him to select the desired device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevSelDevices ccl_devsel_dep_menu(
 	CCLDevSelDevices devices, void *data, GError **err);
 

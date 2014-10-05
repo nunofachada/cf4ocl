@@ -207,12 +207,12 @@ typedef void (CL_CALLBACK* ccl_program_callback)(
 /* *********** */
 
 /* Get the program wrapper for the given OpenCL program. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_wrap(cl_program program);
 
 /* Decrements the reference count of the program wrapper object.
  * If it reaches 0, the program wrapper object is destroyed. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_program_destroy(CCLProgram* prg);
 
 /* *********************** */
@@ -220,24 +220,24 @@ void ccl_program_destroy(CCLProgram* prg);
 /* *********************** */
 
 /* Create a new program wrapper object from a source file. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
 	const char* filename, GError** err);
 
 /* Create a new program wrapper object from several source files. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 	cl_uint count, const char** filenames, GError** err);
 
 /* Create a new program wrapper object from a null-terminated source
  * string. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
 	const char* string, GError** err);
 
 /* Create a new program wrapper object from several source code
  * strings. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	cl_uint count, const char** strings, const size_t* lengths,
 	GError** err);
@@ -248,28 +248,28 @@ CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 
 /* Create a new program wrapper object with binary code from a specific
  * device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
 	CCLDevice* dev, const char* filename, cl_int *binary_status,
 	GError** err);
 
 /* Create a new program wrapper object from files containing binary
  * code executable on the given device list, one file per device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char** filenames,
 	cl_int *binary_status, GError** err);
 
 /* Create a new program wrapper object from binary code executable on a
  * specific device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
 	CCLProgramBinary* binary, cl_int *binary_status, GError** err);
 
 /* Create a new program wrapper object from a list of binary code
  * strings executable on the given device list, one binary string per
  * device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, CCLProgramBinary** bins,
 	cl_int *binary_status, GError** err);
@@ -281,7 +281,7 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 #ifdef CL_VERSION_1_2
 
 /* Create a new program wrapper object from device built-in kernels. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
 	GError** err);
@@ -294,33 +294,33 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 
 /* Utility function which builds (compiles and links) a program
  * executable from the program source or binary. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_program_build(
 	CCLProgram* prg, const char* options, GError** err);
 
 /* Builds (compiles and links) a program executable from the program
  * source or binary. This function wraps the clBuildProgram() OpenCL
  * function. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_program_build_full(CCLProgram* prg,
 	cl_uint num_devices, CCLDevice* const* devs, const char* options,
 	ccl_program_callback pfn_notify, void* user_data, GError** err);
 
 /* Get build log for most recent build, compile or link. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_program_get_build_log(CCLProgram* prg);
 
 #ifdef CL_VERSION_1_2
 
 /* Compile a program's source code. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_headers,
 	CCLProgram** prg_input_headers, const char** header_include_names,
 	ccl_program_callback pfn_notify, void* user_data, GError** err);
 
 /* Link a set of compiled programs. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
 	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
@@ -334,7 +334,7 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 
 /* Get the OpenCL version of the platform associated with this
  * program. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err);
 
 /* ******************************* */
@@ -343,12 +343,12 @@ cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err);
 
 /* Get the kernel wrapper object for the given program kernel
  * function. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLKernel* ccl_program_get_kernel(
 	CCLProgram* prg, const char* kernel_name, GError** err);
 
 /* Enqueues a program kernel function for execution on a device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
 	const size_t* global_work_offset, const size_t* global_work_size,
@@ -356,7 +356,7 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 	GError** err, ...) G_GNUC_NULL_TERMINATED;
 
 /* Enqueues a program kernel function for execution on a device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
 	const size_t* global_work_offset, const size_t* global_work_size,
@@ -368,18 +368,18 @@ CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
 /* ************************* */
 
 /* Get the program's binary object for the the specified device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProgramBinary* ccl_program_get_binary(
 	CCLProgram* prg, CCLDevice* dev, GError** err);
 
 /* Save the program's binary code for a specified device to a file. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	const char* filename, GError** err);
 
 /* Save the program binaries for all associated devices to files, one
  * file per device. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	const char* file_prefix, const char* file_suffix, GError** err);
 
@@ -388,16 +388,16 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 /* ***************************************** */
 
 /* Get ::CCLDevice wrapper at given index. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_program_get_device(
 	CCLProgram* prg, cl_uint index, GError** err);
 
 /* Return number of devices in program. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err);
 
 /* Get all device wrappers in program. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	GError** err);
 

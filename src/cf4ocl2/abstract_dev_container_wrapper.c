@@ -99,7 +99,7 @@ finish:
  *
  * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 
 	/* Make sure devcon wrapper object is not NULL. */
@@ -135,7 +135,7 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
  * @return All ::CCLDevice wrappers in device container or NULL if an
  * error occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err) {
@@ -174,7 +174,7 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_dev_container_get_device(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, cl_uint index,
@@ -241,7 +241,7 @@ finish:
  * @return The number of devices in device container or 0 if an error
  * occurs or is otherwise not possible to get any device.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_dev_container_get_num_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err) {

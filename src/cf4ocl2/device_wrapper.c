@@ -70,7 +70,7 @@ struct ccl_device {
  * @param[in] device The OpenCL device to be wrapped.
  * @return The device wrapper for the given OpenCL device.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_device_new_wrap(cl_device_id device) {
 
 	return (CCLDevice*) ccl_wrapper_new(
@@ -86,7 +86,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device) {
  *
  * @param[in] dev The device wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_device_destroy(CCLDevice* dev) {
 
 	ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),

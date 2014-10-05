@@ -93,49 +93,49 @@ typedef void (CL_CALLBACK *ccl_event_callback)(cl_event event,
 	cl_int event_command_exec_status, void *user_data);
 
 /* Get the event wrapper for the given OpenCL event. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_event_new_wrap(cl_event event);
 
 /* Decrements the reference count of the event wrapper object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_destroy(CCLEvent* evt);
 
 /* Set event name for profiling purposes. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_set_name(CCLEvent* evt, const char* name);
 
 /* Get the event name for profiling purposes. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_event_get_name(CCLEvent* evt);
 
 /* Get the final event name for profiling purposes. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_event_get_final_name(CCLEvent* evt);
 
 /* Get the command type which fired the given event. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_command_type ccl_event_get_command_type(
 	CCLEvent* evt, GError** err);
 
 /* Get the OpenCL version of the platform associated with this event
  * object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err);
 
 #ifdef CL_VERSION_1_1
 
 /* Wrapper for OpenCL clSetEventCallback() function. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
 	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
 	void *user_data, GError** err);
 
 /* Create a new user event. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err);
 
 /* Sets the execution status of a user event object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_user_event_set_status(
 	CCLEvent* evt, cl_int execution_status, GError** err);
 
@@ -319,17 +319,17 @@ typedef GPtrArray* CCLEventWaitList;
 
 /* Add event wrapper objects to an event wait list (variable argument
  * list version). */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_wait_list_add(
 	CCLEventWaitList* evt_wait_lst, ...) G_GNUC_NULL_TERMINATED;
 
 /* Add event wrapper objects to an event wait list (array version). */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_wait_list_add_v(
 	CCLEventWaitList* evt_wait_lst, CCLEvent** evt);
 
 /* Clears an event wait list. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 /**
@@ -366,7 +366,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 
 /* Waits on the host thread for commands identified by events in the
  * wait list to complete. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
 
 /** @} */

@@ -107,20 +107,20 @@
  */
 
 /* Get the platform wrapper for the given OpenCL platform. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 
 /* Get the platform wrapper for the given device wrapper. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err);
 
 /* Decrements the reference count of the platform wrapper
  * object. If it reaches 0, the platform wrapper object is destroyed. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_platform_destroy(CCLPlatform* platf);
 
 /* Get integer OpenCL version of platform. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_platform_get_opencl_version(
 	CCLPlatform* platf, GError** err);
 
@@ -223,17 +223,17 @@ cl_uint ccl_platform_get_opencl_version(
 	((cl_platform_id) ccl_wrapper_unwrap((CCLWrapper*) platform))
 
 /* Get all device wrappers in platform. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* const* ccl_platform_get_all_devices(
 	CCLPlatform* platf, GError** err);
 
 /* Get ::CCLDevice wrapper at given index. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_platform_get_device(
 	CCLPlatform* platf, cl_uint index, GError** err);
 
 /* Return number of devices in platform. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err);
 
 /** @} */

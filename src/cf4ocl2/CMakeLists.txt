@@ -12,7 +12,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.in.h
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
-generate_export_header(${PROJECT_NAME})
+generate_export_header(${PROJECT_NAME} BASE_NAME ccl)
 
 # This is required for Windows compilation
 target_link_libraries(${PROJECT_NAME}
@@ -40,5 +40,5 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 
 # Install the common header and the export header
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/common.h
-	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}${PROJECT_NAME}_export.h
+	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}/ccl_export.h
 	DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME})

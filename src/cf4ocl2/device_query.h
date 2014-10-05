@@ -97,32 +97,32 @@ typedef struct ccl_devquery_map {
 } CCLDevQueryMap;
 
 /** Size of parameter information map. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 extern const int ccl_devquery_info_map_size;
 
 /** Map of parameter name strings to respective cl_device_info
  * bitfields, long description string, format output function and a
  * units suffix. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 extern const CCLDevQueryMap ccl_devquery_info_map[];
 
 /* Get a final device info prefix in the same format as
  * kept in the ccl_devquery_info_map. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 gchar* ccl_devquery_get_prefix_final(const char* prefix);
 
 /* Return a cl_device_info object given its name. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_device_info ccl_devquery_name(const char* name);
 
 /* Get a list of device information parameters which have the
  * given prefix. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLDevQueryMap* ccl_devquery_prefix(const char* prefix, int* size);
 
 /* Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx);
 
 /**

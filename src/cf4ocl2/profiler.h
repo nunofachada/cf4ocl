@@ -484,118 +484,118 @@ typedef struct ccl_prof_export_options {
 }  CCLProfExportOptions;
 
 /* Create a new profile object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProf* ccl_prof_new();
 
 /* Destroy a profile object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_destroy(CCLProf* prof);
 
 /* Starts the global profiler timer. Only required if client
 * wishes to compare the effectively ellapsed time with the OpenCL
 * kernels time. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_start(CCLProf* prof);
 
 /* Stops the global profiler timer. Only required if
  * ccl_prof_start() was called. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_stop(CCLProf* prof);
 
 /* If profiling has started but not stopped, returns the time
  * since the profiling started. If profiling has been stopped, returns
  * the elapsed time between the time it started and the time it stopped. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 double ccl_prof_time_elapsed(CCLProf* prof);
 
 /* Add a command queue wrapper for profiling. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_add_queue(
 	CCLProf* prof, const char* cq_name, CCLQueue* cq);
 
 /* Determine aggregate statistics for the given profile object. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
 
 /* Return aggregate statistics for events with the given name. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLProfAgg* ccl_prof_get_agg(
 	CCLProf* prof, const char* event_name);
 
 /* Initialize an iterator for profiled aggregate event
  * instances. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort);
 
 /* Return the next profiled aggregate event instance. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof);
 
 /* Initialize an iterator for event profiling info instances. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_iter_info_init(CCLProf* prof, int sort);
 
 /* Return the next event profiling info instance. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof);
 
 /* Initialize an iterator for event instant instances. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort);
 
 /* Return the next event instant instance. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof);
 
 /* Initialize an iterator for overlap instances. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort);
 
 /* Return the next overlap instance. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof);
 
 /* Get duration of all events in nanoseconds. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_ulong ccl_prof_get_duration(CCLProf* prof);
 
 /* Get effective duration of all events in nanoseconds, i.e. the
  * duration of all events minus event overlaps. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_ulong ccl_prof_get_eff_duration(CCLProf* prof);
 
 /* Print a summary of the profiling info. More specifically,
  * this function prints a table of aggregate event statistics (sorted
  * by absolute time), and a table of event overlaps (sorted by overlap
  * duration). */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_print_summary(CCLProf* prof);
 
 /* Get a summary with the profiling info. More specifically,
  * this function returns a string containing a table of aggregate event
  * statistics and a table of event overlaps. The order of the returned
  * information can be specified in the function arguments. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort);
 
 /* Export profiling info to a given stream. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, GError** err);
 
 /* Helper function which exports profiling info to a given file,
  * automatically opening and closing the file. Check the
  * ccl_prof_export_info() for more information. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_prof_export_info_file(
 	CCLProf* profile, const char* filename, GError** err);
 
 /* Set export options using a ::CCLProfExportOptions struct. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_prof_set_export_opts(CCLProfExportOptions export_opts);
 
 /* Get current export options. */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLProfExportOptions ccl_prof_get_export_opts();
 
 /** @} */

@@ -71,7 +71,7 @@ struct ccl_event {
  * @param[in] event The OpenCL event to be wrapped.
  * @return The event wrapper for the given OpenCL event.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_event_new_wrap(cl_event event) {
 
 	CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
@@ -89,7 +89,7 @@ CCLEvent* ccl_event_new_wrap(cl_event event) {
  *
  * @param[in] evt The event wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_destroy(CCLEvent* evt) {
 
 	ccl_wrapper_unref((CCLWrapper*) evt, sizeof(CCLEvent),
@@ -108,7 +108,7 @@ void ccl_event_destroy(CCLEvent* evt) {
  * @param[in] evt The event wrapper object.
  * @param[in] name Name to associate with event.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_set_name(CCLEvent* evt, const char* name) {
 
 	/* Make sure evt wrapper object is not NULL. */
@@ -131,7 +131,7 @@ void ccl_event_set_name(CCLEvent* evt, const char* name) {
  * @param[in] evt The event wrapper object.
  * @return Name associated with event.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_event_get_name(CCLEvent* evt) {
 
 	/* Make sure evt wrapper object is not NULL. */
@@ -155,7 +155,7 @@ const char* ccl_event_get_name(CCLEvent* evt) {
  * @param[in] evt The event wrapper object.
  * @return Final name associated with event.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 const char* ccl_event_get_final_name(CCLEvent* evt) {
 
 	/* Make sure evt wrapper object is not NULL. */
@@ -324,7 +324,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
  * @return The command type which fired the given event or 0 if an error
  * occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_command_type ccl_event_get_command_type(
 	CCLEvent* evt, GError** err) {
 
@@ -365,7 +365,7 @@ cl_command_type ccl_event_get_command_type(
  * @return The OpenCL version of the platform associated with this
  * event object as an integer. If an error occurs, 0 is returned.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err) {
 
 	/* Make sure number evt is not NULL. */
@@ -443,7 +443,7 @@ finish:
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
 	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
 	void *user_data, GError** err) {
@@ -514,7 +514,7 @@ finish:
  * @return A new user event, which should be freed using
  * ccl_event_destroy().
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -584,7 +584,7 @@ finish:
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_user_event_set_status(
 	CCLEvent* evt, cl_int execution_status, GError** err) {
 
@@ -647,7 +647,7 @@ finish:
  * @param[out] evt_wait_lst Event wait list.
  * @param[in] ... A `NULL`-terminated list of event wrapper objects.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_wait_list_add(
 	CCLEventWaitList* evt_wait_lst, ...) {
 
@@ -690,7 +690,7 @@ void ccl_event_wait_list_add(
  * @param[out] evt_wait_lst Event wait list.
  * @param[in] evts `NULL`-terminated array of event wrapper objects.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_wait_list_add_v(
 	CCLEventWaitList* evt_wait_lst, CCLEvent** evts) {
 
@@ -726,7 +726,7 @@ void ccl_event_wait_list_add_v(
  *
  * @param[out] evt_wait_lst Event wait list.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
 
 	if ((evt_wait_lst != NULL) && (*evt_wait_lst != NULL)) {
@@ -748,7 +748,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */

@@ -137,7 +137,7 @@ finish:
  * @param[in] platform The OpenCL platform to be wrapped.
  * @return The ::CCLPlatform wrapper for the given OpenCL platform.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
 
 	return (CCLPlatform*) ccl_wrapper_new(
@@ -157,7 +157,7 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
  * @return The platform wrapper for the given device wrapper or NULL in
  * case an error occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err) {
 
 	/* Make sure dev is not NULL. */
@@ -203,7 +203,7 @@ finish:
  *
  * @param[in] platf The platform wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_platform_destroy(CCLPlatform* platf) {
 
 	ccl_wrapper_unref((CCLWrapper*) platf, sizeof(CCLPlatform),
@@ -223,7 +223,7 @@ void ccl_platform_destroy(CCLPlatform* platf) {
  * @return OpenCL version of platform as an integer. If an error
  * occurs, 0 is returned.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_platform_get_opencl_version(
 	CCLPlatform* platf, GError** err) {
 
@@ -281,7 +281,7 @@ CCLDevice* const* ccl_platform_get_all_devices(
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_platform_get_device(
 	CCLPlatform* platf, cl_uint index, GError** err) {
 
@@ -301,7 +301,7 @@ CCLDevice* ccl_platform_get_device(
  * @return The number of devices in platform or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err) {
 
 	return ccl_dev_container_get_num_devices((CCLDevContainer*) platf,

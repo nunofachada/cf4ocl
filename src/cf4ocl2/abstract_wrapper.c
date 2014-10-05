@@ -46,7 +46,7 @@ G_LOCK_DEFINE(wrappers);
  * @param[in] size Size in bytes of wrapper.
  * @return A new wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 
 	/* Make sure OpenCL object is not NULL. */
@@ -93,7 +93,7 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
  *
  * @param[in] wrapper The wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_wrapper_ref(CCLWrapper* wrapper) {
 
 	/* Make sure wrapper object is not NULL. */
@@ -122,7 +122,7 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
  * @return CL_TRUE if wrapper was destroyed (i.e. its ref. count reached
  * zero), CL_FALSE otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
 	ccl_wrapper_release_cl_object rel_cl_fun, GError** err) {
@@ -193,7 +193,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
  * @param[in] wrapper The wrapper object.
  * @return The wrapper object reference count or -1 if wrapper is NULL.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
 
 	/* Make sure wrapper is not NULL. */
@@ -212,7 +212,7 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
  * @param[in] wrapper The wrapper object.
  * @return The wrapped OpenCL object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 
 	/* Make sure wrapper is not NULL. */
@@ -233,7 +233,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * info.
  * @param[in] info Info object to add.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	CCLWrapperInfo* info) {
 
@@ -279,7 +279,7 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * destroyed. If an error occurs, either `NULL` (if `min_size` == 0), or
  * a `min_size`d information object is returned (if `min_size` > 0).
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
@@ -398,7 +398,7 @@ finish:
  * destroyed. If an error occurs, either `NULL` (if `min_size` == 0), or
  * a pointer to a `min_size`d zero value is returned (if `min_size` > 0).
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
@@ -435,7 +435,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @return The requested information size. If an error occurs, a size of
  * `min_size` is returned.
  * */
-size_t CF4OCL2_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
+size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
 
@@ -465,7 +465,7 @@ size_t CF4OCL2_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
  * @return CL_TRUE if memory allocated by wrappers has been properly
  * freed, CL_FALSE otherwise.
  */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_wrapper_memcheck() {
 	return wrappers == NULL;
 }
@@ -478,7 +478,7 @@ cl_bool ccl_wrapper_memcheck() {
  * @param[in] size Parameter size in bytes.
  * @return A new CCLWrapperInfo* object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
 
 	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
@@ -500,7 +500,7 @@ CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
  *
  * @param[in] info Object to destroy.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
 
 	/* Make sure info is not NULL. */

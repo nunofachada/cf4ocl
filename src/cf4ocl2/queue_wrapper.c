@@ -118,7 +118,7 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
  * @param[in] command_queue The OpenCL command queue to be wrapped.
  * @return The ::CCLQueue wrapper for the given OpenCL command queue.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
 
 	return (CCLQueue*) ccl_wrapper_new(
@@ -151,7 +151,7 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * @return The ::CCLQueue wrapper for the given device and context,
  * or `NULL` if an error occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 	const cl_queue_properties* prop_full, GError** err) {
 
@@ -289,7 +289,7 @@ finish:
  * @return The ::CCLQueue wrapper for the given device and context,
  * or `NULL` if an error occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 	cl_command_queue_properties properties, GError** err) {
 
@@ -309,7 +309,7 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
  *
  * @param[in] cq The command queue wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_queue_destroy(CCLQueue* cq) {
 
 	ccl_wrapper_unref((CCLWrapper*) cq, sizeof(CCLQueue),
@@ -330,7 +330,7 @@ void ccl_queue_destroy(CCLQueue* cq) {
  * @return The context associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err) {
 
 	/* Make sure cq is not NULL. */
@@ -385,7 +385,7 @@ finish:
  * @return The device associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err) {
 
 	/* Make sure cq is not NULL. */
@@ -444,7 +444,7 @@ finish:
  * given command queue.
  * @return The event wrapper object for the given OpenCL event object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
 
 	/* Make sure cq is not NULL. */
@@ -483,7 +483,7 @@ CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
  *
  * @param[in] cq The command queue wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_queue_iter_event_init(CCLQueue* cq) {
 
 	/* Make sure cq is not NULL. */
@@ -513,7 +513,7 @@ void ccl_queue_iter_event_init(CCLQueue* cq) {
  * @return The next event wrapper associated with this queue, or `NULL`
  * if no more event wrappers are available.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
 
 	/* Make sure cq is not NULL. */
@@ -537,7 +537,7 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_queue_flush(CCLQueue* cq, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -572,7 +572,7 @@ cl_bool ccl_queue_flush(CCLQueue* cq, GError** err) {
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_queue_finish(CCLQueue* cq, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -612,7 +612,7 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err) {
  *
  * @param[in] cq The command queue wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_queue_gc(CCLQueue* cq) {
 
 	/* Make sure cq is not NULL. */
@@ -731,7 +731,7 @@ finish:
  * @return An event wrapper object that identifies this particular
  * command.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -910,7 +910,7 @@ finish:
  * @return An event wrapper object that identifies this particular
  * command.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 

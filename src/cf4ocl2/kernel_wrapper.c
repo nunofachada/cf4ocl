@@ -94,7 +94,7 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
  * @param[in] kernel The OpenCL kernel to be wrapped.
  * @return The ::CCLKernel wrapper for the given OpenCL kernel.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
 
 	return (CCLKernel*) ccl_wrapper_new(
@@ -113,7 +113,7 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
  * reporting is to be ignored.
  * @return A new kernel wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLKernel* ccl_kernel_new(
 	CCLProgram* prg, const char* kernel_name, GError** err) {
 
@@ -172,7 +172,7 @@ finish:
  *
  * @param[in] krnl The kernel wrapper object.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_destroy(CCLKernel* krnl) {
 
 	ccl_wrapper_unref((CCLWrapper*) krnl, sizeof(CCLKernel),
@@ -200,7 +200,7 @@ void ccl_kernel_destroy(CCLKernel* krnl) {
  * @param[in] arg Argument to set. Arguments must be of type ::CCLArg*,
  * ::CCLBuffer*, ::CCLImage* or ::CCLSampler*.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
 
 	/* Make sure krnl is not NULL. */
@@ -240,7 +240,7 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
  * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
  * ::CCLSampler*.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 
 	/* The va_list, which represents the variable argument list. */
@@ -317,7 +317,7 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
  * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
  * ::CCLSampler*.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
 
 	/* Make sure krnl is not NULL. */
@@ -373,7 +373,7 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
@@ -492,7 +492,7 @@ finish:
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
@@ -607,7 +607,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
@@ -659,7 +659,7 @@ finish:
  * @return The OpenCL version of the platform associated with this
  * kernel as an integer. If an error occurs, 0 is returned.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
 
 	/* Make sure number krnl is not NULL. */
@@ -732,7 +732,7 @@ finish:
  * @return `CL_TRUE` if function returns successfully, `CL_FALSE`
  * otherwise.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
 	GError** err) {
@@ -888,7 +888,7 @@ static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
  * object will be automatically freed when the kernel wrapper object is
  * destroyed. If an error occurs, NULL is returned.
  * */
-CF4OCL2_EXPORT
+CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	cl_kernel_arg_info param_name, GError** err) {
 
