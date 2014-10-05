@@ -63,6 +63,7 @@ struct ccl_platforms {
  * reporting is to be ignored.
  * @return A new ::CCLPlatforms object, or NULL in case an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLPlatforms* ccl_platforms_new(GError **err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -151,6 +152,7 @@ finish:
  *
  * @param[in] platforms ::CCLPlatforms object to destroy.
  * */
+CF4OCL2_EXPORT
 void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
 	/* Platforms object can't be NULL. */
@@ -179,6 +181,7 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
  * @param[in] platforms Object containing the OpenCL platforms.
  * @return The number of OpenCL platforms found.
  * */
+CF4OCL2_EXPORT
 cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
 
 	/* Platforms object can't be NULL. */
@@ -197,6 +200,7 @@ cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
  * @param[in] index Index of platform to return.
  * @return Platform wrapper object at given index.
  * */
+CF4OCL2_EXPORT
 CCLPlatform* ccl_platforms_get(
 	CCLPlatforms* platforms, cl_uint index) {
 

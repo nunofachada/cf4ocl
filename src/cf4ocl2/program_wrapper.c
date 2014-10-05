@@ -218,6 +218,7 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
  * @param[in] program The OpenCL program to be wrapped.
  * @return The ::CCLProgram wrapper for the given OpenCL program.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_wrap(cl_program program) {
 
 	return (CCLProgram*) ccl_wrapper_new(
@@ -233,6 +234,7 @@ CCLProgram* ccl_program_new_wrap(cl_program program) {
  *
  * @param[in] prg The program wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_program_destroy(CCLProgram* prg) {
 
 	ccl_wrapper_unref((CCLWrapper*) prg, sizeof(CCLProgram),
@@ -254,6 +256,7 @@ void ccl_program_destroy(CCLProgram* prg) {
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
 	const char* filename, GError** err) {
 
@@ -275,6 +278,7 @@ CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 	cl_uint count, const char** filenames, GError** err) {
 
@@ -352,6 +356,7 @@ finish:
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
 	const char* string, GError** err) {
 
@@ -376,6 +381,7 @@ CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	cl_uint count, const char** strings, const size_t* lengths,
 	GError** err) {
@@ -434,6 +440,7 @@ finish:
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
 	CCLDevice* dev, const char* filename, cl_int *binary_status,
 	GError** err) {
@@ -461,6 +468,7 @@ CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char** filenames,
 	cl_int *binary_status, GError** err) {
@@ -538,6 +546,7 @@ finish:
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
 	CCLProgramBinary* binary, cl_int *binary_status, GError** err) {
 
@@ -564,6 +573,7 @@ CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, CCLProgramBinary** bins,
 	cl_int *binary_status, GError** err) {
@@ -651,6 +661,7 @@ finish:
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
 	GError** err) {
@@ -746,6 +757,7 @@ finish:
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_program_build(
 	CCLProgram* prg, const char* options, GError** err) {
 
@@ -777,6 +789,7 @@ cl_bool ccl_program_build(
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_program_build_full(CCLProgram* prg,
 	cl_uint num_devices, CCLDevice* const* devs, const char *options,
 	ccl_program_callback pfn_notify, void *user_data, GError** err) {
@@ -891,6 +904,7 @@ finish:
  * empty string if no build, compile or link was performed, or if no
  * build log is available.
  * */
+CF4OCL2_EXPORT
 const char* ccl_program_get_build_log(CCLProgram* prg) {
 
 	/* Make sure prg is not NULL. */
@@ -936,6 +950,7 @@ const char* ccl_program_get_build_log(CCLProgram* prg) {
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_headers,
 	CCLProgram** prg_input_headers, const char** header_include_names,
@@ -1056,6 +1071,7 @@ finish:
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
 	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
@@ -1163,6 +1179,7 @@ finish:
  * @return The OpenCL version of the platform associated with this
  * program as an integer. If an error occurs, 0 is returned.
  * */
+CF4OCL2_EXPORT
 cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err) {
 
 	/* Make sure number prg is not NULL. */
@@ -1228,6 +1245,7 @@ finish:
  * @return The kernel wrapper object for the given program kernel
  * function.
  * */
+CF4OCL2_EXPORT
 CCLKernel* ccl_program_get_kernel(
 	CCLProgram* prg, const char* kernel_name, GError** err) {
 
@@ -1329,6 +1347,7 @@ finish:
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
 	const size_t* global_work_offset, const size_t* global_work_size,
@@ -1439,6 +1458,7 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
 	const size_t* global_work_offset, const size_t* global_work_size,
@@ -1561,6 +1581,7 @@ error_handler:
  * The returned object will be freed when the associated program is
  * destroyed.
  * */
+CF4OCL2_EXPORT
 CCLProgramBinary* ccl_program_get_binary(
 	CCLProgram* prg, CCLDevice* dev, GError** err) {
 
@@ -1644,6 +1665,7 @@ finish:
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	const char* filename, GError** err) {
 
@@ -1712,6 +1734,7 @@ finish:
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	const char* file_prefix, const char* file_suffix, GError** err) {
 
@@ -1802,6 +1825,7 @@ finish:
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
+CF4OCL2_EXPORT
 CCLDevice* ccl_program_get_device(
 	CCLProgram* prg, cl_uint index, GError** err) {
 
@@ -1820,6 +1844,7 @@ CCLDevice* ccl_program_get_device(
  * @return The number of devices in program or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
+CF4OCL2_EXPORT
 cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
 
 	return ccl_dev_container_get_num_devices(
@@ -1842,6 +1867,7 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given program, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	GError** err) {
 

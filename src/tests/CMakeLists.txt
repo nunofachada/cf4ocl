@@ -17,7 +17,7 @@ add_subdirectory(ocl_stub)
 
 # CF4OCL library for tests
 set(CCL_LIB_DIR "../cf4ocl2/")
-add_library(${PROJECT_NAME}_TESTING
+add_library(${PROJECT_NAME}_TESTING STATIC
 	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c
 	${CCL_LIB_DIR}common.c
 	${CCL_LIB_DIR}platforms.c ${CCL_LIB_DIR}kernel_arg.c
@@ -29,6 +29,9 @@ add_library(${PROJECT_NAME}_TESTING
 	${CCL_LIB_DIR}abstract_dev_container_wrapper.c
 	${CCL_LIB_DIR}memobj_wrapper.c ${CCL_LIB_DIR}buffer_wrapper.c
 	${CCL_LIB_DIR}image_wrapper.c ${CCL_LIB_DIR}sampler_wrapper.c)
+
+set_target_properties(${PROJECT_NAME}_TESTING PROPERTIES
+	COMPILE_FLAGS -DCF4OCL2_STATIC_DEFINE)
 
 target_link_libraries(${PROJECT_NAME}_TESTING
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
@@ -59,7 +62,8 @@ set(test_error_handling_LIBS ${PROJECT_NAME}_TESTING)
 foreach(TEST ${TESTS})
 	add_executable(${TEST} ${TEST}.c)
 	target_link_libraries(${TEST} ${GLIB_LIBRARIES} ${${TEST}_LIBS})
-	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST} COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR}")
+	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
+		COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR}")
 endforeach(TEST)
 
 # Add a target which builds all tests

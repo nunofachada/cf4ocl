@@ -66,6 +66,7 @@ struct ccl_buffer {
  * @param[in] mem_object The OpenCL buffer to be wrapped.
  * @return The ::CCLBuffer wrapper for the given OpenCL buffer.
  * */
+CF4OCL2_EXPORT
 CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object) {
 
 	return (CCLBuffer*) ccl_wrapper_new(
@@ -81,6 +82,7 @@ CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object) {
  *
  * @param[in] buf The buffer wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_buffer_destroy(CCLBuffer* buf) {
 
 	ccl_wrapper_unref((CCLWrapper*) buf, sizeof(CCLBuffer),
@@ -105,6 +107,7 @@ void ccl_buffer_destroy(CCLBuffer* buf) {
  * reporting is to be ignored.
  * @return A new wrapper object.
  * */
+CF4OCL2_EXPORT
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	size_t size, void* host_ptr, GError** err) {
 
@@ -166,6 +169,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_read(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -240,6 +244,7 @@ finish:
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_write(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
  	CCLEventWaitList* evt_wait_lst, GError** err) {
@@ -317,6 +322,7 @@ finish:
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
+CF4OCL2_EXPORT
 void* ccl_buffer_enqueue_map(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
@@ -396,6 +402,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_copy(CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, CCLQueue* cq, size_t src_offset,
 	size_t dst_offset, size_t size, CCLEventWaitList* evt_wait_lst,
@@ -479,6 +486,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer* src_buf,
 	CCLImage* dst_img, CCLQueue* cq, size_t src_offset,
 	const size_t *dst_origin, const size_t *region,
@@ -557,6 +565,7 @@ finish:
  * @return A new buffer wrapper object which represents a specific
  * region in the original buffer.
  * */
+CF4OCL2_EXPORT
 CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	cl_mem_flags flags, size_t origin, size_t size, GError** err) {
 
@@ -655,6 +664,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* buffer_origin,
 	const size_t* host_origin, const size_t* region,
@@ -767,6 +777,7 @@ finish:
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_write, const size_t* buffer_origin,
 	const size_t* host_origin, const size_t* region,
@@ -875,6 +886,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *dst_origin, const size_t *region,
@@ -978,6 +990,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	const void *pattern, size_t pattern_size, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {

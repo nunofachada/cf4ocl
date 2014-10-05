@@ -28,6 +28,8 @@
 #ifndef _CCL_ERRORS_H_
 #define _CCL_ERRORS_H_
 
+#include "cf4ocl2_export.h"
+
 /**
  * @defgroup ERRORS Errors
  *
@@ -53,6 +55,7 @@
  */
 
 /* Convert OpenCL error code to a readable string. */
+CF4OCL2_EXPORT
 const char* ccl_err(int code);
 
 /** @} */

@@ -684,17 +684,17 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	prof->infos = g_list_prepend(prof->infos,
 		(gpointer) ccl_prof_info_new(event_name, command_type, cq_name,
 			instant_queued, instant_submit, instant_start, instant_end));
-	
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
-	
+
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
-	
+
 finish:
-	
+
 	/* Return. */
 	return;
 }
@@ -1088,7 +1088,8 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
  * @public @memberof ccl_prof
  *
  * @return A new profile object.
- */
+ * */
+CF4OCL2_EXPORT
 CCLProf* ccl_prof_new() {
 
 	/* Allocate memory for new profile data structure. */
@@ -1108,7 +1109,8 @@ CCLProf* ccl_prof_new() {
  * @public @memberof ccl_prof
  *
  * @param[in] prof Profile object to destroy.
- */
+ * */
+CF4OCL2_EXPORT
 void ccl_prof_destroy(CCLProf* prof) {
 
 	/* Profile to destroy cannot be NULL. */
@@ -1168,6 +1170,7 @@ void ccl_prof_destroy(CCLProf* prof) {
  *
  * @param[in] prof A profile object.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_start(CCLProf* prof) {
 
 	/* Make sure profile is not NULL. */
@@ -1185,6 +1188,7 @@ void ccl_prof_start(CCLProf* prof) {
  *
  * @param[in] prof A profile object.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_stop(CCLProf* prof) {
 
 	/* Make sure profile is not NULL. */
@@ -1204,6 +1208,7 @@ void ccl_prof_stop(CCLProf* prof) {
  * @param[in] prof A profile object.
  * @return number of seconds elapsed, including any fractional part.
  * */
+CF4OCL2_EXPORT
 double ccl_prof_time_elapsed(CCLProf* prof) {
 
 	/* Make sure profile is not NULL. */
@@ -1222,6 +1227,7 @@ double ccl_prof_time_elapsed(CCLProf* prof) {
  * @param[in] cq_name Command queue name.
  * @param[in] cq Command queue wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_add_queue(
 	CCLProf* prof, const char* cq_name, CCLQueue* cq) {
 
@@ -1263,6 +1269,7 @@ void ccl_prof_add_queue(
  * @return CL_TRUE if function terminates successfully, or CL_FALSE
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_prof_calc(CCLProf* prof, GError** err) {
 
 	/* Make sure prof is not NULL. */
@@ -1371,6 +1378,7 @@ const CCLProfAgg* ccl_prof_get_agg(
  * @param[in] sort Bitfield of ::CCLProfAggSort OR ::CCLProfSortOrder,
  * for example `CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC`.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
@@ -1395,6 +1403,7 @@ void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
  * @param[in] prof Profile object.
  * @return The next aggregate statistic instance.
  * */
+CF4OCL2_EXPORT
 const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1428,6 +1437,7 @@ const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
  * @param[in] sort Bitfield of ::CCLProfInfoSort OR ::CCLProfSortOrder,
  * for example `CCL_PROF_INFO_SORT_T_START | CCL_PROF_SORT_ASC`.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
@@ -1451,6 +1461,7 @@ void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
  * @param[in] prof Profile object.
  * @return The next event profiling info instance.
  * */
+CF4OCL2_EXPORT
 const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1484,6 +1495,7 @@ const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
  * @param[in] sort Bitfield of ::CCLProfInstSort OR ::CCLProfSortOrder,
  * for example `CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC`.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
@@ -1508,6 +1520,7 @@ void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
  * @param[in] prof Profile object.
  * @return The next event instant instance.
  * */
+CF4OCL2_EXPORT
 const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1542,6 +1555,7 @@ const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
  * ::CCLProfSortOrder, for example
  * `CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC`.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
 
 	/* Make sure prof is not NULL. */
@@ -1565,6 +1579,7 @@ void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
  * @param[in] prof Profile object.
  * @return The next overlap instance.
  * */
+CF4OCL2_EXPORT
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1597,6 +1612,7 @@ const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
  * @param[in] prof Profile object.
  * @return The duration of all events in nanoseconds.
  * */
+CF4OCL2_EXPORT
 cl_ulong ccl_prof_get_duration(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1622,6 +1638,7 @@ cl_ulong ccl_prof_get_duration(CCLProf* prof) {
  * @return The effective duration of all events in nanoseconds, i.e. the
  * duration of all events minus event overlaps.
  * */
+CF4OCL2_EXPORT
 cl_ulong ccl_prof_get_eff_duration(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1646,6 +1663,7 @@ cl_ulong ccl_prof_get_eff_duration(CCLProf* prof) {
  *
  * @param[in] prof Profile object.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_print_summary(CCLProf* prof) {
 
 	/* Make sure prof is not NULL. */
@@ -1681,6 +1699,7 @@ void ccl_prof_print_summary(CCLProf* prof) {
  * ::CCLProfOverlapSort ORed with ::CCLProfSortOrder).
  * @return A string containing the summary.
  * */
+CF4OCL2_EXPORT
 const char* ccl_prof_get_summary(
 	CCLProf* prof, int agg_sort, int ovlp_sort) {
 
@@ -1801,6 +1820,7 @@ const char* ccl_prof_get_summary(
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
 
 	/* Make sure prof is not NULL. */
@@ -1886,6 +1906,7 @@ finish:
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_prof_export_info_file(
 	CCLProf* prof, const char* filename, GError** err) {
 
@@ -1941,6 +1962,7 @@ finish:
  *
  * @param[in] export_opts Export options to set.
  * */
+CF4OCL2_EXPORT
 void ccl_prof_set_export_opts(CCLProfExportOptions export_opts) {
 	export_options = export_opts;
 }
@@ -1952,6 +1974,7 @@ void ccl_prof_set_export_opts(CCLProfExportOptions export_opts) {
  *
  * @return Current export options.
  * */
+CF4OCL2_EXPORT
  CCLProfExportOptions ccl_prof_get_export_opts() {
 	return export_options;
 }

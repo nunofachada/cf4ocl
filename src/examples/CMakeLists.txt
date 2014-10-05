@@ -27,8 +27,15 @@ endforeach()
 
 # The stb_image.h included in image_filter throws some warnings,
 # this avoids them.
-set_target_properties(image_filter PROPERTIES
-	COMPILE_FLAGS "-Wno-unused-parameter -Wno-sign-compare")
+if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
+
+	set_target_properties(image_filter PROPERTIES
+		COMPILE_FLAGS "-Wno-unused-parameter -Wno-sign-compare")
+
+endif()
+
+
 
 # Add a target which builds all samples
 add_custom_target(examples DEPENDS ${EXAMPLES})

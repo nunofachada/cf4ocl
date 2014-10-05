@@ -207,6 +207,7 @@ static CCLWrapperInfo* ccl_context_get_cldevices(
  * @param[in] context The OpenCL context to be wrapped.
  * @return The context wrapper for the given OpenCL context.
  * */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_wrap(cl_context context) {
 
 	return (CCLContext*) ccl_wrapper_new(
@@ -240,6 +241,7 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
 	ccl_context_callback pfn_notify, void* user_data, GError **err) {
@@ -314,6 +316,7 @@ finish:
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, cl_uint num_devices,
 	CCLDevice* const* devices, ccl_context_callback pfn_notify,
@@ -403,6 +406,7 @@ finish:
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_indep_filter(
 	ccl_devsel_indep filter, void* data, GError** err) {
 
@@ -457,6 +461,7 @@ finish:
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_menu_full(void* data, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -502,6 +507,7 @@ finish:
  *
  * @param[in] ctx The context wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_context_destroy(CCLContext* ctx) {
 
 	ccl_wrapper_unref((CCLWrapper*) ctx, sizeof(CCLContext),
@@ -521,6 +527,7 @@ void ccl_context_destroy(CCLContext* ctx) {
  * @return The OpenCL version of the platform associated with this
  * context as an integer. If an error occurs, 0 is returned.
  * */
+CF4OCL2_EXPORT
 cl_uint ccl_context_get_opencl_version(
 	CCLContext* ctx, GError** err) {
 
@@ -552,6 +559,7 @@ cl_uint ccl_context_get_opencl_version(
  * @return The ::CCLPlatform wrapper associated with the context
  * devices or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err) {
 
 	/* Make sure context is not NULL. */
@@ -611,6 +619,7 @@ finish:
  * @return A list of supported image formats, or `NULL` if an error
  * occurs. Doesn't need to be freed.
  * */
+CF4OCL2_EXPORT
 const cl_image_format* ccl_context_get_supported_image_formats(
 	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
 	cl_uint* num_image_formats, GError** err) {
@@ -690,6 +699,7 @@ finish:
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
+CF4OCL2_EXPORT
 CCLDevice* ccl_context_get_device(
 	CCLContext* ctx, cl_uint index, GError** err) {
 
@@ -708,6 +718,7 @@ CCLDevice* ccl_context_get_device(
  * @return The number of devices in context or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
+CF4OCL2_EXPORT
 cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
 
 	return ccl_dev_container_get_num_devices((CCLDevContainer*) ctx,
@@ -730,6 +741,7 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given context, or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
 	GError** err) {
 

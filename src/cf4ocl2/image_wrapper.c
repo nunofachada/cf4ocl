@@ -155,6 +155,7 @@ finish:
  * @param[in] mem_object The OpenCL image to be wrapped.
  * @return The ::CCLImage wrapper for the given OpenCL image.
  * */
+CF4OCL2_EXPORT
 CCLImage* ccl_image_new_wrap(cl_mem mem_object) {
 
 	return (CCLImage*) ccl_wrapper_new(
@@ -170,6 +171,7 @@ CCLImage* ccl_image_new_wrap(cl_mem mem_object) {
  *
  * @param[in] img The image wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_image_destroy(CCLImage* img) {
 
 	ccl_wrapper_unref((CCLWrapper*) img, sizeof(CCLImage),
@@ -218,6 +220,7 @@ void ccl_image_destroy(CCLImage* img) {
  * reporting is to be ignored.
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err) {
@@ -382,6 +385,7 @@ finish:
  * describe the type and dimensions of the image to be allocated.
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, void* host_ptr, GError** err,
 	...) {
@@ -475,6 +479,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t row_pitch, size_t slice_pitch, void *ptr,
@@ -564,6 +569,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_write, const size_t* origin, const size_t* region,
 	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
@@ -650,6 +656,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
 	CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
 	const size_t* region, CCLEventWaitList* evt_wait_lst,
@@ -737,6 +744,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
 	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *region, size_t dst_offset,
@@ -834,6 +842,7 @@ finish:
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
+CF4OCL2_EXPORT
 void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
 	const size_t* region, size_t *image_row_pitch,
@@ -921,6 +930,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	const void *fill_color, const size_t *origin, const size_t *region,
 	CCLEventWaitList* evt_wait_lst, GError** err) {

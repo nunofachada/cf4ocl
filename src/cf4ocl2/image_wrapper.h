@@ -204,30 +204,36 @@ typedef struct ccl_image_desc {
 } CCLImageDesc;
 
 /* Get the image wrapper for the given OpenCL image. */
+CF4OCL2_EXPORT
 CCLImage* ccl_image_new_wrap(cl_mem mem_object);
 
 /* Decrements the reference count of the wrapper object. If it
  * reaches 0, the wrapper object is destroyed. */
+CF4OCL2_EXPORT
 void ccl_image_destroy(CCLImage* img);
 
 /* Creates a new image wrapper object. */
+CF4OCL2_EXPORT
 CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
 	void* host_ptr, GError** err);
 
 /* Creates a new image wrapper object using a variable list of key-value
  * pairs which describe the image.  */
+CF4OCL2_EXPORT
 CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, void* host_ptr, GError** err,
 	...);
 
 /* Read from an image or image array object to host memory. */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t row_pitch, size_t slice_pitch, void *ptr,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
 /* Write to an image or image array object from host memory. */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
@@ -235,11 +241,13 @@ CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 
 /* Copy image objects. This function wraps the clEnqueueCopyImage()
  * OpenCL function. */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
 	CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
 	const size_t* region, CCLEventWaitList* evt_wait_lst, GError** err);
 
 /* Copy an image object to a buffer object. */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
 	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *region, size_t dst_offset,
@@ -247,6 +255,7 @@ CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
 
 /* Map a region of the image into the host address space and return a
  * pointer to this mapped region. */
+CF4OCL2_EXPORT
 void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
 	const size_t* region, size_t *image_row_pitch,
@@ -257,6 +266,7 @@ void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 
 /* Fill an image object with a specified color. This function wraps the
  * clEnqueueFillImage() OpenCL function. */
+CF4OCL2_EXPORT
 CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	const void *fill_color, const size_t *origin, const size_t *region,
 	CCLEventWaitList* evt_wait_lst, GError** err);

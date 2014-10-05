@@ -38,6 +38,7 @@
  *
  * @param[in] mo A ::CCLMemObj wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_memobj_release_fields(CCLMemObj* mo) {
 
 	/* Make sure mo wrapper object is not NULL. */
@@ -66,6 +67,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * @return The OpenCL version of the platform associated with this
  * memory object as an integer. If an error occurs, 0 is returned.
  * */
+CF4OCL2_EXPORT
 cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err) {
 
 	/* Make sure number mo is not NULL. */
@@ -128,6 +130,7 @@ finish:
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
 	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err) {
 
@@ -200,6 +203,7 @@ finish:
  * @return `CL_TRUE` if device if operation completes successfully,
  * `CL_FALSE` otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	ccl_memobj_destructor_callback pfn_notify,
 	void *user_data, GError** err) {
@@ -280,6 +284,7 @@ finish:
  * reporting is to be ignored.
  * @return
  * */
+CF4OCL2_EXPORT
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags,
  	CCLEventWaitList* evt_wait_lst, GError** err) {

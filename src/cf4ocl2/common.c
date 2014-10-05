@@ -33,6 +33,7 @@
  *
  * @param[in] exec_name Executable name.
  * */
+CF4OCL2_EXPORT
 void ccl_common_version_print(const char* exec_name) {
 	g_printf("%s %s\n\nCopyright (C) 2014 Nuno Fachada\n" \
 		"License GPLv3+: GNU GPL version 3 or later " \
@@ -49,6 +50,7 @@ void ccl_common_version_print(const char* exec_name) {
  * @return A GQuark structure defined by category identifying string,
  * which identifies the error as a cf4ocl generated error.
  */
+CF4OCL2_EXPORT
 GQuark ccl_error_quark() {
 	return g_quark_from_static_string("ccl-error-quark");
 }
@@ -60,6 +62,7 @@ GQuark ccl_error_quark() {
  * @return A GQuark structure defined by category identifying string,
  * which identifies the error as an error in the OpenCL library.
  */
+CF4OCL2_EXPORT
 GQuark ccl_ocl_error_quark() {
 	return g_quark_from_static_string("ccl-ocl-error-quark");
 }

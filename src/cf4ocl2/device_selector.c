@@ -436,6 +436,7 @@ finish:
  * should be freed with the g_strfreev() function from GLib. If an error
  * occurs, NULL is returned.
  * */
+CF4OCL2_EXPORT
 gchar** ccl_devsel_get_device_strings(GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -488,6 +489,7 @@ finish:
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * */
+CF4OCL2_EXPORT
 void ccl_devsel_print_device_strings(GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
@@ -531,6 +533,7 @@ finish:
  * @param[in] function Indendent filter function.
  * @param[in] data Filter data.
  * */
+CF4OCL2_EXPORT
 void ccl_devsel_add_indep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_indep function, void* data) {
 
@@ -545,6 +548,7 @@ void ccl_devsel_add_indep_filter(
  * @param[in] function Indendent filter function.
  * @param[in] data Filter data.
  * */
+CF4OCL2_EXPORT
 void ccl_devsel_add_dep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_dep function, void* data) {
 
@@ -680,6 +684,7 @@ finish:
  * reporting is to be ignored.
  * @return CL_TRUE if device is of the given type, CL_FALSE otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_devsel_indep_type(
 	CCLDevice* dev, void* data, GError **err) {
 
@@ -727,6 +732,7 @@ finish:
  * reporting is to be ignored.
  * @return CL_TRUE if device is a GPU, CL_FALSE otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_devsel_indep_type_gpu(
 	CCLDevice* dev, void *data, GError **err) {
 
@@ -750,6 +756,7 @@ cl_bool ccl_devsel_indep_type_gpu(
  * reporting is to be ignored.
  * @return CL_TRUE if device is a CPU, CL_FALSE otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_devsel_indep_type_cpu(
 	CCLDevice* dev, void *data, GError **err) {
 
@@ -774,6 +781,7 @@ cl_bool ccl_devsel_indep_type_cpu(
  * reporting is to be ignored.
  * @return CL_TRUE if device is a accelerator, CL_FALSE otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_devsel_indep_type_accel(
 	CCLDevice* dev, void *data, GError **err) {
 
@@ -798,6 +806,7 @@ cl_bool ccl_devsel_indep_type_accel(
  * reporting is to be ignored.
  * @return CL_TRUE if device is accepted by filter, CL_FALSE otherwise.
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_devsel_indep_string(
 	CCLDevice* dev, void *data, GError **err) {
 
@@ -912,6 +921,7 @@ finish:
  * @return CL_TRUE if device belongs to the specified platform, CL_FALSE
  * otherwise (or if an error occurs).
  * */
+CF4OCL2_EXPORT
 cl_bool ccl_devsel_indep_platform(
 	CCLDevice* device, void *data, GError **err) {
 
@@ -978,6 +988,7 @@ finish:
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
+CF4OCL2_EXPORT
 CCLDevSelDevices ccl_devsel_dep_platform(
 	CCLDevSelDevices devices, void *data, GError **err) {
 
@@ -1064,6 +1075,7 @@ finish:
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
+CF4OCL2_EXPORT
 CCLDevSelDevices ccl_devsel_dep_menu(
 	CCLDevSelDevices devices, void *data, GError **err) {
 

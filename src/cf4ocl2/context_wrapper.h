@@ -130,6 +130,7 @@ typedef void (CL_CALLBACK* ccl_context_callback)(
 	void* user_data);
 
 /* Get the context wrapper for the given OpenCL context. */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_wrap(cl_context context);
 
 /**
@@ -231,6 +232,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 
 /* Create a new context wrapper object selecting devices using
  * the given set of filters. */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
 	ccl_context_callback pfn_notify, void* user_data, GError **err);
@@ -238,6 +240,7 @@ CCLContext* ccl_context_new_from_filters_full(
 /* Creates a context wrapper given an array of ::CCLDevice
  * wrappers and the remaining parameters required by the
  * clCreateContext function. */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, cl_uint num_devices,
 	CCLDevice* const* devices, ccl_context_callback pfn_notify,
@@ -245,38 +248,47 @@ CCLContext* ccl_context_new_from_devices_full(
 
 /* Creates a context wrapper using one independent device filter
  * specified in the function parameters. */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_indep_filter(
 	ccl_devsel_indep filter, void* data, GError** err);
 
 /* Creates a context wrapper using a device which the user
  * selects from a menu. */
+CF4OCL2_EXPORT
 CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
 
 /* Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
+CF4OCL2_EXPORT
 void ccl_context_destroy(CCLContext* ctx);
 
 /* Get the OpenCL version of the platform associated with this
  * context. */
+CF4OCL2_EXPORT
 cl_uint ccl_context_get_opencl_version(
 	CCLContext* ctx, GError** err);
 
 /* Get the platform associated with the context devices. */
+CF4OCL2_EXPORT
 CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
 
 /* Get the list of image formats supported by a given context. */
+CF4OCL2_EXPORT
 const cl_image_format* ccl_context_get_supported_image_formats(
 	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
 	cl_uint* num_image_formats, GError** err);
 
 /* Get ::CCLDevice wrapper at given index. */
+CF4OCL2_EXPORT
 CCLDevice* ccl_context_get_device(
 	CCLContext* ctx, cl_uint index, GError** err);
 
 /* Return number of devices in context. */
+CF4OCL2_EXPORT
 cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
 
 /* Get all device wrappers in context. */
+CF4OCL2_EXPORT
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
 	GError** err);
 

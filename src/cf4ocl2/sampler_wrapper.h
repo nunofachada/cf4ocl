@@ -85,19 +85,23 @@
  */
 
 /* Get the sampler wrapper for the given OpenCL sampler. */
+CF4OCL2_EXPORT
 CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler);
 
 /* Decrements the reference count of the wrapper object. If it
  * reaches 0, the wrapper object is destroyed. */
+CF4OCL2_EXPORT
 void ccl_sampler_destroy(CCLSampler* smplr);
 
 /* Create a new sampler wrapper object by specifying a basic set of
  * sampler properties. */
+CF4OCL2_EXPORT
 CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
 	cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
 	GError** err);
 
 /* Create a new sampler wrapper object using a list of properties. */
+CF4OCL2_EXPORT
 CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 	const cl_sampler_properties *sampler_properties, GError** err);
 
@@ -189,7 +193,3 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 /** @} */
 
 #endif
-
-
-
-

@@ -10,6 +10,9 @@ find_package(Git QUIET)
 # Determine version from Git
 include(GetVersionFromGitTag)
 
+# Required for building with Visual Studio
+include(GenerateExportHeader)
+
 # Set log domain
 add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 
@@ -20,14 +23,27 @@ set(EXECS_PREFIX "ccl_")
 # -Wno-comment because of comment within comment in OpenCL headers
 if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
+	# Clang and GCC flags
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
+	# Search for glib if using clang or GCC
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
+elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+	# PkgConfig doesnt work well with Visual Studio, so make user
+	# specify location of GLib stuff
+	find_library(GLIB_LIBRARIES glib-2.0)
+	find_path(GLIB_INCLUDE_DIR glib.h)
+	find_path(GLIB_CONFIG_INCLUDE_DIR glibconfig.h)
+	set(GLIB_INCLUDE_DIRS "${GLIB_INCLUDE_DIR}" "${GLIB_CONFIG_INCLUDE_DIR}")
+	# This line is required for glib to work with MSVC
+	add_definitions("-Dinline=__inline")
+	# And this avoids some warnings
+	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 endif()
 
 # Find required libraries
-find_package(PkgConfig REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package(Doxygen 1.8.3 QUIET)
-pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Use provided OpenCL headers or system OpenCL headers?
 if (NOT APPLE) # Not for Apple, which handles these headers differently
@@ -47,7 +63,8 @@ endif()
 # Library include directories
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src
-	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
+	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
+	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME})
 
 # Define install subdirs
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})

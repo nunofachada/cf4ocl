@@ -1,38 +1,38 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with cf4ocl. If not, see 
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with cf4ocl. If not, see
  * <http://www.gnu.org/licenses/>.
  * */
- 
- /** 
+
+ /**
  * @file
- * 
- * Implementation of a wrapper type and related functions for a OpenCL 
+ *
+ * Implementation of a wrapper type and related functions for a OpenCL
  * kernel arguments.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
- 
+
 #include "kernel_arg.h"
 
 /**
  * @internal
  * Determine if argument is local/private.
- * 
+ *
  * @param[in] arg Kernel argument.
  * @return True if argument is local or private, false if argument is
  * a real ::CCLWrapper object.
@@ -42,45 +42,47 @@
 
 /**
  * @internal
- * Marker which determines if argument is local/private or a 
+ * Marker which determines if argument is local/private or a
  * real ::CCLWrapper object.
  * */
 static char arg_local_marker;
 
-/** 
- * Create a new kernel argument. 
- * 
+/**
+ * Create a new kernel argument.
+ *
  * Arguments created with this function can local, private or NULL.
  * Client code shouldn't directly use this function, but use instead
- * ccl_arg_priv(), ccl_arg_local() or ccl_arg_full(). 
- * 
+ * ccl_arg_priv(), ccl_arg_local() or ccl_arg_full().
+ *
  * @param[in] value Argument value.
  * @param[in] size Argument size.
  * @return A new kernel argument.
  * */
+CF4OCL2_EXPORT
 CCLArg* ccl_arg_new(void* value, size_t size) {
 
 	/* Make sure size is > 0. */
 	g_return_val_if_fail(size > 0, NULL);
 
 	CCLArg* arg = g_slice_new(CCLArg);
-	
-	arg->cl_object = g_memdup((const void*) value, size);
+
+	arg->cl_object = g_memdup((const void*) value, (guint) size);
 	arg->info = (void*) &arg_local_marker;
 	arg->ref_count = (gint) size;
-	
+
 	return arg;
-	
+
 }
 
 /**
  * @internal
- * Destroy a kernel argument. 
- * 
+ * Destroy a kernel argument.
+ *
  * Client code shouldn't directly use this function.
- * 
+ *
  * @param[in] arg Argument to destroy.
  * */
+CF4OCL2_EXPORT
 void ccl_arg_destroy(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
@@ -94,13 +96,14 @@ void ccl_arg_destroy(CCLArg* arg) {
 
 /**
  * @internal
- * Get size in bytes of kernel argument. 
- * 
+ * Get size in bytes of kernel argument.
+ *
  * Client code shouldn't directly use this function.
- * 
+ *
  * @param[in] arg Argument to get size of.
  * @return Argument size in bytes.
  * */
+CF4OCL2_EXPORT
 size_t ccl_arg_size(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */
@@ -111,15 +114,16 @@ size_t ccl_arg_size(CCLArg* arg) {
 		: sizeof(void*);
 }
 
-/** 
+/**
  * @internal
- * Get value of kernel argument. 
- * 
+ * Get value of kernel argument.
+ *
  * Client code shouldn't directly use this function.
- * 
+ *
  * @param[in] arg Argument to get value of.
  * @return Argument value.
  * */
+CF4OCL2_EXPORT
 void* ccl_arg_value(CCLArg* arg) {
 
 	/* Make sure arg is not NULL. */

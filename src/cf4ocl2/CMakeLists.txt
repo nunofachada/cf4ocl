@@ -12,6 +12,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.in.h
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
+generate_export_header(${PROJECT_NAME})
 
 # This is required for Windows compilation
 target_link_libraries(${PROJECT_NAME}
@@ -37,6 +38,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	FILES_MATCHING PATTERN "*.h"
 	PATTERN "*.in.h" EXCLUDE)
 
-# Install the common header
+# Install the common header and the export header
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/common.h
-         DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME})
+	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}${PROJECT_NAME}_export.h
+	DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME})

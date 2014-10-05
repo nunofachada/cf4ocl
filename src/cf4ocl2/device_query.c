@@ -36,7 +36,7 @@
 static char* ccl_devquery_format_uint(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	g_snprintf(out, size, "%u %s", *((cl_uint*) info->value), units);
+	g_snprintf(out, (gulong) size, "%u %s", *((cl_uint*) info->value), units);
 	return out;
 
 }
@@ -53,7 +53,7 @@ static char* ccl_devquery_format_hex(CCLWrapperInfo* info,
 	gboolean start = FALSE;
 	gchar val;
 
-	for (gint i = info->size - 1; i >= 0 ; i--) {
+	for (gint i = (gint) info->size - 1; i >= 0 ; i--) {
 		val = ((cl_char*) info->value)[i];
 		if (val) start = TRUE;
 		if (start)
@@ -62,7 +62,7 @@ static char* ccl_devquery_format_hex(CCLWrapperInfo* info,
 	if (units && units[0])
 		g_string_append_printf(str, " %s", units);
 
-	g_snprintf(out, size, "%s", str->str);
+	g_snprintf(out, (gulong) size, "%s", str->str);
 	g_string_free(str, TRUE);
 	return out;
 
@@ -76,7 +76,7 @@ static char* ccl_devquery_format_hex(CCLWrapperInfo* info,
 static char* ccl_devquery_format_sizet(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	g_snprintf(out, size, "%lu %s", (gulong) *((size_t*) info->value), units);
+	g_snprintf(out, (gulong) size, "%lu %s", (gulong) *((size_t*) info->value), units);
 	return out;
 
 }
@@ -470,11 +470,13 @@ static char* ccl_devquery_format_svmc(CCLWrapperInfo* info,
 //~ }
 
 /* Size of parameter information map. */
+CF4OCL2_EXPORT
 const int ccl_devquery_info_map_size = 123;
 
 /* Map of parameter name strings to respective cl_device_info
  * bitfields, long description string, format output function and a
  * units suffix. */
+CF4OCL2_EXPORT
 const CCLDevQueryMap ccl_devquery_info_map[] = {
 
 	{"ADDRESS_BITS", CL_DEVICE_ADDRESS_BITS,
@@ -920,6 +922,7 @@ static int ccl_devquery_get_index(const char* name) {
  * kept in the ::ccl_devquery_info_map, or `NULL` if given prefix is not
  * valid. Should be freed with g_free() function from GLib.
  * */
+CF4OCL2_EXPORT
 gchar* ccl_devquery_get_prefix_final(const char* prefix) {
 
 	/* Make sure prefix is not NULL. */
@@ -965,6 +968,7 @@ gchar* ccl_devquery_get_prefix_final(const char* prefix) {
  * @return A `cl_device_info` object given its name or 0 if no suitable
  * `cl_device_info` is found for the given name.
  * */
+CF4OCL2_EXPORT
 cl_device_info ccl_devquery_name(const char* name) {
 
 	/* Make sure name is not NULL. */
@@ -1006,6 +1010,7 @@ cl_device_info ccl_devquery_name(const char* name) {
  * @return pointer to the first device information parameter which
  * has the given prefix or `NULL` if nothing found.
  * */
+CF4OCL2_EXPORT
 const CCLDevQueryMap* ccl_devquery_prefix(
 	const char* prefix, int* size) {
 
@@ -1093,6 +1098,7 @@ const CCLDevQueryMap* ccl_devquery_prefix(
  * the function updates within calls.
  * @return A matching ::CCLDevQueryMap*, or `NULL` if search is over.
  * */
+CF4OCL2_EXPORT
 const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx) {
 
 	/* Make sure substr is not NULL. */

@@ -12,7 +12,7 @@ foreach(UTIL ${UTILS})
 endforeach(UTIL)
 
 # Set utils version
-set_target_properties(${UTILS} PROPERTIES 
+set_target_properties(${UTILS} PROPERTIES
 	VERSION ${${PROJECT_NAME}_VERSION_STRING})
 
 # How to install utils

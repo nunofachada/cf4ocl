@@ -134,6 +134,7 @@ static struct ccl_sampler_basic_properties
  * @param[in] sampler The OpenCL sampler to be wrapped.
  * @return The ::CCLSampler wrapper for the given OpenCL sampler.
  * */
+CF4OCL2_EXPORT
 CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler) {
 
 	return (CCLSampler*) ccl_wrapper_new(
@@ -149,6 +150,7 @@ CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler) {
  *
  * @param[in] smplr The sampler wrapper object.
  * */
+CF4OCL2_EXPORT
 void ccl_sampler_destroy(CCLSampler* smplr) {
 
 	ccl_wrapper_unref((CCLWrapper*) smplr, sizeof(CCLSampler),
@@ -175,6 +177,7 @@ void ccl_sampler_destroy(CCLSampler* smplr) {
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
 	cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
 	GError** err) {
@@ -221,6 +224,7 @@ CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
+CF4OCL2_EXPORT
 CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 	const cl_sampler_properties *sampler_properties, GError** err) {
 
