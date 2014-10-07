@@ -42,7 +42,6 @@ static void helpers_test() {
 	CCLWrapperInfo* info;
 	gchar param_value_str[CCL_TEST_DEVQUERY_MAXINFOLEN];
 
-
 	/* Get platforms. */
 	platfs = ccl_platforms_new(&err);
 	if (err == NULL) {
