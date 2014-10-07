@@ -150,10 +150,15 @@ if(WIN32)
 	set(CPACK_NSIS_URL_INFO_ABOUT "http://fakenmc.github.io/cf4ocl/" )
 elseif(APPLE)
 elseif(UNIX)
-	set(CPACK_GENERATOR "DEB;TGZ;TZ")
+	set(CPACK_GENERATOR "DEB" "RPM" "TGZ")
+
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nuno Fachada <faken@fakenmc.com>")
 	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libglib2.0-0 (>= 2.32.1), ocl-icd-libopencl1 (>= 1.3)")
-	set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "ocl-icd-opencl-dev (>= 1.3), opencl-headers (>= 1.0)")
+	set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "ocl-icd-opencl-dev (>= 1.3), opencl-headers (>= 1.2)")
+
+	set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
+	set(CPACK_RPM_PACKAGE_REQUIRES "glib2 >= 2.32.1, ocl-icd >= 1.3")
+
 endif()
 
 include (CPack)
