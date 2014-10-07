@@ -32,6 +32,11 @@ elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 endif()
 
+# Avoid including MinGW dll dependency
+if(MINGW)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
+endif()
+
 # How to get Glib location
 option(USE_PKGCONFIG "Use package config for Glib? (will cause problems with MSVC)" ON)
 if(USE_PKGCONFIG)
