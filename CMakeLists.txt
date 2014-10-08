@@ -6,12 +6,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 # Find git
 find_package(Git QUIET)
-
 # Determine version from Git
 include(GetVersionFromGitTag)
-
 # Required for building with Visual Studio
 include(GenerateExportHeader)
+# Auto-determine architecture
+include(TargetArch)
 
 # Set log domain
 add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
@@ -135,20 +135,28 @@ endif()
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
 
+# Determine architecture
+target_architecture(BUILD_ARCH_GET)
+set(BUILD_ARCH "${BUILD_ARCH_GET}" CACHE STRING "Build architecture (for packaging only)")
+
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${${PROJECT_NAME}_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${${PROJECT_NAME}_VERSION_TWEAK}")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A cross-platform pure C99 object-oriented framework for developing and benchmarking OpenCL projects in C/C++")
-set(CPACK_RESOURCE_VENDOR "FakenMC")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}.${BUILD_ARCH}")
+set(CPACK_RESOURCE_VENDOR "fakenmc.com")
 
 if(WIN32)
 	set(CPACK_GENERATOR "NSIS" "ZIP")
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
 	set(CPACK_NSIS_URL_INFO_ABOUT "http://fakenmc.github.io/cf4ocl/" )
 elseif(APPLE)
+
 elseif(UNIX)
 	set(CPACK_GENERATOR "DEB" "RPM" "TGZ")
 
@@ -158,6 +166,7 @@ elseif(UNIX)
 
 	set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
 	set(CPACK_RPM_PACKAGE_REQUIRES "glib2 >= 2.32.1, ocl-icd >= 1.3")
+	set(CPACK_RPM_PACKAGE_SUGGESTS "ocl-icd-devel >= 1.3, opencl-headers >= 1.2")
 
 endif()
 
