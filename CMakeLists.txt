@@ -80,6 +80,7 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 
 # Define install subdirs
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})
+set(INSTALL_SUBDIR_DOCS_MAN share/man/)
 set(INSTALL_SUBDIR_INCLUDE include)
 set(INSTALL_SUBDIR_BIN bin)
 set(INSTALL_SUBDIR_LIB lib)
@@ -107,6 +108,13 @@ if(DOXYGEN_FOUND)
 		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
 	endif()
 
+	# Generate man if system is Unix
+	if(UNIX)
+		set(GENERATE_MAN "YES")
+	else()
+		set(GENERATE_MAN "NO")
+	endif()
+
 	# Copy and configure doxigen configuration file
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
@@ -124,10 +132,21 @@ if(DOXYGEN_FOUND)
 		${DOCS_DIRECTORY}/html/images
 	)
 
+	#~ # Compress man pages created by Doxygen
+	#~ if(UNIX)
+		#~ add_custom_command(TARGET doc POST_BUILD
+			#~ COMMAND "/bin/gzip -r ${CMAKE_BINARY_DIR}/${DOCS_DIRECTORY}/man/*")
+	#~ endif()
+
 	# Add documentation installation target (if the docs have been built)
-	if (${DOC_INSTALL})
-		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/
+	if (DOC_INSTALL)
+		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/html/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
+		if (UNIX)
+			install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
+				DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
+				FILES_MATCHING REGEX "^ccl|^CCL")
+		endif()
 	endif()
 
 endif()

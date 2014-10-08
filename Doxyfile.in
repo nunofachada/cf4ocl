@@ -1249,7 +1249,7 @@ MAKEINDEX_CMD_NAME     = makeindex
 # LaTeX documents. This may be useful for small projects and may help to
 # save some trees in general.
 
-COMPACT_LATEX          = NO
+COMPACT_LATEX          = YES
 
 # The PAPER_TYPE tag can be used to set the paper type that is used
 # by the printer. Possible values are: a4, letter, legal and
@@ -1300,7 +1300,7 @@ LATEX_BATCHMODE        = NO
 # include the index chapters (such as File Index, Compound Index, etc.)
 # in the output.
 
-LATEX_HIDE_INDICES     = NO
+LATEX_HIDE_INDICES     = YES
 
 # If LATEX_SOURCE_CODE is set to YES then doxygen will include
 # source code with syntax highlighting in the LaTeX output.
@@ -1364,7 +1364,7 @@ RTF_EXTENSIONS_FILE    =
 # If the GENERATE_MAN tag is set to YES (the default) Doxygen will
 # generate man pages
 
-GENERATE_MAN           = NO
+GENERATE_MAN           = @GENERATE_MAN@
 
 # The MAN_OUTPUT tag is used to specify where the man pages will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -1383,7 +1383,7 @@ MAN_EXTENSION          = .3
 # only source the real man page, but without them the man command
 # would be unable to find the correct page. The default is NO.
 
-MAN_LINKS              = NO
+MAN_LINKS              = YES
 
 #---------------------------------------------------------------------------
 # configuration options related to the XML output
@@ -1468,13 +1468,13 @@ ENABLE_PREPROCESSING   = YES
 # compilation will be performed. Macro expansion can be done in a controlled
 # way by setting EXPAND_ONLY_PREDEF to YES.
 
-MACRO_EXPANSION        = NO
+MACRO_EXPANSION        = YES
 
 # If the EXPAND_ONLY_PREDEF and MACRO_EXPANSION tags are both set to YES
 # then the macro expansion is limited to the macros specified with the
 # PREDEFINED and EXPAND_AS_DEFINED tags.
 
-EXPAND_ONLY_PREDEF     = NO
+EXPAND_ONLY_PREDEF     = YES
 
 # If the SEARCH_INCLUDES tag is set to YES (the default) the includes files
 # pointed to by INCLUDE_PATH will be searched when a #include is found.
@@ -1507,7 +1507,8 @@ PREDEFINED             = CL_VERSION_1_0 \
                          CL_VERSION_1_2 \
                          CL_VERSION_2_0 \
                          CL_API_ENTRY= \
-                         CL_API_CALL=
+                         CL_API_CALL= \
+                         CCL_EXPORT=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.
@@ -1515,7 +1516,7 @@ PREDEFINED             = CL_VERSION_1_0 \
 # Use the PREDEFINED tag if you want to use a different macro definition that
 # overrules the definition found in the source code.
 
-EXPAND_AS_DEFINED      =
+EXPAND_AS_DEFINED      = CCL_EXPORT
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then
 # doxygen's preprocessor will remove all references to function-like macros
