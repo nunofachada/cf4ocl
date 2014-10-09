@@ -92,7 +92,7 @@ add_subdirectory(src)
 add_subdirectory(scripts)
 
 # add a target to generate API documentation with Doxygen
-if(DOXYGEN_FOUND)
+if(DOXYGEN_FOUND AND GIT_FOUND)
 
 	# Set doc directory
 	set(DOCS_DIRECTORY "doc")
@@ -129,14 +129,15 @@ if(DOXYGEN_FOUND)
 	add_custom_command(TARGET doc POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
 		${CMAKE_CURRENT_SOURCE_DIR}/images
-		${DOCS_DIRECTORY}/html/images
-	)
+		${DOCS_DIRECTORY}/html/images)
 
-	#~ # Compress man pages created by Doxygen
-	#~ if(UNIX)
-		#~ add_custom_command(TARGET doc POST_BUILD
-			#~ COMMAND "/bin/gzip -r ${CMAKE_BINARY_DIR}/${DOCS_DIRECTORY}/man/*")
-	#~ endif()
+	# Compress man pages created by Doxygen
+	if(UNIX)
+		add_custom_command(TARGET doc POST_BUILD
+			COMMAND rm -rf man?/*.gz
+			COMMAND gzip -r -q .
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${DOCS_DIRECTORY}/man/)
+	endif()
 
 	# Add documentation installation target (if the docs have been built)
 	if (DOC_INSTALL)
@@ -145,7 +146,7 @@ if(DOXYGEN_FOUND)
 		if (UNIX)
 			install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
 				DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
-				FILES_MATCHING REGEX "^ccl|^CCL")
+				FILES_MATCHING REGEX "(ccl|CCL).*gz")
 		endif()
 	endif()
 
