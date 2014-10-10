@@ -95,7 +95,10 @@ if(DOXYGEN_FOUND AND GIT_FOUND)
 	set(DOCS_DIRECTORY "doc")
 
 	# Install docs?
-	option(DOC_INSTALL "Install API documentation?" OFF)
+	option(DOC_INSTALL_HTML "Install HTML API documentation?" OFF)
+	if (UNIX)
+		option(DOC_INSTALL_MAN "Install man pages?" OFF)
+	endif()
 
 	# Create links to OpenCL API when OpenCL functions are mentioned?
 	# This is slow and requires Bash and other command-line utilties
@@ -105,13 +108,10 @@ if(DOXYGEN_FOUND AND GIT_FOUND)
 		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
 	endif()
 
-	# Generate man if system is Unix
+	# Required for Doxyfile
 	if(UNIX)
 		set(GENERATE_MAN "YES")
-	else()
-		set(GENERATE_MAN "NO")
 	endif()
-
 	# Copy and configure doxigen configuration file
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
@@ -136,14 +136,14 @@ if(DOXYGEN_FOUND AND GIT_FOUND)
 	endif()
 
 	# Add documentation installation target (if the docs have been built)
-	if (DOC_INSTALL)
+	if (DOC_INSTALL_HTML)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/html/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
-		if (UNIX)
-			install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
-				DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
-				FILES_MATCHING REGEX "(ccl|CCL).*gz")
-		endif()
+	endif()
+	if (UNIX AND DOC_INSTALL_MAN)
+		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
+			DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
+			FILES_MATCHING REGEX "(ccl|CCL).*gz")
 	endif()
 
 endif()
