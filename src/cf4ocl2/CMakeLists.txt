@@ -40,6 +40,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	PATTERN "*.in.h" EXCLUDE)
 
 # Install the common header and the export header
-install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/common.h
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/ccl_common.h
 	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}/ccl_export.h
 	DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME})

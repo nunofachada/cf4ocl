@@ -131,8 +131,7 @@ if(DOXYGEN_FOUND AND GIT_FOUND)
 	# Compress man pages created by Doxygen
 	if(UNIX)
 		add_custom_command(TARGET doc POST_BUILD
-			COMMAND rm -rf man?/*.gz
-			COMMAND gzip -r -q .
+			COMMAND ${CMAKE_SOURCE_DIR}/auxbuild/buildman.sh
 			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${DOCS_DIRECTORY}/man/)
 	endif()
 
