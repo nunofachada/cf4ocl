@@ -18,8 +18,8 @@
 # 1 - Remove old .gz files
 rm -rf man?/*.gz
 # 2 - Give man files a unique namespace
-find . -type f | sed -n 's/.*[1-9]/mv & &cf4ocl2/p' | sh
+find . -type f | sed -n -e 's/.*\.[1-9]/mv & &cf4ocl2/p' | sh
 # 3 - Fix links to account for new namespace and compression
-find . -type f -exec sed -i 's/\.so man[1-9]\/[\._1-9a-zA-Z]*/&cf4ocl2.gz/' '{}' \;
+find . -type f -exec sed -i -e 's/\.so man[1-9]\/[\._1-9a-zA-Z]*/&cf4ocl2.gz/' '{}' \;
 # 4 - Compress files
 gzip -r -q .
