@@ -1,5 +1,5 @@
 # List of utilities
-set(UTILS devinfo kerninfo)
+set(UTILS ccl_devinfo ccl_kerninfo)
 
 # Common libs for utilities
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
@@ -8,7 +8,6 @@ set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
 foreach(UTIL ${UTILS})
 	add_executable(${UTIL} ${UTIL}.c)
 	target_link_libraries(${UTIL} ${COMMON_LIBS})
-	set_target_properties(${UTIL} PROPERTIES OUTPUT_NAME ${EXECS_PREFIX}${UTIL})
 endforeach(UTIL)
 
 # Set utils version

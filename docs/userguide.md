@@ -40,17 +40,17 @@ table:
 
 | _cf4ocl_ module                         | _cf4ocl_ wrapper class | Wrapped OpenCL type |
 | --------------------------------------- | ---------------------- | ------------------- |
-| @ref PLATFORM_WRAPPER "Platform module" | ::CCLPlatform*         | cl_platform_id      |
-| @ref DEVICE_WRAPPER "Device module"     | ::CCLDevice*           | cl_device_id        |
-| @ref CONTEXT_WRAPPER "Context module"   | ::CCLContext*          | cl_context          |
-| @ref QUEUE_WRAPPER "Queue module"       | ::CCLQueue*            | cl_command_queue    |
-| @ref PROGRAM_WRAPPER "Program module"   | ::CCLProgram*          | cl_program          |
-| @ref KERNEL_WRAPPER "Kernel module"     | ::CCLKernel*           | cl_kernel           |
-| @ref EVENT_WRAPPER "Event module"       | ::CCLEvent*            | cl_event            |
-| @ref MEMOBJ_WRAPPER "MemObj module"     | ::CCLMemObj*           | cl_mem              |
-| @ref BUFFER_WRAPPER "Buffer module"     | ::CCLBuffer*           | cl_mem              |
-| @ref IMAGE_WRAPPER "Image module"       | ::CCLImage*            | cl_mem              |
-| @ref SAMPLER_WRAPPER "Sampler module"   | ::CCLSampler*          | cl_sampler          |
+| @ref CCL_PLATFORM_WRAPPER "Platform module" | ::CCLPlatform*         | cl_platform_id      |
+| @ref CCL_DEVICE_WRAPPER "Device module"     | ::CCLDevice*           | cl_device_id        |
+| @ref CCL_CONTEXT_WRAPPER "Context module"   | ::CCLContext*          | cl_context          |
+| @ref CCL_QUEUE_WRAPPER "Queue module"       | ::CCLQueue*            | cl_command_queue    |
+| @ref CCL_PROGRAM_WRAPPER "Program module"   | ::CCLProgram*          | cl_program          |
+| @ref CCL_KERNEL_WRAPPER "Kernel module"     | ::CCLKernel*           | cl_kernel           |
+| @ref CCL_EVENT_WRAPPER "Event module"       | ::CCLEvent*            | cl_event            |
+| @ref CCL_MEMOBJ_WRAPPER "MemObj module"     | ::CCLMemObj*           | cl_mem              |
+| @ref CCL_BUFFER_WRAPPER "Buffer module"     | ::CCLBuffer*           | cl_mem              |
+| @ref CCL_IMAGE_WRAPPER "Image module"       | ::CCLImage*            | cl_mem              |
+| @ref CCL_SAMPLER_WRAPPER "Sampler module"   | ::CCLSampler*          | cl_sampler          |
 
 Some of the provided methods directly wrap OpenCL functions (e.g.
 ::ccl_buffer_enqueue_copy()), while others perform a number of OpenCL
@@ -62,11 +62,11 @@ Additional modules are also available:
 
 | _cf4ocl_ module                                | Description                                                                                        |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| @ref DEVICE_SELECTOR "Device selector module"  | Automatically select devices using filters.                                                        |
-| @ref DEVICE_QUERY "Device query module"        | Helpers for querying device information, mainly used by the @ref ug_devinfo "ccl_devinfo" program. |
-| @ref ERRORS "Errors module"                    | Convert OpenCL error codes into human-readable strings.                                            |
-| @ref PLATFORMS "Platforms module"              | Management of the OpencL platforms available in the system.                                        |
-| @ref PROFILER "Profiler module"                | Simple, convenient and thorough profiling of OpenCL events.                                        |
+| @ref CCL_DEVICE_SELECTOR "Device selector module"  | Automatically select devices using filters.                                                        |
+| @ref CCL_DEVICE_QUERY "Device query module"        | Helpers for querying device information, mainly used by the @ref ug_devinfo "ccl_devinfo" program. |
+| @ref CCL_ERRORS "Errors module"                    | Convert OpenCL error codes into human-readable strings.                                            |
+| @ref CCL_PLATFORMS "Platforms module"              | Management of the OpencL platforms available in the system.                                        |
+| @ref CCL_PROFILER "Profiler module"                | Simple, convenient and thorough profiling of OpenCL events.                                        |
 
 ### The new/destroy rule {#ug_new_destroy}
 
@@ -327,81 +327,81 @@ methods. For example, the ::CCLContext* class provides the
 
 ### Platform module {#ug_platform}
 
-@copydoc PLATFORM_WRAPPER
+@copydoc CCL_PLATFORM_WRAPPER
 
 ### Device module {#ug_device}
 
-@copydoc DEVICE_WRAPPER
+@copydoc CCL_DEVICE_WRAPPER
 
 ### Context module {#ug_context}
 
-@copydoc CONTEXT_WRAPPER
+@copydoc CCL_CONTEXT_WRAPPER
 
 ### Command queue module {#ug_queue}
 
-@copydoc QUEUE_WRAPPER
+@copydoc CCL_QUEUE_WRAPPER
 
 ### Memory object module {#ug_memobj}
 
-@copydoc MEMOBJ_WRAPPER
+@copydoc CCL_MEMOBJ_WRAPPER
 
 ### Buffer module {#ug_buffer}
 
-@copydoc BUFFER_WRAPPER
+@copydoc CCL_BUFFER_WRAPPER
 
 ### Image module {#ug_image}
 
-@copydoc IMAGE_WRAPPER
+@copydoc CCL_IMAGE_WRAPPER
 
 ### Sampler module {#ug_sampler}
 
-@copydoc SAMPLER_WRAPPER
+@copydoc CCL_SAMPLER_WRAPPER
 
 ### Program module {#ug_program}
 
-@copydoc PROGRAM_WRAPPER
+@copydoc CCL_PROGRAM_WRAPPER
 
 ### Kernel module {#ug_kernel}
 
-@copydoc KERNEL_WRAPPER
+@copydoc CCL_KERNEL_WRAPPER
 
 #### Kernel arguments module {#ug_kernel_args}
 
-@copydoc KERNEL_ARG
+@copydoc CCL_KERNEL_ARG
 
 ### Event module {#ug_event}
 
-@copydoc EVENT_WRAPPER
+@copydoc CCL_EVENT_WRAPPER
 
 #### Event wait lists module {#ug_event_wait_lists}
 
-@copydoc EVENT_WAIT_LIST
+@copydoc CCL_EVENT_WAIT_LIST
 
 ## Other modules {#ug_othermodules}
 
 ### Device selector module {#ug_devsel}
 
-@copydoc DEVICE_SELECTOR
+@copydoc CCL_DEVICE_SELECTOR
 
 ### Device query module {#ug_devquery}
 
-@copydoc DEVICE_QUERY
+@copydoc CCL_DEVICE_QUERY
 
 ### Errors module {#ug_errors}
 
-@copydoc ERRORS
+@copydoc CCL_ERRORS
 
 ### Platforms module {#ug_platforms}
 
-@copydoc PLATFORMS
+@copydoc CCL_PLATFORMS
 
 ### Profiler module {#ug_profiling}
 
-@copydoc PROFILER
+@copydoc CCL_PROFILER
 
 # Using the utilities {#ug_utils}
 
-## ccl_devinfo {#ug_devinfo}
+## ccl_devinfo program {#ug_devinfo}
 
 The `ccl_devinfo` program prints information about the OpenCL platforms
 and devices available on the system. By default, only basic device
@@ -428,7 +428,7 @@ platforms and devices with the `-p` and `-d` options, respectively
 accept the platform index or the (platform-wise) device index to perform
 the selection.
 
-## ccl_kerninfo {#ug_kerninfo}
+## ccl_kerninfo program {#ug_kerninfo}
 
 The `ccl_kerninfo` program performs static analysis of OpenCL kernels.
 It accepts three parameters:
@@ -440,11 +440,11 @@ It accepts three parameters:
 If the device index is not given, the user should then select a device
 from a menu.
 
-## ccl_plot_events.py {#ug_plot_events}
+## ccl_plot_events.py script {#ug_plot_events}
 
 The `ccl_plot_events.py` script accepts a single parameter indicating
 a file containing profiling info exported using the
-@ref PROFILER "profiler module".
+@ref CCL_PROFILER "profiler module".
 
 This script requires a [Python](https://www.python.org/) installation,
 and depends on the [Matplotlib](http://matplotlib.org/) and

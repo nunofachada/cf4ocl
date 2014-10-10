@@ -26,7 +26,7 @@
 
 #include "ocl_env.h"
 #include "utils.h"
-#include "common.h"
+#include "ccl_common.h"
 
 
 CL_API_ENTRY cl_command_queue CL_API_CALL

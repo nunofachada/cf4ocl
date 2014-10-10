@@ -1,14 +1,15 @@
 # Sources required for building library
-set(SRC errors.c profiler.c common.c platforms.c
-	kernel_arg.c device_query.c device_selector.c
-	platform_wrapper.c device_wrapper.c context_wrapper.c
-	kernel_wrapper.c program_wrapper.c queue_wrapper.c event_wrapper.c
-	abstract_wrapper.c abstract_dev_container_wrapper.c
-	memobj_wrapper.c buffer_wrapper.c image_wrapper.c sampler_wrapper.c)
+set(SRC ccl_errors.c ccl_profiler.c ccl_common.c ccl_platforms.c
+	ccl_kernel_arg.c ccl_device_query.c ccl_device_selector.c
+	ccl_platform_wrapper.c ccl_device_wrapper.c ccl_context_wrapper.c
+	ccl_kernel_wrapper.c ccl_program_wrapper.c ccl_queue_wrapper.c
+	ccl_event_wrapper.c ccl_abstract_wrapper.c
+	ccl_abstract_dev_container_wrapper.c ccl_memobj_wrapper.c
+	ccl_buffer_wrapper.c ccl_image_wrapper.c ccl_sampler_wrapper.c)
 
 # Setup the configuration header
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.in.h
-	${CMAKE_BINARY_DIR}/cf4ocl2/common.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ccl_common.in.h
+	${CMAKE_BINARY_DIR}/cf4ocl2/ccl_common.h @ONLY)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})

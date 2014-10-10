@@ -16,9 +16,6 @@ include(TargetArch)
 # Set log domain
 add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 
-# Set executables prefix
-set(EXECS_PREFIX "ccl_")
-
 # Compiler options for GCC/Clang
 # -Wno-comment because of comment within comment in OpenCL headers
 if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")

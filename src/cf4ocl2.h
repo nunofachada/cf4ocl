@@ -32,27 +32,27 @@
 extern "C" {
 #endif
 
-#include <cf4ocl2/abstract_dev_container_wrapper.h>
-#include <cf4ocl2/abstract_wrapper.h>
-#include <cf4ocl2/buffer_wrapper.h>
-#include <cf4ocl2/common.h>
-#include <cf4ocl2/context_wrapper.h>
-#include <cf4ocl2/device_query.h>
-#include <cf4ocl2/device_selector.h>
-#include <cf4ocl2/device_wrapper.h>
-#include <cf4ocl2/errors.h>
-#include <cf4ocl2/event_wrapper.h>
-#include <cf4ocl2/image_wrapper.h>
-#include <cf4ocl2/kernel_arg.h>
-#include <cf4ocl2/kernel_wrapper.h>
-#include <cf4ocl2/memobj_wrapper.h>
-#include <cf4ocl2/oclversions.h>
-#include <cf4ocl2/platforms.h>
-#include <cf4ocl2/platform_wrapper.h>
-#include <cf4ocl2/profiler.h>
-#include <cf4ocl2/program_wrapper.h>
-#include <cf4ocl2/queue_wrapper.h>
-#include <cf4ocl2/sampler_wrapper.h>
+#include <cf4ocl2/ccl_abstract_dev_container_wrapper.h>
+#include <cf4ocl2/ccl_abstract_wrapper.h>
+#include <cf4ocl2/ccl_buffer_wrapper.h>
+#include <cf4ocl2/ccl_common.h>
+#include <cf4ocl2/ccl_context_wrapper.h>
+#include <cf4ocl2/ccl_device_query.h>
+#include <cf4ocl2/ccl_device_selector.h>
+#include <cf4ocl2/ccl_device_wrapper.h>
+#include <cf4ocl2/ccl_errors.h>
+#include <cf4ocl2/ccl_event_wrapper.h>
+#include <cf4ocl2/ccl_image_wrapper.h>
+#include <cf4ocl2/ccl_kernel_arg.h>
+#include <cf4ocl2/ccl_kernel_wrapper.h>
+#include <cf4ocl2/ccl_memobj_wrapper.h>
+#include <cf4ocl2/ccl_oclversions.h>
+#include <cf4ocl2/ccl_platforms.h>
+#include <cf4ocl2/ccl_platform_wrapper.h>
+#include <cf4ocl2/ccl_profiler.h>
+#include <cf4ocl2/ccl_program_wrapper.h>
+#include <cf4ocl2/ccl_queue_wrapper.h>
+#include <cf4ocl2/ccl_sampler_wrapper.h>
 
 #ifdef __cplusplus
 }

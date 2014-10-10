@@ -32,7 +32,7 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gprintf.h>
-#include "oclversions.h"
+#include "ccl_oclversions.h"
 
 /** Stub for cl_event objects. */
 struct _cl_event {
