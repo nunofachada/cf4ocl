@@ -11,10 +11,6 @@ and data transfers.
 3. Simplify the analysis of the OpenCL environment and of kernel
 requirements.
 
-Currently _cf4ocl_ 2 is alpha software. The stable 1.3.x branch can be
-found [here](https://github.com/FakenMC/cf4ocl/tree/v1x), although it
-is much more limited in scope than the current 2.x series.
-
 Features
 ========
 
@@ -39,7 +35,7 @@ Feeback
 Clone, build and install the code, take a look at the
 [examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 and the [user guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/).
-The API may change until the beta release. Any feedback is appreciated.
+Any feedback is welcomed.
 
 Not yet implemented
 ===================
