@@ -695,16 +695,21 @@ cl_bool ccl_devsel_indep_type(
 	/* Internal error object. */
 	GError* err_internal = NULL;
 
+	/* Device type. */
+	cl_device_type type = CL_DEVICE_TYPE_DEFAULT;
+	/* Device type to check for. */
+	cl_device_type type_to_check = CL_DEVICE_TYPE_DEFAULT;
+
 	/* Make sure data is not NULL. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL,
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: invalid filter data", G_STRLOC);
 
 	/* Get type to check for. */
-	cl_device_type type_to_check = *((cl_device_type*) data);
+	type_to_check = *((cl_device_type*) data);
 
 	/* Get device type. */
-	cl_device_type type = ccl_device_get_info_scalar(
+	type = ccl_device_get_info_scalar(
 		dev, CL_DEVICE_TYPE, cl_device_type, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
