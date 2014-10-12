@@ -32,8 +32,9 @@ Documentation
 Feeback
 =======
 
-Clone, build and install the code, take a look at the
-[examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
+Get _cf4ocl_, either by [building from source](https://github.com/FakenMC/cf4ocl/wiki/Build%20and%20install%20from%20source)
+or using the provided [binaries](https://github.com/FakenMC/cf4ocl/wiki/Install-the-binaries).
+Take a look at the [examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 and the [user guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/).
 Any feedback is welcomed.
 
