@@ -35,10 +35,12 @@ if(MINGW)
 endif()
 
 # How to get Glib location
-option(USE_PKGCONFIG "Use package config for Glib? (will cause problems with MSVC)" ON)
-if(USE_PKGCONFIG)
+option(GLIB_USE_PKGCONFIG "Use package config for Glib? (will cause problems with MSVC)" ON)
+if(GLIB_USE_PKGCONFIG)
 	# Search for glib with pkg-config (this will cause problems with
 	# Visual Studio). Works on Linux, Mac and MinGW32
+	unset(GLIB_INCLUDE_DIR CACHE)
+	unset(GLIB_CONFIG_INCLUDE_DIR CACHE)
 	find_package(PkgConfig REQUIRED)
 	pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 else()
@@ -50,20 +52,23 @@ else()
 	set(GLIB_INCLUDE_DIRS "${GLIB_INCLUDE_DIR}" "${GLIB_CONFIG_INCLUDE_DIR}")
 endif()
 
-# Find required libraries
+# Find OpenCL
 find_package(OpenCL REQUIRED)
+
+# Find optional executables for creating docs
 find_package(Doxygen 1.8.3 QUIET)
+find_package(LATEX QUIET)
 
 # Use provided OpenCL headers or system OpenCL headers?
 if (NOT APPLE) # Not for Apple, which handles these headers differently
 
-	option(USE_LOCAL_OPENCL_HEADERS "Use local OpenCL headers?" OFF)
+	option(OPENCL_USE_LOCAL_HEADERS "Use local OpenCL headers?" OFF)
 
-	SET(LOCAL_OPENCL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
+	set(OPENCL_LOCAL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
 
-	SET_PROPERTY(CACHE LOCAL_OPENCL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
+	set_property(CACHE OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
 
-	if (USE_LOCAL_OPENCL_HEADERS)
+	if (OPENCL_USE_LOCAL_HEADERS)
 		SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${LOCAL_OPENCL_HEADERS}")
 	endif()
 
@@ -76,7 +81,8 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME})
 
 # Define install subdirs
-set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME})
+set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME}/html)
+set(INSTALL_SUBDIR_DOCS_PDF share/doc/${PROJECT_NAME})
 set(INSTALL_SUBDIR_DOCS_MAN share/man/)
 set(INSTALL_SUBDIR_INCLUDE include)
 set(INSTALL_SUBDIR_BIN bin)
@@ -88,48 +94,111 @@ add_subdirectory(src)
 # Add scripts folder
 add_subdirectory(scripts)
 
-# add a target to generate API documentation with Doxygen
-if(DOXYGEN_FOUND AND GIT_FOUND)
+# ########################### #
+# BUILD DOCUMENTATION SECTION #
+# ########################### #
 
-	# Set doc directory
+# add a target to generate API documentation with Doxygen
+if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
+
+	# Set doc generation directory
 	set(DOCS_DIRECTORY "doc")
 
-	# Install docs?
-	option(DOC_INSTALL_HTML "Install HTML API documentation?" OFF)
-	if (UNIX)
-		option(DOC_INSTALL_MAN "Install man pages?" OFF)
+	# Document generation options
+	option(DOC_GENERATE_HTML "Generate HTML documentation?" ON)
+	option(DOC_GENERATE_LATEX "Generate Latex documentation?" OFF)
+	if (CMAKE_MAKE_PROGRAM AND DOC_GENERATE_LATEX)
+		option(DOC_GENERATE_PDF "Generate PDF documentation?" OFF)
+	else()
+		unset(DOC_GENERATE_PDF CACHE)
 	endif()
-
-	# Create links to OpenCL API when OpenCL functions are mentioned?
-	# This is slow and requires Bash and other command-line utilties
-	option(DOC_OPENCL_FUNCTION_URLS "Create links to OpenCL API (much slower)?" OFF)
-	if (DOC_OPENCL_FUNCTION_URLS)
-		# Create those links
-		set(DOC_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
-	endif()
-
-	# Required for Doxyfile
 	if(UNIX)
-		set(GENERATE_MAN "YES")
+		option(DOC_GENERATE_MAN "Generate man pages?" OFF)
 	endif()
+	
+	# Set doxygen document generation options
+	if (DOC_GENERATE_HTML)
+		set(DOX_GENERATE_HTML "YES")
+	else()
+		set(DOX_GENERATE_HTML "NO")
+	endif()
+	if (DOC_GENERATE_LATEX)
+		set(DOX_GENERATE_LATEX "YES")
+	else()
+		set(DOX_GENERATE_LATEX "NO")
+	endif()
+	if (DOC_GENERATE_MAN)
+		set(DOX_GENERATE_MAN "YES")
+	else()
+		set(DOX_GENERATE_MAN "NO")
+	endif()
+	
+	# Document install options
+	if (DOC_GENERATE_HTML)
+		option(DOC_INSTALL_HTML "Install HTML documentation?" OFF)
+	else()
+		unset(DOC_INSTALL_HTML CACHE)
+	endif()
+	if (DOC_GENERATE_PDF)
+		option(DOC_INSTALL_PDF "Install Latex documentation?" OFF)
+	else()
+		unset(DOC_INSTALL_PDF CACHE)
+	endif()
+	if (DOC_GENERATE_MAN)
+		option(DOC_INSTALL_MAN "Install HTML API documentation?" OFF)
+	else()
+		unset(DOC_INSTALL_MAN CACHE)
+	endif()
+	
+	# If git is found, set document file version filter to last
+	# commit where file was changed
+	if (GIT_FOUND)
+		set(DOX_FILE_VERSION_FILTER 
+			"${GIT_EXECUTABLE} log -n 1 --pretty=%h --")
+	endif()
+	
+	# Linux/OSX options
+	if (UNIX)
+
+		# Create links to OpenCL API when OpenCL functions are mentioned?
+		# This is slow and requires Bash and other command-line utilties
+		option(DOC_OPENCL_FUNCTION_URLS "Create links to OpenCL API (much slower)?" OFF)
+		if (DOC_OPENCL_FUNCTION_URLS)
+			# Create those links
+			set(DOX_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
+		endif()
+
+	endif()
+
 	# Copy and configure doxigen configuration file
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in 
+		${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
 	# Add a build docs target
-	add_custom_target(doc
-		${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Generating API documentation with Doxygen" VERBATIM
-	)
+	if (DOC_GENERATE_HTML OR DOC_GENERATE_LATEX OR DOC_GENERATE_MAN)
+		add_custom_target(doc
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating API documentation with Doxygen" VERBATIM
+		)
+	else()
+		add_custom_target(doc
+			${CMAKE_COMMAND} -E echo "Enable at least one document format."
+			COMMENT "All document generation formats are disabled!" VERBATIM
+		)
+	endif()
+	
+	# Generate PDF from latex files
+	if (DOC_GENERATE_PDF)
+		add_custom_command(TARGET doc POST_BUILD
+			COMMAND ${CMAKE_MAKE_PROGRAM}
+			COMMAND ${CMAKE_COMMAND} -E make_directory ../pdf
+			COMMAND ${CMAKE_COMMAND} -E copy refman.pdf ../pdf
+			WORKING_DIRECTORY ${DOCS_DIRECTORY}/latex)
+	endif()
 
-	# Copy images to doc directory
-	add_custom_command(TARGET doc POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_SOURCE_DIR}/images
-		${DOCS_DIRECTORY}/html/images)
-
-	# Compress man pages created by Doxygen
-	if(UNIX)
+	# Post-process man pages created by Doxygen
+	if(DOC_GENERATE_MAN)
 		add_custom_command(TARGET doc POST_BUILD
 			COMMAND ${CMAKE_SOURCE_DIR}/auxbuild/buildman.sh
 			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${DOCS_DIRECTORY}/man/)
@@ -140,7 +209,13 @@ if(DOXYGEN_FOUND AND GIT_FOUND)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/html/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
 	endif()
-	if (UNIX AND DOC_INSTALL_MAN)
+	
+	if (DOC_INSTALL_PDF)
+		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/latex/refman.pdf
+			DESTINATION ${INSTALL_SUBDIR_DOCS_PDF} OPTIONAL)
+	endif()
+	
+	if (DOC_INSTALL_MAN)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
 			FILES_MATCHING REGEX "(ccl|CCL).*gz")
@@ -148,13 +223,19 @@ if(DOXYGEN_FOUND AND GIT_FOUND)
 
 endif()
 
+# ################# #
+# PACKAGING SECTION #
+# ################# #
+
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
 
 # Determine architecture
 target_architecture(BUILD_ARCH_GET)
-set(BUILD_ARCH "${BUILD_ARCH_GET}" CACHE STRING "Build architecture (for packaging only)")
+set(PACKAGE_ARCH_NAME "${BUILD_ARCH_GET}" CACHE STRING "Build architecture (for packaging only)" FORCE)
+mark_as_advanced(PACKAGE_ARCH_NAME)
 
+# Generic packaging settings
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
@@ -164,16 +245,19 @@ set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A cross-platform pure C99 object-oriented framework for developing and benchmarking OpenCL projects in C/C++")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}.${BUILD_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}.${PACKAGE_ARCH_NAME}")
 set(CPACK_RESOURCE_VENDOR "fakenmc.com")
 
 if(WIN32)
+	# Windows packaging settings
 	set(CPACK_GENERATOR "NSIS" "ZIP")
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
 	set(CPACK_NSIS_URL_INFO_ABOUT "http://fakenmc.github.io/cf4ocl/" )
 elseif(APPLE)
-
+	# OSX packaging settings
+	# Use defaults
 elseif(UNIX)
+	# Linux packaging settings
 	set(CPACK_GENERATOR "DEB" "RPM" "TGZ")
 
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nuno Fachada <faken@fakenmc.com>")

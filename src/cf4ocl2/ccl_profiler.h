@@ -191,9 +191,13 @@
  *
  *     $ python ccl_plot_events.py prof.tsv
  *
- * ...will produce the folllowing image:
+ * ...will produce the following image:
  *
- * @image html images/gantt_ca.svg
+ * @image html gantt_ca.png
+ * @image latex gantt_ca.png "Gantt-like chart of events which took place in the queues" width=0.7\textwidth
+ * @manonly
+ * Image not available in man pages.
+ * @endmanonly
  *
  * @example ca.c
  * @example ca_mt.c

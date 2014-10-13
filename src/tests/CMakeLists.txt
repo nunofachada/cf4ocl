@@ -44,11 +44,11 @@ target_link_libraries(${PROJECT_NAME}_TESTING
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
 
 # Use OpenCL stub when possible?
-option(USE_OPENCL_STUB "Use OpenCL stub when possible?" ON)
+option(OPENCL_USE_STUB_IN_TESTS "Use OpenCL stub in tests when possible?" ON)
 
 # Determine general properties for tests which can either use the OpenCL
 # stub or a real OpenCL implementation
-if (USE_OPENCL_STUB)
+if (OPENCL_USE_STUB_IN_TESTS)
 	set(LIB_OPT ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
 	add_definitions(-DOPENCL_STUB)
 	set(FLAGS_OPT "-DCCL_STATIC_DEFINE")

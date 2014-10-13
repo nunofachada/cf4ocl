@@ -555,7 +555,7 @@ SHOW_NAMESPACES        = NO
 # provided by doxygen. Whatever the program writes to standard output
 # is used as the file version. See the manual for examples.
 
-FILE_VERSION_FILTER    = "git log -n 1 --pretty=%h --"
+FILE_VERSION_FILTER    = "@DOX_FILE_VERSION_FILTER@"
 
 # The LAYOUT_FILE tag can be used to specify a layout file which will be parsed
 # by doxygen. The layout file controls the global structure of the generated
@@ -708,7 +708,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @DOC_EXCLUDE_PATHS@
+EXCLUDE                = @DOX_EXCLUDE_PATHS@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -756,7 +756,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = @PROJECT_BINARY_DIR@/doc/html/images
+IMAGE_PATH             = @PROJECT_SOURCE_DIR@/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -766,7 +766,7 @@ IMAGE_PATH             = @PROJECT_BINARY_DIR@/doc/html/images
 # to standard output.  If FILTER_PATTERNS is specified, this tag will be
 # ignored.
 
-INPUT_FILTER           = "@DOC_OPENCL_FUNCTION_URLS_FILTER@"
+INPUT_FILTER           = "@DOX_OPENCL_FUNCTION_URLS_FILTER@"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
 # basis.  Doxygen will compare the file name with each pattern and apply the
@@ -876,7 +876,7 @@ IGNORE_PREFIX          =
 # If the GENERATE_HTML tag is set to YES (the default) Doxygen will
 # generate HTML output.
 
-GENERATE_HTML          = YES
+GENERATE_HTML          = @DOX_GENERATE_HTML@
 
 # The HTML_OUTPUT tag is used to specify where the HTML docs will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -1223,7 +1223,7 @@ SERVER_BASED_SEARCH    = NO
 # If the GENERATE_LATEX tag is set to YES (the default) Doxygen will
 # generate Latex output.
 
-GENERATE_LATEX         = NO
+GENERATE_LATEX         = @DOX_GENERATE_LATEX@
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -1237,13 +1237,13 @@ LATEX_OUTPUT           = latex
 # generating bitmaps for formulas in the HTML output, but not in the
 # Makefile that is written to the output directory.
 
-LATEX_CMD_NAME         = latex
+LATEX_CMD_NAME         = @LATEX_COMPILER@
 
 # The MAKEINDEX_CMD_NAME tag can be used to specify the command name to
 # generate index for LaTeX. If left blank `makeindex' will be used as the
 # default command name.
 
-MAKEINDEX_CMD_NAME     = makeindex
+MAKEINDEX_CMD_NAME     = @MAKEINDEX_COMPILER@
 
 # If the COMPACT_LATEX tag is set to YES Doxygen generates more compact
 # LaTeX documents. This may be useful for small projects and may help to
@@ -1294,7 +1294,7 @@ USE_PDFLATEX           = YES
 # running if errors occur, instead of asking the user for help.
 # This option is also used when generating formulas in HTML.
 
-LATEX_BATCHMODE        = NO
+LATEX_BATCHMODE        = YES
 
 # If LATEX_HIDE_INDICES is set to YES then doxygen will not
 # include the index chapters (such as File Index, Compound Index, etc.)
@@ -1364,7 +1364,7 @@ RTF_EXTENSIONS_FILE    =
 # If the GENERATE_MAN tag is set to YES (the default) Doxygen will
 # generate man pages
 
-GENERATE_MAN           = @GENERATE_MAN@
+GENERATE_MAN           = @DOX_GENERATE_MAN@
 
 # The MAN_OUTPUT tag is used to specify where the man pages will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -1722,7 +1722,7 @@ INTERACTIVE_SVG        = NO
 # The tag DOT_PATH can be used to specify the path where the dot tool can be
 # found. If left blank, it is assumed the dot tool can be found in the path.
 
-DOT_PATH               =
+DOT_PATH               = @DOXYGEN_DOT_PATH@
 
 # The DOTFILE_DIRS tag can be used to specify one or more directories that
 # contain dot files that are included in the documentation (see the
