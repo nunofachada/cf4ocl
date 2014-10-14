@@ -4,6 +4,13 @@ project(cf4ocl2)
 # Set modules directory
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
+# Set log domain
+add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
+
+# #################### #
+# DEPENDENCIES SECTION #
+# #################### #
+
 # Find git
 find_package(Git QUIET)
 # Determine version from Git
@@ -12,27 +19,6 @@ include(GetVersionFromGitTag)
 include(GenerateExportHeader)
 # Auto-determine architecture
 include(TargetArch)
-
-# Set log domain
-add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
-
-# Compiler options for GCC/Clang
-# -Wno-comment because of comment within comment in OpenCL headers
-if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
-	# Clang and GCC flags
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
-elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-	# This line is required for glib to work with MSVC
-	add_definitions("-Dinline=__inline")
-	# And this avoids some warnings
-	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-endif()
-
-# Avoid including MinGW dll dependency
-if(MINGW)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
-endif()
 
 # How to get Glib location
 option(GLIB_USE_PKGCONFIG "Use package config for Glib? (will cause problems with MSVC)" ON)
@@ -59,6 +45,32 @@ find_package(OpenCL REQUIRED)
 find_package(Doxygen 1.8.3 QUIET)
 find_package(LATEX QUIET)
 
+# ################ #
+# COMPILER OPTIONS #
+# ################ #
+
+# Compiler options for GCC/Clang
+# -Wno-comment because of comment within comment in OpenCL headers
+if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
+	# Clang and GCC flags
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
+elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+	# This line is required for glib to work with MSVC
+	add_definitions("-Dinline=__inline")
+	# And this avoids some warnings
+	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+endif()
+
+# Avoid including MinGW dll dependency
+if(MINGW)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
+endif()
+
+# ################################### #
+# OPTIONALLY USE LOCAL OPENCL HEADERS #
+# ################################### #
+
 # Use provided OpenCL headers or system OpenCL headers?
 if (NOT APPLE) # Not for Apple, which handles these headers differently
 
@@ -74,25 +86,23 @@ if (NOT APPLE) # Not for Apple, which handles these headers differently
 
 endif()
 
-# Library include directories
+# ########################### #
+# SET LIBRARY INCLUDE FOLDERS #
+# ########################### #
 include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src
 	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
 	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME})
 
-# Define install subdirs
+# ###################### #
+# DEFINE INSTALL FOLDERS #
+# ###################### #
 set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME}/html)
 set(INSTALL_SUBDIR_DOCS_PDF share/doc/${PROJECT_NAME})
 set(INSTALL_SUBDIR_DOCS_MAN share/man/)
 set(INSTALL_SUBDIR_INCLUDE include)
 set(INSTALL_SUBDIR_BIN bin)
 set(INSTALL_SUBDIR_LIB lib)
-
-# Add src folder
-add_subdirectory(src)
-
-# Add scripts folder
-add_subdirectory(scripts)
 
 # ########################### #
 # BUILD DOCUMENTATION SECTION #
@@ -101,13 +111,16 @@ add_subdirectory(scripts)
 # add a target to generate API documentation with Doxygen
 if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 
+	# Doc build is enabled
+	set(DOC_BUILD "ON" CACHE INTERNAL "Build documentation")
+	
 	# Set doc generation directory
 	set(DOCS_DIRECTORY "doc")
 
 	# Document generation options
 	option(DOC_GENERATE_HTML "Generate HTML documentation?" ON)
 	option(DOC_GENERATE_LATEX "Generate Latex documentation?" OFF)
-	if (CMAKE_MAKE_PROGRAM AND DOC_GENERATE_LATEX)
+	if (DOC_GENERATE_LATEX AND CMAKE_MAKE_PROGRAM AND PDFLATEX_COMPILER AND MAKEINDEX_COMPILER)
 		option(DOC_GENERATE_PDF "Generate PDF documentation?" OFF)
 	else()
 		unset(DOC_GENERATE_PDF CACHE)
@@ -221,7 +234,22 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 			FILES_MATCHING REGEX "(ccl|CCL).*gz")
 	endif()
 
+else()
+
+	# No doc builds
+	unset(DOC_BUILD CACHE)
+
 endif()
+
+# ############### #
+# PROCESS SUBDIRS #
+# ############### #
+
+# Add src folder
+add_subdirectory(src)
+
+# Add scripts folder
+add_subdirectory(scripts)
 
 # ################# #
 # PACKAGING SECTION #

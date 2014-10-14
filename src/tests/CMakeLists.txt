@@ -10,7 +10,7 @@ set(TESTS_OPT test_profiler test_platforms test_buffer test_devquery
 set(TESTS ${TESTS_STUBONLY} ${TESTS_OPT})
 
 # Exclude tests from documentation?
-if (DOXYGEN_FOUND)
+if (DOC_BUILD)
 	option(DOC_EXCLUDE_TESTS "Exclude tests from API docs?" ON)
 	if (DOC_EXCLUDE_TESTS)
 		# Add tests path to doc exclude path
