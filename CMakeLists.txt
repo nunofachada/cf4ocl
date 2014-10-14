@@ -196,13 +196,11 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 		add_custom_target(doc
 			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			COMMENT "Generating API documentation with Doxygen" VERBATIM
-		)
+			COMMENT "Generating documentation with Doxygen" VERBATIM)
 	else()
 		add_custom_target(doc
 			${CMAKE_COMMAND} -E echo "Enable at least one document format."
-			COMMENT "All document generation formats are disabled!" VERBATIM
-		)
+			COMMENT "All document generation formats are disabled!" VERBATIM)
 	endif()
 	
 	# Generate PDF from latex files
@@ -242,6 +240,13 @@ else()
 
 	# No doc builds
 	unset(DOC_BUILD CACHE)
+	
+	# Add doc target which warns that some document build dependencies
+	# are missing
+	add_custom_target(doc
+		${CMAKE_COMMAND} -E echo "Documentation generation is disabled."
+		COMMENT "One or more tools required for documentation generation were not found!" 
+		VERBATIM)
 
 endif()
 
