@@ -13,6 +13,10 @@ add_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 
 # Find git
 find_package(Git QUIET)
+# Update version from Git?
+if (GIT_FOUND)
+	option(VERSION_UPDATE_FROM_GIT "Update project version from git?" OFF)
+endif()
 # Determine version from Git
 include(GetVersionFromGitTag)
 # Required for building with Visual Studio

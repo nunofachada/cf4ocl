@@ -3,9 +3,13 @@
 # variables by analysing the git tag and commit history. It expects git
 # tags defined with semantic versioning 2.0.0 (http://semver.org/).
 #
-# The module expects the PROJECT_NAME and GIT_EXECUTABLE variables to be
-# set. If Git is not found, the module will try to read a VERSION file
-# containing the full and partial versions.
+# The module expects the PROJECT_NAME variable to be set, and recognizes
+# the GIT_FOUND, GIT_EXECUTABLE and VERSION_UPDATE_FROM_GIT variables. 
+# If Git is found and VERSION_UPDATE_FROM_GIT is set to boolean TRUE, 
+# the project version will be updated using information fetched from the
+# most recent git tag and commit. Otherwise, the module will try to read
+# a VERSION file containing the full and partial versions. The module 
+# will update this file each time the project version is updated.
 #
 # Once done, this module will define the following variables:
 #
@@ -26,7 +30,7 @@
 # Author: Nuno Fachada
 
 # Check if git is found...
-if (${GIT_FOUND})
+if (GIT_FOUND AND VERSION_UPDATE_FROM_GIT)
 
 	# Get last tag from git
 	execute_process(COMMAND ${GIT_EXECUTABLE} describe --abbrev=0 --tags
@@ -73,7 +77,7 @@ if (${GIT_FOUND})
 	set(${PROJECT_NAME}_VERSION_STRING_FULL
 		${${PROJECT_NAME}_VERSION_STRING}+${${PROJECT_NAME}_VERSION_AHEAD}.${${PROJECT_NAME}_VERSION_GIT_SHA})
 
-	# Save version to file (which will be used when Git is not available
+	# Save version to file (which will be used when Git is not available)
 	file(WRITE ${CMAKE_SOURCE_DIR}/VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL}
 		"*" ${${PROJECT_NAME}_VERSION_STRING}
 		"*" ${${PROJECT_NAME}_VERSION_MAJOR}
@@ -82,7 +86,6 @@ if (${GIT_FOUND})
 		"*" ${${PROJECT_NAME}_VERSION_TWEAK}
 		"*" ${${PROJECT_NAME}_VERSION_AHEAD}
 		"*" ${${PROJECT_NAME}_VERSION_GIT_SHA})
-
 
 else()
 
