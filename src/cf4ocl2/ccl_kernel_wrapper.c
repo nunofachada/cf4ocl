@@ -715,7 +715,8 @@ finish:
  *
  * @public @memberof ccl_kernel
  *
- * @param[in] krnl Kernel wrapper object.
+ * @param[in] krnl Kernel wrapper object. If `NULL`, use only device
+ * information for determining global and local worksizes.
  * @param[in] dev Device wrapper object.
  * @param[in] dims The number of dimensions used to specify the global
  * work-items and work-items in the work-group.
@@ -739,8 +740,6 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
 	GError** err) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_val_if_fail(krnl != NULL, CL_FALSE);
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, CL_FALSE);
 	/* Make sure dims not zero. */
@@ -773,31 +772,42 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		"%s: device only supports a max. of %d dimension, but %d where requested.",
 		G_STRLOC, dev_dims, dims);
 
-	/* Determine maximum workgroup size. */
-	wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
-		CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-
-#ifdef CL_VERSION_1_1
-	/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
-	cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	if (ocl_ver >= 110) {
-		wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
-			krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
-			size_t, &err_internal);
-	} else {
-		wg_size_mult = wg_size_max;
-	}
-#else
-	wg_size_mult = wg_size_max;
-#endif
-
 	/* Get max. work item sizes for device. */
 	max_wi_sizes = ccl_device_get_info_array(
 		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
+	/* If kernel is not NULL, query it about workgroup size preferences
+	 * and capabilities. */
+	if (krnl != NULL) {
+		/* Determine maximum workgroup size. */
+		wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+			CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+#ifdef CL_VERSION_1_1
+		/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
+		cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		if (ocl_ver >= 110) {
+			wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
+				krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+				size_t, &err_internal);
+		} else {
+			wg_size_mult = wg_size_max;
+		}
+#else
+		wg_size_mult = wg_size_max;
+#endif
+	} else {
+		
+		/* Kernel is NULL, use values obtained from device. */
+		wg_size_max = ccl_device_get_info_scalar(
+			dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		wg_size_mult = wg_size_max;
+	}
+	
 	/* Try to find an appropriate local worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
 		/* Each lws component is at most the preferred workgroup
