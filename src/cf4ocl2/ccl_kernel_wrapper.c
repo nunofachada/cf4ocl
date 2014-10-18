@@ -379,9 +379,9 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	const size_t* global_work_size, const size_t* local_work_size,
 	CCLEventWaitList* evt_wait_lst, GError** err) {
 
-	/* Make sure number krnl is not NULL. */
+	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
-	/* Make sure number cq is not NULL. */
+	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -613,9 +613,9 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	const size_t* global_work_size, const size_t* local_work_size,
 	CCLEventWaitList* evt_wait_lst, void** args, GError** err) {
 
-	/* Make sure number krnl is not NULL. */
+	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
-	/* Make sure number cq is not NULL. */
+	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -662,7 +662,7 @@ finish:
 CCL_EXPORT
 cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
 
-	/* Make sure number krnl is not NULL. */
+	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, 0);
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -723,7 +723,9 @@ finish:
  * @param[out] gws A "nice" global worksize for the given kernel and
  * device, which must be equal or larger than the `real_worksize` and a
  * multiple of `lws`. This memory location should be pre-allocated with
- * space for `dims` size_t values.
+ * space for `dims` size_t values. If `NULL` it is assumed that the
+ * global worksize must be equal to `real_worksize`, and this function
+ * will only suggest a local worksize.
  * @param[out] lws A "nice" local worksize, which is based and respects
  * the limits of the given kernel and device. This memory location
  * should be pre-allocated with space for `dims` size_t values.
@@ -736,6 +738,19 @@ CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
 	GError** err) {
+
+	/* Make sure krnl is not NULL. */
+	g_return_val_if_fail(krnl != NULL, CL_FALSE);
+	/* Make sure dev is not NULL. */
+	g_return_val_if_fail(dev != NULL, CL_FALSE);
+	/* Make sure dims not zero. */
+	g_return_val_if_fail(dims > 0, CL_FALSE);
+	/* Make sure real_worksize is not NULL. */
+	g_return_val_if_fail(real_worksize != NULL, CL_FALSE);
+	/* Make sure lws is not NULL. */
+	g_return_val_if_fail(lws != NULL, CL_FALSE);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
 	/* The preferred workgroup size. */
 	size_t wg_size_mult = 0;
@@ -814,12 +829,65 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		}
 	}
 
-	/* Now get a global worksize which is a multiple of the local
-	 * worksize and is big enough to handle the real worksize. */
-	for (cl_uint i = 0; i < dims; ++i) {
-		gws[i] = ((real_worksize[i] / lws[i])
-			+ (((real_worksize[i] % lws[i]) > 0) ? 1 : 0))
-			* lws[i];
+	/* If output variable gws is not NULL... */
+	if (gws != NULL) {
+		/* ...find a global worksize which is a multiple of the local
+		 * worksize and is big enough to handle the real worksize. */
+		for (cl_uint i = 0; i < dims; ++i) {
+			gws[i] = ((real_worksize[i] / lws[i])
+				+ (((real_worksize[i] % lws[i]) > 0) ? 1 : 0))
+				* lws[i];
+		}
+	} else {
+		/* ...otherwise check if found local worksizes are divisors of
+		 * the respective real_worksize. If so keep them, otherwise find
+		 * local worksizes which respect the maximum sizes allowed by
+		 * the kernel and the device, and is a dimension-wise divisor of
+		 * the real_worksize. */
+		cl_bool lws_are_divisors = CL_TRUE;
+		for (cl_uint i = 0; i < dims; ++i) {
+			/* Check if lws[i] is divisor of real_worksize[i]. */
+			if (real_worksize[i] % lws[i] != 0) {
+				/* Ops... lws[i] is not divisor of real_worksize[i], so
+				 * we'll have to try and find new lws ahead. */
+				lws_are_divisors = CL_FALSE;
+				break;
+			}
+		}
+		/* Is lws divisor of real_worksize, dimension-wise? */
+		if (!lws_are_divisors) {
+			/* No, so we'll have to find new lws. */
+			wg_size = 1;
+			for (cl_uint i = 0; i < dims; ++i) {
+
+				/* For each dimension, try to use the previously
+				 * found lws[i]. */
+				if ((real_worksize[i] % lws[i] != 0)
+					|| (lws[i] * wg_size > wg_size_max))
+				{
+					/* Previoulsy found lws[i] not usable, find
+					 * new one. Must be a divisor of real_worksize[i]
+					 * and respect the kernel and device maximum lws.*/
+					cl_uint best_lws_i = 1;
+					for (cl_uint j = 2; j <= real_worksize[i] / 2; ++j) {
+						/* If current value is higher than the kernel
+						 * and device limits, stop searching and use
+						 * the best one so far. */
+						if ((wg_size * j > wg_size_max)
+							|| (j > max_wi_sizes[i])) break;
+						/* Otherwise check if current value is divisor
+						 * of lws[i]. If so, keep it as the best so
+						 * far. */
+						if (real_worksize[i] % j == 0)
+							best_lws_i = j;
+					}
+					/* Keep the best divisor for current dimension. */
+					lws[i] = best_lws_i;
+				}
+				/* Update absolute workgroup size (all dimensions). */
+				wg_size *= lws[i];
+			}
+		}
 	}
 
 	/* If we got here, everything is OK. */
