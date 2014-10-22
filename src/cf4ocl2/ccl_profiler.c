@@ -1261,6 +1261,10 @@ void ccl_prof_add_queue(
 /**
  * Determine aggregate statistics for the given profile object.
  *
+ * The command queues to be profiled will have their events garbage
+ * collected with ::ccl_queue_gc(). As such, they can be reused and
+ * re-added for profiling to a new profile object.
+ *
  * @public @memberof ccl_prof
  *
  * @param[in] prof A profile object.
