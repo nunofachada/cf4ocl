@@ -100,6 +100,17 @@ void* ccl_arg_value(CCLArg* arg);
  *     ccl_arg_priv(pi, cl_float), NULL);
  * @endcode
  * @{
+ *
+ * @note These macros wrap the ::ccl_arg_new() function, which returns
+ * a new ::CCLArg* memory object. ::CCLArg* objects are destroyed when
+ * the kernel to which they were passed is released. For further control
+ * of argument instantiation, client code can use the ::ccl_arg_full()
+ * macro instead of the ::ccl_arg_new() function in order to respect the
+ * @ref ug_new_destroy "new/destroy" rule.
+ *
+ * @attention A ::CCLArg* memory object can only be passed once to a
+ * kernel. One way to guarantee this is to use the macros directly
+ * when setting the kernel arguments, as shown in the example above.
  */
 
 /**
@@ -110,8 +121,9 @@ void* ccl_arg_value(CCLArg* arg);
  *
  * @param[in] value Argument value. Must be a variable, not a literal
  * value.
- * @param[in] type Argument scalar type, such as cl_int, cl_float, etc.
- * @return A private kernel argument.
+ * @param[in] type Argument scalar type, such as `cl_int`, `cl_float`,
+ * etc.
+ * @return A private ::CCLArg* kernel argument.
  * */
 #define ccl_arg_priv(value, type) \
 	ccl_arg_new(&value, sizeof(type))
@@ -124,21 +136,23 @@ void* ccl_arg_value(CCLArg* arg);
  * enqueued.
  *
  * @param[in] count Number of values of type given in next parameter.
- * @param[in] type Argument scalar type, such as cl_int, cl_float, etc.
- * @return A local kernel argument.
+ * @param[in] type Argument scalar type, such as `cl_int`, `cl_float`,
+ * etc.
+ * @return A local ::CCLArg* kernel argument.
  * */
 #define ccl_arg_local(count, type) \
 	ccl_arg_new(NULL, count * sizeof(type))
 
 /**
- * Defines a kernel argument which more control.
+ * Defines a kernel argument with more control.
  *
  * The created object is automatically released when kernel is
  * enqueued.
  *
- * @param[in] value Argument value. Can be NULL if argument is local.
+ * @param[in] value Memory location of argument value. Can be NULL if
+ * argument is local.
  * @param[in] size Size in bytes of argument.
- * @return A private or local kernel argument.
+ * @return A private or local ::CCLArg* kernel argument.
  * */
 #define ccl_arg_full(value, size) \
 	ccl_arg_new(value, size)
