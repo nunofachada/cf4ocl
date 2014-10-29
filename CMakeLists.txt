@@ -117,7 +117,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 
 	# Doc build is enabled
 	set(DOC_BUILD "ON" CACHE INTERNAL "Build documentation")
-	
+
 	# Set doc generation directory
 	set(DOCS_DIRECTORY "doc")
 
@@ -132,7 +132,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 	if(UNIX)
 		option(DOC_GENERATE_MAN "Generate man pages?" OFF)
 	endif()
-	
+
 	# Set doxygen document generation options
 	if (DOC_GENERATE_HTML)
 		set(DOX_GENERATE_HTML "YES")
@@ -149,7 +149,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 	else()
 		set(DOX_GENERATE_MAN "NO")
 	endif()
-	
+
 	# Document install options
 	if (DOC_GENERATE_HTML)
 		option(DOC_INSTALL_HTML "Install HTML documentation?" OFF)
@@ -162,18 +162,18 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 		unset(DOC_INSTALL_PDF CACHE)
 	endif()
 	if (DOC_GENERATE_MAN)
-		option(DOC_INSTALL_MAN "Install HTML API documentation?" OFF)
+		option(DOC_INSTALL_MAN "Install man pages" OFF)
 	else()
 		unset(DOC_INSTALL_MAN CACHE)
 	endif()
-	
+
 	# If git is found, set document file version filter to last
 	# commit where file was changed
 	if (GIT_FOUND)
-		set(DOX_FILE_VERSION_FILTER 
+		set(DOX_FILE_VERSION_FILTER
 			"${GIT_EXECUTABLE} log -n 1 --pretty=%h --")
 	endif()
-	
+
 	# Linux/OSX options
 	if (UNIX)
 
@@ -188,7 +188,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 	endif()
 
 	# Copy and configure doxigen configuration file
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in 
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
 		${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
 	# Add a build docs target
@@ -202,7 +202,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 			${CMAKE_COMMAND} -E echo "Enable at least one document format."
 			COMMENT "All document generation formats are disabled!" VERBATIM)
 	endif()
-	
+
 	# Generate PDF from latex files
 	if (DOC_GENERATE_PDF)
 		add_custom_command(TARGET doc POST_BUILD
@@ -224,12 +224,12 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/html/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
 	endif()
-	
+
 	if (DOC_INSTALL_PDF)
 		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/latex/refman.pdf
 			DESTINATION ${INSTALL_SUBDIR_DOCS_PDF} OPTIONAL)
 	endif()
-	
+
 	if (DOC_INSTALL_MAN)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
 			DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
@@ -240,12 +240,12 @@ else()
 
 	# No doc builds
 	unset(DOC_BUILD CACHE)
-	
+
 	# Add doc target which warns that some document build dependencies
 	# are missing
 	add_custom_target(doc
 		${CMAKE_COMMAND} -E echo "Documentation generation is disabled."
-		COMMENT "One or more tools required for documentation generation were not found!" 
+		COMMENT "One or more tools required for documentation generation were not found!"
 		VERBATIM)
 
 endif()
