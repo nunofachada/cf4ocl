@@ -48,6 +48,19 @@
 static char arg_local_marker;
 
 /**
+ * @internal
+ * This variables defines a kernel argument to be skiped in
+ * ::ccl_kernel_set_args() and ::ccl_kernel_set_args_v() functions.
+ * Client code should use the ::ccl_arg_skip global variable.
+ * */
+static const CCLArg arg_skip = { NULL, NULL, 0 };
+
+/* Use this constant to skip kernel arguments in ::ccl_kernel_set_args()
+ * and ::ccl_kernel_set_args_v() functions. */
+CCL_EXPORT
+const CCLArg* ccl_arg_skip = &arg_skip;
+
+/**
  * Create a new kernel argument.
  *
  * Arguments created with this function can local, private or NULL.

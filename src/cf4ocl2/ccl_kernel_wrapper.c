@@ -220,8 +220,13 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
 
 /**
  * Set all kernel arguments. This function accepts a variable list of
- * arguments which must end with `NULL`. Each argument is individually
- * set using the ::ccl_kernel_set_arg() function.
+ * arguments which must end with `NULL`. Internally, this method
+ * sets each argument individually using the ::ccl_kernel_set_arg()
+ * function.
+ *
+ * If the ::ccl_arg_skip constant is passed in place of a specific
+ * argument, that argument will not be set by this function call. Any
+ * previously set argument continues to be valid.
  *
  * The ::ccl_kernel_set_args_v() function performs the same operation
  * but accepts an array of kernel arguments instead.
@@ -305,6 +310,10 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
  * The ::ccl_kernel_set_args() function performs the same operation but
  * accepts a `NULL`-terminated variable list of arguments instead.
  *
+ * If the ::ccl_arg_skip constant is passed in place of a specific
+ * argument, that argument will not be set by this function call. Any
+ * previously set argument continues to be valid.
+ *
  * @public @memberof ccl_kernel
  *
  * @warning This function is not thread-safe. For multi-threaded
@@ -330,6 +339,9 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
 
 		/* Get next argument. */
 		CCLArg* arg = args[i];
+
+		/* Ignore "skip" arguments. */
+		if (arg == ccl_arg_skip) continue;
 
 		/* Set the i^th kernel argument. */
 		ccl_kernel_set_arg(krnl, i, arg);
@@ -462,6 +474,10 @@ finish:
  * The ::ccl_kernel_set_args_and_enqueue_ndrange_v() function performs
  * the same operation but accepts an array of arguments instead.
  *
+ * If the ::ccl_arg_skip constant is passed in place of a specific
+ * argument, that argument will not be set by this function call. Any
+ * previously set argument continues to be valid.
+ *
  * @public @memberof ccl_kernel
  *
  * @attention The variable argument list must end with `NULL`.
@@ -576,6 +592,10 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * The ::ccl_kernel_set_args_and_enqueue_ndrange() function performs the
  * same operation but accepts a `NULL`-terminated variable list of
  * arguments instead.
+ *
+ * If the ::ccl_arg_skip constant is passed in place of a specific
+ * argument, that argument will not be set by this function call. Any
+ * previously set argument continues to be valid.
  *
  * @public @memberof ccl_kernel
  *
@@ -800,14 +820,14 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		wg_size_mult = wg_size_max;
 #endif
 	} else {
-		
+
 		/* Kernel is NULL, use values obtained from device. */
 		wg_size_max = ccl_device_get_info_scalar(
 			dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		wg_size_mult = wg_size_max;
 	}
-	
+
 	/* Try to find an appropriate local worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
 		/* Each lws component is at most the preferred workgroup

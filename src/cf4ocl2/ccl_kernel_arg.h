@@ -74,6 +74,10 @@ void* ccl_arg_value(CCLArg* arg);
  * the macros provided in this module, namely ::ccl_arg_local() and
  * ::ccl_arg_priv(), respectively.
  *
+ * The ::ccl_arg_skip constant can be passed to methods which accept a
+ * variable list of ordered arguments in order to skip a specific
+ * argument.
+ *
  * _Example:_
  *
  * _Kernel code:_
@@ -112,6 +116,15 @@ void* ccl_arg_value(CCLArg* arg);
  * kernel. One way to guarantee this is to use the macros directly
  * when setting the kernel arguments, as shown in the example above.
  */
+
+/**
+ * Use this constant to skip kernel arguments in the
+ * ::ccl_kernel_set_args(), ::ccl_kernel_set_args_v(),
+ * ::ccl_kernel_set_args_and_enqueue_ndrange() and
+ * ::ccl_kernel_set_args_and_enqueue_ndrange_v() functions.
+ * */
+CCL_EXPORT
+extern const CCLArg* ccl_arg_skip;
 
 /**
  * Define a private kernel argument.
