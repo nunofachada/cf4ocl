@@ -674,7 +674,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 
 	} else {
 
-		g_message("Event '%s' did not use device time. As such its "\
+		g_info("Event '%s' did not use device time. As such its "\
 			"start and end instants will not be added to the list of "\
 			"event instants.", event_name);
 
@@ -760,8 +760,7 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 				 * provide profiling info. Don't stop profiling,
 				 * ignore this specific event, but log a message
 				 * saying so. */
-				g_message(
-					"The '%s' event does not have profiling info",
+				g_info("The '%s' event does not have profiling info",
 					ccl_event_get_final_name(evt));
 				g_clear_error(&err_internal);
 				continue;

@@ -75,6 +75,11 @@
 #define CCL_END_IGNORE_DEPRECATIONS
 #endif
 
+/* Define a g_info() macro for older GLib versions. */
+#ifndef g_info
+#define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
+#endif
+
 /**
  * Buffer wrapper class
  *
