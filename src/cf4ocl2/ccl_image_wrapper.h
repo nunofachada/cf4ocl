@@ -274,6 +274,25 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 #endif
 
 /**
+ * Enqueues a command to unmap a previously mapped image object. This
+ * is a utility macro that expands to ::ccl_memobj_enqueue_unmap(),
+ * casting `img` into a ::CCLMemObj object.
+ *
+ * @param[in] img An image wrapper object.
+ * @param[in] cq A command queue wrapper object.
+ * @param[in] ptr The host address returned by a previous call to
+ * ::ccl_image_enqueue_map().
+ * @param[in,out] ewl List of events that need to complete
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this command.
+ * */
+#define ccl_image_enqueue_unmap(img, cq, ptr, ewl, err) \
+	ccl_memobj_enqueue_unmap((CCLMemObj*) img, cq, ptr, ewl, err)
+
+/**
  * Get a ::CCLWrapperInfo image information object.
  *
  * @param[in] img The image wrapper object.

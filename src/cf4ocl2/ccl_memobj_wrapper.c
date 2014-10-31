@@ -122,7 +122,7 @@ finish:
  * @param[in] mo A memory object wrapper object.
  * @param[in] cq A command queue wrapper object.
  * @param[in] mapped_ptr The host address returned by a previous call
- * to ccl_buffer_enqueue_map() or ccl_image_enqueue_map() for `mo`.
+ * to ::ccl_buffer_enqueue_map() or ::ccl_image_enqueue_map() for `mo`.
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.

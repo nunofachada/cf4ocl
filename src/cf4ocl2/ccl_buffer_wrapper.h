@@ -190,6 +190,25 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 #endif
 
 /**
+ * Enqueues a command to unmap a previously mapped buffer object. This
+ * is a utility macro that expands to ::ccl_memobj_enqueue_unmap(),
+ * casting `buf` into a ::CCLMemObj object.
+ *
+ * @param[in] buf A buffer wrapper object.
+ * @param[in] cq A command queue wrapper object.
+ * @param[in] ptr The host address returned by a previous call to
+ * ::ccl_buffer_enqueue_map().
+ * @param[in,out] ewl List of events that need to complete
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this command.
+ * */
+#define ccl_buffer_enqueue_unmap(buf, cq, ptr, ewl, err) \
+	ccl_memobj_enqueue_unmap((CCLMemObj*) buf, cq, ptr, ewl, err)
+
+/**
  * Increase the reference count of the buffer wrapper object.
  *
  * @param[in] buf The buffer wrapper object.
