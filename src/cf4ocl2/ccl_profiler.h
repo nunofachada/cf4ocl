@@ -198,9 +198,6 @@
  * @manonly
  * Image not available in man pages.
  * @endmanonly
- *
- * @example ca.c
- * @example ca_mt.c
  * @{
  */
 

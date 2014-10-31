@@ -31,11 +31,6 @@
 #include "ccl_buffer_wrapper.h"
 
 /**
- * @addtogroup CCL_IMAGE_WRAPPER
- * @{
- */
-
-/**
  * Image wrapper class.
  *
  * @extends ccl_memobj
@@ -49,6 +44,11 @@ struct ccl_image {
 	CCLMemObj mo;
 
 };
+
+/**
+ * @addtogroup CCL_IMAGE_WRAPPER
+ * @{
+ */
 
 /**
  * @internal

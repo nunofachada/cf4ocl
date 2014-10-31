@@ -154,16 +154,16 @@
  * * ::ccl_program_get_num_devices()
  *
  * _Example:_
- * 
+ *
  * Kernel code:
  * @dontinclude canon.cl
  * @skipline __kernel
  * @until }
- * 
+ *
  * Host code:
  * @dontinclude canon.c
  * @skipline int main
- * 
+ *
  * @skipline Wrappers.
  * @until c_dev
  * @skipline CCLEvent* evt_exec
@@ -185,10 +185,8 @@
  *
  * @skipline Destroy wrappers
  * @skipline ccl_program_destroy
- * 
- * @skipline }
  *
- * @example canon.c
+ * @skipline }
  *
  * @{
  */

@@ -708,6 +708,13 @@ In other words, both OpenCL images and buffers are memory objects with
 common functionality, and _cf4ocl_ directly maps this relationship with
 the respective wrappers.
 
+@example ca.c
+@example ca_mt.c
+@example list_devices.c
+@example device_filter.c
+@example image_fill.c
+@example image_filter.c
+
 [GLib]: https://developer.gnome.org/glib/ "GLib"
 [g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
 [OpenCL type]: http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/abstractDataTypes.html "OpenCL types"

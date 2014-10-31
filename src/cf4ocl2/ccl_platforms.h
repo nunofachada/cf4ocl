@@ -67,15 +67,8 @@
  * @skipline Cycle platforms
  * @until ccl_platforms_destroy
  *
- * @example list_devices.c
  * @{
  */
-
-/**
- * Class which represents the OpenCL platforms available
- * in the system.
- */
-typedef struct ccl_platforms CCLPlatforms;
 
 /* Creates a new CCLPlatforms* object, which contains the list
  * of OpenCL platforms available in the system. */

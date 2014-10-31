@@ -30,11 +30,6 @@
 #include "ccl_sampler_wrapper.h"
 
 /**
- * @addtogroup CCL_SAMPLER_WRAPPER
- * @{
- */
-
-/**
  * Sampler wrapper class.
  *
  * @extends ccl_wrapper
@@ -48,6 +43,11 @@ struct ccl_sampler {
 	CCLWrapper base;
 
 };
+
+/**
+ * @addtogroup CCL_SAMPLER_WRAPPER
+ * @{
+ */
 
 /**
  * @internal

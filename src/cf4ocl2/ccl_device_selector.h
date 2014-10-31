@@ -104,7 +104,6 @@
  * * ::ccl_devsel_get_device_strings()
  * * ::ccl_devsel_print_device_strings()
  *
- * @example device_filter.c
  * @{
  */
 

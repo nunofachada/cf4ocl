@@ -83,6 +83,7 @@
 /**
  * Buffer wrapper class
  *
+ * @ingroup CCL_BUFFER_WRAPPER
  * @extends ccl_memobj
  * */
 typedef struct ccl_buffer CCLBuffer;
@@ -90,6 +91,7 @@ typedef struct ccl_buffer CCLBuffer;
 /**
  * Context wrapper class.
  *
+ * @ingroup CCL_CONTEXT_WRAPPER
  * @extends ccl_dev_container
  * */
 typedef struct ccl_context CCLContext;
@@ -97,6 +99,7 @@ typedef struct ccl_context CCLContext;
 /**
  * Device wrapper class.
  *
+ * @ingroup CCL_DEVICE_WRAPPER
  * @extends ccl_wrapper
  * */
 typedef struct ccl_device CCLDevice;
@@ -104,6 +107,7 @@ typedef struct ccl_device CCLDevice;
 /**
  * Event wrapper class.
  *
+ * @ingroup CCL_EVENT_WRAPPER
  * @extends ccl_wrapper
  * */
 typedef struct ccl_event CCLEvent;
@@ -111,6 +115,7 @@ typedef struct ccl_event CCLEvent;
 /**
  * Image wrapper class
  *
+ * @ingroup CCL_IMAGE_WRAPPER
  * @extends ccl_memobj
  * */
 typedef struct ccl_image CCLImage;
@@ -118,13 +123,23 @@ typedef struct ccl_image CCLImage;
 /**
  * Kernel wrapper class.
  *
+ * @ingroup CCL_KERNEL_WRAPPER
  * @extends ccl_wrapper
  */
 typedef struct ccl_kernel CCLKernel;
 
 /**
+ * Memory object wrapper class.
+ *
+ * @ingroup CCL_MEMOBJ_WRAPPER
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_memobj CCLMemObj;
+
+/**
  * Platform wrapper class.
  *
+ * @ingroup CCL_PLATFORM_WRAPPER
  * @extends ccl_dev_container
  * */
 typedef struct ccl_platform CCLPlatform;
@@ -132,6 +147,7 @@ typedef struct ccl_platform CCLPlatform;
 /**
  * Program wrapper class.
  *
+ * @ingroup CCL_PROGRAM_WRAPPER
  * @extends ccl_dev_container
  */
 typedef struct ccl_program CCLProgram;
@@ -139,6 +155,7 @@ typedef struct ccl_program CCLProgram;
 /**
  * Sampler wrapper class
  *
+ * @ingroup CCL_SAMPLER_WRAPPER
  * @extends ccl_wrapper
  * */
 typedef struct ccl_sampler CCLSampler;
@@ -146,9 +163,18 @@ typedef struct ccl_sampler CCLSampler;
 /**
  * Command queue wrapper class.
  *
+ * @ingroup CCL_QUEUE_WRAPPER
  * @extends ccl_wrapper
  */
 typedef struct ccl_queue CCLQueue;
+
+/**
+ * Class which represents the OpenCL platforms available
+ * in the system.
+ *
+ * @ingroup CCL_PLATFORMS
+ */
+typedef struct ccl_platforms CCLPlatforms;
 
 /**
  * Error codes.

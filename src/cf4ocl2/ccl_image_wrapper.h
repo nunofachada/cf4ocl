@@ -108,9 +108,6 @@
  * ccl_image_destroy(img_out);
  * @endcode
  *
- * @example image_filter.c
- * @example image_fill.c
- *
  * @{
  */
 

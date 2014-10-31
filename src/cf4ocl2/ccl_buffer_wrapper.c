@@ -33,7 +33,7 @@
 /**
  * Buffer wrapper class
  *
- * @implements ccl_memobj
+ * @extends ccl_memobj
  * */
 struct ccl_buffer {
 
