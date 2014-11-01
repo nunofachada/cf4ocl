@@ -535,7 +535,7 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
 	GError* err_internal = NULL;
 
 	/* Check that context platform is >= OpenCL 1.1 */
-	ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.1, throw error. */

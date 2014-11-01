@@ -128,6 +128,7 @@ clCreateUserEvent(cl_context context, cl_int* errcode_ret) {
 	} else {
 		ocl_stub_create_event(&event, NULL, CL_COMMAND_USER);
 		event->context = context;
+		event->exec_status = CL_SUBMITTED;
 		seterrcode(errcode_ret, CL_SUCCESS);
 	}
 	return event;
