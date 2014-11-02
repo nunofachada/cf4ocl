@@ -26,6 +26,8 @@
 
 #include <cf4ocl2.h>
 
+#ifdef CL_VERSION_1_1
+
 /**
  * Tests user events.
  * */
@@ -103,6 +105,91 @@ static void user_event_test() {
 }
 
 /**
+ * Callback function to be tested.
+ * */
+static void callback_fun(
+	cl_event event, cl_int event_command_exec_status, void *user_data) {
+
+	(void)event;
+
+	/* Confirm event is CL_COMPLETE. */
+	g_assert_cmpint(event_command_exec_status, ==, CL_COMPLETE);
+
+	/* Set userdata to CL_TRUE, thus providing evidence that the
+	 * callback was indeed called. */
+	*((cl_bool*) user_data) = CL_TRUE;
+}
+
+/**
+ * Tests event callbacks.
+ * */
+static void event_callback_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLBuffer* buf = NULL;
+	CCLEvent* evt = NULL;
+	GError* err = NULL;
+	GTimer* timer = NULL;
+	cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
+	cl_bool test_var = CL_FALSE;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a device buffer. */
+	buf = ccl_buffer_new(
+		ctx, CL_MEM_READ_WRITE, 8 * sizeof(cl_uint), NULL, &err);
+	g_assert_no_error(err);
+
+	/* Write something to buffer and get an event. */
+	evt = ccl_buffer_enqueue_write(buf, cq, CL_FALSE, 0,
+		8 * sizeof(cl_uint), vector, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Add a callback. */
+	ccl_event_set_callback(
+		evt, CL_COMPLETE, callback_fun, &test_var, &err);
+	g_assert_no_error(err);
+
+	/* Wait on host thread for all events to complete. */
+	ccl_queue_finish(cq, &err);
+	g_assert_no_error(err);
+
+	/* Release wrappers. */
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+	/* Wait some more... */
+	timer = g_timer_new();
+	while (g_timer_elapsed(timer, NULL) < 2.0);
+	g_timer_stop(timer);
+	g_timer_destroy(timer);
+
+	/* Confirm that test_var is CL_TRUE. */
+	g_assert_cmpuint(test_var, ==, CL_TRUE);
+
+}
+
+#endif
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -112,9 +199,16 @@ int main(int argc, char** argv) {
 
 	g_test_init(&argc, &argv, NULL);
 
+#ifdef CL_VERSION_1_1
+
 	g_test_add_func(
 		"/wrappers/event/user",
 		user_event_test);
+
+	g_test_add_func(
+		"/wrappers/event/callback",
+		event_callback_test);
+#endif
 
 	return g_test_run();
 }
