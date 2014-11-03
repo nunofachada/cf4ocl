@@ -27,6 +27,21 @@
 #include "ocl_env.h"
 #include "utils.h"
 
+#ifdef CL_VERSION_1_1
+
+/* Check if event callbacks should be called. */
+static void checkForCallbacks(cl_event event) {
+
+	for (cl_int i = CL_SUBMITTED; i >= MAX(event->exec_status, 0); --i) {
+		if (event->pfn_notify[i] != NULL) {
+			event->pfn_notify[i](event, i, event->user_data[i]);
+			event->pfn_notify[i] = NULL;
+		}
+	}
+}
+
+#endif
+
 CL_API_ENTRY cl_int CL_API_CALL
 clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
 	size_t param_value_size, void* param_value,
@@ -99,6 +114,9 @@ clRetainEvent(cl_event event) {
 CL_API_ENTRY cl_int CL_API_CALL
 clReleaseEvent(cl_event event) {
 
+	/* Check if any callbacks should be called. */
+	checkForCallbacks(event);
+
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&event->ref_count)) {
 
@@ -118,6 +136,8 @@ clWaitForEvents(cl_uint num_events, const cl_event* event_list) {
 
 	return CL_SUCCESS;
 }
+
+#ifdef CL_VERSION_1_1
 
 CL_API_ENTRY cl_event CL_API_CALL
 clCreateUserEvent(cl_context context, cl_int* errcode_ret) {
@@ -153,19 +173,19 @@ clSetUserEventStatus(cl_event event, cl_int execution_status) {
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetEventCallback(cl_event event, cl_int command_exec_callback_type,
-	void (CL_CALLBACK *pfn_notify)(cl_event, cl_int, void *),
+	void (CL_CALLBACK *pfn_notify)(cl_event, cl_int, void*),
 	void* user_data) {
 
-	/* Not implemented. Doesn't make sense to implement in current
-	 * state of stub because created events are automatically set to
-	 * CL_COMPLETE. */
+	/* Register callback. */
+	event->pfn_notify[command_exec_callback_type] = pfn_notify;
+	event->user_data[command_exec_callback_type] = user_data;
 
-	(void)(event);
-	(void)(command_exec_callback_type);
-	(void)(pfn_notify);
-	(void)(user_data);
+	/* Check if any callbacks should be called. */
+	checkForCallbacks(event);
 
-	/* Return an error. */
-	return CL_OUT_OF_RESOURCES;
+	/* Return success. */
+	return CL_SUCCESS;
 
 }
+
+#endif
