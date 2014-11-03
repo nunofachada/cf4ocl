@@ -114,8 +114,10 @@ clRetainEvent(cl_event event) {
 CL_API_ENTRY cl_int CL_API_CALL
 clReleaseEvent(cl_event event) {
 
+#ifdef CL_VERSION_1_1
 	/* Check if any callbacks should be called. */
 	checkForCallbacks(event);
+#endif
 
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&event->ref_count)) {

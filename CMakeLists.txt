@@ -85,7 +85,7 @@ if (NOT APPLE) # Not for Apple, which handles these headers differently
 	set_property(CACHE OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
 
 	if (OPENCL_USE_LOCAL_HEADERS)
-		SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${LOCAL_OPENCL_HEADERS}")
+		SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${OPENCL_LOCAL_HEADERS}")
 	endif()
 
 endif()
