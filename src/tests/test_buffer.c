@@ -332,6 +332,71 @@ static void buffer_map_unmap() {
 
 }
 
+#ifdef CL_VERSION_1_1
+
+/**
+ * Test callback function.
+ * */
+static void destructor_callback(cl_mem memobj, void *user_data) {
+
+	/* The memory object cannot be NULL. */
+	g_assert(memobj != NULL);
+
+	/* Set userdata to CL_TRUE, thus providing evidence that the
+	 * callback was indeed called. */
+	*((cl_bool*) user_data) = CL_TRUE;
+}
+
+/**
+ * Test memory object destructor callbacks.
+ * */
+static void buffer_destructor_callback() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLBuffer* b = NULL;
+	GError* err = NULL;
+	GTimer* timer = NULL;
+	cl_bool test_var = CL_FALSE;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Create a buffer. */
+	b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, 128 * sizeof(cl_uint),
+		NULL, &err);
+
+	/* Add destructor callback. */
+	ccl_memobj_set_destructor_callback((CCLMemObj*) b,
+		destructor_callback, &test_var, &err);
+	g_assert_no_error(err);
+
+	/* Destroy buffer. */
+	ccl_buffer_destroy(b);
+
+	/* Destroy context. */
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+	/* Wait some more... */
+	timer = g_timer_new();
+	while (g_timer_elapsed(timer, NULL) < 2.0);
+	g_timer_stop(timer);
+	g_timer_destroy(timer);
+
+	/* Confirm that test_var is CL_TRUE. */
+	g_assert_cmpuint(test_var, ==, CL_TRUE);
+
+
+}
+
+#endif
+
+
 #ifdef CL_VERSION_1_2
 
 /**
@@ -446,6 +511,12 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/buffer/map-unmap",
 		buffer_map_unmap);
+
+#ifdef CL_VERSION_1_1
+	g_test_add_func(
+		"/wrappers/buffer/destruct_callback",
+		buffer_destructor_callback);
+#endif
 
 #ifdef CL_VERSION_1_2
 	g_test_add_func(
