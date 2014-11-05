@@ -190,6 +190,107 @@ static void event_callback_test() {
 #endif
 
 /**
+ * Event name and type test.
+ * */
+static void event_name_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLBuffer* buf = NULL;
+	CCLEvent* evt = NULL;
+	GError* err = NULL;
+	cl_ulong* host_buf;
+	CCLEventWaitList ewl = NULL;
+	cl_int exec_status = -1;
+	cl_command_type ct = 0;
+	const char* evt_name = NULL;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a device buffer. */
+	buf = ccl_buffer_new(
+		ctx, CL_MEM_READ_WRITE, 8 * sizeof(cl_ulong), NULL, &err);
+	g_assert_no_error(err);
+
+	/* Map device buffer, get an event and analise it. */
+	host_buf = ccl_buffer_enqueue_map(buf, cq, CL_FALSE, CL_MAP_WRITE,
+		0, 8 * sizeof(cl_ulong), NULL, &evt, &err);
+	g_assert_no_error(err);
+
+	/* Wait that buffer gets mapped. */
+	ccl_event_wait_list_add(&ewl, evt, NULL);
+	ccl_event_wait(&ewl, &err);
+	g_assert_no_error(err);
+
+	/* Check that the event is CL_COMPLETE. */
+	exec_status = ccl_event_get_info_scalar(
+		evt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+	g_assert_no_error(err);
+	g_assert_cmpint(exec_status, ==, CL_COMPLETE);
+
+	/* Check that the event is CL_COMMAND_MAP_BUFFER. */
+	ct = ccl_event_get_command_type(evt, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ct, ==, CL_COMMAND_MAP_BUFFER);
+
+	/* Check that final event name is "MAP_BUFFER". */
+	evt_name = ccl_event_get_final_name(evt);
+	g_assert_cmpstr("MAP_BUFFER", ==, evt_name);
+
+	/* Set another name for the event. */
+	ccl_event_set_name(evt, "SomeOtherName");
+
+	/* Get the final event name now. */
+	evt_name = ccl_event_get_final_name(evt);
+	g_assert_cmpstr("SomeOtherName", ==, evt_name);
+
+	/* Unmap buffer, get resulting event. */
+	evt = ccl_buffer_enqueue_unmap(buf, cq, host_buf, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Wait that buffer gets unmapped. */
+	ccl_event_wait_list_add(&ewl, evt, NULL);
+	ccl_event_wait(&ewl, &err);
+	g_assert_no_error(err);
+
+	/* Check that the event is CL_COMPLETE. */
+	exec_status = ccl_event_get_info_scalar(
+		evt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+	g_assert_no_error(err);
+	g_assert_cmpint(exec_status, ==, CL_COMPLETE);
+
+	/* Check that the event is CL_COMMAND_UNMAP_MEM_OBJECT. */
+	ct = ccl_event_get_command_type(evt, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ct, ==, CL_COMMAND_UNMAP_MEM_OBJECT);
+
+	/* Check that final event name is "UNMAP_MEM_OBJECT". */
+	evt_name = ccl_event_get_final_name(evt);
+	g_assert_cmpstr("UNMAP_MEM_OBJECT", ==, evt_name);
+
+	/* Release wrappers. */
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -209,6 +310,10 @@ int main(int argc, char** argv) {
 		"/wrappers/event/callback",
 		event_callback_test);
 #endif
+
+	g_test_add_func(
+		"/wrappers/event/name-type",
+		event_name_test);
 
 	return g_test_run();
 }
