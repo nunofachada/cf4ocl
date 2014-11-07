@@ -169,7 +169,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
  * work size, based on device and kernel characteristics. */
 CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
-	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
+	cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
 	GError** err);
 
 /**

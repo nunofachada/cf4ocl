@@ -738,13 +738,14 @@ finish:
 }
 
 /**
- * Suggest appropriate global and local worksizes for the given real
- * work size, based on device and kernel characteristics.
+ * Suggest appropriate local (and optionally global) work sizes for the
+ * given real work size, based on device and kernel characteristics.
  *
- * The returned global worksize may be larger than the real work size
- * in order to better fit the kernel preferred multiple worksize. As
- * such, kernels enqueued with worksizes given by this function should
- * check if their global ID is within `real_worksize`.
+ * If the `gws` parameter is not `NULL`, it will be populated with a
+ * global worksize which may be larger than the real work size
+ * in order to better fit the kernel preferred multiple work size. As
+ * such, kernels enqueued with global work sizes suggested by this
+ * function should check if their global ID is within `real_worksize`.
  *
  * @public @memberof ccl_kernel
  *
@@ -754,15 +755,21 @@ finish:
  * @param[in] dims The number of dimensions used to specify the global
  * work-items and work-items in the work-group.
  * @param[in] real_worksize The real worksize.
- * @param[out] gws A "nice" global worksize for the given kernel and
- * device, which must be equal or larger than the `real_worksize` and a
- * multiple of `lws`. This memory location should be pre-allocated with
- * space for `dims` size_t values. If `NULL` it is assumed that the
- * global worksize must be equal to `real_worksize`, and this function
- * will only suggest a local worksize.
- * @param[out] lws A "nice" local worksize, which is based and respects
- * the limits of the given kernel and device. This memory location
- * should be pre-allocated with space for `dims` size_t values.
+ * @param[out] gws Location where to place a "nice" global worksize for
+ * the given kernel and device, which must be equal or larger than the `
+ * real_worksize` and a multiple of `lws`. This memory location should
+ * be pre-allocated with space for `dims` values of size `size_t`. If
+ * `NULL` it is assumed that the global worksize must be equal to
+ * `real_worksize`.
+ * @param[in,out] lws This memory location, of size
+ * `dims * sizeof(size_t)`, serves a dual purpose: 1) as an input,
+ * containing the maximum allowed local work size for each dimension, or
+ * zeros if these maximums are to be fetched from the given device
+ * CL_DEVICE_MAX_WORK_ITEM_SIZES information (if the specified values
+ * are larger than the device limits, the device limits are used
+ * instead); 2) as an output, where to place a "nice" local worksize,
+ * which is based and respects the limits of the given kernel and device
+ * (and of the non-zero values given as input).
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if function returns successfully, `CL_FALSE`
@@ -770,7 +777,7 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
-	cl_uint dims, size_t* real_worksize, size_t* gws, size_t* lws,
+	cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
 	GError** err) {
 
 	/* Make sure dev is not NULL. */
@@ -809,6 +816,14 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	max_wi_sizes = ccl_device_get_info_array(
 		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* For each dimension, if the user specified a maximum local work
+	 * size, the effective maximum local work size will be the minimum
+	 * between the user value and the device value. */
+	for (cl_uint i = 0; i < dims; ++i) {
+		if (lws[i] != 0)
+			max_wi_sizes[i] = MIN(max_wi_sizes[i], lws[i]);
+	}
 
 	/* If kernel is not NULL, query it about workgroup size preferences
 	 * and capabilities. */
