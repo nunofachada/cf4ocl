@@ -36,7 +36,7 @@ Get _cf4ocl_, either by [building from source](https://github.com/FakenMC/cf4ocl
 or using the provided [binaries](https://github.com/FakenMC/cf4ocl/wiki/Install-the-binaries).
 Take a look at the [examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 and the [user guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/).
-Any feedback is welcomed.
+Any feedback is welcome.
 
 Not yet implemented
 ===================

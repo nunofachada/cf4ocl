@@ -112,6 +112,7 @@ static void context_create_info_destroy_test() {
 	guint num_devices;
 	cl_int ocl_status;
 	gboolean any_device;
+	cl_uint ocl_ver;
 
 	/*
 	 * 1. Test context creation from devices.
@@ -154,6 +155,11 @@ static void context_create_info_destroy_test() {
 	/* Check again that the number of devices is 1, this time not using
 	 * CL_CONTEXT_NUM_DEVICES, which is not available in OpenCL 1.0. */
 	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
+
+	/* Test getting OpenCL version from context. */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ocl_ver % 10, ==, 0);
 
 	/* Free context. */
 	ccl_context_destroy(ctx);
@@ -756,6 +762,10 @@ static void context_device_container() {
 
 	/* Create some context. */
 	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Test get platform. */
+	ccl_context_get_platform(ctx, &err);
 	g_assert_no_error(err);
 
 	/* Test get all devices from context. */
