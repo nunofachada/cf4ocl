@@ -253,7 +253,7 @@ static void event_name_test() {
 	ccl_event_set_name(evt, "SomeOtherName");
 
 	/* Get the final event name now. */
-	evt_name = ccl_event_get_final_name(evt);
+	evt_name = ccl_event_get_name(evt);
 	g_assert_cmpstr("SomeOtherName", ==, evt_name);
 
 	/* Unmap buffer, get resulting event. */

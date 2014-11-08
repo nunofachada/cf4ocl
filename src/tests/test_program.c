@@ -506,6 +506,11 @@ static void program_ref_unref_test() {
 	g_assert_no_error(err);
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) cq), ==, 1);
 
+	/* Reference the program object, check its ref count. */
+	ccl_program_ref(prg);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) prg), ==, 2);
+	ccl_program_unref(prg);
+
 	/* Destroy remaining stuff. */
 	ccl_queue_destroy(cq);
 	ccl_program_destroy(prg);

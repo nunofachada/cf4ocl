@@ -746,6 +746,39 @@ static void context_get_supported_image_formats() {
 }
 
 /**
+ * Tests the device container aspects of a context.
+ * */
+static void context_device_container() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	GError* err = NULL;
+
+	/* Create some context. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Test get all devices from context. */
+	ccl_context_get_all_devices(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Test get first device from context. */
+	ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Test get number of devices from context. */
+	ccl_context_get_num_devices(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Destroy context. */
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -766,6 +799,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/context/get-supported-image-formats",
 		context_get_supported_image_formats);
+
+	g_test_add_func(
+		"/wrappers/context/device-container",
+		context_device_container);
 
 	return g_test_run();
 }

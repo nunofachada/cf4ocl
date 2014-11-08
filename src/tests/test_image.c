@@ -240,6 +240,18 @@ static void image_ref_unref_test(
 	/* Check that image ref count is 2. */
 	g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
 
+	/* Increase again, this time using the helper macro. */
+	ccl_image_ref(img);
+
+	/* Check that image ref count is 3. */
+	g_assert_cmpuint(3, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
+
+	/* Unref image. */
+	ccl_image_unref(img);
+
+	/* Check that image ref count is 2. */
+	g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
+
 	/* Unref image. */
 	ccl_image_unref(img);
 
