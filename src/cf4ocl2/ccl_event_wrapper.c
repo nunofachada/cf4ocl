@@ -640,7 +640,6 @@ finish:
 
 #endif
 
-
 /**
  * Add event wrapper objects to an event wait list (variable argument
  * list version).

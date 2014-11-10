@@ -294,7 +294,7 @@ cl_bool ccl_user_event_set_status(
  * wait lists should be freed with the ::ccl_event_wait_list_clear()
  * function.
  *
- * _Example:_
+ * _Example 1:_
  *
  * @code{.c}
  * CCLEvent *evt1, *evt2, *evt3;
@@ -311,6 +311,19 @@ cl_bool ccl_user_event_set_status(
  * ccl_buffer_enqueue_read(cq, c_dev, CL_TRUE, 0, size, c_host, &evt_wait_lst, NULL);
  * @endcode
  *
+ * _Example 2:_
+ *
+ * @code{.c}
+ * CCLEvent *evt = NULL;
+ * CCLEventWaitList evt_wait_lst = NULL;
+ * @endcode
+ * @code{.c}
+ * evt = ccl_buffer_enqueue_write(cq1, dev, CL_FALSE, 0, size, a_host, NULL, NULL);
+ * @endcode
+ * @code{.c}
+ * ccl_kernel_enqueue_ndrange(krnl, cq2, dim, offset, gws, lws,
+ *     ccl_event_wait_list_add(&evt_wait_lst, evt, NULL), NULL);
+ * @endcode
  * @{
  */
 
