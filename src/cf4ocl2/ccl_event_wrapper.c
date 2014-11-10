@@ -640,19 +640,21 @@ finish:
 
 #endif
 
+
 /**
  * Add event wrapper objects to an event wait list (variable argument
  * list version).
  *
  * @param[out] evt_wait_lst Event wait list.
  * @param[in] ... A `NULL`-terminated list of event wrapper objects.
+ * @return Event wait list populated with the given events.
  * */
 CCL_EXPORT
-void ccl_event_wait_list_add(
+CCLEventWaitList* ccl_event_wait_list_add(
 	CCLEventWaitList* evt_wait_lst, ...) {
 
 	/* Check that evt_wait_lst is not NULL. */
-	g_return_if_fail(evt_wait_lst != NULL);
+	g_return_val_if_fail(evt_wait_lst != NULL, NULL);
 
 	/* Variable argument list. */
 	va_list al;
@@ -660,8 +662,9 @@ void ccl_event_wait_list_add(
 	/* Current event wrapper object. */
 	CCLEvent* evt;
 
-	/* Array of event wrapper objects. */
-	GPtrArray* evts = g_ptr_array_new();
+	/* Initialize list if required. */
+	if (*evt_wait_lst == NULL)
+		*evt_wait_lst = g_ptr_array_new();
 
 	/* Initialize variable argument list. */
 	va_start(al, evt_wait_lst);
@@ -670,18 +673,19 @@ void ccl_event_wait_list_add(
 	while ((evt = va_arg(al, CCLEvent*)) != NULL) {
 
 		/* Add event wrapper to array. */
-		g_ptr_array_add(evts, evt);
+		g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evt));
 
 	}
 
-	/* Add NULL to the end of array of event wrapper objects. */
-	g_ptr_array_add(evts, NULL);
+	/* Finalize variable argument list. */
+	va_end(al);
 
-	/* Add to wait list using the array version of this function. */
-	ccl_event_wait_list_add_v(evt_wait_lst, (CCLEvent**) evts->pdata);
+	/* Signal bug if no events have been given. */
+	g_return_val_if_fail((*evt_wait_lst)->len > 0, NULL);
 
-	/* Destroy the array of event wrapper objects. */
-	g_ptr_array_free(evts, TRUE);
+	/* Return event wait list. */
+	return evt_wait_lst;
+
 }
 
 /**
@@ -689,19 +693,20 @@ void ccl_event_wait_list_add(
  *
  * @param[out] evt_wait_lst Event wait list.
  * @param[in] evts `NULL`-terminated array of event wrapper objects.
+ * @return Event wait list populated with the given events.
  * */
 CCL_EXPORT
-void ccl_event_wait_list_add_v(
+CCLEventWaitList* ccl_event_wait_list_add_v(
 	CCLEventWaitList* evt_wait_lst, CCLEvent** evts) {
 
 	/* Check that evt_wait_lst is not NULL. */
-	g_return_if_fail(evt_wait_lst != NULL);
+	g_return_val_if_fail(evt_wait_lst != NULL, NULL);
 
 	/* Check that events array is not NULL. */
-	g_return_if_fail(evts != NULL);
+	g_return_val_if_fail(evts != NULL, NULL);
 
 	/* Check that events array contains events. */
-	g_return_if_fail(evts[0] != NULL);
+	g_return_val_if_fail(evts[0] != NULL, NULL);
 
 	/* Initialize list if required. */
 	if (*evt_wait_lst == NULL)
@@ -714,6 +719,9 @@ void ccl_event_wait_list_add_v(
 		g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evts[i]));
 
 	}
+
+	/* Return event wait list. */
+	return evt_wait_lst;
 
 }
 
