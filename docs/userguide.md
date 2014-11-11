@@ -235,10 +235,10 @@ if (err) {
 ~~~~~~~~~~~~~~~
 
 Finally, if client code wants to continue execution after an error was
-caught, it is mandatory to use the [g_clear_error()] function to free
-the error object and reset its value to `NULL`. Not doing so is a bug,
-especially if more error-reporting functions are to be called moving
-forward. For example:
+caught, it is mandatory to use the [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
+function to free the error object and reset its value to `NULL`. Not
+doing so is a bug, especially if more error-reporting functions are to
+be called moving forward. For example:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
@@ -254,8 +254,8 @@ if (err) {
 }
 ~~~~~~~~~~~~~~~
 
-Even if the program terminates due to an error, the [g_clear_error()]
-can be still be called to destroy the error object.
+Even if the program terminates due to an error, the [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
+function can be still be called to destroy the error object.
 
 ### Log messages {#ug_log}
 
@@ -714,7 +714,3 @@ the respective wrappers.
 @example device_filter.c
 @example image_fill.c
 @example image_filter.c
-
-[GLib]: https://developer.gnome.org/glib/ "GLib"
-[g_clear_error()]: https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error "g_clear_error()"
-[OpenCL type]: http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/abstractDataTypes.html "OpenCL types"
