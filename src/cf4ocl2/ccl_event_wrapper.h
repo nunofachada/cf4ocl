@@ -286,7 +286,7 @@ cl_bool ccl_user_event_set_status(
  *
  * This module provides simple management of event wait lists.
  *
- * Client code must initialize #CCLEventWaitList variables to NULL,
+ * Client code must initialize ::CCLEventWaitList variables to `NULL`,
  * and can reuse them between `ccl_*_enqueue_*()` function calls. No
  * allocation and deallocation of events and event wait lists is
  * required if populated event wait lists are consumed by
@@ -322,13 +322,20 @@ cl_bool ccl_user_event_set_status(
  * @endcode
  * @code{.c}
  * ccl_kernel_enqueue_ndrange(krnl, cq2, dim, offset, gws, lws,
- *     ccl_event_wait_list_add(&evt_wait_lst, evt, NULL), NULL);
+ *     ccl_ewl(&evt_wait_lst, evt, NULL), NULL);
  * @endcode
  * @{
  */
 
 /** A list of event objects on which enqueued commands can wait. */
 typedef GPtrArray* CCLEventWaitList;
+
+/**
+ * Alias the for the ::ccl_event_wait_list_add() function. Intended as
+ * a shortcut to use ::ccl_event_wait_list_add() directly in
+ * `ccl_*_enqueue_*()` functions.
+ * */
+#define ccl_ewl ccl_event_wait_list_add
 
 /* Add event wrapper objects to an event wait list (variable argument
  * list version). */
