@@ -291,6 +291,98 @@ static void event_name_test() {
 }
 
 /**
+ * Event wait lists test.
+ * */
+static void event_wait_lists_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq1 = NULL;
+	CCLQueue* cq2 = NULL;
+	CCLBuffer* buf = NULL;
+	CCLEvent* evt = NULL;
+	GError* err = NULL;
+	cl_float host_buf1[8] = { 2.0, 3.5, 4.2, 5.0, 2.2, 199.0, -12.9, -0.01 };
+	cl_float host_buf2[8];
+	CCLEvent* evt_array[2] = { NULL, NULL };
+	CCLEventWaitList ewl = NULL;
+	const cl_event* clevent_ptr;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create command queues. */
+	cq1 = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	cq2 = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a device buffer. */
+	buf = ccl_buffer_new(
+		ctx, CL_MEM_READ_WRITE, 8 * sizeof(cl_float), NULL, &err);
+	g_assert_no_error(err);
+
+	/* Write something to buffer using command queue 1, get an event. */
+	evt = ccl_buffer_enqueue_write(buf, cq1, CL_FALSE, 0,
+		8 * sizeof(cl_float), host_buf1, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Read something from buffer using command queue 2, depending on
+	 * previous event. */
+	evt = ccl_buffer_enqueue_read(buf, cq2, CL_FALSE, 0,
+		8 * sizeof(cl_float), host_buf2, ccl_ewl(&ewl, evt, NULL), &err);
+	g_assert_no_error(err);
+
+	/* Wait for read event using ccl_event_wait_list_add_v(). */
+	evt_array[0] = evt;
+	ccl_event_wait_list_add_v(&ewl, evt_array);
+
+	/* Analise event wait list. */
+	g_assert_cmpuint(ccl_event_wait_list_get_num_events(&ewl), ==, 1);
+	clevent_ptr = ccl_event_wait_list_get_clevents(&ewl);
+	g_assert(*clevent_ptr == ccl_event_unwrap(evt));
+
+	/* Wait on last event. */
+	ccl_event_wait(&ewl, &err);
+	g_assert_no_error(err);
+
+	/* Check that ewl is NULL. */
+	g_assert(ewl == NULL);
+
+	/* Check if host buffers contain the same information. */
+	for (cl_uint i = 0; i < 8; ++i)
+		g_assert_cmpfloat(host_buf1[i], ==, host_buf2[i]);
+
+	/* Re-add completed event to wait list, clear list explicitly. */
+	ccl_event_wait_list_add(&ewl, evt, NULL);
+	g_assert(ewl != NULL);
+	ccl_event_wait_list_clear(&ewl);
+	g_assert(ewl == NULL);
+
+	/* Clear it again, should throw no error. */
+	ccl_event_wait_list_clear(&ewl);
+	g_assert(ewl == NULL);
+
+	/* Release wrappers. */
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq1);
+	ccl_queue_destroy(cq2);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -314,6 +406,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/event/name-type",
 		event_name_test);
+
+	g_test_add_func(
+		"/wrappers/event/wait-lists",
+		event_wait_lists_test);
 
 	return g_test_run();
 }
