@@ -41,6 +41,12 @@
 typedef struct ccl_wrapper_info CCLWrapperInfo;
 
 /**
+ * @internal
+ * Information about wrapped OpenCL objects.
+ * */
+typedef struct ccl_wrapper_info_table CCLWrapperInfoTable;
+
+/**
  * Base class for all OpenCL wrappers.
  * */
 typedef struct ccl_wrapper {
@@ -55,7 +61,7 @@ typedef struct ccl_wrapper {
 	 * Information about the wrapped OpenCL object.
 	 * @private
 	 * */
-	GHashTable* info;
+	CCLWrapperInfoTable* info;
 
 	/**
 	 * Reference count.

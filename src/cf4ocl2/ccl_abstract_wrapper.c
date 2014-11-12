@@ -36,6 +36,32 @@ static GHashTable* wrappers = NULL;
 G_LOCK_DEFINE(wrappers);
 
 /**
+ * Information about wrapped OpenCL objects.
+ * */
+struct ccl_wrapper_info_table {
+
+	/**
+	 * Table containing information about the wrapped OpenCL object.
+	 * @private
+	 * */
+	GHashTable* table;
+
+	/**
+	 * List of replaced information about the wrapped OpenCL object.
+	 * @private
+	 * */
+	GSList* old_info;
+
+	/**
+	 * Mutex for controlling thread access to the OpenCL object
+	 * information table.
+	 * @private
+	 * */
+	GMutex mutex;
+
+};
+
+/**
  * Create a new ::CCLWrapper object. This function is called by
  * the concrete wrapper constructors and should not be called by client
  * code.
@@ -71,6 +97,9 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 		/* Wrapper doesn't yet exist, create it. */
 		w = (CCLWrapper*) g_slice_alloc0(size);
 		w->cl_object = cl_object;
+		/* Initialize info table. */
+		w->info = g_slice_new0(struct ccl_wrapper_info_table);
+		g_mutex_init(&w->info->mutex);
 		/* Insert newly created wrapper in table of all existing
 		 * wrappers. */
 		g_hash_table_insert(wrappers, cl_object, w);
@@ -155,10 +184,16 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 			}
 		}
 
-		/* Destroy hash table containing information. */
-		if (wrapper->info != NULL) {
-			g_hash_table_destroy(wrapper->info);
+		/* Destroy table containing wrapped object information. */
+		if (wrapper->info->table != NULL) {
+			g_hash_table_destroy(wrapper->info->table);
 		}
+		if (wrapper->info->old_info != NULL) {
+			g_slist_free_full(wrapper->info->old_info,
+				(GDestroyNotify) ccl_wrapper_info_destroy);
+		}
+		g_mutex_clear(&wrapper->info->mutex);
+		g_slice_free(struct ccl_wrapper_info_table, wrapper->info);
 
 		/* Remove wrapper from static table, release static table if
 		 * empty. */
@@ -242,17 +277,47 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	/* Make sure info is not NULL. */
 	g_return_if_fail(info != NULL);
 
+	/* Lock access to info table. */
+	g_mutex_lock(&wrapper->info->mutex);
+
 	/* If information table is not yet initialized, then
 	 * initialize it. */
-	if (wrapper->info == NULL) {
-		wrapper->info = g_hash_table_new_full(
+	if (wrapper->info->table == NULL) {
+		wrapper->info->table = g_hash_table_new_full(
 			g_direct_hash, g_direct_equal,
 			NULL, (GDestroyNotify) ccl_wrapper_info_destroy);
 	}
 
-	/* Keep information in information table. */
-	g_hash_table_replace(wrapper->info,
+	/* Check if information with same key as already present in
+	 * table... */
+	if (g_hash_table_contains(
+			wrapper->info->table, GUINT_TO_POINTER(param_name))) {
+
+		/* ...if so, move this information to the old information
+		 * table. */
+
+		/* Get existing information... */
+		CCLWrapperInfo* info_old =
+			(CCLWrapperInfo*) g_hash_table_lookup(
+				wrapper->info->table, GUINT_TO_POINTER(param_name));
+
+		/* ...and put it in table of old information. */
+		wrapper->info->old_info =
+			g_slist_prepend(wrapper->info->old_info, info_old);
+
+		/* Remove old info from info table without destroying it. */
+		g_hash_table_steal(
+			wrapper->info->table, GUINT_TO_POINTER(param_name));
+
+	}
+
+	/* Keep new information in information table. */
+	g_hash_table_insert(wrapper->info->table,
 		GUINT_TO_POINTER(param_name), info);
+
+	/* Unlock access to info table. */
+	g_mutex_unlock(&wrapper->info->mutex);
+
 }
 
 /**
@@ -293,14 +358,21 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	/* Information object. */
 	CCLWrapperInfo* info = NULL;
 
-	/* Check if it is required to query OpenCL object. */
-	if ((!use_cache) /* Query it if info table cache is not to be used. */
-		/* Do query if info table is not yet initialized. */
-		|| (wrapper1->info == NULL)
-		/* Do query if info table does not contain requested info.  */
-		|| (!g_hash_table_contains(
-				wrapper1->info, GUINT_TO_POINTER(param_name)))
-		) {
+	/* Does info table cache contain requested information? */
+	gboolean contains;
+
+	/* Check if info table cache contains requested information. */
+	g_mutex_lock(&wrapper1->info->mutex);
+	contains = wrapper1->info->table != NULL
+		? g_hash_table_contains(
+			wrapper1->info->table, GUINT_TO_POINTER(param_name))
+		: FALSE;
+	g_mutex_unlock(&wrapper1->info->mutex);
+
+	/* Check if it is required to query OpenCL object, i.e. if info
+	 * table cache is not to be used or info table cache does not
+	 * contain requested info.  */
+	if ((!use_cache) || (!contains)) {
 
 		/* Let's query OpenCL object.*/
 		cl_int ocl_status;
@@ -352,8 +424,10 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 
 		/* Requested info is already present in the info table,
 		 * retrieve it from there. */
+		g_mutex_lock(&wrapper1->info->mutex);
 		info = g_hash_table_lookup(
-			wrapper1->info, GUINT_TO_POINTER(param_name));
+			wrapper1->info->table, GUINT_TO_POINTER(param_name));
+		g_mutex_unlock(&wrapper1->info->mutex);
 
 	}
 
