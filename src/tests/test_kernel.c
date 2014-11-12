@@ -33,12 +33,49 @@
 #define RAND_RWS (size_t) g_test_rand_int_range(1, G_MAXINT32)
 
 /**
+ * @internal
+ * Helper function for ::suggest_worksizes_test() which checks if
+ * suggested work sizes are within device limits.
+ * */
+static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
+
+	/* Error handling object. */
+	GError* err = NULL;
+
+	/* Max device workgroup size. */
+	size_t max_wgsize = ccl_device_get_info_scalar(
+		dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err);
+	g_assert_no_error(err);
+
+	/* Max device workitem sizes. */
+	size_t* max_wisizes = ccl_device_get_info_array(
+		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err);
+	g_assert_no_error(err);
+
+	/* Suggested work group size. */
+	size_t wgsize = 1;
+
+	/* Check dimension by dimension. */
+	for (cl_uint i = 0; i < dims; ++i) {
+
+		/* Check workitem size. */
+		g_assert_cmpuint(lws[i], <=, max_wisizes[i]);
+
+		/* Update work group size with size in current dimension. */
+		wgsize *= lws[i];
+	}
+
+	/* Check work group size. */
+	g_assert_cmpuint(wgsize, <=, max_wgsize);
+
+}
+
+/**
  * Tests the ::ccl_kernel_suggest_worksizes() function.
  *
  * @todo Perform tests with a non-`NULL` kernel argument.
- * @todo Confirm that local work sizes don't exceed device maximums.
  * */
-static void kernel_suggest_worksizes() {
+static void suggest_worksizes_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -69,6 +106,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[0] % lws[0], ==, 0);
+		check_dev_limits(dev, 1, lws);
 
 		/* 2. Request a local work size, forcing the global work size to
 		 * be equal to the real work size. */
@@ -77,6 +115,7 @@ static void kernel_suggest_worksizes() {
 		ccl_kernel_suggest_worksizes(NULL, dev, 1, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
+		check_dev_limits(dev, 1, lws);
 
 		/* 3. Request for global work size and local work sizes given a
 		 * real work size and a maximum local work size. */
@@ -88,6 +127,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
+		check_dev_limits(dev, 1, lws);
 
 		/* 4. Request a local work size (but specifying a maximum),
 		 * forcing the global work size to be equal to the real work
@@ -99,6 +139,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
+		check_dev_limits(dev, 1, lws);
 
 		/* ************************* */
 		/* ******* 2-D tests ******* */
@@ -114,6 +155,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(gws[1], >=, rws[1]);
 		g_assert_cmpuint(gws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(gws[1] % lws[1], ==, 0);
+		check_dev_limits(dev, 2, lws);
 
 		/* 2. Request a local work size, forcing the global work size to be
 		 * equal to the real work size. */
@@ -123,6 +165,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
+		check_dev_limits(dev, 2, lws);
 
 		/* 3. Request for global work size and local work sizes given a real
 		 * work size and a maximum local work size. */
@@ -137,6 +180,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(gws[1] % lws[1], ==, 0);
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
 		g_assert_cmpuint(lws[1], <=, lws_max[1]);
+		check_dev_limits(dev, 2, lws);
 
 		/* 4. Request a local work size (but specifying a maximum), forcing
 		 * the global work size to be equal to the real work size. */
@@ -149,6 +193,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
 		g_assert_cmpuint(lws[1], <=, lws_max[1]);
+		check_dev_limits(dev, 2, lws);
 
 		/* ************************* */
 		/* ******* 3-D tests ******* */
@@ -166,6 +211,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(gws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(gws[1] % lws[1], ==, 0);
 		g_assert_cmpuint(gws[2] % lws[2], ==, 0);
+		check_dev_limits(dev, 3, lws);
 
 		/* 2. Request a local work size, forcing the global work size to be
 		 * equal to the real work size. */
@@ -176,6 +222,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
 		g_assert_cmpuint(rws[2] % lws[2], ==, 0);
+		check_dev_limits(dev, 3, lws);
 
 		/* 3. Request for global work size and local work sizes given a real
 		 * work size and a maximum local work size. */
@@ -193,6 +240,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
 		g_assert_cmpuint(lws[1], <=, lws_max[1]);
 		g_assert_cmpuint(lws[2], <=, lws_max[2]);
+		check_dev_limits(dev, 3, lws);
 
 		/* 4. Request a local work size (but specifying a maximum), forcing
 		 * the global work size to be equal to the real work size. */
@@ -207,6 +255,7 @@ static void kernel_suggest_worksizes() {
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
 		g_assert_cmpuint(lws[1], <=, lws_max[1]);
 		g_assert_cmpuint(lws[2], <=, lws_max[2]);
+		check_dev_limits(dev, 3, lws);
 
 	}
 
@@ -230,7 +279,7 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/kernel/suggest-worksizes",
-		kernel_suggest_worksizes);
+		suggest_worksizes_test);
 
 	return g_test_run();
 }
