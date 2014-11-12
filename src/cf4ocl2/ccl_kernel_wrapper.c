@@ -794,7 +794,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	/* The preferred workgroup size. */
 	size_t wg_size_mult = 0;
 	size_t wg_size_max;
-	size_t wg_size = 1;
+	size_t wg_size = 1, wg_size_aux;
 	size_t* max_wi_sizes;
 	cl_uint dev_dims;
 	cl_bool ret_status;
@@ -809,7 +809,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	ccl_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: device only supports a max. of %d dimension, but %d where requested.",
+		"%s: device only supports a max. of %d dimension, but %d were requested.",
 		G_STRLOC, dev_dims, dims);
 
 	/* Get max. work item sizes for device. */
@@ -880,11 +880,21 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	/* The total workgroup size can't be higher than the maximum
 	 * supported by the device. */
 	while (wg_size > wg_size_max) {
+		wg_size_aux = wg_size;
 		for (int i = dims - 1; i >= 0; --i) {
-			lws[i] /= 2;
-			wg_size /= 2;
+			if (lws[i] > 1) {
+				/* Local work size can't be smaller than 1. */
+				lws[i] /= 2;
+				wg_size /= 2;
+			}
 			if (wg_size <= wg_size_max) break;
 		}
+		/* Avoid infinite loops and throw error if wg_size didn't
+		 * change. */
+		ccl_if_err_create_goto(*err, CCL_ERROR, wg_size == wg_size_aux,
+			CCL_ERROR_OTHER, error_handler,
+			"%s: Unable to determine a work size within the device limit (%d).",
+			G_STRLOC, (int) wg_size_max);
 	}
 
 	/* If output variable gws is not NULL... */
