@@ -185,7 +185,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * */
 #define ccl_kernel_get_info(krnl, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) (krnl), NULL, (param_name), 0, \
-		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, (err))
+		(ccl_wrapper_info_fp) clGetKernelInfo, CL_FALSE, (err))
 
 /**
  * Macro which returns a scalar kernel information value.
@@ -206,7 +206,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 #define ccl_kernel_get_info_scalar(krnl, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		NULL, (param_name), sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, (err)))
+		(ccl_wrapper_info_fp) clGetKernelInfo, CL_FALSE, (err)))
 
 /**
  * Macro which returns an array kernel information value.
@@ -227,7 +227,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 #define ccl_kernel_get_info_array(krnl, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		NULL, (param_name), sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetKernelInfo, CL_TRUE, (err))
+		(ccl_wrapper_info_fp) clGetKernelInfo, CL_FALSE, (err))
 
 /**
  * Get a ::CCLWrapperInfo kernel workgroup information object.

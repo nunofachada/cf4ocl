@@ -429,7 +429,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
 	: ccl_wrapper_get_info((CCLWrapper*) prg, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetProgramInfo, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar program information value.
@@ -453,7 +453,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	? (param_type) 0 \
 	: *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err))
+		(ccl_wrapper_info_fp) clGetProgramInfo, CL_FALSE, err))
 
 /**
  * Macro which returns an array program information value. To get
@@ -480,7 +480,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 	? NULL \
 	: (param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetProgramInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetProgramInfo, CL_FALSE, err)
 
 /**
  * Get a ::CCLWrapperInfo program build information object.

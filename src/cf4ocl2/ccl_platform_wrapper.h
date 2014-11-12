@@ -137,7 +137,7 @@ cl_uint ccl_platform_get_opencl_version(
  * */
 #define ccl_platform_get_info(platf, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) platf, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar platform information value.
@@ -158,7 +158,7 @@ cl_uint ccl_platform_get_opencl_version(
 #define ccl_platform_get_info_scalar(platf, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err))
+		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_FALSE, err))
 
 /**
  * Macro which returns an array platform information value.
@@ -179,7 +179,7 @@ cl_uint ccl_platform_get_opencl_version(
 #define ccl_platform_get_info_array(platf, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetPlatformInfo, CL_FALSE, err)
 
 /**
  * Helper macro which gets a platform information string. This

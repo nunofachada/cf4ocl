@@ -142,7 +142,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  * */
 #define ccl_memobj_get_info(mo, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) mo, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar memory object information value.
@@ -163,7 +163,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 #define ccl_memobj_get_info_scalar(mo, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err))
+		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_FALSE, err))
 
 /**
  * Macro which returns an array memory object information value.
@@ -184,7 +184,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 #define ccl_memobj_get_info_array(mo, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetMemObjectInfo, CL_FALSE, err)
 
 /**
  * Increase the reference count of the cl_mem wrapper object.

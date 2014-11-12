@@ -305,7 +305,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * */
 #define ccl_context_get_info(ctx, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) ctx, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetContextInfo, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar context information value.
@@ -326,7 +326,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
 #define ccl_context_get_info_scalar(ctx, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err))
+		(ccl_wrapper_info_fp) clGetContextInfo, CL_FALSE, err))
 
 /**
  * Macro which returns an array context information value.
@@ -347,7 +347,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
 #define ccl_context_get_info_array(ctx, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetContextInfo, CL_TRUE, err)
+		(ccl_wrapper_info_fp) clGetContextInfo, CL_FALSE, err)
 /**
  * Increase the reference count of the context wrapper object.
  *

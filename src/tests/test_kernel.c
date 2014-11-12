@@ -30,7 +30,7 @@
 	ws[0] = a; ws[1] = b; ws[2] = c;
 
 #define RAND_LWS (size_t) (1 << g_test_rand_int_range(1, 8))
-#define RAND_RWS (size_t) g_test_rand_int_range(1 << 2, 1 << 20)
+#define RAND_RWS (size_t) g_test_rand_int_range(1, G_MAXINT32)
 
 /**
  * Tests the ::ccl_kernel_suggest_worksizes() function.
@@ -55,7 +55,7 @@ static void kernel_suggest_worksizes() {
 	g_assert_no_error(err);
 
 	/* Perform test 20 times with different values. */
-	for (cl_uint i = 0; i < 20; ++i) {
+	for (cl_uint i = 0; i < 200; ++i) {
 
 		/* ************************* */
 		/* ******* 1-D tests ******* */
