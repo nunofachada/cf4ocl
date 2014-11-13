@@ -95,7 +95,7 @@ static cl_bool ccl_devsel_indep_test_true(
  * Tests creation, getting info from and destruction of
  * context wrapper objects.
  * */
-static void context_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	CCLContext* ctx = NULL;
 	GError* err = NULL;
@@ -372,7 +372,7 @@ static void context_create_info_destroy_test() {
  * which increase its reference count. This function tests the following
  * modules: context, device and platform wrappers.
  * */
-static void context_ref_unref_test() {
+static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
 	CCLContext* ctx_cmp = NULL;
@@ -682,7 +682,7 @@ static void context_ref_unref_test() {
 /**
  * Tests the ccl_context_get_supported_image_formats() function.
  * */
-static void context_get_supported_image_formats() {
+static void get_supported_image_formats_test() {
 
 	CCLPlatforms* ps;
 	CCLPlatform* p;
@@ -754,7 +754,7 @@ static void context_get_supported_image_formats() {
 /**
  * Tests the device container aspects of a context.
  * */
-static void context_device_container() {
+static void device_container_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -800,19 +800,19 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/context/create-info-destroy",
-		context_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/context/ref-unref",
-		context_ref_unref_test);
+		ref_unref_test);
 
 	g_test_add_func(
 		"/wrappers/context/get-supported-image-formats",
-		context_get_supported_image_formats);
+		get_supported_image_formats_test);
 
 	g_test_add_func(
 		"/wrappers/context/device-container",
-		context_device_container);
+		device_container_test);
 
 	return g_test_run();
 }

@@ -30,7 +30,7 @@
  * Tests creation (using "simple" constructor), getting info from and
  * destruction of sampler wrapper objects.
  * */
-static void sampler_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -85,7 +85,7 @@ static void sampler_create_info_destroy_test() {
  * Tests creation (using "full" constructor), getting info from and
  * destruction of sampler wrapper objects.
  * */
-static void sampler_create_full_info_destroy_test() {
+static void create_full_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -144,7 +144,7 @@ static void sampler_create_full_info_destroy_test() {
 /**
  * Tests sampler wrapper class reference counting.
  * */
-static void sampler_ref_unref_test() {
+static void ref_unref_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -193,15 +193,15 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/sampler/create-info-destroy",
-		sampler_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/sampler/create-full-info-destroy",
-		sampler_create_full_info_destroy_test);
+		create_full_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/sampler/ref-unref",
-		sampler_ref_unref_test);
+		ref_unref_test);
 
 	return g_test_run();
 }

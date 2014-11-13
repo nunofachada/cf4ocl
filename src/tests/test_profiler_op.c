@@ -298,8 +298,12 @@ static void operation_test() {
  * @return Result of test run.
  * */
 int main(int argc, char** argv) {
+
 	g_test_init(&argc, &argv, NULL);
+
 	g_test_add_func("/profiler/operation", operation_test);
+
 	return g_test_run();
+
 }
 

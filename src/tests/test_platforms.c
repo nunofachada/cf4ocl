@@ -86,7 +86,7 @@ static void ccl_test_platforms_check_error(GError** err) {
  * Tests creation, getting info from and destruction of
  * platforms, platform and device wrapper objects.
  * */
-static void platforms_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
@@ -565,7 +565,7 @@ static void platforms_create_info_destroy_test() {
  * which increase its reference count. This function tests the following
  * modules: platforms, platform and device wrappers.
  * */
-static void platforms_ref_unref_test() {
+static void ref_unref_test() {
 
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
@@ -620,11 +620,11 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/platforms/create-info-destroy",
-		platforms_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/platforms/ref-unref",
-		platforms_ref_unref_test);
+		ref_unref_test);
 
 	return g_test_run();
 }

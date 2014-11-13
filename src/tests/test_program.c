@@ -50,7 +50,7 @@ G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
  * Tests creation, getting info from and destruction of
  * program wrapper objects.
  * */
-static void program_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -449,16 +449,14 @@ static void program_create_info_destroy_test() {
  * which increase its reference count. This function tests the following
  * modules: program, queue, kernel and event wrappers.
  * */
-static void program_ref_unref_test() {
+static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
 	GError* err = NULL;
-	//~ CCLDevice* d = NULL;
 	CCLProgram* prg = NULL;
 	CCLKernel* krnl1 = NULL;
 	CCLKernel* krnl2 = NULL;
 	CCLQueue* cq = NULL;
-	//~ CCLEvent* evt = NULL;
 
 	const char* src = CCL_TEST_PROGRAM_SUM_CONTENT;
 
@@ -534,11 +532,11 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/program/create-info-destroy",
-		program_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/program/ref-unref",
-		program_ref_unref_test);
+		ref_unref_test);
 
 	return g_test_run();
 }

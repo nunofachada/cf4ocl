@@ -32,7 +32,7 @@
  * Tests creation, getting info from and destruction of
  * buffer wrapper objects.
  * */
-static void buffer_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -92,7 +92,7 @@ static void buffer_create_info_destroy_test() {
 /**
  * Tests buffer wrapper class reference counting.
  * */
-static void buffer_ref_unref_test() {
+static void ref_unref_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -132,7 +132,7 @@ static void buffer_ref_unref_test() {
 /**
  * Tests basic read/write operations from/to buffer objects.
  * */
-static void buffer_read_write() {
+static void read_write_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -206,7 +206,7 @@ static void buffer_read_write() {
 /**
  * Tests copy operations from one buffer to another.
  * */
-static void buffer_copy() {
+static void copy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -275,7 +275,7 @@ static void buffer_copy() {
 /**
  * Tests map/unmap operations in buffer objects.
  * */
-static void buffer_map_unmap() {
+static void map_unmap_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -350,7 +350,7 @@ static void destructor_callback(cl_mem memobj, void *user_data) {
 /**
  * Test memory object destructor callbacks.
  * */
-static void buffer_destructor_callback() {
+static void destructor_callback_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -402,7 +402,7 @@ static void buffer_destructor_callback() {
 /**
  * Tests buffer fill.
  * */
-static void buffer_fill() {
+static void fill_test() {
 
 	/* Test variables. */
 	CCLPlatforms* ps;
@@ -494,34 +494,34 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/buffer/create-info-destroy",
-		buffer_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/buffer/ref-unref",
-		buffer_ref_unref_test);
+		ref_unref_test);
 
 	g_test_add_func(
 		"/wrappers/buffer/read-write",
-		buffer_read_write);
+		read_write_test);
 
 	g_test_add_func(
 		"/wrappers/buffer/copy",
-		buffer_copy);
+		copy_test);
 
 	g_test_add_func(
 		"/wrappers/buffer/map-unmap",
-		buffer_map_unmap);
+		map_unmap_test);
 
 #ifdef CL_VERSION_1_1
 	g_test_add_func(
 		"/wrappers/buffer/destruct_callback",
-		buffer_destructor_callback);
+		destructor_callback_test);
 #endif
 
 #ifdef CL_VERSION_1_2
 	g_test_add_func(
 		"/wrappers/buffer/fill",
-		buffer_fill);
+		fill_test);
 #endif
 
 	return g_test_run();

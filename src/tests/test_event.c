@@ -123,7 +123,7 @@ static void callback_fun(
 /**
  * Tests event callbacks.
  * */
-static void event_callback_test() {
+static void callback_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -192,7 +192,7 @@ static void event_callback_test() {
 /**
  * Event name and type test.
  * */
-static void event_name_test() {
+static void name_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -400,12 +400,12 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/event/callback",
-		event_callback_test);
+		callback_test);
 #endif
 
 	g_test_add_func(
 		"/wrappers/event/name-type",
-		event_name_test);
+		name_test);
 
 	g_test_add_func(
 		"/wrappers/event/wait-lists",

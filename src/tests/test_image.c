@@ -117,7 +117,7 @@ static void context_with_image_support_teardown(
  * Tests creation, getting info from and destruction of
  * image wrapper objects.
  * */
-static void image_create_info_destroy_test(
+static void create_info_destroy_test(
 	CCLContext** ctx_fixt, gconstpointer user_data) {
 
 	/* Test variables. */
@@ -208,7 +208,7 @@ static void image_create_info_destroy_test(
 /**
  * Tests image wrapper class reference counting.
  * */
-static void image_ref_unref_test(
+static void ref_unref_test(
 	CCLContext** ctx_fixt, gconstpointer user_data) {
 
 	/* Test variables. */
@@ -266,7 +266,7 @@ static void image_ref_unref_test(
 /**
  * Tests basic read/write operations from/to image objects.
  * */
-static void image_read_write(
+static void read_write_test(
 	CCLContext** ctx_fixt, gconstpointer user_data) {
 
 	/* Test variables. */
@@ -347,7 +347,7 @@ static void image_read_write(
 /**
  * Tests copy operations from one image to another.
  * */
-static void image_copy(
+static void copy_test(
 	CCLContext** ctx_fixt, gconstpointer user_data) {
 
 	/* Test variables. */
@@ -431,7 +431,7 @@ static void image_copy(
 /**
  * Tests image fill.
  * */
-static void image_fill(
+static void fill_test(
 	CCLContext** ctx_fixt, gconstpointer user_data) {
 
 	/* Test variables. */
@@ -512,25 +512,25 @@ int main(int argc, char** argv) {
 	g_test_add(
 		"/wrappers/image/create-info-destroy",
 		CCLContext*, NULL, context_with_image_support_setup,
-		image_create_info_destroy_test,
+		create_info_destroy_test,
 		context_with_image_support_teardown);
 
 	g_test_add(
 		"/wrappers/image/ref-unref",
 		CCLContext*, NULL, context_with_image_support_setup,
-		image_ref_unref_test,
+		ref_unref_test,
 		context_with_image_support_teardown);
 
 	g_test_add(
 		"/wrappers/image/read-write",
 		CCLContext*, NULL, context_with_image_support_setup,
-		image_read_write,
+		read_write_test,
 		context_with_image_support_teardown);
 
 	g_test_add(
 		"/wrappers/image/copy",
 		CCLContext*, NULL, context_with_image_support_setup,
-		image_copy,
+		copy_test,
 		context_with_image_support_teardown);
 
 #ifdef CL_VERSION_1_2
@@ -538,7 +538,7 @@ int main(int argc, char** argv) {
 	g_test_add(
 		"/wrappers/image/fill",
 		CCLContext*, &ocl_min_ver, context_with_image_support_setup,
-		image_fill,
+		fill_test,
 		context_with_image_support_teardown);
 #endif
 
