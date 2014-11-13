@@ -426,6 +426,88 @@ static void copy_test(
 
 }
 
+/**
+ * Tests map/unmap operations in image objects.
+ * */
+static void map_unmap_test(
+	CCLContext** ctx_fixt, gconstpointer user_data) {
+
+	/* Test variables. */
+	CCLDevice* d = NULL;
+	CCLEvent* evt = NULL;
+	CCLImage* img = NULL;
+	CCLQueue* q = NULL;
+	CCLEventWaitList ewl = NULL;
+	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
+	gint32 himg[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
+	gint32* himg_map;
+	size_t origin[3] = {0, 0, 0};
+	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
+	size_t image_row_pitch;
+	GError* err = NULL;
+	CCL_UNUSED(user_data);
+
+	/* Check that a context is set. */
+	if (*ctx_fixt == NULL) {
+		/* If not, skip test. */
+		g_test_fail();
+		g_test_message("An appropriate device for this test was not found.");
+		return;
+	}
+
+	/* Create a random 4-channel 8-bit image (i.e. each pixel has 32
+	 * bits). */
+	for (guint i = 0; i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
+		himg[i] = g_test_rand_int();
+
+	/* Get first device in context. */
+	d = ccl_context_get_device(*ctx_fixt, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	q = ccl_queue_new(*ctx_fixt, d, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create 2D image, copy data from host. */
+	img = ccl_image_new(*ctx_fixt, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		&image_format, himg, &err,
+		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+		"image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
+		"image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
+		NULL);
+	g_assert_no_error(err);
+
+	/* Map image onto host memory. */
+	himg_map = ccl_image_enqueue_map(img, q, CL_FALSE, CL_MAP_READ,
+		origin, region, &image_row_pitch, NULL, NULL, &evt, &err);
+	g_assert_no_error(err);
+
+	/* Wait before mapping is complete. */
+	ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
+	g_assert_no_error(err);
+
+	/* Compare image in device with image in host. */
+	for (cl_uint i = 0; i < CCL_TEST_IMAGE_HEIGHT; ++i) {
+		for (cl_uint j = 0; j < image_row_pitch; ++j) {
+			if (j < CCL_TEST_IMAGE_WIDTH) {
+				g_assert_cmphex(
+					himg_map[i * CCL_TEST_IMAGE_WIDTH + j],
+					==,
+					himg[i * CCL_TEST_IMAGE_WIDTH + j]);
+			}
+		}
+	}
+
+	/* Unmap image. */
+	ccl_memobj_enqueue_unmap((CCLMemObj*) img, q, himg_map, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Free stuff. */
+	ccl_image_destroy(img);
+	ccl_queue_destroy(q);
+
+}
+
 #ifdef CL_VERSION_1_2
 
 /**
@@ -531,6 +613,12 @@ int main(int argc, char** argv) {
 		"/wrappers/image/copy",
 		CCLContext*, NULL, context_with_image_support_setup,
 		copy_test,
+		context_with_image_support_teardown);
+
+	g_test_add(
+		"/wrappers/image/map-unmap",
+		CCLContext*, NULL, context_with_image_support_setup,
+		map_unmap_test,
 		context_with_image_support_teardown);
 
 #ifdef CL_VERSION_1_2
