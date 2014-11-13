@@ -55,26 +55,64 @@ GQuark test_error_handling_error_quark() {
 /* Aux. functions */
 /* ************** */
 
-int errorL2Aux(int code, const char* xtramsg, GError **err) {
+/* This function can create an error. */
+cl_bool error_l2_aux(int code, const char* xtramsg, GError **err) {
+
+	/* Return status variable. */
+	cl_bool status;
+
+	/* Check for error. */
 	ccl_if_err_create_goto(*err, TEST_CCL_ERROR,
 		code != TEST_CCL_SUCCESS, code, error_handler,
 		"Big error in level %d function: %s", 2, xtramsg);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	status = CL_TRUE;
 	goto finish;
+
 error_handler:
-	g_assert(*err != NULL);
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	status = CL_FALSE;
+
 finish:
-	return code;
+
+	/* Return status. */
+	return status;
+
 }
 
-int errorL1Aux(int code, GError **err) {
-	int status = errorL2Aux(code, "called by errorL1Aux", err);
-	ccl_if_err_goto(*err, error_handler);
+/* This function can propagate an error created by another function. */
+cl_bool error_l1_aux(int code, GError **err) {
+
+	/* Return status variable. */
+	cl_bool status;
+
+	/* Internal error handling variable. */
+	GError* err_internal = NULL;
+
+	/* Call sub-function, check for error. */
+	error_l2_aux(code, "called by error_l1_aux", &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	status = CL_TRUE;
 	goto finish;
+
 error_handler:
-	g_assert(*err != NULL);
-	status = (*err)->code;
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+	status = CL_FALSE;
+
 finish:
+
+	/* Return status. */
 	return status;
+
 }
 
 /* ************** */
@@ -84,24 +122,36 @@ finish:
 /**
  * Test one level error handling.
  * */
-static void errorOneLevelTest() {
+static void error_one_level_test() {
+
+	/* Error handling object. */
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_CCL_ERROR_1,
-		"called by errorOneLevelTest", &err);
-	ccl_if_err_goto(err, error_handler);
-	CCL_UNUSED(status); /* Avoid compiler warnings. */
+	/* Status variable. */
+	cl_bool status;
 
+	/* Call function which can create an error, and force it to create
+	 * error. */
+	status = error_l2_aux(TEST_CCL_ERROR_1,
+		"called by error_one_level_test", &err);
+	ccl_if_err_goto(err, error_handler);
+
+	/* Function should throw error, so we shouldn't get here. */
 	g_assert_not_reached();
-	goto cleanup;
+	goto finish;
 
 error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
 	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_1);
+	g_assert_cmpint(status, ==, CL_FALSE);
 	g_assert_cmpstr(err->message, ==,
-		"Big error in level 2 function: called by errorOneLevelTest");
+		"Big error in level 2 function: called by error_one_level_test");
 	g_error_free(err);
 
-cleanup:
+finish:
+
+	/* Return. */
 	return;
 
 }
@@ -109,75 +159,117 @@ cleanup:
 /**
  * Test two level error handling.
  * */
-static void errorTwoLevelTest() {
+static void error_two_level_test() {
+
+	/* Error handling object. */
 	GError *err = NULL;
 
-	int status = errorL1Aux(TEST_CCL_ERROR_2, &err);
-	ccl_if_err_goto(err, error_handler);
-	CCL_UNUSED(status); /* Avoid compiler warnings. */
+	/* Status variable. */
+	cl_bool status;
 
+	/* Call function which can propagate an error thrown by a
+	 * sub-function. */
+	status = error_l1_aux(TEST_CCL_ERROR_2, &err);
+	ccl_if_err_goto(err, error_handler);
+
+	/* Function should throw error, so we shouldn't get here. */
 	g_assert_not_reached();
-	goto cleanup;
+	goto finish;
 
 error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
 	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_2);
+	g_assert_cmpint(status, ==, CL_FALSE);
 	g_assert_cmpstr(err->message, ==,
-		"Big error in level 2 function: called by errorL1Aux");
+		"Big error in level 2 function: called by error_l1_aux");
 	g_error_free(err);
 
-cleanup:
+finish:
+
+	/* Return. */
 	return;
+
 }
 
 /**
  * Test no errors.
  * */
-static void errorNoneTest() {
+static void error_none_test() {
+
+	/* Error handling object. */
 	GError *err = NULL;
 
-	int status = errorL2Aux(TEST_CCL_SUCCESS,
-		"called by errorOneLevelTest", &err);
-	ccl_if_err_goto(err, error_handler);
-	CCL_UNUSED(status); /* Avoid compiler warnings. */
+	/* Status variable. */
+	cl_bool status;
 
-	goto cleanup;
+	/* Call a function which will not throw an error. */
+	status = error_l2_aux(TEST_CCL_SUCCESS,
+		"called by error_one_level_test", &err);
+	ccl_if_err_goto(err, error_handler);
+
+	/* If we got here, everything is OK. */
+	goto finish;
 
 error_handler:
-	g_assert_not_reached();
-	g_error_free(err);
 
-cleanup:
+	/* No error should be thrown. */
+	g_assert_not_reached();
+
+finish:
+
+	/* Confirm no error was thrown. */
 	g_assert_no_error(err);
+	g_assert_cmpint(status, ==, CL_TRUE);
+
+	/* Return. */
 	return;
 }
 
 /**
  * Test an error without additional arguments.
  * */
-static void errorNoVargsTest() {
+static void error_no_vargs_test() {
+
+	/* Error handling object. */
 	GError *err = NULL;
 
+	/* Create an error without additional arguments. */
 	ccl_if_err_create_goto(err, TEST_CCL_ERROR, 1,
 		TEST_CCL_ERROR_1, error_handler,
 		"I have no additional arguments");
 
+	/* We shouldn't get here. */
 	g_assert_not_reached();
-	goto cleanup;
+	goto finish;
 
 error_handler:
+
+	/* Check error properties. */
 	g_assert_error(err, TEST_CCL_ERROR, TEST_CCL_ERROR_1);
 	g_assert_cmpstr(err->message, ==, "I have no additional arguments");
 	g_error_free(err);
 
-cleanup:
+finish:
+
+	/* Return. */
 	return;
 }
 
+/**
+ * Main function.
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
+ * @return Result of test run.
+ * */
 int main(int argc, char** argv) {
+
 	g_test_init(&argc, &argv, NULL);
-	g_test_add_func("/utils/error-onelevel", errorOneLevelTest);
-	g_test_add_func("/utils/error-twolevel", errorTwoLevelTest);
-	g_test_add_func("/utils/error-none", errorNoneTest);
-	g_test_add_func("/utils/error-novargs", errorNoVargsTest);
+
+	g_test_add_func("/utils/error-onelevel", error_one_level_test);
+	g_test_add_func("/utils/error-twolevel", error_two_level_test);
+	g_test_add_func("/utils/error-none", error_none_test);
+	g_test_add_func("/utils/error-novargs", error_no_vargs_test);
+
 	return g_test_run();
 }
