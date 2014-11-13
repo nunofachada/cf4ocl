@@ -469,58 +469,56 @@ clEnqueueMapImage(cl_command_queue command_queue, cl_mem image,
 	const cl_event* event_wait_list, cl_event* event,
 	cl_int* errcode_ret) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	void* map_ptr = NULL;
 
-	(void)(command_queue);
-	(void)(image);
+	/* Unused. */
 	(void)(blocking_map);
 	(void)(map_flags);
-	(void)(origin);
-	(void)(region);
-	(void)(image_row_pitch);
-	(void)(image_slice_pitch);
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_IMAGE);
-	seterrcode(errcode_ret, CL_SUCCESS);
-	return NULL;
+	/* Error check. */
+	if (command_queue == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_COMMAND_QUEUE);
+	} else if (image == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_MEM_OBJECT);
+	} else if (image->context != command_queue->context) {
+		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+		/* Not testing if events in wait list belong to this context. */
+	} else if ((image_row_pitch == NULL)
+		|| (origin == NULL) || (region == NULL)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if ((image->image_desc.image_type == CL_MEM_OBJECT_IMAGE3D)
+		&& (image_slice_pitch == NULL)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if ((origin[0] + region[0] > image->image_desc.image_width)
+		|| (origin[1] + region[1] > image->image_desc.image_height)
+		|| (origin[2] + region[2] > image->image_desc.image_depth)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else {
 
-	//~ /* Error check. */
-	//~ if (command_queue == NULL) {
-		//~ seterrcode(errcode_ret, CL_INVALID_COMMAND_QUEUE);
-	//~ } else if (image == NULL) {
-		//~ seterrcode(errcode_ret, CL_INVALID_MEM_OBJECT);
-	//~ } else if (image->context != command_queue->context) {
-		//~ seterrcode(errcode_ret, CL_INVALID_CONTEXT);
-		//~ /* Not testing if events in wait list belong to this context. */
-	//~ } else if ((image_row_pitch == NULL)
-		//~ || (origin == NULL) || (region == NULL)) {
-		//~ seterrcode(errcode_ret, CL_INVALID_VALUE);
-	//~ } else if ((image->image_desc.image_type == CL_MEM_OBJECT_IMAGE3D)
-		//~ || (image_slice_pitch == NULL)) {
-		//~ seterrcode(errcode_ret, CL_INVALID_VALUE);
-	//~ } else if ((origin[0] + region[0] > image->image_desc.image_width)
-		//~ || (origin[1] + region[1] > image->image_desc.image_height)
-		//~ || (origin[2] + region[2] > image->image_desc.image_depth)) {
-		//~ seterrcode(errcode_ret, CL_INVALID_VALUE);
-	//~ } else {
-//~
-		//~ /* Set event. */
-		//~ ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_IMAGE);
-		//~ seterrcode(errcode_ret, CL_SUCCESS);
-//~
-		//~ /* Just return a pointer to the memory region. */
-		//~ map_ptr = image->mem + origin[0]
-			//~ + origin[1] * image->image_desc.image_row_pitch
-			//~ + origin[2] * image->image_desc.image_slice_pitch;
-		//~ /* Set the row pitch. */
-		//~ *image_row_pitch = image->image_desc->image_row_pitch
-		//~
-		//~ image->map_count++;
-	//~ }
+		/* Set event. */
+		ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_IMAGE);
+		seterrcode(errcode_ret, CL_SUCCESS);
 
+		/* Just return a pointer to the memory region. */
+		map_ptr = image->mem + origin[0]
+			+ origin[1] * image->image_desc.image_row_pitch
+			+ origin[2] * image->image_desc.image_slice_pitch;
+		/* Set the row pitch. */
+		*image_row_pitch = image->image_desc.image_row_pitch;
+
+		/* Set the slice pitch. */
+		if (image_slice_pitch != NULL) {
+			*image_slice_pitch = image->image_desc.image_slice_pitch;
+		}
+
+		/* Increase map count. */
+		image->map_count++;
+	}
+
+	/* Return mapped pointer. */
+	return map_ptr;
 
 }
 
