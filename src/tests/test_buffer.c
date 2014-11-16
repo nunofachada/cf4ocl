@@ -469,8 +469,8 @@ static void rect_read_write_copy_test() {
 	CCLQueue* cq;
 	cl_uchar h1[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
 	cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
-	size_t buf_size =
-		sizeof(cl_uchar) * CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE;
+	size_t buf_size = sizeof(cl_uchar) * sizeof(cl_uchar)
+		* CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE;
 	GError* err = NULL;
 	const size_t origin[] = {0, 0, 0};
 	const size_t region[] = {CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),

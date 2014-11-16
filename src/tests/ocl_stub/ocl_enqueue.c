@@ -556,62 +556,120 @@ clEnqueueBarrier(cl_command_queue command_queue) {
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueReadBufferRect(cl_command_queue command_queue, cl_mem buffer,
-	cl_bool blocking_read, const size_t* buffer_offset,
-	const size_t* host_offset, const size_t* region,
+	cl_bool blocking_read, const size_t* buffer_origin,
+	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
 	size_t host_row_pitch, size_t host_slice_pitch, void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (buffer == NULL) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (ptr == NULL) {
+		return CL_INVALID_VALUE;
+	}
+	/* Many errors not checked... */
 
-	(void)(command_queue);
-	(void)(buffer);
+	/* These are ignored. */
 	(void)(blocking_read);
-	(void)(buffer_offset);
-	(void)(host_offset);
-	(void)(region);
-	(void)(buffer_row_pitch);
-	(void)(buffer_slice_pitch);
-	(void)(host_row_pitch);
-	(void)(host_slice_pitch);
-	(void)(ptr);
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER_RECT);
+	/* Set event. */
+	ocl_stub_create_event(
+		event, command_queue, CL_COMMAND_READ_BUFFER_RECT);
+
+	/* Determine effective row and slice pitches. */
+	if (buffer_row_pitch == 0)
+		buffer_row_pitch = region[0];
+	if (buffer_slice_pitch == 0)
+		buffer_slice_pitch = region[1];
+	if (host_row_pitch == 0)
+		host_row_pitch = region[0];
+	if (host_slice_pitch == 0)
+		host_slice_pitch = region[1];
+
+	/* Read buffer. */
+	for (size_t z = 0; z < region[2]; ++z) {
+		size_t z_buffer = buffer_slice_pitch * buffer_row_pitch * (z + buffer_origin[2]);
+		size_t z_host = host_slice_pitch * host_row_pitch * (z + host_origin[2]);
+		for (size_t y = 0; y < region[1]; ++y) {
+			size_t y_buffer = buffer_row_pitch * (y + buffer_origin[1]);
+			size_t y_host = host_row_pitch * (y + host_origin[1]);
+			g_memmove(
+				((cl_uchar*)ptr) + z_host + y_host,
+				((cl_uchar*)buffer->mem) + z_buffer + y_buffer,
+				region[0]);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 }
 
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueWriteBufferRect(cl_command_queue command_queue, cl_mem buffer,
-	cl_bool blocking_write, const size_t* buffer_offset,
-	const size_t* host_offset, const size_t* region,
+	cl_bool blocking_write, const size_t* buffer_origin,
+	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
 	size_t host_row_pitch, size_t host_slice_pitch, const void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (buffer == NULL) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (ptr == NULL) {
+		return CL_INVALID_VALUE;
+	}
+	/* Many errors not checked... */
 
-	(void)(command_queue);
-	(void)(buffer);
+	/* These are ignored. */
 	(void)(blocking_write);
-	(void)(buffer_offset);
-	(void)(host_offset);
-	(void)(region);
-	(void)(buffer_row_pitch);
-	(void)(buffer_slice_pitch);
-	(void)(host_row_pitch);
-	(void)(host_slice_pitch);
-	(void)(ptr);
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER_RECT);
+	/* Set event. */
+	ocl_stub_create_event(
+		event, command_queue, CL_COMMAND_WRITE_BUFFER_RECT);
+
+	/* Determine effective row and slice pitches. */
+	if (buffer_row_pitch == 0)
+		buffer_row_pitch = region[0];
+	if (buffer_slice_pitch == 0)
+		buffer_slice_pitch = region[1];
+	if (host_row_pitch == 0)
+		host_row_pitch = region[0];
+	if (host_slice_pitch == 0)
+		host_slice_pitch = region[1];
+
+	/* Write buffer. */
+	for (size_t z = 0; z < region[2]; ++z) {
+		size_t z_buffer = buffer_slice_pitch * buffer_row_pitch * (z + buffer_origin[2]);
+		size_t z_host = host_slice_pitch * host_row_pitch * (z + host_origin[2]);
+		for (size_t y = 0; y < region[1]; ++y) {
+			size_t y_buffer = buffer_row_pitch * (y + buffer_origin[1]);
+			size_t y_host = host_row_pitch * (y + host_origin[1]);
+			g_memmove(
+				((cl_uchar*)buffer->mem) + z_buffer + y_buffer,
+				((cl_uchar*)ptr) + z_host + y_host,
+				region[0]);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 }
 
@@ -623,23 +681,52 @@ clEnqueueCopyBufferRect(cl_command_queue command_queue,
 	size_t dst_slice_pitch, cl_uint num_events_in_wait_list,
 	const cl_event* event_wait_list, cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((src_buffer == NULL) || (dst_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (src_buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+	} else if (dst_buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Many errors not checked... */
 
-	(void)(command_queue);
-	(void)(src_buffer);
-	(void)(dst_buffer);
-	(void)(src_origin);
-	(void)(dst_origin);
-	(void)(region);
-	(void)(src_row_pitch);
-	(void)(src_slice_pitch);
-	(void)(dst_row_pitch);
-	(void)(dst_slice_pitch);
+	/* These are ignored. */
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_RECT);
+	/* Set event. */
+	ocl_stub_create_event(
+		event, command_queue, CL_COMMAND_COPY_BUFFER_RECT);
+
+	/* Determine effective row and slice pitches. */
+	if (src_row_pitch == 0)
+		src_row_pitch = region[0];
+	if (src_slice_pitch == 0)
+		src_slice_pitch = region[1];
+	if (dst_row_pitch == 0)
+		dst_row_pitch = region[0];
+	if (dst_slice_pitch == 0)
+		dst_slice_pitch = region[1];
+
+	/* Copy buffer. */
+	for (size_t z = 0; z < region[2]; ++z) {
+		size_t z_src = src_slice_pitch * src_row_pitch * (z + src_origin[2]);
+		size_t z_dst = dst_slice_pitch * dst_row_pitch * (z + dst_origin[2]);
+		for (size_t y = 0; y < region[1]; ++y) {
+			size_t y_src = src_row_pitch * (y + src_origin[1]);
+			size_t y_dst = dst_row_pitch * (y + dst_origin[1]);
+			g_memmove(
+				((cl_uchar*)dst_buffer->mem) + z_dst + y_dst,
+				((cl_uchar*)src_buffer->mem) + z_src + y_src,
+				region[0]);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 
 }
