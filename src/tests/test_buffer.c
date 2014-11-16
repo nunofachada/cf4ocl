@@ -456,6 +456,81 @@ static void destructor_callback_test() {
 
 }
 
+/**
+ * Tests rect buffer operations.
+ * */
+static void rect_read_write_copy_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* d = NULL;
+	CCLBuffer* b1 = NULL;
+	CCLBuffer* b2 = NULL;
+	CCLQueue* cq;
+	cl_uchar h1[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
+	cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
+	size_t buf_size =
+		sizeof(cl_uchar) * CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE;
+	GError* err = NULL;
+	const size_t origin[] = {0, 0, 0};
+	const size_t region[] = {CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
+		CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar), 1};
+
+	/* Create a "2D" host array, put some stuff in it. */
+	for (cl_uint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
+		for (cl_uint j = 0; j < CCL_TEST_BUFFER_SIZE; ++j)
+			h1[i * CCL_TEST_BUFFER_SIZE + j] =
+				(cl_uchar) (g_test_rand_int() % 0xFF);
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, d, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create device buffers. */
+	b1 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, buf_size, NULL, &err);
+	g_assert_no_error(err);
+	b2 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, buf_size, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Write "rect" data to first buffer in device. */
+	ccl_buffer_enqueue_write_rect(b1, cq, CL_TRUE, origin, origin,
+		region, 0, 0, 0, 0, h1, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Copy "rect" data from first buffer to second buffer. */
+	ccl_buffer_enqueue_copy_rect(b1, b2, cq, origin, origin, region,
+		0, 0, 0, 0, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Read data "rect" back to host from the second buffer. */
+	ccl_buffer_enqueue_read_rect(b2, cq, CL_TRUE, origin, origin,
+		region, 0, 0, 0, 0, h2, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Check data is OK doing a flat comparison. */
+	for (cl_uint i = 0; i < CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE; ++i)
+		g_assert_cmpuint(h1[i], ==, h2[i]);
+
+	/* Free stuff. */
+	ccl_buffer_destroy(b1);
+	ccl_buffer_destroy(b2);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
 #endif
 
 
@@ -582,6 +657,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/buffer/destruct_callback",
 		destructor_callback_test);
+
+	g_test_add_func(
+		"/wrappers/buffer/rect-read-write-copy",
+		rect_read_write_copy_test);
 #endif
 
 #ifdef CL_VERSION_1_2
