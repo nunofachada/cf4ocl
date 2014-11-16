@@ -114,7 +114,15 @@ static void ref_unref_test() {
 	/* Check that buffer ref count is 2. */
 	g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
 
-	/* Unref buffer. */
+	/* Increase buffer reference count again, this time using helper
+	 * macro. */
+	ccl_buffer_ref(b);
+
+	/* Check that buffer ref count is 3. */
+	g_assert_cmpuint(3, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+
+	/* Unref buffer, twice. */
+	ccl_buffer_unref(b);
 	ccl_buffer_unref(b);
 
 	/* Check that buffer ref count is 1. */
@@ -122,6 +130,60 @@ static void ref_unref_test() {
 
 	/* Destroy stuff. */
 	ccl_buffer_unref(b);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
+/**
+ * Tests buffer wrapping and unwrapping.
+ * */
+static void wrap_unwrap_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLBuffer* b = NULL;
+	CCLBuffer* b_aux = NULL;
+	cl_mem buffer = NULL;
+	GError* err = NULL;
+	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
+	cl_int status;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Create a buffer using OpenCL functions directly. */
+	buffer = clCreateBuffer(ccl_context_unwrap(ctx), CL_MEM_READ_ONLY,
+		buf_size, NULL, &status);
+	g_assert_cmpint(status, ==, CL_SUCCESS);
+
+	/* Wrap buffer. */
+	b = ccl_buffer_new_wrap(buffer);
+
+	/* If we now unwrap the wrapper, we must get the originally created
+	 * buffer. */
+	g_assert(buffer == ccl_buffer_unwrap(b));
+
+	/* If we again wrap the original buffer... */
+	b_aux = ccl_buffer_new_wrap(buffer);
+
+	/* ...we must get the same wrapper... */
+	g_assert(b == b_aux);
+
+	/* ... and the buffer wrapper ref count must be 2. */
+	g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+
+	/* Unref buffer, twice. */
+	ccl_buffer_unref(b);
+
+	/* Check that buffer ref count is 1. */
+	g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+
+	/* Destroy stuff. */
+	ccl_buffer_destroy(b);
 	ccl_context_destroy(ctx);
 
 	/* Confirm that memory allocated by wrappers has been properly
@@ -499,6 +561,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/buffer/ref-unref",
 		ref_unref_test);
+
+	g_test_add_func(
+		"/wrappers/buffer/wrap-unwrap",
+		wrap_unwrap_test);
 
 	g_test_add_func(
 		"/wrappers/buffer/read-write",
