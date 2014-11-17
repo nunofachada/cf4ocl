@@ -26,6 +26,248 @@
 
 #include <cf4ocl2.h>
 
+#define CCL_TEST_KERNEL_NAME "test_krnl"
+
+#define CCL_TEST_KERNEL_CONTENT \
+	"__kernel void " CCL_TEST_KERNEL_NAME "(__global uint *buf)\n" \
+	"{\n" \
+	"	int gid = get_global_id(0);\n" \
+	"	buf[gid] = buf[gid] + 1;\n" \
+	"}\n"
+
+
+#define CCL_TEST_KERNEL_BUF_SIZE 16
+#define CCL_TEST_KERNEL_LWS 8 /* Must be a divisor of CCL_TEST_KERNEL_BUF_SIZE */
+G_STATIC_ASSERT(CCL_TEST_KERNEL_BUF_SIZE % CCL_TEST_KERNEL_LWS == 0);
+
+/**
+ * Tests creation, getting info from and destruction of
+ * kernel wrapper objects.
+ * */
+static void create_info_destroy_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	cl_context context = NULL;
+	CCLProgram* prg = NULL;
+	cl_program program = NULL;
+	CCLKernel* krnl = NULL;
+	CCLDevice* d = NULL;
+	CCLQueue* cq = NULL;
+	size_t gws;
+	size_t lws;
+	cl_uint host_buf[CCL_TEST_KERNEL_BUF_SIZE];
+	cl_uint host_buf_aux[CCL_TEST_KERNEL_BUF_SIZE];
+	CCLBuffer* buf;
+	GError* err = NULL;
+	CCLEvent* evt = NULL;
+	CCLEventWaitList ewl = NULL;
+	const char* krnl_name;
+
+	/* Create a context with devices from first available platform. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Create a new program from source and build it. */
+	prg = ccl_program_new_from_source(
+		ctx, CCL_TEST_KERNEL_CONTENT, &err);
+	g_assert_no_error(err);
+
+	ccl_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Create kernel wrapper object. */
+	krnl = ccl_kernel_new(prg, CCL_TEST_KERNEL_NAME, &err);
+	g_assert_no_error(err);
+
+	/* Get some kernel info, compare it with expected info. */
+
+	/* Get kernel function name from kernel info, compare it with the
+	 * expected value. */
+	krnl_name = ccl_kernel_get_info_array(
+		krnl, CL_KERNEL_FUNCTION_NAME, char*, &err);
+	g_assert_no_error(err);
+	g_assert_cmpstr(krnl_name, ==, CCL_TEST_KERNEL_NAME);
+
+	/* Check if the kernel context is the same as the initial context
+	 * and the program context. */
+	context = ccl_kernel_get_info_scalar(
+		krnl, CL_KERNEL_CONTEXT, cl_context, &err);
+	g_assert_no_error(err);
+	g_assert(context == ccl_context_unwrap(ctx));
+
+	program = ccl_kernel_get_info_scalar(
+		krnl, CL_KERNEL_PROGRAM, cl_program, &err);
+	g_assert_no_error(err);
+	g_assert(program == ccl_program_unwrap(prg));
+
+#ifndef OPENCL_STUB
+#ifdef CL_VERSION_1_2
+
+	cl_kernel_arg_address_qualifier kaaq;
+	char* kernel_arg_type_name;
+	char* kernel_arg_name;
+
+	/* Get kernel argument information, compare it with expected info. */
+
+	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
+			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+			cl_kernel_arg_address_qualifier, &err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+	if (err == NULL) {
+		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+	} else {
+		g_clear_error(&err);
+	}
+
+	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
+		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+	if (err == NULL) {
+		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+	} else {
+		g_clear_error(&err);
+	}
+
+	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
+		CL_KERNEL_ARG_NAME, char*, &err);
+	if (err == NULL) {
+		g_assert_cmpstr(kernel_arg_name, ==, "buf");
+	} else {
+		g_clear_error(&err);
+	}
+
+#endif
+#endif
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
+	g_assert_no_error(err);
+
+	/* Set kernel enqueue properties and initialize host data. */
+	gws = CCL_TEST_KERNEL_BUF_SIZE;
+	lws = CCL_TEST_KERNEL_LWS;
+
+	for (cl_uint i = 0; i < CCL_TEST_KERNEL_BUF_SIZE; ++i) {
+		host_buf[i] = i + 1;
+	}
+
+	/* Create device buffer. */
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		CCL_TEST_KERNEL_BUF_SIZE * sizeof(cl_uint), host_buf, &err);
+	g_assert_no_error(err);
+
+	/* Set args and execute kernel. */
+	ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL, &gws,
+		&lws, NULL, &err, buf, NULL);
+	g_assert_no_error(err);
+
+	/* Read back results to host. */
+	evt = ccl_buffer_enqueue_read(buf, cq, CL_FALSE, 0,
+		CCL_TEST_KERNEL_BUF_SIZE * sizeof(cl_uint), host_buf_aux,
+		NULL, &err);
+	g_assert_no_error(err);
+
+	/* Wait for all events in wait list to terminate (this will empty
+	 * the wait list). */
+	ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
+	g_assert_no_error(err);
+
+#ifndef OPENCL_STUB
+	/* Check results are as expected (not available with OpenCL stub). */
+	for (cl_uint i = 0; i < CCL_TEST_KERNEL_BUF_SIZE; ++i) {
+		g_assert_cmpuint(host_buf[i] + 1, ==, host_buf_aux[i]);
+	}
+#endif
+
+	/* Destroy the memory objects. */
+	ccl_buffer_destroy(buf);
+
+	/* Destroy the command queue. */
+	ccl_queue_destroy(cq);
+
+	/* Destroy stuff. */
+	ccl_kernel_destroy(krnl);
+	ccl_program_destroy(prg);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+/**
+ * Test increasing reference count of kernel wrappers.
+ * */
+static void ref_unref_test() {
+
+	CCLContext* ctx = NULL;
+	GError* err = NULL;
+	CCLProgram* prg = NULL;
+	CCLKernel* krnl1 = NULL;
+	CCLKernel* krnl2 = NULL;
+
+	/* Get some context. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Create a program from source. */
+	prg = ccl_program_new_from_source(
+		ctx, CCL_TEST_KERNEL_CONTENT, &err);
+	g_assert_no_error(err);
+
+	/* Build program. */
+	ccl_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Get kernel wrapper from program (will be the instance kept in the
+	 * program wrapper). */
+	krnl1 = ccl_program_get_kernel(prg, CCL_TEST_KERNEL_NAME, &err);
+	g_assert_no_error(err);
+
+	/* Create another kernel wrapper for the same kernel. This should
+	 * yield a different object because we're not getting it from
+	 * the program wrapper. */
+	krnl2 = ccl_kernel_new(prg, CCL_TEST_KERNEL_NAME, &err);
+	g_assert_no_error(err);
+
+	/* Check that they're different. */
+	g_assert_cmphex(
+		GPOINTER_TO_UINT(krnl1), !=, GPOINTER_TO_UINT(krnl2));
+
+	/* Check that each has a ref count of 1. */
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 1);
+
+	/* Increment the ref count of the directly created kernel. */
+	ccl_kernel_ref(krnl2);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 2);
+
+	/* Get rid of the directly created kernel. */
+	ccl_kernel_unref(krnl2);
+	ccl_kernel_unref(krnl2);
+
+	/* Get kernel wrapper from program again (will be the instance kept
+	 * in the program wrapper). */
+	krnl2 = ccl_program_get_kernel(prg, CCL_TEST_KERNEL_NAME, &err);
+	g_assert_no_error(err);
+
+	/* Check that it's the same as krnl1. */
+	g_assert_cmphex(
+		GPOINTER_TO_UINT(krnl1), ==, GPOINTER_TO_UINT(krnl2));
+
+	/* Destroy remaining stuff. */
+	ccl_program_destroy(prg);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
 #define WS_INIT(ws, a, b, c) \
 	ws[0] = a; ws[1] = b; ws[2] = c;
 
@@ -71,25 +313,15 @@ static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
 }
 
 /**
- * Tests the ::ccl_kernel_suggest_worksizes() function.
+ * @internal
  *
- * @todo Perform tests with a non-`NULL` kernel argument.
+ * Aux. function for suggest_worksizes_test()-
  * */
-static void suggest_worksizes_test() {
+static void suggest_worksizes_aux(CCLDevice* dev, CCLKernel* krnl) {
 
 	/* Test variables. */
-	CCLContext* ctx = NULL;
-	CCLDevice* dev = NULL;
 	GError* err = NULL;
 	size_t rws[3], gws[3], lws[3], lws_max[3];
-
-	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
-	g_assert_no_error(err);
-
-	/* Get first device in context. */
-	dev = ccl_context_get_device(ctx, 0, &err);
-	g_assert_no_error(err);
 
 	/* Perform test 20 times with different values. */
 	for (cl_uint i = 0; i < 200; ++i) {
@@ -102,7 +334,7 @@ static void suggest_worksizes_test() {
 		 * real work size. */
 		WS_INIT(lws, 0, 0, 0);
 		WS_INIT(rws, RAND_RWS, 0, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 1, rws, gws, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 1, rws, gws, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[0] % lws[0], ==, 0);
@@ -112,7 +344,7 @@ static void suggest_worksizes_test() {
 		 * be equal to the real work size. */
 		WS_INIT(lws, 0, 0, 0);
 		WS_INIT(rws, RAND_RWS, 0, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 1, rws, NULL, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 1, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		check_dev_limits(dev, 1, lws);
@@ -122,7 +354,7 @@ static void suggest_worksizes_test() {
 		WS_INIT(lws_max, RAND_LWS, 0, 0);
 		memcpy(lws, lws_max, 3 * sizeof(size_t));
 		WS_INIT(rws, RAND_RWS, 0, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 1, rws, gws, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 1, rws, gws, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[0] % lws[0], ==, 0);
@@ -135,7 +367,7 @@ static void suggest_worksizes_test() {
 		WS_INIT(lws_max, RAND_LWS, 0, 0);
 		memcpy(lws, lws_max, 3 * sizeof(size_t));
 		WS_INIT(rws, RAND_RWS, 0, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 1, rws, NULL, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 1, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(lws[0], <=, lws_max[0]);
@@ -149,7 +381,7 @@ static void suggest_worksizes_test() {
 		 * work size. */
 		WS_INIT(lws, 0, 0, 0);
 		WS_INIT(rws, RAND_RWS, RAND_RWS, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 2, rws, gws, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 2, rws, gws, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[1], >=, rws[1]);
@@ -161,7 +393,7 @@ static void suggest_worksizes_test() {
 		 * equal to the real work size. */
 		WS_INIT(lws, 0, 0, 0);
 		WS_INIT(rws, RAND_RWS, RAND_RWS, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 2, rws, NULL, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 2, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
@@ -172,7 +404,7 @@ static void suggest_worksizes_test() {
 		WS_INIT(lws_max, RAND_LWS, RAND_LWS, 0);
 		memcpy(lws, lws_max, 3 * sizeof(size_t));
 		WS_INIT(rws, RAND_RWS, RAND_RWS, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 2, rws, gws, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 2, rws, gws, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[1], >=, rws[1]);
@@ -187,7 +419,7 @@ static void suggest_worksizes_test() {
 		WS_INIT(lws_max, RAND_LWS, RAND_LWS, 0);
 		memcpy(lws, lws_max, 3 * sizeof(size_t));
 		WS_INIT(rws, RAND_RWS, RAND_RWS, 0);
-		ccl_kernel_suggest_worksizes(NULL, dev, 2, rws, NULL, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 2, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
@@ -203,7 +435,7 @@ static void suggest_worksizes_test() {
 		 * work size. */
 		WS_INIT(lws, 0, 0, 0);
 		WS_INIT(rws, RAND_RWS, RAND_RWS, RAND_RWS);
-		ccl_kernel_suggest_worksizes(NULL, dev, 3, rws, gws, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 3, rws, gws, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[1], >=, rws[1]);
@@ -217,7 +449,7 @@ static void suggest_worksizes_test() {
 		 * equal to the real work size. */
 		WS_INIT(lws, 0, 0, 0);
 		WS_INIT(rws, RAND_RWS, RAND_RWS, RAND_RWS);
-		ccl_kernel_suggest_worksizes(NULL, dev, 3, rws, NULL, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 3, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
@@ -229,7 +461,7 @@ static void suggest_worksizes_test() {
 		WS_INIT(lws_max, RAND_LWS, RAND_LWS, RAND_LWS);
 		memcpy(lws, lws_max, 3 * sizeof(size_t));
 		WS_INIT(rws, RAND_RWS, RAND_RWS, RAND_RWS);
-		ccl_kernel_suggest_worksizes(NULL, dev, 3, rws, gws, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 3, rws, gws, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(gws[0], >=, rws[0]);
 		g_assert_cmpuint(gws[1], >=, rws[1]);
@@ -247,7 +479,7 @@ static void suggest_worksizes_test() {
 		WS_INIT(lws_max, RAND_LWS, RAND_LWS, RAND_LWS);
 		memcpy(lws, lws_max, 3 * sizeof(size_t));
 		WS_INIT(rws, RAND_RWS, RAND_RWS, RAND_RWS);
-		ccl_kernel_suggest_worksizes(NULL, dev, 3, rws, NULL, lws, &err);
+		ccl_kernel_suggest_worksizes(krnl, dev, 3, rws, NULL, lws, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(rws[0] % lws[0], ==, 0);
 		g_assert_cmpuint(rws[1] % lws[1], ==, 0);
@@ -258,6 +490,58 @@ static void suggest_worksizes_test() {
 		check_dev_limits(dev, 3, lws);
 
 	}
+
+}
+
+/**
+ * Tests the ::ccl_kernel_suggest_worksizes() function.
+ *
+ * */
+static void suggest_worksizes_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	GError* err = NULL;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Test with NULL kernel. */
+	suggest_worksizes_aux(dev, NULL);
+
+#ifndef OPENCL_STUB
+
+	/* Kernel info is not functional with the OCL stub, so this
+	 * test will only take place with a real OCL implementation. */
+
+	CCLProgram* prg = NULL;
+	CCLKernel* krnl = NULL;
+
+	/* Create and build program. */
+	prg = ccl_program_new_from_source(
+		ctx, CCL_TEST_KERNEL_CONTENT, &err);
+	g_assert_no_error(err);
+
+	ccl_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Get kernel wrapper object. */
+	krnl = ccl_program_get_kernel(prg, CCL_TEST_KERNEL_NAME, &err);
+	g_assert_no_error(err);
+
+	/* Test with non-NULL kernel. */
+	suggest_worksizes_aux(dev, krnl);
+
+	/* Destroy program. */
+	ccl_program_destroy(prg);
+
+#endif
 
 	/* Destroy stuff. */
 	ccl_context_destroy(ctx);
@@ -276,6 +560,14 @@ static void suggest_worksizes_test() {
 int main(int argc, char** argv) {
 
 	g_test_init(&argc, &argv, NULL);
+
+	g_test_add_func(
+		"/wrappers/kernel/create-info-destroy",
+		create_info_destroy_test);
+
+	g_test_add_func(
+		"/wrappers/kernel/ref-unref",
+		ref_unref_test);
 
 	g_test_add_func(
 		"/wrappers/kernel/suggest-worksizes",

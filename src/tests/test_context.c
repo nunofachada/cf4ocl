@@ -103,6 +103,7 @@ static void create_info_destroy_test() {
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
 	cl_device_id d_id = NULL;
+	cl_device_id* d_ids = NULL;
 	CCLDevSelFilters filters = NULL;
 	CCLWrapperInfo* info = NULL;
 	cl_context_properties* ctx_props = NULL;
@@ -133,7 +134,8 @@ static void create_info_destroy_test() {
 	/* Unwrap cl_device_id from device wrapper object. */
 	d_id = ccl_device_unwrap(d);
 
-	/* Create a context from the device. */
+	/* 1.1 Create a context from the device using the "quick"
+	 * ccl_context_new_from_devices() function. */
 	ctx = ccl_context_new_from_devices(1, &d, &err);
 	g_assert_no_error(err);
 
@@ -160,6 +162,31 @@ static void create_info_destroy_test() {
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(ocl_ver % 10, ==, 0);
+
+	/* Free context. */
+	ccl_context_destroy(ctx);
+
+	/* 1.2 Create a context from the device using the "full"
+	 * ccl_context_new_from_devices_full() function. */
+	ctx = ccl_context_new_from_devices_full(
+		NULL, 1, &d, NULL, NULL, &err);
+
+	/* Get number of devices from context wrapper, check that this
+	 * number is 1. */
+#ifdef CL_VERSION_1_1
+	cl_uint num_devs = ccl_context_get_info_scalar(
+		ctx, CL_CONTEXT_NUM_DEVICES, cl_uint, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(num_devs, ==, 1);
+#endif
+
+	/* Get the cl_device_id from context via context info and check
+	 * that it corresponds to the cl_device_id with which the context
+	 * was created. */
+	d_ids = ccl_context_get_info_array(
+		ctx, CL_CONTEXT_DEVICES, cl_device_id*, &err);
+	g_assert_no_error(err);
+	g_assert(d_ids[0] == d_id);
 
 	/* Free context. */
 	ccl_context_destroy(ctx);
@@ -293,11 +320,53 @@ static void create_info_destroy_test() {
 	 * (explicit dependent filters).
 	 * */
 
+	/* 4.1 Use "quick" ccl_context_new_from_filters() function. */
+
 	/* Same platform filter. */
 	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
 
 	/* Check that a context wrapper was created. */
 	ctx = ccl_context_new_from_filters(&filters, &err);
+	g_assert_no_error(err);
+
+	/* Check that context wrapper contains a device. */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Check that the device platform corresponds to the expected
+	 * platform (the one which the first device belongs to). */
+	platf_ref = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
+		cl_platform_id, &err);
+	g_assert_no_error(err);
+
+	/* Get number of devices. */
+	num_devices = ccl_context_get_num_devices(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Check that all devices belong to the same platform. */
+	for (guint i = 1; i < num_devices; i++) {
+
+		d = ccl_context_get_device(ctx, i, &err);
+		g_assert_no_error(err);
+
+		platform = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
+			cl_platform_id, &err);
+		g_assert_no_error(err);
+
+		g_assert(platf_ref == platform);
+	}
+
+	/* Free context and set filters to NULL. */
+	ccl_context_destroy(ctx);
+
+	/* 4.2 Use "full" ccl_context_new_from_filters_full() function. */
+
+	/* Same platform filter. */
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
+
+	/* Check that a context wrapper was created. */
+	ctx = ccl_context_new_from_filters_full(
+		NULL, &filters, NULL, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Check that context wrapper contains a device. */
