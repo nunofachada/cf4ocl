@@ -551,6 +551,175 @@ static void suggest_worksizes_test() {
 	g_assert(ccl_wrapper_memcheck());
 }
 
+#define CCL_TEST_KERNEL_ARGS_NAME "test_krnl_args"
+
+#define CCL_TEST_KERNEL_ARGS_CONTENT \
+	"__kernel void " CCL_TEST_KERNEL_ARGS_NAME "(" \
+	"	__global uint *buf,\n" \
+	"	__read_only image2d_t img,\n" \
+	"	sampler_t sampler,\n" \
+	"	__local uint* loc,\n" \
+	"	uint x)\n" \
+	"{\n" \
+	"	uint gid = get_global_id(0);\n" \
+	"	uint lid = get_local_id(0);\n" \
+	"	int2 coord = (int2) (gid, 1);\n" \
+	"	uint4 point = read_imageui(img, sampler, coord);\n" \
+	"	loc[lid] = point.x + point.y + point.z + point.w;\n" \
+	"	buf[gid] = loc[lid] + x;\n" \
+	"}\n"
+
+
+#define CCL_TEST_KERNEL_ARGS_BUF_SIZE 16
+#define CCL_TEST_KERNEL_ARGS_LWS 8 /* Must be a divisor of CCL_TEST_ARGS_KERNEL_BUF_SIZE */
+G_STATIC_ASSERT(CCL_TEST_KERNEL_ARGS_BUF_SIZE % CCL_TEST_KERNEL_ARGS_LWS == 0);
+
+/**
+ * Tests functions and macros related with kernel arguments.
+ * */
+static void args_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLProgram* prg = NULL;
+	CCLKernel* krnl = NULL;
+	CCLImage* img = NULL;
+	CCLBuffer* buf = NULL;
+	CCLQueue* cq = NULL;
+	CCLEvent* evt = NULL;
+	CCLSampler* smplr = NULL;
+	CCLEventWaitList ewl = NULL;
+	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
+	union {cl_uint u; cl_uchar c[4];} himg[CCL_TEST_KERNEL_ARGS_BUF_SIZE];
+	cl_uint hbuf[CCL_TEST_KERNEL_ARGS_BUF_SIZE];
+	GError* err = NULL;
+	size_t gws = CCL_TEST_KERNEL_ARGS_BUF_SIZE;
+	size_t lws = CCL_TEST_KERNEL_ARGS_LWS;
+	void* args[6];
+	cl_uint to_sum = 3;
+
+	/* **************************************************** */
+	/* 1 - Test different types of arguments with a kernel. */
+	/* **************************************************** */
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a random 4-channel 8-bit image (i.e. each pixel has 32
+	 * bits). */
+	for (cl_uint i = 0; i < CCL_TEST_KERNEL_ARGS_BUF_SIZE; ++i)
+		himg[i].u = (cl_uint) g_test_rand_int();
+
+	/* Create 2D image, copy data from host. */
+	img = ccl_image_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+		&image_format, himg, &err,
+		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+		"image_width", (size_t) CCL_TEST_KERNEL_ARGS_BUF_SIZE,
+		"image_height", (size_t) 1,
+		NULL);
+	g_assert_no_error(err);
+
+	/* Create buffer. */
+	buf = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+		sizeof(cl_uint) * CCL_TEST_KERNEL_ARGS_BUF_SIZE, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Create sampler (this could also be created in-kernel). */
+	smplr = ccl_sampler_new(ctx, CL_FALSE, CL_ADDRESS_CLAMP_TO_EDGE,
+		CL_FILTER_NEAREST, &err);
+
+	/* Create and build program. */
+	prg = ccl_program_new_from_source(
+		ctx, CCL_TEST_KERNEL_ARGS_CONTENT, &err);
+	g_assert_no_error(err);
+
+	ccl_program_build(prg, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Get kernel wrapper object. */
+	krnl = ccl_program_get_kernel(prg, CCL_TEST_KERNEL_ARGS_NAME, &err);
+	g_assert_no_error(err);
+
+	/* Set args array. */
+	args[0] = buf;
+	args[1] = img;
+	args[2] = smplr;
+	args[3] = ccl_arg_local(lws, cl_uint);
+	args[4] = ccl_arg_priv(to_sum, cl_uint);
+	args[5] = NULL;
+
+	/* Set args and execute kernel. */
+	ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, 1, NULL,
+		&gws, &lws, NULL, args, &err);
+	g_assert_no_error(err);
+
+	/* Get results. */
+	evt = ccl_buffer_enqueue_read(buf, cq, CL_FALSE, 0,
+		sizeof(cl_uint) * CCL_TEST_KERNEL_ARGS_BUF_SIZE,
+		hbuf, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Wait for transfer. */
+	ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
+	g_assert_no_error(err);
+
+#ifndef OPENCL_STUB
+
+	/* Check that results are as expected. */
+	for (cl_uint i = 0; i < CCL_TEST_KERNEL_ARGS_BUF_SIZE; ++i)
+		g_assert_cmpuint(hbuf[i], ==, himg[i].c[0] + himg[i].c[1] +
+			himg[i].c[2] + himg[i].c[3] + to_sum);
+		//~ printf("%5d == %5d (%3d, %3d, %3d, %3d, %3d)\n", hbuf[i],
+			//~ himg[i].c[0] + himg[i].c[1] + himg[i].c[2] + himg[i].c[3] + to_sum,
+			//~ himg[i].c[0], himg[i].c[1], himg[i].c[2], himg[i].c[3], to_sum);
+
+#endif
+
+	/* Destroy stuff. */
+	ccl_sampler_destroy(smplr);
+	ccl_image_destroy(img);
+	ccl_buffer_destroy(buf);
+	ccl_program_destroy(prg);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* ********************************************************** */
+	/* 2 - Test kernel argument functions directly (these are not */
+	/*     commonly used by client code).                         */
+	/* ********************************************************** */
+
+	cl_float pi = 3.1415f;
+	cl_char c = 12;
+	CCLArg* arg_test = NULL;
+
+	arg_test = ccl_arg_new(&pi, sizeof(cl_float));
+	g_assert(arg_test != NULL);
+	g_assert_cmpuint(ccl_arg_size(arg_test), ==, sizeof(cl_float));
+	g_assert_cmpfloat(pi, ==, *((cl_float*) ccl_arg_value(arg_test)));
+	ccl_arg_destroy(arg_test);
+
+	arg_test = NULL;
+	arg_test = ccl_arg_full(&c, sizeof(cl_char));
+	g_assert(arg_test != NULL);
+	g_assert_cmpuint(ccl_arg_size(arg_test), ==, sizeof(cl_char));
+	g_assert_cmpfloat(c, ==, *((cl_char*) ccl_arg_value(arg_test)));
+	ccl_arg_destroy(arg_test);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
 /**
  * Main function.
  * @param[in] argc Number of command line arguments.
@@ -572,6 +741,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/kernel/suggest-worksizes",
 		suggest_worksizes_test);
+
+	g_test_add_func(
+		"/wrappers/kernel/args",
+		args_test);
 
 	return g_test_run();
 }
