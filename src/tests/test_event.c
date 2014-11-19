@@ -76,6 +76,12 @@ static void create_info_destroy_test() {
 	/* Wrap OpenCL event. */
 	evt = ccl_event_new_wrap(event);
 
+	/* Add event to queue. */
+	ccl_queue_produce_event(cq, event);
+
+	/* Ref. count of event wrapper should be 2. */
+	g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) evt));
+
 	/* Wait on host thread for all events to complete. */
 	ccl_queue_finish(cq, &err);
 	g_assert_no_error(err);
