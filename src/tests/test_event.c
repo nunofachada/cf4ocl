@@ -26,6 +26,119 @@
 
 #include <cf4ocl2.h>
 
+/**
+ * Tests creation, getting info from and destruction of
+ * event wrapper objects.
+ * */
+static void create_info_destroy_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLEvent* evt = NULL;
+	CCLBuffer* buf = NULL;
+	cl_float hbuf[] = {1.2, 2.4, 0.021, -44.23};
+	GError* err = NULL;
+	cl_int ocl_status;
+	cl_uint ocl_ver;
+	cl_event event = NULL;
+	cl_context context = NULL;
+	cl_command_queue command_queue = NULL;
+	CCLWrapperInfo* info = NULL;
+	cl_command_type evt_type;
+	cl_int exec_status;
+	cl_ulong time_end;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+	g_assert_no_error(err);
+
+	/* Create device buffer. */
+	buf = ccl_buffer_new(
+		ctx, CL_MEM_READ_ONLY, sizeof(cl_float) * 4, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Transfer something to device directly using low-level OpenCL
+	 * function and get a low-level OpenCL event. */
+	ocl_status = clEnqueueWriteBuffer(ccl_queue_unwrap(cq),
+		ccl_buffer_unwrap(buf), CL_FALSE, 0, sizeof(cl_float) * 4,
+		hbuf, 0, NULL, &event);
+	g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
+
+	/* Wrap OpenCL event. */
+	evt = ccl_event_new_wrap(event);
+
+	/* Wait on host thread for all events to complete. */
+	ccl_queue_finish(cq, &err);
+	g_assert_no_error(err);
+
+	/* ***** Get some event information. ***** */
+
+	/* Check OpenCL version. */
+	ocl_ver = ccl_event_get_opencl_version (evt, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ocl_ver % 10, ==, 0);
+
+	/* Check context. */
+	context = ccl_event_get_info_scalar(
+		evt, CL_EVENT_CONTEXT, cl_context, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
+		GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+
+	/* Check command queue. */
+	command_queue = ccl_event_get_info_scalar(
+		evt, CL_EVENT_COMMAND_QUEUE, cl_command_queue, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(command_queue), ==,
+		GPOINTER_TO_UINT(ccl_queue_unwrap(cq)));
+
+	/* Check event type. */
+	evt_type = ccl_event_get_info_scalar(evt, CL_EVENT_COMMAND_TYPE,
+		cl_command_type, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(evt_type, ==, CL_COMMAND_WRITE_BUFFER);
+
+	/* Check exec status. */
+	exec_status = ccl_event_get_info_scalar(
+		evt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+	g_assert_no_error(err);
+	g_assert_cmpint(exec_status, ==, CL_COMPLETE);
+
+	/* Check profiling info using info function. */
+	info = ccl_event_get_profiling_info(
+		evt, CL_PROFILING_COMMAND_START, &err);
+	g_assert_no_error(err);
+
+	/* Check profiling info using scalar function. */
+	time_end = ccl_event_get_profiling_info_scalar(
+		evt, CL_PROFILING_COMMAND_END, cl_ulong, &err);
+	g_assert_no_error(err);
+
+	/* Check that start time occurs before end time. */
+	g_assert_cmpuint(*((cl_ulong*) info->value), <=, time_end);
+
+	/* Release wrappers. */
+	ccl_event_destroy(evt);
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
 #ifdef CL_VERSION_1_1
 
 /**
@@ -391,6 +504,10 @@ static void event_wait_lists_test() {
 int main(int argc, char** argv) {
 
 	g_test_init(&argc, &argv, NULL);
+
+	g_test_add_func(
+		"/wrappers/event/create-info-destroy",
+		create_info_destroy_test);
 
 #ifdef CL_VERSION_1_1
 
