@@ -56,7 +56,8 @@ GQuark test_error_handling_error_quark() {
 /* ************** */
 
 /* This function can create an error. */
-cl_bool error_l2_aux(int code, const char* xtramsg, GError **err) {
+static cl_bool error_l2_aux(
+	int code, const char* xtramsg, GError **err) {
 
 	/* Return status variable. */
 	cl_bool status;
@@ -85,7 +86,7 @@ finish:
 }
 
 /* This function can propagate an error created by another function. */
-cl_bool error_l1_aux(int code, GError **err) {
+static cl_bool error_l1_aux(int code, GError **err) {
 
 	/* Return status variable. */
 	cl_bool status;
