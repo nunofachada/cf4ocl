@@ -130,6 +130,119 @@ static void ref_unref_test() {
 }
 
 /**
+ * Tests the ::ccl_enqueue_barrier() and ::ccl_enqueue_marker()
+ * functions.
+ * */
+static void barrier_marker_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLBuffer* buf = NULL;
+	CCLEvent* evt_map = NULL;
+	CCLEvent* evt_unmap = NULL;
+	CCLEvent* evt_barrier = NULL;
+	CCLEvent* evt_marker = NULL;
+	GError* err = NULL;
+	cl_ulong* host_buf;
+	CCLEventWaitList ewl = NULL;
+	cl_int exec_status = -1;
+	cl_command_type ct = 0;
+	cl_uint ocl_ver;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Get OpenCL version for context. */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a device buffer. */
+	buf = ccl_buffer_new(
+		ctx, CL_MEM_READ_WRITE, 8 * sizeof(cl_ulong), NULL, &err);
+	g_assert_no_error(err);
+
+	/* Map device buffer, get an event and analise it. */
+	host_buf = ccl_buffer_enqueue_map(buf, cq, CL_FALSE, CL_MAP_WRITE,
+		0, 8 * sizeof(cl_ulong), NULL, &evt_map, &err);
+	g_assert_no_error(err);
+
+	/* Enqueue a barrier for waiting on the map event. */
+	evt_barrier =
+		ccl_enqueue_barrier(cq, ccl_ewl(&ewl, evt_map, NULL), &err);
+	g_assert_no_error(err);
+
+	/* Check that the map event is CL_COMPLETE. */
+	exec_status = ccl_event_get_info_scalar(
+		evt_map, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+	g_assert_no_error(err);
+	g_assert_cmpint(exec_status, ==, CL_COMPLETE);
+
+	/* Check that the barrier event is CL_COMMAND_BARRIER (OpenCL >=
+	 * 1.2) or CL_COMMAND_MARKER (OpenCL <= 1.1). */
+	ct = ccl_event_get_command_type(evt_barrier, &err);
+	g_assert_no_error(err);
+#ifdef CL_VERSION_1_2
+	if (ocl_ver >= 120)
+		g_assert_cmpuint(ct, ==, CL_COMMAND_BARRIER);
+	else
+#endif
+		g_assert_cmpuint(ct, ==, CL_COMMAND_MARKER);
+
+	/* Unmap buffer, get resulting event. */
+	evt_unmap = ccl_buffer_enqueue_unmap(buf, cq, host_buf, NULL, &err);
+	g_assert_no_error(err);
+
+#ifdef CL_VERSION_1_2
+	if (ocl_ver >= 120) {
+		/* For OpenCL >= 1.2 the marker event is complete when either
+		 * a) all previous enqueued events have completed, or b) the
+		 * events specified in the event wait list have completed. */
+		ccl_event_wait_list_add(
+			&ewl, evt_map, evt_barrier, evt_unmap, NULL);
+		evt_marker = ccl_enqueue_marker(cq, &ewl, &err);
+		g_assert_no_error(err);
+	} else {
+#endif
+		/* For OpenCL <= 1.1, the marker event is complete ONLY when all
+		 * previous enqueued events have completed. */
+		evt_marker = ccl_enqueue_marker(cq, NULL, &err);
+		g_assert_no_error(err);
+#ifdef CL_VERSION_1_2
+	}
+#endif
+
+	/* Wait for marker event to complete (which means all previous
+	 * enqueued events have also completed). */
+	ccl_event_wait(ccl_ewl(&ewl, evt_marker, NULL), &err);
+
+	/* Check that the event is a marker event. */
+	ct = ccl_event_get_command_type(evt_marker, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ct, ==, CL_COMMAND_MARKER);
+
+	/* Release wrappers. */
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -146,6 +259,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/queue/ref-unref",
 		ref_unref_test);
+
+	g_test_add_func(
+		"/wrappers/queue/barrier-marker",
+		barrier_marker_test);
 
 	return g_test_run();
 }
