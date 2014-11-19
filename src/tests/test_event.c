@@ -43,7 +43,6 @@ static void create_info_destroy_test() {
 	cl_int ocl_status;
 	cl_uint ocl_ver;
 	cl_event event = NULL;
-	cl_context context = NULL;
 	cl_command_queue command_queue = NULL;
 	CCLWrapperInfo* info = NULL;
 	cl_command_type evt_type;
@@ -88,12 +87,14 @@ static void create_info_destroy_test() {
 	g_assert_no_error(err);
 	g_assert_cmpuint(ocl_ver % 10, ==, 0);
 
+#ifdef CL_VERSION_1_1
 	/* Check context. */
-	context = ccl_event_get_info_scalar(
+	cl_context context = ccl_event_get_info_scalar(
 		evt, CL_EVENT_CONTEXT, cl_context, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
 		GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+#endif
 
 	/* Check command queue. */
 	command_queue = ccl_event_get_info_scalar(
