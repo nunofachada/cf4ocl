@@ -128,22 +128,41 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) {
 
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((dst_image == NULL) || (src_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if ((dst_image->context != command_queue->context)
+		|| (src_buffer->context != command_queue->context)) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Also not testing if dest buffer has enough space for the image
+	 * data. */
+
 	/* These are ignored. */
-	(void)(command_queue);
-	(void)(src_buffer);
-	(void)(dst_image);
-	(void)(src_offset);
-	(void)(dst_origin);
-	(void)(region);
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
+
+	size_t dst_offset = dst_image->image_elem_size * (dst_origin[0] +
+		dst_origin[0] * dst_origin[1]
+		+ dst_origin[0] * dst_origin[1] * dst_origin[2]);
+
+	size_t size_coord[] = {region[0] - dst_origin[0],
+			region[1] - dst_origin[1], region[2] - dst_origin[2]};
+
+	size_t size = dst_image->image_elem_size * size_coord[0]
+		* size_coord[1] * size_coord[2];
+
+	/* Perform copy. */
+	g_memmove(((cl_uchar*) dst_image->mem) + dst_offset,
+		((cl_uchar*) src_buffer->mem) + src_offset, size);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_TO_IMAGE);
 
-	/* Unimplemented. */
-	g_assert_not_reached();
-
+	/* All good. */
 	return CL_SUCCESS;
 
 }
@@ -444,21 +463,42 @@ clEnqueueCopyImageToBuffer(cl_command_queue command_queue,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
 	cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((src_image == NULL) || (dst_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if ((dst_buffer->context != command_queue->context)
+		|| (src_image->context != command_queue->context)) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Also not testing if dest buffer has enough space for the image
+	 * data. */
 
-	(void)(command_queue);
-	(void)(src_image);
-	(void)(dst_buffer);
-	(void)(src_origin);
-	(void)(region);
-	(void)(dst_offset);
+	/* These are ignored. */
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_IMAGE_TO_BUFFER);
-	return CL_SUCCESS;
+	size_t src_offset = src_image->image_elem_size * (src_origin[0]
+		+ src_origin[0] * src_origin[1]
+		+ src_origin[0] * src_origin[1] * src_origin[2]);
 
+	size_t size_coord[] = {region[0] - src_origin[0],
+			region[1] - src_origin[1], region[2] - src_origin[2]};
+
+	size_t size = src_image->image_elem_size * size_coord[0]
+		* size_coord[1] * size_coord[2];
+
+	/* Perform copy. */
+	g_memmove(((cl_uchar*) dst_buffer->mem) + dst_offset,
+		((cl_uchar*) src_image->mem) + src_offset, size);
+
+	/* Set event. */
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_IMAGE_TO_BUFFER);
+
+	/* All good. */
+	return CL_SUCCESS;
 }
 
 CL_API_ENTRY void * CL_API_CALL
