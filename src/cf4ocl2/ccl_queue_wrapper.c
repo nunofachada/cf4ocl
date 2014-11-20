@@ -350,11 +350,9 @@ CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err) {
 	} else {
 		/* Otherwise, get it using a query. */
 		CCLWrapperInfo* info = NULL;
-		info = ccl_queue_get_info(
-			cq, CL_QUEUE_CONTEXT, &err_internal);
+		info = ccl_queue_get_info(cq, CL_QUEUE_CONTEXT, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		ctx = ccl_context_new_wrap(*((cl_context*) info->value));
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		cq->ctx = ctx;
 	}
 
@@ -406,11 +404,9 @@ CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err) {
 	} else {
 		/* Otherwise, get it using a query. */
 		CCLWrapperInfo* info = NULL;
-		info = ccl_queue_get_info(
-			cq, CL_QUEUE_DEVICE, &err_internal);
+		info = ccl_queue_get_info(cq, CL_QUEUE_DEVICE, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		dev = ccl_device_new_wrap(*((cl_device_id*) info->value));
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		cq->dev = dev;
 	}
 
