@@ -122,9 +122,12 @@ static void create_info_destroy_test(
 
 	/* Test variables. */
 	CCLImage* img = NULL;
+	cl_mem image = NULL;
 	GError* err = NULL;
+	cl_int ocl_status;
 	CCL_UNUSED(user_data);
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
+	CCLImageDesc img_dsc = CCL_IMAGE_DESC_BLANK;
 
 	/* Check that a context is set. */
 	if (*ctx_fixt == NULL) {
@@ -134,75 +137,105 @@ static void create_info_destroy_test(
 		return;
 	}
 
-	/* Create 2D image. */
-	img = ccl_image_new(
-		*ctx_fixt, CL_MEM_READ_WRITE, &image_format, NULL, &err,
-		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
-		"image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
-		"image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
-		NULL);
-	g_assert_no_error(err);
+	/* Test three ways to create an image. */
+	for (cl_uint i = 0; i < 3; ++i) {
 
-	/* Get some info and check if the return value is as expected. */
+		/* Create image wrapper. */
+		switch (i) {
+			case 0:
+				/* The regular way. */
+				img = ccl_image_new(
+					*ctx_fixt, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+					"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+					"image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
+					"image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
+					NULL);
+				g_assert_no_error(err);
+				break;
+			case 1:
+				/* Using the struct constructor. */
+				img_dsc.image_type = CL_MEM_OBJECT_IMAGE2D;
+				img_dsc.image_width = CCL_TEST_IMAGE_WIDTH;
+				img_dsc.image_height = CCL_TEST_IMAGE_HEIGHT;
+				img = ccl_image_new_v(*ctx_fixt, CL_MEM_READ_WRITE,
+					&image_format, &img_dsc, NULL, &err);
+				g_assert_no_error(err);
+				break;
+			case 2:
+				/* Using the "wrap" constructor. */
+				CCL_BEGIN_IGNORE_DEPRECATIONS
+				image = clCreateImage2D(ccl_context_unwrap(*ctx_fixt),
+					CL_MEM_READ_WRITE, &image_format,
+					CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 0,
+					NULL, &ocl_status);
+				CCL_END_IGNORE_DEPRECATIONS
+				g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
+				img = ccl_image_new_wrap(image);
+				g_assert_cmphex(GPOINTER_TO_UINT(image), ==,
+					GPOINTER_TO_UINT(ccl_image_unwrap(img)));
+				break;
+		}
 
-	/* Generic memory object queries. */
-	cl_mem_object_type mot;
-	mot = ccl_memobj_get_info_scalar(
-		img, CL_MEM_TYPE, cl_mem_object_type, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex(mot, ==, CL_MEM_OBJECT_IMAGE2D);
+		/* Get some info and check if the return value is as expected. */
 
-	cl_mem_flags flags;
-	flags = ccl_memobj_get_info_scalar(
-		img, CL_MEM_FLAGS, cl_mem_flags, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex(flags, ==, CL_MEM_READ_WRITE);
+		/* Generic memory object queries. */
+		cl_mem_object_type mot;
+		mot = ccl_memobj_get_info_scalar(
+			img, CL_MEM_TYPE, cl_mem_object_type, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(mot, ==, CL_MEM_OBJECT_IMAGE2D);
 
-	void* host_ptr;
-	host_ptr = ccl_memobj_get_info_scalar(
-		img, CL_MEM_HOST_PTR, void*, &err);
-	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
-	g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
-    g_clear_error(&err);
+		cl_mem_flags flags;
+		flags = ccl_memobj_get_info_scalar(
+			img, CL_MEM_FLAGS, cl_mem_flags, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(flags, ==, CL_MEM_READ_WRITE);
 
-	cl_context context;
-	context = ccl_memobj_get_info_scalar(
-		img, CL_MEM_CONTEXT, cl_context, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex((gulong) context, ==,
-		(gulong) ccl_context_unwrap(*ctx_fixt));
+		void* host_ptr;
+		host_ptr = ccl_memobj_get_info_scalar(
+			img, CL_MEM_HOST_PTR, void*, &err);
+		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
+		g_clear_error(&err);
 
-	/* Specific image queries. */
-	cl_image_format img_fmt;
-	img_fmt = ccl_image_get_info_scalar(
-		img, CL_IMAGE_FORMAT, cl_image_format, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex(img_fmt.image_channel_order, ==,
-		image_format.image_channel_order);
-	g_assert_cmphex(img_fmt.image_channel_data_type, ==,
-		image_format.image_channel_data_type);
+		cl_context context;
+		context = ccl_memobj_get_info_scalar(
+			img, CL_MEM_CONTEXT, cl_context, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex((gulong) context, ==,
+			(gulong) ccl_context_unwrap(*ctx_fixt));
 
-	size_t elem_size;
-	elem_size = ccl_image_get_info_scalar(
-		img, CL_IMAGE_ELEMENT_SIZE, size_t, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(elem_size, ==, 4); /* Four channels of 1 byte each. */
+		/* Specific image queries. */
+		cl_image_format img_fmt;
+		img_fmt = ccl_image_get_info_scalar(
+			img, CL_IMAGE_FORMAT, cl_image_format, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex(img_fmt.image_channel_order, ==,
+			image_format.image_channel_order);
+		g_assert_cmphex(img_fmt.image_channel_data_type, ==,
+			image_format.image_channel_data_type);
 
-	size_t width;
-	width = ccl_image_get_info_scalar(
-		img, CL_IMAGE_WIDTH, size_t, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(width, ==, CCL_TEST_IMAGE_WIDTH);
+		size_t elem_size;
+		elem_size = ccl_image_get_info_scalar(
+			img, CL_IMAGE_ELEMENT_SIZE, size_t, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(elem_size, ==, 4); /* Four channels of 1 byte each. */
 
-	size_t height;
-	height = ccl_image_get_info_scalar(
-		img, CL_IMAGE_HEIGHT, size_t, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(height, ==, CCL_TEST_IMAGE_HEIGHT);
+		size_t width;
+		width = ccl_image_get_info_scalar(
+			img, CL_IMAGE_WIDTH, size_t, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(width, ==, CCL_TEST_IMAGE_WIDTH);
 
-	/* Destroy stuff. */
-	ccl_image_destroy(img);
+		size_t height;
+		height = ccl_image_get_info_scalar(
+			img, CL_IMAGE_HEIGHT, size_t, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(height, ==, CCL_TEST_IMAGE_HEIGHT);
 
+		/* Destroy image. */
+		ccl_image_destroy(img);
+	}
 }
 
 /**
@@ -499,13 +532,114 @@ static void map_unmap_test(
 	}
 
 	/* Unmap image. */
-	ccl_memobj_enqueue_unmap((CCLMemObj*) img, q, himg_map, NULL, &err);
+	ccl_image_enqueue_unmap(img, q, himg_map, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Free stuff. */
 	ccl_image_destroy(img);
 	ccl_queue_destroy(q);
 
+}
+
+
+/**
+ * Tests copy image to buffer and buffer to image functions.
+ * */
+static void copy_buffer_test(
+	CCLContext** ctx_fixt, gconstpointer user_data) {
+
+	/* Test variables. */
+	CCLDevice* dev = NULL;
+	CCLEvent* evt = NULL;
+	CCLImage* img1 = NULL;
+	CCLImage* img2 = NULL;
+	CCLBuffer* buf = NULL;
+	CCLQueue* cq = NULL;
+	CCLEventWaitList ewl = NULL;
+	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
+	cl_uint himg_in[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
+	cl_uint himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
+	size_t origin[3] = {0, 0, 0};
+	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
+	GError* err = NULL;
+	CCL_UNUSED(user_data);
+
+	/* Check that a context is set. */
+	if (*ctx_fixt == NULL) {
+		/* If not, skip test. */
+		g_test_fail();
+		g_test_message("An appropriate device for this test was not found.");
+		return;
+	}
+
+	/* Create a random 4-channel 8-bit image (i.e. each pixel has 32
+	 * bits). */
+	for (cl_uint i = 0;
+			i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
+		himg_in[i] = (cl_uint) g_test_rand_int();
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(*ctx_fixt, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(*ctx_fixt, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create 2D image, copy data from host. */
+	img1 = ccl_image_new(*ctx_fixt, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+		&image_format, himg_in, &err,
+		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+		"image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
+		"image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
+		NULL);
+	g_assert_no_error(err);
+
+	/* Create destination 2D image. */
+	img2 = ccl_image_new(*ctx_fixt, CL_MEM_WRITE_ONLY, &image_format,
+		NULL, &err,
+		"image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+		"image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
+		"image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
+		NULL);
+	g_assert_no_error(err);
+
+	/* Create buffer with enough size to hold image. */
+	buf = ccl_buffer_new(*ctx_fixt, CL_MEM_READ_WRITE,
+		CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT * sizeof(cl_uint),
+		NULL, &err);
+	g_assert_no_error(err);
+
+	/* Copy image to buffer. */
+	ccl_image_enqueue_copy_to_buffer(img1, buf, cq, origin,
+		region, 0, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Copy buffer to new image. */
+	ccl_buffer_enqueue_copy_to_image(buf, img2, cq, 0, origin, region,
+		NULL, &err);
+	g_assert_no_error(err);
+
+	/* Read image to host. */
+	evt = ccl_image_enqueue_read(img2, cq, CL_FALSE, origin, region,
+		0, 0, himg_out, NULL, &err);
+	g_assert_no_error(err);
+
+	/* For for transfer. */
+	ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
+	g_assert_no_error(err);
+
+	/* Check that the contents are the same as in the origin buffer. */
+	for (cl_uint i = 0;
+			i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i) {
+		g_assert_cmpuint(himg_in[i], ==, himg_out[i]);
+	}
+
+	/* Free stuff. */
+	ccl_image_destroy(img1);
+	ccl_image_destroy(img2);
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq);
 }
 
 #ifdef CL_VERSION_1_2
@@ -619,6 +753,12 @@ int main(int argc, char** argv) {
 		"/wrappers/image/map-unmap",
 		CCLContext*, NULL, context_with_image_support_setup,
 		map_unmap_test,
+		context_with_image_support_teardown);
+
+	g_test_add(
+		"/wrappers/image/copy-buffer",
+		CCLContext*, NULL, context_with_image_support_setup,
+		copy_buffer_test,
 		context_with_image_support_teardown);
 
 #ifdef CL_VERSION_1_2
