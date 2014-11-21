@@ -25,7 +25,7 @@ for ccl_fun in $ccl_functions
 do
   for test_src in $test_srcs
   do
-    callers=`cflow $test_src | awk '/^    [^ ]/ { caller=$1 }; /^        '$ccl_fun'/ { printf caller " " }'`
+    callers=`cflow $test_src | awk '/^    [^ ]/ { caller=$1 }; /^.*'$ccl_fun'/ { printf caller " " }'`
     fun_table[${ccl_fun}]+=$callers
   done
 done
