@@ -407,6 +407,14 @@ static void create_info_destroy_test() {
 			ccl_test_platforms_check_error(&err);
 			ccl_test_platforms_msg("...... OpenCL C version :", "%s",
 				ccl_info_array(info, char*));
+			ccl_test_platforms_check_error(&err);
+
+			info = ccl_device_get_info(d, CL_DEVICE_PLATFORM, &err);
+			ccl_test_platforms_check_error(&err);
+			g_assert_cmphex(
+				GPOINTER_TO_UINT(*((cl_platform_id*) info->value)),
+				==,
+				GPOINTER_TO_UINT(ccl_platform_unwrap(p)));
 
 			info = ccl_device_get_info(d, CL_DEVICE_PARENT_DEVICE, &err);
 			ccl_test_platforms_check_error(&err);
