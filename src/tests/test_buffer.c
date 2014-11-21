@@ -558,7 +558,7 @@ static void fill_test() {
 	g_assert_no_error(err);
 	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
 		p = ccl_platforms_get(ps, i);
-		double ocl_ver = ccl_platform_get_opencl_version(p, &err);
+		cl_uint ocl_ver = ccl_platform_get_opencl_version(p, &err);
 		if (ocl_ver >= 120) {
 			ctx = ccl_context_new_from_devices(
 				ccl_platform_get_num_devices(p, NULL),
@@ -617,6 +617,83 @@ static void fill_test() {
 
 }
 
+/**
+ * Tests memory object migration.
+ * */
+static void migrate_test() {
+
+	/* Test variables. */
+	CCLPlatforms* ps;
+	CCLPlatform* p;
+	CCLContext* ctx = NULL;
+	CCLDevice* d = NULL;
+	CCLBuffer* b = NULL;
+	CCLQueue* q;
+	size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
+	GError* err = NULL;
+
+	/* Get a context which supports OpenCL 1.2 if possible. */
+	ps = ccl_platforms_new(&err);
+	g_assert_no_error(err);
+	for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
+		p = ccl_platforms_get(ps, i);
+		cl_uint ocl_ver = ccl_platform_get_opencl_version(p, &err);
+		if (ocl_ver >= 120) {
+			ctx = ccl_context_new_from_devices(
+				ccl_platform_get_num_devices(p, NULL),
+				ccl_platform_get_all_devices(p, NULL),
+				&err);
+			g_assert_no_error(err);
+			break;
+		}
+	}
+
+	/* If not possible to find a 1.2 or better context, finish this
+	 * test. */
+	if (ctx == NULL) {
+		g_test_fail();
+		g_test_message("'%s' test not performed because no platform " \
+			"with OpenCL 1.2 support was found", G_STRLOC);
+		ccl_platforms_destroy(ps);
+		return;
+	}
+
+	/* Get first device in context. */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue associated with first device in
+	 * context. */
+	q = ccl_queue_new(ctx, d, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create regular buffer. */
+	b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, buf_size, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Assign buffer to first device in context (via the command
+	 * queue). */
+	ccl_memobj_enqueue_migrate((CCLMemObj**) &b, 1, q, 0, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Migrate buffer to host. */
+	ccl_memobj_enqueue_migrate((CCLMemObj**) &b, 1, q,
+		CL_MIGRATE_MEM_OBJECT_HOST, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Free stuff. */
+	ccl_buffer_destroy(b);
+	ccl_queue_destroy(q);
+	ccl_context_destroy(ctx);
+	ccl_platforms_destroy(ps);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+
 #endif
 
 /**
@@ -667,6 +744,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/buffer/fill",
 		fill_test);
+
+	g_test_add_func(
+		"/wrappers/buffer/migrate",
+		migrate_test);
 #endif
 
 	return g_test_run();

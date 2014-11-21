@@ -781,18 +781,37 @@ clEnqueueMigrateMemObjects(cl_command_queue command_queue,
 	cl_mem_migration_flags flags, cl_uint num_events_in_wait_list,
 	const cl_event* event_wait_list, cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	cl_uint flag_check = CL_MIGRATE_MEM_OBJECT_HOST
+		| CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED;
 
-	(void)(command_queue);
-	(void)(num_mem_objects);
-	(void)(mem_objects);
-	(void)(flags);
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((num_mem_objects == 0) || (mem_objects == NULL)) {
+		return CL_INVALID_VALUE;
+	} else if ((flags | flag_check) != flag_check) {
+		return CL_INVALID_VALUE;
+	}
+	for (cl_uint i = 0; i < num_mem_objects; ++i) {
+		if (mem_objects[i] == NULL)
+			return CL_INVALID_MEM_OBJECT;
+		if (mem_objects[i]->context != command_queue->context)
+			return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Not testing anything related with the event wait list. */
+
+	/* These are ignored. */
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
+	/* Create migrate event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_MIGRATE_MEM_OBJECTS);
 
+	/* In practice we don't need to migrate anything here because all
+	 * memory objects are in the same physical device, i.e., the host. */
+
+	/* Bye. */
 	return CL_SUCCESS;
 }
 
