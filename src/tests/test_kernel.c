@@ -161,10 +161,12 @@ static void create_info_destroy_test() {
 			kwgz = ccl_kernel_get_workgroup_info_scalar(
 				krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
 			g_assert_no_error(err);
+			(void)kwgz;
 
 			kcwgs = ccl_kernel_get_workgroup_info_array(krnl, dev,
 				CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t*, &err);
 			g_assert_no_error(err);
+			(void)kcwgs;
 
 		}
 

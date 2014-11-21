@@ -411,6 +411,13 @@ static void name_test() {
 }
 
 /**
+ * Bogus function to avoid GCC errors in ::event_wait_lists_test().
+ * */
+CCLEventWaitList* ewl_test_aux(void* ptr) {
+	return (CCLEventWaitList*) ptr;
+}
+
+/**
  * Event wait lists test.
  * */
 static void event_wait_lists_test() {
@@ -428,6 +435,7 @@ static void event_wait_lists_test() {
 	CCLEvent* evt_array[2] = { NULL, NULL };
 	CCLEventWaitList ewl = NULL;
 	const cl_event* clevent_ptr;
+	cl_uint num_evts;
 
 	/* Get a context with any device. */
 	ctx = ccl_context_new_any(&err);
@@ -464,9 +472,13 @@ static void event_wait_lists_test() {
 	evt_array[0] = evt;
 	ccl_event_wait_list_add_v(&ewl, evt_array);
 
-	/* Analise event wait list. */
-	g_assert_cmpuint(ccl_event_wait_list_get_num_events(&ewl), ==, 1);
-	clevent_ptr = ccl_event_wait_list_get_clevents(&ewl);
+	/* Analise event wait list. We use the bogus function ewl_test_aux()
+	 * to avoid the following GCC warning: "the comparison will always
+	 * evaluate as ‘true’". We know that it will, but this is only
+	 * a test. */
+	num_evts = ccl_event_wait_list_get_num_events(ewl_test_aux(&ewl));
+	g_assert_cmpuint(num_evts, ==, 1);
+	clevent_ptr = ccl_event_wait_list_get_clevents(ewl_test_aux(&ewl));
 	g_assert(*clevent_ptr == ccl_event_unwrap(evt));
 
 	/* Wait on last event. */
