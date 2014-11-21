@@ -176,121 +176,129 @@ static void create_info_destroy_test() {
 	cl_kernel_arg_address_qualifier kaaq;
 	char* kernel_arg_type_name;
 	char* kernel_arg_name;
+	cl_uint ocl_ver;
 
-	/* Get kernel argument information, compare it with expected info. */
+	/* Get OpenCL version of program's underlying platform. */
+	ocl_ver = ccl_program_get_opencl_version(prg, &err);
+	g_assert_no_error(err);
 
-	/* First kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	} else {
+	/* If platform supports kernel argument queries, get kernel argument
+	 * information and compare it with expected info. */
+	if (ocl_ver >= 120) {
+
+		/* First kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "a");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Second kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 1,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 1,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "b");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Third kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 2,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 2,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "c");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Fourth kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 3,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 3,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "d");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Bogus request, should return NULL and should raise an error. */
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
+			0 /* invalid value */, char*, &err);
+		g_assert(kernel_arg_type_name == NULL);
+		g_assert (err != NULL);
 		g_clear_error(&err);
 	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "a");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Second kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 1,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 1,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "b");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Third kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 2,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 2,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "c");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Fourth kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 3,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 3,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "d");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Bogus request, should return NULL and should raise an error. */
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-		0 /* invalid value */, char*, &err);
-	g_assert(kernel_arg_type_name == NULL);
-	g_assert (err != NULL);
-	g_clear_error(&err);
 
 #endif
 #endif
@@ -387,8 +395,9 @@ static void create_info_destroy_test() {
 
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
-	evt_kr = ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL, &gws, &lws,
-		&ewl, &err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
+	evt_kr = ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL,
+		&gws, &lws, &ewl, &err, a_w, b_w, c_w,
+		ccl_arg_priv(d_h, cl_uint), NULL);
 	g_assert_no_error(err);
 
 	/* Add the kernel termination event to the wait list. */
