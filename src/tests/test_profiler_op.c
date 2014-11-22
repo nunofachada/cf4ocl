@@ -80,7 +80,8 @@ static void operation_test() {
 	q3 = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	g_assert_no_error(err);
 
-	buf = ccl_buffer_new(ctx, CL_MEM_READ_ONLY, sizeof(cl_int) * CCL_TEST_MAXBUF, NULL, &err);
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+		sizeof(cl_int) * CCL_TEST_MAXBUF, NULL, &err);
 	g_assert_no_error(err);
 
 	prg = ccl_program_new_from_source(ctx, src, &err);
@@ -93,21 +94,24 @@ static void operation_test() {
 	prof = ccl_prof_new();
 
 	/* Test with 5 different event names. */
-	ev1 = ccl_buffer_enqueue_write(buf, q1, CL_TRUE, 0, sizeof(cl_int) * CCL_TEST_MAXBUF, host_ptr, NULL, &err);
+	ev1 = ccl_buffer_enqueue_write(buf, q1, CL_TRUE, 0,
+		sizeof(cl_int) * CCL_TEST_MAXBUF, host_ptr, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev1, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev1);
 	ev_unwrapped->t_start = 10;
 	ev_unwrapped->t_end = 15;
 
-	mapped_ptr = ccl_buffer_enqueue_map(buf, q1, CL_TRUE, CL_MAP_READ, 0, sizeof(cl_int) * CCL_TEST_MAXBUF, NULL, &ev2, &err);
+	mapped_ptr = ccl_buffer_enqueue_map(buf, q1, CL_TRUE, CL_MAP_READ,
+		0, sizeof(cl_int) * CCL_TEST_MAXBUF, NULL, &ev2, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev2, "Event2");
 	ev_unwrapped = ccl_event_unwrap(ev2);
 	ev_unwrapped->t_start = 16;
 	ev_unwrapped->t_end = 20;
 
-	ev3 = ccl_memobj_enqueue_unmap((CCLMemObj*) buf, q1, mapped_ptr, NULL, &err);
+	ev3 = ccl_memobj_enqueue_unmap(
+		(CCLMemObj*) buf, q1, mapped_ptr, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev3, "Event3");
 	ev_unwrapped = ccl_event_unwrap(ev3);
@@ -118,35 +122,40 @@ static void operation_test() {
 	size_t lws = 16;
 	size_t gwo = 0;
 
-	ev4 = ccl_kernel_set_args_and_enqueue_ndrange(krnl, q3, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
+	ev4 = ccl_kernel_set_args_and_enqueue_ndrange(
+		krnl, q3, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev4, "Event4");
 	ev_unwrapped = ccl_event_unwrap(ev4);
 	ev_unwrapped->t_start = 19;
 	ev_unwrapped->t_end = 25;
 
-	ev5 = ccl_buffer_enqueue_read(buf, q1, CL_TRUE, 0, sizeof(cl_int) * CCL_TEST_MAXBUF, host_ptr, NULL, &err);
+	ev5 = ccl_buffer_enqueue_read(buf, q1, CL_TRUE, 0,
+		sizeof(cl_int) * CCL_TEST_MAXBUF, host_ptr, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev5, "Event5");
 	ev_unwrapped = ccl_event_unwrap(ev5);
 	ev_unwrapped->t_start = 29;
 	ev_unwrapped->t_end = 40;
 
-	ev6 = ccl_buffer_enqueue_write(buf, q2, CL_TRUE, 0, sizeof(cl_int) * (CCL_TEST_MAXBUF / 5), host_ptr, NULL, &err);
+	ev6 = ccl_buffer_enqueue_write(buf, q2, CL_TRUE, 0,
+		sizeof(cl_int) * (CCL_TEST_MAXBUF / 5), host_ptr, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev6, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev6);
 	ev_unwrapped->t_start = 35;
 	ev_unwrapped->t_end = 45;
 
-	ev7 = ccl_kernel_set_args_and_enqueue_ndrange(krnl, q1, 1, &gwo, &gws, &lws, NULL, &err, buf, NULL);
+	ev7 = ccl_kernel_set_args_and_enqueue_ndrange(krnl, q1, 1, &gwo,
+		&gws, &lws, NULL, &err, buf, NULL);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev7, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev7);
 	ev_unwrapped->t_start = 68;
 	ev_unwrapped->t_end = 69;
 
-	ev8 = ccl_buffer_enqueue_write(buf, q3, CL_TRUE, 0, sizeof(cl_int) * (CCL_TEST_MAXBUF / 5), host_ptr, NULL, &err);
+	ev8 = ccl_buffer_enqueue_write(buf, q3, CL_TRUE, 0,
+		sizeof(cl_int) * (CCL_TEST_MAXBUF / 5), host_ptr, NULL, &err);
 	g_assert_no_error(err);
 	ccl_event_set_name(ev8, "Event1");
 	ev_unwrapped = ccl_event_unwrap(ev8);
@@ -166,6 +175,7 @@ static void operation_test() {
 	/* Test aggregate statistics */
 	/* ************************* */
 
+	/* 1) Directly. */
 	const CCLProfAgg* agg;
 
 	agg = ccl_prof_get_agg(prof, "Event1");
@@ -178,20 +188,68 @@ static void operation_test() {
 	g_assert_cmpuint(agg->absolute_time, ==, 4);
 	g_assert_cmpfloat(agg->relative_time - 0.05714, <, 0.0001);
 
-	agg = (CCLProfAgg*) ccl_prof_get_agg(prof, "Event3");
+	agg = ccl_prof_get_agg(prof, "Event3");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 13);
 	g_assert_cmpfloat(agg->relative_time - 0.18571, <, 0.0001);
 
-	agg = (CCLProfAgg*) ccl_prof_get_agg(prof, "Event4");
+	agg = ccl_prof_get_agg(prof, "Event4");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 6);
 	g_assert_cmpfloat(agg->relative_time - 0.08571, <, 0.0001);
 
-	agg = (CCLProfAgg*) ccl_prof_get_agg(prof, "Event5");
+	agg = ccl_prof_get_agg(prof, "Event5");
 	g_assert(agg != NULL);
 	g_assert_cmpuint(agg->absolute_time, ==, 11);
 	g_assert_cmpfloat(agg->relative_time - 0.15714, <, 0.0001);
+
+	/* 2) By cycling all agg. stats. */
+	const char* prev_name = "zzzz";
+
+	ccl_prof_iter_agg_init(
+		prof, CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC);
+
+	while ((agg = ccl_prof_iter_agg_next(prof)) != NULL) {
+
+		/* Just check that the event names are ordered properly. */
+		g_assert_cmpstr(agg->event_name, <=, prev_name);
+		prev_name = agg->event_name;
+	}
+
+	/* **************** */
+	/* Test event infos */
+	/* **************** */
+
+	prev_name = "0000";
+	const CCLProfInfo* info;
+
+	/* Test ordering by event name. */
+	ccl_prof_iter_info_init(
+		prof, CCL_PROF_INFO_SORT_NAME_EVENT | CCL_PROF_SORT_ASC);
+
+	while ((info = ccl_prof_iter_info_next(prof)) != NULL) {
+
+		/* Check that the event names are ordered properly. */
+		g_assert_cmpstr(info->event_name, >=, prev_name);
+		prev_name = info->event_name;
+
+	}
+
+	/* ******************* */
+	/* Test event instants */
+	/* ******************* */
+
+	const CCLProfInst* pi;
+	cl_ulong prev_inst = 0;
+	ccl_prof_iter_inst_init(
+		prof, CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC);
+
+	while ((pi = ccl_prof_iter_inst_next(prof)) != NULL) {
+
+		/* Check that previous instant occured before current one. */
+		g_assert_cmpuint(prev_inst, <=, pi->instant);
+		prev_inst = pi->instant;
+	}
 
 	/* ************* */
 	/* Test overlaps */
