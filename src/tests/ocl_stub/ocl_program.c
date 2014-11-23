@@ -351,7 +351,8 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 				program->binaries[j] = (unsigned char*)
 					g_compute_checksum_for_string(
 						G_CHECKSUM_SHA256, program->source, -1);
-				program->binary_sizes[j] = strlen((const char*) program->binaries[j]);
+				program->binary_sizes[j] =
+					strlen((const char*) program->binaries[j]);
 			}
 		}
 
@@ -491,17 +492,27 @@ clCompileProgram(cl_program program, cl_uint num_devices,
 	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
 	void* user_data) {
 
-	(void)(program);
-	(void)(num_devices);
-	(void)(device_list);
+	/* Check for a few errors. */
+	if (program == NULL) {
+		return CL_INVALID_PROGRAM;
+	} else if ((device_list == NULL) && (num_devices > 0)) {
+		return CL_INVALID_VALUE;
+	} else if ((device_list != NULL) && (num_devices == 0)) {
+		return CL_INVALID_VALUE;
+	} else if (((input_headers == NULL) || (header_include_names == NULL))
+			&& (num_input_headers > 0)) {
+		return CL_INVALID_VALUE;
+	} else if (((input_headers != NULL) || (header_include_names != NULL))
+			&& (num_input_headers == 0)) {
+		return CL_INVALID_VALUE;
+	}
+
+	/* Unused vars. */
 	(void)(options);
-	(void)(num_input_headers);
-	(void)(input_headers);
-	(void)(header_include_names);
 	(void)(pfn_notify);
 	(void)(user_data);
-	g_error("Unimplemented.");
 
+	/* Success in doing nothing. */
 	return CL_SUCCESS;
 }
 
@@ -512,16 +523,42 @@ clLinkProgram(cl_context context, cl_uint num_devices,
 	void (CL_CALLBACK *pfn_notify)(cl_program program, void* user_data),
 	void* user_data, cl_int* errcode_ret) {
 
-	(void)(context);
-	(void)(num_devices);
-	(void)(device_list);
+	/* Unused vars. */
 	(void)(options);
-	(void)(num_input_programs);
-	(void)(input_programs);
 	(void)(pfn_notify);
 	(void)(user_data);
 	(void)(errcode_ret);
-	g_error("Unimplemented.");
+
+	/* Aux vars. */
+	unsigned char** binaries;
+	size_t* lengths;
+	cl_program prog;
+
+	/* Check for a few errors. */
+	if (context == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+	} else if ((device_list == NULL) && (num_devices > 0)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if ((device_list != NULL) && (num_devices == 0)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if ((input_programs == NULL) || (num_input_programs == 0)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else {
+		/* No basic errors, just do some bogus linking. */
+		seterrcode(errcode_ret, CL_SUCCESS);
+		binaries = g_slice_alloc0(num_devices * sizeof(unsigned char*));
+		lengths = g_slice_alloc0(num_devices * sizeof(size_t));
+
+		for (cl_uint i = 0; i < num_devices; ++i) {
+			binaries[i] = (unsigned char*) "bogus";
+			lengths[i] = strlen("bogus") + 1;
+		}
+		prog = clCreateProgram(context, num_devices, device_list, NULL,
+			lengths, (const unsigned char**) binaries);
+		g_slice_free1(num_devices * sizeof(size_t), lengths);
+		g_slice_free1(num_devices * sizeof(unsigned char*), binaries);
+		return prog;
+	}
 
 	return NULL;
 

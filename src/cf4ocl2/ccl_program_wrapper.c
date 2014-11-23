@@ -682,7 +682,7 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	/* List of cl_device_id objects. */
 	cl_device_id* device_list = NULL;
 	/* OpenCL version of underlying platform. */
-	double ocl_ver;
+	cl_uint ocl_ver;
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
