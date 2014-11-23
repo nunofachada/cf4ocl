@@ -452,11 +452,7 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Test increasing reference count of objects which compose
- * larger objects, then destroy the larger object and verify that
- * composing object still exists and must be freed by the function
- * which increase its reference count. This function tests the following
- * modules: program, queue, kernel and event wrappers.
+ * Test program and kernel wrappers ref counting.
  * */
 static void ref_unref_test() {
 
@@ -522,6 +518,115 @@ static void ref_unref_test() {
 
 }
 
+#ifdef CL_VERSION_1_2
+
+static const char* src_head[] = {
+	"#define SOMETYPE char\n",
+	"SOMETYPE some_function(SOMETYPE a, size_t b) {\n" \
+	"	return (SOMETYPE) (a + b);\n" \
+	"}\n"};
+
+static const char src_main[] =
+	"#include <head.h>\n" \
+	"__kernel void complinktest(__global SOMETYPE *buf) {\n" \
+	"	size_t gid = get_global_id(0);\n" \
+	"	buf[gid] = some_function(buf[gid], gid);\n" \
+	"}\n";
+
+static const char* src_head_name = "head.h";
+
+/**
+ * Test program and kernel wrappers ref counting.
+ * */
+static void compile_link_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLProgram* prg_head = NULL;
+	CCLProgram* prg_main = NULL;
+	CCLProgram* prg_exec = NULL;
+	CCLBuffer* buf = NULL;
+	cl_char hbuf_in[8] = {-3, -2, -1, 0, 1, 2, 3, 4};
+	cl_char hbuf_out[8];
+	size_t ws = 8;
+	GError* err = NULL;
+
+	/* Get a context with any device. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create device buffer and initialize it with values from host
+	 * buffer in. */
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		8, hbuf_in, &err);
+	g_assert_no_error(err);
+
+	/* Create header program. */
+	prg_head =
+		ccl_program_new_from_sources(ctx, 2, src_head, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Create main program */
+	prg_main = ccl_program_new_from_source(ctx, src_main, &err);
+	g_assert_no_error(err);
+
+	/* Compile main program. */
+	ccl_program_compile(prg_main, 1, &dev, NULL, 1, &prg_head,
+		&src_head_name, NULL, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Link programs into an executable program. */
+	prg_exec = ccl_program_link(
+		ctx, 1, &dev, NULL, 1, &prg_main, NULL, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Run program. */
+	ccl_program_enqueue_kernel(prg_exec, "complinktest", cq, 1, NULL,
+		&ws, &ws, NULL, &err, buf, NULL);
+	g_assert_no_error(err);
+
+	/* Read results back to host. */
+	ccl_buffer_enqueue_read(
+		buf, cq, CL_TRUE, 0, 8, hbuf_out, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Terminate queue. */
+	ccl_queue_finish(cq, &err);
+	g_assert_no_error(err);
+
+#ifndef OPENCL_STUB
+
+	/* Check results. */
+	for (cl_char i = 0; i < 8; ++i)
+		g_assert_cmpint(hbuf_out[i], ==, hbuf_in[i] + i);
+
+#endif
+
+	/* Free stuff. */
+	ccl_buffer_destroy(buf);
+	ccl_program_destroy(prg_exec);
+	ccl_program_destroy(prg_main);
+	ccl_program_destroy(prg_head);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
+#endif
+
 /**
  * Main function.
  * @param[in] argc Number of command line arguments.
@@ -540,6 +645,11 @@ int main(int argc, char** argv) {
 		"/wrappers/program/ref-unref",
 		ref_unref_test);
 
+#ifdef CL_VERSION_1_2
+	g_test_add_func(
+		"/wrappers/program/compile-link",
+		compile_link_test);
+#endif
 	return g_test_run();
 }
 

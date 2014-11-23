@@ -970,7 +970,7 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	/* Result of function call. */
 	cl_bool result;
 	/* OpenCL version of underlying platform. */
-	double ocl_ver;
+	cl_uint ocl_ver;
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
@@ -1093,12 +1093,12 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	/* OpenCL program object to create and wrap. */
 	cl_program program = NULL;
 	/* OpenCL version of underlying platform. */
-	double ocl_ver;
+	cl_uint ocl_ver;
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
 	/* Check that context platform is >= OpenCL 1.2 */
-	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.2, throw error. */
