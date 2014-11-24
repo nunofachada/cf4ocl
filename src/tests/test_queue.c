@@ -228,16 +228,12 @@ static void barrier_marker_test() {
 		ccl_enqueue_barrier(cq, ccl_ewl(&ewl, evt_map, NULL), &err);
 	g_assert_no_error(err);
 
-	/* Check that the barrier event is CL_COMMAND_BARRIER (OpenCL >=
-	 * 1.2) or CL_COMMAND_MARKER (OpenCL <= 1.1). */
+	/* Check that the barrier event is CL_COMMAND_BARRIER or
+	 * CL_COMMAND_MARKER (this depends on the OpenCL version, as well
+	 * as the specific implementation). */
 	ct = ccl_event_get_command_type(evt_barrier, &err);
 	g_assert_no_error(err);
-#ifdef CL_VERSION_1_2
-	if (ocl_ver >= 120)
-		g_assert_cmpuint(ct, ==, CL_COMMAND_BARRIER);
-	else
-#endif
-		g_assert_cmpuint(ct, ==, CL_COMMAND_MARKER);
+	g_assert((ct == CL_COMMAND_BARRIER) || (ct == CL_COMMAND_MARKER));
 
 	/* Unmap buffer, get resulting event. */
 	evt_unmap = ccl_buffer_enqueue_unmap(buf, cq, host_buf, NULL, &err);
