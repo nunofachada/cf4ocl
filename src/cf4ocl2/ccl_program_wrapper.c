@@ -1723,12 +1723,25 @@ finish:
  * variable part of the filename is obtained via the device name and
  * the device index.
  *
+ * @attention Depending on the OpenCL implementation, this function
+ * might throw an error if program has not been built for all devices
+ * associated with the program context. Use ::ccl_program_save_binary()
+ * for saving binaries associated with specific devices.
+ *
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[in] file_prefix Prefix of files to save, can include full or
  * relative paths.
  * @param[in] file_suffix Suffix of files to save.
+ * @param[out] filenames Location where to place array of strings
+ * containing the saved binaries filenames, or `NULL` if this
+ * information is not required. If not `NULL` this variable will point
+ * to an array containg *n* strings, where *n* is the number of devices
+ * associated with the program, obtained with the
+ * ::ccl_program_get_num_devices() function. If not `NULL` the value
+ * pointed to by this variable should be freed with GLib's
+ * _g_strfreev()_ function.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
@@ -1736,7 +1749,8 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
-	const char* file_prefix, const char* file_suffix, GError** err) {
+	const char* file_prefix, const char* file_suffix, char*** filenames,
+	GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
@@ -1757,6 +1771,11 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	num_devices = ccl_program_get_num_devices(prg, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
+	/* Allocate space for filenames. */
+	if (filenames != NULL)
+		*filenames = g_malloc((num_devices + 1) * sizeof(char**));
+
+	/* Allocate space for*/
 	/* Cycle through each device. */
 	for (guint i = 0; i < num_devices; ++i) {
 
@@ -1789,10 +1808,22 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		ccl_program_save_binary(prg, dev, filename, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
-		/* Free filename variables. */
-		g_free(filename);
+		/* Keep filename or free it, depending if the filenames
+		 * variable is NULL or not. */
+		if (filenames != NULL) {
+			(*filenames)[i] = filename;
+		} else {
+			g_free(filename);
+		}
+
+		/* Free middle filename variable. */
 		g_free(file_middle);
 	}
+
+	/* Signal the end of the array with NULL, so it can be freed with
+	 * GLib's g_strfreev() function. */
+	if (filenames != NULL)
+		(*filenames)[num_devices] = NULL;
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);

@@ -55,6 +55,7 @@ static void create_info_destroy_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLProgram* prg = NULL;
+	CCLProgram* prg2 = NULL;
 	CCLKernel* krnl = NULL;
 	CCLWrapperInfo* info = NULL;
 	CCLDevice* d = NULL;
@@ -78,7 +79,7 @@ static void create_info_destroy_test() {
 	gchar* tmp_file_prefix;
 
 	/* Get a temp. dir. */
-	tmp_dir_name = g_dir_make_tmp("test_cad_program_XXXXXX", &err);
+	tmp_dir_name = g_dir_make_tmp("test_program_XXXXXX", &err);
 	g_assert_no_error(err);
 
 	/* Get a temp file prefix. */
@@ -303,14 +304,27 @@ static void create_info_destroy_test() {
 #endif
 #endif
 
-	/* Save binaries for all available devices. */
+	/* Save binaries for all available devices (which we will load into
+	 * a new program later). */
+	char** filenames;
+
 	tmp_file_prefix = g_strdup_printf(
 		"%s%ctest_", tmp_dir_name, G_DIR_SEPARATOR);
 
-	ccl_program_save_all_binaries(prg, tmp_file_prefix, ".bin", &err);
+	ccl_program_save_all_binaries(
+		prg, tmp_file_prefix, ".bin", &filenames, &err);
 	g_assert_no_error(err);
 
 	g_free(tmp_file_prefix);
+
+	cl_uint num_devs = ccl_program_get_num_devices(prg, &err);
+	g_assert_no_error(err);
+	CCLDevice* const* devs = ccl_program_get_all_devices(prg, &err);
+	g_assert_no_error(err);
+
+	g_debug(" ==== NUMDEVS=%d =====\n", num_devs);
+	for (cl_uint i = 0; i < num_devs; ++i)
+		g_debug("=> '%s'\n", filenames[i]);
 
 	/* Save binary for a specific device (which we will load into a new
 	 * program later). */
@@ -320,10 +334,21 @@ static void create_info_destroy_test() {
 	ccl_program_save_binary(prg, d, tmp_file_prefix, &err);
 	g_assert_no_error(err);
 
-	/* Destroy program. */
+	/* Create a new program using the saved binaries. */
+	prg2 = ccl_program_new_from_binary_files(
+		ctx, num_devs, devs, (const char**) filenames, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Destroy the filenames string array. */
+	g_strfreev(filenames);
+
+	/* Destroy program created with saved binary files. */
+	ccl_program_destroy(prg2);
+
+	/* Destroy original program. */
 	ccl_program_destroy(prg);
 
-	/* Create a new program using the saved binary. */
+	/* Create a new program using the specifically saved binary. */
 	prg = ccl_program_new_from_binary_file(
 		ctx, d, tmp_file_prefix, NULL, &err);
 	g_assert_no_error(err);
@@ -331,7 +356,10 @@ static void create_info_destroy_test() {
 	g_free(tmp_file_prefix);
 
 	/* **** BUILD PROGRAM **** */
-	ccl_program_build(prg, NULL, &err);
+
+	/* Use the build_full function for testing, not really required
+	 * (we could have used the "short" version). */
+	ccl_program_build_full(prg, 1, &d, NULL, NULL, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Get some program build info, compare it with expected values. */
@@ -344,17 +372,6 @@ static void create_info_destroy_test() {
 	info = ccl_program_get_build_info(
 		prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
-
-	/* Get kernel wrapper object. */
-	krnl = ccl_program_get_kernel(
-		prg, CCL_TEST_PROGRAM_SUM, &err);
-	g_assert_no_error(err);
-
-	/* Get some kernel info, compare it with expected info. */
-	info = ccl_kernel_get_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
-	g_assert_no_error(err);
-	g_assert_cmpstr(
-		(gchar*) info->value, ==, CCL_TEST_PROGRAM_SUM);
 
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
@@ -395,9 +412,9 @@ static void create_info_destroy_test() {
 
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
-	evt_kr = ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL,
-		&gws, &lws, &ewl, &err, a_w, b_w, c_w,
-		ccl_arg_priv(d_h, cl_uint), NULL);
+	void* args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
+	evt_kr =  ccl_program_enqueue_kernel_v(prg, CCL_TEST_PROGRAM_SUM,
+		cq, 1, NULL, &gws, &lws, &ewl, args, &err);
 	g_assert_no_error(err);
 
 	/* Add the kernel termination event to the wait list. */

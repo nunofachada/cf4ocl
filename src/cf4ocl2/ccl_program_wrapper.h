@@ -386,7 +386,8 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
  * file per device. */
 CCL_EXPORT
 cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
-	const char* file_prefix, const char* file_suffix, GError** err);
+	const char* file_prefix, const char* file_suffix, char*** filenames,
+	GError** err);
 
 /* ***************************************** */
 /* DEVICE CONTAINER FUNCTION IMPLEMENTATIONS */
