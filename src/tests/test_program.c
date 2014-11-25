@@ -100,6 +100,12 @@ static void create_info_destroy_test() {
 		ctx, tmp_file_prefix, &err);
 	g_assert_no_error(err);
 
+	ccl_program_destroy(prg);
+
+	const char* file_pref = (const char*) tmp_file_prefix;
+	prg = ccl_program_new_from_source_files(ctx, 1, &file_pref, &err);
+	g_assert_no_error(err);
+
 	g_free(tmp_file_prefix);
 
 	/* Get some program info, compare it with expected info. */
@@ -345,6 +351,44 @@ static void create_info_destroy_test() {
 	/* Destroy program created with saved binary files. */
 	ccl_program_destroy(prg2);
 
+	/* Get binary in variable. */
+	CCLProgramBinary* prg_bin = ccl_program_get_binary(prg, d, &err);
+	g_assert_no_error(err);
+
+	/* Create program using that binary. */
+	prg2 = ccl_program_new_from_binaries(
+		ctx, 1, &d, &prg_bin, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Check that device is the correct one. */
+	CCLDevice* d2 = ccl_program_get_device(prg2, 0, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(d), ==, GPOINTER_TO_UINT(d2));
+
+	cl_device_id* devices = ccl_program_get_info_array(
+		prg2, CL_PROGRAM_DEVICES, cl_device_id*, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(devices[0]),
+		==, GPOINTER_TO_UINT(ccl_device_unwrap(d)));
+
+	cl_context context = ccl_program_get_info_scalar(
+		prg2, CL_PROGRAM_CONTEXT, cl_context, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(context),
+		==, GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+
+	/* Destroy program created with binary. */
+	ccl_program_destroy(prg2);
+
+	/* Create program using the wrap constructor. */
+	prg2 = ccl_program_new_wrap(ccl_program_unwrap(prg));
+
+	/* It must be the same program as the original one. */
+	g_assert_cmphex(GPOINTER_TO_UINT(prg), ==, GPOINTER_TO_UINT(prg2));
+
+	/* Destroy it. */
+	ccl_program_destroy(prg2);
+
 	/* Destroy original program. */
 	ccl_program_destroy(prg);
 
@@ -372,6 +416,15 @@ static void create_info_destroy_test() {
 	info = ccl_program_get_build_info(
 		prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
+
+	g_assert(g_strrstr(
+		ccl_program_get_build_log(prg), (char*) info->value));
+
+	char* build_log = ccl_program_get_build_info_array(
+		prg, d, CL_PROGRAM_BUILD_LOG, char*, &err);
+	g_assert_no_error(err);
+
+	g_assert_cmpstr(build_log, ==, (char*) info->value);
 
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
