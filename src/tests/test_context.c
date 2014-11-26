@@ -27,6 +27,7 @@
 
 #include <cf4ocl2.h>
 #include <glib/gstdio.h>
+#include "test.h"
 
 static const char* ccl_test_channel_order_string(cl_uint co) {
 	switch(co) {
@@ -89,13 +90,6 @@ static cl_bool ccl_devsel_indep_test_true(
 	CCL_UNUSED(err);
 	return CL_TRUE;
 
-}
-
-/*
- * Print handler which redirects output to debug stream.
- * */
-static void ccl_print_to_debug(const gchar* string) {
-	g_debug(string);
 }
 
 /**
@@ -247,6 +241,11 @@ static void create_info_destroy_test() {
 	 * 3. Test context creation by device filtering
 	 * (using shortcut macros).
 	 * */
+
+	/* 3.0. Create a context using the "any" macro. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+	ccl_context_destroy(ctx);
 
 	/* For the next device type filters, at least one device must be
 	 * found in order the test to pass. */
@@ -721,7 +720,8 @@ static void ref_unref_test() {
 	/* Set print handler to print to debug stream. */
 	g_set_print_handler(ccl_print_to_debug);
 
-	int data = 0; /* Select device with index 0 in menu. */
+	/* Select device with index defined in header. */
+	int data = CCL_TEST_DEFAULT_DEVICE_IDX;
 	ctx = ccl_context_new_from_menu_full(&data, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
@@ -843,7 +843,7 @@ static void device_container_test() {
 	GError* err = NULL;
 
 	/* Create some context. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Test get platform. */

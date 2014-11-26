@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 /**
  * Tests creation (using "simple" constructor), getting info from and
@@ -48,7 +49,7 @@ static void create_info_destroy_test() {
 	cl_int ocl_status;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -141,7 +142,7 @@ static void ref_unref_test() {
 	GError* err = NULL;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -198,7 +199,7 @@ static void barrier_marker_test() {
 	cl_bool evt_in_cq;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */

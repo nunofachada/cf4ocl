@@ -1,3 +1,11 @@
+# Build utils?
+option(BUILD_UTILS "Build and install utilities?" ON)
+
+# Stop processing if utils are not to be built
+if (NOT ${BUILD_UTILS})
+	return()
+endif()
+
 # List of utilities
 set(UTILS ccl_devinfo ccl_kerninfo)
 

@@ -1,3 +1,11 @@
+# Build examples?
+option(BUILD_EXAMPLES "Build examples?" ON)
+
+# Stop processing if examples are not to be built
+if (NOT ${BUILD_EXAMPLES})
+	return()
+endif()
+
 # List of examples
 SET(EXAMPLES image_fill image_filter list_devices ca ca_mt device_filter
 	canon)

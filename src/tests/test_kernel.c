@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 #define CCL_TEST_KERNEL_NAME "test_krnl"
 
@@ -69,7 +70,7 @@ static void create_info_destroy_test() {
 	cl_int ocl_status;
 
 	/* Create a context with devices from first available platform. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a new program from source and build it. */
@@ -284,7 +285,7 @@ static void ref_unref_test() {
 	CCLKernel* krnl2 = NULL;
 
 	/* Get some context. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a program from source. */
@@ -582,7 +583,7 @@ static void suggest_worksizes_test() {
 	GError* err = NULL;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -682,7 +683,7 @@ static void args_test() {
 	/* **************************************************** */
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */

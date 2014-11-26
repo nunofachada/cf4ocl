@@ -26,6 +26,7 @@
 
 #include <cf4ocl2.h>
 #include <glib/gstdio.h>
+#include "test.h"
 
 #define CCL_TEST_PROGRAM_SUM "sum"
 
@@ -92,7 +93,7 @@ static void create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Create a context with devices from first available platform. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a new program from kernel file. */
@@ -535,7 +536,7 @@ static void ref_unref_test() {
 	const char* src = CCL_TEST_PROGRAM_SUM_CONTENT;
 
 	/* Get some context. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a program from source. */
@@ -622,9 +623,10 @@ static void compile_link_test() {
 	cl_char hbuf_out[8];
 	size_t ws = 8;
 	GError* err = NULL;
+	cl_uint ocl_ver;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -634,6 +636,16 @@ static void compile_link_test() {
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, dev, 0, &err);
 	g_assert_no_error(err);
+
+	/* Check if platform supports compilation and linking
+	 * (OpenCL >= 1.2) */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err);
+	g_assert_no_error(err);
+	if (ocl_ver < 120) {
+		g_test_message("Device being tested does not support \
+			compilation and linking");
+		return;
+	}
 
 	/* Create device buffer and initialize it with values from host
 	 * buffer in. */

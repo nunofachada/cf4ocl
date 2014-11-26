@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 #define CCL_TEST_BUFFER_SIZE 512
 
@@ -41,7 +42,7 @@ static void create_info_destroy_test() {
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create regular buffer. */
@@ -101,7 +102,7 @@ static void ref_unref_test() {
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create regular buffer. */
@@ -152,7 +153,7 @@ static void wrap_unwrap_test() {
 	cl_int status;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a buffer using OpenCL functions directly. */
@@ -211,7 +212,7 @@ static void read_write_test() {
 		h_in[i] = g_test_rand_int();
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -286,7 +287,7 @@ static void copy_test() {
 		h1[i] = g_test_rand_int();
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -354,7 +355,7 @@ static void map_unmap_test() {
 		h_in[i] = g_test_rand_int();
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */
@@ -422,7 +423,7 @@ static void destructor_callback_test() {
 	cl_bool test_var = CL_FALSE;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a buffer. */
@@ -483,7 +484,7 @@ static void rect_read_write_copy_test() {
 				(cl_uchar) (g_test_rand_int() % 0xFF);
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Get first device in context. */

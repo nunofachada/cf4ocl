@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 /**
  * Tests creation, getting info from and destruction of
@@ -53,7 +54,7 @@ static void create_add_destroy_test() {
 	prof = ccl_prof_new();
 
 	/* Get a context and a device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	d = ccl_context_get_device(ctx, 0, &err);

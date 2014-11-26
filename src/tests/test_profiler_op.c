@@ -27,6 +27,7 @@
 
 #include <cf4ocl2.h>
 #include "ocl_stub/ocl_impl.h"
+#include "test.h"
 
 #define ccl_test_prof_is_overlap(ev1, ev2) \
 	( \
@@ -67,7 +68,7 @@ static void operation_test() {
 	void* mapped_ptr;
 
 	/* Create OpenCL wrappers for testing. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	dev = ccl_context_get_device(ctx, 0, &err);

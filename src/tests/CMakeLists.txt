@@ -1,3 +1,18 @@
+# Build tests?
+option(BUILD_TESTS "Build tests?" ON)
+
+# Stop processing if tests are not to be built
+if (NOT ${BUILD_TESTS})
+	unset(DOC_EXCLUDE_TESTS CACHE)
+	unset(TESTS_USE_OPENCL_STUB CACHE)
+	unset(TESTS_DEVICE_INDEX CACHE)
+	return()
+endif()
+
+# Allow the user to specify which device to use in generic device tests
+set(TESTS_DEVICE_INDEX "0" CACHE STRING "Index of device to use in generic device tests")
+add_definitions("-DCCL_TEST_DEFAULT_DEVICE_IDX=${TESTS_DEVICE_INDEX}")
+
 # Set of tests which only work with the OpenCL stub
 set(TESTS_STUBONLY test_profiler_op test_error_handling)
 
@@ -45,11 +60,11 @@ target_link_libraries(${PROJECT_NAME}_TESTING
 	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
 
 # Use OpenCL stub when possible?
-option(OPENCL_USE_STUB_IN_TESTS "Use OpenCL stub in tests when possible?" ON)
+option(TESTS_USE_OPENCL_STUB "Use OpenCL stub in tests when possible?" ON)
 
 # Determine general properties for tests which can either use the OpenCL
 # stub or a real OpenCL implementation
-if (OPENCL_USE_STUB_IN_TESTS)
+if (TESTS_USE_OPENCL_STUB)
 	set(LIB_OPT ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
 	add_definitions(-DOPENCL_STUB)
 	set(FLAGS_OPT "-DCCL_STATIC_DEFINE")
@@ -73,7 +88,7 @@ endforeach()
 
 # Add a target for each test
 foreach(TEST ${TESTS})
-	add_executable(${TEST} ${TEST}.c)
+	add_executable(${TEST} ${TEST}.c test.c)
 	target_link_libraries(${TEST} ${GLIB_LIBRARIES} ${${TEST}_LIBS})
 	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
 		COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR} ${${TEST}_FLAGS}")

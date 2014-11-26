@@ -27,6 +27,7 @@
 
 #include <cf4ocl2.h>
 #include <glib/gstdio.h>
+#include "test.h"
 
 /* Max. length of information string. */
 #define CCL_TEST_PLATFORMS_MAXINFOSTR 200

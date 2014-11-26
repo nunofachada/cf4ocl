@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 /**
  * Tests creation (using "simple" constructor), getting info from and
@@ -38,7 +39,7 @@ static void create_info_destroy_test() {
 	GError* err = NULL;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create sampler using "simple" constructor. */
@@ -99,7 +100,7 @@ static void create_full_info_destroy_test() {
 	GError* err = NULL;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create sampler using "full" constructor. */
@@ -152,7 +153,7 @@ static void ref_unref_test() {
 	GError* err = NULL;
 
 	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create sampler. */
