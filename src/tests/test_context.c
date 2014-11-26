@@ -91,6 +91,13 @@ static cl_bool ccl_devsel_indep_test_true(
 
 }
 
+/*
+ * Print handler which redirects output to debug stream.
+ * */
+static void ccl_print_to_debug(const gchar* string) {
+	g_debug(string);
+}
+
 /**
  * Tests creation, getting info from and destruction of
  * context wrapper objects.
@@ -711,10 +718,16 @@ static void ref_unref_test() {
 	/* **** Test context creation by menu. **** */
 	/* **************************************** */
 
+	/* Set print handler to print to debug stream. */
+	g_set_print_handler(ccl_print_to_debug);
+
 	int data = 0; /* Select device with index 0 in menu. */
 	ctx = ccl_context_new_from_menu_full(&data, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+
+	/* Reset print handler to default. */
+	g_set_print_handler(NULL);
 
 	d = ccl_context_get_device(ctx, 0, &err);
 	ccl_device_ref(d);

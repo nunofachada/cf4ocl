@@ -327,7 +327,7 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 		}
 
 		/* Print string. */
-		g_printf(" %s %s\n",
+		g_print(" %s %s\n",
 			sel_str, dev_strings[i]);
 
 	}
