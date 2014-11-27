@@ -582,7 +582,7 @@ static void suggest_worksizes_test() {
 	CCLDevice* dev = NULL;
 	GError* err = NULL;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -682,7 +682,7 @@ static void args_test() {
 	/* 1 - Test different types of arguments with a kernel. */
 	/* **************************************************** */
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 

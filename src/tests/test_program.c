@@ -625,7 +625,7 @@ static void compile_link_test() {
 	GError* err = NULL;
 	cl_uint ocl_ver;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 

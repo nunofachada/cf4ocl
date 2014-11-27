@@ -48,7 +48,7 @@ static void create_info_destroy_test() {
 		{ CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0 };
 	cl_int ocl_status;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -141,7 +141,7 @@ static void ref_unref_test() {
 	CCLDevice* dev = NULL;
 	GError* err = NULL;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -198,7 +198,7 @@ static void barrier_marker_test() {
 	cl_uint ocl_ver;
 	cl_bool evt_in_cq;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 

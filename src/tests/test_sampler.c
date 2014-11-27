@@ -38,7 +38,7 @@ static void create_info_destroy_test() {
 	CCLSampler* s = NULL;
 	GError* err = NULL;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -99,7 +99,7 @@ static void create_full_info_destroy_test() {
 
 	GError* err = NULL;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -152,7 +152,7 @@ static void ref_unref_test() {
 	CCLSampler* s = NULL;
 	GError* err = NULL;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 

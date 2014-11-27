@@ -41,7 +41,7 @@ static void create_info_destroy_test() {
 	GError* err = NULL;
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -101,7 +101,7 @@ static void ref_unref_test() {
 	GError* err = NULL;
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -152,7 +152,7 @@ static void wrap_unwrap_test() {
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 	cl_int status;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -211,7 +211,7 @@ static void read_write_test() {
 	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
 		h_in[i] = g_test_rand_int();
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -286,7 +286,7 @@ static void copy_test() {
 	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
 		h1[i] = g_test_rand_int();
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -354,7 +354,7 @@ static void map_unmap_test() {
 	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
 		h_in[i] = g_test_rand_int();
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -422,7 +422,7 @@ static void destructor_callback_test() {
 	GTimer* timer = NULL;
 	cl_bool test_var = CL_FALSE;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -483,7 +483,7 @@ static void rect_read_write_copy_test() {
 			h1[i * CCL_TEST_BUFFER_SIZE + j] =
 				(cl_uchar) (g_test_rand_int() % 0xFF);
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -523,6 +523,75 @@ static void rect_read_write_copy_test() {
 	/* Free stuff. */
 	ccl_buffer_destroy(b1);
 	ccl_buffer_destroy(b2);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+
+}
+
+/**
+ * Tests the ccl_buffer_new_from_region() function.
+ * */
+static void create_from_region_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLBuffer* buf = NULL;
+	CCLBuffer* subbuf = NULL;
+	CCLEvent* evt = NULL;
+	CCLEventWaitList ewl = NULL;
+	GError* err = NULL;
+	cl_ulong hbuf[64];
+	cl_ulong hsubbuf[16];
+
+	/* Initialize initial host buffer. */
+	for (cl_uint i = 0; i < 64; ++i)
+		hbuf[i] = g_test_rand_int();
+
+	/* Get the test context with the pre-defined device. */
+	ctx = ccl_test_context_new(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a regular buffer, put some data in it. */
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		64 * sizeof(cl_ulong), hbuf, &err);
+	g_assert_no_error(err);
+
+	/* Create sub-buffer from indexes 16 to 31 (16 positions) of
+	 * original buffer. */
+	subbuf = ccl_buffer_new_from_region(buf, 0, 16 * sizeof(cl_ulong),
+		16 * sizeof(cl_ulong), &err);
+	g_assert_no_error(err);
+
+	/* Get data in sub-buffer to a new host buffer. */
+	evt = ccl_buffer_enqueue_read(subbuf, cq, CL_FALSE, 0,
+		16 * sizeof(cl_ulong), hsubbuf, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Wait for read to be complete. */
+	ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
+	g_assert_no_error(err);
+
+	/* Check that expected values were successfully read. */
+	for (cl_uint i = 0; i < 16; ++i)
+		g_assert_cmpuint(hsubbuf[i], ==, hbuf[i + 16]);
+
+	/* Destroy stuff. */
+	ccl_buffer_destroy(buf);
+	ccl_buffer_destroy(subbuf);
 	ccl_queue_destroy(cq);
 	ccl_context_destroy(ctx);
 
@@ -739,6 +808,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/buffer/rect-read-write-copy",
 		rect_read_write_copy_test);
+
+	g_test_add_func(
+		"/wrappers/buffer/create-from-region",
+		create_from_region_test);
 #endif
 
 #ifdef CL_VERSION_1_2

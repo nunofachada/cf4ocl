@@ -50,7 +50,7 @@ static void create_info_destroy_test() {
 	cl_int exec_status;
 	cl_ulong time_end;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -163,7 +163,7 @@ static void user_event_test() {
 	cl_command_type clct = 0;
 	cl_int exec_status;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -257,7 +257,7 @@ static void callback_test() {
 	cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
 	cl_bool test_var = CL_FALSE;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -328,7 +328,7 @@ static void name_test() {
 	cl_command_type ct = 0;
 	const char* evt_name = NULL;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
@@ -438,7 +438,7 @@ static void event_wait_lists_test() {
 	const cl_event* clevent_ptr;
 	cl_uint num_evts;
 
-	/* Get a context with any device. */
+	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
