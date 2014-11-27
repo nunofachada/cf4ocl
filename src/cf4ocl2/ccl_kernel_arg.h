@@ -106,15 +106,15 @@ void* ccl_arg_value(CCLArg* arg);
  * @{
  *
  * @note These macros wrap the ::ccl_arg_new() function, which returns
- * a new ::CCLArg* memory object. ::CCLArg* objects are destroyed when
- * the kernel to which they were passed is released. For further control
+ * a new ::CCLArg* object. ::CCLArg* objects are destroyed when the
+ * kernel to which they were passed is released. For further control
  * of argument instantiation, client code can use the ::ccl_arg_full()
  * macro instead of the ::ccl_arg_new() function in order to respect the
  * @ref ug_new_destroy "new/destroy" rule.
  *
- * @attention A ::CCLArg* memory object can only be passed once to a
- * kernel. One way to guarantee this is to use the macros directly
- * when setting the kernel arguments, as shown in the example above.
+ * @attention A ::CCLArg* object can only be passed once to a kernel.
+ * One way to guarantee this is to use the macros directly when setting
+ * the kernel arguments, as shown in the example above.
  */
 
 /**

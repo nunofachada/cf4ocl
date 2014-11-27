@@ -74,10 +74,12 @@ static void create_info_destroy_test() {
 				break;
 			case 2:
 				/* Using the "wrap" constructor. */
+				CCL_BEGIN_IGNORE_DEPRECATIONS
 				command_queue = clCreateCommandQueue(
 					ccl_context_unwrap(ctx), ccl_device_unwrap(dev),
 					CL_QUEUE_PROFILING_ENABLE, &ocl_status);
 				g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
+				CCL_END_IGNORE_DEPRECATIONS
 				cq = ccl_queue_new_wrap(command_queue);
 				g_assert_cmphex(GPOINTER_TO_UINT(command_queue), ==,
 					GPOINTER_TO_UINT(ccl_queue_unwrap(cq)));
