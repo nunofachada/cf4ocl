@@ -79,6 +79,8 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 	seterrcode(errcode_ret, CL_SUCCESS);
 	cl_mem memobj = g_slice_new(struct _cl_mem);
 
+	buffer->ref_count++;
+
 	memobj->ref_count = 1;
 	memobj->type = CL_MEM_OBJECT_BUFFER;
 	memobj->flags = flags;
@@ -93,6 +95,7 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 		? ((struct _cl_buffer_region*) buffer_create_info)->origin
 		: 0;
 
+	memobj->mem = buffer->mem + memobj->offset;
 	memobj->callbacks = NULL;
 
 	return memobj;

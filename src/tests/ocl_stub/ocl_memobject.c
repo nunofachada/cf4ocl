@@ -58,12 +58,26 @@ clReleaseMemObject(cl_mem memobj) {
 		/* Free callback list. */
 		g_slist_free_full(memobj->callbacks, g_free);
 
-		/* Destroy allocated memory. */
-		if ((memobj->mem != NULL) && !(memobj->flags & CL_MEM_USE_HOST_PTR))
-			g_free(memobj->mem);
+		/* Check if this is a regular buffer or a sub-buffer. */
+		if (memobj->associated_object == NULL) {
+			/* It's a regular buffer. */
+
+			/* Destroy allocated memory. */
+			if ((memobj->mem != NULL) && !(memobj->flags & CL_MEM_USE_HOST_PTR))
+				g_free(memobj->mem);
+
+		} else {
+			/* It's a sub-buffer. */
+
+			/* Decrease ref. count of parent buffer, possibly
+			 * destroying it. */
+			clReleaseMemObject(memobj->associated_object);
+
+		}
 
 		/* Release memory object.*/
 		g_slice_free(struct _cl_mem, memobj);
+
 	}
 
 	return CL_SUCCESS;
