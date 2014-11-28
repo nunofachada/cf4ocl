@@ -144,7 +144,11 @@ CL_API_ENTRY cl_mem CL_API_CALL clCreateImage2D(cl_context context,
 	size_t image_width, size_t image_height, size_t image_row_pitch,
 	void* host_ptr, cl_int* errcode_ret) {
 
+#ifdef CL_VERSION_2_0
+	cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, {.buffer = NULL}};
+#else
 	cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL};
+#endif
 	img_dsc.image_type = CL_MEM_OBJECT_IMAGE2D;
 	img_dsc.image_width = image_width;
 	img_dsc.image_height = image_height;
@@ -160,7 +164,11 @@ clCreateImage3D(cl_context context, cl_mem_flags flags,
 	size_t image_height, size_t image_depth, size_t image_row_pitch,
 	size_t image_slice_pitch, void* host_ptr, cl_int* errcode_ret) {
 
+#ifdef CL_VERSION_2_0
+	cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, {.buffer = NULL}};
+#else
 	cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, NULL};
+#endif
 	img_dsc.image_type = CL_MEM_OBJECT_IMAGE3D;
 	img_dsc.image_width = image_width;
 	img_dsc.image_height = image_height;
