@@ -598,7 +598,7 @@ static const char* src_head[] = {
 	"}\n"};
 
 static const char src_main[] =
-	"#include <head.h>\n" \
+	"#include \"head.h\"\n" \
 	"__kernel void complinktest(__global SOMETYPE *buf) {\n" \
 	"	size_t gid = get_global_id(0);\n" \
 	"	buf[gid] = some_function(buf[gid], gid);\n" \
