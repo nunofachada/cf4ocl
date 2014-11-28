@@ -355,7 +355,6 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 					strlen((const char*) program->binaries[j]);
 			}
 		}
-
 	}
 
 error_handler:
@@ -507,13 +506,10 @@ clCompileProgram(cl_program program, cl_uint num_devices,
 		return CL_INVALID_VALUE;
 	}
 
-	/* Unused vars. */
-	(void)(options);
-	(void)(pfn_notify);
-	(void)(user_data);
+	/* Just call build to do the work. It doesn't really matter. */
+	return clBuildProgram(program, num_devices, device_list, options,
+		pfn_notify, user_data);
 
-	/* Success in doing nothing. */
-	return CL_SUCCESS;
 }
 
 CL_API_ENTRY cl_program CL_API_CALL
@@ -555,6 +551,8 @@ clLinkProgram(cl_context context, cl_uint num_devices,
 		}
 		prog = clCreateProgram(context, num_devices, device_list, NULL,
 			lengths, (const unsigned char**) binaries);
+		clBuildProgram(prog, num_devices, device_list, options,
+			pfn_notify, user_data);
 		g_slice_free1(num_devices * sizeof(size_t), lengths);
 		g_slice_free1(num_devices * sizeof(unsigned char*), binaries);
 		return prog;

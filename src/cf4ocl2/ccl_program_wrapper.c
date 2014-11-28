@@ -189,12 +189,79 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
 
 /**
  * @internal
+ * Populate the build log after a build, compile or link.
+ *
+ * @private @memberof ccl_program
+ *
+ * @param[in] prg A ::CCLProgram wrapper object.
+ * @param[in] build_status The build status.
+ * @param[in] num_devices The number of devices listed in `devs`.
+ * @param[in] devs List of devices for which to get the build log.
+ * If `NULL`, the build log is fetched for all deviecs.
+ * */
+static void ccl_program_populate_build_log(CCLProgram* prg,
+	cl_int build_status, cl_uint num_devices, CCLDevice* const* devs) {
+
+	/* Get build log only if it makes sense to do so. */
+	if ((build_status == CL_SUCCESS)
+		|| (build_status == CL_BUILD_PROGRAM_FAILURE)
+		|| (build_status == CL_COMPILE_PROGRAM_FAILURE)
+		|| (build_status == CL_LINK_PROGRAM_FAILURE)) {
+
+		/* Number of devices. */
+		cl_uint real_num_devs = (num_devices != 0)
+			? num_devices
+			: ccl_program_get_num_devices(prg, NULL);
+		/* Device list. */
+		CCLDevice* const* real_devs = (devs != NULL)
+			? devs
+			: ccl_program_get_all_devices(prg, NULL);
+
+		/* Build log for current device.*/
+		char* build_log_dev;
+
+		/* Complete build log string object. */
+		GString* build_log_obj = g_string_new("");
+
+		/* Device name. */
+		char* dev_name;
+
+		/* Get build log for each device. */
+		for (cl_uint i = 0; i < real_num_devs; ++i) {
+			build_log_dev = ccl_program_get_build_info_array(
+				prg, real_devs[i], CL_PROGRAM_BUILD_LOG, char*, NULL);
+			if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
+				dev_name = ccl_device_get_info_array(
+					real_devs[i], CL_DEVICE_NAME, char*, NULL);
+				g_string_append_printf(build_log_obj, "\n*** Build log "\
+					"for device '%s' ****\n\n%s\n\n********************"\
+					"**************\n", dev_name, build_log_dev);
+			}
+		}
+
+		if (prg->build_log) g_free(prg->build_log);
+		prg->build_log = build_log_obj->str;
+		g_string_free(build_log_obj, FALSE);
+
+		/* Check if build log is not empty. */
+		if ((prg->build_log != NULL) && (strlen(prg->build_log) > 0)) {
+			g_message("Build log is not empty");
+			g_debug("\n%s", prg->build_log);
+		}
+	}
+
+	/* Bye. */
+	return;
+
+}
+
+/**
+ * @internal
  * Helper macro to create a new empty binary object.
  *
  * @return A new empty binary object.
  * */
 #define ccl_program_binary_new_empty() ccl_program_binary_new(NULL, 0)
-
 
 /**
  * @addtogroup CCL_PROGRAM_WRAPPER
@@ -818,49 +885,8 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	ocl_status = clBuildProgram(ccl_program_unwrap(prg),
 		num_devices, cl_devices, options, pfn_notify, user_data);
 	/* Get build log, if possible. */
-	if ((ocl_status == CL_SUCCESS)
-		|| (ocl_status == CL_BUILD_PROGRAM_FAILURE)) {
+	ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
 
-		/* Number of devices. */
-		cl_uint real_num_devs = (num_devices != 0)
-			? num_devices
-			: ccl_program_get_num_devices(prg, NULL);
-		/* Device list. */
-		CCLDevice* const* real_devs = (devs != NULL)
-			? devs
-			: ccl_program_get_all_devices(prg, NULL);
-
-		/* Build log for current device.*/
-		char* build_log_dev;
-
-		/* Complete build log string object. */
-		GString* build_log_obj = g_string_new("");
-
-		/* Device name. */
-		char* dev_name;
-
-		/* Get build log for each device. */
-		for (cl_uint i = 0; i < real_num_devs; ++i) {
-			build_log_dev = ccl_program_get_build_info_array(
-				prg, real_devs[i], CL_PROGRAM_BUILD_LOG, char*, NULL);
-			if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
-				dev_name = ccl_device_get_info_array(
-					real_devs[i], CL_DEVICE_NAME, char*, NULL);
-				g_string_append_printf(build_log_obj, "\n*** Build log "\
-					"for device '%s' ****\n\n%s\n\n********************"\
-					"**************\n", dev_name, build_log_dev);
-			}
-		}
-		prg->build_log = build_log_obj->str;
-		g_string_free(build_log_obj, FALSE);
-
-		/* Check if build log is not empty. */
-		if ((prg->build_log != NULL) && (strlen(prg->build_log) > 0)) {
-			g_message("Build log is not empty");
-			g_debug("%s", prg->build_log);
-		}
-
-	}
 	/* Check for any other errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
@@ -893,16 +919,15 @@ finish:
 }
 
 /**
- * Get build log for most recent build. Compile and link do not
- * produce this automatic build log.
+ * Get build log for most recent build, compile or link.
  *
  * The build log is returned for all devices associated with the
  * program.
  *
  * @param[in] prg Program wrapper object.
- * @return The build log for most recent build. May be `NULL` or an
- * empty string if no build, compile or link was performed, or if no
- * build log is available.
+ * @return The build log for most recent build, compile or link. May be
+ * `NULL` or an empty string if no build, compile or link was performed,
+ * or if no build log is available.
  * */
 CCL_EXPORT
 const char* ccl_program_get_build_log(CCLProgram* prg) {
@@ -1006,6 +1031,10 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 		(const cl_device_id*) cl_devices, options, num_input_headers,
 		(const cl_program*) input_headers, header_include_names,
 		pfn_notify, user_data);
+	/* Get build log, if possible. */
+	ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
+
+	/* Check for errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to compile program (OpenCL error %d: %s).",
@@ -1129,13 +1158,18 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		(const cl_device_id*) cl_devices, options, num_input_programs,
 		(const cl_program*) input_programs, pfn_notify, user_data,
 		&ocl_status);
+
+	/* Wrap OpenCL program object. */
+	prg = ccl_program_new_wrap(program);
+
+	/* Get build log, if possible. */
+	ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
+
+	/* Check for errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to link program (OpenCL error %d: %s).",
 		G_STRLOC, ocl_status, ccl_err(ocl_status));
-
-	/* Wrap OpenCL program object. */
-	prg = ccl_program_new_wrap(program);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -1147,6 +1181,7 @@ error_handler:
 	g_assert(err == NULL || *err != NULL);
 
 	/* Return NULL to signal error. */
+	if (prg) ccl_program_destroy(prg);
 	prg = NULL;
 
 finish:
