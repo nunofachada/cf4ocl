@@ -19,8 +19,8 @@
  /**
  * @file
  *
- * Definition of a wrapper class and its methods for OpenCL memory
- * objects.
+ * Implementation of a wrapper class for OpenCL memory objects. This
+ * file is only for building _cf4ocl_. Is is not part of its public API.
  *
  * @author Nuno Fachada
  * @date 2014

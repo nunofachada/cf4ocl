@@ -19,8 +19,8 @@
  /**
  * @file
  *
- * Definition of an abstract wrapper class and its methods for
- * OpenCL objects which contain a list of devices.
+ * Implementation of an abstract device container wrapper class. This
+ * file is only for building _cf4ocl_. Is is not part of its public API.
  *
  * @author Nuno Fachada
  * @date 2014
