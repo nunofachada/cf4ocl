@@ -35,27 +35,6 @@
 #define _CCL_MEMOBJ_WRAPPER_H_
 
 /**
- * Memory object wrapper class.
- *
- * @extends ccl_wrapper
- * */
-struct ccl_memobj {
-
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
-
-	/**
-	 * Context wrapper.
-	 * @private
-	 * */
-	CCLContext* ctx;
-
-};
-
-/**
  * @defgroup CCL_MEMOBJ_WRAPPER Memory object wrapper
  *
  * The memory object wrapper module provides functionality for simple

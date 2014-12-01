@@ -28,6 +28,7 @@
  * */
 
 #include "ccl_platform_wrapper.h"
+#include "priv_abstract_dev_container_wrapper.h"
 
 /**
  * The platform wrapper class.

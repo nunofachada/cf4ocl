@@ -30,6 +30,7 @@
 
 #include "ccl_device_wrapper.h"
 #include "ccl_platform_wrapper.h"
+#include "priv_abstract_wrapper.h"
 
 /**
  * Device wrapper class.

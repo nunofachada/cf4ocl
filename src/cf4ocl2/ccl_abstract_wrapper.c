@@ -28,6 +28,7 @@
  * */
 
 #include "ccl_abstract_wrapper.h"
+#include "priv_abstract_wrapper.h"
 
 /* Table of all existing wrappers. */
 static GHashTable* wrappers = NULL;

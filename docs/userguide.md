@@ -468,43 +468,42 @@ header (.h) file. The former contains the private class properties and
 the method implementations, while the later defines its public API. The
 class body is implemented in the source file as a C `struct`; the header
 file provides an opaque pointer to it, which is the public side of the
-class from a client code perspective. The only exceptions are the
-::CCLWrapper* and ::CCLDevContainer* abstract classes, which have the
-respective `struct` body publicly available in their header files. This
-is required due to the way inheritance is implemented in _cf4ocl_,
-i.e., by including a member representing the parent class `struct` in
-the body of the child class `struct`. This way, instances of the child
-class can be cast to its parent type when required. The child class
-`struct` effectively extends the parent class `struct`. An example of
-this approach can be shown with the definitions of the abstract
-::CCLWrapper* class and of the concrete ::CCLEvent* class, which extends
-::CCLWrapper*:
+class from a client code perspective. Inheritance is implemented by
+including a member representing the parent class `struct` in the body of
+the child class `struct`. This requires the sharing of parent class
+implementations. In order to keep these opaque, the respective `struct`
+is defined in "private" header files which are not included in the
+public API. This way, instances of the child class can be cast to its
+parent type when required. The child class `struct` effectively extends
+the parent class `struct`. An example of this approach can be shown with
+the definitions of the abstract ::CCLWrapper* class and of the concrete
+::CCLEvent* class, which extends ::CCLWrapper*:
 
-_In abstract_wrapper.h:_
+_In priv_abstract_wrapper.h (not part of public API):_
 @code{.c}
 /* Base class for all OpenCL wrappers. */
-typedef struct ccl_wrapper {
+struct ccl_wrapper {
 
 	/* The wrapped OpenCL object. */
 	void* cl_object;
 
 	/* Information about the wrapped OpenCL object. */
-	GHashTable* info;
+	CCLWrapperInfoTable* info;
 
 	/* Reference count. */
 	int ref_count;
 
-} CCLWrapper;
+};
 @endcode
 
-_In event_wrapper.h:_
+_In ccl_common.h:_
 
 @code{.c}
 /* Event wrapper class type declaration. */
 typedef struct ccl_event CCLEvent;
 @endcode
 
-_In event_wrapper.c:_
+_In ccl_event_wrapper.c:_
 
 @code{.c}
 /* Event wrapper class, extends CCLWrapper */
@@ -518,14 +517,6 @@ struct ccl_event {
 
 };
 @endcode
-
-The cost to this flexibility is that encapsulation for the two abstract
-classes is lost. However, the properties and functionality of these
-classes are private, in the sense that they should not be directly
-handled by client code. They are not part of the _de jure_ public API,
-which minimizes the issue of lost encapsulation, keeping the
-architecture simple while guaranteeing an implementation of inheritance
-in C.
 
 Methods are implemented as functions which accept the object on which
 they operate as the first parameter. When useful, function-like macros
@@ -674,10 +665,8 @@ Client code will usually use the @ref ug_getinfo "info macros" of each
 wrapper in order to fetch information about the underlying OpenCL
 object. These macros expand into the `ccl_wrapper_get_info*()` methods,
 automatically casting objects and values to the appropriate type,
-selecting the correct `clGet*Info()` function and setting the cache flag
-as appropriate for the object being queried. For example, platform
-object queries can always be cached, as the returned information will
-never change.
+selecting the correct `clGet*Info()` function for the object being
+queried. The cache is never used by the  @ref ug_getinfo "info macros".
 
 ## The CCLDevContainer class {#ug_ccldevcontainer}
 

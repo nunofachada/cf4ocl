@@ -16,7 +16,8 @@
  * <http://www.gnu.org/licenses/>.
  * */
 
- #include "ccl_memobj_wrapper.h"
+#include "ccl_memobj_wrapper.h"
+#include "priv_memobj_wrapper.h"
 
  /**
  * @file

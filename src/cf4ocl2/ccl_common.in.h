@@ -81,6 +81,29 @@
 #endif
 
 /**
+ * Base class for all OpenCL wrappers.
+ * */
+typedef struct ccl_wrapper CCLWrapper;
+
+/**
+ * Base class for wrappers which contain devices, i.e.,
+ * ::CCLPlatform, ::CCLProgram and ::CCLContext. This class extends
+ * ::CCLWrapper.
+ *
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_dev_container CCLDevContainer;
+
+/**
+ * Base class for memory object wrappers, i.e., ::CCLBuffer and
+ * ::CCLImage.
+ *
+ * @ingroup CCL_MEMOBJ_WRAPPER
+ * @extends ccl_wrapper
+ * */
+typedef struct ccl_memobj CCLMemObj;
+
+/**
  * Buffer wrapper class
  *
  * @ingroup CCL_BUFFER_WRAPPER
@@ -127,14 +150,6 @@ typedef struct ccl_image CCLImage;
  * @extends ccl_wrapper
  */
 typedef struct ccl_kernel CCLKernel;
-
-/**
- * Memory object wrapper class.
- *
- * @ingroup CCL_MEMOBJ_WRAPPER
- * @extends ccl_wrapper
- * */
-typedef struct ccl_memobj CCLMemObj;
 
 /**
  * Platform wrapper class.

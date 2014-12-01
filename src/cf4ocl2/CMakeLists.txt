@@ -36,7 +36,7 @@ install(TARGETS ${PROJECT_NAME}
 # Where to install headers
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME}
-	FILES_MATCHING PATTERN "*.h"
+	FILES_MATCHING PATTERN "ccl_*.h"
 	PATTERN "*.in.h" EXCLUDE)
 
 # Install the common header and the export header
