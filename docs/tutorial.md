@@ -1,6 +1,8 @@
 Tutorial {#tut}
 ========
 
+### Introduction
+
 This tutorial is based on the `canon` example available in the
 examples folder. The goal is to add two vectors, `a` and `b`, as well as
 a constant `d`, and save the result in a third vector, 'c'. The OpenCL
@@ -22,6 +24,8 @@ __kernel void sum(__global const uint *a, __global const uint *b,
 
 For the purpose of this tutorial, we'll assume the kernel code is in a
 file called `mysum.cl`, and the host code in `mysum.c`.
+
+### Getting started
 
 The _cf4ocl_ header should be included at the beggining of the `mysum.c`
 file:
@@ -93,10 +97,13 @@ int main() {
 ~~~~~~~~~~~~~~~
 
 We can compile the program with `gcc` (or `clang`), and run it:
+
 ~~~~~~~~~~~~~~~
 $ gcc `pkg-config --cflags glib-2.0` mysum.c -o mysum -lcf4ocl2 `pkg-config --libs glib-2.0` -lOpenCL
 $ ./mysum
 ~~~~~~~~~~~~~~~
+
+### Host and device buffers
 
 The goal of the program is to sum two vectors and a constant. Let's
 declare two host vectors with some values, a third host vector which
@@ -209,4 +216,251 @@ int main() {
 }
 ~~~~~~~~~~~~~~~
 
+### Creating the command queue
 
+The ::ccl_queue_new() constructor provides the simplest way to create a
+command queue. However, command queue creation requires a device. At
+this time, only the context has the memory address of the selected
+device. To get a pointer to the device, one can use the
+::ccl_context_get_device() function:
+
+~~~~~~~~~~~~~~~{.c}
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice* dev = NULL;
+    ...
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, NULL);
+    if (dev == NULL) exit(-1);
+~~~~~~~~~~~~~~~
+
+There's no need to release the device object. It will be automatically
+released when the context is destroyed, in accordance to the
+@ref ug_new_destroy "new/destroy" rule.
+
+Now we can create the command queue. We don't require any special
+queue properties for now, so we pass `0` in the third argument:
+
+~~~~~~~~~~~~~~~{.c}
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice* dev = NULL;
+    CCLQueue* queue = NULL;
+    ...
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, 0, NULL);
+    if (queue == NULL) exit(-1);
+    ...
+
+    /* Destroy cf4ocl wrappers. */
+    ...
+    ccl_queue_destroy(queue);
+~~~~~~~~~~~~~~~
+
+Both ::ccl_context_get_device() and ::ccl_queue_new() expect an error
+handling object as the last argument. By passing `NULL` we must rely
+on the return value of these functions in order to check for errors.
+Here's the complete program so far:
+
+~~~~~~~~~~~~~~~{.c}
+#include <cf4ocl2.h>
+
+#define VECSIZE 8
+#define SUM_CONST 3
+
+int main() {
+
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
+    CCLBuffer * a = NULL, * b = NULL, * c = NULL;
+    cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
+    cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
+    cl_uint vec_c[VECSIZE];
+    const cl_uint d = SUM_CONST;
+
+    /* Create context with user selected device. */
+    ctx = ccl_context_new_from_menu(NULL);
+    if (ctx == NULL) exit(-1);
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, NULL);
+    if (dev == NULL) exit(-1);
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, 0, NULL);
+    if (queue == NULL) exit(-1);
+
+    /* Instantiate and initialize device buffers. */
+    a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_a, NULL);
+    if (a == NULL) exit(-1);
+
+    b = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_b, NULL);
+    if (b == NULL) exit(-1);
+
+    c = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, NULL);
+    if (c == NULL) exit(-1);
+
+    /* Destroy cf4ocl wrappers. */
+    ccl_buffer_destroy(c);
+    ccl_buffer_destroy(b);
+    ccl_buffer_destroy(a);
+    ccl_queue_destroy(queue);
+    ccl_context_destroy(ctx);
+
+    return 0;
+}
+~~~~~~~~~~~~~~~
+
+Compile it and run it. As expected, nothing special happens yet.
+
+### Creating and building the program
+
+_cf4ocl_ provides several constructors for creating
+@ref CCL_PROGRAM_WRAPPER "program objects". When a single OpenCL C
+kernel source file is involved, the most adequate constructor is
+::ccl_program_new_from_source_file():
+
+~~~~~~~~~~~~~~~{.c}
+
+    /* Variables. */
+    ...
+    CCLProgram* prg = NULL;
+
+    ...
+    /* Create program. */
+    prg = ccl_program_new_from_source_file(ctx, "mysum.cl", NULL);
+    if (prg == NULL) exit(-1);
+    ...
+
+    /* Destroy cf4ocl wrappers. */
+    ccl_program_destroy(prg);
+    ...
+
+~~~~~~~~~~~~~~~
+
+Building the program is just as easy. For this purpose, we use the
+::ccl_program_build() function which returns `CL_TRUE` if the build is
+successful or `CL_FALSE` otherwise:
+
+~~~~~~~~~~~~~~~{.c}
+
+    /* Build program. */
+    if (!ccl_program_build(prg, NULL, NULL))
+        exit(-1);
+
+~~~~~~~~~~~~~~~
+
+Here's the current state of our program:
+
+~~~~~~~~~~~~~~~{.c}
+#include <cf4ocl2.h>
+
+#define VECSIZE 8
+#define SUM_CONST 3
+
+int main() {
+
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
+    CCLProgram* prg = NULL;
+    CCLBuffer * a = NULL, * b = NULL, * c = NULL;
+    cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
+    cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
+    cl_uint vec_c[VECSIZE];
+    const cl_uint d = SUM_CONST;
+
+    /* Create context with user selected device. */
+    ctx = ccl_context_new_from_menu(NULL);
+    if (ctx == NULL) exit(-1);
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, NULL);
+    if (dev == NULL) exit(-1);
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, 0, NULL);
+    if (queue == NULL) exit(-1);
+
+    /* Instantiate and initialize device buffers. */
+    a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_a, NULL);
+    if (a == NULL) exit(-1);
+
+    b = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_b, NULL);
+    if (b == NULL) exit(-1);
+
+    c = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, NULL);
+    if (c == NULL) exit(-1);
+
+    /* Create program. */
+    prg = ccl_program_new_from_source_file(ctx, "mysum.cl", NULL);
+    if (prg == NULL) exit(-1);
+
+    /* Build program. */
+    if (!ccl_program_build(prg, NULL, NULL))
+        exit(-1);
+
+    /* Destroy cf4ocl wrappers. */
+    ccl_program_destroy(prg);
+    ccl_buffer_destroy(c);
+    ccl_buffer_destroy(b);
+    ccl_buffer_destroy(a);
+    ccl_queue_destroy(queue);
+    ccl_context_destroy(ctx);
+
+    return 0;
+}
+~~~~~~~~~~~~~~~
+
+Compile and run it. Don't forget to put the `mysum.cl` file containing
+the kernel source code in the same folder, otherwise the program will
+not be successfully created.
+
+**Pro tip:** To get the build log automatically printed to screen, set
+the `G_MESSAGES_DEBUG` environment variable to `cf4ocl2`. For example:
+
+~~~~~~~~~~~~~~~
+$ G_MESSAGES_DEBUG=cf4ocl2 ./mysum
+~~~~~~~~~~~~~~~
+
+Add some junk to the kernel source code, run our program and check the
+build log.
+
+### Setting kernel arguments and running the program
+
+TODO
+
+### Checking results
+
+TODO
+
+### Getting and using a "nice" local work size
+
+TODO
+
+### A better way to check for errors
+
+TODO
+
+### Forget to invoke a destructor?
+
+TODO
+
+### Profiling your program the easy way
+
+TODO
+
+### Further reading
+
+TODO
