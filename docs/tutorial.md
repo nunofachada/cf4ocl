@@ -122,7 +122,7 @@ will hold the result, three device buffers and the constant.
     cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
     cl_uint vec_c[VECSIZE];
-    const cl_uint d = SUM_CONST;
+    cl_uint d = SUM_CONST;
 
 ~~~~~~~~~~~~~~~
 
@@ -187,7 +187,7 @@ int main() {
     cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
     cl_uint vec_c[VECSIZE];
-    const cl_uint d = SUM_CONST;
+    cl_uint d = SUM_CONST;
 
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(NULL);
@@ -280,7 +280,7 @@ int main() {
     cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
     cl_uint vec_c[VECSIZE];
-    const cl_uint d = SUM_CONST;
+    cl_uint d = SUM_CONST;
 
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(NULL);
@@ -351,9 +351,14 @@ successful or `CL_FALSE` otherwise:
 
 ~~~~~~~~~~~~~~~{.c}
 
+    /* Variables. */
+    ...
+    cl_bool status;
+
+    ...
     /* Build program. */
-    if (!ccl_program_build(prg, NULL, NULL))
-        exit(-1);
+    status = ccl_program_build(prg, NULL, NULL);
+    if (!status) exit(-1);
 
 ~~~~~~~~~~~~~~~
 
@@ -376,7 +381,8 @@ int main() {
     cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
     cl_uint vec_c[VECSIZE];
-    const cl_uint d = SUM_CONST;
+    cl_uint d = SUM_CONST;
+    cl_bool status;
 
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(NULL);
@@ -408,8 +414,8 @@ int main() {
     if (prg == NULL) exit(-1);
 
     /* Build program. */
-    if (!ccl_program_build(prg, NULL, NULL))
-        exit(-1);
+    status = ccl_program_build(prg, NULL, NULL);
+    if (!status) exit(-1);
 
     /* Destroy cf4ocl wrappers. */
     ccl_program_destroy(prg);
@@ -439,15 +445,172 @@ build log.
 
 ### Setting kernel arguments and running the program
 
-TODO
+_cf4ocl_ greatly simplifies the execution of OpenCL programs. Instead
+of creating a kernel with clCreateKernel(), setting kernel arguments
+one-by-one with clSetKernelArg(), and finally executing the kernel with
+clEnqueueNDRangeKernel(), _cf4ocl_ allows client code to do this using
+a single function:
+
+~~~~~~~~~~~~~~~{.c}
+
+    /* Variables. */
+    ...
+    size_t gws = VECSIZE;
+    CCLEvent* evt = NULL;
+
+    ...
+    /* Set kernel arguments and run kernel. */
+    evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, &gws,
+        NULL, NULL, NULL, a, b, c, ccl_arg_priv(d, cl_uint),
+        ccl_arg_priv(gws, cl_uint), NULL);
+    if (!evt) exit(-1);
+
+~~~~~~~~~~~~~~~
+
+Buffer, image and sampler objects can be passed directly as kernel
+arguments. Local and private variables are passed using the
+::ccl_arg_local() and ::ccl_arg_priv() macros, respectively.
+
+A local work size vector is expected as the 6th argument to
+::ccl_program_enqueue_kernel(). In this example, we pass `NULL`, which
+means that the local work size is to be automatically determined by the
+OpenCL implementation (as specified in the clEnqueueNDRangeKernel()
+documentation). Often we need more control over this value, because
+OpenCL implementations don't let us know what local work size was
+effectively used. It can be a bit of a chore to determine a local work
+size, especially when multiple dimensions are involved. Among other
+things, it's necessary to check kernel and device limits. The
+::ccl_kernel_suggest_worksizes() is a very versatile function which can
+help in this regard.
+
+While the ::ccl_program_enqueue_kernel() simplifies executing a kernel
+(including setting its arguments), _cf4ocl_ provides additional
+functions which allow client code to have finer control over this
+process.
 
 ### Checking results
 
-TODO
+To check the results of the kernel execution, it's necessary to first
+read the `c` output buffer from the device:
 
-### Getting and using a "nice" local work size
+~~~~~~~~~~~~~~~{.c}
 
-TODO
+    /* Read the output buffer from the device. */
+    evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_c, NULL, NULL);
+    if (!evt) exit(-1);
+
+~~~~~~~~~~~~~~~
+
+Now we can check the results:
+
+~~~~~~~~~~~~~~~{.c}
+
+    /* Check for errors. */
+    for (int i = 0; i < VECSIZE; ++i) {
+        if (vec_c[i] != vec_a[i] + vec_b[i] + c) {
+            fprintf(stderr, "Unexpected results.\n");
+            exit(-1);
+        }
+    }
+    /* No errors found. */
+    printf("Results OK!\n");
+
+~~~~~~~~~~~~~~~
+
+We now have a fully working OpenCL program, simplified with _cf4ocl_:
+
+~~~~~~~~~~~~~~~{.c}
+#include <cf4ocl2.h>
+
+#define VECSIZE 8
+#define SUM_CONST 3
+
+int main() {
+
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
+    CCLProgram* prg = NULL;
+    CCLBuffer * a = NULL, * b = NULL, * c = NULL;
+    cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
+    cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
+    cl_uint vec_c[VECSIZE];
+    cl_uint d = SUM_CONST;
+    size_t gws = VECSIZE;
+    cl_bool status;
+    CCLEvent* evt = NULL;
+
+    /* Create context with user selected device. */
+    ctx = ccl_context_new_from_menu(NULL);
+    if (ctx == NULL) exit(-1);
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, NULL);
+    if (dev == NULL) exit(-1);
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, 0, NULL);
+    if (queue == NULL) exit(-1);
+
+    /* Instantiate and initialize device buffers. */
+    a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_a, NULL);
+    if (a == NULL) exit(-1);
+
+    b = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_b, NULL);
+    if (b == NULL) exit(-1);
+
+    c = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, NULL);
+    if (c == NULL) exit(-1);
+
+    /* Create program. */
+    prg = ccl_program_new_from_source_file(ctx, "mysum.cl", NULL);
+    if (prg == NULL) exit(-1);
+
+    /* Build program. */
+    status = ccl_program_build(prg, NULL, NULL);
+    if (!status) exit(-1);
+
+    evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
+        NULL, NULL, NULL, a, b, c, ccl_arg_priv(d, cl_uint),
+        ccl_arg_priv(gws, cl_uint), NULL);
+    if (!evt) exit(-1);
+
+    /* Read the output buffer from the device. */
+    evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_c, NULL, NULL);
+    if (!evt) exit(-1);
+
+    /* Some OpenCL implementations don't respect the blocking read,
+     * so this guarantees that the read is effectively finished. */
+    status = ccl_queue_finish(queue, NULL);
+    if (!status) exit(-1);
+
+    /* Check for errors. */
+    for (int i = 0; i < VECSIZE; ++i) {
+        if (vec_c[i] != vec_a[i] + vec_b[i] + d) {
+            fprintf(stderr, "Unexpected results.\n");
+            exit(-1);
+        }
+    }
+    /* No errors found. */
+    printf("Results OK!\n");
+
+   /* Destroy cf4ocl wrappers. */
+    ccl_program_destroy(prg);
+    ccl_buffer_destroy(c);
+    ccl_buffer_destroy(b);
+    ccl_buffer_destroy(a);
+    ccl_queue_destroy(queue);
+    ccl_context_destroy(ctx);
+
+    return 0;
+}
+~~~~~~~~~~~~~~~
 
 ### A better way to check for errors
 
