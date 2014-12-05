@@ -103,6 +103,9 @@ $ gcc `pkg-config --cflags glib-2.0` mysum.c -o mysum -lcf4ocl2 `pkg-config --li
 $ ./mysum
 ~~~~~~~~~~~~~~~
 
+With Clang the command is the same, just replace `gcc` with `clang`. OSX
+users should replace `-lOpenCL` with `-framework OpenCL`.
+
 ### Host and device buffers
 
 The goal of the program is to sum two vectors and a constant. Let's
