@@ -5,7 +5,7 @@ Tutorial {#tut}
 
 This tutorial is based on the `canon` example available in the
 examples folder. The goal is to add two vectors, `a` and `b`, as well as
-a constant `d`, and save the result in a third vector, 'c'. The OpenCL
+a constant `d`, and save the result in a third vector, `c`. The OpenCL
 kernel which performs this operation is given in the following code:
 
 ~~~~~~~~~~~~~~~{.c}
@@ -509,8 +509,13 @@ Now we can check the results:
 
 ~~~~~~~~~~~~~~~{.c}
 
+    /* Variables. */
+    ...
+    int i;
+    ...
+
     /* Check for errors. */
-    for (int i = 0; i < VECSIZE; ++i) {
+    for (i = 0; i < VECSIZE; ++i) {
         if (vec_c[i] != vec_a[i] + vec_b[i] + c) {
             fprintf(stderr, "Unexpected results.\n");
             exit(-1);
@@ -535,7 +540,7 @@ int main() {
     CCLContext * ctx = NULL;
     CCLDevice * dev = NULL;
     CCLQueue * queue = NULL;
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     CCLBuffer * a = NULL, * b = NULL, * c = NULL;
     cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
@@ -543,7 +548,8 @@ int main() {
     cl_uint d = SUM_CONST;
     size_t gws = VECSIZE;
     cl_bool status;
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
+    int i;
 
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(NULL);
@@ -594,7 +600,7 @@ int main() {
     if (!status) exit(-1);
 
     /* Check for errors. */
-    for (int i = 0; i < VECSIZE; ++i) {
+    for (i = 0; i < VECSIZE; ++i) {
         if (vec_c[i] != vec_a[i] + vec_b[i] + d) {
             fprintf(stderr, "Unexpected results.\n");
             exit(-1);
@@ -617,16 +623,361 @@ int main() {
 
 ### A better way to check for errors
 
-TODO
+Our program may be correctly implemented, but a number of OpenCL errors
+can still occur. Checking the return values of _cf4ocl_ functions
+allows us only to determine that something went wrong, not what went
+wrong. Fortunately, all error-throwing _cf4ocl_ functions accept the
+memory location of [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
+error handling object, usually the last function argument. If given,
+this object will be populated with an error code and an error domain, as
+well as an error message, if an error occurs. In our program we're
+passing `NULL` where the `GError` object memory location was expected,
+so no information about errors is made available to the caller. To
+change the way we're handling errors, we must first declare a `GError`
+object, and initialize it to `NULL`:
 
-### Forget to invoke a destructor?
+~~~~~~~~~~~~~~~{.c}
 
-TODO
+    /* Variables. */
+    ...
+    GError * err = NULL;
+~~~~~~~~~~~~~~~
+
+Then, we should pass the memory location of this object to all _cf4ocl_
+error-throwing functions, e.g.:
+
+~~~~~~~~~~~~~~~{.c}
+    /* Create context with user selected device. */
+    ctx = ccl_context_new_from_menu(&err);
+    ...
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    ...
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, 0, &err);
+    ...
+~~~~~~~~~~~~~~~
+
+Now we can check this object after _cf4ocl_ function calls. Let's create
+a small macro to do so:
+
+~~~~~~~~~~~~~~~{.c}
+#define CHECK_ERROR(err) \
+    if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
+~~~~~~~~~~~~~~~
+
+The complete program, with more informative error checking:
+
+~~~~~~~~~~~~~~~{.c}
+#include <cf4ocl2.h>
+
+#define VECSIZE 8
+#define SUM_CONST 3
+#define CHECK_ERROR(err) \
+    if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
+
+int main() {
+
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
+    CCLProgram * prg = NULL;
+    CCLBuffer * a = NULL, * b = NULL, * c = NULL;
+    cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
+    cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
+    cl_uint vec_c[VECSIZE];
+    cl_uint d = SUM_CONST;
+    size_t gws = VECSIZE;
+    cl_bool status;
+    CCLEvent * evt = NULL;
+    int i;
+    GError * err = NULL;
+
+    /* Create context with user selected device. */
+    ctx = ccl_context_new_from_menu(&err);
+    CHECK_ERROR(err);
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    CHECK_ERROR(err);
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, 0, &err);
+    CHECK_ERROR(err);
+
+    /* Instantiate and initialize device buffers. */
+    a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_a, &err);
+    CHECK_ERROR(err);
+
+    b = ccl_buffer_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        VECSIZE * sizeof(cl_uint), vec_b, &err);
+    CHECK_ERROR(err);
+
+    c = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, &err);
+    CHECK_ERROR(err);
+
+    /* Create program. */
+    prg = ccl_program_new_from_source_file(ctx, "mysum.cl", &err);
+    CHECK_ERROR(err);
+
+    /* Build program. */
+    status = ccl_program_build(prg, NULL, &err);
+    CHECK_ERROR(err);
+
+    evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
+        NULL, NULL, &err, a, b, c, ccl_arg_priv(d, cl_uint),
+        ccl_arg_priv(gws, cl_uint), NULL);
+    CHECK_ERROR(err);
+
+    /* Read the output buffer from the device. */
+    evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_c, NULL, &err);
+    CHECK_ERROR(err);
+
+    /* Some OpenCL implementations don't respect the blocking read,
+     * so this guarantees that the read is effectively finished. */
+    status = ccl_queue_finish(queue, &err);
+    CHECK_ERROR(err);
+
+    /* Check for errors. */
+    for (i = 0; i < VECSIZE; ++i) {
+        if (vec_c[i] != vec_a[i] + vec_b[i] + d) {
+            fprintf(stderr, "Unexpected results.\n");
+            exit(-1);
+        }
+    }
+    /* No errors found. */
+    printf("Results OK!\n");
+
+   /* Destroy cf4ocl wrappers. */
+    ccl_program_destroy(prg);
+    ccl_buffer_destroy(c);
+    ccl_buffer_destroy(b);
+    ccl_buffer_destroy(a);
+    ccl_queue_destroy(queue);
+    ccl_context_destroy(ctx);
+
+    return 0;
+}
+~~~~~~~~~~~~~~~
+
+The error checking strategy in our program is just an example. Client
+code can implement any strategy. More information about this topic is
+available in the @ref ug_errorhandle "user guide".
 
 ### Profiling your program the easy way
 
-TODO
+Profiling OpenCL code by hand, i.e. by gathering and processing
+information about all `cl_event` objects, is an extremely verbose and
+error-prone process. However, it comes for free with _cf4ocl_. Well,
+mostly. The first change we must perform on our program is to enable
+profiling when the command queue is created:
 
-### Further reading
+~~~~~~~~~~~~~~~{.c}
 
-TODO
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+
+~~~~~~~~~~~~~~~
+
+Additionally, we copied host vectors to device implicitly during device
+buffer creation. These implicit transfers don't produce OpenCL events,
+and are thus unavailable for profiling. As such, we must make these
+operations explicit:
+
+~~~~~~~~~~~~~~~{.c}
+
+    /* Instantiate device buffers. */
+    a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, &err);
+    CHECK_ERROR(err);
+
+    b = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, &err);
+    CHECK_ERROR(err);
+
+    ...
+
+    /* Initialize device buffers. */
+    ccl_buffer_enqueue_write(a, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_a, NULL, &err);
+    CHECK_ERROR(err);
+
+    ccl_buffer_enqueue_write(b, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_b, NULL, &err);
+    CHECK_ERROR(err);
+
+~~~~~~~~~~~~~~~
+
+We can now profile our program using functionality provided by the
+@ref CCL_PROFILER "profiler module":
+
+~~~~~~~~~~~~~~~{.c}
+
+    /* Variables. */
+    ...
+    CCLProf* prof = NULL;
+
+    ...
+
+    /* Perform profiling. */
+    prof = ccl_prof_new();
+    ccl_prof_add_queue(prof, "queue1", queue);
+    ccl_prof_calc(prof, &err);
+    CHECK_ERROR(err);
+
+    /* Show profiling info. */
+    ccl_prof_print_summary(prof);
+
+    /* Destroy profiler object. */
+    ccl_prof_destroy(prof);
+
+~~~~~~~~~~~~~~~
+
+Our final program, with error checking and profiling, is as follows:
+
+~~~~~~~~~~~~~~~{.c}
+#include <cf4ocl2.h>
+
+#define VECSIZE 8
+#define SUM_CONST 3
+#define CHECK_ERROR(err) \
+    if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
+
+int main() {
+
+    /* Variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
+    CCLProgram * prg = NULL;
+    CCLBuffer * a = NULL, * b = NULL, * c = NULL;
+    cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
+    cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
+    cl_uint vec_c[VECSIZE];
+    cl_uint d = SUM_CONST;
+    size_t gws = VECSIZE;
+    cl_bool status;
+    CCLEvent * evt = NULL;
+    int i;
+    GError * err = NULL;
+    CCLProf* prof = NULL;
+
+    /* Create context with user selected device. */
+    ctx = ccl_context_new_from_menu(&err);
+    CHECK_ERROR(err);
+
+    /* Get the selected device. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    CHECK_ERROR(err);
+
+    /* Create a command queue. */
+    queue = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+    CHECK_ERROR(err);
+
+    /* Instantiate device buffers. */
+    a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, &err);
+    CHECK_ERROR(err);
+
+    b = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, &err);
+    CHECK_ERROR(err);
+
+    c = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+        VECSIZE * sizeof(cl_uint), NULL, &err);
+    CHECK_ERROR(err);
+
+    /* Initialize device buffers. */
+    ccl_buffer_enqueue_write(a, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_a, NULL, &err);
+    CHECK_ERROR(err);
+
+    ccl_buffer_enqueue_write(b, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_b, NULL, &err);
+    CHECK_ERROR(err);
+
+    /* Create program. */
+    prg = ccl_program_new_from_source_file(ctx, "mysum.cl", &err);
+    CHECK_ERROR(err);
+
+    /* Build program. */
+    status = ccl_program_build(prg, NULL, &err);
+    CHECK_ERROR(err);
+
+    evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
+        NULL, NULL, &err, a, b, c, ccl_arg_priv(d, cl_uint),
+        ccl_arg_priv(gws, cl_uint), NULL);
+    CHECK_ERROR(err);
+
+    /* Read the output buffer from the device. */
+    evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
+        VECSIZE * sizeof(cl_uint), vec_c, NULL, &err);
+    CHECK_ERROR(err);
+
+    /* Some OpenCL implementations don't respect the blocking read,
+     * so this guarantees that the read is effectively finished. */
+    status = ccl_queue_finish(queue, &err);
+    CHECK_ERROR(err);
+
+    /* Check for errors. */
+    for (i = 0; i < VECSIZE; ++i) {
+        if (vec_c[i] != vec_a[i] + vec_b[i] + d) {
+            fprintf(stderr, "Unexpected results.\n");
+            exit(-1);
+        }
+    }
+    /* No errors found. */
+    printf("Results OK!\n");
+
+    /* Perform profiling. */
+    prof = ccl_prof_new();
+    ccl_prof_add_queue(prof, "queue1", queue);
+    ccl_prof_calc(prof, &err);
+    CHECK_ERROR(err);
+
+    /* Show profiling info. */
+    ccl_prof_print_summary(prof);
+
+    /* Destroy profiler object. */
+    ccl_prof_destroy(prof);
+
+   /* Destroy cf4ocl wrappers. */
+    ccl_program_destroy(prg);
+    ccl_buffer_destroy(c);
+    ccl_buffer_destroy(b);
+    ccl_buffer_destroy(a);
+    ccl_queue_destroy(queue);
+    ccl_context_destroy(ctx);
+
+    return 0;
+}
+
+~~~~~~~~~~~~~~~
+
+Compile and run the program. A profiling summary will be printed on the
+screen, something like:
+
+@verbatim
+
+ Aggregate times by event  :
+   ------------------------------------------------------------------
+   | Event name                     | Rel. time (%) | Abs. time (s) |
+   ------------------------------------------------------------------
+   | NDRANGE_KERNEL                 |       64.8583 |    1.7993e-05 |
+   | WRITE_BUFFER                   |       31.8254 |    8.8290e-06 |
+   | READ_BUFFER                    |        3.3163 |    9.2000e-07 |
+   ------------------------------------------------------------------
+                                    |         Total |    2.7742e-05 |
+                                    ---------------------------------
+ Event overlaps            : None
+
+@endverbatim
+
+While this profiling summary is useful, the
+@ref CCL_PROFILER "profiler module" can do much more.
