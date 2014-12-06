@@ -194,7 +194,6 @@ int main(int argc, char** argv) {
 	/* Perform profiling. */
 	prof = ccl_prof_new();
 	ccl_prof_add_queue(prof, "queue1", queue);
-	HANDLE_ERROR(err);
 	ccl_prof_calc(prof, &err);
 	HANDLE_ERROR(err);
 	/* Show profiling info. */
