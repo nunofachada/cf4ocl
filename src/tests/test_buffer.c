@@ -400,7 +400,8 @@ static void map_unmap_test() {
 /**
  * Test callback function.
  * */
-static void destructor_callback(cl_mem memobj, void *user_data) {
+static void CL_CALLBACK destructor_callback(
+	cl_mem memobj, void *user_data) {
 
 	/* The memory object cannot be NULL. */
 	g_assert(memobj != NULL);

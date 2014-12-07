@@ -95,7 +95,7 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
 		? ((struct _cl_buffer_region*) buffer_create_info)->origin
 		: 0;
 
-	memobj->mem = buffer->mem + memobj->offset;
+	memobj->mem = ((cl_uchar*) buffer->mem) + memobj->offset;
 	memobj->callbacks = NULL;
 
 	return memobj;

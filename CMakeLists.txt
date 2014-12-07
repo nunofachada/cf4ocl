@@ -64,6 +64,10 @@ elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 	add_definitions("-Dinline=__inline")
 	# And this avoids some warnings
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+	# Visual Studio flags
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+	set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
 endif()
 
 # Avoid including MinGW dll dependency

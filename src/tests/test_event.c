@@ -228,7 +228,7 @@ static void user_event_test() {
 /**
  * Test callback function.
  * */
-static void callback_fun(
+static void CL_CALLBACK callback_fun(
 	cl_event event, cl_int event_command_exec_status, void *user_data) {
 
 	(void)event;
