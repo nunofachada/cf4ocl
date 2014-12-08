@@ -27,6 +27,7 @@ Documentation
 =============
 
 * [User guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/)
+* [Tutorial](http://fakenmc.github.io/cf4ocl/docs/latest/tut.html)
 * [Wiki](https://github.com/FakenMC/cf4ocl/wiki)
 * [Examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 
