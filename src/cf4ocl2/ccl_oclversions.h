@@ -89,6 +89,9 @@
 #ifndef CL_VERSION_1_2
 	typedef intptr_t            cl_device_partition_property;
 	typedef cl_bitfield         cl_device_affinity_domain;
+	/* Error Codes */
+	#define CL_COMPILE_PROGRAM_FAILURE                  -15
+	#define CL_LINK_PROGRAM_FAILURE                     -17
 	/* cl_device_type - bitfield */
 	#define CL_DEVICE_TYPE_CUSTOM                       (1 << 4)
 	/* cl_device_partition_property */

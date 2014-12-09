@@ -542,7 +542,7 @@ clEnqueueMapImage(cl_command_queue command_queue, cl_mem image,
 		seterrcode(errcode_ret, CL_SUCCESS);
 
 		/* Just return a pointer to the memory region. */
-		map_ptr = image->mem + origin[0]
+		map_ptr = ((cl_uchar*) image->mem) + origin[0]
 			+ origin[1] * image->image_desc.image_row_pitch
 			+ origin[2] * image->image_desc.image_slice_pitch;
 		/* Set the row pitch. */

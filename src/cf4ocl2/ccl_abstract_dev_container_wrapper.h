@@ -37,35 +37,6 @@
 #include "ccl_abstract_wrapper.h"
 
 /**
- * Base class for wrappers which contain devices, i.e.,
- * ::CCLPlatform, ::CCLProgram and ::CCLContext. This class extends
- * ::CCLWrapper.
- *
- * @extends ccl_wrapper
- * */
-typedef struct ccl_dev_container {
-
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
-
-	/**
-	 * Number of devices in context (can be lazy initialized).
-	 * @private
-	 * */
-	cl_uint num_devices;
-
-	/**
-	 * Devices in context (can be lazy initialized).
-	 * @private
-	 * */
-	CCLDevice** devices;
-
-} CCLDevContainer;
-
-/**
  * Returns the list of cl_device_id OpenCL objects in the
  * wrapped OpenCL device container object (i.e. cl_platform_id,
  * cl_program and cl_context). This is an abstract function prototype

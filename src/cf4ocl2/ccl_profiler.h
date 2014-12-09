@@ -151,7 +151,6 @@
  * The output of ::ccl_prof_print_summary() will be something like:
  *
  * @verbatim
-    =========================== Timming/Profiling ===========================
 
     Aggregate times by event  :
       ------------------------------------------------------------------

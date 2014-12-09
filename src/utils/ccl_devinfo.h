@@ -27,11 +27,7 @@
 #ifndef _CCL_DEVINFO_H_
 #define _CCL_DEVINFO_H_
 
-#include "ccl_platforms.h"
-#include "ccl_platform_wrapper.h"
-#include "ccl_device_wrapper.h"
-#include "ccl_device_query.h"
-#include "ccl_common.h"
+#include <cf4ocl2.h>
 
 #ifndef CCL_DEVINFO_OUT
 	/** Default device information output stream. */

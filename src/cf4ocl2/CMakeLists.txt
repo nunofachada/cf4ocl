@@ -24,7 +24,7 @@ add_custom_target(lib DEPENDS ${PROJECT_NAME})
 
 # Set library version
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	VERSION ${${PROJECT_NAME}_VERSION_STRING}
+	VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}-${${PROJECT_NAME}_VERSION_TWEAK}
 	SOVERSION ${${PROJECT_NAME}_VERSION_MAJOR})
 
 # Where to install lib
@@ -36,7 +36,7 @@ install(TARGETS ${PROJECT_NAME}
 # Where to install headers
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${INSTALL_SUBDIR_INCLUDE}/${PROJECT_NAME}
-	FILES_MATCHING PATTERN "*.h"
+	FILES_MATCHING PATTERN "ccl_*.h"
 	PATTERN "*.in.h" EXCLUDE)
 
 # Install the common header and the export header

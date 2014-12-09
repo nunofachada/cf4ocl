@@ -64,6 +64,10 @@ elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 	add_definitions("-Dinline=__inline")
 	# And this avoids some warnings
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+	# Visual Studio flags
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+	set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
 endif()
 
 # Avoid including MinGW dll dependency
@@ -263,6 +267,18 @@ add_subdirectory(scripts)
 # ################# #
 # PACKAGING SECTION #
 # ################# #
+
+if(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
+    set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE PATH "C/C++ Header Files")
+endif()
+
+if (NOT DEFINED CMAKE_INSTALL_LIBDIR)
+    set(CMAKE_INSTALL_LIBDIR "lib" CACHE PATH "Library Files")
+endif()
+
+# pkg-config support
+configure_file(${CMAKE_SOURCE_DIR}/cf4ocl.pc.in ${CMAKE_BINARY_DIR}/cf4ocl.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/cf4ocl.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig COMPONENT utilities)
 
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)

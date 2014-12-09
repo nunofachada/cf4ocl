@@ -28,6 +28,7 @@
  * */
 
 #include "ccl_queue_wrapper.h"
+#include "priv_abstract_wrapper.h"
 
 /**
  * Command queue wrapper class.

@@ -186,13 +186,13 @@ static void user_event_test() {
 	clcq = ccl_event_get_info_scalar(uevt, CL_EVENT_COMMAND_QUEUE,
 		cl_command_queue, &err);
 	g_assert_no_error(err);
-	g_assert_cmphex(((cl_ulong) clcq), ==, ((cl_ulong) NULL));
+	g_assert_cmphex(GPOINTER_TO_UINT(clcq), ==, GPOINTER_TO_UINT(NULL));
 
 	/* Confirm that event returns the correct context. */
 	clctx = ccl_event_get_info_scalar(uevt, CL_EVENT_CONTEXT,
 		cl_context, &err);
 	g_assert_no_error(err);
-	g_assert_cmphex(((cl_ulong) clctx), ==, ((cl_ulong) ccl_context_unwrap(ctx)));
+	g_assert_cmphex(GPOINTER_TO_UINT(clctx), ==, GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
 
 	/* Confirm command type is user event. */
 	clct = ccl_event_get_info_scalar(uevt, CL_EVENT_COMMAND_TYPE,
@@ -228,7 +228,7 @@ static void user_event_test() {
 /**
  * Test callback function.
  * */
-static void callback_fun(
+static void CL_CALLBACK callback_fun(
 	cl_event event, cl_int event_command_exec_status, void *user_data) {
 
 	(void)event;

@@ -1,11 +1,12 @@
 Summary
 =======
 
-The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C99
-object-oriented framework for developing and benchmarking OpenCL
-projects in C/C++. It aims to:
+The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C
+object-oriented framework for developing and benchmarking [OpenCL][]
+projects in C. It aims to:
 
-1. Promote the rapid development of OpenCL programs in C/C++.
+1. Promote the rapid development of OpenCL programs in C, with support
+for C++.
 2. Assist in the benchmarking of OpenCL events, such as kernel execution
 and data transfers.
 3. Simplify the analysis of the OpenCL environment and of kernel
@@ -26,6 +27,7 @@ Documentation
 =============
 
 * [User guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/)
+* [Tutorial](http://fakenmc.github.io/cf4ocl/docs/latest/tut.html)
 * [Wiki](https://github.com/FakenMC/cf4ocl/wiki)
 * [Examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 
@@ -63,25 +65,9 @@ projects:
 * [Computing Language Utility][]
 * [OCL-MLA][]
 
-[GLib]: https://developer.gnome.org/glib/ "GLib"
 [OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
-[Doxygen]: http://www.doxygen.org/‎ "Doxygen"
-[cppcheck]: http://cppcheck.sourceforge.net/ "cppcheck"
 [LGPLv3]: http://www.gnu.org/licenses/lgpl.html) "LGPLv3"
 [GPLv3]: http://www.gnu.org/licenses/gpl.html "GPLv3"
-[AMDSDK]: http://developer.amd.com/tools-and-sdks/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/ "AMD"
-[IntelSDK]: http://software.intel.com/en-us/vcsource/tools/opencl-sdk "Intel"
-[NvidiaSDK]: https://developer.nvidia.com/category/zone/cuda-zone "Nvidia"
-[clheaders]: http://www.khronos.org/registry/cl/ "Khronos"
-[markdown]: http://daringfireball.net/projects/markdown/ "Markdown"
-[doxymd]: http://www.stack.nl/~dimitri/doxygen/manual/markdown.html "Doxygen Markdown"
-[ghmd]: https://help.github.com/articles/github-flavored-markdown "Github Flavored Markdown"
-[gliberror]: https://developer.gnome.org/glib/2.32/glib-Error-Reporting.html "GLib Error Reporting"
-[gnuplot]: http://www.gnuplot.info/
-[gantt.py]: http://se.wtb.tue.nl/sewiki/wonham/gantt.py
-[cl.h]: http://www.khronos.org/registry/cl/api/1.2/cl.h
-[CMake]: http://www.cmake.org/
-
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
 [Computing Language Utility]: https://github.com/Computing-Language-Utility/CLU "Computing Language Utility"

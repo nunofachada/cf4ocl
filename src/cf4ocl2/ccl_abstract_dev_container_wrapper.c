@@ -28,6 +28,7 @@
  * */
 
 #include "ccl_abstract_dev_container_wrapper.h"
+#include "priv_abstract_dev_container_wrapper.h"
 
 /**
  * @internal

@@ -36,40 +36,23 @@
 
 /**
  * Class which represents information about a wrapped OpenCL
- * entity.
+ * object.
  * */
-typedef struct ccl_wrapper_info CCLWrapperInfo;
-
-/**
- * @internal
- * Information about wrapped OpenCL objects.
- * */
-typedef struct ccl_wrapper_info_table CCLWrapperInfoTable;
-
-/**
- * Base class for all OpenCL wrappers.
- * */
-typedef struct ccl_wrapper {
+typedef struct ccl_wrapper_info {
 
 	/**
-	 * The wrapped OpenCL object.
-	 * @private
+	 * Object information.
+	 * @public
 	 * */
-	void* cl_object;
+	void* value;
 
 	/**
-	 * Information about the wrapped OpenCL object.
-	 * @private
+	 * Size in bytes of object information.
+	 * @public
 	 * */
-	CCLWrapperInfoTable* info;
+	size_t size;
 
-	/**
-	 * Reference count.
-	 * @private
-	 * */
-	int ref_count;
-
-} CCLWrapper;
+} CCLWrapperInfo;
 
 /**
  * Release the fields of the concrete wrapper implementation.
@@ -213,26 +196,6 @@ CCL_EXPORT
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
-
-/**
- * Class which represents information about a wrapped OpenCL
- * object.
- * */
-struct ccl_wrapper_info {
-
-	/**
-	 * Object information.
-	 * @public
-	 * */
-	void* value;
-
-	/**
-	 * Size in bytes of object information.
-	 * @public
-	 * */
-	size_t size;
-
-};
 
 /* Create a new CCLWrapperInfo* object with a given value size. */
 CCL_EXPORT

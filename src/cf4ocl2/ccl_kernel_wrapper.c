@@ -29,6 +29,7 @@
 
 #include "ccl_kernel_wrapper.h"
 #include "ccl_program_wrapper.h"
+#include "priv_abstract_wrapper.h"
 
 /**
  * Kernel wrapper class.

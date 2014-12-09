@@ -32,8 +32,7 @@
  *
  * */
 
-#include "ccl_program_wrapper.h"
-#include "ccl_kernel_wrapper.h"
+#include <cf4ocl2.h>
 
 /**
  * Kernel info main function.

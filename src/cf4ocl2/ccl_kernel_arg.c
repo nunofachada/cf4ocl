@@ -28,6 +28,7 @@
  * */
 
 #include "ccl_kernel_arg.h"
+#include "priv_abstract_wrapper.h"
 
 /**
  * @internal
