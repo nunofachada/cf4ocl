@@ -63,6 +63,15 @@ ELSE (APPLE)
 		GET_FILENAME_COMPONENT(OPENCL_LIB_DIR ${OPENCL_LIBRARIES} PATH)
 		GET_FILENAME_COMPONENT(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
 
+        # Find each library defined by pkg-config and add to OPENCL_LIBRARIES
+        FOREACH (DEP IN ITEMS ${PC_OPENCL_LIBRARIES})
+            FIND_LIBRARY(${DEP}_LIBRARY ${DEP} HINTS ${PC_OPENCL_LIBRARY_DIRS})
+            
+            IF (${DEP}_LIBRARY)
+                SET(OPENCL_LIBRARIES ${OPENCL_LIBRARIES} ${${DEP}_LIBRARY})
+            ENDIF ()
+        ENDFOREACH (LIBRARY_NAME)
+
 		# The AMD SDK currently does not place its headers
 		# in /usr/include, therefore also search relative
 		# to the library
