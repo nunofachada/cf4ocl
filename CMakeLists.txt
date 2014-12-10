@@ -268,6 +268,18 @@ add_subdirectory(scripts)
 # PACKAGING SECTION #
 # ################# #
 
+if(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
+    set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE PATH "C/C++ Header Files")
+endif()
+
+if (NOT DEFINED CMAKE_INSTALL_LIBDIR)
+    set(CMAKE_INSTALL_LIBDIR "lib" CACHE PATH "Library Files")
+endif()
+
+# pkg-config support
+configure_file(${CMAKE_SOURCE_DIR}/cf4ocl.pc.in ${CMAKE_BINARY_DIR}/cf4ocl.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/cf4ocl.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig COMPONENT utilities)
+
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
 
