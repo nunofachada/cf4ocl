@@ -105,12 +105,39 @@ include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
 # ###################### #
 # DEFINE INSTALL FOLDERS #
 # ###################### #
-set(INSTALL_SUBDIR_DOCS_HTML share/doc/${PROJECT_NAME}/html)
-set(INSTALL_SUBDIR_DOCS_PDF share/doc/${PROJECT_NAME})
-set(INSTALL_SUBDIR_DOCS_MAN share/man/)
-set(INSTALL_SUBDIR_INCLUDE include)
-set(INSTALL_SUBDIR_BIN bin)
-set(INSTALL_SUBDIR_LIB lib)
+if(NOT DEFINED CMAKE_INSTALL_BINDIR)
+	set(CMAKE_INSTALL_BINDIR "bin"
+		CACHE PATH "Install sub-location for executables")
+endif(NOT DEFINED CMAKE_INSTALL_BINDIR)
+
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+	set(CMAKE_INSTALL_LIBDIR "lib"
+		CACHE PATH "Install sub-location for object code libraries")
+endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+
+if(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
+	set(CMAKE_INSTALL_INCLUDEDIR "include"
+		CACHE PATH "Install sub-location for header files")
+endif(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
+
+if(NOT DEFINED CMAKE_INSTALL_DATADIR)
+	set(CMAKE_INSTALL_DATADIR "share"
+		CACHE PATH "Install sub-location for read-only data")
+endif(NOT DEFINED CMAKE_INSTALL_DATADIR)
+
+if(NOT DEFINED CMAKE_INSTALL_DOCDIR)
+	set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DATADIR}/doc"
+		CACHE PATH "Install sub-location for documentation")
+endif(NOT DEFINED CMAKE_INSTALL_DOCDIR)
+
+if(NOT DEFINED CMAKE_INSTALL_MANDIR)
+	set(CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_DATADIR}/man"
+		CACHE PATH "Install sub-location for man docs")
+endif(NOT DEFINED CMAKE_INSTALL_MANDIR)
+
+mark_as_advanced(CMAKE_INSTALL_BINDIR CMAKE_INSTALL_LIBDIR
+	CMAKE_INSTALL_INCLUDEDIR CMAKE_INSTALL_DATADIR
+	CMAKE_INSTALL_DOCDIR CMAKE_INSTALL_MANDIR)
 
 # ########################### #
 # BUILD DOCUMENTATION SECTION #
@@ -226,17 +253,17 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 	# Add documentation installation target (if the docs have been built)
 	if (DOC_INSTALL_HTML)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/html/
-			DESTINATION ${INSTALL_SUBDIR_DOCS_HTML} OPTIONAL)
+			DESTINATION ${CMAKE_INSTALL_DOCDIR}/${PROJECT_NAME}/html OPTIONAL)
 	endif()
 
 	if (DOC_INSTALL_PDF)
 		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/latex/refman.pdf
-			DESTINATION ${INSTALL_SUBDIR_DOCS_PDF} OPTIONAL)
+			DESTINATION ${CMAKE_INSTALL_DOCDIR}/${PROJECT_NAME} OPTIONAL)
 	endif()
 
 	if (DOC_INSTALL_MAN)
 		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${DOCS_DIRECTORY}/man/
-			DESTINATION ${INSTALL_SUBDIR_DOCS_MAN} OPTIONAL
+			DESTINATION ${CMAKE_INSTALL_MANDIR} OPTIONAL
 			FILES_MATCHING REGEX "(ccl|CCL).*gz")
 	endif()
 
@@ -267,6 +294,13 @@ add_subdirectory(scripts)
 # ################# #
 # PACKAGING SECTION #
 # ################# #
+
+# pkg-config support
+configure_file(${CMAKE_SOURCE_DIR}/cf4ocl2.pc.in
+	${CMAKE_BINARY_DIR}/cf4ocl2.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/cf4ocl2.pc
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+	COMPONENT utilities)
 
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
