@@ -91,7 +91,7 @@
  *
  * While this information can be subject to different types of
  * examination by client code, the profiler module also offers some
- * functionality which allows for a more instant interpretation of
+ * functionality which allows for a more immediate interpretation of
  * results:
  *
  * 1. A summary of the profiling analysis can be obtained or printed

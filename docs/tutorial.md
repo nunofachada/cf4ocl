@@ -668,7 +668,9 @@ a small macro to do so:
     if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
 ~~~~~~~~~~~~~~~
 
-The complete program, with more informative error checking:
+We can also remove the `status` and `evt` variables, because we don't
+rely on them anymore for error checking. Here's the complete program,
+with more informative error checking:
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -691,8 +693,6 @@ int main() {
     cl_uint vec_c[VECSIZE];
     cl_uint d = SUM_CONST;
     size_t gws = VECSIZE;
-    cl_bool status;
-    CCLEvent * evt = NULL;
     int i;
     GError * err = NULL;
 
@@ -726,22 +726,22 @@ int main() {
     CHECK_ERROR(err);
 
     /* Build program. */
-    status = ccl_program_build(prg, NULL, &err);
+    ccl_program_build(prg, NULL, &err);
     CHECK_ERROR(err);
 
-    evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
+    ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
         NULL, NULL, &err, a, b, c, ccl_arg_priv(d, cl_uint),
         ccl_arg_priv(gws, cl_uint), NULL);
     CHECK_ERROR(err);
 
     /* Read the output buffer from the device. */
-    evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
+    ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
         VECSIZE * sizeof(cl_uint), vec_c, NULL, &err);
     CHECK_ERROR(err);
 
     /* Some OpenCL implementations don't respect the blocking read,
      * so this guarantees that the read is effectively finished. */
-    status = ccl_queue_finish(queue, &err);
+    ccl_queue_finish(queue, &err);
     CHECK_ERROR(err);
 
     /* Check for errors. */
@@ -862,8 +862,6 @@ int main() {
     cl_uint vec_c[VECSIZE];
     cl_uint d = SUM_CONST;
     size_t gws = VECSIZE;
-    cl_bool status;
-    CCLEvent * evt = NULL;
     int i;
     GError * err = NULL;
     CCLProf* prof = NULL;
@@ -907,22 +905,22 @@ int main() {
     CHECK_ERROR(err);
 
     /* Build program. */
-    status = ccl_program_build(prg, NULL, &err);
+    ccl_program_build(prg, NULL, &err);
     CHECK_ERROR(err);
 
-    evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
+    ccl_program_enqueue_kernel(prg, "sum", queue, 1, NULL, &gws,
         NULL, NULL, &err, a, b, c, ccl_arg_priv(d, cl_uint),
         ccl_arg_priv(gws, cl_uint), NULL);
     CHECK_ERROR(err);
 
     /* Read the output buffer from the device. */
-    evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
+    ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
         VECSIZE * sizeof(cl_uint), vec_c, NULL, &err);
     CHECK_ERROR(err);
 
     /* Some OpenCL implementations don't respect the blocking read,
      * so this guarantees that the read is effectively finished. */
-    status = ccl_queue_finish(queue, &err);
+    ccl_queue_finish(queue, &err);
     CHECK_ERROR(err);
 
     /* Check for errors. */
