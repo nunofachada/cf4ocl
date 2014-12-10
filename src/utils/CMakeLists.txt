@@ -23,7 +23,7 @@ set_target_properties(${UTILS} PROPERTIES
 	VERSION ${${PROJECT_NAME}_VERSION_STRING})
 
 # How to install utils
-install(TARGETS ${UTILS} RUNTIME DESTINATION ${INSTALL_SUBDIR_BIN})
+install(TARGETS ${UTILS} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Add a target which builds all utilities
 add_custom_target(utils DEPENDS ${UTILS})

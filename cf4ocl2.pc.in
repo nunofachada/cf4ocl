@@ -3,10 +3,10 @@ exec_prefix=${prefix}
 libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
-Name: cf4ocl
+Name: cf4ocl2
 Description: C Framework for OpenCL
 URL: http://fakenmc.github.io/cf4ocl/
-Version: 2.0
-Libs: -L${libdir} -lcf4ocl
+Version: 2.0.0
+Libs: -L${libdir} -lcf4ocl2
 Cflags: -I${includedir}
 
