@@ -547,12 +547,11 @@ static void create_from_region_test() {
 	CCLEvent* evt = NULL;
 	CCLEventWaitList ewl = NULL;
 	GError* err = NULL;
-	cl_ulong hbuf[64];
-	cl_ulong hsubbuf[16];
-
-	/* Initialize initial host buffer. */
-	for (cl_uint i = 0; i < 64; ++i)
-		hbuf[i] = g_test_rand_int();
+	cl_ulong* hbuf;
+	cl_ulong* hsubbuf;
+	cl_uint min_align;
+	size_t siz_buf;
+	size_t siz_subbuf;
 
 	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
@@ -562,24 +561,42 @@ static void create_from_region_test() {
 	dev = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 
+	/* Get minimum alignment for sub-buffer in bits. */
+	min_align = ccl_device_get_info_scalar(
+		dev, CL_DEVICE_MEM_BASE_ADDR_ALIGN, cl_uint, &err);
+	g_assert_no_error(err);
+
+	/* Determine buffer and sub-buffer sizes (divide by 64 because its
+	 * the number of bits in cl_ulong). */
+	siz_subbuf = sizeof(cl_ulong) * min_align / 64;
+	siz_buf = 4 * siz_subbuf;
+
+	/* Allocate memory for host buffer and host sub-buffer. */
+	hbuf = g_slice_alloc(siz_buf);
+	hsubbuf = g_slice_alloc(siz_subbuf);
+
+	/* Initialize initial host buffer. */
+	for (cl_uint i = 0; i < siz_buf / sizeof(cl_ulong); ++i)
+		hbuf[i] = g_test_rand_int();
+
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, dev, 0, &err);
 	g_assert_no_error(err);
 
 	/* Create a regular buffer, put some data in it. */
 	buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		64 * sizeof(cl_ulong), hbuf, &err);
+		siz_buf, hbuf, &err);
 	g_assert_no_error(err);
 
 	/* Create sub-buffer from indexes 16 to 31 (16 positions) of
 	 * original buffer. */
-	subbuf = ccl_buffer_new_from_region(buf, 0, 16 * sizeof(cl_ulong),
-		16 * sizeof(cl_ulong), &err);
+	subbuf = ccl_buffer_new_from_region(
+		buf, 0, siz_subbuf, siz_subbuf, &err);
 	g_assert_no_error(err);
 
 	/* Get data in sub-buffer to a new host buffer. */
 	evt = ccl_buffer_enqueue_read(subbuf, cq, CL_FALSE, 0,
-		16 * sizeof(cl_ulong), hsubbuf, NULL, &err);
+		siz_subbuf, hsubbuf, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Wait for read to be complete. */
@@ -587,14 +604,16 @@ static void create_from_region_test() {
 	g_assert_no_error(err);
 
 	/* Check that expected values were successfully read. */
-	for (cl_uint i = 0; i < 16; ++i)
-		g_assert_cmpuint(hsubbuf[i], ==, hbuf[i + 16]);
+	for (cl_uint i = 0; i < siz_subbuf / sizeof(cl_ulong); ++i)
+		g_assert_cmpuint(hsubbuf[i], ==, hbuf[i + siz_subbuf / sizeof(cl_ulong)]);
 
 	/* Destroy stuff. */
 	ccl_buffer_destroy(buf);
 	ccl_buffer_destroy(subbuf);
 	ccl_queue_destroy(cq);
 	ccl_context_destroy(ctx);
+	g_slice_free1(siz_buf, hbuf);
+	g_slice_free1(siz_subbuf, hsubbuf);
 
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
