@@ -26,6 +26,7 @@
 
 #include <cf4ocl2.h>
 #include <glib/gstdio.h>
+#include "test.h"
 
 #define CCL_TEST_PROGRAM_SUM "sum"
 
@@ -50,11 +51,12 @@ G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
  * Tests creation, getting info from and destruction of
  * program wrapper objects.
  * */
-static void program_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLProgram* prg = NULL;
+	CCLProgram* prg2 = NULL;
 	CCLKernel* krnl = NULL;
 	CCLWrapperInfo* info = NULL;
 	CCLDevice* d = NULL;
@@ -78,7 +80,7 @@ static void program_create_info_destroy_test() {
 	gchar* tmp_file_prefix;
 
 	/* Get a temp. dir. */
-	tmp_dir_name = g_dir_make_tmp("test_cad_program_XXXXXX", &err);
+	tmp_dir_name = g_dir_make_tmp("test_program_XXXXXX", &err);
 	g_assert_no_error(err);
 
 	/* Get a temp file prefix. */
@@ -91,12 +93,18 @@ static void program_create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Create a context with devices from first available platform. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a new program from kernel file. */
 	prg = ccl_program_new_from_source_file(
 		ctx, tmp_file_prefix, &err);
+	g_assert_no_error(err);
+
+	ccl_program_destroy(prg);
+
+	const char* file_pref = (const char*) tmp_file_prefix;
+	prg = ccl_program_new_from_source_files(ctx, 1, &file_pref, &err);
 	g_assert_no_error(err);
 
 	g_free(tmp_file_prefix);
@@ -176,133 +184,154 @@ static void program_create_info_destroy_test() {
 	cl_kernel_arg_address_qualifier kaaq;
 	char* kernel_arg_type_name;
 	char* kernel_arg_name;
+	cl_uint ocl_ver;
 
-	/* Get kernel argument information, compare it with expected info. */
+	/* Get OpenCL version of program's underlying platform. */
+	ocl_ver = ccl_program_get_opencl_version(prg, &err);
+	g_assert_no_error(err);
 
-	/* First kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	g_assert((err == NULL) || (err->code == CCL_ERROR_UNSUPPORTED_OCL));
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	} else {
+	/* If platform supports kernel argument queries, get kernel argument
+	 * information and compare it with expected info. */
+	if (ocl_ver >= 120) {
+
+		/* First kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "a");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Second kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 1,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 1,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "b");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Third kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 2,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 2,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "c");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Fourth kernel argument. */
+		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
+				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+				cl_kernel_arg_address_qualifier, &err);
+		if (err == NULL) {
+			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 3,
+			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
+		} else {
+			g_clear_error(&err);
+		}
+
+		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 3,
+			CL_KERNEL_ARG_NAME, char*, &err);
+		if (err == NULL) {
+			g_assert_cmpstr(kernel_arg_name, ==, "d");
+		} else {
+			g_clear_error(&err);
+		}
+
+		/* Bogus request, should return NULL and should raise an error. */
+		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
+			0 /* invalid value */, char*, &err);
+		g_assert(kernel_arg_type_name == NULL);
+		g_assert (err != NULL);
 		g_clear_error(&err);
 	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	g_assert((err == NULL) || (err->code == CCL_ERROR_UNSUPPORTED_OCL));
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "a");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Second kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 1,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 1,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "b");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Third kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 2,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 2,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "c");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Fourth kernel argument. */
-	kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
-			CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			cl_kernel_arg_address_qualifier, &err);
-	if (err == NULL) {
-		g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 3,
-		CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
-	} else {
-		g_clear_error(&err);
-	}
-
-	kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 3,
-		CL_KERNEL_ARG_NAME, char*, &err);
-	if (err == NULL) {
-		g_assert_cmpstr(kernel_arg_name, ==, "d");
-	} else {
-		g_clear_error(&err);
-	}
-
-	/* Bogus request, should return NULL and should raise an error. */
-	kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-		0 /* invalid value */, char*, &err);
-	g_assert(kernel_arg_type_name == NULL);
-	g_assert (err != NULL);
-	g_clear_error(&err);
 
 #endif
 #endif
 
-	/* Save binaries for all available devices. */
+	/* Save binaries for all available devices (which we will load into
+	 * a new program later). */
+	char** filenames;
+
 	tmp_file_prefix = g_strdup_printf(
 		"%s%ctest_", tmp_dir_name, G_DIR_SEPARATOR);
 
-	ccl_program_save_all_binaries(prg, tmp_file_prefix, ".bin", &err);
+	ccl_program_save_all_binaries(
+		prg, tmp_file_prefix, ".bin", &filenames, &err);
 	g_assert_no_error(err);
 
 	g_free(tmp_file_prefix);
+
+	cl_uint num_devs = ccl_program_get_num_devices(prg, &err);
+	g_assert_no_error(err);
+	CCLDevice* const* devs = ccl_program_get_all_devices(prg, &err);
+	g_assert_no_error(err);
+
+	g_debug(" ==== NUMDEVS=%d =====\n", num_devs);
+	for (cl_uint i = 0; i < num_devs; ++i)
+		g_debug("=> '%s'\n", filenames[i]);
 
 	/* Save binary for a specific device (which we will load into a new
 	 * program later). */
@@ -312,10 +341,59 @@ static void program_create_info_destroy_test() {
 	ccl_program_save_binary(prg, d, tmp_file_prefix, &err);
 	g_assert_no_error(err);
 
-	/* Destroy program. */
+	/* Create a new program using the saved binaries. */
+	prg2 = ccl_program_new_from_binary_files(
+		ctx, num_devs, devs, (const char**) filenames, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Destroy the filenames string array. */
+	g_strfreev(filenames);
+
+	/* Destroy program created with saved binary files. */
+	ccl_program_destroy(prg2);
+
+	/* Get binary in variable. */
+	CCLProgramBinary* prg_bin = ccl_program_get_binary(prg, d, &err);
+	g_assert_no_error(err);
+
+	/* Create program using that binary. */
+	prg2 = ccl_program_new_from_binaries(
+		ctx, 1, &d, &prg_bin, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Check that device is the correct one. */
+	CCLDevice* d2 = ccl_program_get_device(prg2, 0, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(d), ==, GPOINTER_TO_UINT(d2));
+
+	cl_device_id* devices = ccl_program_get_info_array(
+		prg2, CL_PROGRAM_DEVICES, cl_device_id*, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(devices[0]),
+		==, GPOINTER_TO_UINT(ccl_device_unwrap(d)));
+
+	cl_context context = ccl_program_get_info_scalar(
+		prg2, CL_PROGRAM_CONTEXT, cl_context, &err);
+	g_assert_no_error(err);
+	g_assert_cmphex(GPOINTER_TO_UINT(context),
+		==, GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+
+	/* Destroy program created with binary. */
+	ccl_program_destroy(prg2);
+
+	/* Create program using the wrap constructor. */
+	prg2 = ccl_program_new_wrap(ccl_program_unwrap(prg));
+
+	/* It must be the same program as the original one. */
+	g_assert_cmphex(GPOINTER_TO_UINT(prg), ==, GPOINTER_TO_UINT(prg2));
+
+	/* Destroy it. */
+	ccl_program_destroy(prg2);
+
+	/* Destroy original program. */
 	ccl_program_destroy(prg);
 
-	/* Create a new program using the saved binary. */
+	/* Create a new program using the specifically saved binary. */
 	prg = ccl_program_new_from_binary_file(
 		ctx, d, tmp_file_prefix, NULL, &err);
 	g_assert_no_error(err);
@@ -323,7 +401,10 @@ static void program_create_info_destroy_test() {
 	g_free(tmp_file_prefix);
 
 	/* **** BUILD PROGRAM **** */
-	ccl_program_build(prg, NULL, &err);
+
+	/* Use the build_full function for testing, not really required
+	 * (we could have used the "short" version). */
+	ccl_program_build_full(prg, 1, &d, NULL, NULL, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Get some program build info, compare it with expected values. */
@@ -337,16 +418,14 @@ static void program_create_info_destroy_test() {
 		prg, d, CL_PROGRAM_BUILD_LOG, &err);
 	g_assert_no_error(err);
 
-	/* Get kernel wrapper object. */
-	krnl = ccl_program_get_kernel(
-		prg, CCL_TEST_PROGRAM_SUM, &err);
+	g_assert(g_strrstr(
+		ccl_program_get_build_log(prg), (char*) info->value));
+
+	char* build_log = ccl_program_get_build_info_array(
+		prg, d, CL_PROGRAM_BUILD_LOG, char*, &err);
 	g_assert_no_error(err);
 
-	/* Get some kernel info, compare it with expected info. */
-	info = ccl_kernel_get_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
-	g_assert_no_error(err);
-	g_assert_cmpstr(
-		(gchar*) info->value, ==, CCL_TEST_PROGRAM_SUM);
+	g_assert_cmpstr(build_log, ==, (char*) info->value);
 
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
@@ -375,10 +454,10 @@ static void program_create_info_destroy_test() {
 
 	/* Copy host data to device buffers without waiting for transfer
 	 * to terminate before continuing host program. */
-	evt_w1 = ccl_buffer_enqueue_write(cq, a_w, CL_FALSE, 0,
+	evt_w1 = ccl_buffer_enqueue_write(a_w, cq, CL_FALSE, 0,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
 	g_assert_no_error(err);
-	evt_w2 = ccl_buffer_enqueue_write(cq, b_w, CL_FALSE, 0,
+	evt_w2 = ccl_buffer_enqueue_write(b_w, cq, CL_FALSE, 0,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
 	g_assert_no_error(err);
 
@@ -387,8 +466,9 @@ static void program_create_info_destroy_test() {
 
 	/* Set args and execute kernel, waiting for the two transfer events
 	 * to terminate (this will empty the event wait list). */
-	evt_kr = ccl_kernel_set_args_and_enqueue_ndrange(krnl, cq, 1, NULL, &gws, &lws,
-		&ewl, &err, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
+	void* args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
+	evt_kr =  ccl_program_enqueue_kernel_v(prg, CCL_TEST_PROGRAM_SUM,
+		cq, 1, NULL, &gws, &lws, &ewl, args, &err);
 	g_assert_no_error(err);
 
 	/* Add the kernel termination event to the wait list. */
@@ -401,7 +481,7 @@ static void program_create_info_destroy_test() {
 
 	/* Read back results from host without waiting for
 	 * transfer to terminate before continuing host program.. */
-	evt_r1 = ccl_buffer_enqueue_read(cq, c_w, CL_FALSE, 0,
+	evt_r1 = ccl_buffer_enqueue_read(c_w, cq, CL_FALSE, 0,
 		CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, NULL, &err);
 	g_assert_no_error(err);
 
@@ -443,27 +523,20 @@ static void program_create_info_destroy_test() {
 }
 
 /**
- * Test increasing reference count of objects which compose
- * larger objects, then destroy the larger object and verify that
- * composing object still exists and must be freed by the function
- * which increase its reference count. This function tests the following
- * modules: program, queue, kernel and event wrappers.
+ * Test program and kernel wrappers ref counting.
  * */
-static void program_ref_unref_test() {
+static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
 	GError* err = NULL;
-	//~ CCLDevice* d = NULL;
 	CCLProgram* prg = NULL;
 	CCLKernel* krnl1 = NULL;
 	CCLKernel* krnl2 = NULL;
-	CCLQueue* cq = NULL;
-	//~ CCLEvent* evt = NULL;
 
 	const char* src = CCL_TEST_PROGRAM_SUM_CONTENT;
 
 	/* Get some context. */
-	ctx = ccl_context_new_any(&err);
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create a program from source. */
@@ -501,13 +574,12 @@ static void program_ref_unref_test() {
 	ccl_kernel_unref(krnl2);
 	ccl_kernel_unref(krnl2);
 
-	/* Create a command queue and check its ref count. */
-	cq = ccl_queue_new(ctx, NULL, 0, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) cq), ==, 1);
+	/* Reference the program object, check its ref count. */
+	ccl_program_ref(prg);
+	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) prg), ==, 2);
+	ccl_program_unref(prg);
 
 	/* Destroy remaining stuff. */
-	ccl_queue_destroy(cq);
 	ccl_program_destroy(prg);
 	ccl_context_destroy(ctx);
 
@@ -516,6 +588,126 @@ static void program_ref_unref_test() {
 	g_assert(ccl_wrapper_memcheck());
 
 }
+
+#ifdef CL_VERSION_1_2
+
+static const char* src_head[] = {
+	"#define SOMETYPE char\n",
+	"SOMETYPE some_function(SOMETYPE a, size_t b) {\n" \
+	"	return (SOMETYPE) (a + b);\n" \
+	"}\n"};
+
+static const char src_main[] =
+	"#include \"head.h\"\n" \
+	"__kernel void complinktest(__global SOMETYPE *buf) {\n" \
+	"	size_t gid = get_global_id(0);\n" \
+	"	buf[gid] = some_function(buf[gid], gid);\n" \
+	"}\n";
+
+static const char* src_head_name = "head.h";
+
+/**
+ * Test program and kernel wrappers ref counting.
+ * */
+static void compile_link_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLQueue* cq = NULL;
+	CCLProgram* prg_head = NULL;
+	CCLProgram* prg_main = NULL;
+	CCLProgram* prg_exec = NULL;
+	CCLBuffer* buf = NULL;
+	cl_char hbuf_in[8] = {-3, -2, -1, 0, 1, 2, 3, 4};
+	cl_char hbuf_out[8];
+	size_t ws = 8;
+	GError* err = NULL;
+	cl_uint ocl_ver;
+
+	/* Get the test context with the pre-defined device. */
+	ctx = ccl_test_context_new(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Check if platform supports compilation and linking
+	 * (OpenCL >= 1.2) */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err);
+	g_assert_no_error(err);
+	if (ocl_ver < 120) {
+		g_test_message("Device being tested does not support \
+			compilation and linking");
+		return;
+	}
+
+	/* Create device buffer and initialize it with values from host
+	 * buffer in. */
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		8, hbuf_in, &err);
+	g_assert_no_error(err);
+
+	/* Create header program. */
+	prg_head =
+		ccl_program_new_from_sources(ctx, 2, src_head, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Create main program */
+	prg_main = ccl_program_new_from_source(ctx, src_main, &err);
+	g_assert_no_error(err);
+
+	/* Compile main program. */
+	ccl_program_compile(prg_main, 1, &dev, NULL, 1, &prg_head,
+		&src_head_name, NULL, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Link programs into an executable program. */
+	prg_exec = ccl_program_link(
+		ctx, 1, &dev, NULL, 1, &prg_main, NULL, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Run program. */
+	ccl_program_enqueue_kernel(prg_exec, "complinktest", cq, 1, NULL,
+		&ws, &ws, NULL, &err, buf, NULL);
+	g_assert_no_error(err);
+
+	/* Read results back to host. */
+	ccl_buffer_enqueue_read(
+		buf, cq, CL_TRUE, 0, 8, hbuf_out, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Terminate queue. */
+	ccl_queue_finish(cq, &err);
+	g_assert_no_error(err);
+
+#ifndef OPENCL_STUB
+
+	/* Check results. */
+	for (cl_char i = 0; i < 8; ++i)
+		g_assert_cmpint(hbuf_out[i], ==, hbuf_in[i] + i);
+
+#endif
+
+	/* Free stuff. */
+	ccl_buffer_destroy(buf);
+	ccl_program_destroy(prg_exec);
+	ccl_program_destroy(prg_main);
+	ccl_program_destroy(prg_head);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
+#endif
 
 /**
  * Main function.
@@ -529,12 +721,17 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/program/create-info-destroy",
-		program_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/program/ref-unref",
-		program_ref_unref_test);
+		ref_unref_test);
 
+#ifdef CL_VERSION_1_2
+	g_test_add_func(
+		"/wrappers/program/compile-link",
+		compile_link_test);
+#endif
 	return g_test_run();
 }
 

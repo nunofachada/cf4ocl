@@ -25,54 +25,90 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 /**
  * Tests creation (using "simple" constructor), getting info from and
  * destruction of sampler wrapper objects.
  * */
-static void sampler_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLSampler* s = NULL;
+	cl_sampler sampler = NULL;
 	GError* err = NULL;
+	cl_int ocl_status;
+	const cl_sampler_properties sampler_properties[] = {
+		CL_SAMPLER_NORMALIZED_COORDS, CL_TRUE,
+		CL_SAMPLER_ADDRESSING_MODE, CL_ADDRESS_NONE,
+		CL_SAMPLER_FILTER_MODE, CL_FILTER_NEAREST,
+		0};
 
-	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	/* Get the test context with the pre-defined device. */
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
-	/* Create sampler using "simple" constructor. */
-	s = ccl_sampler_new(ctx, CL_TRUE, CL_ADDRESS_NONE,
-		CL_FILTER_NEAREST, &err);
-	g_assert_no_error(err);
+	/* Test three ways to create a sampler. */
+	for (cl_uint i = 0; i < 3; ++i) {
 
-	/* Get some info and check if the return value is as expected. */
-	cl_addressing_mode am;
-	am = ccl_sampler_get_info_scalar(
-		s, CL_SAMPLER_ADDRESSING_MODE, cl_addressing_mode, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(am, ==, CL_ADDRESS_NONE);
+		/* Create sampler wrapper. */
+		switch (i) {
+			case 0:
+				/* Create sampler using "simple" constructor. */
+				s = ccl_sampler_new(ctx, CL_TRUE, CL_ADDRESS_NONE,
+					CL_FILTER_NEAREST, &err);
+				g_assert_no_error(err);
+				break;
+			case 1:
+				/* Using the "full" constructor. */
+				s = ccl_sampler_new_full(ctx, sampler_properties, &err);
+				g_assert_no_error(err);
+				break;
+			case 2:
+				/* Using the "wrap" constructor. */
+				CCL_BEGIN_IGNORE_DEPRECATIONS
+				sampler = clCreateSampler(ccl_context_unwrap(ctx),
+					CL_TRUE, CL_ADDRESS_NONE, CL_FILTER_NEAREST,
+					&ocl_status);
+				g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
+				CCL_END_IGNORE_DEPRECATIONS
+				s = ccl_sampler_new_wrap(sampler);
+				g_assert_cmphex(GPOINTER_TO_UINT(sampler), ==,
+					GPOINTER_TO_UINT(ccl_sampler_unwrap(s)));
+				break;
+		}
 
-	cl_filter_mode fm;
-	fm = ccl_sampler_get_info_scalar(
-		s, CL_SAMPLER_FILTER_MODE, cl_filter_mode, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(fm, ==, CL_FILTER_NEAREST);
+		/* Get some info and check if the return value is as expected. */
+		cl_addressing_mode am;
+		am = ccl_sampler_get_info_scalar(
+			s, CL_SAMPLER_ADDRESSING_MODE, cl_addressing_mode, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(am, ==, CL_ADDRESS_NONE);
 
-	cl_bool nc;
-	nc = ccl_sampler_get_info_scalar(
-		s, CL_SAMPLER_NORMALIZED_COORDS, cl_bool, &err);
-	g_assert_no_error(err);
-	g_assert_cmpuint(nc, ==, CL_TRUE);
+		cl_filter_mode fm;
+		fm = ccl_sampler_get_info_scalar(
+			s, CL_SAMPLER_FILTER_MODE, cl_filter_mode, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(fm, ==, CL_FILTER_NEAREST);
 
-	cl_context context;
-	context = ccl_sampler_get_info_scalar(
-		s, CL_SAMPLER_CONTEXT, cl_context, &err);
-	g_assert_no_error(err);
-	g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));
+		cl_bool nc;
+		nc = ccl_sampler_get_info_scalar(
+			s, CL_SAMPLER_NORMALIZED_COORDS, cl_bool, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(nc, ==, CL_TRUE);
 
-	/* Destroy sampler. */
-	ccl_sampler_destroy(s);
+		cl_context context;
+		context = ccl_sampler_get_info_scalar(
+			s, CL_SAMPLER_CONTEXT, cl_context, &err);
+		g_assert_no_error(err);
+		g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));
+
+		/* Destroy sampler. */
+		ccl_sampler_destroy(s);
+	}
+
+	/* Destroy context. */
 	ccl_context_destroy(ctx);
 
 	/* Confirm that memory allocated by wrappers has been properly
@@ -85,7 +121,7 @@ static void sampler_create_info_destroy_test() {
  * Tests creation (using "full" constructor), getting info from and
  * destruction of sampler wrapper objects.
  * */
-static void sampler_create_full_info_destroy_test() {
+static void create_full_info_destroy_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
@@ -98,8 +134,8 @@ static void sampler_create_full_info_destroy_test() {
 
 	GError* err = NULL;
 
-	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	/* Get the test context with the pre-defined device. */
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create sampler using "full" constructor. */
@@ -144,15 +180,15 @@ static void sampler_create_full_info_destroy_test() {
 /**
  * Tests sampler wrapper class reference counting.
  * */
-static void sampler_ref_unref_test() {
+static void ref_unref_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLSampler* s = NULL;
 	GError* err = NULL;
 
-	/* Get a context with any device. */
-	ctx = ccl_context_new_any(&err);
+	/* Get the test context with the pre-defined device. */
+	ctx = ccl_test_context_new(&err);
 	g_assert_no_error(err);
 
 	/* Create sampler. */
@@ -193,15 +229,15 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/sampler/create-info-destroy",
-		sampler_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/sampler/create-full-info-destroy",
-		sampler_create_full_info_destroy_test);
+		create_full_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/sampler/ref-unref",
-		sampler_ref_unref_test);
+		ref_unref_test);
 
 	return g_test_run();
 }

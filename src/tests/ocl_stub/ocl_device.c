@@ -1,42 +1,41 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
- 
- /** 
+
+ /**
  * @file
  * OpenCL device stub functions.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
- 
+
 #include "ocl_env.h"
 #include "utils.h"
 
 CL_API_ENTRY cl_int CL_API_CALL
-clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type, 
-	cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices) 
-	CL_API_SUFFIX__VERSION_1_0 {
-	
+clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type,
+	cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices) {
+
 	cl_int status = CL_SUCCESS;
 
 	if (platform == NULL) {
 		status = CL_INVALID_PLATFORM;
-	} else if (((num_entries == 0) && (devices != NULL)) 
+	} else if (((num_entries == 0) && (devices != NULL))
 			|| ((num_devices == NULL) && (devices == NULL))) {
 		status = CL_INVALID_VALUE;
 	} else {
@@ -44,15 +43,15 @@ clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type,
 		for (guint i = 0; i < platform->num_devices; i++) {
 			if (platform->devices[i].type || device_type) {
 				if (devices != NULL)
-					devices[num_devices_found] = 
+					devices[num_devices_found] =
 						(cl_device_id) &platform->devices[i];
 				num_devices_found++;
-				if ((num_devices_found >= num_entries) 
+				if ((num_devices_found >= num_entries)
 					&& (devices != NULL))
 					break;
 			}
 		}
-		if (num_devices != NULL) 
+		if (num_devices != NULL)
 			*num_devices = num_devices_found;
 		if (num_devices_found == 0)
 			status = CL_DEVICE_NOT_FOUND;
@@ -61,10 +60,10 @@ clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type,
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clGetDeviceInfo(cl_device_id device, cl_device_info param_name, 
-	size_t param_value_size, void* param_value, 
-	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
-		
+clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
+	size_t param_value_size, void* param_value,
+	size_t* param_value_size_ret) {
+
 	cl_int status = CL_SUCCESS;
 
 	if (device == NULL) {
@@ -221,12 +220,6 @@ clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 				status = CL_INVALID_VALUE;
 		}
 	}
-		
+
 	return status;
 }
-
-
-
-
-
-

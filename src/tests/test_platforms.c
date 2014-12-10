@@ -27,6 +27,7 @@
 
 #include <cf4ocl2.h>
 #include <glib/gstdio.h>
+#include "test.h"
 
 /* Max. length of information string. */
 #define CCL_TEST_PLATFORMS_MAXINFOSTR 200
@@ -50,7 +51,7 @@ static void ccl_test_platforms_check_error(GError** err) {
 	if  (*err == NULL) {
 		status = TRUE;
 	} else if (((*err)->domain == CCL_ERROR)
-			&& ((*err)->code == CCL_ERROR_INVALID_DATA)) {
+			&& ((*err)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) {
 		status = TRUE;
 	} else if (((*err)->domain == CCL_OCL_ERROR)
 			&& ((*err)->code == CL_INVALID_VALUE)) {
@@ -86,7 +87,7 @@ static void ccl_test_platforms_check_error(GError** err) {
  * Tests creation, getting info from and destruction of
  * platforms, platform and device wrapper objects.
  * */
-static void platforms_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
@@ -160,9 +161,6 @@ static void platforms_create_info_destroy_test() {
 			g_assert_no_error(err);
 			ccl_test_platforms_msg("...... Name :", "%s",
 				ccl_info_array(info, char*));
-
-			g_debug("...... Memory location : %p",
-				*((void**) ccl_device_unwrap(d)));
 
 			info = ccl_device_get_info(d, CL_DEVICE_ADDRESS_BITS, &err);
 			ccl_test_platforms_check_error(&err);
@@ -410,6 +408,14 @@ static void platforms_create_info_destroy_test() {
 			ccl_test_platforms_check_error(&err);
 			ccl_test_platforms_msg("...... OpenCL C version :", "%s",
 				ccl_info_array(info, char*));
+			ccl_test_platforms_check_error(&err);
+
+			info = ccl_device_get_info(d, CL_DEVICE_PLATFORM, &err);
+			ccl_test_platforms_check_error(&err);
+			g_assert_cmphex(
+				GPOINTER_TO_UINT(*((cl_platform_id*) info->value)),
+				==,
+				GPOINTER_TO_UINT(ccl_platform_unwrap(p)));
 
 			info = ccl_device_get_info(d, CL_DEVICE_PARENT_DEVICE, &err);
 			ccl_test_platforms_check_error(&err);
@@ -568,7 +574,7 @@ static void platforms_create_info_destroy_test() {
  * which increase its reference count. This function tests the following
  * modules: platforms, platform and device wrappers.
  * */
-static void platforms_ref_unref_test() {
+static void ref_unref_test() {
 
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
@@ -623,11 +629,11 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/platforms/create-info-destroy",
-		platforms_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/platforms/ref-unref",
-		platforms_ref_unref_test);
+		ref_unref_test);
 
 	return g_test_run();
 }

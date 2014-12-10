@@ -26,12 +26,12 @@
 
 #include "ocl_env.h"
 #include "utils.h"
+#include "ccl_common.h"
 
 
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueue(cl_context context, cl_device_id device,
-	cl_command_queue_properties properties, cl_int* errcode_ret)
-	CL_API_SUFFIX__VERSION_1_0 {
+	cl_command_queue_properties properties, cl_int* errcode_ret) {
 
 	seterrcode(errcode_ret, CL_SUCCESS);
 
@@ -50,19 +50,18 @@ clCreateCommandQueue(cl_context context, cl_device_id device,
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueueWithProperties(cl_context context,
 	cl_device_id device, const cl_queue_properties* properties,
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_2_0 {
+	cl_int* errcode_ret) {
 
-	G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	CCL_BEGIN_IGNORE_DEPRECATIONS
 	return clCreateCommandQueue(context, device, *properties,
 		errcode_ret);
-	G_GNUC_END_IGNORE_DEPRECATIONS
+	CCL_END_IGNORE_DEPRECATIONS
 
 }
 #endif
 
 CL_API_ENTRY cl_int CL_API_CALL
-clRetainCommandQueue(cl_command_queue command_queue)
-	CL_API_SUFFIX__VERSION_1_0 {
+clRetainCommandQueue(cl_command_queue command_queue) {
 
 	g_atomic_int_inc(&command_queue->ref_count);
 	return CL_SUCCESS;
@@ -70,8 +69,7 @@ clRetainCommandQueue(cl_command_queue command_queue)
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clReleaseCommandQueue(cl_command_queue command_queue)
-	CL_API_SUFFIX__VERSION_1_0 {
+clReleaseCommandQueue(cl_command_queue command_queue) {
 
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&command_queue->ref_count)) {
@@ -86,8 +84,7 @@ clReleaseCommandQueue(cl_command_queue command_queue)
 CL_API_ENTRY cl_int CL_API_CALL
 clGetCommandQueueInfo(cl_command_queue command_queue,
 	cl_command_queue_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret)
-	CL_API_SUFFIX__VERSION_1_0 {
+	void* param_value, size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -114,13 +111,13 @@ clGetCommandQueueInfo(cl_command_queue command_queue,
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clFlush(cl_command_queue command_queue) CL_API_SUFFIX__VERSION_1_0 {
-	command_queue = command_queue;
+clFlush(cl_command_queue command_queue) {
+	(void)(command_queue);
 	return CL_SUCCESS;
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clFinish(cl_command_queue command_queue) CL_API_SUFFIX__VERSION_1_0 {
-	command_queue = command_queue;
+clFinish(cl_command_queue command_queue) {
+	(void)(command_queue);
 	return CL_SUCCESS;
 }

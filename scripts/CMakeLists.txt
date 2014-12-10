@@ -1,10 +1,9 @@
 # Available scripts
-set(SCRIPTS plot_events.py)
+set(SCRIPTS ccl_plot_events.py)
 
 # Where to install scripts
 foreach(SCRIPT ${SCRIPTS})
 	install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}
-		DESTINATION ${INSTALL_SUBDIR_BIN}
-		RENAME ${EXECS_PREFIX}${SCRIPT})
+		DESTINATION ${CMAKE_INSTALL_BINDIR})
 endforeach()
 

@@ -32,17 +32,17 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
 	/* These are ignored. */
-	command_queue = command_queue;
-	kernel = kernel;
-	work_dim = work_dim;
-	global_work_offset = global_work_offset;
-	global_work_size = global_work_size;
-	local_work_size = local_work_size;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(command_queue);
+	(void)(kernel);
+	(void)(work_dim);
+	(void)(global_work_offset);
+	(void)(global_work_size);
+	(void)(local_work_size);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_NDRANGE_KERNEL);
@@ -55,7 +55,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	cl_bool blocking_read, size_t offset, size_t size, void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -72,15 +72,15 @@ clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	}
 
 	/* These are ignored. */
-	blocking_read = blocking_read;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(blocking_read);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER);
 
 	/* Read buffer. */
-	g_memmove(ptr, buffer->mem + offset, size);
+	g_memmove(ptr, ((cl_uchar*)buffer->mem) + offset, size);
 
 	/* All good. */
 	return CL_SUCCESS;
@@ -90,7 +90,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueWriteBuffer(cl_command_queue command_queue, cl_mem buffer,
 	cl_bool blocking_write, size_t offset, size_t size, const void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -107,15 +107,15 @@ clEnqueueWriteBuffer(cl_command_queue command_queue, cl_mem buffer,
 	}
 
 	/* These are ignored. */
-	blocking_write = blocking_write;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(blocking_write);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER);
 
 	/* Write to buffer. */
-	g_memmove(buffer->mem + offset, ptr, size);
+	g_memmove(((cl_uchar*) buffer->mem) + offset, ptr, size);
 
 	/* All good. */
 	return CL_SUCCESS;
@@ -126,24 +126,43 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
 	cl_mem src_buffer, cl_mem dst_image, size_t src_offset,
 	const size_t* dst_origin, const size_t* region,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
+
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((dst_image == NULL) || (src_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if ((dst_image->context != command_queue->context)
+		|| (src_buffer->context != command_queue->context)) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Also not testing if dest buffer has enough space for the image
+	 * data. */
 
 	/* These are ignored. */
-	command_queue = command_queue;
-	src_buffer = src_buffer;
-	dst_image = dst_image;
-	src_offset = src_offset;
-	dst_origin = dst_origin;
-	region = region;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
+
+	size_t dst_offset = dst_image->image_elem_size * (dst_origin[0] +
+		dst_origin[0] * dst_origin[1]
+		+ dst_origin[0] * dst_origin[1] * dst_origin[2]);
+
+	size_t size_coord[] = {region[0] - dst_origin[0],
+			region[1] - dst_origin[1], region[2] - dst_origin[2]};
+
+	size_t size = dst_image->image_elem_size * size_coord[0]
+		* size_coord[1] * size_coord[2];
+
+	/* Perform copy. */
+	g_memmove(((cl_uchar*) dst_image->mem) + dst_offset,
+		((cl_uchar*) src_buffer->mem) + src_offset, size);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_TO_IMAGE);
 
-	/* Unimplemented. */
-	g_assert_not_reached();
-
+	/* All good. */
 	return CL_SUCCESS;
 
 }
@@ -153,7 +172,7 @@ clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, cl_uint num_events_in_wait_list,
 	const cl_event* event_wait_list, cl_event* event,
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	cl_int* errcode_ret) {
 
 	void* map_ptr = NULL;
 
@@ -174,15 +193,15 @@ clEnqueueMapBuffer(cl_command_queue command_queue, cl_mem buffer,
 		seterrcode(errcode_ret, CL_SUCCESS);
 
 		/* Just return a pointer to the memory region. */
-		map_ptr = buffer->mem + offset;
+		map_ptr = ((cl_uchar*)buffer->mem) + offset;
 		buffer->map_count++;
 	}
 
 	/* These are ignored. */
-	blocking_map = blocking_map;
-	map_flags = map_flags;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(blocking_map);
+	(void)(map_flags);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Return the mapped pointer. */
 	return map_ptr;
@@ -193,8 +212,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 	cl_mem dst_buffer, size_t src_offset, size_t dst_offset,
 	size_t size, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event)
-	CL_API_SUFFIX__VERSION_1_0 {
+	const cl_event* event_wait_list, cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -215,11 +233,12 @@ clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 	}
 
 	/* These are ignored. */
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Perform copy. */
-	g_memmove(dst_buffer->mem + dst_offset, src_buffer->mem + src_offset, size);
+	g_memmove(((cl_uchar*) dst_buffer->mem) + dst_offset,
+		((cl_uchar*) src_buffer->mem) + src_offset, size);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER);
@@ -232,8 +251,7 @@ clEnqueueCopyBuffer(cl_command_queue command_queue, cl_mem src_buffer,
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
 	void* mapped_ptr, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event)
-	CL_API_SUFFIX__VERSION_1_0 {
+	const cl_event* event_wait_list, cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -246,14 +264,14 @@ clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
 	} else if (mapped_ptr == NULL) {
 		return CL_INVALID_VALUE;
 	} else if ((mapped_ptr < memobj->mem)
-		|| (mapped_ptr >= memobj->mem + memobj->size)
+		|| ((cl_uchar*)mapped_ptr >= ((cl_uchar*)memobj->mem) + memobj->size)
 		|| (memobj->map_count == 0)) {
 		return CL_INVALID_VALUE;
 	}
 
 	/* These are ignored. */
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_UNMAP_MEM_OBJECT);
@@ -271,7 +289,7 @@ clEnqueueReadImage(cl_command_queue command_queue, cl_mem image,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t row_pitch, size_t slice_pitch, void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -290,9 +308,9 @@ clEnqueueReadImage(cl_command_queue command_queue, cl_mem image,
 	}
 
 	/* These are ignored. */
-	blocking_read = blocking_read;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(blocking_read);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_IMAGE);
@@ -313,8 +331,8 @@ clEnqueueReadImage(cl_command_queue command_queue, cl_mem image,
 		for (size_t y = 0; y < region[1]; y++) {
 			size_t row_pitch_index = y * row_pitch;
 			g_memmove(
-				ptr + slice_pitch_index + row_pitch_index,
-				image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
+				((cl_uchar*)ptr) + slice_pitch_index + row_pitch_index,
+				((cl_uchar*)image->mem) + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
 				region[0] * image->image_elem_size);
 		}
 	}
@@ -329,7 +347,7 @@ clEnqueueWriteImage(cl_command_queue command_queue, cl_mem image,
 	cl_bool blocking_write, const size_t* origin, const size_t* region,
 	size_t input_row_pitch, size_t input_slice_pitch, const void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -348,9 +366,9 @@ clEnqueueWriteImage(cl_command_queue command_queue, cl_mem image,
 	}
 
 	/* These are ignored. */
-	blocking_write = blocking_write;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(blocking_write);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_IMAGE);
@@ -371,8 +389,8 @@ clEnqueueWriteImage(cl_command_queue command_queue, cl_mem image,
 		for (size_t y = 0; y < region[1]; y++) {
 			size_t row_pitch_index = y * input_row_pitch;
 			g_memmove(
-				image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
-				ptr + slice_pitch_index + row_pitch_index,
+				((cl_uchar*)image->mem) + ((z + origin[2]) * w * h + (y + origin[1]) * w + origin[0]) * image->image_elem_size,
+				((cl_uchar*)ptr) + slice_pitch_index + row_pitch_index,
 				region[0] * image->image_elem_size);
 		}
 	}
@@ -387,7 +405,7 @@ clEnqueueCopyImage(cl_command_queue command_queue, cl_mem src_image,
 	cl_mem dst_image, const size_t* src_origin,
 	const size_t* dst_origin, const size_t* region,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -411,8 +429,8 @@ clEnqueueCopyImage(cl_command_queue command_queue, cl_mem src_image,
 	}
 
 	/* These are ignored. */
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_IMAGE);
@@ -427,8 +445,8 @@ clEnqueueCopyImage(cl_command_queue command_queue, cl_mem src_image,
 	for (size_t z = 0; z < region[2]; z++) {
 		for (size_t y = 0; y < region[1]; y++) {
 			g_memmove(
-				dst_image->mem + ((z + dst_origin[2]) * dst_w * dst_h + (y + dst_origin[1]) * dst_w + dst_origin[0]) * dst_image->image_elem_size,
-				src_image->mem + ((z + src_origin[2]) * src_w * src_h + (y + src_origin[1]) * src_w + src_origin[0]) * src_image->image_elem_size,
+				((cl_uchar*)dst_image->mem) + ((z + dst_origin[2]) * dst_w * dst_h + (y + dst_origin[1]) * dst_w + dst_origin[0]) * dst_image->image_elem_size,
+				((cl_uchar*)src_image->mem) + ((z + src_origin[2]) * src_w * src_h + (y + src_origin[1]) * src_w + src_origin[0]) * src_image->image_elem_size,
 				region[0] * dst_image->image_elem_size);
 		}
 	}
@@ -443,23 +461,44 @@ clEnqueueCopyImageToBuffer(cl_command_queue command_queue,
 	cl_mem src_image, cl_mem dst_buffer, const size_t* src_origin,
 	const size_t* region, size_t dst_offset,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_0 {
+	cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((src_image == NULL) || (dst_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if ((dst_buffer->context != command_queue->context)
+		|| (src_image->context != command_queue->context)) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Also not testing if dest buffer has enough space for the image
+	 * data. */
 
-	command_queue = command_queue;
-	src_image = src_image;
-	dst_buffer = dst_buffer;
-	src_origin = src_origin;
-	region = region;
-	dst_offset = dst_offset;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	/* These are ignored. */
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
+	size_t src_offset = src_image->image_elem_size * (src_origin[0]
+		+ src_origin[0] * src_origin[1]
+		+ src_origin[0] * src_origin[1] * src_origin[2]);
+
+	size_t size_coord[] = {region[0] - src_origin[0],
+			region[1] - src_origin[1], region[2] - src_origin[2]};
+
+	size_t size = src_image->image_elem_size * size_coord[0]
+		* size_coord[1] * size_coord[2];
+
+	/* Perform copy. */
+	g_memmove(((cl_uchar*) dst_buffer->mem) + dst_offset,
+		((cl_uchar*) src_image->mem) + src_offset, size);
+
+	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_IMAGE_TO_BUFFER);
-	return CL_SUCCESS;
 
+	/* All good. */
+	return CL_SUCCESS;
 }
 
 CL_API_ENTRY void * CL_API_CALL
@@ -468,67 +507,64 @@ clEnqueueMapImage(cl_command_queue command_queue, cl_mem image,
 	const size_t* region, size_t* image_row_pitch,
 	size_t* image_slice_pitch, cl_uint num_events_in_wait_list,
 	const cl_event* event_wait_list, cl_event* event,
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	cl_int* errcode_ret) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	void* map_ptr = NULL;
 
-	command_queue = command_queue;
-	image = image;
-	blocking_map = blocking_map;
-	map_flags = map_flags;
-	origin = origin;
-	region = region;
-	image_row_pitch = image_row_pitch;
-	image_slice_pitch = image_slice_pitch;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	/* Unused. */
+	(void)(blocking_map);
+	(void)(map_flags);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_IMAGE);
-	seterrcode(errcode_ret, CL_SUCCESS);
-	return NULL;
+	/* Error check. */
+	if (command_queue == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_COMMAND_QUEUE);
+	} else if (image == NULL) {
+		seterrcode(errcode_ret, CL_INVALID_MEM_OBJECT);
+	} else if (image->context != command_queue->context) {
+		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+		/* Not testing if events in wait list belong to this context. */
+	} else if ((image_row_pitch == NULL)
+		|| (origin == NULL) || (region == NULL)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if ((image->image_desc.image_type == CL_MEM_OBJECT_IMAGE3D)
+		&& (image_slice_pitch == NULL)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else if ((origin[0] + region[0] > image->image_desc.image_width)
+		|| (origin[1] + region[1] > image->image_desc.image_height)
+		|| (origin[2] + region[2] > image->image_desc.image_depth)) {
+		seterrcode(errcode_ret, CL_INVALID_VALUE);
+	} else {
 
-	//~ /* Error check. */
-	//~ if (command_queue == NULL) {
-		//~ seterrcode(errcode_ret, CL_INVALID_COMMAND_QUEUE);
-	//~ } else if (image == NULL) {
-		//~ seterrcode(errcode_ret, CL_INVALID_MEM_OBJECT);
-	//~ } else if (image->context != command_queue->context) {
-		//~ seterrcode(errcode_ret, CL_INVALID_CONTEXT);
-		//~ /* Not testing if events in wait list belong to this context. */
-	//~ } else if ((image_row_pitch == NULL)
-		//~ || (origin == NULL) || (region == NULL)) {
-		//~ seterrcode(errcode_ret, CL_INVALID_VALUE);
-	//~ } else if ((image->image_desc.image_type == CL_MEM_OBJECT_IMAGE3D)
-		//~ || (image_slice_pitch == NULL)) {
-		//~ seterrcode(errcode_ret, CL_INVALID_VALUE);
-	//~ } else if ((origin[0] + region[0] > image->image_desc.image_width)
-		//~ || (origin[1] + region[1] > image->image_desc.image_height)
-		//~ || (origin[2] + region[2] > image->image_desc.image_depth)) {
-		//~ seterrcode(errcode_ret, CL_INVALID_VALUE);
-	//~ } else {
-//~
-		//~ /* Set event. */
-		//~ ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_IMAGE);
-		//~ seterrcode(errcode_ret, CL_SUCCESS);
-//~
-		//~ /* Just return a pointer to the memory region. */
-		//~ map_ptr = image->mem + origin[0]
-			//~ + origin[1] * image->image_desc.image_row_pitch
-			//~ + origin[2] * image->image_desc.image_slice_pitch;
-		//~ /* Set the row pitch. */
-		//~ *image_row_pitch = image->image_desc->image_row_pitch
-		//~
-		//~ image->map_count++;
-	//~ }
+		/* Set event. */
+		ocl_stub_create_event(event, command_queue, CL_COMMAND_MAP_IMAGE);
+		seterrcode(errcode_ret, CL_SUCCESS);
 
+		/* Just return a pointer to the memory region. */
+		map_ptr = ((cl_uchar*) image->mem) + origin[0]
+			+ origin[1] * image->image_desc.image_row_pitch
+			+ origin[2] * image->image_desc.image_slice_pitch;
+		/* Set the row pitch. */
+		*image_row_pitch = image->image_desc.image_row_pitch;
+
+		/* Set the slice pitch. */
+		if (image_slice_pitch != NULL) {
+			*image_slice_pitch = image->image_desc.image_slice_pitch;
+		}
+
+		/* Increase map count. */
+		image->map_count++;
+	}
+
+	/* Return mapped pointer. */
+	return map_ptr;
 
 }
 
 
 CL_API_ENTRY cl_int CL_API_CALL
-clEnqueueMarker(cl_command_queue command_queue, cl_event *event)
-	CL_API_SUFFIX__VERSION_1_0 {
+clEnqueueMarker(cl_command_queue command_queue, cl_event *event) {
 
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_MARKER);
 	return CL_SUCCESS;
@@ -537,23 +573,21 @@ clEnqueueMarker(cl_command_queue command_queue, cl_event *event)
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueWaitForEvents(cl_command_queue command_queue,
-	cl_uint num_events, const cl_event* event_list)
-	CL_API_SUFFIX__VERSION_1_0 {
+	cl_uint num_events, const cl_event* event_list) {
 
 	/* These are ignored. */
-	command_queue = command_queue;
-	num_events = num_events;
-	event_list = event_list;
+	(void)(command_queue);
+	(void)(num_events);
+	(void)(event_list);
 
 	return CL_SUCCESS;
 
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clEnqueueBarrier(cl_command_queue command_queue)
-	CL_API_SUFFIX__VERSION_1_0 {
+clEnqueueBarrier(cl_command_queue command_queue) {
 
-	command_queue = command_queue;
+	(void)(command_queue);
 
 	return CL_SUCCESS;
 }
@@ -562,62 +596,120 @@ clEnqueueBarrier(cl_command_queue command_queue)
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueReadBufferRect(cl_command_queue command_queue, cl_mem buffer,
-	cl_bool blocking_read, const size_t* buffer_offset,
-	const size_t* host_offset, const size_t* region,
+	cl_bool blocking_read, const size_t* buffer_origin,
+	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
 	size_t host_row_pitch, size_t host_slice_pitch, void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_1 {
+	cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (buffer == NULL) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (ptr == NULL) {
+		return CL_INVALID_VALUE;
+	}
+	/* Many errors not checked... */
 
-	command_queue = command_queue;
-	buffer = buffer;
-	blocking_read = blocking_read;
-	buffer_offset = buffer_offset;
-	host_offset = host_offset;
-	region = region;
-	buffer_row_pitch = buffer_row_pitch;
-	buffer_slice_pitch = buffer_slice_pitch;
-	host_row_pitch = host_row_pitch;
-	host_slice_pitch = host_slice_pitch;
-	ptr = ptr;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	/* These are ignored. */
+	(void)(blocking_read);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER_RECT);
+	/* Set event. */
+	ocl_stub_create_event(
+		event, command_queue, CL_COMMAND_READ_BUFFER_RECT);
+
+	/* Determine effective row and slice pitches. */
+	if (buffer_row_pitch == 0)
+		buffer_row_pitch = region[0];
+	if (buffer_slice_pitch == 0)
+		buffer_slice_pitch = region[1];
+	if (host_row_pitch == 0)
+		host_row_pitch = region[0];
+	if (host_slice_pitch == 0)
+		host_slice_pitch = region[1];
+
+	/* Read buffer. */
+	for (size_t z = 0; z < region[2]; ++z) {
+		size_t z_buffer = buffer_slice_pitch * buffer_row_pitch * (z + buffer_origin[2]);
+		size_t z_host = host_slice_pitch * host_row_pitch * (z + host_origin[2]);
+		for (size_t y = 0; y < region[1]; ++y) {
+			size_t y_buffer = buffer_row_pitch * (y + buffer_origin[1]);
+			size_t y_host = host_row_pitch * (y + host_origin[1]);
+			g_memmove(
+				((cl_uchar*)ptr) + z_host + y_host,
+				((cl_uchar*)buffer->mem) + z_buffer + y_buffer,
+				region[0]);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 }
 
 
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueWriteBufferRect(cl_command_queue command_queue, cl_mem buffer,
-	cl_bool blocking_write, const size_t* buffer_offset,
-	const size_t* host_offset, const size_t* region,
+	cl_bool blocking_write, const size_t* buffer_origin,
+	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
 	size_t host_row_pitch, size_t host_slice_pitch, const void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_1 {
+	cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if (buffer == NULL) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	} else if (ptr == NULL) {
+		return CL_INVALID_VALUE;
+	}
+	/* Many errors not checked... */
 
-	command_queue = command_queue;
-	buffer = buffer;
-	blocking_write = blocking_write;
-	buffer_offset = buffer_offset;
-	host_offset = host_offset;
-	region = region;
-	buffer_row_pitch = buffer_row_pitch;
-	buffer_slice_pitch = buffer_slice_pitch;
-	host_row_pitch = host_row_pitch;
-	host_slice_pitch = host_slice_pitch;
-	ptr = ptr;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	/* These are ignored. */
+	(void)(blocking_write);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_WRITE_BUFFER_RECT);
+	/* Set event. */
+	ocl_stub_create_event(
+		event, command_queue, CL_COMMAND_WRITE_BUFFER_RECT);
+
+	/* Determine effective row and slice pitches. */
+	if (buffer_row_pitch == 0)
+		buffer_row_pitch = region[0];
+	if (buffer_slice_pitch == 0)
+		buffer_slice_pitch = region[1];
+	if (host_row_pitch == 0)
+		host_row_pitch = region[0];
+	if (host_slice_pitch == 0)
+		host_slice_pitch = region[1];
+
+	/* Write buffer. */
+	for (size_t z = 0; z < region[2]; ++z) {
+		size_t z_buffer = buffer_slice_pitch * buffer_row_pitch * (z + buffer_origin[2]);
+		size_t z_host = host_slice_pitch * host_row_pitch * (z + host_origin[2]);
+		for (size_t y = 0; y < region[1]; ++y) {
+			size_t y_buffer = buffer_row_pitch * (y + buffer_origin[1]);
+			size_t y_host = host_row_pitch * (y + host_origin[1]);
+			g_memmove(
+				((cl_uchar*)buffer->mem) + z_buffer + y_buffer,
+				((cl_uchar*)ptr) + z_host + y_host,
+				region[0]);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 }
 
@@ -627,26 +719,54 @@ clEnqueueCopyBufferRect(cl_command_queue command_queue,
 	const size_t* dst_origin, const size_t* region,
 	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
 	size_t dst_slice_pitch, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event)
-	CL_API_SUFFIX__VERSION_1_1 {
+	const cl_event* event_wait_list, cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((src_buffer == NULL) || (dst_buffer == NULL)) {
+		return CL_INVALID_MEM_OBJECT;
+	} else if (src_buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+	} else if (dst_buffer->context != command_queue->context) {
+		return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Many errors not checked... */
 
-	command_queue = command_queue;
-	src_buffer = src_buffer;
-	dst_buffer = dst_buffer;
-	src_origin = src_origin;
-	dst_origin = dst_origin;
-	region = region;
-	src_row_pitch = src_row_pitch;
-	src_slice_pitch = src_slice_pitch;
-	dst_row_pitch = dst_row_pitch;
-	dst_slice_pitch = dst_slice_pitch;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	/* These are ignored. */
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
-	ocl_stub_create_event(event, command_queue, CL_COMMAND_COPY_BUFFER_RECT);
+	/* Set event. */
+	ocl_stub_create_event(
+		event, command_queue, CL_COMMAND_COPY_BUFFER_RECT);
+
+	/* Determine effective row and slice pitches. */
+	if (src_row_pitch == 0)
+		src_row_pitch = region[0];
+	if (src_slice_pitch == 0)
+		src_slice_pitch = region[1];
+	if (dst_row_pitch == 0)
+		dst_row_pitch = region[0];
+	if (dst_slice_pitch == 0)
+		dst_slice_pitch = region[1];
+
+	/* Copy buffer. */
+	for (size_t z = 0; z < region[2]; ++z) {
+		size_t z_src = src_slice_pitch * src_row_pitch * (z + src_origin[2]);
+		size_t z_dst = dst_slice_pitch * dst_row_pitch * (z + dst_origin[2]);
+		for (size_t y = 0; y < region[1]; ++y) {
+			size_t y_src = src_row_pitch * (y + src_origin[1]);
+			size_t y_dst = dst_row_pitch * (y + dst_origin[1]);
+			g_memmove(
+				((cl_uchar*)dst_buffer->mem) + z_dst + y_dst,
+				((cl_uchar*)src_buffer->mem) + z_src + y_src,
+				region[0]);
+		}
+	}
+
+	/* All good. */
 	return CL_SUCCESS;
 
 }
@@ -659,20 +779,39 @@ CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueMigrateMemObjects(cl_command_queue command_queue,
 	cl_uint num_mem_objects, const cl_mem* mem_objects,
 	cl_mem_migration_flags flags, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event)
-	CL_API_SUFFIX__VERSION_1_2 {
+	const cl_event* event_wait_list, cl_event* event) {
 
-	/* Unimplemented. */
-	g_assert_not_reached();
+	cl_uint flag_check = CL_MIGRATE_MEM_OBJECT_HOST
+		| CL_MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED;
 
-	command_queue = command_queue;
-	num_mem_objects = num_mem_objects;
-	mem_objects = mem_objects;
-	flags = flags;
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((num_mem_objects == 0) || (mem_objects == NULL)) {
+		return CL_INVALID_VALUE;
+	} else if ((flags | flag_check) != flag_check) {
+		return CL_INVALID_VALUE;
+	}
+	for (cl_uint i = 0; i < num_mem_objects; ++i) {
+		if (mem_objects[i] == NULL)
+			return CL_INVALID_MEM_OBJECT;
+		if (mem_objects[i]->context != command_queue->context)
+			return CL_INVALID_CONTEXT;
+		/* Not testing if events in wait list belong to this context. */
+	}
+	/* Not testing anything related with the event wait list. */
+
+	/* These are ignored. */
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
+
+	/* Create migrate event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_MIGRATE_MEM_OBJECTS);
 
+	/* In practice we don't need to migrate anything here because all
+	 * memory objects are in the same physical device, i.e., the host. */
+
+	/* Bye. */
 	return CL_SUCCESS;
 }
 
@@ -680,8 +819,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer,
 	const void* pattern, size_t pattern_size, size_t offset,
 	size_t size, cl_uint num_events_in_wait_list,
-	const cl_event* event_wait_list, cl_event* event)
-	CL_API_SUFFIX__VERSION_1_2 {
+	const cl_event* event_wait_list, cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -701,15 +839,15 @@ clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer,
 	}
 
 	/* These are ignored. */
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_FILL_BUFFER);
 
 	/* Fill buffer. */
-	for (guint i = 0; i < size; i += pattern_size) {
-		g_memmove(buffer->mem + offset + i, pattern, pattern_size);
+	for (guint i = 0; i < size; i += (guint) pattern_size) {
+		g_memmove(((cl_uchar*)buffer->mem) + offset + i, pattern, pattern_size);
 	}
 
 	/* All good. */
@@ -720,10 +858,10 @@ clEnqueueFillBuffer(cl_command_queue command_queue, cl_mem buffer,
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueMarkerWithWaitList(cl_command_queue command_queue,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_2 {
+	cl_event* event) {
 
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_MARKER);
 	return CL_SUCCESS;
@@ -733,10 +871,10 @@ clEnqueueMarkerWithWaitList(cl_command_queue command_queue,
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueBarrierWithWaitList(cl_command_queue command_queue,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_2 {
+	cl_event* event) {
 
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_BARRIER);
 	return CL_SUCCESS;
@@ -748,7 +886,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 	const void* fill_color, const size_t* origin, const size_t* region,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
-	cl_event* event) CL_API_SUFFIX__VERSION_1_2 {
+	cl_event* event) {
 
 	/* Error check. */
 	if (command_queue == NULL) {
@@ -774,24 +912,24 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 		g_memmove(final_color, fill_color, 16);
 	} else if (image->image_elem_size == 8) {
 		/* 8 bytes, 2 bytes (16 bits) per component. */
-		g_memmove(final_color, fill_color + 0, 2);
-		g_memmove(final_color + 2, fill_color + 4, 2);
-		g_memmove(final_color + 4, fill_color + 8, 2);
-		g_memmove(final_color + 6, fill_color + 12, 2);
+		g_memmove(((cl_uchar*)final_color), ((cl_uchar*)fill_color) + 0, 2);
+		g_memmove(((cl_uchar*)final_color) + 2, ((cl_uchar*)fill_color) + 4, 2);
+		g_memmove(((cl_uchar*)final_color) + 4, ((cl_uchar*)fill_color) + 8, 2);
+		g_memmove(((cl_uchar*)final_color) + 6, ((cl_uchar*)fill_color) + 12, 2);
 	} else if (image->image_elem_size == 4) {
 		/* 4 bytes, 1 byte (8 bits) per component. */
-		g_memmove(final_color, fill_color + 0, 1);
-		g_memmove(final_color + 1, fill_color + 4, 1);
-		g_memmove(final_color + 2, fill_color + 8, 1);
-		g_memmove(final_color + 3, fill_color + 12, 1);
+		g_memmove(((cl_uchar*)final_color), ((cl_uchar*)fill_color) + 0, 1);
+		g_memmove(((cl_uchar*)final_color) + 1, ((cl_uchar*)fill_color) + 4, 1);
+		g_memmove(((cl_uchar*)final_color) + 2, ((cl_uchar*)fill_color) + 8, 1);
+		g_memmove(((cl_uchar*)final_color) + 3, ((cl_uchar*)fill_color) + 12, 1);
 	} else {
 		/* Others are unsupported. */
 		g_assert_not_reached();
 	}
 
 	/* These are ignored. */
-	num_events_in_wait_list = num_events_in_wait_list;
-	event_wait_list = event_wait_list;
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_FILL_IMAGE);
@@ -805,7 +943,7 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 		for (size_t y = 0; y < region[1]; y++) {
 			for (size_t x = 0; x < region[0]; x++) {
 				g_memmove(
-					image->mem + ((z + origin[2]) * w * h + (y + origin[1]) * w + (x + origin[0])) * image->image_elem_size,
+					((cl_uchar*)image->mem) + ((z + origin[2]) * w * h + (y + origin[1]) * w + (x + origin[0])) * image->image_elem_size,
 					final_color,
 					image->image_elem_size);
 			}

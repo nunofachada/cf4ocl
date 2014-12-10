@@ -27,6 +27,7 @@
 
 #include <cf4ocl2.h>
 #include <glib/gstdio.h>
+#include "test.h"
 
 static const char* ccl_test_channel_order_string(cl_uint co) {
 	switch(co) {
@@ -84,9 +85,9 @@ static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
 static cl_bool ccl_devsel_indep_test_true(
 	CCLDevice* device, void *data, GError **err) {
 
-	device = device;
-	data = data;
-	err = err;
+	CCL_UNUSED(device);
+	CCL_UNUSED(data);
+	CCL_UNUSED(err);
 	return CL_TRUE;
 
 }
@@ -95,7 +96,7 @@ static cl_bool ccl_devsel_indep_test_true(
  * Tests creation, getting info from and destruction of
  * context wrapper objects.
  * */
-static void context_create_info_destroy_test() {
+static void create_info_destroy_test() {
 
 	CCLContext* ctx = NULL;
 	GError* err = NULL;
@@ -103,6 +104,7 @@ static void context_create_info_destroy_test() {
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
 	cl_device_id d_id = NULL;
+	cl_device_id* d_ids = NULL;
 	CCLDevSelFilters filters = NULL;
 	CCLWrapperInfo* info = NULL;
 	cl_context_properties* ctx_props = NULL;
@@ -112,6 +114,7 @@ static void context_create_info_destroy_test() {
 	guint num_devices;
 	cl_int ocl_status;
 	gboolean any_device;
+	cl_uint ocl_ver;
 
 	/*
 	 * 1. Test context creation from devices.
@@ -132,7 +135,8 @@ static void context_create_info_destroy_test() {
 	/* Unwrap cl_device_id from device wrapper object. */
 	d_id = ccl_device_unwrap(d);
 
-	/* Create a context from the device. */
+	/* 1.1 Create a context from the device using the "quick"
+	 * ccl_context_new_from_devices() function. */
 	ctx = ccl_context_new_from_devices(1, &d, &err);
 	g_assert_no_error(err);
 
@@ -154,6 +158,36 @@ static void context_create_info_destroy_test() {
 	/* Check again that the number of devices is 1, this time not using
 	 * CL_CONTEXT_NUM_DEVICES, which is not available in OpenCL 1.0. */
 	g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
+
+	/* Test getting OpenCL version from context. */
+	ocl_ver = ccl_context_get_opencl_version(ctx, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(ocl_ver % 10, ==, 0);
+
+	/* Free context. */
+	ccl_context_destroy(ctx);
+
+	/* 1.2 Create a context from the device using the "full"
+	 * ccl_context_new_from_devices_full() function. */
+	ctx = ccl_context_new_from_devices_full(
+		NULL, 1, &d, NULL, NULL, &err);
+
+	/* Get number of devices from context wrapper, check that this
+	 * number is 1. */
+#ifdef CL_VERSION_1_1
+	cl_uint num_devs = ccl_context_get_info_scalar(
+		ctx, CL_CONTEXT_NUM_DEVICES, cl_uint, &err);
+	g_assert_no_error(err);
+	g_assert_cmpuint(num_devs, ==, 1);
+#endif
+
+	/* Get the cl_device_id from context via context info and check
+	 * that it corresponds to the cl_device_id with which the context
+	 * was created. */
+	d_ids = ccl_context_get_info_array(
+		ctx, CL_CONTEXT_DEVICES, cl_device_id*, &err);
+	g_assert_no_error(err);
+	g_assert(d_ids[0] == d_id);
 
 	/* Free context. */
 	ccl_context_destroy(ctx);
@@ -207,6 +241,11 @@ static void context_create_info_destroy_test() {
 	 * 3. Test context creation by device filtering
 	 * (using shortcut macros).
 	 * */
+
+	/* 3.0. Create a context using the "any" macro. */
+	ctx = ccl_context_new_any(&err);
+	g_assert_no_error(err);
+	ccl_context_destroy(ctx);
 
 	/* For the next device type filters, at least one device must be
 	 * found in order the test to pass. */
@@ -287,11 +326,53 @@ static void context_create_info_destroy_test() {
 	 * (explicit dependent filters).
 	 * */
 
+	/* 4.1 Use "quick" ccl_context_new_from_filters() function. */
+
 	/* Same platform filter. */
 	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
 
 	/* Check that a context wrapper was created. */
 	ctx = ccl_context_new_from_filters(&filters, &err);
+	g_assert_no_error(err);
+
+	/* Check that context wrapper contains a device. */
+	d = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Check that the device platform corresponds to the expected
+	 * platform (the one which the first device belongs to). */
+	platf_ref = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
+		cl_platform_id, &err);
+	g_assert_no_error(err);
+
+	/* Get number of devices. */
+	num_devices = ccl_context_get_num_devices(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Check that all devices belong to the same platform. */
+	for (guint i = 1; i < num_devices; i++) {
+
+		d = ccl_context_get_device(ctx, i, &err);
+		g_assert_no_error(err);
+
+		platform = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
+			cl_platform_id, &err);
+		g_assert_no_error(err);
+
+		g_assert(platf_ref == platform);
+	}
+
+	/* Free context and set filters to NULL. */
+	ccl_context_destroy(ctx);
+
+	/* 4.2 Use "full" ccl_context_new_from_filters_full() function. */
+
+	/* Same platform filter. */
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
+
+	/* Check that a context wrapper was created. */
+	ctx = ccl_context_new_from_filters_full(
+		NULL, &filters, NULL, NULL, &err);
 	g_assert_no_error(err);
 
 	/* Check that context wrapper contains a device. */
@@ -366,7 +447,7 @@ static void context_create_info_destroy_test() {
  * which increase its reference count. This function tests the following
  * modules: context, device and platform wrappers.
  * */
-static void context_ref_unref_test() {
+static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
 	CCLContext* ctx_cmp = NULL;
@@ -636,10 +717,17 @@ static void context_ref_unref_test() {
 	/* **** Test context creation by menu. **** */
 	/* **************************************** */
 
-	int data = 0; /* Select device with index 0 in menu. */
+	/* Set print handler to print to debug stream. */
+	g_set_print_handler(ccl_print_to_debug);
+
+	/* Select device with index defined in header. */
+	int data = CCL_TEST_DEFAULT_DEVICE_IDX;
 	ctx = ccl_context_new_from_menu_full(&data, &err);
 	g_assert_no_error(err);
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+
+	/* Reset print handler to default. */
+	g_set_print_handler(NULL);
 
 	d = ccl_context_get_device(ctx, 0, &err);
 	ccl_device_ref(d);
@@ -676,7 +764,7 @@ static void context_ref_unref_test() {
 /**
  * Tests the ccl_context_get_supported_image_formats() function.
  * */
-static void context_get_supported_image_formats() {
+static void get_supported_image_formats_test() {
 
 	CCLPlatforms* ps;
 	CCLPlatform* p;
@@ -746,6 +834,43 @@ static void context_get_supported_image_formats() {
 }
 
 /**
+ * Tests the device container aspects of a context.
+ * */
+static void device_container_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	GError* err = NULL;
+
+	/* Create some context. */
+	ctx = ccl_test_context_new(&err);
+	g_assert_no_error(err);
+
+	/* Test get platform. */
+	ccl_context_get_platform(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Test get all devices from context. */
+	ccl_context_get_all_devices(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Test get first device from context. */
+	ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Test get number of devices from context. */
+	ccl_context_get_num_devices(ctx, &err);
+	g_assert_no_error(err);
+
+	/* Destroy context. */
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
+/**
  * Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -757,15 +882,19 @@ int main(int argc, char** argv) {
 
 	g_test_add_func(
 		"/wrappers/context/create-info-destroy",
-		context_create_info_destroy_test);
+		create_info_destroy_test);
 
 	g_test_add_func(
 		"/wrappers/context/ref-unref",
-		context_ref_unref_test);
+		ref_unref_test);
 
 	g_test_add_func(
 		"/wrappers/context/get-supported-image-formats",
-		context_get_supported_image_formats);
+		get_supported_image_formats_test);
+
+	g_test_add_func(
+		"/wrappers/context/device-container",
+		device_container_test);
 
 	return g_test_run();
 }

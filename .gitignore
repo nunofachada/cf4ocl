@@ -7,7 +7,7 @@ cf4ocl
 doc/
 bin/
 obj/
-build/
+build*/
 CMakeFiles/
 CMakeCache*
 auxbuild/*.txt

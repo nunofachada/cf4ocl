@@ -29,7 +29,7 @@
 
 CL_API_ENTRY cl_kernel CL_API_CALL
 clCreateKernel(cl_program program, const char* kernel_name,
-	cl_int* errcode_ret) CL_API_SUFFIX__VERSION_1_0 {
+	cl_int* errcode_ret) {
 
 	/* Allocate memory for kernel. */
 	cl_kernel kernel = g_slice_new(struct _cl_kernel);
@@ -47,19 +47,19 @@ clCreateKernel(cl_program program, const char* kernel_name,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetKernelArg(cl_kernel kernel, cl_uint arg_index, size_t arg_size,
-	const void* arg_value) CL_API_SUFFIX__VERSION_1_0 {
+	const void* arg_value) {
 
-	kernel = kernel;
-	arg_index = arg_index;
-	arg_size = arg_size;
-	arg_value = arg_value;
+	(void)(kernel);
+	(void)(arg_index);
+	(void)(arg_size);
+	(void)(arg_value);
 
 	return CL_SUCCESS;
 }
 
 
 CL_API_ENTRY cl_int CL_API_CALL
-clRetainKernel(cl_kernel kernel) CL_API_SUFFIX__VERSION_1_0 {
+clRetainKernel(cl_kernel kernel) {
 
 	g_atomic_int_inc(&kernel->ref_count);
 	return CL_SUCCESS;
@@ -67,7 +67,7 @@ clRetainKernel(cl_kernel kernel) CL_API_SUFFIX__VERSION_1_0 {
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clReleaseKernel(cl_kernel kernel) CL_API_SUFFIX__VERSION_1_0 {
+clReleaseKernel(cl_kernel kernel) {
 
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&kernel->ref_count)) {
@@ -83,7 +83,7 @@ clReleaseKernel(cl_kernel kernel) CL_API_SUFFIX__VERSION_1_0 {
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret) CL_API_SUFFIX__VERSION_1_0 {
+	size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -117,8 +117,7 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 	cl_kernel_work_group_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret)
-	CL_API_SUFFIX__VERSION_1_0 {
+	void* param_value, size_t* param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -154,15 +153,14 @@ clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
 	cl_kernel_arg_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret)
-	CL_API_SUFFIX__VERSION_1_2 {
+	void* param_value, size_t* param_value_size_ret) {
 
-	kernel = kernel;
-	arg_indx = arg_indx;
-	param_name = param_name;
-	param_value_size = param_value_size;
-	param_value = param_value;
-	param_value_size_ret = param_value_size_ret;
+	(void)(kernel);
+	(void)(arg_indx);
+	(void)(param_name);
+	(void)(param_value_size);
+	(void)(param_value);
+	(void)(param_value_size_ret);
 
 	return CL_INVALID_VALUE;
 

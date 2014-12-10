@@ -32,13 +32,7 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gprintf.h>
-#if defined(__APPLE__) || defined(__MACOSX)
-	#include <OpenCL/opencl.h>
-#else
-	#include <CL/opencl.h>
-#endif
-#include "oclversions.h"
-
+#include "ccl_oclversions.h"
 
 /** Stub for cl_event objects. */
 struct _cl_event {
@@ -51,6 +45,12 @@ struct _cl_event {
 	cl_command_type command_type;
 	cl_int exec_status;
 	cl_uint ref_count;
+	/* Registered callbacks. */
+#ifdef CL_VERSION_1_1
+	void (CL_CALLBACK *pfn_notify[3])(cl_event, cl_int, void*);
+	void* user_data[3];
+#endif
+
 };
 
 /** Stub for cl_command_queue objects. */

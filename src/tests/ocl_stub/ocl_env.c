@@ -1,42 +1,42 @@
-/*   
+/*
  * This file is part of cf4ocl (C Framework for OpenCL).
- * 
+ *
  * cf4ocl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * cf4ocl is distributed in the hope that it will be useful, 
+ *
+ * cf4ocl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
- 
- /** 
+
+ /**
  * @file
  * OpenCL fake environment.
- * 
+ *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
- 
+
 #include "ocl_env.h"
 
 const cl_uint ccl_test_num_platforms = 3;
 
 const struct _cl_platform_id ccl_test_platforms[] = {
-	{ 
-		.profile = "FULL_PROFILE", 
+	{
+		.profile = "FULL_PROFILE",
 		.version = "OpenCL 1.2",
 		.name = "cf4ocl test platform #0",
 		.vendor = "FakenMC p0",
 		.extensions = "cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing",
 		.image_formats = (const cl_image_format[]) {
-			{ 
+			{
 				.image_channel_order = CL_RGBA,
 				.image_channel_data_type = CL_UNORM_INT8
 			},
@@ -85,7 +85,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.max_samplers = 16,
 				.max_work_group_size = 512,
 				.max_work_item_dimensions = 3,
-				.max_work_item_sizes = (const size_t const[]) {512, 256, 16, 0},
+				.max_work_item_sizes = (size_t const[]) {512, 256, 16, 0},
 				.max_write_image_args = 16,
 				.mem_base_addr_align = 1024,
 				.min_data_type_align_size = 0, /* Deprecated in OpenCL 1.2 */
@@ -100,9 +100,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.opencl_c_version = "OpenCL C 1.2",
 				.parent_device = NULL,
 				.partition_max_sub_devices = 16,
-				.partition_properties = (const cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, 0},
+				.partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, 0},
 				.partition_affinity_domain = 0,
-				.partition_type = (const cl_device_partition_property const[]) {0},
+				.partition_type = (cl_device_partition_property const[]) {0},
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[0],
 				.preferred_vector_width_char = 16,
 				.preferred_vector_width_short = 8,
@@ -123,7 +123,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.version = "OpenCL 1.2 cf4ocl",
 				.driver_version = "2.0.0"
 			},
-			{ 
+			{
 				.address_bits = 64,
 				.available = CL_TRUE,
 				.built_in_kernels = "",
@@ -160,7 +160,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.max_samplers = 0,
 				.max_work_group_size = 1024,
 				.max_work_item_dimensions = 3,
-				.max_work_item_sizes = (const size_t const[]) {1024, 512, 16, 0},
+				.max_work_item_sizes = (size_t const[]) {1024, 512, 16, 0},
 				.max_write_image_args = 0,
 				.mem_base_addr_align = 4096,
 				.min_data_type_align_size = 0, /* Deprecated in OpenCL 1.2 */
@@ -175,9 +175,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.opencl_c_version = "OpenCL C 1.2",
 				.parent_device = NULL,
 				.partition_max_sub_devices = 8,
-				.partition_properties = (const cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
+				.partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
 				.partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
-				.partition_type = (const cl_device_partition_property const[]) {0},
+				.partition_type = (cl_device_partition_property const[]) {0},
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[0],
 				.preferred_vector_width_char = 8,
 				.preferred_vector_width_short = 4,
@@ -200,14 +200,14 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 			}
 		}
 	},
-	{ 
-		.profile = "FULL_PROFILE", 
+	{
+		.profile = "FULL_PROFILE",
 		.version = "OpenCL 1.1",
 		.name = "cf4ocl test platform #1",
 		.vendor = "FakenMC p1",
 		.extensions = "cl_khr_byte_addressable_store cl_khr_icd",
 		.image_formats = (const cl_image_format[]) {
-			{ 
+			{
 				.image_channel_order = CL_RGBA,
 				.image_channel_data_type = CL_UNORM_INT8
 			},
@@ -219,7 +219,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 		.num_image_formats = 2,
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
-			{ 
+			{
 				.address_bits = 32,
 				.available = CL_TRUE,
 				.built_in_kernels = "", /* Not available in OpenCL 1.1 */
@@ -256,7 +256,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.max_samplers = 16,
 				.max_work_group_size = 1024,
 				.max_work_item_dimensions = 3,
-				.max_work_item_sizes = (const size_t const[]) {1024, 256, 16, 0},
+				.max_work_item_sizes = (size_t const[]) {1024, 256, 16, 0},
 				.max_write_image_args = 16,
 				.mem_base_addr_align = 2048,
 				.min_data_type_align_size = 8, /* Deprecated in OpenCL 1.2 */
@@ -271,9 +271,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.opencl_c_version = "OpenCL C 1.1",
 				.parent_device = NULL, /* Not available in OpenCL 1.1 */
 				.partition_max_sub_devices = 0, /* Not available in OpenCL 1.1 */
-				.partition_properties = (const cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
+				.partition_properties = (cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
 				.partition_affinity_domain = 0, /* Not available in OpenCL 1.1 */
-				.partition_type = (const cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
+				.partition_type = (cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[1],
 				.preferred_vector_width_char = 4,
 				.preferred_vector_width_short = 2,
@@ -296,14 +296,14 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 			}
 		}
 	},
-	{ 
-		.profile = "EMBEDDED_PROFILE", 
+	{
+		.profile = "EMBEDDED_PROFILE",
 		.version = "OpenCL 1.2",
 		.name = "cf4ocl test platform #2",
 		.vendor = "FakenMC p2",
 		.extensions = "cl_khr_icd",
 		.image_formats = (const cl_image_format[]) {
-			{ 
+			{
 				.image_channel_order = CL_RGBA,
 				.image_channel_data_type = CL_SNORM_INT16
 			}
@@ -311,7 +311,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 		.num_image_formats = 1,
 		.num_devices = 1,
 		.devices = (const struct _cl_device_id[]) {
-			{ 
+			{
 				.address_bits = 64,
 				.available = CL_TRUE,
 				.built_in_kernels = "",
@@ -348,7 +348,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.max_samplers = 0,
 				.max_work_group_size = 1024,
 				.max_work_item_dimensions = 3,
-				.max_work_item_sizes = (const size_t const[]) {512, 256, 8, 0},
+				.max_work_item_sizes = (size_t const[]) {512, 256, 8, 0},
 				.max_write_image_args = 0,
 				.mem_base_addr_align = 1024,
 				.min_data_type_align_size = 0, /* Deprecated in OpenCL 1.2 */
@@ -363,9 +363,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.opencl_c_version = "OpenCL C 1.2",
 				.parent_device = NULL,
 				.partition_max_sub_devices = 4,
-				.partition_properties = (const cl_device_partition_property const[]) {CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
+				.partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
 				.partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
-				.partition_type = (const cl_device_partition_property const[]) {0},
+				.partition_type = (cl_device_partition_property const[]) {0},
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[2],
 				.preferred_vector_width_char = 8,
 				.preferred_vector_width_short = 4,

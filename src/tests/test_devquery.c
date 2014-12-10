@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "test.h"
 
 #define CCL_TEST_DEVQUERY_MAXINFOLEN 500
 
@@ -41,7 +42,6 @@ static void helpers_test() {
 	guint num_platfs;
 	CCLWrapperInfo* info;
 	gchar param_value_str[CCL_TEST_DEVQUERY_MAXINFOLEN];
-
 
 	/* Get platforms. */
 	platfs = ccl_platforms_new(&err);
