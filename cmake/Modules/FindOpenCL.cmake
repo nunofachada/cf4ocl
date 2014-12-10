@@ -70,7 +70,7 @@ ELSE (APPLE)
 			IF (${DEP}_LIBRARY)
 				SET(OPENCL_LIBRARIES ${OPENCL_LIBRARIES} ${${DEP}_LIBRARY})
 			ENDIF ()
-		ENDFOREACH (LIBRARY_NAME)
+		ENDFOREACH ()
 
 		# The AMD SDK currently does not place its headers
 		# in /usr/include, therefore also search relative
