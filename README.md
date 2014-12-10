@@ -43,10 +43,12 @@ Any feedback is welcome.
 Not yet implemented
 ===================
 
-* OpenGL and DirectX interoperability
-* Support for sub-devices
-* clEnqueueNativeKernel()
-* Pipes and SVM (OpenCL 2.0 only)
+* [OpenGL](https://github.com/FakenMC/cf4ocl/issues/3) and
+[DirectX](https://github.com/FakenMC/cf4ocl/issues/4) interoperability
+* [Support for sub-devices](https://github.com/FakenMC/cf4ocl/issues/6)
+* [clEnqueueNativeKernel()](https://github.com/FakenMC/cf4ocl/issues/5)
+* [Pipes](https://github.com/FakenMC/cf4ocl/issues/8) and
+[SVM](https://github.com/FakenMC/cf4ocl/issues/7) (OpenCL 2.0 only)
 
 License
 =======
