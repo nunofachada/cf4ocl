@@ -117,8 +117,8 @@ static const int ccl_errors_count = 71;
 CCL_EXPORT
 const char* ccl_err(int code) {
 	int index = -1 * code;
-	return (index >= 0) || (index < ccl_errors_count)
-		? ccl_errors[-1 * code]
+	return (index >= 0) && (index < ccl_errors_count)
+		? ccl_errors[index]
 		: "Unknown OpenCL error code";
 }
 
