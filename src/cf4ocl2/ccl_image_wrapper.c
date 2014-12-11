@@ -96,7 +96,7 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: unable to create image with clCreateImage2D() " \
 			"(OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else if (img_dsc->image_type == CL_MEM_OBJECT_IMAGE3D) {
 
@@ -110,14 +110,14 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: unable to create image with clCreateImage3D() " \
 			"(OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else {
 
 		/* Unknown or unsupported image type. */
 		ccl_if_err_create_goto(*err, CCL_ERROR, CL_TRUE,
 			CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-			"%s: unknown or unsuported image type (%x)", G_STRLOC,
+			"%s: unknown or unsuported image type (%x)", CCL_STRD,
 			img_dsc->image_type);
 
 	}
@@ -284,7 +284,7 @@ CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: unable to create image with clCreateImage() " \
 			"(OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else {
 		/* OpenCL is < 1.2, use "old" API. */
@@ -432,7 +432,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 			image_dsc.memobj = va_arg(args_va, CCLMemObj*);
 		} else {
 			g_set_error(err, CCL_ERROR, CCL_ERROR_ARGS,
-				"%s: unknown key '%s'", G_STRLOC, key);
+				"%s: unknown key '%s'", CCL_STRD, key);
 			va_end(args_va);
 			return NULL;
 		}
@@ -509,7 +509,7 @@ CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue an image read (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -599,7 +599,7 @@ CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue an image write (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -688,7 +688,7 @@ CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue an image copy (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -776,7 +776,7 @@ CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to copy image to buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -872,7 +872,7 @@ void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to map image (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -963,7 +963,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Image fill requires OpenCL version 1.2 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Fill image. */
 	ocl_status = clEnqueueFillImage(ccl_queue_unwrap(cq),
@@ -973,7 +973,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a fill image command (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command

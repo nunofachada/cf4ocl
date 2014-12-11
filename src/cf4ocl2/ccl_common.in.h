@@ -50,6 +50,14 @@
 
 #define CCL_UNUSED(x) (void)(x)
 
+#ifndef CCL_STRD
+	#ifdef NDEBUG
+		#define CCL_STRD G_STRFUNC
+	#else
+		#define CCL_STRD G_STRLOC
+	#endif
+#endif
+
 /* These deprecation macros are copied from GLib latest version in
  * order to support Clang. */
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
@@ -232,7 +240,7 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
 	if (error_condition) { \
-		g_debug(G_STRLOC); \
+		g_debug(CCL_STRD); \
 		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
 		goto label; \
 	}
@@ -246,7 +254,7 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_goto(err, label)	\
 	if ((err) != NULL) { \
-		g_debug(G_STRLOC); \
+		g_debug(CCL_STRD); \
 		goto label; \
 	}
 
@@ -260,7 +268,7 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_propagate_goto(err_dest, err_src, label) \
 	if ((err_src) != NULL) { \
-		g_debug(G_STRLOC); \
+		g_debug(CCL_STRD); \
 		g_propagate_error(err_dest, err_src); \
 		goto label; \
 	}

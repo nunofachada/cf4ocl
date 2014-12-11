@@ -89,11 +89,11 @@ CCLPlatforms* ccl_platforms_new(GError **err) {
 	ocl_status = clGetPlatformIDs(0, NULL, &platforms->num_platfs);
 	ccl_if_err_create_goto(*err, CCL_ERROR,
 		platforms->num_platfs == 0, CCL_ERROR_DEVICE_NOT_FOUND,
-		error_handler, "%s: no OpenCL platforms found.", G_STRLOC);
+		error_handler, "%s: no OpenCL platforms found.", CCL_STRD);
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get number of platforms (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Determine size in bytes of array of platform IDs. */
 	platf_ids_size = sizeof(cl_platform_id) * platforms->num_platfs;
@@ -107,7 +107,7 @@ CCLPlatforms* ccl_platforms_new(GError **err) {
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get platforms IDs (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Allocate memory for array of platform wrapper objects. */
 	platforms->platfs =

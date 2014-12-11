@@ -138,7 +138,7 @@ static cl_context_properties* ccl_context_properties_default(
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: unable to get platform from device (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 		/* Set context properties using discovered platform. */
 		ctx_props[0] = CL_CONTEXT_PLATFORM;
@@ -269,7 +269,7 @@ CCLContext* ccl_context_new_from_filters_full(
 	ccl_if_err_create_goto(*err, CCL_ERROR, devices->len == 0,
 		CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
 		"%s: no device found for selected filters.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Create context wrapper. */
 	ctx = ccl_context_new_from_devices_full(properties, devices->len,
@@ -362,7 +362,7 @@ CCLContext* ccl_context_new_from_devices_full(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create cl_context (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap OpenCL context. */
 	ctx = ccl_context_new_wrap(context);
@@ -649,11 +649,11 @@ const cl_image_format* ccl_context_get_supported_image_formats(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get number of supported image formats (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 	ccl_if_err_create_goto(*err, CCL_ERROR,
 		*num_image_formats == 0, CCL_ERROR_OTHER, error_handler,
 		"%s: number of returned supported image formats is 0.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Allocate memory for number of image formats. */
 	info = ccl_wrapper_info_new(
@@ -666,7 +666,7 @@ const cl_image_format* ccl_context_get_supported_image_formats(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get supported image formats (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Keep information in information table for latter disposal. */
 	ccl_wrapper_add_info((CCLWrapper*) ctx, CL_IMAGE_FORMAT, info);

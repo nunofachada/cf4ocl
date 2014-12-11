@@ -78,7 +78,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get number of devices (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Create info object with size in bytes of array of device IDs. */
 	info = ccl_wrapper_info_new(
@@ -90,7 +90,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get device IDs (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Add device list to info table, so that it will be
 	 * automatically released. Because the cl_platform_id object

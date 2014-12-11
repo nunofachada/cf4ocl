@@ -155,7 +155,7 @@ CCLKernel* ccl_kernel_new(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create kernel (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Create kernel wrapper. */
 	krnl = ccl_kernel_new_wrap(kernel);
@@ -435,7 +435,7 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 			ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 				CL_SUCCESS != ocl_status, ocl_status, error_handler,
 				"%s: unable to set kernel arg %d (OpenCL error %d: %s).",
-				G_STRLOC, arg_index, ocl_status, ccl_err(ocl_status));
+				CCL_STRD, arg_index, ocl_status, ccl_err(ocl_status));
 			g_hash_table_iter_remove(&iter);
 		}
 	}
@@ -449,7 +449,7 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue kernel (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -811,7 +811,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	ccl_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: device only supports a max. of %d dimension, but %d were requested.",
-		G_STRLOC, dev_dims, dims);
+		CCL_STRD, dev_dims, dims);
 
 	/* Get max. work item sizes for device. */
 	max_wi_sizes = ccl_device_get_info_array(
@@ -895,7 +895,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		ccl_if_err_create_goto(*err, CCL_ERROR, wg_size == wg_size_aux,
 			CCL_ERROR_OTHER, error_handler,
 			"%s: Unable to determine a work size within the device limit (%d).",
-			G_STRLOC, (int) wg_size_max);
+			CCL_STRD, (int) wg_size_max);
 	}
 
 	/* If output variable gws is not NULL... */
@@ -1042,7 +1042,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: information about kernel arguments requires OpenCL" \
-		" version 1.2 or newer.", G_STRLOC);
+		" version 1.2 or newer.", CCL_STRD);
 
 	/* Wrap argument index in a fake cl_object. */
 	fake_wrapper.cl_object = GUINT_TO_POINTER(idx);

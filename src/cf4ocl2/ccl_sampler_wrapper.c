@@ -283,7 +283,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create sampler (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Create sampler wrapper. */
 	smplr = ccl_sampler_new_wrap(sampler);

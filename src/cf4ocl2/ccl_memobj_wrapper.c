@@ -157,7 +157,7 @@ CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to unmap memory object (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -232,7 +232,7 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: memory object destructor callbacks require OpenCL " \
 		"version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Set destructor callback. */
 	ocl_status = clSetMemObjectDestructorCallback(ccl_memobj_unwrap(mo),
@@ -240,7 +240,7 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to set memory object destructor callback (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -321,7 +321,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: memory object migration requires OpenCL version 1.2 or " \
 		"newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Allocate mmemory for memory objects. */
 	mem_objects = (cl_mem*)g_slice_alloc(sizeof(cl_mem) * num_mos);
@@ -339,7 +339,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to migrate memory objects (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command

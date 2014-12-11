@@ -127,7 +127,7 @@ CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap OpenCL buffer. */
 	buf = ccl_buffer_new_wrap(buffer);
@@ -193,7 +193,7 @@ CCLEvent* ccl_buffer_enqueue_read(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to read buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -268,7 +268,7 @@ CCLEvent* ccl_buffer_enqueue_write(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to write buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -350,7 +350,7 @@ void* ccl_buffer_enqueue_map(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to map buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -430,7 +430,7 @@ CCLEvent* ccl_buffer_enqueue_copy(CCLBuffer* src_buf,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to write buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -518,7 +518,7 @@ CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer* src_buf,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to copy buffer to image (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -598,7 +598,7 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: sub-buffers require OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Create the OpenCL sub-buffer. */
 	buffer = clCreateSubBuffer(ccl_memobj_unwrap(buf), flags,
@@ -606,7 +606,7 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable create sub-buffer (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap the OpenCL sub-buffer. */
 	subbuf = ccl_buffer_new_wrap(buffer);
@@ -700,7 +700,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: rect. buffer reads require OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Read rectangular region of buffer. */
 	ocl_status = clEnqueueReadBufferRect(ccl_queue_unwrap(cq),
@@ -712,7 +712,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a rectangular buffer read (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -813,7 +813,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: rect. buffer writes require OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Write rectangular region of buffer. */
 	ocl_status = clEnqueueWriteBufferRect(ccl_queue_unwrap(cq),
@@ -825,7 +825,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a rectangular buffer write (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -924,7 +924,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: rect. buffer copy requires OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Copy rectangular region between buffers. */
 	ocl_status = clEnqueueCopyBufferRect(ccl_queue_unwrap(cq),
@@ -936,7 +936,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a rectangular buffer copy (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command
@@ -1023,7 +1023,7 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Buffer fill requires OpenCL version 1.2 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Fill buffer. */
 	ocl_status = clEnqueueFillBuffer(ccl_queue_unwrap(cq),
@@ -1033,7 +1033,7 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a fill buffer command (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event and associate it with the respective command queue.
 	 * The event object will be released automatically when the command

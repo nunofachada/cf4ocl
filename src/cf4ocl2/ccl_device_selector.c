@@ -703,7 +703,7 @@ cl_bool ccl_devsel_indep_type(
 	/* Make sure data is not NULL. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL,
 		CCL_ERROR_INVALID_DATA, error_handler,
-		"%s: invalid filter data", G_STRLOC);
+		"%s: invalid filter data", CCL_STRD);
 
 	/* Get type to check for. */
 	type_to_check = *((cl_device_type*) data);
@@ -832,7 +832,7 @@ cl_bool ccl_devsel_indep_string(
 	/* Make sure data is not NULL. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL,
 		CCL_ERROR_INVALID_DATA, error_handler,
-		"%s: invalid filter data", G_STRLOC);
+		"%s: invalid filter data", CCL_STRD);
 
 	/* Lower-case partial name for comparison. */
 	part_info = g_ascii_strdown((gchar*) data, -1);
@@ -947,7 +947,7 @@ cl_bool ccl_devsel_indep_platform(
 	/* Check if data is NULL, throw error if so. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL,
 		CCL_ERROR_INVALID_DATA, error_handler,
-		"%s: invalid filter data", G_STRLOC);
+		"%s: invalid filter data", CCL_STRD);
 
 	/* Get device platform. */
 	platf = ccl_device_get_info_scalar(device, CL_DEVICE_PLATFORM,

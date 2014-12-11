@@ -181,7 +181,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 			if (ocl_status != CL_SUCCESS) {
 				g_set_error(err, CCL_OCL_ERROR, ocl_status,
 				"%s: unable to create release OpenCL object (OpenCL error %d: %s).",
-				G_STRLOC, ocl_status, ccl_err(ocl_status));
+				CCL_STRD, ocl_status, ccl_err(ocl_status));
 			}
 		}
 
@@ -397,11 +397,11 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get info [size] (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 		ccl_if_err_create_goto(*err, CCL_ERROR, size_ret == 0,
 			CCL_ERROR_INFO_UNAVAILABLE_OCL, error_handler,
 			"%s: the requested info is unavailable (info size is 0).",
-			G_STRLOC);
+			CCL_STRD);
 
 		/* Allocate memory for information. */
 		info = ccl_wrapper_info_new(size_ret);
@@ -416,7 +416,7 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get context info [info] (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 		/* Keep information in information table. */
 		ccl_wrapper_add_info(wrapper1, param_name, info);

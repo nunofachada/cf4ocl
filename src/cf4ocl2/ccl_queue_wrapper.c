@@ -239,7 +239,7 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create queue (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap the queue. */
 	cq = ccl_queue_new_wrap(queue);
@@ -550,7 +550,7 @@ cl_bool ccl_queue_flush(CCLQueue* cq, GError** err) {
 	if (ocl_status != CL_SUCCESS)
 		g_set_error(err, CCL_OCL_ERROR, ocl_status,
 			"%s: unable to flush queue (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Return status. */
 	return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
@@ -585,7 +585,7 @@ cl_bool ccl_queue_finish(CCLQueue* cq, GError** err) {
 	if (ocl_status != CL_SUCCESS)
 		g_set_error(err, CCL_OCL_ERROR, ocl_status,
 			"%s: unable to finish queue (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Return status. */
 	return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
@@ -666,7 +666,7 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: error in clEnqueueBarrier() (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else {
 
@@ -677,7 +677,7 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	}
 
@@ -686,7 +686,7 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	CCL_END_IGNORE_DEPRECATIONS
 
@@ -773,7 +773,7 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: error in clEnqueueBarrierWithWaitList() (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else {
 
@@ -864,7 +864,7 @@ static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	CCL_END_IGNORE_DEPRECATIONS
 
@@ -952,7 +952,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: error in clEnqueueMarkerWithWaitList() (OpenCL error %d: %s).",
-			G_STRLOC, ocl_status, ccl_err(ocl_status));
+			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else {
 

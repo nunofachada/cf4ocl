@@ -471,7 +471,7 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: set event callback requires OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Set event callback.*/
 	ocl_status = clSetEventCallback(ccl_event_unwrap(evt),
@@ -479,7 +479,7 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to set event callback (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -543,14 +543,14 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: User events require OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Create user event. */
 	event = clCreateUserEvent(ccl_context_unwrap(ctx), &ocl_status);
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: error creating user event (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap event. */
 	evt = ccl_event_new_wrap(event);
@@ -612,7 +612,7 @@ cl_bool ccl_user_event_set_status(
 	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: User events require OpenCL version 1.1 or newer.",
-		G_STRLOC);
+		CCL_STRD);
 
 	/* Set status. */
 	ocl_status = clSetUserEventStatus(
@@ -620,7 +620,7 @@ cl_bool ccl_user_event_set_status(
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: error setting user event status (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -774,7 +774,7 @@ cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: error while waiting for events (OpenCL error %d: %s).",
-		G_STRLOC, ocl_status, ccl_err(ocl_status));
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Clear event wait list. */
 	ccl_event_wait_list_clear(evt_wait_lst);
