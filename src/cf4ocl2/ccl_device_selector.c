@@ -193,7 +193,7 @@ error_handler:
 finish:
 
 	/* Free platforms wrapper object. */
-	ccl_platforms_destroy(platforms);
+	if (platforms != NULL) ccl_platforms_destroy(platforms);
 
 	/* Return the selected devices. */
 	return devices;

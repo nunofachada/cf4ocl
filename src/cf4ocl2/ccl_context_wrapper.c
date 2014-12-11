@@ -289,7 +289,7 @@ error_handler:
 finish:
 
 	/* Free array object containing device wrappers. */
-	g_ptr_array_free(devices, TRUE);
+	if (devices != NULL) g_ptr_array_free(devices, TRUE);
 
 	/* Return ctx. */
 	return ctx;
