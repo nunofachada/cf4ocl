@@ -53,19 +53,6 @@ struct ccl_kernel {
 };
 
 /**
- * @class ccl_kernel
- * @todo Wrapper function for clEnqueueNativeKernel(). A possible header
- * for such wrapper function could be:
- * @code CCLEvent* ccl_kernel_enqueue_native_full(CCLQueue* cq,
- *     void (CL_CALLBACK *user_func)(void *), CCLKernelNativeArgs args,
- *     CCLEventWaitList* evt_wait_lst, GError** err); @endcode
- * Some links regarding the use of clEnqueueNativeKernel():
- * * http://steckdenis.wordpress.com/2011/06/18/use-opencl-to-execute-native-kernels/
- * * http://stackoverflow.com/questions/10140494/using-clenqueuenativekernel-in-opencl
- * * https://github.com/pcpratts/gcc_opencl/blob/master/example.c
- * */
-
-/**
  * @internal
  * Implementation of ::ccl_wrapper_release_fields() function for
  * ::CCLKernel wrapper objects.
@@ -82,7 +69,6 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
 	/* Free kernel arguments. */
 	if (krnl->args != NULL)
 		g_hash_table_destroy(krnl->args);
-
 
 }
 
