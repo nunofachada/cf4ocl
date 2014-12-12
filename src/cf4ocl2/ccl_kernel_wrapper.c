@@ -683,6 +683,109 @@ finish:
 }
 
 /**
+ * Enqueues a command to execute a native C/C++ function not compiled
+ * using the OpenCL compiler. This function is a wrapper for the
+ * clEnqueueNativeKernel() OpenCL function, the documentation of which
+ * provides additional information.
+ *
+ * @public @memberof ccl_kernel
+ *
+ * @param[in] cq A command queue wrapper object.
+ * @param[in] user_func A pointer to a host-callable user function.
+ * @param[in] args A pointer to the args list that `user_func` should be
+ * called with.
+ * @param[in] cb_args The size in bytes of the args list that args
+ * points to.
+ * @param[in] num_mos The number of ::CCLMemObj* objects that are passed
+ * in `mo_list`.
+ * @param[in] mo_list A list of ::CCLMemObj* objects (or `NULL`
+ * references), if num_mos > 0.
+ * @param[in] args_mem_loc A pointer to appropriate locations that
+ * `args` points to where `cl_mem` values (unwrapped from the respective
+ * ::CCLMemObj* objects) are stored. Before the user function is
+ * executed, the `cl_mem` values are replaced by pointers to global
+ * memory.
+ * @param[in,out] evt_wait_lst List of events that need to complete
+ * before this command can be executed. The list will be cleared and
+ * can be reused by client code.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return Event wrapper object that identifies this command.
+ * */
+CCL_EXPORT
+CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
+	void (*user_func)(void*), void* args, size_t cb_args,
+	cl_uint num_mos, CCLMemObj* const* mo_list,
+	const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
+	GError** err) {
+
+	/* Make sure cq is not NULL. */
+	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure that num_mos == 0 AND mo_list != NULL, OR, that
+	 * num_mos > 0  AND mo_list != NULL */
+	g_return_val_if_fail(((num_mos == 0) && (mo_list == NULL))
+		|| ((num_mos > 0) && (mo_list != NULL)), NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* OpenCL status flag. */
+	cl_int ocl_status;
+	/* OpenCL event. */
+	cl_event event = NULL;
+	/* Event wrapper. */
+	CCLEvent* evt = NULL;
+	/* List of cl_mem objects. */
+	cl_mem* mem_list = NULL;
+
+	/* Unwrap memory objects. */
+	if (num_mos > 0) {
+		mem_list = g_slice_alloc(sizeof(cl_mem) * num_mos);
+		for (cl_uint i = 0; i < num_mos; ++i) {
+			mem_list[i] = mo_list[i] != NULL
+				? ccl_memobj_unwrap(mo_list[i])
+				: NULL;
+		}
+	}
+
+	/* Enqueue kernel. */
+	ocl_status = clEnqueueNativeKernel(ccl_queue_unwrap(cq), user_func,
+		args, cb_args, num_mos, (const cl_mem*) mem_list, args_mem_loc,
+		ccl_event_wait_list_get_num_events(evt_wait_lst),
+		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+		CL_SUCCESS != ocl_status, ocl_status, error_handler,
+		"%s: unable to enqueue native kernel (OpenCL error %d: %s).",
+		CCL_STRD, ocl_status, ccl_err(ocl_status));
+
+	/* Wrap event and associate it with the respective command queue.
+	 * The event object will be released automatically when the command
+	 * queue is released. */
+	evt = ccl_queue_produce_event(cq, event);
+
+	/* Clear event wait list. */
+	ccl_event_wait_list_clear(evt_wait_lst);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
+
+	/* Release temporary cl_mem list. */
+	if (num_mos > 0)
+		g_slice_free1(sizeof(cl_mem) * num_mos, mem_list);
+
+	/* Return event wrapper. */
+	return evt;
+
+}
+
+/**
  * Get the OpenCL version of the platform associated with this kernel.
  *
  * @public @memberof ccl_kernel

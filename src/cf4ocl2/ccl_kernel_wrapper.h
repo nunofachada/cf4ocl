@@ -36,6 +36,7 @@
 #include "ccl_kernel_arg.h"
 #include "ccl_event_wrapper.h"
 #include "ccl_queue_wrapper.h"
+#include "ccl_memobj_wrapper.h"
 
 /**
  * @defgroup CCL_KERNEL_WRAPPER Kernel wrapper
@@ -159,6 +160,15 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
 	CCLEventWaitList* evt_wait_lst, void** args, GError** err);
+
+/* Enqueues a command to execute a native C/C++ function not compiled
+ * using the OpenCL compiler. */
+CCL_EXPORT
+CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
+	void (*user_func)(void*), void* args, size_t cb_args,
+	cl_uint num_mos, CCLMemObj* const* mo_list,
+	const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
+	GError** err);
 
 /* Get the OpenCL version of the platform associated with this
  * kernel. */

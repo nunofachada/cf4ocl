@@ -52,6 +52,32 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
+clEnqueueNativeKernel(cl_command_queue command_queue,
+	void (*user_func)(void*), void* args, size_t cb_args,
+	cl_uint num_mem_objects, const cl_mem* mem_list,
+	const void** args_mem_loc, cl_uint num_events_in_wait_list,
+	const cl_event* event_wait_list, cl_event* event) {
+
+	/* These are ignored. */
+	(void)(command_queue);
+	(void)(user_func);
+	(void)(args);
+	(void)(cb_args);
+	(void)(num_mem_objects);
+	(void)(mem_list);
+	(void)(args_mem_loc);
+	(void)(num_events_in_wait_list);
+	(void)(event_wait_list);
+
+	/* Set event. */
+	ocl_stub_create_event(event, command_queue, CL_COMMAND_NATIVE_KERNEL);
+
+	/* All good. */
+	return CL_SUCCESS;
+
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
 	cl_bool blocking_read, size_t offset, size_t size, void* ptr,
 	cl_uint num_events_in_wait_list, const cl_event* event_wait_list,
