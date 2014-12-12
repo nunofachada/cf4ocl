@@ -629,6 +629,11 @@ static void suggest_worksizes_test() {
 	g_assert(ccl_wrapper_memcheck());
 }
 
+
+/* ******************************************** */
+/* ********* Test kernel arguments ************ */
+/* ******************************************** */
+
 #define CCL_TEST_KERNEL_ARGS_NAME "test_krnl_args"
 
 #define CCL_TEST_KERNEL_ARGS_CONTENT \
@@ -968,6 +973,121 @@ static void args_test() {
 	g_assert(ccl_wrapper_memcheck());
 }
 
+/* ******************************************** */
+/* **** Test ccl_kernel_enqueue_native() ****** */
+/* ******************************************** */
+
+#define CCL_TEST_KERNEL_NATIVE_BUF_SIZE 32
+
+/* Data structure used for for the native_test. */
+struct nk_args {
+	cl_int* buf;
+	cl_uint numel;
+};
+
+/* Native function used for the native_test. */
+static void native_kernel(void* args) {
+
+	struct nk_args* nka = (struct nk_args*) args;
+
+	/* Perform some simple operation. */
+	for (cl_uint i = 0; i < nka->numel; ++i)
+		nka->buf[i] = nka->buf[i] + 1;
+
+}
+
+/**
+ * Tests the ccl_kernel_enqueue_native() function.
+ * */
+static void native_test() {
+
+	/* Test variables. */
+	CCLContext* ctx = NULL;
+	CCLDevice* dev = NULL;
+	CCLBuffer* buf = NULL;
+	CCLQueue* cq = NULL;
+	GError* err = NULL;
+	cl_int hbuf[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
+	cl_int hbuf_out[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
+	size_t bs = CCL_TEST_KERNEL_NATIVE_BUF_SIZE * sizeof(cl_int);
+	cl_device_exec_capabilities exec_cap;
+	struct nk_args args;
+	const void* args_mem_loc;
+	cl_uint i;
+
+	/* Get the test context with the pre-defined device. */
+	ctx = ccl_test_context_new(&err);
+	g_assert_no_error(err);
+
+	/* Get first device in context. */
+	dev = ccl_context_get_device(ctx, 0, &err);
+	g_assert_no_error(err);
+
+	/* Check if the device supports the execution of native kernels. */
+	exec_cap = ccl_device_get_info_scalar(
+		dev, CL_DEVICE_EXECUTION_CAPABILITIES,
+		cl_device_exec_capabilities, &err);
+	g_assert_no_error(err);
+
+	/* If not, return. */
+	if (!(exec_cap & CL_EXEC_NATIVE_KERNEL)) {
+		g_test_message("Test device doesn't support native kernels." \
+			"Native kernels test will not be performed.");
+		return;
+	}
+
+	/* Create a command queue. */
+	cq = ccl_queue_new(ctx, dev, 0, &err);
+	g_assert_no_error(err);
+
+	/* Initialize host buffer. */
+	for (i = 0; i < CCL_TEST_KERNEL_NATIVE_BUF_SIZE; ++i)
+		hbuf[i] = g_test_rand_int();
+
+	/* Create device buffer, copy contents from host buffer. */
+	buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		bs, hbuf, &err);
+	g_assert_no_error(err);
+
+	/* Initialize arguments for native kernel. We only initialize
+	 * 'args.numel' because 'args.buf' will be setup by the OpenCL
+	 * implementation using the device buffer 'buf'. */
+	args.numel = CCL_TEST_KERNEL_NATIVE_BUF_SIZE;
+
+	/* Here we specify the location of 'args.buf', which the OpenCL
+	 * implementation will setup using data in the device buffer
+	 * 'buf'. */
+	args_mem_loc = (const void*) &args.buf;
+
+	/* Test the ccl_kernel_enqueue_native() function. */
+	ccl_kernel_enqueue_native(cq, native_kernel, &args,
+		sizeof(struct nk_args), 1, (CCLMemObj* const*) &buf,
+		&args_mem_loc, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Read device buffer, modified by native kernel. */
+	ccl_buffer_enqueue_read(
+		buf, cq, CL_FALSE, 0, bs, hbuf_out, NULL, &err);
+	g_assert_no_error(err);
+
+	/* Wait for queue operations to complete. */
+	ccl_queue_finish(cq, &err);
+	g_assert_no_error(err);
+
+	/* Check that buffer was properly modified. */
+	for (i = 0; i < CCL_TEST_KERNEL_NATIVE_BUF_SIZE; ++i)
+		g_assert_cmpint(hbuf[i] + 1, ==, hbuf_out[i]);
+
+	/* Destroy stuff. */
+	ccl_buffer_destroy(buf);
+	ccl_queue_destroy(cq);
+	ccl_context_destroy(ctx);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_assert(ccl_wrapper_memcheck());
+}
+
 /**
  * Main function.
  * @param[in] argc Number of command line arguments.
@@ -993,6 +1113,10 @@ int main(int argc, char** argv) {
 	g_test_add_func(
 		"/wrappers/kernel/args",
 		args_test);
+
+	g_test_add_func(
+		"/wrappers/kernel/native",
+		native_test);
 
 	return g_test_run();
 }
