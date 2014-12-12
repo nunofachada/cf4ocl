@@ -51,6 +51,9 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
 	return CL_SUCCESS;
 }
 
+/* Parts of this function are based on the POCL implementation.
+ * https://github.com/pocl/pocl/blob/master/lib/CL/clEnqueueNativeKernel.c
+ * https://github.com/pocl/pocl/blob/master/LICENSE */
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueNativeKernel(cl_command_queue command_queue,
 	void (*user_func)(void*), void* args, size_t cb_args,
@@ -58,19 +61,50 @@ clEnqueueNativeKernel(cl_command_queue command_queue,
 	const void** args_mem_loc, cl_uint num_events_in_wait_list,
 	const cl_event* event_wait_list, cl_event* event) {
 
+	/* Variables. */
+	void* args_copy;
+	cl_mem *mem_list_copy;
+
 	/* These are ignored. */
 	(void)(command_queue);
-	(void)(user_func);
-	(void)(args);
-	(void)(cb_args);
-	(void)(num_mem_objects);
-	(void)(mem_list);
-	(void)(args_mem_loc);
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
 	/* Set event. */
 	ocl_stub_create_event(event, command_queue, CL_COMMAND_NATIVE_KERNEL);
+
+	/* Copy native kernel arguments. */
+	args_copy = g_memdup(args, cb_args);
+	mem_list_copy = g_memdup(mem_list, num_mem_objects * sizeof(cl_mem));
+
+	/* Put global memory locations in args_copy. */
+	for (cl_uint i = 0; i < num_mem_objects; ++i) {
+
+		const char *loc = (const char*) args_mem_loc[i];
+		void **arg_loc;
+
+		/* If a cl_mem object is NULL throw error. */
+		if (mem_list[i] == NULL) {
+			g_free(mem_list_copy);
+			g_free(args_copy);
+			return CL_INVALID_MEM_OBJECT;
+		}
+
+		/* args_mem_loc is a pointer relative to the original args,
+		 * since we recopy them, we must do some relocation */
+		gulong offset = GPOINTER_TO_UINT(loc) - GPOINTER_TO_UINT(args);
+		arg_loc = GUINT_TO_POINTER(
+			GPOINTER_TO_UINT(args_copy) + GPOINTER_TO_UINT(offset));
+
+		*arg_loc = mem_list[i]->mem;
+
+	}
+
+	/* Call the native kernel. */
+	user_func(args_copy);
+
+	g_free(mem_list_copy);
+	g_free(args_copy);
 
 	/* All good. */
 	return CL_SUCCESS;
