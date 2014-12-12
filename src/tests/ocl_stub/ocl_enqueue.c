@@ -61,6 +61,19 @@ clEnqueueNativeKernel(cl_command_queue command_queue,
 	const void** args_mem_loc, cl_uint num_events_in_wait_list,
 	const cl_event* event_wait_list, cl_event* event) {
 
+	/* Error check. */
+	if (command_queue == NULL) {
+		return CL_INVALID_COMMAND_QUEUE;
+	} else if ((user_func == NULL)
+		|| (((args == NULL) && (cb_args > 0))
+		|| ((args == NULL) && (num_mem_objects > 0)))
+		|| ((args != NULL) && (cb_args == 0))
+		|| ((num_mem_objects > 0) && ((mem_list == NULL) || (args_mem_loc == NULL)))
+		|| ((num_mem_objects == 0) && ((mem_list != NULL) || (args_mem_loc != NULL))))
+	{
+		return CL_INVALID_MEM_OBJECT;
+	}
+
 	/* Variables. */
 	void* args_copy;
 	cl_mem *mem_list_copy;
