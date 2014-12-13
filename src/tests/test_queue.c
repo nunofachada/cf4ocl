@@ -255,6 +255,7 @@ static void barrier_marker_test() {
 #endif
 		/* For OpenCL <= 1.1, the marker event is complete ONLY when all
 		 * previous enqueued events have completed. */
+		CCL_UNUSED(ocl_ver);
 		evt_marker = ccl_enqueue_marker(cq, NULL, &err);
 		g_assert_no_error(err);
 #ifdef CL_VERSION_1_2
