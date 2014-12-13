@@ -79,7 +79,6 @@ clEnqueueNativeKernel(cl_command_queue command_queue,
 	cl_mem *mem_list_copy;
 
 	/* These are ignored. */
-	(void)(command_queue);
 	(void)(num_events_in_wait_list);
 	(void)(event_wait_list);
 
