@@ -196,15 +196,16 @@ static void create_info_destroy_test(
 		host_ptr = ccl_memobj_get_info_scalar(
 			img, CL_MEM_HOST_PTR, void*, &err);
 		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
-		g_assert_cmphex((gulong) host_ptr, ==, (gulong) NULL);
+		g_assert_cmphex(GPOINTER_TO_UINT(host_ptr), ==,
+			GPOINTER_TO_UINT(NULL));
 		g_clear_error(&err);
 
 		cl_context context;
 		context = ccl_memobj_get_info_scalar(
 			img, CL_MEM_CONTEXT, cl_context, &err);
 		g_assert_no_error(err);
-		g_assert_cmphex((gulong) context, ==,
-			(gulong) ccl_context_unwrap(*ctx_fixt));
+		g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
+			GPOINTER_TO_UINT(ccl_context_unwrap(*ctx_fixt)));
 
 		/* Specific image queries. */
 		cl_image_format img_fmt;

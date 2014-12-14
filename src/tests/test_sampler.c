@@ -102,7 +102,8 @@ static void create_info_destroy_test() {
 		context = ccl_sampler_get_info_scalar(
 			s, CL_SAMPLER_CONTEXT, cl_context, &err);
 		g_assert_no_error(err);
-		g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));
+		g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
+			GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
 
 		/* Destroy sampler. */
 		ccl_sampler_destroy(s);
@@ -165,7 +166,8 @@ static void create_full_info_destroy_test() {
 	context = ccl_sampler_get_info_scalar(
 		s, CL_SAMPLER_CONTEXT, cl_context, &err);
 	g_assert_no_error(err);
-	g_assert_cmphex((gulong) context, ==, (gulong) ccl_context_unwrap(ctx));
+	g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
+		GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
 
 	/* Destroy sampler. */
 	ccl_sampler_destroy(s);
