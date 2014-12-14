@@ -71,11 +71,6 @@
 typedef void (CL_CALLBACK *ccl_memobj_destructor_callback)(
 	cl_mem memobj, void *user_data);
 
-/* Implementation of ccl_wrapper_release_fields() function for
- * ::CCLMemObj wrapper objects. */
-CCL_EXPORT
-void ccl_memobj_release_fields(CCLMemObj* mo);
-
 /* Get the OpenCL version of the platform associated with this memory
  * object. */
 CCL_EXPORT

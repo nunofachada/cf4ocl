@@ -17,7 +17,7 @@
  * */
 
 #include "ccl_memobj_wrapper.h"
-#include "priv_memobj_wrapper.h"
+#include "_ccl_memobj_wrapper.h"
 
  /**
  * @file
@@ -39,7 +39,6 @@
  *
  * @param[in] mo A ::CCLMemObj wrapper object.
  * */
-CCL_EXPORT
 void ccl_memobj_release_fields(CCLMemObj* mo) {
 
 	/* Make sure mo wrapper object is not NULL. */

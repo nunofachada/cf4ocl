@@ -19,8 +19,9 @@
  /**
  * @file
  *
- * Implementation of a wrapper class for OpenCL memory objects. This
- * file is only for building _cf4ocl_. Is is not part of its public API.
+ * Implementation of a wrapper class for OpenCL memory objects and
+ * declaration of some of this methods. This file is only for building
+ * _cf4ocl_. Is is not part of its public API.
  *
  * @author Nuno Fachada
  * @date 2014
@@ -30,8 +31,8 @@
 #include "ccl_context_wrapper.h"
 #include "_ccl_abstract_wrapper.h"
 
-#ifndef _CCL_PRIV_MEMOBJ_WRAPPER_H_
-#define _CCL_PRIV_MEMOBJ_WRAPPER_H_
+#ifndef __CCL_MEMOBJ_WRAPPER_H_
+#define __CCL_MEMOBJ_WRAPPER_H_
 
 /**
  * Base class for memory object wrappers, i.e., ::CCLBuffer and
@@ -55,5 +56,9 @@ struct ccl_memobj {
 	CCLContext* ctx;
 
 };
+
+/* Implementation of ccl_wrapper_release_fields() function for
+ * ::CCLMemObj wrapper objects. */
+void ccl_memobj_release_fields(CCLMemObj* mo);
 
 #endif
