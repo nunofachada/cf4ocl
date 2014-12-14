@@ -146,6 +146,8 @@ static void create_info_destroy_test() {
 		ocl_ver = ccl_kernel_get_opencl_version(krnl, &err);
 		g_assert_no_error(err);
 
+		(void)ocl_ver;
+
 #ifdef CL_VERSION_1_1
 
 		size_t kwgz;
