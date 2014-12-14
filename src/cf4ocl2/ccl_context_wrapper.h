@@ -36,7 +36,6 @@
 #include "ccl_errors.h"
 #include "ccl_device_wrapper.h"
 #include "ccl_platform_wrapper.h"
-#include "ccl_abstract_dev_container_wrapper.h"
 
 /**
  * @defgroup CCL_CONTEXT_WRAPPER Context wrapper

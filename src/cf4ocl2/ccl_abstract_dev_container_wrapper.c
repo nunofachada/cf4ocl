@@ -19,16 +19,15 @@
 /**
  * @file
  *
- * Implementation of an abstract wrapper class and its methods for
- * OpenCL objects which contain a list of devices.
+ * Implementation of the methods of the abstract device container
+ * wrapper class.
  *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#include "ccl_abstract_dev_container_wrapper.h"
-#include "priv_abstract_dev_container_wrapper.h"
+#include "_ccl_abstract_dev_container_wrapper.h"
 
 /**
  * @internal
@@ -100,7 +99,6 @@ finish:
  *
  * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
-CCL_EXPORT
 void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 
 	/* Make sure devcon wrapper object is not NULL. */
@@ -136,7 +134,6 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
  * @return All ::CCLDevice wrappers in device container or NULL if an
  * error occurs.
  * */
-CCL_EXPORT
 CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err) {
@@ -175,7 +172,6 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
-CCL_EXPORT
 CCLDevice* ccl_dev_container_get_device(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, cl_uint index,
@@ -242,7 +238,6 @@ finish:
  * @return The number of devices in device container or 0 if an error
  * occurs or is otherwise not possible to get any device.
  * */
-CCL_EXPORT
 cl_uint ccl_dev_container_get_num_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err) {

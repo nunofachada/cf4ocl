@@ -28,7 +28,7 @@
  * */
 
 #include "ccl_program_wrapper.h"
-#include "priv_abstract_dev_container_wrapper.h"
+#include "_ccl_abstract_dev_container_wrapper.h"
 
 /**
  * Program wrapper class.

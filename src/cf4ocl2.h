@@ -32,7 +32,6 @@
 extern "C" {
 #endif
 
-#include <cf4ocl2/ccl_abstract_dev_container_wrapper.h>
 #include <cf4ocl2/ccl_abstract_wrapper.h>
 #include <cf4ocl2/ccl_buffer_wrapper.h>
 #include <cf4ocl2/ccl_common.h>

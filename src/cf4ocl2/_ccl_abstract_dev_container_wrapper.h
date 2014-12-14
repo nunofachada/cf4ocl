@@ -19,22 +19,53 @@
  /**
  * @file
  *
- * Definition of an abstract wrapper class and its methods for
- * OpenCL objects which contain a list of devices.
+ * Implementation of an abstract device container wrapper class and
+ * specification of its methods. This file is only for building
+ * _cf4ocl_. Is is not part of its public API.
  *
  * @author Nuno Fachada
  * @date 2014
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
-#ifndef _CCL_ABSTRACT_DEV_CONTAINER_WRAPPER_H_
-#define _CCL_ABSTRACT_DEV_CONTAINER_WRAPPER_H_
+#ifndef __CCL_ABSTRACT_DEV_CONTAINER_WRAPPER_H_
+#define __CCL_ABSTRACT_DEV_CONTAINER_WRAPPER_H_
 
 #include "ccl_oclversions.h"
 #include "ccl_common.h"
 #include "ccl_errors.h"
 #include "ccl_device_wrapper.h"
 #include "ccl_abstract_wrapper.h"
+#include "priv_abstract_wrapper.h"
+
+/**
+ * Base class for wrappers which contain devices, i.e.,
+ * ::CCLPlatform, ::CCLProgram and ::CCLContext. This class extends
+ * ::CCLWrapper.
+ *
+ * @extends ccl_wrapper
+ * */
+struct ccl_dev_container {
+
+	/**
+	 * Parent wrapper object.
+	 * @private
+	 * */
+	CCLWrapper base;
+
+	/**
+	 * Number of devices in context (can be lazy initialized).
+	 * @private
+	 * */
+	cl_uint num_devices;
+
+	/**
+	 * Devices in context (can be lazy initialized).
+	 * @private
+	 * */
+	CCLDevice** devices;
+
+};
 
 /**
  * Returns the list of cl_device_id OpenCL objects in the
@@ -56,23 +87,19 @@ typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
 
 /* Release the devices held by the given #CCLDevContainer
  * object. */
-CCL_EXPORT
 void ccl_dev_container_release_devices(CCLDevContainer* devcon);
 
 /* Get all ::CCLDevice wrappers in device container. */
-CCL_EXPORT
 CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 
 /* Get ::CCLDevice wrapper at given index. */
-CCL_EXPORT
 CCLDevice* ccl_dev_container_get_device(CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices,
 	cl_uint index, GError** err);
 
 /* Return number of devices in device container. */
-CCL_EXPORT
 cl_uint ccl_dev_container_get_num_devices(CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices, GError** err);
 
