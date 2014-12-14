@@ -92,6 +92,7 @@ finish:
 }
 
 /**
+ * @internal
  * Release the devices held by the given ::CCLDevContainer
  * object. Implements the ccl_wrapper_release_fields() function.
  *
@@ -122,6 +123,7 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 }
 
 /**
+ * @internal
  * Get all ::CCLDevice wrappers in device container.
  *
  * @protected @memberof ccl_dev_container
@@ -159,6 +161,7 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
 
 
 /**
+ * @internal
  * Get ::CCLDevice wrapper at given index.
  *
  * @protected @memberof ccl_dev_container
@@ -226,6 +229,7 @@ finish:
 }
 
 /**
+ * @internal
  * Return number of devices in device container.
  *
  * @protected @memberof ccl_dev_container

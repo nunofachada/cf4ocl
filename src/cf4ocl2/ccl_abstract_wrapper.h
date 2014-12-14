@@ -85,12 +85,6 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 CCL_EXPORT
 cl_bool ccl_wrapper_memcheck();
 
-/* Add a ::CCLWrapperInfo object to the info table of the
- * given wrapper. */
-CCL_EXPORT
-void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
-	CCLWrapperInfo* info);
-
 /* Get information about any wrapped OpenCL object. */
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,

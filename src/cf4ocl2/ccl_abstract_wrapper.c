@@ -62,10 +62,14 @@ struct ccl_wrapper_info_table {
 
 };
 
+/* ********************************* */
+/* ****** Protected methods ******** */
+/* ********************************* */
+
 /**
+ * @internal
  * Create a new ::CCLWrapper object. This function is called by
- * the concrete wrapper constructors and should not be called by client
- * code.
+ * the concrete wrapper constructors.
  *
  * @protected @memberof ccl_wrapper
  *
@@ -116,24 +120,7 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 }
 
 /**
- * Increase the reference count of the wrapper object.
- *
- * @public @memberof ccl_wrapper
- *
- * @param[in] wrapper The wrapper object.
- * */
-CCL_EXPORT
-void ccl_wrapper_ref(CCLWrapper* wrapper) {
-
-	/* Make sure wrapper object is not NULL. */
-	g_return_if_fail(wrapper != NULL);
-
-	/* Increment wrapper reference count. */
-	g_atomic_int_inc(&wrapper->ref_count);
-
-}
-
-/**
+ * @internal
  * Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed.
  *
@@ -219,55 +206,17 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 }
 
 /**
- * Returns the wrapper object reference count. For debugging and
- * testing purposes only.
- *
- * @public @memberof ccl_wrapper
- *
- * @param[in] wrapper The wrapper object.
- * @return The wrapper object reference count or -1 if wrapper is NULL.
- * */
-CCL_EXPORT
-int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
-
-	/* Make sure wrapper is not NULL. */
-	g_return_val_if_fail(wrapper != NULL, -1);
-
-	/* Return reference count. */
-	return wrapper->ref_count;
-
-}
-
-/**
- * Get the wrapped OpenCL object.
- *
- * @public @memberof ccl_wrapper
- *
- * @param[in] wrapper The wrapper object.
- * @return The wrapped OpenCL object.
- * */
-CCL_EXPORT
-void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
-
-	/* Make sure wrapper is not NULL. */
-	g_return_val_if_fail(wrapper != NULL, NULL);
-
-	/* Return the OpenCL wrapped object. */
-	return wrapper->cl_object;
-}
-
-/**
+ * @internal
  * Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper.
  *
- * @public @memberof ccl_wrapper
+ * @protected @memberof ccl_wrapper
  *
  * @param[in] wrapper Wrapper to add info to.
  * @param[in] param_name Name of parameter which will refer to this
  * info.
  * @param[in] info Info object to add.
  * */
-CCL_EXPORT
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	CCLWrapperInfo* info) {
 
@@ -317,6 +266,108 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 	/* Unlock access to info table. */
 	g_mutex_unlock(&wrapper->info->mutex);
 
+}
+
+/**
+ * @internal
+ * Create a new ::CCLWrapperInfo object with a given value size.
+ *
+ * @protected @memberof ccl_wrapper_info
+ *
+ * @param[in] size Parameter size in bytes.
+ * @return A new CCLWrapperInfo* object.
+ * */
+CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
+
+	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
+
+	if (size > 0)
+		info->value = g_slice_alloc0(size);
+	else
+		info->value = NULL;
+	info->size = size;
+
+	return info;
+
+}
+
+/**
+ * @internal
+ * Destroy a ::CCLWrapperInfo object.
+ *
+ * @protected @memberof ccl_wrapper_info
+ *
+ * @param[in] info Object to destroy.
+ * */
+void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
+
+	/* Make sure info is not NULL. */
+	g_return_if_fail(info != NULL);
+
+	if (info->size > 0)
+		g_slice_free1(info->size, info->value);
+	g_slice_free(CCLWrapperInfo, info);
+
+}
+
+/* ********************************* */
+/* ******** Public methods ********* */
+/* ********************************* */
+
+/**
+ * Increase the reference count of the wrapper object.
+ *
+ * @public @memberof ccl_wrapper
+ *
+ * @param[in] wrapper The wrapper object.
+ * */
+CCL_EXPORT
+void ccl_wrapper_ref(CCLWrapper* wrapper) {
+
+	/* Make sure wrapper object is not NULL. */
+	g_return_if_fail(wrapper != NULL);
+
+	/* Increment wrapper reference count. */
+	g_atomic_int_inc(&wrapper->ref_count);
+
+}
+
+/**
+ * Returns the wrapper object reference count. For debugging and
+ * testing purposes only.
+ *
+ * @public @memberof ccl_wrapper
+ *
+ * @param[in] wrapper The wrapper object.
+ * @return The wrapper object reference count or -1 if wrapper is NULL.
+ * */
+CCL_EXPORT
+int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
+
+	/* Make sure wrapper is not NULL. */
+	g_return_val_if_fail(wrapper != NULL, -1);
+
+	/* Return reference count. */
+	return wrapper->ref_count;
+
+}
+
+/**
+ * Get the wrapped OpenCL object.
+ *
+ * @public @memberof ccl_wrapper
+ *
+ * @param[in] wrapper The wrapper object.
+ * @return The wrapped OpenCL object.
+ * */
+CCL_EXPORT
+void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
+
+	/* Make sure wrapper is not NULL. */
+	g_return_val_if_fail(wrapper != NULL, NULL);
+
+	/* Return the OpenCL wrapped object. */
+	return wrapper->cl_object;
 }
 
 /**
@@ -541,45 +592,5 @@ size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 CCL_EXPORT
 cl_bool ccl_wrapper_memcheck() {
 	return wrappers == NULL;
-}
-
-/**
- * Create a new ::CCLWrapperInfo object with a given value size.
- *
- * @protected @memberof ccl_wrapper_info
- *
- * @param[in] size Parameter size in bytes.
- * @return A new CCLWrapperInfo* object.
- * */
-CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
-
-	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
-
-	if (size > 0)
-		info->value = g_slice_alloc0(size);
-	else
-		info->value = NULL;
-	info->size = size;
-
-	return info;
-
-}
-
-/**
- * Destroy a ::CCLWrapperInfo object.
- *
- * @protected @memberof ccl_wrapper_info
- *
- * @param[in] info Object to destroy.
- * */
-void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
-
-	/* Make sure info is not NULL. */
-	g_return_if_fail(info != NULL);
-
-	if (info->size > 0)
-		g_slice_free1(info->size, info->value);
-	g_slice_free(CCLWrapperInfo, info);
-
 }
 

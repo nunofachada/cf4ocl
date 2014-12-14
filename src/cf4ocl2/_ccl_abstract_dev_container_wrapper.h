@@ -68,6 +68,7 @@ struct ccl_dev_container {
 };
 
 /**
+ * @internal
  * Returns the list of cl_device_id OpenCL objects in the
  * wrapped OpenCL device container object (i.e. cl_platform_id,
  * cl_program and cl_context). This is an abstract function prototype

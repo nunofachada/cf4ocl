@@ -66,6 +66,7 @@ struct ccl_wrapper {
 };
 
 /**
+ * @internal
  * Release the fields of the concrete wrapper implementation.
  *
  * @protected @memberof ccl_wrapper
@@ -75,6 +76,7 @@ struct ccl_wrapper {
 typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
 
 /**
+ * @internal
  * Release the OpenCL object wrapped by the concrete wrapper
  * implementation.
  *
@@ -91,6 +93,7 @@ typedef CL_API_ENTRY cl_int
 	(CL_API_CALL* ccl_wrapper_release_cl_object)(void* cl_object);
 
 /**
+ * @internal
  * Generic type for OpenCL clget*Info() functions.
  *
  * @protected @memberof ccl_wrapper
@@ -115,6 +118,7 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp1)(
 	void* param_value, size_t* param_value_size_ret);
 
 /**
+ * @internal
  * Generic type for OpenCL clget**Info() functions, in which two
  * OpenCL objects are involved.
  *
@@ -150,6 +154,11 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size);
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
 	ccl_wrapper_release_cl_object rel_cl_fun, GError** err);
+
+/* Add a ::CCLWrapperInfo object to the info table of the
+ * given wrapper. */
+void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
+	CCLWrapperInfo* info);
 
 /* Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
