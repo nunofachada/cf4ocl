@@ -28,6 +28,7 @@
  * */
 
 #include "ccl_platform_wrapper.h"
+#include "_ccl_abstract_wrapper.h"
 #include "_ccl_abstract_dev_container_wrapper.h"
 
 /**

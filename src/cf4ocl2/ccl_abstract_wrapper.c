@@ -28,7 +28,7 @@
  * */
 
 #include "ccl_abstract_wrapper.h"
-#include "priv_abstract_wrapper.h"
+#include "_ccl_abstract_wrapper.h"
 
 /* Table of all existing wrappers. */
 static GHashTable* wrappers = NULL;
@@ -73,7 +73,6 @@ struct ccl_wrapper_info_table {
  * @param[in] size Size in bytes of wrapper.
  * @return A new wrapper object.
  * */
-CCL_EXPORT
 CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 
 	/* Make sure OpenCL object is not NULL. */
@@ -119,7 +118,7 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 /**
  * Increase the reference count of the wrapper object.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper The wrapper object.
  * */
@@ -152,7 +151,6 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
  * @return CL_TRUE if wrapper was destroyed (i.e. its ref. count reached
  * zero), CL_FALSE otherwise.
  * */
-CCL_EXPORT
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
 	ccl_wrapper_release_cl_object rel_cl_fun, GError** err) {
@@ -224,7 +222,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
  * Returns the wrapper object reference count. For debugging and
  * testing purposes only.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper The wrapper object.
  * @return The wrapper object reference count or -1 if wrapper is NULL.
@@ -243,7 +241,7 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
 /**
  * Get the wrapped OpenCL object.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper The wrapper object.
  * @return The wrapped OpenCL object.
@@ -262,7 +260,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper Wrapper to add info to.
  * @param[in] param_name Name of parameter which will refer to this
@@ -327,7 +325,7 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * This function should not be called directly, but using the
  * ccl_*_info() macros instead.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some
@@ -456,7 +454,7 @@ finish:
 /**
  * Get pointer to information value.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some
@@ -495,7 +493,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 /**
  * Get information size.
  *
- * @protected @memberof ccl_wrapper
+ * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some
@@ -548,12 +546,11 @@ cl_bool ccl_wrapper_memcheck() {
 /**
  * Create a new ::CCLWrapperInfo object with a given value size.
  *
- * @public @memberof ccl_wrapper_info
+ * @protected @memberof ccl_wrapper_info
  *
  * @param[in] size Parameter size in bytes.
  * @return A new CCLWrapperInfo* object.
  * */
-CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
 
 	CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
@@ -571,11 +568,10 @@ CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
 /**
  * Destroy a ::CCLWrapperInfo object.
  *
- * @public @memberof ccl_wrapper_info
+ * @protected @memberof ccl_wrapper_info
  *
  * @param[in] info Object to destroy.
  * */
-CCL_EXPORT
 void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
 
 	/* Make sure info is not NULL. */

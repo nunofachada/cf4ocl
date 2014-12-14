@@ -28,7 +28,7 @@
  * */
 
 #include "ccl_context_wrapper.h"
-#include "priv_abstract_wrapper.h"
+#include "_ccl_abstract_wrapper.h"
 
 #ifndef _CCL_PRIV_MEMOBJ_WRAPPER_H_
 #define _CCL_PRIV_MEMOBJ_WRAPPER_H_

@@ -27,7 +27,7 @@
  * */
 
 #include "ccl_device_query.h"
-#include "priv_abstract_wrapper.h"
+#include "_ccl_abstract_wrapper.h"
 
 /**
  * @internal

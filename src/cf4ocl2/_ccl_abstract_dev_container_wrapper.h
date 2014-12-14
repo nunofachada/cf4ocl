@@ -36,7 +36,7 @@
 #include "ccl_errors.h"
 #include "ccl_device_wrapper.h"
 #include "ccl_abstract_wrapper.h"
-#include "priv_abstract_wrapper.h"
+#include "_ccl_abstract_wrapper.h"
 
 /**
  * Base class for wrappers which contain devices, i.e.,

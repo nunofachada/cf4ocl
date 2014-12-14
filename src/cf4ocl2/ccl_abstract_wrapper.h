@@ -54,107 +54,6 @@ typedef struct ccl_wrapper_info {
 
 } CCLWrapperInfo;
 
-/**
- * Release the fields of the concrete wrapper implementation.
- *
- * @protected @memberof ccl_wrapper
- *
- * @param[in] wrapper A concrete wrapper implementation.
- * */
-typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
-
-/**
- * Release the OpenCL object wrapped by the concrete wrapper
- * implementation.
- *
- * @protected @memberof ccl_wrapper
- *
- * Concrete implementations of this function are provided by the OpenCL
- * implementation.
- *
- * @param[in] cl_object The OpenCL object to release.
- * @return Returns CL_SUCCESS if the function is executed successfully
- * or an OpenCL error code otherwise.
- * */
-typedef CL_API_ENTRY cl_int
-	(CL_API_CALL* ccl_wrapper_release_cl_object)(void* cl_object);
-
-/* Create a new wrapper object. This function is called by the
- * concrete wrapper constructors and should not be called by client
- * code. */
-CCL_EXPORT
-CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size);
-
-/* Increase the reference count of the wrapper object. */
-CCL_EXPORT
-void ccl_wrapper_ref(CCLWrapper* wrapper);
-
-/* Decrements the reference count of the wrapper object.
- * If it reaches 0, the wrapper object is destroyed. */
-CCL_EXPORT
-cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
-	ccl_wrapper_release_fields rel_fields_fun,
-	ccl_wrapper_release_cl_object rel_cl_fun, GError** err);
-
-/* Returns the wrapper object reference count. For debugging and
- * testing purposes only. */
-CCL_EXPORT
-int ccl_wrapper_ref_count(CCLWrapper* wrapper);
-
-/* Get the wrapped OpenCL object. */
-CCL_EXPORT
-void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
-
-/**
- * Generic type for OpenCL clget*Info() functions.
- *
- * @private @memberof ccl_wrapper
- *
- * Concrete implementations of this function are provided by the OpenCL
- * implementation.
- *
- * @param[in] cl_object OpenCL object to be queried.
- * @param[in] param_name Parameter to query.
- * @param[in] param_value_size Used to specify the size in bytes of
- * memory pointed to by param_value.
- * @param[out] param_value A pointer to memory where the appropriate
- * result being queried is returned
- * @param[out] param_value_size_ret Returns the actual size in bytes of
- * data copied to param_value. If param_value_size_ret is NULL, it is
- * ignored.
- * @return Returns CL_SUCCESS if the function is executed successfully,
- * or an error code otherwise.
- * */
-typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp1)(
-	void* cl_object, cl_uint param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret);
-
-/**
- * Generic type for OpenCL clget**Info() functions, in which two
- * OpenCL objects are involved.
- *
- * @private @memberof ccl_wrapper
- *
- * Concrete implementations of this function are provided by the OpenCL
- * implementation.
- *
- * @param[in] cl_object1 OpenCL object to be queried.
- * @param[in] cl_object2 OpenCL object required for query.
- * @param[in] param_name Parameter to query.
- * @param[in] param_value_size Used to specify the size in bytes of
- * memory pointed to by param_value.
- * @param[out] param_value A pointer to memory where the appropriate
- * result being queried is returned
- * @param[out] param_value_size_ret Returns the actual size in bytes of
- * data copied to param_value. If param_value_size_ret is NULL, it is
- * ignored.
- * @return Returns CL_SUCCESS if the function is executed successfully,
- * or an error code otherwise.
- * */
-typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp2)(
-	void* cl_object1, void* cl_object2, cl_uint param_name,
-	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret);
 
 /**
  * Generic function pointer for OpenCL clget**Info() functions
@@ -167,6 +66,19 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp2)(
  * implementation.
  * */
 typedef cl_int (*ccl_wrapper_info_fp)(void);
+
+/* Increase the reference count of the wrapper object. */
+CCL_EXPORT
+void ccl_wrapper_ref(CCLWrapper* wrapper);
+
+/* Returns the wrapper object reference count. For debugging and
+ * testing purposes only. */
+CCL_EXPORT
+int ccl_wrapper_ref_count(CCLWrapper* wrapper);
+
+/* Get the wrapped OpenCL object. */
+CCL_EXPORT
+void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 
 /* Debug function which checks if memory allocated by wrappers
  * has been properly freed. */
@@ -196,14 +108,6 @@ CCL_EXPORT
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
-
-/* Create a new CCLWrapperInfo* object with a given value size. */
-CCL_EXPORT
-CCLWrapperInfo* ccl_wrapper_info_new(size_t size);
-
-/* Destroy a ::CCLWrapperInfo object. */
-CCL_EXPORT
-void ccl_wrapper_info_destroy(CCLWrapperInfo* info);
 
 #endif
 
