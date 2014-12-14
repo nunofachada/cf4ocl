@@ -1123,7 +1123,7 @@ CCLDevSelDevices ccl_devsel_dep_menu(
 	ccl_device_ref((CCLDevice*) sel_dev);
 	g_ptr_array_remove_range(devices, 0, devices->len);
 	g_ptr_array_add(devices, sel_dev);
-	g_assert_cmpint(1, ==, devices->len);
+	g_assert_cmpuint(1, ==, devices->len);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);

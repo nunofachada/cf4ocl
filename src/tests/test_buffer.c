@@ -54,13 +54,13 @@ static void create_info_destroy_test() {
 	mot = ccl_memobj_get_info_scalar(
 		b, CL_MEM_TYPE, cl_mem_object_type, &err);
 	g_assert_no_error(err);
-	g_assert_cmpuint(mot, ==, CL_MEM_OBJECT_BUFFER);
+	g_assert_cmphex(mot, ==, CL_MEM_OBJECT_BUFFER);
 
 	cl_mem_flags flags;
 	flags = ccl_memobj_get_info_scalar(
 		b, CL_MEM_FLAGS, cl_mem_flags, &err);
 	g_assert_no_error(err);
-	g_assert_cmpuint(flags, ==, CL_MEM_READ_WRITE);
+	g_assert_cmphex(flags, ==, CL_MEM_READ_WRITE);
 
 	size_t mem_size;
 	mem_size = ccl_memobj_get_info_scalar(b, CL_MEM_SIZE, size_t, &err);

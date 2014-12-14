@@ -309,10 +309,10 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 		device_list = program->devices;
 	}
 	for (cl_uint i = 0; i < num_devices; ++i) {
-		cl_bool found = FALSE;
+		cl_bool found = CL_FALSE;
 		for (cl_uint j = 0; j < program->num_devices; ++j) {
 			if (device_list[i] == program->devices[j]) {
-				found = TRUE;
+				found = CL_TRUE;
 				break;
 			}
 		}
@@ -338,7 +338,7 @@ clBuildProgram(cl_program program, cl_uint num_devices,
 				break;
 			}
 		}
-		g_assert_cmpint(found, ==, TRUE);
+		g_assert_cmpint(found, ==, CL_TRUE);
 		/* Compile if build status is NONE. */
 		if (program->build_status[j] == CL_BUILD_NONE) {
 			program->build_status[j] = CL_BUILD_SUCCESS;
