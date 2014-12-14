@@ -700,7 +700,7 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
-	void (*user_func)(void*), void* args, size_t cb_args,
+	void (CL_CALLBACK * user_func)(void*), void* args, size_t cb_args,
 	cl_uint num_mos, CCLMemObj* const* mo_list,
 	const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
 	GError** err) {

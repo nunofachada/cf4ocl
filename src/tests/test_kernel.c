@@ -986,7 +986,7 @@ struct nk_args {
 };
 
 /* Native function used for the native_test. */
-static void native_kernel(void* args) {
+static void CL_CALLBACK native_kernel(void* args) {
 
 	struct nk_args* nka = (struct nk_args*) args;
 
