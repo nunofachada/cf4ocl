@@ -16,7 +16,8 @@
  * <http://www.gnu.org/licenses/>.
  * */
 
- /**
+/**
+ * @internal
  * @file
  *
  * Implementation of a wrapper class for OpenCL memory objects and

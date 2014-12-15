@@ -16,7 +16,8 @@
  * <http://www.gnu.org/licenses/>.
  * */
 
- /**
+/**
+ * @internal
  * @file
  *
  * Definition of an abstract wrapper class and some of its methods. This

@@ -154,6 +154,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 
 	# Document generation options
 	option(DOC_GENERATE_HTML "Generate HTML documentation?" ON)
+	option(DOC_INTERNAL "Generate internal documentation (for cf4ocl development only)?" OFF)
 	option(DOC_GENERATE_LATEX "Generate Latex documentation?" OFF)
 	if (DOC_GENERATE_LATEX AND CMAKE_MAKE_PROGRAM AND PDFLATEX_COMPILER AND MAKEINDEX_COMPILER)
 		option(DOC_GENERATE_PDF "Generate PDF documentation?" OFF)
@@ -179,6 +180,11 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 		set(DOX_GENERATE_MAN "YES")
 	else()
 		set(DOX_GENERATE_MAN "NO")
+	endif()
+	if (DOC_INTERNAL)
+		set(DOX_INTERNAL "YES")
+	else()
+		set(DOX_INTERNAL "NO")
 	endif()
 
 	# Document install options

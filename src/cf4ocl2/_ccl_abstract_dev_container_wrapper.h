@@ -16,7 +16,8 @@
  * <http://www.gnu.org/licenses/>.
  * */
 
- /**
+/**
+ * @internal
  * @file
  *
  * Implementation of an abstract device container wrapper class and

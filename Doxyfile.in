@@ -408,7 +408,7 @@ HIDE_IN_BODY_DOCS      = NO
 # to NO (the default) then the documentation will be excluded.
 # Set it to YES to include the internal documentation.
 
-INTERNAL_DOCS          = NO
+INTERNAL_DOCS          = @DOX_INTERNAL@
 
 # If the CASE_SENSE_NAMES tag is set to NO then Doxygen will only generate
 # file names in lower-case letters. If set to YES upper-case letters are also
@@ -1508,6 +1508,7 @@ PREDEFINED             = CL_VERSION_1_0 \
                          CL_VERSION_2_0 \
                          CL_API_ENTRY= \
                          CL_API_CALL= \
+                         CL_CALLBACK= \
                          CCL_EXPORT=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then

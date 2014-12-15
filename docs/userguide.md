@@ -8,7 +8,7 @@ User guide {#ug}
 # Overview {#ug_overview}
 
 The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C
-object-oriented framework for developing and benchmarking [OpenCL][]
+object-oriented framework for developing and benchmarking [OpenCL](http://www.khronos.org/opencl/)
 projects in C. It aims to:
 
 1. Promote the rapid development of OpenCL programs in C, with support
@@ -705,5 +705,3 @@ the respective wrappers.
 @example device_filter.c
 @example image_fill.c
 @example image_filter.c
-
-[OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
