@@ -78,6 +78,17 @@ void ccl_device_destroy(CCLDevice* dev);
 CCL_EXPORT
 CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
+#ifdef CL_VERSION_1_2
+
+/* Creates an array of sub-devices that each reference a
+ * non-intersecting set of compute units within the given device. */
+CCL_EXPORT
+CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
+	const cl_device_partition_property *properties,
+	cl_uint *num_devs_ret, GError** err);
+
+#endif
+
 /**
  * Get a ::CCLWrapperInfo device information object.
  *
