@@ -102,7 +102,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.partition_max_sub_devices = 16,
 				.partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, 0},
 				.partition_affinity_domain = 0,
-				.partition_type = (cl_device_partition_property const[]) {0},
+				.partition_type = (cl_device_partition_property[]) {0},
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[0],
 				.preferred_vector_width_char = 16,
 				.preferred_vector_width_short = 8,
@@ -121,7 +121,8 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.vendor = "FakenMC",
 				.vendor_id = 0xFFFF,
 				.version = "OpenCL 1.2 cf4ocl",
-				.driver_version = "2.0.0"
+				.driver_version = "2.0.0",
+				.ref_count = 1
 			},
 			{
 				.address_bits = 64,
@@ -177,7 +178,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.partition_max_sub_devices = 8,
 				.partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
 				.partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
-				.partition_type = (cl_device_partition_property const[]) {0},
+				.partition_type = (cl_device_partition_property[]) {0},
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[0],
 				.preferred_vector_width_char = 8,
 				.preferred_vector_width_short = 4,
@@ -196,7 +197,8 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.vendor = "FakenMC",
 				.vendor_id = 0xFFFF,
 				.version = "OpenCL 1.2 cf4ocl",
-				.driver_version = "2.0.0"
+				.driver_version = "2.0.0",
+				.ref_count = 1
 			}
 		}
 	},
@@ -273,7 +275,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.partition_max_sub_devices = 0, /* Not available in OpenCL 1.1 */
 				.partition_properties = (cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
 				.partition_affinity_domain = 0, /* Not available in OpenCL 1.1 */
-				.partition_type = (cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
+				.partition_type = (cl_device_partition_property[]) {0}, /* Not available in OpenCL 1.1 */
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[1],
 				.preferred_vector_width_char = 4,
 				.preferred_vector_width_short = 2,
@@ -292,7 +294,8 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.vendor = "FakenMC",
 				.vendor_id = 0xFFFF,
 				.version = "OpenCL 1.1 cf4ocl",
-				.driver_version = "2.0.0"
+				.driver_version = "2.0.0",
+				.ref_count = 1
 			}
 		}
 	},
@@ -365,7 +368,7 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.partition_max_sub_devices = 4,
 				.partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
 				.partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
-				.partition_type = (cl_device_partition_property const[]) {0},
+				.partition_type = (cl_device_partition_property[]) {0},
 				.platform_id = (const cl_platform_id) &ccl_test_platforms[2],
 				.preferred_vector_width_char = 8,
 				.preferred_vector_width_short = 4,
@@ -384,7 +387,8 @@ const struct _cl_platform_id ccl_test_platforms[] = {
 				.vendor = "FakenMC",
 				.vendor_id = 0xFFFF,
 				.version = "OpenCL 1.2 cf4ocl",
-				.driver_version = "2.0.0"
+				.driver_version = "2.0.0",
+				.ref_count = 1
 			}
 		}
 	}

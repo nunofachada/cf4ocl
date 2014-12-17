@@ -223,3 +223,48 @@ clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 
 	return status;
 }
+
+#ifdef CL_VERSION_1_2
+
+CL_API_ENTRY cl_int CL_API_CALL
+clCreateSubDevices(cl_device_id in_device,
+	const cl_device_partition_property* properties, cl_uint num_devices,
+	cl_device_id* out_devices, cl_uint* num_devices_ret) {
+
+	(void)in_device;
+	(void)properties;
+	(void)num_devices;
+	(void)out_devices;
+	(void)num_devices_ret;
+
+	return CL_SUCCESS;
+}
+
+
+
+CL_API_ENTRY cl_int CL_API_CALL
+clRetainDevice(cl_device_id device) {
+
+	/* Only increment ref count if it's a sub-device. */
+	if (device->parent_device != NULL) {
+		g_atomic_int_inc(&device->ref_count);
+	}
+	return CL_SUCCESS;
+
+}
+
+CL_API_ENTRY cl_int CL_API_CALL
+clReleaseDevice(cl_device_id device) {
+
+	/* Only decrement ref count if it's a sub--device. */
+	if (device->parent_device != NULL) {
+		/* Decrement reference count and check if it reaches 0. */
+		if (g_atomic_int_dec_and_test(&device->ref_count)) {
+
+			g_slice_free(struct _cl_device_id, device);
+
+		}
+	}
+	return CL_SUCCESS;
+}
+#endif

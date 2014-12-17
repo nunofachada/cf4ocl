@@ -64,14 +64,14 @@ struct _cl_command_queue {
 struct _cl_device_id {
 	const cl_uint address_bits;
 	const cl_bool available;
-	const char* built_in_kernels;
+	char* built_in_kernels; /* Not const because it can change in sub-devices. */
 	const cl_bool compiler_available;
 	const cl_device_fp_config double_fp_config;
 	const cl_bool endian_little;
 	const cl_bool error_correction_support;
 	const cl_device_exec_capabilities execution_capabilities;
 	const char* extensions;
-	const cl_ulong global_mem_cache_size;
+	cl_ulong global_mem_cache_size; /* Not const because it can change in sub-devices. */
 	const cl_device_mem_cache_type global_mem_cache_type;
 	const cl_uint global_mem_cacheline_size;
 	const cl_ulong global_mem_size;
@@ -89,7 +89,7 @@ struct _cl_device_id {
 	const cl_ulong local_mem_size;
 	const cl_device_local_mem_type local_mem_type;
 	const cl_uint max_clock_frequency;
-	const cl_uint max_compute_units;
+	cl_uint max_compute_units; /* Not const because it can change in sub-devices. */
 	const cl_uint max_constant_args;
 	const cl_ulong max_constant_buffer_size;
 	const cl_ulong max_mem_alloc_size;
@@ -111,11 +111,11 @@ struct _cl_device_id {
 	const cl_uint native_vector_width_double;
 	const cl_uint native_vector_width_half;
 	const char* opencl_c_version;
-	const cl_device_id parent_device;
-	const cl_uint partition_max_sub_devices;
+	cl_device_id parent_device; /* Not const because it can change in sub-devices. */
+	cl_uint partition_max_sub_devices; /* Not const because it can change in sub-devices. */
 	const cl_device_partition_property* partition_properties;
 	const cl_device_affinity_domain partition_affinity_domain;
-	const cl_device_partition_property* partition_type;
+	cl_device_partition_property* partition_type; /* Not const because it can change in sub-devices. */
 	const cl_platform_id platform_id;
 	const cl_uint preferred_vector_width_char;
 	const cl_uint preferred_vector_width_short;
@@ -135,6 +135,7 @@ struct _cl_device_id {
 	const cl_uint vendor_id;
 	const char* version;
 	const char* driver_version;
+	cl_uint ref_count; /* Not const because it can change in sub-devices. */
 };
 
 struct _cl_platform_id {
