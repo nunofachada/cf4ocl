@@ -172,7 +172,8 @@ void ccl_device_destroy(CCLDevice* dev) {
  * in the returned array.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return A `NULL`-terminated array of sub-devices.
+ * @return A `NULL`-terminated array of sub-devices. Sub-devices will
+ * be automatically disposed of when parent device is destroyed.
  * */
 CCL_EXPORT
 CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
