@@ -340,7 +340,7 @@ clCreateSubDevices(cl_device_id in_device,
 			}
 
 			/* Create sub-devices. */
-			for (i = 1; i < properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END; ++i) {
+			for (i = 1; properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END; ++i) {
 				cl_device_id subdev =
 					g_memdup(in_device, sizeof(struct _cl_device_id));
 				subdev->global_mem_cache_size =
@@ -351,7 +351,7 @@ clCreateSubDevices(cl_device_id in_device,
 				subdev->partition_type = g_memdup(properties,
 					sizeof(cl_device_partition_property) * (num_subdevices + 3)); /* 3 is for CL_DEVICE_PARTITION_BY_COUNTS + CL_DEVICE_PARTITION_BY_COUNTS_LIST_END + `0`. */
 				subdev->ref_count = 1;
-				out_devices[i] = subdev;
+				out_devices[i - 1] = subdev;
 			}
 
 		}

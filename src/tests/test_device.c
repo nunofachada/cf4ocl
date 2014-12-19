@@ -45,6 +45,9 @@ static void sub_devices_test() {
 	CCLDevice* const* subdevs;
 	cl_uint num_subdevs;
 	cl_uint max_subdevs;
+	cl_uint cu;
+	cl_uint subcu;
+	cl_device_id parent_device;
 
 	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
@@ -88,7 +91,6 @@ static void sub_devices_test() {
 
 		/* Find an appropriate number of compute units for each
 		 * sub-device. */
-		cl_uint cu;
 		for (i = 8; (cu = max_subdevs / i) == 0; i /= 2);
 
 		/* Set partition properties. */
@@ -104,31 +106,92 @@ static void sub_devices_test() {
 		for (i = 0; i < num_subdevs; ++i) {
 
 			/* Check the number of compute units. */
-			cl_uint subcu = ccl_device_get_info_scalar(subdevs[i],
+			subcu = ccl_device_get_info_scalar(subdevs[i],
 				CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, &err);
 			g_assert_no_error(err);
 			g_assert_cmpuint(subcu, ==, cu);
 
 			/* Check the parent device. */
-			cl_device_id parent_device = ccl_device_get_info_scalar(
+			parent_device = ccl_device_get_info_scalar(
 				subdevs[i], CL_DEVICE_PARENT_DEVICE, cl_device_id, &err);
 			g_assert_no_error(err);
 			g_assert_cmphex(GPOINTER_TO_UINT(parent_device), ==,
 				GPOINTER_TO_UINT(ccl_device_unwrap(pdev)));
 		}
 
+		/* Check that the last position is NULL. */
+		g_assert_cmphex(
+			GPOINTER_TO_UINT(subdevs[i]), ==, GPOINTER_TO_UINT(NULL));
+
 	}
 
-	//~ /* Test partition by counts, if supported by device. */
-	//~ supported = CL_FALSE;
-	//~ for (i = 0; dpp[i] != 0; ++i) {
-		//~ if (dpp[i] == CL_DEVICE_PARTITION_BY_COUNTS) {
-			//~ supported = CL_TRUE;
-			//~ break;
-		//~ }
-	//~ }
-	//~ if (supported) {
-	//~ }
+	/* Test partition by counts, if supported by device. */
+	supported = CL_FALSE;
+	for (i = 0; dpp[i] != 0; ++i) {
+		if (dpp[i] == CL_DEVICE_PARTITION_BY_COUNTS) {
+			supported = CL_TRUE;
+			break;
+		}
+	}
+	if (supported) {
+
+		/* Allocate partition properties array and initialize it. */
+		cl_device_partition_property* ctprop = g_slice_alloc0(
+			(max_subdevs + 3) * sizeof(cl_device_partition_property));
+		ctprop[0] = CL_DEVICE_PARTITION_BY_COUNTS;
+
+		/* Find an appropriate number of compute units for each
+		 * sub-device. */
+		cu = max_subdevs / 2;
+		cl_uint total_cu = 0, total_cu_check = 0;
+		if (cu == 0) {
+			total_cu = 1;
+			ctprop[1] = max_subdevs;
+			ctprop[2] = CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+		} else {
+			for (i = 1; (i <= max_subdevs) && (cu > 0); ++i) {
+				total_cu += cu;
+				ctprop[i] = cu;
+				cu /= 2;
+			}
+			ctprop[i] = CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+		}
+
+		/* Partition device. */
+		subdevs = ccl_device_create_subdevices(
+			pdev, ctprop, &num_subdevs, &err);
+		g_assert_no_error(err);
+
+		/* Check sub-devices. */
+		for (i = 0; i < num_subdevs; ++i) {
+
+			/* Check the number of compute units. */
+			subcu = ccl_device_get_info_scalar(subdevs[i],
+				CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, &err);
+			g_assert_no_error(err);
+			total_cu_check += subcu;
+
+			/* Check the parent device. */
+			parent_device = ccl_device_get_info_scalar(
+				subdevs[i], CL_DEVICE_PARENT_DEVICE, cl_device_id, &err);
+			g_assert_no_error(err);
+			g_assert_cmphex(GPOINTER_TO_UINT(parent_device), ==,
+				GPOINTER_TO_UINT(ccl_device_unwrap(pdev)));
+		}
+
+		/* Check that the total number of compute units is as
+		 * expected. */
+		g_assert_cmpuint(total_cu_check, ==, total_cu);
+
+		/* Check that the last position is NULL. */
+		g_assert_cmphex(
+			GPOINTER_TO_UINT(subdevs[i]), ==, GPOINTER_TO_UINT(NULL));
+
+		/* Release memory associated with partition properties array. */
+		g_slice_free1(
+			(max_subdevs + 3) * sizeof(cl_device_partition_property),
+			ctprop);
+	}
 
 	/* Destroy stuff. */
 	ccl_context_destroy(ctx);
