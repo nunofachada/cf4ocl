@@ -231,11 +231,138 @@ clCreateSubDevices(cl_device_id in_device,
 	const cl_device_partition_property* properties, cl_uint num_devices,
 	cl_device_id* out_devices, cl_uint* num_devices_ret) {
 
-	(void)in_device;
-	(void)properties;
-	(void)num_devices;
-	(void)out_devices;
-	(void)num_devices_ret;
+	cl_uint i;
+	cl_uint num_subdevices;
+
+	if (in_device == NULL) {
+		return CL_INVALID_DEVICE;
+	} else if (properties == NULL) {
+		return CL_INVALID_VALUE;
+	} else {
+		/* Check if device supports partition type. */
+		cl_bool supported = CL_FALSE;
+		for (i = 0; in_device->partition_properties[i] != 0; ++i) {
+			if (properties[0] == in_device->partition_properties[i]) {
+				supported = CL_TRUE;
+				break;
+			}
+		}
+		if (!supported) {
+			return CL_INVALID_VALUE;
+		}
+	}
+
+	/* Check properties array. */
+	/* This stub will only recognize partition equally and by counts. */
+	if (properties[0] == CL_DEVICE_PARTITION_EQUALLY) {
+
+		/* Divide device equally. */
+
+		/* Get requested number of compute units. */
+		cl_uint n = properties[1];
+
+		/* How many sub-devices to create with n compute units? */
+		num_subdevices = in_device->max_compute_units / n;
+
+		/* Can we divide the sub-device as requested? */
+		if (num_subdevices > in_device->partition_max_sub_devices) {
+			return CL_DEVICE_PARTITION_FAILED;
+		}
+
+		/* If num_devices_ret is not NULL, populate it with the number
+		 * of possibly created sub-devices. */
+		if (num_devices_ret != NULL) {
+			*num_devices_ret = num_subdevices;
+		}
+
+		/* If out_devices is not NULL, create sub-devices. */
+		if (out_devices != NULL) {
+
+			/* Check if there is enough space in out_devices for the
+			 * number of sub-devices about to be created.*/
+			if (num_devices < num_subdevices) {
+				return CL_INVALID_VALUE;
+			}
+
+			/* Create sub-devices. */
+			for (i = 0; i < num_subdevices; ++i) {
+				cl_device_id subdev =
+					g_memdup(in_device, sizeof(struct _cl_device_id));
+				subdev->global_mem_cache_size =
+					in_device->global_mem_cache_size *
+					n / in_device->max_compute_units;
+				subdev->max_compute_units = n;
+				subdev->parent_device = in_device;
+				subdev->partition_type = g_memdup(properties,
+					sizeof(cl_device_partition_property) * 3);
+				subdev->ref_count = 1;
+				out_devices[i] = subdev;
+			}
+
+		}
+
+	} else if (properties[0] == CL_DEVICE_PARTITION_BY_COUNTS) {
+
+		/* Divide device by counts. */
+
+		/* Determine total number of necessary compute units and total
+		 * number of necessary subdevices. */
+		cl_uint num_cus = 0;
+		num_subdevices = 0;
+		for (i = 1; properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END; ++i) {
+			if (properties[i] < 0) {
+				return CL_INVALID_DEVICE_PARTITION_COUNT;
+			}
+			num_cus  += (cl_uint) properties[i];
+			num_subdevices++;
+		}
+
+		/* Can we divide the sub-device as requested? */
+		if ((num_subdevices > in_device->partition_max_sub_devices)
+			|| (num_cus > in_device->max_compute_units)
+			|| (num_subdevices > in_device->max_compute_units)) {
+			return CL_INVALID_DEVICE_PARTITION_COUNT;
+		}
+
+		/* If num_devices_ret is not NULL, populate it with the number
+		 * of possibly created sub-devices. */
+		if (num_devices_ret != NULL) {
+			*num_devices_ret = num_subdevices;
+		}
+
+		/* If out_devices is not NULL, create sub-devices. */
+		if (out_devices != NULL) {
+
+			/* Check if there is enough space in out_devices for the
+			 * number of sub-devices about to be created.*/
+			if (num_devices < num_subdevices) {
+				return CL_INVALID_VALUE;
+			}
+
+			/* Create sub-devices. */
+			for (i = 1; i < properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END; ++i) {
+				cl_device_id subdev =
+					g_memdup(in_device, sizeof(struct _cl_device_id));
+				subdev->global_mem_cache_size =
+					in_device->global_mem_cache_size *
+					properties[i] / in_device->max_compute_units;
+				subdev->max_compute_units = properties[i];
+				subdev->parent_device = in_device;
+				subdev->partition_type = g_memdup(properties,
+					sizeof(cl_device_partition_property) * (num_subdevices + 3)); /* 3 is for CL_DEVICE_PARTITION_BY_COUNTS + CL_DEVICE_PARTITION_BY_COUNTS_LIST_END + `0`. */
+				subdev->ref_count = 1;
+				out_devices[i] = subdev;
+			}
+
+		}
+
+
+	} else {
+
+		/* Unknown or unsupported partition type. */
+		return CL_INVALID_VALUE;
+
+	}
 
 	return CL_SUCCESS;
 }
@@ -261,7 +388,8 @@ clReleaseDevice(cl_device_id device) {
 		/* Decrement reference count and check if it reaches 0. */
 		if (g_atomic_int_dec_and_test(&device->ref_count)) {
 
-			g_slice_free(struct _cl_device_id, device);
+			g_free(device->partition_type);
+			g_free(device);
 
 		}
 	}
