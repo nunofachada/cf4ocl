@@ -36,8 +36,6 @@
  * Device wrapper class.
  *
  * @extends ccl_wrapper
- *
- * @todo Add support for sub-devices.
  */
 struct ccl_device {
 

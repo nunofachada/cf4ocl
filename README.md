@@ -45,7 +45,6 @@ Not yet implemented
 
 * [OpenGL](https://github.com/FakenMC/cf4ocl/issues/3) and
 [DirectX](https://github.com/FakenMC/cf4ocl/issues/4) interoperability
-* [Support for sub-devices](https://github.com/FakenMC/cf4ocl/issues/6)
 * [Pipes](https://github.com/FakenMC/cf4ocl/issues/8) and
 [SVM](https://github.com/FakenMC/cf4ocl/issues/7) (OpenCL 2.0 only)
 
