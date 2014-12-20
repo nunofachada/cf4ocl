@@ -27,7 +27,7 @@
 #include "utils.h"
 
 guint veclen(void* vector, size_t elem_size) {
-	gulong value;
+	cl_ulong value;
 	guint len = 0;
 	do {
 		value = 0;
