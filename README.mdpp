@@ -64,6 +64,7 @@ projects:
 * [The OpenCL utility library][]
 * [Computing Language Utility][]
 * [OCL-MLA][]
+* [oclkit][]
 
 [OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
 [LGPLv3]: http://www.gnu.org/licenses/lgpl.html) "LGPLv3"
@@ -72,4 +73,4 @@ projects:
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
 [Computing Language Utility]: https://github.com/Computing-Language-Utility/CLU "Computing Language Utility"
 [OCL-MLA]: http://tuxfan.github.io/ocl-mla/ "OCL-MLA"
-
+[oclkit]: https://github.com/matze/oclkit "oclkit"
