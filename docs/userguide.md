@@ -479,7 +479,7 @@ the parent class `struct`. An example of this approach can be shown with
 the definitions of the abstract ::CCLWrapper* class and of the concrete
 ::CCLEvent* class, which extends ::CCLWrapper*:
 
-_In priv_abstract_wrapper.h (not part of public API):_
+_In @c %_ccl_abstract_wrapper.h (not part of public API):_
 @code{.c}
 /* Base class for all OpenCL wrappers. */
 struct ccl_wrapper {
@@ -524,10 +524,10 @@ are also used as object methods, such as the case of the
 @ref ug_getinfo "info macros". Polymorphism is not used, as the so
 called "abstract" methods are just functions which provide common
 operations to concrete methods, named differently for each concrete
-class. For example, the ::ccl_dev_container_get_device() abstract method
-is called by the ::ccl_context_get_device(), ::ccl_platform_get_device()
-and ::ccl_program_get_device() concrete methods, for which it provides
-common functionality.
+class. For example, the @c ccl_dev_container_get_device() abstract
+method is called by the ::ccl_context_get_device(),
+::ccl_platform_get_device() and ::ccl_program_get_device() concrete
+methods, for which it provides common functionality.
 
 The _cf4ocl_ class hierarchy is shown in the following inheritance
 diagram:
@@ -579,7 +579,7 @@ relationship between wrapped objects and wrapper objects
 Wrapper constructors create the OpenCL object to be wrapped, but
 delegate memory allocation to the special `ccl_<class>_new_wrap()`
 functions. These accept the OpenCL object, and in turn call the
-::ccl_wrapper_new() function, passing it not only the object, but also
+@c ccl_wrapper_new() function, passing it not only the object, but also
 the size in bytes of the wrapper to be created. The ::ccl_wrapper_new()
 function allocates memory for the wrapper (initializing this memory
 to zero), and keeps the OpenCL object (wrapping it) in the created

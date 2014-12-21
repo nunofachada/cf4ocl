@@ -43,7 +43,8 @@
  * All the functions in this module are direct wrappers of the
  * respective OpenCL memory object functions, except for the
  * ::ccl_memobj_get_opencl_version() function, which returns the OpenCL
- * version of the platform to which the memory object is associated.
+ * version of the platform to which the memory object is associated
+ * with.
  *
  * For specific buffer and image handling, see the
  * @ref CCL_BUFFER_WRAPPER "buffer wrapper" and

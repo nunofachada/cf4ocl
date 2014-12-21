@@ -674,7 +674,7 @@ finish:
  * Independent filter function which accepts devices of the type
  * given in the data parameter.
  *
- * This function is used by the ccl_devsel_indep_type_*() group of
+ * This function is used by the `ccl_devsel_indep_type_*()` group of
  * functions. Using these is simpler than using this function directly.
  *
  * @param[in] dev OpenCL device to filter depending on type.

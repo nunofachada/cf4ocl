@@ -51,7 +51,7 @@
  * took place is destroyed. User events (OpenCL >= 1.1), created with
  * the ::ccl_user_event_new() constructor, are the only exception. These
  * are special events which allow applications to enqueue commands that
- * wait on user-controlled situations before the command is executed by
+ * wait on user-controlled occurrences before the command is executed by
  * the device. These events should be destroyed with
  * ::ccl_event_destroy().
  *

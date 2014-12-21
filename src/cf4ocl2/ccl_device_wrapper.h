@@ -45,8 +45,11 @@
  * In most cases, device wrapper objects should not be directly
  * instanced by client code. They are usually fetched from
  * @ref CCLDevContainer "device container" objects such as
- * ::CCLPlatform* or ::CCLContext* instances. As such, and in accordance
- * with the _cf4ocl_ @ref ug_new_destroy "new/destroy" rule, the
+ * ::CCLPlatform* or ::CCLContext* instances, or created as sub-devices
+ * using the ::ccl_device_create_subdevices() function. In either case,
+ * when the parent object is destroyed, the associated devices (or
+ * sub-devices) are also destroyed. As such, and in accordance with the
+ * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule, the
  * ::ccl_device_destroy() destructor function will rarely be used.
  *
  * Information about device objects can be fetched using the
