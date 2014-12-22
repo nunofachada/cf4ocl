@@ -160,6 +160,7 @@ void ccl_device_destroy(CCLDevice* dev) {
  * device.
  *
  * @public @memberof ccl_device
+ * @note Requires OpenCL >= 1.2
  *
  * @param[in] dev The parent device to be partitioned.
  * @param[in] properties Specifies how `dev` is to be partitioned. See

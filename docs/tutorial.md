@@ -117,7 +117,7 @@ will hold the result, three device buffers and the constant.
 #define VECSIZE 8
 #define SUM_CONST 3
 
-    ...
+    //...
 
     /* Variables. */
     CCLContext * ctx = NULL;
@@ -134,7 +134,7 @@ will be initialized with the values in the respective host vectors:
 
 ~~~~~~~~~~~~~~~{.c}
 
-    ...
+    //...
 
     /* Code. */
     ctx = ccl_context_new_from_menu(NULL);
@@ -153,7 +153,7 @@ will be initialized with the values in the respective host vectors:
         VECSIZE * sizeof(cl_uint), NULL, NULL);
     if (c == NULL) exit(-1);
 
-    ....
+    //...
 
 ~~~~~~~~~~~~~~~
 
@@ -161,7 +161,7 @@ Don't forget the destructors at the end:
 
 ~~~~~~~~~~~~~~~{.c}
 
-    ...
+    //...
 
     /* Destroy cf4ocl wrappers. */
     ccl_buffer_destroy(c);
@@ -231,7 +231,7 @@ device. To get a pointer to the device, one can use the
     /* Variables. */
     CCLContext * ctx = NULL;
     CCLDevice* dev = NULL;
-    ...
+    //...
 
     /* Get the selected device. */
     dev = ccl_context_get_device(ctx, 0, NULL);
@@ -250,15 +250,15 @@ queue properties for now, so we pass `0` in the third argument:
     CCLContext * ctx = NULL;
     CCLDevice* dev = NULL;
     CCLQueue* queue = NULL;
-    ...
+    //...
 
     /* Create a command queue. */
     queue = ccl_queue_new(ctx, dev, 0, NULL);
     if (queue == NULL) exit(-1);
-    ...
+    //...
 
     /* Destroy cf4ocl wrappers. */
-    ...
+    //...
     ccl_queue_destroy(queue);
 ~~~~~~~~~~~~~~~
 
@@ -333,18 +333,18 @@ kernel source file is involved, the most adequate constructor is
 ~~~~~~~~~~~~~~~{.c}
 
     /* Variables. */
-    ...
+    //...
     CCLProgram* prg = NULL;
 
-    ...
+    //...
     /* Create program. */
     prg = ccl_program_new_from_source_file(ctx, "mysum.cl", NULL);
     if (prg == NULL) exit(-1);
-    ...
+    //...
 
     /* Destroy cf4ocl wrappers. */
     ccl_program_destroy(prg);
-    ...
+    //...
 
 ~~~~~~~~~~~~~~~
 
@@ -355,10 +355,10 @@ successful or `CL_FALSE` otherwise:
 ~~~~~~~~~~~~~~~{.c}
 
     /* Variables. */
-    ...
+    //...
     cl_bool status;
 
-    ...
+    //...
     /* Build program. */
     status = ccl_program_build(prg, NULL, NULL);
     if (!status) exit(-1);
@@ -457,11 +457,11 @@ a single function:
 ~~~~~~~~~~~~~~~{.c}
 
     /* Variables. */
-    ...
+    //...
     size_t gws = VECSIZE;
     CCLEvent* evt = NULL;
 
-    ...
+    //...
     /* Set kernel arguments and run kernel. */
     evt = ccl_program_enqueue_kernel(prg, "sum", queue, 1, &gws,
         NULL, NULL, NULL, a, b, c, ccl_arg_priv(d, cl_uint),
@@ -510,9 +510,9 @@ Now we can check the results:
 ~~~~~~~~~~~~~~~{.c}
 
     /* Variables. */
-    ...
+    //...
     int i;
-    ...
+    //...
 
     /* Check for errors. */
     for (i = 0; i < VECSIZE; ++i) {
@@ -639,7 +639,7 @@ object, and initialize it to `NULL`:
 ~~~~~~~~~~~~~~~{.c}
 
     /* Variables. */
-    ...
+    //...
     GError * err = NULL;
 ~~~~~~~~~~~~~~~
 
@@ -649,15 +649,15 @@ error-throwing functions, e.g.:
 ~~~~~~~~~~~~~~~{.c}
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(&err);
-    ...
+    //...
 
     /* Get the selected device. */
     dev = ccl_context_get_device(ctx, 0, &err);
-    ...
+    //...
 
     /* Create a command queue. */
     queue = ccl_queue_new(ctx, dev, 0, &err);
-    ...
+    //...
 ~~~~~~~~~~~~~~~
 
 Now we can check this object after _cf4ocl_ function calls. Let's create
@@ -801,7 +801,7 @@ operations explicit:
         VECSIZE * sizeof(cl_uint), NULL, &err);
     CHECK_ERROR(err);
 
-    ...
+    //...
 
     /* Initialize device buffers. */
     ccl_buffer_enqueue_write(a, queue, CL_TRUE, 0,
@@ -820,10 +820,10 @@ We can now profile our program using functionality provided by the
 ~~~~~~~~~~~~~~~{.c}
 
     /* Variables. */
-    ...
+    //...
     CCLProf* prof = NULL;
 
-    ...
+    //...
 
     /* Perform profiling. */
     prof = ccl_prof_new();

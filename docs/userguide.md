@@ -479,7 +479,7 @@ the parent class `struct`. An example of this approach can be shown with
 the definitions of the abstract ::CCLWrapper* class and of the concrete
 ::CCLEvent* class, which extends ::CCLWrapper*:
 
-_In @c %_ccl_abstract_wrapper.h (not part of public API):_
+<em>In @c %_ccl_abstract_wrapper.h (not part of public API):</em>
 @code{.c}
 /* Base class for all OpenCL wrappers. */
 struct ccl_wrapper {
@@ -580,29 +580,30 @@ Wrapper constructors create the OpenCL object to be wrapped, but
 delegate memory allocation to the special `ccl_<class>_new_wrap()`
 functions. These accept the OpenCL object, and in turn call the
 @c ccl_wrapper_new() function, passing it not only the object, but also
-the size in bytes of the wrapper to be created. The ::ccl_wrapper_new()
-function allocates memory for the wrapper (initializing this memory
-to zero), and keeps the OpenCL object (wrapping it) in the created
-wrapper instance. For example, the ::ccl_kernel_new() creates the
-`cl_kernel` object with the clCreateKernel() OpenCL function, but then
-relies on the ::ccl_kernel_new_wrap() function (and thus, on
-::ccl_wrapper_new()) for allocation and initialization of the new
-::CCLKernel* wrapper object memory.
+the size in bytes of the wrapper to be created. The
+@c ccl_wrapper_new() function allocates memory for the wrapper
+(initializing this memory to zero), and keeps the OpenCL object
+(wrapping it) in the created wrapper instance. For example, the
+::ccl_kernel_new() creates the `cl_kernel` object with the
+clCreateKernel() OpenCL function, but then relies on the
+::ccl_kernel_new_wrap() function (and thus, on @c ccl_wrapper_new())
+for allocation and initialization of the new ::CCLKernel* wrapper object
+memory.
 
 The destruction of wrapper objects and respective memory deallocation
 is performed in a similar fashion. Each wrapper class has its own
 `ccl_<class>_destroy()` method, but this method delegates actual
-object release to the "abstract" ::ccl_wrapper_unref() function. This
+object release to the "abstract" @c ccl_wrapper_unref() function. This
 function accepts the wrapper to be destroyed, its size in bytes, and
 two function pointers: the first, with prototype defined by
-::ccl_wrapper_release_fields(), is a wrapper specific function for
+@c ccl_wrapper_release_fields(), is a wrapper specific function for
 releasing internal wrapper objects, which the super class has no
 knowledge of; the second is the OpenCL object destructor function, with
-prototype defined by ::ccl_wrapper_release_cl_object(). Continuing on
+prototype defined by @c ccl_wrapper_release_cl_object(). Continuing on
 the kernel example, the ::ccl_kernel_destroy() method delegates kernel
-wrapper destruction to ::ccl_wrapper_unref(), passing it the kernel
+wrapper destruction to @c ccl_wrapper_unref(), passing it the kernel
 wrapper object, its size (i.e. `sizeof(` ::CCLKernel `)`), the "private"
-(static in C) `ccl_kernel_release_fields()` function for destroying
+(static in C) @c ccl_kernel_release_fields() function for destroying
 kernel internal objects, and the clReleaseKernel() OpenCL kernel
 destructor function.
 
@@ -628,14 +629,14 @@ respective wrapper, only destroying it if the reference count reaches
 zero. Client code can increase and decrease the reference count of a
 wrapper object using the associated `ccl_<class>_ref()` and
 `ccl_<class>_unref()` macros. The `ccl_<class>_ref()` macros call the
-::ccl_wrapper_ref() "abstract" function, casting the wrapper to its
-base class (::CCLWrapper*), while the `ccl_<class>_unref()` macros are
-just aliases for the respective `ccl_<class>_destroy()` functions.
+::ccl_wrapper_ref() function, casting the wrapper to its base class
+(::CCLWrapper*), while the `ccl_<class>_unref()` macros are just aliases
+for the respective `ccl_<class>_destroy()` functions.
 
 The ::CCLWrapper* class maintains a static hash table which associates
 OpenCL objects (keys) to _cf4ocl_ wrappers (values). Access to this
-table is thread-safe and performed by the ::ccl_wrapper_new() and
-::ccl_wrapper_unref() functions.
+table is thread-safe and performed by the @c ccl_wrapper_new() and
+@c ccl_wrapper_unref() functions.
 
 The management of OpenCL object information is also handled by the
 ::CCLWrapper* class. The ::ccl_wrapper_get_info() method accepts
@@ -677,18 +678,18 @@ all of which internally keep a set of devices. The ::CCLDevContainer*
 class contains three "abstract" methods for accessing the associated set
 of ::CCLDevice* wrappers, namely:
 
-* ::ccl_dev_container_get_all_devices(): get all ::CCLDevice* wrappers
+* @c ccl_dev_container_get_all_devices() : get all ::CCLDevice* wrappers
 in device container object.
-* ::ccl_dev_container_get_device(): get ::CCLDevice* wrapper at given
+* @c ccl_dev_container_get_device() : get ::CCLDevice* wrapper at given
 index.
-* ::ccl_dev_container_get_num_devices(): return number of devices in
+* @c ccl_dev_container_get_num_devices() : return number of devices in
 device container object.
 
-Client code should use the respective wrapper implementations. For
-example, in the case of ::CCLProgram* objects, client code should use
-the ::ccl_program_get_all_devices(), ::ccl_program_get_device() and
-::ccl_program_get_num_devices() methods to manage the set of devices
-associated with the program.
+Concrete wrapper implementations rely on this functionality, which
+is exposed to client code via specific methods methods, e.g. in the case
+of ::CCLProgram* objects, these are ::ccl_program_get_all_devices(),
+::ccl_program_get_device() and ::ccl_program_get_num_devices(),
+respectively.
 
 ## The CCLMemObj class {#ug_cclmemobj}
 
