@@ -99,12 +99,11 @@ int main() {
 We can compile the program with `gcc` (or `clang`), and run it:
 
 ~~~~~~~~~~~~~~~
-$ gcc `pkg-config --cflags glib-2.0` mysum.c -o mysum -lcf4ocl2 `pkg-config --libs glib-2.0` -lOpenCL
+$ gcc `pkg-config --cflags cf4ocl2` mysum.c -o mysum `pkg-config --libs cf4ocl2`
 $ ./mysum
 ~~~~~~~~~~~~~~~
 
-With Clang the command is the same, just replace `gcc` with `clang`. OSX
-users should replace `-lOpenCL` with `-framework OpenCL`.
+With Clang the command is the same, just replace `gcc` with `clang`.
 
 ### Host and device buffers
 
