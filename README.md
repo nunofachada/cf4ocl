@@ -1,3 +1,8 @@
+News
+====
+
+The 2.0.0 stable version is now [available](releases).
+
 Summary
 =======
 
@@ -5,12 +10,16 @@ The C Framework for OpenCL, _cf4ocl_, is a cross-platform pure C
 object-oriented framework for developing and benchmarking [OpenCL][]
 projects in C. It aims to:
 
-1. Promote the rapid development of OpenCL programs in C, with support
-for C++.
+1. Promote the rapid development of OpenCL host programs in C (with
+support for C++) and avoid the tedious and error-prone boilerplate code
+usually required.
 2. Assist in the benchmarking of OpenCL events, such as kernel execution
-and data transfers.
+and data transfers. Profiling comes for **free** with _cf4ocl_.
 3. Simplify the analysis of the OpenCL environment and of kernel
 requirements.
+4. Allow for all levels of integration with existing OpenCL code: use as
+much or as few of _cf4ocl_ required for your project, with full access
+to the underlying OpenCL objects and functions at all times.
 
 Features
 ========
@@ -22,6 +31,7 @@ Features
   * User-friendly error management
 * OpenCL version independent
 * Integrated profiling
+* Tested on Linux, OSX and Windows
 
 Documentation
 =============
@@ -31,22 +41,50 @@ Documentation
 * [Wiki](https://github.com/FakenMC/cf4ocl/wiki)
 * [Examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
 
-Feeback
-=======
+Feedback and collaboration
+==========================
 
-Get _cf4ocl_, either by [building from source](https://github.com/FakenMC/cf4ocl/wiki/Build%20and%20install%20from%20source)
-or using the provided [binaries](https://github.com/FakenMC/cf4ocl/wiki/Install-the-binaries).
-Take a look at the [examples](http://fakenmc.github.io/cf4ocl/docs/latest/examples.html)
-and the [user guide and API](http://fakenmc.github.io/cf4ocl/docs/latest/).
-Any feedback is welcome.
+Download or clone _cf4ocl_, [build and install it](https://github.com/FakenMC/cf4ocl/wiki/Build%20and%20install%20from%20source),
+and [build](https://github.com/FakenMC/cf4ocl/wiki/Using-cf4ocl-in-a-new-project)
+a small example, such as the one bellow, which shows a nice and fast way
+to get an OpenCL context with a user-selected device:
+:
 
-Not yet implemented
-===================
+```c
+#include <cf4ocl2.h>
+int main() {
+
+    /* Variables. */
+    CCLContext * ctx = NULL;
+
+    /* Code. */
+    ctx = ccl_context_new_from_menu(NULL);
+    if (ctx == NULL) exit(-1);
+
+    /* Destroy context wrapper. */
+    ccl_context_destroy(ctx);
+
+    return 0;
+}
+```
+
+We appreciate any feedback. If you like this project and want to
+contribute, take a look at the existing [issues](issues). We also need
+help with [binary packaging](wiki/Install-the-binaries) for different
+OSes. Other improvements or suggestions are of course, welcome.
+
+Not yet integrated
+==================
+
+The following aspects of OpenCL are not yet integrated with _cf4ocl_:
 
 * [OpenGL](https://github.com/FakenMC/cf4ocl/issues/3) and
 [DirectX](https://github.com/FakenMC/cf4ocl/issues/4) interoperability
 * [Pipes](https://github.com/FakenMC/cf4ocl/issues/8) and
 [SVM](https://github.com/FakenMC/cf4ocl/issues/7) (OpenCL 2.0 only)
+
+This functionality is still available to client code, because _cf4ocl_
+can be used simultaneously with raw OpenCL objects and functions.
 
 License
 =======
