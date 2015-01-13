@@ -1,7 +1,7 @@
 News
 ====
 
-The 2.0.0 stable version is now [available](releases).
+The 2.0.0 stable version is now [available](https://github.com/FakenMC/cf4ocl/releases).
 
 Summary
 =======
@@ -48,7 +48,6 @@ Download or clone _cf4ocl_, [build and install it](https://github.com/FakenMC/cf
 and [build](https://github.com/FakenMC/cf4ocl/wiki/Using-cf4ocl-in-a-new-project)
 a small example, such as the one bellow, which shows a nice and fast way
 to get an OpenCL context with a user-selected device:
-:
 
 ```c
 #include <cf4ocl2.h>
@@ -69,9 +68,10 @@ int main() {
 ```
 
 We appreciate any feedback. If you like this project and want to
-contribute, take a look at the existing [issues](issues). We also need
-help with [binary packaging](wiki/Install-the-binaries) for different
-OSes. Other improvements or suggestions are of course, welcome.
+contribute, take a look at the existing [issues](https://github.com/FakenMC/cf4ocl/issues).
+We also need help with [binary packaging](https://github.com/FakenMC/cf4ocl/wiki/Install-the-binaries)
+for different OSes. Other improvements or suggestions are of course,
+welcome.
 
 Not yet integrated
 ==================
