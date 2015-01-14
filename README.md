@@ -67,11 +67,11 @@ int main() {
 }
 ```
 
-We appreciate any feedback. If you like this project and want to
-contribute, take a look at the existing [issues](https://github.com/FakenMC/cf4ocl/issues).
-We also need help with [binary packaging](https://github.com/FakenMC/cf4ocl/wiki/Install-the-binaries)
+If you like this project and want to contribute, take a look at the
+existing [issues](https://github.com/FakenMC/cf4ocl/issues). We also
+need help with [binary packaging](https://github.com/FakenMC/cf4ocl/wiki/Install-the-binaries)
 for different OSes. Other improvements or suggestions are of course,
-welcome.
+welcome. We appreciate any feedback.
 
 Not yet integrated
 ==================
@@ -105,7 +105,7 @@ projects:
 * [oclkit][]
 
 [OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
-[LGPLv3]: http://www.gnu.org/licenses/lgpl.html) "LGPLv3"
+[LGPLv3]: http://www.gnu.org/licenses/lgpl.html "LGPLv3"
 [GPLv3]: http://www.gnu.org/licenses/gpl.html "GPLv3"
 [Simple OpenCL]: http://code.google.com/p/simple-opencl/ "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
