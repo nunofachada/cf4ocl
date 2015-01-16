@@ -69,6 +69,16 @@ static void sub_devices_test() {
 	pdev = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 
+	/* Check if device has more than one compute unit. */
+	cu = ccl_device_get_info_scalar(
+		pdev, CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, &err);
+	g_assert_no_error(err);
+	if (cu == 1) {
+		g_test_message("Test device only has one compute unit, as "\
+			"such sub-devices test will not be performed.");
+		return;
+	}
+
 	/* Get device partition properties. */
 	dpp = ccl_device_get_info_array(pdev, CL_DEVICE_PARTITION_PROPERTIES,
 		cl_device_partition_property*, &err);
