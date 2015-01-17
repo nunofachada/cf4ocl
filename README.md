@@ -1,7 +1,11 @@
 News
 ====
 
-The 2.0.0 stable version is now [available](https://github.com/FakenMC/cf4ocl/releases).
+*17 Jan. 2015* 
+
+The 2.0.1 version fixes a specific issue with OpenCL <= 1.2 devices and
+is available in the [releases](https://github.com/FakenMC/cf4ocl/releases)
+page.
 
 Summary
 =======
