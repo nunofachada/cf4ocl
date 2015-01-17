@@ -73,15 +73,18 @@ static void sub_devices_test() {
 	cu = ccl_device_get_info_scalar(
 		pdev, CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, &err);
 	g_assert_no_error(err);
-	if (cu == 1) {
-		g_test_message("Test device only has one compute unit, as "\
-			"such sub-devices test will not be performed.");
-		return;
-	}
 
 	/* Get device partition properties. */
 	dpp = ccl_device_get_info_array(pdev, CL_DEVICE_PARTITION_PROPERTIES,
 		cl_device_partition_property*, &err);
+
+	/* Make sure device is partitionable. */
+	if ((err != NULL) && (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+			&& (err->domain == CCL_ERROR)) {
+		g_test_message("Test device could not be partitioned, as "\
+			"such sub-devices test will not be performed.");
+		return;
+	}
 	g_assert_no_error(err);
 
 	/* Get maximum number sub-devices. */
