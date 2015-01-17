@@ -81,6 +81,10 @@ void ccl_device_destroy(CCLDevice* dev);
 CCL_EXPORT
 CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
+/* Get the OpenCL version of the device. */
+CCL_EXPORT
+cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err);
+
 #ifdef CL_VERSION_1_2
 
 /* Creates an array of sub-devices that each reference a
