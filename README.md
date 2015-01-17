@@ -3,7 +3,7 @@ News
 
 *17 Jan. 2015* 
 
-The 2.0.1 version fixes a specific issue with OpenCL <= 1.2 devices and
+The 2.0.1 version fixes a specific issue with OpenCL <= 1.1 devices and
 is available in the [releases](https://github.com/FakenMC/cf4ocl/releases)
 page.
 
