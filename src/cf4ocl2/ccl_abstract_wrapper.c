@@ -97,16 +97,21 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 
 	/* Check if requested wrapper already exists, and get it if so. */
 	w = g_hash_table_lookup(wrappers, cl_object);
+
 	if (w == NULL) {
+
 		/* Wrapper doesn't yet exist, create it. */
 		w = (CCLWrapper*) g_slice_alloc0(size);
 		w->cl_object = cl_object;
+
 		/* Initialize info table. */
 		w->info = g_slice_new0(struct ccl_wrapper_info_table);
 		g_mutex_init(&w->info->mutex);
+
 		/* Insert newly created wrapper in table of all existing
 		 * wrappers. */
 		g_hash_table_insert(wrappers, cl_object, w);
+
 	}
 
 	/* Increase reference count of wrapper. */

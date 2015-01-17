@@ -62,6 +62,7 @@ static void sub_devices_test() {
 	if (ocl_ver < 120) {
 		g_test_message("OpenCL version of parent device does not "\
 			"support sub-devices. Sub-devices test not performed.");
+		ccl_context_destroy(ctx);
 		return;
 	}
 
@@ -83,6 +84,7 @@ static void sub_devices_test() {
 			&& (err->domain == CCL_ERROR)) {
 		g_test_message("Test device could not be partitioned, as "\
 			"such sub-devices test will not be performed.");
+		ccl_context_destroy(ctx);
 		return;
 	}
 	g_assert_no_error(err);

@@ -215,7 +215,14 @@ void ccl_platform_destroy(CCLPlatform* platf) {
 }
 
 /**
- * Get the OpenCL version of this platform
+ * Get the OpenCL version of this platform. The version is returned as
+ * an integer, in the following format:
+ *
+ * * 100 for OpenCL 1.0
+ * * 110 for OpenCL 1.1
+ * * 120 for OpenCL 1.2
+ * * 200 for OpenCL 2.0
+ * * etc.
  *
  * @public @memberof ccl_platform
  *

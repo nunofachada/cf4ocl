@@ -172,13 +172,62 @@ void ccl_device_destroy(CCLDevice* dev) {
 }
 
 /**
- * Get the supported OpenCL C version for the device.
+ * Get the OpenCL version supported by the device.  This information
+ * is parsed from the CL_DEVICE_VERSION parameter name. The version is
+ * returned as an integer, in the following format:
+ *
+ * * 100 for OpenCL 1.0
+ * * 110 for OpenCL 1.1
+ * * 120 for OpenCL 1.2
+ * * 200 for OpenCL 2.0
+ * * etc.
  *
  * @param[in] dev The device wrapper object.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return The supported OpenCL C version for the device, as an integer.
- * If an error occurs, 0 is returned.
+ * @return The OpenCL version supported by the device. If an error
+ * occurs, 0 is returned.
+ * */
+CCL_EXPORT
+cl_uint ccl_device_get_opencl_version(CCLDevice* dev, GError** err) {
+
+	/* Make sure dev is not NULL. */
+	g_return_val_if_fail(dev != NULL, 0);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+
+	char* ver_str;
+	cl_uint ver = 0;
+
+	/* Get version string which has the format "OpenCL x.x ..." */
+	ver_str = ccl_device_get_info_array(
+		dev, CL_DEVICE_VERSION, char*, err);
+
+	if (ver_str != NULL) {
+		ver = /* strlen("OpenCL ") == 7 */
+			atoi(ver_str + 7) * 100 + /* Major version. */
+			atoi(ver_str + 9) * 10; /* Minor version. */
+	}
+	return ver;
+
+}
+
+/**
+ * Get the OpenCL C version supported by the device. This information
+ * is parsed from the CL_DEVICE_OPENCL_C_VERSION parameter name. The
+ * version is returned as an integer, in the following format:
+ *
+ * * 100 for OpenCL 1.0
+ * * 110 for OpenCL 1.1
+ * * 120 for OpenCL 1.2
+ * * 200 for OpenCL 2.0
+ * * etc.
+ *
+ * @param[in] dev The device wrapper object.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The supported OpenCL C version  supported by the device. If
+ * an error occurs, 0 is returned.
  * */
 CCL_EXPORT
 cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err) {

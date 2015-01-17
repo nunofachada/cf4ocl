@@ -162,6 +162,10 @@ static void create_info_destroy_test() {
 			g_assert_no_error(err);
 			g_debug("...... OCL C Ver : %d", dev_ocl_ver);
 
+			dev_ocl_ver = ccl_device_get_opencl_version(d, &err);
+			g_assert_no_error(err);
+			g_debug("...... OCL Ver : %d", dev_ocl_ver);
+
 			info = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
 			g_assert_no_error(err);
 			ccl_test_platforms_msg("...... Name :", "%s",

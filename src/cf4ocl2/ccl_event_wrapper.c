@@ -356,7 +356,14 @@ cl_command_type ccl_event_get_command_type(
 
 /**
  * Get the OpenCL version of the platform associated with this event
- * object.
+ * object. The version is returned as an integer, in the following
+ * format:
+ *
+ * * 100 for OpenCL 1.0
+ * * 110 for OpenCL 1.1
+ * * 120 for OpenCL 1.2
+ * * 200 for OpenCL 2.0
+ * * etc.
  *
  * @public @memberof ccl_event
  *
