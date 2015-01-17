@@ -102,6 +102,7 @@ static void create_info_destroy_test() {
 
 	char* info_check_array;
 	cl_uint info_check_scalar;
+	cl_uint dev_ocl_ver;
 
 	/* Get platforms. */
 	platfs = ccl_platforms_new(&err);
@@ -156,6 +157,10 @@ static void create_info_destroy_test() {
 			d = ccl_platform_get_device(p, j, &err);
 			g_assert_no_error(err);
 			g_debug("====== Device #%d", j);
+
+			dev_ocl_ver = ccl_device_get_opencl_c_version(d, &err);
+			g_assert_no_error(err);
+			g_debug("...... OCL C Ver : %d", dev_ocl_ver);
 
 			info = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
 			g_assert_no_error(err);
