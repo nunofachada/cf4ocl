@@ -145,7 +145,7 @@ void ccl_device_destroy(CCLDevice* dev) {
 
 #ifdef CL_VERSION_1_2
 
-	cl_uint ver = ccl_device_get_opencl_c_version(dev, NULL);
+	cl_uint ver = ccl_device_get_opencl_version(dev, NULL);
 
 	/* Device destruction depends on device OpenCL version. */
 	if (ver >= 120) {
