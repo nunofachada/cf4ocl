@@ -7,7 +7,7 @@ if (NOT ${BUILD_UTILS})
 endif()
 
 # List of utilities
-set(UTILS ccl_devinfo ccl_kerninfo)
+set(UTILS ccl_devinfo ccl_kerninfo ccl_c)
 
 # Common libs for utilities
 set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
