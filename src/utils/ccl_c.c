@@ -81,10 +81,6 @@ void ccl_c_args_parse(int argc, char* argv[], GError** err) {
 	/* Command line options context. */
 	GOptionContext* context = NULL;
 
-	/* Set default output, if not set. */
-	if (!opt_output)
-		opt_output = g_strdup("a.out");
-
 	/* Create parsing context. */
 	context = g_option_context_new(" - " CCL_C_DESCRIPTION);
 
@@ -151,7 +147,24 @@ int main(int argc, char* argv[]) {
 	} else {
 
 		/* User didn't request list of devices, proceed with task. */
-		g_printf("Will do a task\n");
+		switch (opt_task) {
+			case CCL_C_INFO:
+				g_printf("Print kernel info\n");
+				break;
+			case CCL_C_BUILD:
+				g_printf("Build kernel\n");
+				break;
+			case CCL_C_COMPILE:
+				g_printf("Compile kernel\n");
+				break;
+			case CCL_C_LINK:
+				g_printf("Link kernel\n");
+				break;
+			default:
+				ccl_if_err_create_goto(err, CCL_ERROR, TRUE,
+					CCL_ERROR_ARGS, error_handler, "Unknown task: %d",
+					opt_task);
+		}
 	}
 
 	/* If we got here, everything is OK. */
@@ -170,7 +183,8 @@ error_handler:
 cleanup:
 
 	/* Free stuff! */
-	g_free(opt_output);
+	if (opt_output)
+		g_free(opt_output);
 
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
