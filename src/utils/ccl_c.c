@@ -20,7 +20,7 @@
  * Utility for static compilation and linking of OpenCL kernels.
  *
  * @author Nuno Fachada
- * @date 2015
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -37,16 +37,18 @@
 
 /* Available tasks. */
 typedef enum ccl_c_tasks {
-	CCL_C_INFO = 0,
-	CCL_C_BUILD = 1,
-	CCL_C_COMPILE = 2,
-	CCL_C_LINK = 3
+	CCL_C_BUILD = 0,
+	CCL_C_COMPILE = 1,
+	CCL_C_LINK = 2
 } CCLCTasks;
 
 /* Command line arguments and respective default values. */
 static gboolean opt_list = FALSE;
-static guint opt_dev = G_MAXUINT;
-static guint opt_task = CCL_C_INFO;
+static guint dev = G_MAXUINT;
+static guint opt_task = CCL_C_BUILD;
+static gchar** inputs = NULL;
+static gboolean hide_log = FALSE;
+static gchar** kernel_names = NULL;
 static gchar* opt_output = NULL;
 static gboolean version = FALSE;
 
@@ -54,12 +56,18 @@ static gboolean version = FALSE;
 static GOptionEntry entries[] = {
 	{"list",     'l', 0, G_OPTION_ARG_NONE,               &opt_list,
 	 "List available devices",                            NULL},
-	{"device",   'd', 0, G_OPTION_ARG_INT,                &opt_dev,
+	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev,
 	 "Specify a device on which to perform the task",     "DEV"},
 	{"task",     't', 0, G_OPTION_ARG_INT,                &opt_task,
-	 "0:Info, 1:Build, 2:Compile, 3:Link",                "TASK"},
-	{"output",   'o', 0, G_OPTION_ARG_STRING,             &opt_output,
-	 "Output file for build, compile or link tasks",      "OUTPUT"},
+	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
+	{"input",    'i', 0, G_OPTION_ARG_FILENAME_ARRAY,     &inputs,
+	 "Input file for build, compile or link tasks",       "FILE"},
+	{"hidelog",  'h', 0, G_OPTION_ARG_NONE,               &hide_log,
+	 "Hide build log",                                    NULL},
+	{"kerninfo", 'k', 0, G_OPTION_ARG_STRING_ARRAY        &kernel_names,
+	 "Show information for KERNEL",                       "KERNEL"},
+	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &opt_output,
+	 "Output file for compile and/or link tasks",         "FILE"},
 	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
 	 "Output version information and exit",               NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
@@ -126,31 +134,31 @@ int main(int argc, char* argv[]) {
 	/* Program return status. */
 	gint status;
 
+	/* Temporary kernel name. */
+	gchar* kname;
+
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
 	ccl_if_err_goto(err, error_handler);
 
-	/* If version was requested, output version and exit. */
+	/* Determine main program goal. */
 	if (version) {
+
+		/* If version was requested, show version. */
 		ccl_common_version_print("ccl_c");
-		exit(0);
-	}
 
-	/* Check if user requested a list of available devices. */
-	if (opt_list) {
+	} else if (opt_list) {
 
-		/*Yes, user requested list, present it. */
-
+		/* If user requested a list of available devices,
+		 * present the list. */
 		ccl_devsel_print_device_strings(&err);
 		ccl_if_err_goto(err, error_handler);
 
 	} else {
 
-		/* User didn't request list of devices, proceed with task. */
+		/* Otherwise perform a task, which requires at least one input
+		 * file and the specification of a device. */
 		switch (opt_task) {
-			case CCL_C_INFO:
-				g_printf("Print kernel info\n");
-				break;
 			case CCL_C_BUILD:
 				g_printf("Build kernel\n");
 				break;
@@ -165,6 +173,23 @@ int main(int argc, char* argv[]) {
 					CCL_ERROR_ARGS, error_handler, "Unknown task: %d",
 					opt_task);
 		}
+
+		/* Show build log? */
+		if (!hide_log) {
+
+
+		}
+
+		/* Show information about kernels? */
+		if (kernel_names) {
+
+			/* Cycle through the specified kernels. */
+			while ((kname = *(kernel_names++)) != NULL) {
+
+			}
+
+		}
+
 	}
 
 	/* If we got here, everything is OK. */
@@ -183,6 +208,10 @@ error_handler:
 cleanup:
 
 	/* Free stuff! */
+	if (inputs)
+		g_strfreev(inputs);
+	if (kernel_names)
+		g_strfreev(kernel_names);
 	if (opt_output)
 		g_free(opt_output);
 
