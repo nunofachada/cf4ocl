@@ -139,15 +139,15 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL *clIcdGetPlatformIDsKHR_fn)(
  * cl_khr_initalize_memory extension *
  *************************************/
     
-#define CL_CONTEXT_MEMORY_INITIALIZE_KHR            0x200E
+#define CL_CONTEXT_MEMORY_INITIALIZE_KHR            0x2030
     
     
 /**************************************
  * cl_khr_terminate_context extension *
  **************************************/
     
-#define CL_DEVICE_TERMINATE_CAPABILITY_KHR          0x200F
-#define CL_CONTEXT_TERMINATE_KHR                    0x2010
+#define CL_DEVICE_TERMINATE_CAPABILITY_KHR          0x2031
+#define CL_CONTEXT_TERMINATE_KHR                    0x2032
 
 #define cl_khr_terminate_context 1
 extern CL_API_ENTRY cl_int CL_API_CALL clTerminateContextKHR(cl_context /* context */) CL_EXT_SUFFIX__VERSION_1_2;
@@ -286,7 +286,7 @@ typedef struct _cl_mem_ext_host_ptr
     /* Legal values will be defined in layered extensions. */
     cl_uint  allocation_type;
             
-	/* Host cache policy for this external memory allocation. */
+    /* Host cache policy for this external memory allocation. */
     cl_uint  host_cache_policy;
 
 } cl_mem_ext_host_ptr;
@@ -312,6 +312,76 @@ typedef struct _cl_mem_ion_host_ptr
 } cl_mem_ion_host_ptr;
 
 #endif /* CL_VERSION_1_1 */
+
+
+#ifdef CL_VERSION_2_0
+/*********************************
+* cl_khr_sub_groups extension
+*********************************/
+#define cl_khr_sub_groups 1
+
+typedef cl_uint  cl_kernel_sub_group_info;
+
+/* cl_khr_sub_group_info */
+#define CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE_KHR	0x2033
+#define CL_KERNEL_SUB_GROUP_COUNT_FOR_NDRANGE_KHR		0x2034
+
+extern CL_API_ENTRY cl_int CL_API_CALL
+clGetKernelSubGroupInfoKHR(cl_kernel /* in_kernel */,
+						   cl_device_id /*in_device*/,
+						   cl_kernel_sub_group_info /* param_name */,
+						   size_t /*input_value_size*/,
+						   const void * /*input_value*/,
+						   size_t /*param_value_size*/,
+						   void* /*param_value*/,
+						   size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0;
+						   
+typedef CL_API_ENTRY cl_int
+     ( CL_API_CALL * clGetKernelSubGroupInfoKHR_fn)(cl_kernel /* in_kernel */,
+						      cl_device_id /*in_device*/,
+						      cl_kernel_sub_group_info /* param_name */,
+						      size_t /*input_value_size*/,
+						      const void * /*input_value*/,
+						      size_t /*param_value_size*/,
+						      void* /*param_value*/,
+						      size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0;
+#endif /* CL_VERSION_2_0 */
+
+#ifdef CL_VERSION_2_1
+/*********************************
+* cl_khr_priority_hints extension
+*********************************/
+#define cl_khr_priority_hints 1
+
+typedef cl_uint  cl_queue_priority_khr;
+
+/* cl_command_queue_properties */
+#define CL_QUEUE_PRIORITY_KHR 0x1096
+
+/* cl_queue_priority_khr */
+#define CL_QUEUE_PRIORITY_HIGH_KHR (1<<0)
+#define CL_QUEUE_PRIORITY_MED_KHR (1<<1)
+#define CL_QUEUE_PRIORITY_LOW_KHR (1<<2)
+
+#endif /* CL_VERSION_2_1 */
+
+#ifdef CL_VERSION_2_1
+/*********************************
+* cl_khr_throttle_hints extension
+*********************************/
+#define cl_khr_throttle_hints 1
+
+typedef cl_uint  cl_queue_throttle_khr;
+
+/* cl_command_queue_properties */
+#define CL_QUEUE_THROTTLE_KHR 0x1097
+
+/* cl_queue_throttle_khr */
+#define CL_QUEUE_THROTTLE_HIGH_KHR (1<<0)
+#define CL_QUEUE_THROTTLE_MED_KHR (1<<1)
+#define CL_QUEUE_THROTTLE_LOW_KHR (1<<2)
+
+#endif /* CL_VERSION_2_1 */
 
 #ifdef __cplusplus
 }

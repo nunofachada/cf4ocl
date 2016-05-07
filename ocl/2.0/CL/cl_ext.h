@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 The Khronos Group Inc.
+ * Copyright (c) 2008-2015 The Khronos Group Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and/or associated documentation files (the
@@ -11,6 +11,11 @@
  *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Materials.
+ *
+ * MODIFICATIONS TO THIS FILE MAY MEAN IT NO LONGER ACCURATELY REFLECTS
+ * KHRONOS STANDARDS. THE UNMODIFIED, NORMATIVE VERSIONS OF KHRONOS
+ * SPECIFICATIONS AND HEADER INFORMATION ARE LOCATED AT
+ *    https://www.khronos.org/registry/
  *
  * THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -134,15 +139,15 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL *clIcdGetPlatformIDsKHR_fn)(
  * cl_khr_initalize_memory extension *
  *************************************/
     
-#define CL_CONTEXT_MEMORY_INITIALIZE_KHR            0x200E
+#define CL_CONTEXT_MEMORY_INITIALIZE_KHR            0x2030
     
     
 /**************************************
  * cl_khr_terminate_context extension *
  **************************************/
     
-#define CL_DEVICE_TERMINATE_CAPABILITY_KHR          0x200F
-#define CL_CONTEXT_TERMINATE_KHR                    0x2010
+#define CL_DEVICE_TERMINATE_CAPABILITY_KHR          0x2031
+#define CL_CONTEXT_TERMINATE_KHR                    0x2032
 
 #define cl_khr_terminate_context 1
 extern CL_API_ENTRY cl_int CL_API_CALL clTerminateContextKHR(cl_context /* context */) CL_EXT_SUFFIX__VERSION_1_2;
@@ -307,6 +312,40 @@ typedef struct _cl_mem_ion_host_ptr
 } cl_mem_ion_host_ptr;
 
 #endif /* CL_VERSION_1_1 */
+
+
+#ifdef CL_VERSION_2_0
+/*********************************
+* cl_khr_sub_groups extension
+*********************************/
+#define cl_khr_sub_groups 1
+
+typedef cl_uint  cl_kernel_sub_group_info;
+
+/* cl_khr_sub_group_info */
+#define CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE_KHR	0x2033
+#define CL_KERNEL_SUB_GROUP_COUNT_FOR_NDRANGE_KHR		0x2034
+
+extern CL_API_ENTRY cl_int CL_API_CALL
+clGetKernelSubGroupInfoKHR(cl_kernel /* in_kernel */,
+						   cl_device_id /*in_device*/,
+						   cl_kernel_sub_group_info /* param_name */,
+						   size_t /*input_value_size*/,
+						   const void * /*input_value*/,
+						   size_t /*param_value_size*/,
+						   void* /*param_value*/,
+						   size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0;
+						   
+typedef CL_API_ENTRY cl_int
+     ( CL_API_CALL * clGetKernelSubGroupInfoKHR_fn)(cl_kernel /* in_kernel */,
+						      cl_device_id /*in_device*/,
+						      cl_kernel_sub_group_info /* param_name */,
+						      size_t /*input_value_size*/,
+						      const void * /*input_value*/,
+						      size_t /*param_value_size*/,
+						      void* /*param_value*/,
+						      size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0;
+#endif /* CL_VERSION_2_0 */
 
 #ifdef __cplusplus
 }
