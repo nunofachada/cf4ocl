@@ -46,11 +46,12 @@ typedef enum ccl_c_tasks {
 /* Command line arguments and respective default values. */
 static gboolean opt_list = FALSE;
 static guint dev_idx = CCL_C_NODEVICE;
-static guint opt_task = CCL_C_BUILD;
+static guint task = CCL_C_BUILD;
+static gchar* options = NULL;
 static gchar** inputs = NULL;
 static gboolean hide_log = FALSE;
 static gchar** kernel_names = NULL;
-static gchar* opt_output = NULL;
+static gchar* output = NULL;
 static gboolean version = FALSE;
 
 /* Valid command line options. */
@@ -59,7 +60,9 @@ static GOptionEntry entries[] = {
 	 "List available devices",                            NULL},
 	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev_idx,
 	 "Specify a device on which to perform the task",     "DEV"},
-	{"task",     't', 0, G_OPTION_ARG_INT,                &opt_task,
+	{"task",     't', 0, G_OPTION_ARG_INT,                &task,
+	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
+	{"options",  '0', 0, G_OPTION_ARG_STRING,             &options,
 	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
 	{"input",    'i', 0, G_OPTION_ARG_FILENAME_ARRAY,     &inputs,
 	 "Input file for build, compile or link tasks",       "FILE"},
@@ -67,7 +70,7 @@ static GOptionEntry entries[] = {
 	 "Hide build log",                                    NULL},
 	{"kerninfo", 'k', 0, G_OPTION_ARG_STRING_ARRAY,       &kernel_names,
 	 "Show information for KERNEL",                       "KERNEL"},
-	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &opt_output,
+	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &output,
 	 "Output file for compile and/or link tasks",         "FILE"},
 	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
 	 "Output version information and exit",               NULL},
@@ -179,7 +182,7 @@ int main(int argc, char* argv[]) {
 		ccl_if_err_goto(err, error_handler);
 
 		 /* Perform task. */
-		switch (opt_task) {
+		switch (task) {
 			case CCL_C_BUILD:
 				g_printf("Build kernel\n");
 				break;
@@ -192,7 +195,7 @@ int main(int argc, char* argv[]) {
 			default:
 				ccl_if_err_create_goto(err, CCL_ERROR, TRUE,
 					CCL_ERROR_ARGS, error_handler, "Unknown task: %d",
-					opt_task);
+					task);
 		}
 
 		/* Show build log? */
@@ -233,8 +236,9 @@ cleanup:
 
 	/* Free stuff! */
 	if (inputs) g_strfreev(inputs);
+	if (options) g_free(options);
 	if (kernel_names) g_strfreev(kernel_names);
-	if (opt_output) g_free(opt_output);
+	if (output) g_free(output);
 	if (ctx) ccl_context_destroy(ctx);
 
 	/* Confirm that memory allocated by wrappers has been properly
