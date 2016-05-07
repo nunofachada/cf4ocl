@@ -34,6 +34,7 @@
 #include <cf4ocl2.h>
 
 #define CCL_C_DESCRIPTION "Static kernel compiler and analyzer"
+#define CCL_C_NODEVICE G_MAXUINT
 
 /* Available tasks. */
 typedef enum ccl_c_tasks {
@@ -44,7 +45,7 @@ typedef enum ccl_c_tasks {
 
 /* Command line arguments and respective default values. */
 static gboolean opt_list = FALSE;
-static guint dev = G_MAXUINT;
+static guint dev_idx = CCL_C_NODEVICE;
 static guint opt_task = CCL_C_BUILD;
 static gchar** inputs = NULL;
 static gboolean hide_log = FALSE;
@@ -56,7 +57,7 @@ static gboolean version = FALSE;
 static GOptionEntry entries[] = {
 	{"list",     'l', 0, G_OPTION_ARG_NONE,               &opt_list,
 	 "List available devices",                            NULL},
-	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev,
+	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev_idx,
 	 "Specify a device on which to perform the task",     "DEV"},
 	{"task",     't', 0, G_OPTION_ARG_INT,                &opt_task,
 	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
@@ -64,7 +65,7 @@ static GOptionEntry entries[] = {
 	 "Input file for build, compile or link tasks",       "FILE"},
 	{"hidelog",  'h', 0, G_OPTION_ARG_NONE,               &hide_log,
 	 "Hide build log",                                    NULL},
-	{"kerninfo", 'k', 0, G_OPTION_ARG_STRING_ARRAY        &kernel_names,
+	{"kerninfo", 'k', 0, G_OPTION_ARG_STRING_ARRAY,       &kernel_names,
 	 "Show information for KERNEL",                       "KERNEL"},
 	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &opt_output,
 	 "Output file for compile and/or link tasks",         "FILE"},
@@ -134,8 +135,14 @@ int main(int argc, char* argv[]) {
 	/* Program return status. */
 	gint status;
 
-	/* Temporary kernel name. */
-	gchar* kname;
+	/* Counter. */
+	int i;
+
+	/* Device filters. */
+	CCLDevSelFilters filters = NULL;
+
+	/* Context wrapper. */
+	CCLContext* ctx = NULL;
 
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
@@ -158,6 +165,20 @@ int main(int argc, char* argv[]) {
 
 		/* Otherwise perform a task, which requires at least one input
 		 * file and the specification of a device. */
+
+		/* Check for input files. */
+		ccl_if_err_create_goto(err, CCL_ERROR, inputs == NULL,
+					CCL_ERROR_ARGS, error_handler,
+					"No input files have been specified");
+
+		/* Select a context/device. */
+		ccl_devsel_add_dep_filter(
+			&filters, ccl_devsel_dep_menu,
+			(dev_idx == CCL_C_NODEVICE) ? NULL : (void*) &dev_idx);
+		ctx = ccl_context_new_from_filters(&filters, &err);
+		ccl_if_err_goto(err, error_handler);
+
+		 /* Perform task. */
 		switch (opt_task) {
 			case CCL_C_BUILD:
 				g_printf("Build kernel\n");
@@ -177,6 +198,7 @@ int main(int argc, char* argv[]) {
 		/* Show build log? */
 		if (!hide_log) {
 
+			printf("Build log not hidden!\n");
 
 		}
 
@@ -184,7 +206,9 @@ int main(int argc, char* argv[]) {
 		if (kernel_names) {
 
 			/* Cycle through the specified kernels. */
-			while ((kname = *(kernel_names++)) != NULL) {
+			for (i = 0; kernel_names[i] != NULL; i++) {
+
+				printf("Kernel name: %s\n", kernel_names[i]);
 
 			}
 
@@ -208,12 +232,10 @@ error_handler:
 cleanup:
 
 	/* Free stuff! */
-	if (inputs)
-		g_strfreev(inputs);
-	if (kernel_names)
-		g_strfreev(kernel_names);
-	if (opt_output)
-		g_free(opt_output);
+	if (inputs) g_strfreev(inputs);
+	if (kernel_names) g_strfreev(kernel_names);
+	if (opt_output) g_free(opt_output);
+	if (ctx) ccl_context_destroy(ctx);
 
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
