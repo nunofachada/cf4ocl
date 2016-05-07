@@ -48,7 +48,9 @@ static gboolean opt_list = FALSE;
 static guint dev_idx = CCL_C_NODEVICE;
 static guint task = CCL_C_BUILD;
 static gchar* options = NULL;
-static gchar** inputs = NULL;
+static gchar** src_files = NULL;
+static gchar** src_h_files = NULL;
+static gchar** bin_files = NULL;
 static gboolean hide_log = FALSE;
 static gchar** kernel_names = NULL;
 static gchar* output = NULL;
@@ -57,21 +59,25 @@ static gboolean version = FALSE;
 /* Valid command line options. */
 static GOptionEntry entries[] = {
 	{"list",     'l', 0, G_OPTION_ARG_NONE,               &opt_list,
-	 "List available devices",                            NULL},
+	 "List available devices and exit",                   NULL},
 	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev_idx,
 	 "Specify a device on which to perform the task",     "DEV"},
 	{"task",     't', 0, G_OPTION_ARG_INT,                &task,
 	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
 	{"options",  '0', 0, G_OPTION_ARG_STRING,             &options,
-	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
-	{"input",    'i', 0, G_OPTION_ARG_FILENAME_ARRAY,     &inputs,
-	 "Input file for build, compile or link tasks",       "FILE"},
+	 "Compiler/linker options",                           "OPTIONS"},
+	{"src",      's', 0, G_OPTION_ARG_FILENAME_ARRAY,     &src_files,
+	 "Source input file",                                 "FILE"},
+	{"src-h",    'h', 0, G_OPTION_ARG_FILENAME_ARRAY,     &src_h_files,
+	 "Source header input file",                          "FILE"},
+	{"bin",      'b', 0, G_OPTION_ARG_FILENAME_ARRAY,     &bin_files,
+	 "Binary input file",                                 "FILE"},
 	{"hidelog",  'h', 0, G_OPTION_ARG_NONE,               &hide_log,
 	 "Hide build log",                                    NULL},
 	{"kerninfo", 'k', 0, G_OPTION_ARG_STRING_ARRAY,       &kernel_names,
 	 "Show information for KERNEL",                       "KERNEL"},
 	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &output,
-	 "Output file for compile and/or link tasks",         "FILE"},
+	 "Binary output file",                               "FILE"},
 	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
 	 "Output version information and exit",               NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
@@ -141,11 +147,20 @@ int main(int argc, char* argv[]) {
 	/* Counter. */
 	int i;
 
+	/* Number of types of files. */
+	guint n_src_files, n_src_h_files, n_bin_files;
+
 	/* Device filters. */
 	CCLDevSelFilters filters = NULL;
 
 	/* Context wrapper. */
 	CCLContext* ctx = NULL;
+
+	/* Device wrapper. */
+	CCLDevice* dev = NULL;
+
+	/* Program wrapper. */
+	CCLProgram* prg = NULL;
 
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
@@ -170,9 +185,18 @@ int main(int argc, char* argv[]) {
 		 * file and the specification of a device. */
 
 		/* Check for input files. */
-		ccl_if_err_create_goto(err, CCL_ERROR, inputs == NULL,
-					CCL_ERROR_ARGS, error_handler,
-					"No input files have been specified");
+		ccl_if_err_create_goto(err, CCL_ERROR, (src_files == NULL) &&
+			(src_h_files == NULL) && (bin_files == NULL),
+			CCL_ERROR_ARGS, error_handler,
+			"No source or binary input files have been specified.");
+
+		/* How many files of each type? */
+		n_src_files = src_files != NULL
+			? g_strv_length(src_files) : 0;
+		n_src_h_files = src_h_files != NULL
+			? g_strv_length(src_h_files) : 0;
+		n_bin_files = bin_files != NULL
+			? g_strv_length(bin_files) : 0;
 
 		/* Select a context/device. */
 		ccl_devsel_add_dep_filter(
@@ -180,18 +204,49 @@ int main(int argc, char* argv[]) {
 			(dev_idx == CCL_C_NODEVICE) ? NULL : (void*) &dev_idx);
 		ctx = ccl_context_new_from_filters(&filters, &err);
 		ccl_if_err_goto(err, error_handler);
+		dev = ccl_context_get_device(ctx, 0, &err);
+		ccl_if_err_goto(err, error_handler);
 
 		 /* Perform task. */
 		switch (task) {
 			case CCL_C_BUILD:
-				g_printf("Build kernel\n");
+
+				/* For direct builds we can only have either binary or
+				 * source files, but not both. */
+				ccl_if_err_create_goto(err, CCL_ERROR,
+					((n_src_files + n_src_h_files > 0) &&
+					(n_bin_files > 0)) || (n_bin_files > 1),
+					CCL_ERROR_ARGS, error_handler,
+					"The 'build' task requires either: 1) one or more "
+					"source files; or, 2) one binary file.");
+
+				/* Create program object. */
+				if (n_bin_files == 1) {
+					prg = ccl_program_new_from_binary_file(ctx, dev,
+						*bin_files, NULL, &err);
+				} else {
+					/* TODO: Add header files */
+					prg = ccl_program_new_from_source_files(ctx,
+						n_src_files, (const char**) src_files, &err);
+				}
+				ccl_if_err_goto(err, error_handler);
+
+				/* Build program. */
+				ccl_program_build(prg, options, &err);
+				ccl_if_err_goto(err, error_handler);
+
 				break;
+
 			case CCL_C_COMPILE:
+
 				g_printf("Compile kernel\n");
 				break;
+
 			case CCL_C_LINK:
+
 				g_printf("Link kernel\n");
 				break;
+
 			default:
 				ccl_if_err_create_goto(err, CCL_ERROR, TRUE,
 					CCL_ERROR_ARGS, error_handler, "Unknown task: %d",
@@ -201,7 +256,7 @@ int main(int argc, char* argv[]) {
 		/* Show build log? */
 		if (!hide_log) {
 
-			printf("Build log not hidden!\n");
+			printf("%s", ccl_program_get_build_log(prg));
 
 		}
 
@@ -228,18 +283,26 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
-	g_fprintf(stderr, "%s\n", err->message);
+
+	if (err->code == CL_BUILD_PROGRAM_FAILURE) {
+		g_fprintf(stderr, "%s", ccl_program_get_build_log(prg));
+	} else {
+		g_fprintf(stderr, "%s\n", err->message);
+	}
 	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
 	g_error_free(err);
 
 cleanup:
 
 	/* Free stuff! */
-	if (inputs) g_strfreev(inputs);
+	if (src_files) g_strfreev(src_files);
+	if (src_h_files) g_strfreev(src_h_files);
+	if (bin_files) g_strfreev(bin_files);
 	if (options) g_free(options);
 	if (kernel_names) g_strfreev(kernel_names);
 	if (output) g_free(output);
 	if (ctx) ccl_context_destroy(ctx);
+	if (prg) ccl_program_destroy(prg);
 
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
