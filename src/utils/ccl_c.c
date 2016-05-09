@@ -32,6 +32,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include <string.h>
 
 #define CCL_C_DESCRIPTION "Static kernel compiler and analyzer"
 #define CCL_C_NODEVICE G_MAXUINT
@@ -52,7 +53,6 @@ static gchar** src_files = NULL;
 static gchar** src_h_files = NULL;
 static gchar** bin_files = NULL;
 static gboolean hide_log = FALSE;
-static gchar** kernel_names = NULL;
 static gchar* output = NULL;
 static gboolean version = FALSE;
 
@@ -74,8 +74,6 @@ static GOptionEntry entries[] = {
 	 "Binary input file",                                 "FILE"},
 	{"hidelog",  'h', 0, G_OPTION_ARG_NONE,               &hide_log,
 	 "Hide build log",                                    NULL},
-	{"kerninfo", 'k', 0, G_OPTION_ARG_STRING_ARRAY,       &kernel_names,
-	 "Show information for KERNEL",                       "KERNEL"},
 	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &output,
 	 "Binary output file",                               "FILE"},
 	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
@@ -144,11 +142,11 @@ int main(int argc, char* argv[]) {
 	/* Program return status. */
 	gint status;
 
-	/* Counter. */
-	int i;
-
 	/* Number of types of files. */
 	guint n_src_files, n_src_h_files, n_bin_files;
+
+	/* All source files. */
+	gchar** src_files_all = NULL;
 
 	/* Device filters. */
 	CCLDevSelFilters filters = NULL;
@@ -222,12 +220,32 @@ int main(int argc, char* argv[]) {
 
 				/* Create program object. */
 				if (n_bin_files == 1) {
+
+					/* Create program from binary file. */
 					prg = ccl_program_new_from_binary_file(ctx, dev,
 						*bin_files, NULL, &err);
+
 				} else {
-					/* TODO: Add header files */
+
+					/* Join header sources + program sources. */
+					src_files_all = (gchar**)
+						g_slice_alloc(sizeof(gchar*) *
+							(n_src_files + n_src_h_files));
+					g_memmove(src_files_all, src_h_files,
+						n_src_h_files * sizeof(char*));
+					g_memmove(src_files_all + n_src_h_files, src_files,
+						n_src_files * sizeof(char*));
+
+					/* Create program from source. */
 					prg = ccl_program_new_from_source_files(ctx,
-						n_src_files, (const char**) src_files, &err);
+						n_src_h_files + n_src_files,
+						(const char**) src_files_all, &err);
+
+					/* Free joined header + program sources. */
+					g_slice_free1(sizeof(gchar*) *
+							(n_src_files + n_src_h_files),
+							src_files_all);
+
 				}
 				ccl_if_err_goto(err, error_handler);
 
@@ -253,22 +271,16 @@ int main(int argc, char* argv[]) {
 					task);
 		}
 
+		/* Output binary? */
+		if (output) {
+			ccl_program_save_binary(prg, dev, output, &err);
+			ccl_if_err_goto(err, error_handler);
+		}
+
 		/* Show build log? */
 		if (!hide_log) {
 
 			printf("%s", ccl_program_get_build_log(prg));
-
-		}
-
-		/* Show information about kernels? */
-		if (kernel_names) {
-
-			/* Cycle through the specified kernels. */
-			for (i = 0; kernel_names[i] != NULL; i++) {
-
-				printf("Kernel name: %s\n", kernel_names[i]);
-
-			}
 
 		}
 
@@ -299,7 +311,6 @@ cleanup:
 	if (src_h_files) g_strfreev(src_h_files);
 	if (bin_files) g_strfreev(bin_files);
 	if (options) g_free(options);
-	if (kernel_names) g_strfreev(kernel_names);
 	if (output) g_free(output);
 	if (ctx) ccl_context_destroy(ctx);
 	if (prg) ccl_program_destroy(prg);
