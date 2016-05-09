@@ -86,7 +86,7 @@ if (NOT APPLE) # Not for Apple, which handles these headers differently
 
 	set(OPENCL_LOCAL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
 
-	set_property(CACHE OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0")
+	set_property(CACHE OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0" "2.1")
 
 	if (OPENCL_USE_LOCAL_HEADERS)
 		SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${OPENCL_LOCAL_HEADERS}")

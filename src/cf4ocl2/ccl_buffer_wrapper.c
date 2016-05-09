@@ -982,8 +982,8 @@ finish:
  * @param[in] pattern_size Size of data pattern in bytes.
  * @param[in] offset The location in bytes of the region being filled in
  * buffer and must be a multiple of pattern_size.
- * @param[in] size he size in bytes of region being filled in buffer and
- * must be a multiple of pattern_size.
+ * @param[in] size The size in bytes of region being filled in buffer.
+ * Must be a multiple of pattern_size.
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
