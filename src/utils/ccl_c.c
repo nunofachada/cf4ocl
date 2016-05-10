@@ -163,6 +163,9 @@ int main(int argc, char* argv[]) {
 	/* Main program wrapper. */
 	CCLProgram* prg = NULL;
 
+	/* Auxiliary program wrapper. */
+	CCLProgram* prg_aux = NULL;
+
 	/* Array containing multiple program wrappers. */
 	GPtrArray* prgs = NULL;
 
@@ -283,12 +286,12 @@ int main(int argc, char* argv[]) {
 					for (i = 0; i < n_src_h_files; i++) {
 
 						/* Create current header program from source. */
-						prg = ccl_program_new_from_source_files(ctx, 1,
-							(const char**) &(src_h_files[i]), &err);
+						prg_aux = ccl_program_new_from_source_files(ctx,
+							1, (const char**) &(src_h_files[i]), &err);
 						ccl_if_err_goto(err, error_handler);
 
 						/* Add header program to array. */
-						g_ptr_array_add(prgs, (gpointer) prg);
+						g_ptr_array_add(prgs, (gpointer) prg_aux);
 
 					}
 				}
@@ -303,7 +306,8 @@ int main(int argc, char* argv[]) {
 				 * of assuming they are the same as the included
 				 * files. */
 				ccl_program_compile(prg, 1, &dev, options,
-					n_src_h_files, (CCLProgram **) prgs->pdata,
+					n_src_h_files,
+					(CCLProgram**) (prgs ? prgs->pdata : NULL),
 					(const char**) src_h_files, NULL, NULL, &err);
 				ccl_if_err_goto(err, error_handler);
 
@@ -311,7 +315,32 @@ int main(int argc, char* argv[]) {
 
 			case CCL_C_LINK:
 
-				g_printf("Link kernel\n");
+				/* Instantiate array of programs. */
+				prgs = g_ptr_array_new_full(
+					n_bin_files,
+					(GDestroyNotify) ccl_program_destroy);
+
+				/* Create programs from source, probably REMOVE */
+
+				/* Create programs from binaries. */
+				for (i = 0; i < n_bin_files; i++) {
+
+					/* Create program from current binary file. */
+					prg_aux = ccl_program_new_from_binary_file(ctx, dev,
+						*bin_files, NULL, &err);
+					ccl_if_err_goto(err, error_handler);
+
+					/* Add binary program to array. */
+					g_ptr_array_add(prgs, (gpointer) prg_aux);
+
+				}
+
+				/* Link programs. */
+				prg = ccl_program_link(ctx, 1, &dev, options,
+					n_bin_files, (CCLProgram**) prgs->pdata, NULL,
+					NULL, &err);
+				ccl_if_err_goto(err, error_handler);
+
 				break;
 
 			default:
