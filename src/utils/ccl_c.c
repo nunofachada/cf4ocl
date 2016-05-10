@@ -142,6 +142,9 @@ int main(int argc, char* argv[]) {
 	/* Program return status. */
 	gint status;
 
+	/* Counter for for loops. */
+	guint i = 0;
+
 	/* Number of types of files. */
 	guint n_src_files, n_src_h_files, n_bin_files;
 
@@ -157,8 +160,11 @@ int main(int argc, char* argv[]) {
 	/* Device wrapper. */
 	CCLDevice* dev = NULL;
 
-	/* Program wrapper. */
+	/* Main program wrapper. */
 	CCLProgram* prg = NULL;
+
+	/* Array containing multiple program wrappers. */
+	GPtrArray* prgs = NULL;
 
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
@@ -209,8 +215,8 @@ int main(int argc, char* argv[]) {
 		switch (task) {
 			case CCL_C_BUILD:
 
-				/* For direct builds we can only have either binary or
-				 * source files, but not both. */
+				/* For direct builds we can only have either one binary
+				 * or one or more source files (but not both). */
 				ccl_if_err_create_goto(err, CCL_ERROR,
 					((n_src_files + n_src_h_files > 0) &&
 					(n_bin_files > 0)) || (n_bin_files > 1),
@@ -257,7 +263,50 @@ int main(int argc, char* argv[]) {
 
 			case CCL_C_COMPILE:
 
-				g_printf("Compile kernel\n");
+				/* Compilation requires at least one source file and
+				 * does not support binaries. */
+				ccl_if_err_create_goto(err, CCL_ERROR,
+					(n_bin_files > 0) || (n_src_files == 0),
+					CCL_ERROR_ARGS, error_handler,
+					"The 'compile' task requires at least one source "
+					"file and does not support binaries.");
+
+				/* Create header programs, if any. */
+				if (n_src_h_files) {
+
+					/* Instantiate array of header programs. */
+					prgs = g_ptr_array_new_full(
+						n_src_h_files,
+						(GDestroyNotify) ccl_program_destroy);
+
+					/* Create individual header programs. */
+					for (i = 0; i < n_src_h_files; i++) {
+
+						/* Create current header program from source. */
+						prg = ccl_program_new_from_source_files(ctx, 1,
+							(const char**) &(src_h_files[i]), &err);
+						ccl_if_err_goto(err, error_handler);
+
+						/* Add header program to array. */
+						g_ptr_array_add(prgs, (gpointer) prg);
+
+					}
+				}
+
+				/* Create main program from source. */
+				prg = ccl_program_new_from_source_files(ctx,
+					n_src_files, (const char**) src_files, &err);
+				ccl_if_err_goto(err, error_handler);
+
+				/* Compile program. */
+				/* TODO: Allow to specify header_include_names instead
+				 * of assuming they are the same as the included
+				 * files. */
+				ccl_program_compile(prg, 1, &dev, options,
+					n_src_h_files, (CCLProgram **) prgs->pdata,
+					(const char**) src_h_files, NULL, NULL, &err);
+				ccl_if_err_goto(err, error_handler);
+
 				break;
 
 			case CCL_C_LINK:
@@ -314,6 +363,7 @@ cleanup:
 	if (output) g_free(output);
 	if (ctx) ccl_context_destroy(ctx);
 	if (prg) ccl_program_destroy(prg);
+	if (prgs) g_ptr_array_free(prgs, TRUE);
 
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
