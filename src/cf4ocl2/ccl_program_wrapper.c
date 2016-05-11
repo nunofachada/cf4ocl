@@ -203,11 +203,13 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
 static void ccl_program_populate_build_log(CCLProgram* prg,
 	cl_int build_status, cl_uint num_devices, CCLDevice* const* devs) {
 
+	/* Make sure program wrapper is not NULL. */
+	g_return_if_fail(prg != NULL);
+
 	/* Get build log only if it makes sense to do so. */
 	if ((build_status == CL_SUCCESS)
 		|| (build_status == CL_BUILD_PROGRAM_FAILURE)
-		|| (build_status == CL_COMPILE_PROGRAM_FAILURE)
-		|| (build_status == CL_LINK_PROGRAM_FAILURE)) {
+		|| (build_status == CL_COMPILE_PROGRAM_FAILURE)) {
 
 		/* Number of devices. */
 		cl_uint real_num_devs = (num_devices != 0)
@@ -1160,11 +1162,16 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		(const cl_program*) input_programs, pfn_notify, user_data,
 		&ocl_status);
 
-	/* Wrap OpenCL program object. */
-	prg = ccl_program_new_wrap(program);
+	/* When link fails, cl_program can be NULL, so we check that before
+	 * wrapping it and getting a build log. */
+	if (program != NULL) {
 
-	/* Get build log, if possible. */
-	ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
+		/* Wrap OpenCL program object. */
+		prg = ccl_program_new_wrap(program);
+
+		/* Get build log, if possible. */
+		ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
+	}
 
 	/* Check for errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
