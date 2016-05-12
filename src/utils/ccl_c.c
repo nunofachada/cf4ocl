@@ -52,7 +52,6 @@ static gchar* options = NULL;
 static gchar** src_files = NULL;
 static gchar** src_h_files = NULL;
 static gchar** bin_files = NULL;
-static gboolean hide_log = FALSE;
 static gchar* output = NULL;
 static gboolean version = FALSE;
 
@@ -63,17 +62,18 @@ static GOptionEntry entries[] = {
 	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev_idx,
 	 "Specify a device on which to perform the task",     "DEV"},
 	{"task",     't', 0, G_OPTION_ARG_INT,                &task,
-	 "0: Compile + Link (default); 1: Compile; 2: Link",  "TASK"},
+	 "0 (Build, default), 1 (Compile) or 2 (Link)",       "TASK"},
 	{"options",  '0', 0, G_OPTION_ARG_STRING,             &options,
 	 "Compiler/linker options",                           "OPTIONS"},
 	{"src",      's', 0, G_OPTION_ARG_FILENAME_ARRAY,     &src_files,
-	 "Source input file",                                 "FILE"},
+	 "Source input file (this option can be specified multiple times)",
+	                                                      "FILE"},
 	{"src-h",    'h', 0, G_OPTION_ARG_FILENAME_ARRAY,     &src_h_files,
-	 "Source header input file",                          "FILE"},
+	 "Source header input file (this option can be specified multiple "
+	 "times)",                                            "FILE"},
 	{"bin",      'b', 0, G_OPTION_ARG_FILENAME_ARRAY,     &bin_files,
-	 "Binary input file",                                 "FILE"},
-	{"hidelog",  'h', 0, G_OPTION_ARG_NONE,               &hide_log,
-	 "Hide build log",                                    NULL},
+	 "Binary input file (this option can be specified multiple times)",
+	                                                      "FILE"},
 	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &output,
 	 "Binary output file",                               "FILE"},
 	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
@@ -315,12 +315,18 @@ int main(int argc, char* argv[]) {
 
 			case CCL_C_LINK:
 
+				/* Linking requires at least one binary file and does
+				 * not support source files. */
+				ccl_if_err_create_goto(err, CCL_ERROR,
+					(n_bin_files == 0) || (n_src_files > 0),
+					CCL_ERROR_ARGS, error_handler,
+					"The 'link' task requires at least one binary file "
+					"and does not support source files.");
+
 				/* Instantiate array of programs. */
 				prgs = g_ptr_array_new_full(
 					n_bin_files,
 					(GDestroyNotify) ccl_program_destroy);
-
-				/* Create programs from source, probably REMOVE */
 
 				/* Create programs from binaries. */
 				for (i = 0; i < n_bin_files; i++) {
@@ -349,18 +355,14 @@ int main(int argc, char* argv[]) {
 					task);
 		}
 
-		/* Output binary? */
+		/* Save binary? */
 		if (output) {
 			ccl_program_save_binary(prg, dev, output, &err);
 			ccl_if_err_goto(err, error_handler);
 		}
 
-		/* Show build log? */
-		if (!hide_log) {
-
-			printf("%s", ccl_program_get_build_log(prg));
-
-		}
+		/* Show build log, if any. */
+		printf("%s", ccl_program_get_build_log(prg));
 
 	}
 
