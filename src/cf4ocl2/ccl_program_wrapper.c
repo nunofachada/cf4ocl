@@ -56,10 +56,16 @@ struct ccl_program {
 	GHashTable* krnls;
 
 	/**
-	 * Build log of most recent build.
+	 * Build logs of most recent build for each device.
 	 * @private
 	 * */
-	char* build_log;
+	GHashTable* build_logs;
+
+	/**
+	 * Concatenated build logs of most recent build for all devices.
+	 * @private
+	 * */
+	gchar* build_logs_concat;
 
 };
 
@@ -118,11 +124,19 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 
 	}
 
-	/* If there is a build log... */
-	if (prg->build_log != NULL) {
+	/* If the build logs table was created... */
+	if (prg->build_logs != NULL) {
+
+		/*...free it and the included logs. */
+		g_hash_table_destroy(prg->build_logs);
+
+	}
+
+	/* If there is a concatenated build log... */
+	if (prg->build_logs_concat != NULL) {
 
 		/*...free it. */
-		g_free(prg->build_log);
+		g_free(prg->build_logs_concat);
 
 	}
 
@@ -223,33 +237,37 @@ static void ccl_program_populate_build_log(CCLProgram* prg,
 		/* Build log for current device.*/
 		char* build_log_dev;
 
-		/* Complete build log string object. */
-		GString* build_log_obj = g_string_new("");
-
-		/* Device name. */
-		char* dev_name;
-
 		/* Get build log for each device. */
 		for (cl_uint i = 0; i < real_num_devs; ++i) {
+
+			/* Get build log for current device. */
 			build_log_dev = ccl_program_get_build_info_array(
 				prg, real_devs[i], CL_PROGRAM_BUILD_LOG, char*, NULL);
-			if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
-				dev_name = ccl_device_get_info_array(
-					real_devs[i], CL_DEVICE_NAME, char*, NULL);
-				g_string_append_printf(build_log_obj, "\n*** Build log "\
-					"for device '%s' ****\n\n%s\n\n********************"\
-					"**************\n", dev_name, build_log_dev);
+
+			/* If build log is not empty, keep it in build logs
+			 * table. */
+			if ((build_log_dev != NULL)
+				&& (strlen(build_log_dev) > 0)) {
+
+				/* Check if build logs table is initialized, if not,
+				 * initialize it. */
+				if (!prg->build_logs) {
+					prg->build_logs = g_hash_table_new(
+						g_direct_hash, g_direct_equal);
+				}
+
+				/* Keep build log for current device in build logs
+				 * table. */
+				g_hash_table_insert(prg->build_logs,
+					(gpointer) real_devs[i],
+					(gpointer) build_log_dev);
+
+				/* If build log is not empty, say something about it. */
+				g_info("Build log for device %d is not empty", i);
+				g_debug("Build log for device %d:\n\n%s\n",
+					i, build_log_dev);
+
 			}
-		}
-
-		if (prg->build_log) g_free(prg->build_log);
-		prg->build_log = build_log_obj->str;
-		g_string_free(build_log_obj, FALSE);
-
-		/* Check if build log is not empty. */
-		if ((prg->build_log != NULL) && (strlen(prg->build_log) > 0)) {
-			g_message("Build log is not empty");
-			g_debug("\n%s", prg->build_log);
 		}
 	}
 
@@ -922,10 +940,12 @@ finish:
 }
 
 /**
- * Get build log for most recent build, compile or link.
+ * Get a general build log of most recent build, compile or link, for
+ * all devices.
  *
- * The build log is returned for all devices associated with the
- * program.
+ * Individual build logs for each device associated with the program are
+ * returned in a concatenated fashion, with a header (identifying the
+ * device) and footer separating them.
  *
  * @param[in] prg Program wrapper object.
  * @return The build log for most recent build, compile or link. May be
@@ -936,10 +956,96 @@ CCL_EXPORT
 const char* ccl_program_get_build_log(CCLProgram* prg) {
 
 	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, CL_FALSE);
+	g_return_val_if_fail(prg != NULL, NULL);
 
-	/* Return build log. */
-	return (const char*) prg->build_log;
+	/* Counter. */
+	cl_uint i = 0;
+
+	/* Number of devices in program. */
+	cl_uint num_devs = 0;
+
+	/* Current device. */
+	CCLDevice* dev = NULL;
+
+	/* Name of current device. */
+	char* dev_name;
+
+	/* Build log for current device.*/
+	const char* build_log;
+
+	/* Complete build log string object. */
+	GString* build_log_obj = g_string_new("");
+
+	/* Clear any previously obtained concatenated build log. */
+	if (prg->build_logs_concat) {
+		g_free(prg->build_logs_concat);
+		prg->build_logs_concat = NULL;
+	}
+
+	/* How many devices in program? */
+	num_devs = ccl_program_get_num_devices(prg, NULL);
+
+	/* For each device in program: */
+	for (i = 0; i < num_devs; i++) {
+
+		/* Get the respective device wrapper. */
+		dev = ccl_program_get_device(prg, i, NULL);
+
+		/* Is it a valid device? */
+		if (dev) {
+
+			/* If so, get its name. */
+			dev_name = ccl_device_get_info_array(
+				dev, CL_DEVICE_NAME, char*, NULL);
+
+			/* Get the respective build log. */
+			build_log = ccl_program_get_device_build_log(prg, dev);
+
+			/* Append build log to string of concatenated build logs. */
+			g_string_append_printf(build_log_obj, "\n### Build log "
+				"for device '%s'\n\n%s\n\n", dev_name,
+				build_log != NULL ? build_log : "");
+		}
+	}
+
+	/* Clear any previously obtained concatenated build log... */
+	if (prg->build_logs_concat) g_free(prg->build_logs_concat);
+
+	/* ...and add the newly concatenated build log. */
+	prg->build_logs_concat = build_log_obj->str;
+
+	/* Release the string object (but not the underlying character
+	 * array). */
+	g_string_free(build_log_obj, FALSE);
+
+	/* Return concatenated build log. */
+	return (const char*) prg->build_logs_concat;
+}
+
+/**
+ * Get build log for most recent build, compile or link for the
+ * specified device.
+ *
+ * @param[in] prg Program wrapper object.
+ * @param[in] dev Device for which to get the build log.
+ * @return The build log for most recent build, compile or link. May be
+ * `NULL` or an empty string if no build, compile or link was performed,
+ * or if no build log is available.
+ * */
+CCL_EXPORT
+const char* ccl_program_get_device_build_log(
+	CCLProgram* prg, CCLDevice* dev) {
+
+	/* Make sure prg is not NULL. */
+	g_return_val_if_fail(prg != NULL, NULL);
+
+	/* Make sure dev is not NULL. */
+	g_return_val_if_fail(dev != NULL, NULL);
+
+	/* Return build log for the specified device, if it exists. */
+	return (const char*) ((prg->build_logs != NULL)
+		? g_hash_table_lookup(prg->build_logs, dev)
+		: NULL);
 }
 
 #ifdef CL_VERSION_1_2

@@ -311,9 +311,16 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	cl_uint num_devices, CCLDevice* const* devs, const char* options,
 	ccl_program_callback pfn_notify, void* user_data, GError** err);
 
-/* Get build log for most recent build, compile or link. */
+/* Get a general build log of most recent build, compile or link, for
+ * all devices. */
 CCL_EXPORT
 const char* ccl_program_get_build_log(CCLProgram* prg);
+
+/* Get build log for most recent build, compile or link for the
+ * specified device. */
+CCL_EXPORT
+const char* ccl_program_get_device_build_log(
+	CCLProgram* prg, CCLDevice* dev);
 
 #ifdef CL_VERSION_1_2
 
