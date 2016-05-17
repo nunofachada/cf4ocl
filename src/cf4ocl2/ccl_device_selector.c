@@ -310,8 +310,8 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 
 
 	/* Print menu. */
-	g_print("\n   " \
-		"=========================== Device Selection " \
+	g_print("\n   "
+		"=========================== Device Selection "
 		"============================\n\n");
 
 	/* Print each device description string. */
@@ -327,11 +327,9 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 		}
 
 		/* Print string. */
-		g_print(" %s %s\n",
-			sel_str, dev_strings[i]);
+		g_print(" %s %s\n", sel_str, dev_strings[i]);
 
 	}
-
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -1108,7 +1106,7 @@ CCLDevSelDevices ccl_devsel_dep_menu(
 			g_print("\n   (!) No device at index %d!\n", index);
 			index = -1;
 		}
-		/* Don't show warning if a negative index if given, just
+		/* Don't show warning if a negative index is given, just
 		 * show the menu. */
 	}
 
