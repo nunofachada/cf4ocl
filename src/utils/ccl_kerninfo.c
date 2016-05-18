@@ -60,8 +60,6 @@ int main(int argc, char *argv[]) {
 	CCLKernel* krnl = NULL;
 	/* Device wrapper. */
 	CCLDevice* dev = NULL;
-	/* Device filters. */
-	CCLDevSelFilters filters = NULL;
 	/* Default device index. */
 	cl_int dev_idx = -1;
 	/* OpenCL version. */
@@ -94,10 +92,9 @@ int main(int argc, char *argv[]) {
 	/* ********************************************* */
 
 	/* Select a context/device. */
-	ccl_devsel_add_dep_filter(
-		&filters, ccl_devsel_dep_menu,
-		(dev_idx == -1) ? NULL : (void*) &dev_idx);
-	ctx = ccl_context_new_from_filters(&filters, &err);
+	ctx = ccl_context_new_from_menu_full(
+		(dev_idx == -1) ? NULL : (void*) &dev_idx,
+		&err);
 	ccl_if_err_goto(err, error_handler);
 
 	/* Get program which contains kernel. */

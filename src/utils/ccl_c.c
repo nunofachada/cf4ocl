@@ -151,9 +151,6 @@ int main(int argc, char* argv[]) {
 	/* All source files. */
 	gchar** src_files_all = NULL;
 
-	/* Device filters. */
-	CCLDevSelFilters filters = NULL;
-
 	/* Context wrapper. */
 	CCLContext* ctx = NULL;
 
@@ -206,10 +203,9 @@ int main(int argc, char* argv[]) {
 			? g_strv_length(bin_files) : 0;
 
 		/* Select a context/device. */
-		ccl_devsel_add_dep_filter(
-			&filters, ccl_devsel_dep_menu,
-			(dev_idx == CCL_C_NODEVICE) ? NULL : (void*) &dev_idx);
-		ctx = ccl_context_new_from_filters(&filters, &err);
+		ctx = ccl_context_new_from_menu_full(
+			(dev_idx == CCL_C_NODEVICE) ? NULL : (void*) &dev_idx,
+			&err);
 		ccl_if_err_goto(err, error_handler);
 		dev = ccl_context_get_device(ctx, 0, &err);
 		ccl_if_err_goto(err, error_handler);
