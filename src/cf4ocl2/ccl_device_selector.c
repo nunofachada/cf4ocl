@@ -305,12 +305,12 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 	gchar** dev_strings;
 
 	/* Get device description strings. */
-	dev_strings = ccl_get_device_strings_from_array(devices, &err_internal);
+	dev_strings = ccl_get_device_strings_from_array(
+		devices, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
-
 	/* Print menu. */
-	g_print("\n   "
+	g_printf("\n   "
 		"=========================== Device Selection "
 		"============================\n\n");
 
@@ -327,7 +327,7 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 		}
 
 		/* Print string. */
-		g_print(" %s %s\n", sel_str, dev_strings[i]);
+		g_printf(" %s %s\n", sel_str, dev_strings[i]);
 
 	}
 
@@ -382,7 +382,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	} else {
 		/* Otherwise, query the user. */
 		do {
-			g_print("\n   (?) Select device (0-%d) > ", devices->len - 1);
+			g_printf("\n   (?) Select device (0-%d) > ", devices->len - 1);
 			result = scanf("%u", &index);
 			/* Clean keyboard buffer */
 			int c;
@@ -393,7 +393,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 					break;
 			}
 			/* Result not Ok, print error message */
-			g_print("   (!) Invalid choice, please insert a value " \
+			g_printf("   (!) Invalid choice, please insert a value " \
 				"between 0 and %u.\n", devices->len - 1);
 		} while (1);
 	}
@@ -1067,9 +1067,6 @@ finish:
  * Dependent filter function which presents a menu to the user
  * allowing him to select the desired device.
  *
- * @note Client code can select where the menu is printed to using the
- * `g_set_print_handler()` GLib function.
- *
  * @param[in] devices List of devices.
  * @param[in] data If not NULL, can contain a device index, such that
  * the device is automatically selected by this filter.
@@ -1092,32 +1089,104 @@ CCLDevSelDevices ccl_devsel_dep_menu(
 	/* Index of selected device. */
 	cl_int index = -1;
 
+	/* Device to be selected. */
+	gpointer sel_dev;
+
 	/* If data argument is given, perform auto-selection. */
 	if (data != NULL) {
 		/* Check if data contains a valid device index. */
 		index = *((cl_uint*) data);
 		/* Check if index is within bounds. */
 		if ((index >= 0) && (index < (cl_int) devices->len)) {
-			/* Device index is within bounds, print list with selection. */
+			/* Device index is within bounds, print list with
+			 * selection. */
 			ccl_devsel_dep_menu_list(devices, index, &err_internal);
 			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		} else if (index >= 0) {
 			/* If we get here, an invalid device index was given. */
-			g_print("\n   (!) No device at index %d!\n", index);
+			g_printf("\n   (!) No device at index %d!\n", index);
 			index = -1;
 		}
 		/* Don't show warning if a negative index is given, just
 		 * show the menu. */
 	}
 
-	/* If no proper index was given ask the user for the correct index. */
+	/* If no proper index was given ask the user for the correct
+	 * index. */
 	if (index < 0) {
 		index = ccl_devsel_dep_menu_query(devices, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 
 	/* Remove all devices except the selected device. */
-	gpointer sel_dev = g_ptr_array_index(devices, index);
+	sel_dev = g_ptr_array_index(devices, index);
+	ccl_device_ref((CCLDevice*) sel_dev);
+	g_ptr_array_remove_range(devices, 0, devices->len);
+	g_ptr_array_add(devices, sel_dev);
+	g_assert_cmpuint(1, ==, devices->len);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+	/* Set return value to NULL to conform to specification. */
+	devices = NULL;
+
+finish:
+
+	/* Return filtered devices. */
+	return devices;
+}
+
+/**
+ * Dependent filter function which selects the device at the specified
+ * index, failing if no device is found at that index.
+ *
+ * Device indexes depend on the order in which devices appear in the
+ * `devices` parameter.
+ *
+ * @param[in] devices List of devices.
+ * @param[in] data Must point to a valid device index of type `cl_uint`.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return The OpenCL device which was selected by the filter.
+ * */
+CCL_EXPORT
+CCLDevSelDevices ccl_devsel_dep_index(
+	CCLDevSelDevices devices, void *data, GError **err) {
+
+	/* Make sure devices is not NULL. */
+	g_return_val_if_fail(devices != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Index of selected device. */
+	cl_uint index;
+
+	/* Device to be selected. */
+	gpointer sel_dev;
+
+	/* If data is NULL, throw error, because we expect a valid device
+	 * index. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL,
+		CCL_ERROR_INVALID_DATA, error_handler,
+		"The 'data' parameter must not be NULL.");
+
+	/* Check if data contains a valid device index. */
+	index = *((cl_uint*) data);
+
+	/* Check if index is within bounds. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, index < devices->len,
+		CCL_ERROR_INVALID_DATA, error_handler,
+		"No device found at index %d.", index);
+
+	/* Select device: remove all devices from list except the selected
+	 * device. */
+	sel_dev = g_ptr_array_index(devices, index);
 	ccl_device_ref((CCLDevice*) sel_dev);
 	g_ptr_array_remove_range(devices, 0, devices->len);
 	g_ptr_array_add(devices, sel_dev);

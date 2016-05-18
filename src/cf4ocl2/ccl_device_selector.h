@@ -269,6 +269,12 @@ CCL_EXPORT
 CCLDevSelDevices ccl_devsel_dep_menu(
 	CCLDevSelDevices devices, void *data, GError **err);
 
+/* Dependent filter function which selects the device at the specified
+ * index, failing if no device is found at that index. */
+CCL_EXPORT
+CCLDevSelDevices ccl_devsel_dep_index(
+	CCLDevSelDevices devices, void *data, GError **err);
+
 /** @} */
 
 /** @} */
