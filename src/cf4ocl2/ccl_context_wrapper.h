@@ -146,11 +146,10 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 		NULL, (filters), NULL, NULL, (err))
 
 /**
- * Creates a context wrapper given an array of ::CCLDevice
- * wrappers.
+ * Creates a context wrapper given an array of ::CCLDevice wrappers.
  *
- * This macro simply calls ccl_context_new_from_devices_full()
- * setting properties, callback and user data to NULL.
+ * This macro simply calls ccl_context_new_from_devices_full() setting
+ * properties, callback and user data to `NULL`.
  *
  * @param[in] num_devices Number of cl_devices_id's in list.
  * @param[in] devices Array of ::CCLDevice wrappers.
@@ -207,8 +206,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /**
  * Creates a context wrapper for the first found device(s).
  *
- * The first found device is used. More than one device might be used if
- * all devices belong to the same platform.
+ * The first found device is used. More than one device might be used if all
+ * devices belong to the same platform.
  *
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
@@ -217,28 +216,25 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 #define ccl_context_new_any(err) \
 	ccl_context_new_from_indep_filter(NULL, NULL, err)
 
-
 /**
- * Creates a context wrapper from a device selected by the user
- * from a menu.
+ * Creates a context wrapper from a device selected by the user from a menu.
  *
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu(err) \
 	ccl_context_new_from_menu_full(NULL, err)
 
-/* Create a new context wrapper object selecting devices using
- * the given set of filters. */
+/* Create a new context wrapper object selecting devices using the given set of
+ * filters. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
 	ccl_context_callback pfn_notify, void* user_data, GError **err);
 
-/* Creates a context wrapper given an array of ::CCLDevice
- * wrappers and the remaining parameters required by the
- * clCreateContext function. */
+/* Creates a context wrapper given an array of ::CCLDevice wrappers and the
+ * remaining parameters required by the clCreateContext() function. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, cl_uint num_devices,
@@ -251,8 +247,8 @@ CCL_EXPORT
 CCLContext* ccl_context_new_from_indep_filter(
 	ccl_devsel_indep filter, void* data, GError** err);
 
-/* Creates a context wrapper using a device which the user
- * selects from a menu. */
+/* Creates a context wrapper using a device which the user selects from a
+ * menu. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
 
@@ -261,11 +257,9 @@ CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
 CCL_EXPORT
 void ccl_context_destroy(CCLContext* ctx);
 
-/* Get the OpenCL version of the platform associated with this
- * context. */
+/* Get the OpenCL version of the platform associated with this context. */
 CCL_EXPORT
-cl_uint ccl_context_get_opencl_version(
-	CCLContext* ctx, GError** err);
+cl_uint ccl_context_get_opencl_version(CCLContext* ctx, GError** err);
 
 /* Get the platform associated with the context devices. */
 CCL_EXPORT

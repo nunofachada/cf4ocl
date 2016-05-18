@@ -296,25 +296,23 @@ finish:
 }
 
 /**
- * Creates a context wrapper given an array of ::CCLDevice
- * wrappers and the remaining parameters required by the
- * clCreateContext function.
+ * Creates a context wrapper given an array of ::CCLDevice wrappers and the
+ * remaining parameters required by the clCreateContext() function.
  *
- * If the properties parameter is NULL, this function obtains
- * the cl_platform_id object from the first device.
+ * If the properties parameter is NULL, this function obtains the cl_platform_id
+ * object from the first device.
  *
  * @public @memberof ccl_context
  *
  * @param[in] properties Context properties, may be NULL.
  * @param[in] num_devices Number of ::CCLDevice wrappers in array.
  * @param[in] devices Array of ::CCLDevice wrappers.
- * @param[in] pfn_notify A callback function used by the OpenCL
- * implementation to report information on errors during context
- * creation as well as errors that occur at runtime in this context.
- * Ignored if NULL.
+ * @param[in] pfn_notify A callback function used by the OpenCL implementation
+ * to report information on errors during context creation as well as errors
+ * that occur at runtime in this context. Ignored if NULL.
  * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
  * @return A new context wrapper object.
  * */
 CCL_EXPORT
@@ -451,8 +449,7 @@ finish:
 }
 
 /**
- * Creates a context wrapper using a device which the user
- * selects from a menu.
+ * Creates a context wrapper using a device which the user selects from a menu.
  *
  * @public @memberof ccl_context
  *
@@ -525,6 +522,7 @@ void ccl_context_destroy(CCLContext* ctx) {
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @public @memberof ccl_context
@@ -536,8 +534,7 @@ void ccl_context_destroy(CCLContext* ctx) {
  * context as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_context_get_opencl_version(
-	CCLContext* ctx, GError** err) {
+cl_uint ccl_context_get_opencl_version(CCLContext* ctx, GError** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, 0);

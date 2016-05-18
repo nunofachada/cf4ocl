@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# This script scrapes the OpenCL function names from the OpenCL headers and obtains 
-# the most recent documentation URLs for each function.
+# This script scrapes the OpenCL function names from the OpenCL headers and
+# obtains the most recent documentation URLs for each function.
 #
 # Requires: ctags curl cut head
 # Author: Nuno Fachada <faken@fakenmc.com>

@@ -669,16 +669,16 @@ finish:
  */
 
 /**
- * Independent filter function which accepts devices of the type
- * given in the data parameter.
+ * Independent filter function which accepts devices of the type given in the
+ * data parameter.
  *
- * This function is used by the `ccl_devsel_indep_type_*()` group of
- * functions. Using these is simpler than using this function directly.
+ * This function is used by the `ccl_devsel_indep_type_*()` group of functions.
+ * Using these is simpler than using this function directly.
  *
  * @param[in] dev OpenCL device to filter depending on type.
  * @param[in] data Filter data, must point to a cl_device_type value.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
  * @return CL_TRUE if device is of the given type, CL_FALSE otherwise.
  * */
 CCL_EXPORT
