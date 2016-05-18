@@ -1151,8 +1151,8 @@ finish:
  *
  * @param[in] devices List of devices.
  * @param[in] data Must point to a valid device index of type `cl_uint`.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
  * @return The OpenCL device which was selected by the filter.
  * */
 CCL_EXPORT

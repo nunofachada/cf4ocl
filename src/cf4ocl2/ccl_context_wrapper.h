@@ -252,6 +252,10 @@ CCLContext* ccl_context_new_from_indep_filter(
 CCL_EXPORT
 CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
 
+/* Creates a context wrapper using a device selected by its index. */
+CCL_EXPORT
+CCLContext* ccl_context_new_from_device_index(void* data, GError** err);
+
 /* Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
 CCL_EXPORT

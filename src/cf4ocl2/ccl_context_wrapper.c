@@ -498,6 +498,57 @@ finish:
 }
 
 /**
+ * Creates a context wrapper using a device selected by its index.
+ *
+ * The device index depends on the ordering of platforms within the system, and
+ * of devices within the platforms.
+ *
+ * @public @memberof ccl_context
+ *
+ * @param[in] data Must point to a valid device index of type `cl_uint`.
+ * @param[out] err Return location for a GError, or `NULL` if error
+ * reporting is to be ignored.
+ * @return A new context wrapper object or `NULL` if an error occurs.
+ * */
+CCL_EXPORT
+CCLContext* ccl_context_new_from_device_index(void* data, GError** err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+
+	/* Context wrapper to create. */
+	CCLContext* ctx;
+
+	/* Set of device selection filters. */
+	CCLDevSelFilters filters = NULL;
+
+	/* Add menu dependent filter. */
+	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_index, data);
+
+	/* Create a context with selected device. */
+	ctx = ccl_context_new_from_filters(&filters, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
+
+	/* Return new context wrapper. */
+	return ctx;
+
+}
+
+/**
  * Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed.
  *
