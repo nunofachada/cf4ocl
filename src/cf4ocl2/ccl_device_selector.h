@@ -107,6 +107,19 @@
  * @{
  */
 
+/**
+ * Filter type.
+ * */
+typedef enum ccl_devsel_filter_type {
+
+	/** Independent filter, filters one device at a time. */
+	CCL_DEVSEL_INDEP,
+	/** Dependent filter, filters devices depending on the currently
+	 * available device choices. */
+	CCL_DEVSEL_DEP
+
+} CCLDevSelFilterType;
+
 /** A set of device wrappers, used between filtering steps. */
 typedef GPtrArray* CCLDevSelDevices;
 

@@ -173,7 +173,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * */
 #define ccl_context_new_cpu(err) \
 	ccl_context_new_from_indep_filter( \
-		ccl_devsel_indep_type_cpu, NULL, err)
+		ccl_devsel_indep_type_cpu, NULL, (err))
 
 /**
  * Creates a context wrapper for a GPU device.
@@ -187,7 +187,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * */
 #define ccl_context_new_gpu(err) \
 	ccl_context_new_from_indep_filter( \
-		ccl_devsel_indep_type_gpu, NULL, err)
+		ccl_devsel_indep_type_gpu, NULL, (err))
 
 /**
  * Creates a context wrapper for an Accelerator device.
@@ -201,7 +201,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * */
 #define ccl_context_new_accel(err) \
 	ccl_context_new_from_indep_filter( \
-		ccl_devsel_indep_type_accel, NULL, err)
+		ccl_devsel_indep_type_accel, NULL, (err))
 
 /**
  * Creates a context wrapper for the first found device(s).
@@ -214,7 +214,42 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_any(err) \
-	ccl_context_new_from_indep_filter(NULL, NULL, err)
+	ccl_context_new_from_indep_filter(NULL, NULL, (err))
+
+/**
+ * Creates a context wrapper using one independent device filter specified in
+ * the function parameters.
+ *
+ * The first device accepted by the given filter is used. More than one device
+ * may be used if all devices belong to the same platform (and pass the given
+ * filter).
+ *
+ * @param[in] filter An independent device filter. If NULL, no independent
+ * filter is used, and the first found device(s) is used.
+ * @param[in] data Specific filter data.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return A new context wrapper object or `NULL` if an error occurs.
+ * */
+#define ccl_context_new_from_indep_filter(filter, data, err) \
+	ccl_context_new_from_filter(CCL_DEVSEL_INDEP, (filter), (data), (err))
+
+/**
+ * Creates a context wrapper using one dependent device filter specified in the
+ * function parameters.
+ *
+ * The first device accepted by the given filter is used. More than one device
+ * may be used if all devices belong to the same platform (and pass the given
+ * filter).
+ *
+ * @param[in] data If not NULL, can point to a device index, such that the
+ * device is automatically selected.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return A new context wrapper object or `NULL` if an error occurs.
+ * */
+#define ccl_context_new_from_dep_filter(filter, data, err) \
+	ccl_context_new_from_filter(CCL_DEVSEL_DEP, (filter), (data), (err))
 
 /**
  * Creates a context wrapper using a device selected by its index.
@@ -228,8 +263,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_device_index(data, err) \
-	ccl_context_new_from_dep_filter( \
-		ccl_devsel_dep_index, data, err)
+	ccl_context_new_from_dep_filter(ccl_devsel_dep_index, (data), (err))
 
 /**
  * Creates a context wrapper using a device which the user selects from a menu.
@@ -241,8 +275,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu_full(data, err) \
-	ccl_context_new_from_dep_filter( \
-		ccl_devsel_dep_menu, data, err)
+	ccl_context_new_from_dep_filter(ccl_devsel_dep_menu, (data), (err))
 
 /**
  * Creates a context wrapper from a device selected by the user from a menu.
@@ -252,8 +285,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu(err) \
-	ccl_context_new_from_dep_filter( \
-		ccl_devsel_dep_menu, NULL, err)
+	ccl_context_new_from_dep_filter(ccl_devsel_dep_menu, NULL, (err))
 
 /* Create a new context wrapper object selecting devices using the given set of
  * filters. */
@@ -270,17 +302,11 @@ CCLContext* ccl_context_new_from_devices_full(
 	CCLDevice* const* devices, ccl_context_callback pfn_notify,
 	void* user_data, GError** err);
 
-/* Creates a context wrapper using one independent device filter
- * specified in the function parameters. */
+/* Creates a context wrapper using one device filter specified in the function
+ * parameters. */
 CCL_EXPORT
-CCLContext* ccl_context_new_from_indep_filter(
-	ccl_devsel_indep filter, void* data, GError** err);
-
-/* Creates a context wrapper using one independent device filter
- * specified in the function parameters. */
-CCL_EXPORT
-CCLContext* ccl_context_new_from_dep_filter(
-	ccl_devsel_dep filter, void* data, GError** err);
+CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
+	void* filter, void* data, GError** err);
 
 /* Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
