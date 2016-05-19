@@ -164,11 +164,11 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /**
  * Creates a context wrapper for a CPU device.
  *
- * The first found CPU device is used. More than one CPU might be used
- * if all CPUs belong to the same platform.
+ * The first found CPU device is used. More than one CPU might be used if all
+ * CPUs belong to the same platform.
  *
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_cpu(err) \
@@ -217,6 +217,34 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 	ccl_context_new_from_indep_filter(NULL, NULL, err)
 
 /**
+ * Creates a context wrapper using a device selected by its index.
+ *
+ * The device index depends on the ordering of platforms within the system, and
+ * of devices within the platforms.
+ *
+ * @param[in] data Must point to a valid device index of type `cl_uint`.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return A new context wrapper object or `NULL` if an error occurs.
+ * */
+#define ccl_context_new_from_device_index(data, err) \
+	ccl_context_new_from_dep_filter( \
+		ccl_devsel_dep_index, data, err)
+
+/**
+ * Creates a context wrapper using a device which the user selects from a menu.
+ *
+ * @param[in] data If not NULL, can point to a device index, such that the
+ * device is automatically selected.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return A new context wrapper object or `NULL` if an error occurs.
+ * */
+#define ccl_context_new_from_menu_full(data, err) \
+	ccl_context_new_from_dep_filter( \
+		ccl_devsel_dep_menu, data, err)
+
+/**
  * Creates a context wrapper from a device selected by the user from a menu.
  *
  * @param[out] err Return location for a GError, or `NULL` if error reporting is
@@ -224,7 +252,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu(err) \
-	ccl_context_new_from_menu_full(NULL, err)
+	ccl_context_new_from_dep_filter( \
+		ccl_devsel_dep_menu, NULL, err)
 
 /* Create a new context wrapper object selecting devices using the given set of
  * filters. */
@@ -247,14 +276,11 @@ CCL_EXPORT
 CCLContext* ccl_context_new_from_indep_filter(
 	ccl_devsel_indep filter, void* data, GError** err);
 
-/* Creates a context wrapper using a device which the user selects from a
- * menu. */
+/* Creates a context wrapper using one independent device filter
+ * specified in the function parameters. */
 CCL_EXPORT
-CCLContext* ccl_context_new_from_menu_full(void* data, GError** err);
-
-/* Creates a context wrapper using a device selected by its index. */
-CCL_EXPORT
-CCLContext* ccl_context_new_from_device_index(void* data, GError** err);
+CCLContext* ccl_context_new_from_dep_filter(
+	ccl_devsel_dep filter, void* data, GError** err);
 
 /* Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
