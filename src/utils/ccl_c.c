@@ -44,9 +44,9 @@
 	"Unknown"))))))
 #define ccl_c_is_build_error(err) \
 	(((err != NULL) && (err->domain == CCL_OCL_ERROR) && \
-	 ((err->code != CL_BUILD_PROGRAM_FAILURE) || \
-	  (err->code != CL_COMPILE_PROGRAM_FAILURE) || \
-	  (err->code != CL_LINK_PROGRAM_FAILURE))))
+	 ((err->code == CL_BUILD_PROGRAM_FAILURE) || \
+	  (err->code == CL_COMPILE_PROGRAM_FAILURE) || \
+	  (err->code == CL_LINK_PROGRAM_FAILURE))))
 
 /* Available tasks. */
 typedef enum ccl_c_tasks {
@@ -148,7 +148,7 @@ cleanup:
 int main(int argc, char* argv[]) {
 
 	/* Error object. */
-	GError* err = NULL;
+	GError* err = NULL, *err_build = NULL;
 
 	/* Program return status. */
 	gint status;
@@ -183,8 +183,13 @@ int main(int argc, char* argv[]) {
 	/* Build status. */
 	cl_build_status build_status;
 
+	/* Build status string. */
+	const char* build_status_str;
+
 	/* Build log. */
 	const char* build_log;
+
+	g_printf("\n");
 
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
@@ -235,7 +240,7 @@ int main(int argc, char* argv[]) {
 		/* Get and show device name. */
 		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
 		ccl_if_err_goto(err, error_handler);
-		g_printf("\n* Using device '%s'\n", dname);
+		g_printf("* Device: %s\n", dname);
 
 		 /* Perform task. */
 		switch (task) {
@@ -282,11 +287,11 @@ int main(int argc, char* argv[]) {
 				ccl_if_err_goto(err, error_handler);
 
 				/* Build program. */
-				ccl_program_build(prg, options, &err);
+				ccl_program_build(prg, options, &err_build);
 				/* Only check for errors that are not build/compile/link
 				 * failures. */
-				if (!ccl_c_is_build_error(err)) {
-					ccl_if_err_goto(err, error_handler);
+				if (!ccl_c_is_build_error(err_build)) {
+					ccl_if_err_propagate_goto(&err, err_build, error_handler);
 				}
 
 				break;
@@ -335,11 +340,11 @@ int main(int argc, char* argv[]) {
 				ccl_program_compile(prg, 1, &dev, options,
 					n_src_h_files,
 					(CCLProgram**) (prgs ? prgs->pdata : NULL),
-					(const char**) src_h_files, NULL, NULL, &err);
+					(const char**) src_h_files, NULL, NULL, &err_build);
 				/* Only check for errors that are not build/compile/link
 				 * failures. */
-				if (!ccl_c_is_build_error(err)) {
-					ccl_if_err_goto(err, error_handler);
+				if (!ccl_c_is_build_error(err_build)) {
+					ccl_if_err_propagate_goto(&err, err_build, error_handler);
 				}
 
 				break;
@@ -375,11 +380,11 @@ int main(int argc, char* argv[]) {
 				/* Link programs. */
 				prg = ccl_program_link(ctx, 1, &dev, options,
 					n_bin_files, (CCLProgram**) prgs->pdata, NULL,
-					NULL, &err);
+					NULL, &err_build);
 				/* Only check for errors that are not build/compile/link
 				 * failures. */
-				if (!ccl_c_is_build_error(err)) {
-					ccl_if_err_goto(err, error_handler);
+				if (!ccl_c_is_build_error(err_build)) {
+					ccl_if_err_propagate_goto(&err, err_build, error_handler);
 				}
 
 				break;
@@ -391,28 +396,41 @@ int main(int argc, char* argv[]) {
 		}
 
 		/* Get build status. */
-		build_status = ccl_program_get_build_info_scalar(prg, dev,
-			CL_PROGRAM_BUILD_STATUS, cl_build_status, &err);
-		ccl_if_err_goto(err, error_handler);
+		if (prg) {
+			build_status = ccl_program_get_build_info_scalar(prg, dev,
+				CL_PROGRAM_BUILD_STATUS, cl_build_status, &err);
+			ccl_if_err_goto(err, error_handler);
+			build_status_str = ccl_c_get_build_status_str(build_status);
+		} else {
+			build_status_str = "Unavailable";
+		}
 
 		/* Show build status. */
-		g_printf("* Build status: %s\n",
-			ccl_c_get_build_status_str(build_status));
+		g_printf("* Build status: %s\n", build_status_str);
 
 		/* If build successful, save binary? */
-		if (output && (build_status == CL_BUILD_SUCCESS)) {
+		if (output && prg && (build_status == CL_BUILD_SUCCESS)) {
 			ccl_program_save_binary(prg, dev, output, &err);
 			ccl_if_err_goto(err, error_handler);
 			g_printf("* Binary output file: %s\n", output);
 		}
 
+		/* Show build error message, if any. */
+		if (err_build) {
+			g_printf("* Additional information: %s\n", err_build->message);
+		}
+
 		/* Show build log, if any. */
-		build_log = ccl_program_get_device_build_log(prg, dev);
 		g_printf("* Build log:");
-		if ((build_log) && (strlen(build_log) > 0)) {
-			g_printf("\n%s\n", build_log);
+		if (!prg) {
+			g_printf(" Unavailable\n");
 		} else {
-			g_printf(" (empty)\n\n");
+			build_log = ccl_program_get_device_build_log(prg, dev);
+			if ((build_log) && (strlen(build_log) > 0)) {
+				g_printf("\n%s\n", build_log);
+			} else {
+				g_printf(" Empty\n");
+			}
 		}
 
 	}
@@ -427,17 +445,16 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
 
-	if (err->code == CL_BUILD_PROGRAM_FAILURE) {
-		g_fprintf(stderr, "%s", ccl_program_get_device_build_log(prg, dev));
-	} else {
-		g_fprintf(stderr, "%s\n", err->message);
-	}
+	g_fprintf(stderr, "* Error: %s\n", err->message);
 	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
 	g_error_free(err);
 
 cleanup:
 
+	g_printf("\n");
+
 	/* Free stuff! */
+	g_clear_error(&err_build);
 	if (src_files) g_strfreev(src_files);
 	if (src_h_files) g_strfreev(src_h_files);
 	if (bin_files) g_strfreev(bin_files);
