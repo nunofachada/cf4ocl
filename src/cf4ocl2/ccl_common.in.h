@@ -88,10 +88,6 @@
 #define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
 #endif
 
-/* Define a development log level. */
-#define CCL_LOG_LEVEL_DEV 1 << G_LOG_LEVEL_USER_SHIFT
-#define ccl_log_dev(...) g_log(G_LOG_DOMAIN, CCL_LOG_LEVEL_DEV, __VA_ARGS__)
-
 /**
  * Base class for all OpenCL wrappers.
  * */
