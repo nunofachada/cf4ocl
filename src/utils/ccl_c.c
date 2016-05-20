@@ -157,6 +157,9 @@ int main(int argc, char* argv[]) {
 	/* Device wrapper. */
 	CCLDevice* dev = NULL;
 
+	/* Device name. */
+	char* dname;
+
 	/* Main program wrapper. */
 	CCLProgram* prg = NULL;
 
@@ -165,6 +168,9 @@ int main(int argc, char* argv[]) {
 
 	/* Array containing multiple program wrappers. */
 	GPtrArray* prgs = NULL;
+
+	/* Build log. */
+	const char* build_log;
 
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
@@ -203,12 +209,19 @@ int main(int argc, char* argv[]) {
 			? g_strv_length(bin_files) : 0;
 
 		/* Select a context/device. */
-		ctx = ccl_context_new_from_menu_full(
-			(dev_idx == CCL_C_NODEVICE) ? NULL : (void*) &dev_idx,
-			&err);
+		if (dev_idx == CCL_C_NODEVICE) {
+			ctx = ccl_context_new_from_menu(&err);
+		} else {
+			ctx = ccl_context_new_from_device_index(&dev_idx, &err);
+		}
 		ccl_if_err_goto(err, error_handler);
 		dev = ccl_context_get_device(ctx, 0, &err);
 		ccl_if_err_goto(err, error_handler);
+
+		/* Get and show device name. */
+		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
+		ccl_if_err_goto(err, error_handler);
+		g_printf("\n* Using device '%s'\n", dname);
 
 		 /* Perform task. */
 		switch (task) {
@@ -358,7 +371,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		/* Show build log, if any. */
-		printf("%s", ccl_program_get_build_log(prg));
+		build_log = ccl_program_get_device_build_log(prg, dev);
+		g_printf("* Build log:\n%s\n", build_log);
 
 	}
 
@@ -373,7 +387,7 @@ error_handler:
 	g_assert(err != NULL);
 
 	if (err->code == CL_BUILD_PROGRAM_FAILURE) {
-		g_fprintf(stderr, "%s", ccl_program_get_build_log(prg));
+		g_fprintf(stderr, "%s", ccl_program_get_device_build_log(prg, dev));
 	} else {
 		g_fprintf(stderr, "%s\n", err->message);
 	}

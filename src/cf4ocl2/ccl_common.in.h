@@ -207,7 +207,7 @@ typedef enum ccl_error_code {
 	CCL_SUCCESS                = 0,
 	/** Unable to open file. */
 	CCL_ERROR_OPENFILE         = 1,
-	/** Invalid program arguments. */
+	/** Invalid program or function arguments. */
 	CCL_ERROR_ARGS             = 2,
 	/** Invalid data passed to a function or returned from function. */
 	CCL_ERROR_INVALID_DATA     = 3,
