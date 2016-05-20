@@ -36,6 +36,17 @@
 
 #define CCL_C_DESCRIPTION "Static kernel compiler and analyzer"
 #define CCL_C_NODEVICE G_MAXUINT
+#define ccl_c_get_build_status_str(build_status) \
+	(build_status) == CL_BUILD_NONE ? "Program not built (unexpected)" : \
+	((build_status) == CL_BUILD_ERROR ? "Error" : \
+	(((build_status) == CL_BUILD_SUCCESS ? "Success" : \
+	((((build_status) == CL_BUILD_IN_PROGRESS ? "In progress (unexpected)" : \
+	"Unknown"))))))
+#define ccl_c_is_build_error(err) \
+	(((err != NULL) && (err->domain == CCL_OCL_ERROR) && \
+	 ((err->code != CL_BUILD_PROGRAM_FAILURE) || \
+	  (err->code != CL_COMPILE_PROGRAM_FAILURE) || \
+	  (err->code != CL_LINK_PROGRAM_FAILURE))))
 
 /* Available tasks. */
 typedef enum ccl_c_tasks {
@@ -169,6 +180,9 @@ int main(int argc, char* argv[]) {
 	/* Array containing multiple program wrappers. */
 	GPtrArray* prgs = NULL;
 
+	/* Build status. */
+	cl_build_status build_status;
+
 	/* Build log. */
 	const char* build_log;
 
@@ -269,7 +283,11 @@ int main(int argc, char* argv[]) {
 
 				/* Build program. */
 				ccl_program_build(prg, options, &err);
-				ccl_if_err_goto(err, error_handler);
+				/* Only check for errors that are not build/compile/link
+				 * failures. */
+				if (!ccl_c_is_build_error(err)) {
+					ccl_if_err_goto(err, error_handler);
+				}
 
 				break;
 
@@ -318,7 +336,11 @@ int main(int argc, char* argv[]) {
 					n_src_h_files,
 					(CCLProgram**) (prgs ? prgs->pdata : NULL),
 					(const char**) src_h_files, NULL, NULL, &err);
-				ccl_if_err_goto(err, error_handler);
+				/* Only check for errors that are not build/compile/link
+				 * failures. */
+				if (!ccl_c_is_build_error(err)) {
+					ccl_if_err_goto(err, error_handler);
+				}
 
 				break;
 
@@ -354,7 +376,11 @@ int main(int argc, char* argv[]) {
 				prg = ccl_program_link(ctx, 1, &dev, options,
 					n_bin_files, (CCLProgram**) prgs->pdata, NULL,
 					NULL, &err);
-				ccl_if_err_goto(err, error_handler);
+				/* Only check for errors that are not build/compile/link
+				 * failures. */
+				if (!ccl_c_is_build_error(err)) {
+					ccl_if_err_goto(err, error_handler);
+				}
 
 				break;
 
@@ -364,15 +390,30 @@ int main(int argc, char* argv[]) {
 					task);
 		}
 
-		/* Save binary? */
-		if (output) {
+		/* Get build status. */
+		build_status = ccl_program_get_build_info_scalar(prg, dev,
+			CL_PROGRAM_BUILD_STATUS, cl_build_status, &err);
+		ccl_if_err_goto(err, error_handler);
+
+		/* Show build status. */
+		g_printf("* Build status: %s\n",
+			ccl_c_get_build_status_str(build_status));
+
+		/* If build successful, save binary? */
+		if (output && (build_status == CL_BUILD_SUCCESS)) {
 			ccl_program_save_binary(prg, dev, output, &err);
 			ccl_if_err_goto(err, error_handler);
+			g_printf("* Binary output file: %s\n", output);
 		}
 
 		/* Show build log, if any. */
 		build_log = ccl_program_get_device_build_log(prg, dev);
-		g_printf("* Build log:\n%s\n", build_log);
+		g_printf("* Build log:");
+		if ((build_log) && (strlen(build_log) > 0)) {
+			g_printf("\n%s\n", build_log);
+		} else {
+			g_printf(" (empty)\n\n");
+		}
 
 	}
 
