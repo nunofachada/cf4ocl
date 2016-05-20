@@ -170,7 +170,8 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 			ocl_status = rel_cl_fun(wrapper->cl_object);
 			if (ocl_status != CL_SUCCESS) {
 				g_set_error(err, CCL_OCL_ERROR, ocl_status,
-				"%s: unable to create release OpenCL object (OpenCL error %d: %s).",
+				"%s: unable to create release OpenCL object "
+				"(OpenCL error %d: %s).",
 				CCL_STRD, ocl_status, ccl_err(ocl_status));
 			}
 		}
