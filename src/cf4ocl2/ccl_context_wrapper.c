@@ -437,7 +437,7 @@ CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
 		} else {
 			/* Unknown filter type. */
 			ccl_if_err_create_goto(*err, CCL_ERROR, TRUE, CCL_ERROR_ARGS,
-				error_handler, "Unknown filter type.");
+				error_handler, "%s: Unknown filter type.", CCL_STRD);
 		}
 
 	}

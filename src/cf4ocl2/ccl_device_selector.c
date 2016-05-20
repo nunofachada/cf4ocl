@@ -1161,7 +1161,7 @@ CCLDevSelDevices ccl_devsel_dep_index(
 	 * index. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, data == NULL,
 		CCL_ERROR_INVALID_DATA, error_handler,
-		"The 'data' parameter must not be NULL.");
+		"%s: The 'data' parameter must not be NULL.", CCL_STRD);
 
 	/* Check if data contains a valid device index. */
 	index = *((cl_uint*) data);
@@ -1169,7 +1169,7 @@ CCLDevSelDevices ccl_devsel_dep_index(
 	/* Check if index is within bounds. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, index >= devices->len,
 		CCL_ERROR_INVALID_DATA, error_handler,
-		"No device found at index %d.", index);
+		"%s: No device found at index %d.", CCL_STRD, index);
 
 	/* Select device: remove all devices from list except the selected
 	 * device. */
