@@ -44,11 +44,8 @@ CCLContext* ccl_test_context_new(GError** err) {
 	/* Set print handler to print to debug stream. */
 	g_set_print_handler(ccl_print_to_debug);
 
-	/* Create context*/
-	ctx = ccl_context_new_from_menu_full(&def_dev, err);
-
-	/* Reset print handler to default. */
-	g_set_print_handler(NULL);
+	/* Create context, error handling is performed by the caller. */
+	ctx = ccl_context_new_from_device_index(&def_dev, err);
 
 	return ctx;
 }

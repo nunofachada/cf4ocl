@@ -1167,7 +1167,7 @@ CCLDevSelDevices ccl_devsel_dep_index(
 	index = *((cl_uint*) data);
 
 	/* Check if index is within bounds. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, index < devices->len,
+	ccl_if_err_create_goto(*err, CCL_ERROR, index >= devices->len,
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"No device found at index %d.", index);
 
