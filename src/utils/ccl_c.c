@@ -65,6 +65,7 @@ static gchar** src_h_files = NULL;
 static gchar** bin_files = NULL;
 static gchar* output = NULL;
 static gboolean version = FALSE;
+static gboolean silent = FALSE;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
@@ -87,6 +88,8 @@ static GOptionEntry entries[] = {
 	                                                      "FILE"},
 	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &output,
 	 "Binary output file",                               "FILE"},
+	{"silent",   'n', 0, G_OPTION_ARG_NONE,               &silent,
+	 "Work silently, suppress output",                    NULL},
 	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
 	 "Output version information and exit",               NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
@@ -135,6 +138,16 @@ cleanup:
 	/* Return. */
 	return;
 
+}
+
+/**
+ * Output handler which discards output.
+ *
+ * @param[in] string Output to discard.
+ * */
+void ccl_c_print_silent(const gchar* string) {
+	/* Do nothing. */
+	CCL_UNUSED(string);
 }
 
 /**
@@ -189,11 +202,17 @@ int main(int argc, char* argv[]) {
 	/* Build log. */
 	const char* build_log;
 
-	g_printf("\n");
-
 	/* Parse command line options. */
 	ccl_c_args_parse(argc, argv, &err);
 	ccl_if_err_goto(err, error_handler);
+
+	/* Suppress output? */
+	if (silent) {
+		g_set_print_handler(ccl_c_print_silent);
+		g_set_printerr_handler(ccl_c_print_silent);
+	}
+
+	g_print("\n");
 
 	/* Determine main program goal. */
 	if (version) {
@@ -240,7 +259,7 @@ int main(int argc, char* argv[]) {
 		/* Get and show device name. */
 		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
 		ccl_if_err_goto(err, error_handler);
-		g_printf("* Device: %s\n", dname);
+		g_print("* Device: %s\n", dname);
 
 		 /* Perform task. */
 		switch (task) {
@@ -406,30 +425,30 @@ int main(int argc, char* argv[]) {
 		}
 
 		/* Show build status. */
-		g_printf("* Build status: %s\n", build_status_str);
+		g_print("* Build status: %s\n", build_status_str);
 
 		/* If build successful, save binary? */
 		if (output && prg && (build_status == CL_BUILD_SUCCESS)) {
 			ccl_program_save_binary(prg, dev, output, &err);
 			ccl_if_err_goto(err, error_handler);
-			g_printf("* Binary output file: %s\n", output);
+			g_print("* Binary output file: %s\n", output);
 		}
 
 		/* Show build error message, if any. */
 		if (err_build) {
-			g_printf("* Additional information: %s\n", err_build->message);
+			g_print("* Additional information: %s\n", err_build->message);
 		}
 
 		/* Show build log, if any. */
-		g_printf("* Build log:");
+		g_print("* Build log:");
 		if (!prg) {
-			g_printf(" Unavailable\n");
+			g_print(" Unavailable\n");
 		} else {
 			build_log = ccl_program_get_device_build_log(prg, dev);
 			if ((build_log) && (strlen(build_log) > 0)) {
-				g_printf("\n%s\n", build_log);
+				g_print("\n%s\n", build_log);
 			} else {
-				g_printf(" Empty\n");
+				g_print(" Empty\n");
 			}
 		}
 
@@ -445,13 +464,13 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
 
-	g_fprintf(stderr, "* Error: %s\n", err->message);
+	g_printerr("* Error: %s\n", err->message);
 	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
 	g_error_free(err);
 
 cleanup:
 
-	g_printf("\n");
+	g_print("\n");
 
 	/* Free stuff! */
 	g_clear_error(&err_build);
