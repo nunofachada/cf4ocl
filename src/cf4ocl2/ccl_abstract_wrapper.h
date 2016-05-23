@@ -80,11 +80,6 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper);
 CCL_EXPORT
 void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 
-/* Debug function which checks if memory allocated by wrappers
- * has been properly freed. */
-CCL_EXPORT
-cl_bool ccl_wrapper_memcheck();
-
 /* Get information about any wrapped OpenCL object. */
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
@@ -102,6 +97,15 @@ CCL_EXPORT
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err);
+
+/* Debug function which checks if memory allocated by wrappers
+ * has been properly freed. */
+CCL_EXPORT
+cl_bool ccl_wrapper_memcheck();
+
+/* Get wrapper class or type name. */
+CCL_EXPORT
+const char* ccl_wrapper_get_class_name(CCLWrapper* wrapper);
 
 #endif
 

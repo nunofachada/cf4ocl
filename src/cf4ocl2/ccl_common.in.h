@@ -93,17 +93,17 @@
  * */
 typedef enum ccl_class {
 
-	CCL_NONE,
-	CCL_BUFFER,
-	CCL_CONTEXT,
-	CCL_DEVICE,
-	CCL_EVENT,
-	CCL_IMAGE,
-	CCL_KERNEL,
-	CCL_PLATFORM,
-	CCL_PROGRAM,
-	CCL_SAMPLER,
-	CCL_QUEUE
+	CCL_BUFFER    = 0,
+	CCL_CONTEXT   = 1,
+	CCL_DEVICE    = 2,
+	CCL_EVENT     = 3,
+	CCL_IMAGE     = 4,
+	CCL_KERNEL    = 5,
+	CCL_PLATFORM  = 6,
+	CCL_PROGRAM   = 7,
+	CCL_SAMPLER   = 8,
+	CCL_QUEUE     = 9,
+	CCL_NONE      = 10
 
 } CCLClass;
 

@@ -36,6 +36,10 @@ static GHashTable* wrappers = NULL;
  * wrappers. */
 G_LOCK_DEFINE(wrappers);
 
+/* Wrapper names ordered by their enum type. */
+static const char* ccl_class_names[] = {"Buffer", "Context", "Device", "Event",
+	"Image", "Kernel", "Platform", "Program", "Sampler", "Queue", "None", NULL};
+
 /**
  * Information about wrapped OpenCL objects.
  * */
@@ -122,6 +126,14 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
 	/* Unlock access to table of all existing wrappers. */
 	G_UNLOCK(wrappers);
 
+#ifndef NDEBUG
+
+	/* If cf4ocl is built in Debug mode, log creation/referencing of wrapper. */
+	g_debug("New/ref. CCL%s(%p)",
+		ccl_wrapper_get_class_name(w), (void*) cl_object);
+
+#endif
+
 	/* Return requested wrapper. */
 	return w;
 }
@@ -161,6 +173,15 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	/* OpenCL status flag. */
 	cl_int ocl_status;
 
+#ifndef NDEBUG
+
+	/* If cf4ocl is built in Debug mode, log destruction/unreferencing of
+	 * wrapper. */
+	g_debug("Destroy/unref. CCL%s(%p)",
+		ccl_wrapper_get_class_name(wrapper), (void*) wrapper->cl_object);
+
+#endif
+
 	/* Decrement reference count and check if it reaches 0. */
 	if (g_atomic_int_dec_and_test(&wrapper->ref_count)) {
 
@@ -172,7 +193,8 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 			ocl_status = rel_cl_fun(wrapper->cl_object);
 			if (ocl_status != CL_SUCCESS) {
 				g_set_error(err, CCL_OCL_ERROR, ocl_status,
-				"%s: unable to create release OpenCL object (OpenCL error %d: %s).",
+				"%s: unable to create release OpenCL object "
+				"(OpenCL error %d: %s).",
 				CCL_STRD, ocl_status, ccl_err(ocl_status));
 			}
 		}
@@ -585,19 +607,109 @@ size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 }
 
 /**
- * Debug function which checks if memory allocated by wrappers
- * has been properly freed.
+ * Debug function which checks if memory allocated by wrappers has been properly
+ * freed.
  *
  * @public @memberof ccl_wrapper
  *
- * This function is merely a debug helper and shouldn't replace
- * proper leak checks with Valgrind or similar tool.
+ * This function is merely a debug helper and shouldn't replace proper leak
+ * checks with Valgrind or similar tool.
  *
- * @return CL_TRUE if memory allocated by wrappers has been properly
- * freed, CL_FALSE otherwise.
+ * @return CL_TRUE if memory allocated by wrappers has been properly freed,
+ * CL_FALSE otherwise.
  */
 CCL_EXPORT
 cl_bool ccl_wrapper_memcheck() {
-	return wrappers == NULL;
+
+	/* Check return variable. */
+	cl_bool check;
+
+#ifndef NDEBUG
+
+	/* Iterator over existing wrappers. */
+	GHashTableIter iter;
+
+	/* Current wrapper. */
+	CCLWrapper* obj = NULL;
+
+	/* Current wrapper address. */
+	gpointer addr;
+
+	/* Log string. */
+	GString* logstr = NULL;
+
+#endif
+
+	/* Lock access to wrappers variable. */
+	G_LOCK(wrappers);
+
+	/* Check if wrappers variable is set. */
+	check = (wrappers == NULL);
+
+#ifndef NDEBUG
+
+	/* In debug mode, log existing wrappers. */
+	if (check) {
+
+		/* Wrappers table is empty. */
+		g_debug("Wrappers table is empty");
+
+	} else {
+
+		/* Wrappers table is not empty, list them. */
+
+		/* Initialize iterator. */
+		g_hash_table_iter_init(&iter, wrappers);
+
+		/* Initialize log string. */
+		logstr = g_string_new("");
+		g_string_append_printf(logstr,
+			"There are %u wrappers in table: ", g_hash_table_size(wrappers));
+
+		/* Iterate over existing wrappers... */
+		while(g_hash_table_iter_next(&iter, &addr, (gpointer) &obj)) {
+
+			/*...and add their name and address to log string. */
+			g_string_append_printf(logstr, "\n%s(%p) ",
+				ccl_wrapper_get_class_name(obj), addr);
+
+		}
+
+		/* Log existing wrappers.*/
+		g_debug("%s\n", logstr->str);
+
+		/* Release string. */
+		g_string_free(logstr, TRUE);
+
+	}
+
+#endif
+
+	/* Unlock access to wrappers variable. */
+	G_UNLOCK(wrappers);
+
+	/* Return check. */
+	return check;
 }
 
+/**
+ * Get wrapper class or type name.
+ *
+ * @param[in] wrapper Wrapper object.
+ *
+ * @return
+ * */
+CCL_EXPORT
+const char* ccl_wrapper_get_class_name(CCLWrapper* wrapper) {
+
+	/* Make sure wrapper is not NULL. */
+	g_return_val_if_fail(wrapper != NULL, NULL);
+
+	/* Make sure class enum value is within bounds. */
+	g_return_val_if_fail(
+		(wrapper->class >= 0) && (wrapper->class < CCL_NONE), NULL);
+
+	/* Return wrapper class name. */
+	return ccl_class_names[wrapper->class];
+
+}
