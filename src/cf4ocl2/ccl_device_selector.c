@@ -96,13 +96,12 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
 
 /**
  * @internal
- * Populate array of device wrapper objects with all OpenCL
- * devices present in the system
+ * Populate array of device wrapper objects with all OpenCL devices present in
+ * the system
  *
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
- * @return One or more OpenCL devices selected based on the provided
- * filters.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return One or more OpenCL devices selected based on the provided filters.
  *  */
 static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
 
@@ -541,12 +540,11 @@ void ccl_devsel_add_dep_filter(
 }
 
 /**
- * Select one or more OpenCL devices based on the provided
- * filters.
+ * Select one or more OpenCL devices based on the provided filters.
  *
- * This function is internally used by the
- * ccl_context_new_from_filters_full() function for selecting context
- * devices. Clients should not need to use it frequently.
+ * This function is internally used by the ccl_context_new_from_filters_full()
+ * function for selecting context devices. Clients should not need to use it
+ * frequently.
  *
  * @param[in] filters Filters used to select device(s).
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -1120,8 +1118,11 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
 
-	/* Set return value to NULL to conform to specification. */
-	devices = NULL;
+	/* Free array object containing device wrappers and set it to NULL. */
+	if (devices != NULL) {
+		g_ptr_array_free(devices, TRUE);
+		devices = NULL;
+	}
 
 finish:
 
@@ -1187,8 +1188,11 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
 
-	/* Set return value to NULL to conform to specification. */
-	devices = NULL;
+	/* Free array object containing device wrappers and set it to NULL. */
+	if (devices != NULL) {
+		g_ptr_array_free(devices, TRUE);
+		devices = NULL;
+	}
 
 finish:
 
