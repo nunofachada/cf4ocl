@@ -126,14 +126,6 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
 	/* Unlock access to table of all existing wrappers. */
 	G_UNLOCK(wrappers);
 
-#ifndef NDEBUG
-
-	/* If cf4ocl is built in Debug mode, log creation/referencing of wrapper. */
-	g_debug("New/ref. CCL%s(%p)",
-		ccl_wrapper_get_class_name(w), (void*) cl_object);
-
-#endif
-
 	/* Return requested wrapper. */
 	return w;
 }
@@ -358,6 +350,14 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
 
 	/* Increment wrapper reference count. */
 	g_atomic_int_inc(&wrapper->ref_count);
+
+#ifndef NDEBUG
+
+	/* If cf4ocl is built in Debug mode, log creation/referencing of wrapper. */
+	g_debug("New/ref. CCL%s(%p)",
+		ccl_wrapper_get_class_name(wrapper), (void*) wrapper->cl_object);
+
+#endif
 
 }
 
