@@ -62,6 +62,7 @@ static guint task = CCL_C_BUILD;
 static gchar* options = NULL;
 static gchar** src_files = NULL;
 static gchar** src_h_files = NULL;
+static gchar** h_names = NULL;
 static gchar** bin_files = NULL;
 static gchar* output = NULL;
 static gboolean version = FALSE;
@@ -69,29 +70,35 @@ static gboolean silent = FALSE;
 
 /* Valid command line options. */
 static GOptionEntry entries[] = {
-	{"list",     'l', 0, G_OPTION_ARG_NONE,               &opt_list,
-	 "List available devices and exit",                   NULL},
-	{"device",   'd', 0, G_OPTION_ARG_INT,                &dev_idx,
-	 "Specify a device on which to perform the task",     "DEV"},
-	{"task",     't', 0, G_OPTION_ARG_INT,                &task,
-	 "0 (Build, default), 1 (Compile) or 2 (Link)",       "TASK"},
-	{"options",  '0', 0, G_OPTION_ARG_STRING,             &options,
-	 "Compiler/linker options",                           "OPTIONS"},
-	{"src",      's', 0, G_OPTION_ARG_FILENAME_ARRAY,     &src_files,
-	 "Source input file (this option can be specified multiple times)",
-	                                                      "FILE"},
-	{"src-h",    'h', 0, G_OPTION_ARG_FILENAME_ARRAY,     &src_h_files,
-	 "Source header input file (this option can be specified multiple "
-	 "times)",                                            "FILE"},
-	{"bin",      'b', 0, G_OPTION_ARG_FILENAME_ARRAY,     &bin_files,
-	 "Binary input file (this option can be specified multiple times)",
-	                                                      "FILE"},
-	{"output",   'o', 0, G_OPTION_ARG_FILENAME,           &output,
-	 "Binary output file",                               "FILE"},
-	{"silent",   'n', 0, G_OPTION_ARG_NONE,               &silent,
-	 "Work silently, suppress output",                    NULL},
-	{"version",   0, 0, G_OPTION_ARG_NONE,                &version,
-	 "Output version information and exit",               NULL},
+	{"list",                 'l', 0, G_OPTION_ARG_NONE,           &opt_list,
+	 "List available devices and exit.",                          NULL},
+	{"device",               'd', 0, G_OPTION_ARG_INT,            &dev_idx,
+	 "Specify a device on which to perform the task.",            "DEV"},
+	{"task",                 't', 0, G_OPTION_ARG_INT,            &task,
+	 "0 (Build, default), 1 (Compile) or 2 (Link). Tasks 1 and 2 are only "
+	 "available for devices with support for OpenCL 1.2 or higher.",
+	                                                              "TASK"},
+	{"options",              '0', 0, G_OPTION_ARG_STRING,         &options,
+	 "Compiler/linker options.",                                  "OPTIONS"},
+	{"src",                  's', 0, G_OPTION_ARG_FILENAME_ARRAY, &src_files,
+	 "Source input files. This option can be specified multiple times.",
+	                                                              "FILE"},
+	{"input-headers",        'h', 0, G_OPTION_ARG_FILENAME_ARRAY, &src_h_files,
+	 "Embedded header input files for the compile task. This option can be "
+	 "specified multiple times.",                                 "FILE"},
+	{"header-include-names", 'n', 0, G_OPTION_ARG_STRING_ARRAY,   &h_names,
+	 "Embedded header include names for the compile task. This option can be "
+	 "specified multiple and has a one to one correspondence with "
+	 "--input-headers.",                                          "STRING"},
+	{"bin",                  'b', 0, G_OPTION_ARG_FILENAME_ARRAY, &bin_files,
+	 "Binary input file. This option can be specified multiple times.",
+	                                                              "FILE"},
+	{"output",               'o', 0, G_OPTION_ARG_FILENAME,       &output,
+	 "Binary output file.",                                       "FILE"},
+	{"silent",               'i', 0, G_OPTION_ARG_NONE,           &silent,
+	 "Work silently, suppress output.",                           NULL},
+	{"version",               0,  0, G_OPTION_ARG_NONE,           &version,
+	 "Output version information and exit.",                      NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
 };
 
@@ -353,13 +360,12 @@ int main(int argc, char* argv[]) {
 				ccl_if_err_goto(err, error_handler);
 
 				/* Compile program. */
-				/* TODO: Allow to specify header_include_names instead
-				 * of assuming they are the same as the included
-				 * files. */
 				ccl_program_compile(prg, 1, &dev, options,
 					n_src_h_files,
 					(CCLProgram**) (prgs ? prgs->pdata : NULL),
-					(const char**) src_h_files, NULL, NULL, &err_build);
+					(const char**) (h_names ? h_names : src_h_files), NULL,
+					NULL, &err_build);
+
 				/* Only check for errors that are not build/compile/link
 				 * failures. */
 				if (!ccl_c_is_build_error(err_build)) {
@@ -476,6 +482,7 @@ cleanup:
 	g_clear_error(&err_build);
 	if (src_files) g_strfreev(src_files);
 	if (src_h_files) g_strfreev(src_h_files);
+	if (h_names) g_strfreev(h_names);
 	if (bin_files) g_strfreev(bin_files);
 	if (options) g_free(options);
 	if (output) g_free(output);
