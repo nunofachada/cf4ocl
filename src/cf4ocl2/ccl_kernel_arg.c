@@ -54,7 +54,7 @@ static char arg_local_marker;
  * ::ccl_kernel_set_args() and ::ccl_kernel_set_args_v() functions.
  * Client code should use the ::ccl_arg_skip global variable.
  * */
-static const CCLArg arg_skip = { NULL, NULL, 0 };
+static const CCLArg arg_skip = { CCL_NONE, NULL, NULL, 0 };
 
 /* Use this constant to skip kernel arguments in ::ccl_kernel_set_args()
  * and ::ccl_kernel_set_args_v() functions. */

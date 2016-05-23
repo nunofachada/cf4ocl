@@ -139,7 +139,7 @@ CCL_EXPORT
 CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler) {
 
 	return (CCLSampler*) ccl_wrapper_new(
-		(void*) sampler, sizeof(CCLSampler));
+		CCL_SAMPLER, (void*) sampler, sizeof(CCLSampler));
 
 }
 

@@ -212,7 +212,7 @@ CCL_EXPORT
 CCLContext* ccl_context_new_wrap(cl_context context) {
 
 	return (CCLContext*) ccl_wrapper_new(
-		(void*) context, sizeof(CCLContext));
+		CCL_CONTEXT, (void*) context, sizeof(CCLContext));
 
 }
 

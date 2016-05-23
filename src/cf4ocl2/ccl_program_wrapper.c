@@ -310,7 +310,7 @@ CCL_EXPORT
 CCLProgram* ccl_program_new_wrap(cl_program program) {
 
 	return (CCLProgram*) ccl_wrapper_new(
-		(void*) program, sizeof(CCLProgram));
+		CCL_PROGRAM, (void*) program, sizeof(CCLProgram));
 
 }
 

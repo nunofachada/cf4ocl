@@ -89,6 +89,25 @@
 #endif
 
 /**
+ * Class or type of wrapped OpenCL object.
+ * */
+typedef enum ccl_class {
+
+	CCL_NONE,
+	CCL_BUFFER,
+	CCL_CONTEXT,
+	CCL_DEVICE,
+	CCL_EVENT,
+	CCL_IMAGE,
+	CCL_KERNEL,
+	CCL_PLATFORM,
+	CCL_PROGRAM,
+	CCL_SAMPLER,
+	CCL_QUEUE
+
+} CCLClass;
+
+/**
  * Base class for all OpenCL wrappers.
  * */
 typedef struct ccl_wrapper CCLWrapper;

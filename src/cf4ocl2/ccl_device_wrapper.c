@@ -128,7 +128,7 @@ CCL_EXPORT
 CCLDevice* ccl_device_new_wrap(cl_device_id device) {
 
 	return (CCLDevice*) ccl_wrapper_new(
-		(void*) device, sizeof(CCLDevice));
+		CCL_DEVICE, (void*) device, sizeof(CCLDevice));
 
 }
 

@@ -123,7 +123,7 @@ CCL_EXPORT
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
 
 	return (CCLQueue*) ccl_wrapper_new(
-		(void*) command_queue, sizeof(CCLQueue));
+		CCL_QUEUE, (void*) command_queue, sizeof(CCLQueue));
 
 }
 

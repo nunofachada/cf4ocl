@@ -98,7 +98,7 @@ CCL_EXPORT
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
 
 	return (CCLKernel*) ccl_wrapper_new(
-		(void*) kernel, sizeof(CCLKernel));
+		CCL_KERNEL, (void*) kernel, sizeof(CCLKernel));
 
 }
 

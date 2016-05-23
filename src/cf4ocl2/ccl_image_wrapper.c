@@ -160,7 +160,7 @@ CCL_EXPORT
 CCLImage* ccl_image_new_wrap(cl_mem mem_object) {
 
 	return (CCLImage*) ccl_wrapper_new(
-		(void*) mem_object, sizeof(CCLImage));
+		CCL_IMAGE, (void*) mem_object, sizeof(CCLImage));
 
 }
 

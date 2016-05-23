@@ -143,7 +143,7 @@ CCL_EXPORT
 CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
 
 	return (CCLPlatform*) ccl_wrapper_new(
-		(void*) platform, sizeof(CCLPlatform));
+		CCL_PLATFORM, (void*) platform, sizeof(CCLPlatform));
 
 }
 

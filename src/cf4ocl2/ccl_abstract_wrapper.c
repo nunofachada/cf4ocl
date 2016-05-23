@@ -73,11 +73,12 @@ struct ccl_wrapper_info_table {
  *
  * @protected @memberof ccl_wrapper
  *
+ * @param[in] class Class or type of OpenCL object to wrap.
  * @param[in] cl_object OpenCL object to wrap.
  * @param[in] size Size in bytes of wrapper.
  * @return A new wrapper object.
  * */
-CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
+CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
 
 	/* Make sure OpenCL object is not NULL. */
 	g_return_val_if_fail(cl_object != NULL, NULL);
@@ -102,6 +103,7 @@ CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size) {
 
 		/* Wrapper doesn't yet exist, create it. */
 		w = (CCLWrapper*) g_slice_alloc0(size);
+		w->class = class;
 		w->cl_object = cl_object;
 
 		/* Initialize info table. */

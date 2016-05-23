@@ -71,7 +71,7 @@ CCL_EXPORT
 CCLBuffer* ccl_buffer_new_wrap(cl_mem mem_object) {
 
 	return (CCLBuffer*) ccl_wrapper_new(
-		(void*) mem_object, sizeof(CCLBuffer));
+		CCL_BUFFER, (void*) mem_object, sizeof(CCLBuffer));
 
 }
 

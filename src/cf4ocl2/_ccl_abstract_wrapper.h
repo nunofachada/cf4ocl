@@ -47,6 +47,12 @@ typedef struct ccl_wrapper_info_table CCLWrapperInfoTable;
 struct ccl_wrapper {
 
 	/**
+	 * The class or type of wrapped OpenCL object.
+	 * @private
+	 * */
+	CCLClass class;
+
+	/**
 	 * The wrapped OpenCL object.
 	 * @private
 	 * */
@@ -148,7 +154,7 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp2)(
 
 /* Create a new wrapper object. This function is called by the
  * concrete wrapper constructors. */
-CCLWrapper* ccl_wrapper_new(void* cl_object, size_t size);
+CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size);
 
 /* Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed. */
