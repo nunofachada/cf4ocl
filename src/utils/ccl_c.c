@@ -61,9 +61,9 @@ static guint dev_idx = CCL_C_NODEVICE;
 static guint task = CCL_C_BUILD;
 static gchar* options = NULL;
 static gchar** src_files = NULL;
-static gchar** src_h_files = NULL;
-static gchar** h_names = NULL;
 static gchar** bin_files = NULL;
+static gchar** src_h_files = NULL;
+static gchar** src_h_names = NULL;
 static gchar* output = NULL;
 static gboolean version = FALSE;
 static gboolean silent = FALSE;
@@ -76,7 +76,7 @@ static GOptionEntry entries[] = {
 	 "Specify a device on which to perform the task.",            "DEV"},
 	{"task",                 't', 0, G_OPTION_ARG_INT,            &task,
 	 "0 (Build, default), 1 (Compile) or 2 (Link). Tasks 1 and 2 are only "
-	 "available for devices with support for OpenCL 1.2 or higher.",
+	 "available for platforms with support for OpenCL 1.2 or higher.",
 	                                                              "TASK"},
 	{"options",              '0', 0, G_OPTION_ARG_STRING,         &options,
 	 "Compiler/linker options.",                                  "OPTIONS"},
@@ -86,7 +86,7 @@ static GOptionEntry entries[] = {
 	{"input-headers",        'h', 0, G_OPTION_ARG_FILENAME_ARRAY, &src_h_files,
 	 "Embedded header input files for the compile task. This option can be "
 	 "specified multiple times.",                                 "FILE"},
-	{"header-include-names", 'n', 0, G_OPTION_ARG_STRING_ARRAY,   &h_names,
+	{"header-include-names", 'n', 0, G_OPTION_ARG_STRING_ARRAY,   &src_h_names,
 	 "Embedded header include names for the compile task. This option can be "
 	 "specified multiple and has a one to one correspondence with "
 	 "--input-headers.",                                          "STRING"},
@@ -176,11 +176,8 @@ int main(int argc, char* argv[]) {
 	/* Counter for for loops. */
 	guint i = 0;
 
-	/* Number of types of files. */
-	guint n_src_files, n_src_h_files, n_bin_files;
-
-	/* All source files. */
-	gchar** src_files_all = NULL;
+	/* Number of types of files and file names. */
+	guint n_src_files, n_bin_files, n_src_h_files, n_src_h_names;
 
 	/* Context wrapper. */
 	CCLContext* ctx = NULL;
@@ -248,10 +245,12 @@ int main(int argc, char* argv[]) {
 		/* How many files of each type? */
 		n_src_files = src_files != NULL
 			? g_strv_length(src_files) : 0;
-		n_src_h_files = src_h_files != NULL
-			? g_strv_length(src_h_files) : 0;
 		n_bin_files = bin_files != NULL
 			? g_strv_length(bin_files) : 0;
+		n_src_h_files = src_h_files != NULL
+			? g_strv_length(src_h_files) : 0;
+		n_src_h_names = src_h_names != NULL
+			? g_strv_length(src_h_names) : 0;
 
 		/* Select a context/device. */
 		if (dev_idx == CCL_C_NODEVICE) {
@@ -275,11 +274,20 @@ int main(int argc, char* argv[]) {
 				/* For direct builds we can only have either one binary
 				 * or one or more source files (but not both). */
 				ccl_if_err_create_goto(err, CCL_ERROR,
-					((n_src_files + n_src_h_files > 0) &&
-					(n_bin_files > 0)) || (n_bin_files > 1),
+					(n_src_files > 0) && (n_bin_files > 0),
 					CCL_ERROR_ARGS, error_handler,
 					"The 'build' task requires either: 1) one or more "
 					"source files; or, 2) one binary file.");
+				ccl_if_err_create_goto(err, CCL_ERROR, n_bin_files > 1,
+					CCL_ERROR_ARGS, error_handler,
+					"The 'build' task accepts at most one binary file.");
+
+				/* Input headers are not accepted by the compile task. */
+				ccl_if_err_create_goto(err, CCL_ERROR,
+					(n_src_h_files > 0) || (n_src_h_names > 0),
+					CCL_ERROR_ARGS, error_handler,
+					"Input headers can only be specified for the 'compile' "
+					"task.");
 
 				/* Create program object. */
 				if (n_bin_files == 1) {
@@ -290,30 +298,16 @@ int main(int argc, char* argv[]) {
 
 				} else {
 
-					/* Join header sources + program sources. */
-					src_files_all = (gchar**)
-						g_slice_alloc(sizeof(gchar*) *
-							(n_src_files + n_src_h_files));
-					g_memmove(src_files_all, src_h_files,
-						n_src_h_files * sizeof(char*));
-					g_memmove(src_files_all + n_src_h_files, src_files,
-						n_src_files * sizeof(char*));
-
 					/* Create program from source. */
-					prg = ccl_program_new_from_source_files(ctx,
-						n_src_h_files + n_src_files,
-						(const char**) src_files_all, &err);
-
-					/* Free joined header + program sources. */
-					g_slice_free1(sizeof(gchar*) *
-							(n_src_files + n_src_h_files),
-							src_files_all);
+					prg = ccl_program_new_from_source_files(
+						ctx, n_src_files, (const char**) src_files, &err);
 
 				}
 				ccl_if_err_goto(err, error_handler);
 
 				/* Build program. */
 				ccl_program_build(prg, options, &err_build);
+
 				/* Only check for errors that are not build/compile/link
 				 * failures. */
 				if (!ccl_c_is_build_error(err_build)) {
@@ -324,13 +318,23 @@ int main(int argc, char* argv[]) {
 
 			case CCL_C_COMPILE:
 
-				/* Compilation requires at least one source file and
-				 * does not support binaries. */
-				ccl_if_err_create_goto(err, CCL_ERROR,
-					(n_bin_files > 0) || (n_src_files == 0),
+				/* Compilation requires at least one source file. */
+				ccl_if_err_create_goto(err, CCL_ERROR, n_src_files == 0,
 					CCL_ERROR_ARGS, error_handler,
-					"The 'compile' task requires at least one source "
-					"file and does not support binaries.");
+					"The 'compile' task requires at least one source file.");
+
+				/* Compilation does not support binaries. */
+				ccl_if_err_create_goto(err, CCL_ERROR, n_bin_files > 0,
+					CCL_ERROR_ARGS, error_handler,
+					"The 'compile' task does not support binaries.");
+
+				/* Number of header include names must be zero OR be the same as
+				 * the number of input headers. */
+				ccl_if_err_create_goto(err, CCL_ERROR,
+					(n_src_h_files != n_src_h_names) && (n_src_h_names > 0),
+					CCL_ERROR_ARGS, error_handler,
+					"Number of header include names must be the same as the "
+					"number of input headers.");
 
 				/* Create header programs, if any. */
 				if (n_src_h_files) {
@@ -363,8 +367,8 @@ int main(int argc, char* argv[]) {
 				ccl_program_compile(prg, 1, &dev, options,
 					n_src_h_files,
 					(CCLProgram**) (prgs ? prgs->pdata : NULL),
-					(const char**) (h_names ? h_names : src_h_files), NULL,
-					NULL, &err_build);
+					(const char**) (src_h_names ? src_h_names : src_h_files),
+					NULL, NULL, &err_build);
 
 				/* Only check for errors that are not build/compile/link
 				 * failures. */
@@ -378,8 +382,8 @@ int main(int argc, char* argv[]) {
 
 				/* Linking requires at least one binary file and does
 				 * not support source files. */
-				ccl_if_err_create_goto(err, CCL_ERROR,
-					(n_bin_files == 0) || (n_src_files > 0),
+				ccl_if_err_create_goto(err, CCL_ERROR, (n_bin_files == 0) ||
+					(n_src_files > 0) || (n_src_h_files > 0),
 					CCL_ERROR_ARGS, error_handler,
 					"The 'link' task requires at least one binary file "
 					"and does not support source files.");
@@ -482,7 +486,7 @@ cleanup:
 	g_clear_error(&err_build);
 	if (src_files) g_strfreev(src_files);
 	if (src_h_files) g_strfreev(src_h_files);
-	if (h_names) g_strfreev(h_names);
+	if (src_h_names) g_strfreev(src_h_names);
 	if (bin_files) g_strfreev(bin_files);
 	if (options) g_free(options);
 	if (output) g_free(output);
