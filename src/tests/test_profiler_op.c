@@ -358,6 +358,7 @@ static void operation_test() {
  * */
 int main(int argc, char** argv) {
 
+	ccl_test_init_device_index();
 	g_test_init(&argc, &argv, NULL);
 
 	g_test_add_func("/profiler/operation", operation_test);

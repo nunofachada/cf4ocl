@@ -141,6 +141,7 @@ static void create_add_destroy_test() {
  * @return Result of test run.
  * */
 int main(int argc, char** argv) {
+	ccl_test_init_device_index();
 	g_test_init(&argc, &argv, NULL);
 	g_test_add_func(
 		"/profiler/create-add-destroy", create_add_destroy_test);
