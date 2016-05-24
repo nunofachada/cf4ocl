@@ -32,7 +32,7 @@
 #endif
 
 /* The efective device to use in tests. */
-extern cl_uint devidx;
+extern cl_uint ccl_tests_devidx;
 
 /* Print handler which redirects output to debug stream. */
 void ccl_print_to_debug(const gchar* string);
