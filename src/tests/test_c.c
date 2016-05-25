@@ -168,6 +168,13 @@ static void build_test() {
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_ARGS);
 
+	/* Test build with source headers. */
+	g_string_printf(com, CCL_C_COM_DEV,
+		" -i -h " CCL_C_K1_OK, ccl_tests_devidx);
+	g_debug("%s", com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_ARGS);
+
 	/* Test build with erroneous kernel. */
 	g_string_printf(com, CCL_C_COM_DEV,
 		" -i -s " CCL_C_K3_KO,  ccl_tests_devidx);
@@ -182,7 +189,12 @@ static void build_test() {
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_DEVICE_NOT_FOUND);
 
-	/* Test with */
+	/* Test build with non-existing file. */
+	g_string_printf(com, CCL_C_COM_DEV,
+		" -i -s this_file_does_not_exist.cl", ccl_tests_devidx);
+	g_debug("%s", com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_ARGS);
 
 	/* Release command string object. */
 	g_string_free(com, TRUE);
