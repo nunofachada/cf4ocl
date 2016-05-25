@@ -239,6 +239,8 @@ typedef enum ccl_error_code {
 	CCL_ERROR_UNSUPPORTED_OCL  = 6,
 	/** Object information is unavailable. */
 	CCL_ERROR_INFO_UNAVAILABLE_OCL = 7,
+	/** Unable to compile/build/link program. */
+	CCL_ERROR_PROGRAM_BUILD = 8,
 	/** Any other errors. */
 	CCL_ERROR_OTHER            = 15
 } CCLErrorCode;

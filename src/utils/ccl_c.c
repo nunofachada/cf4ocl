@@ -466,7 +466,7 @@ int main(int argc, char* argv[]) {
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL);
-	status = CCL_SUCCESS;
+	status = err_build ? CCL_ERROR_PROGRAM_BUILD : CCL_SUCCESS;
 	goto cleanup;
 
 error_handler:

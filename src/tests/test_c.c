@@ -38,7 +38,7 @@
  * options and an integer placeholder flag for command line device
  * specification. */
 #define CCL_C_COM_DEV \
-	CCL_C_COM "-d %d"
+	CCL_C_COM "-d %u"
 
 /* Full path to the example binaries and kernels. */
 #define CCL_C_EXAMPLES \
@@ -53,9 +53,9 @@
 #define CCL_C_K2_OK \
 	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "ca.cl"
 
-/* Full path to a .c source file which will not compile as an OpenCL kernel. */
+/* Full path to a file which will certainly not compile as an OpenCL kernel. */
 #define CCL_C_K3_KO \
-	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "ca.c"
+	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "CMakeLists.txt"
 
 /**
  * Tests information requests made to the ccl_c utility.
@@ -128,6 +128,20 @@ static void build_test() {
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+
+	/* Test build with erroneous kernel. */
+	g_string_printf(com, CCL_C_COM_DEV,
+		" -i -s " CCL_C_K3_KO,  ccl_tests_devidx);
+	g_debug("%s", com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_PROGRAM_BUILD);
+
+	/* Test build with non-existing device. */
+	g_string_printf(com, CCL_C_COM_DEV,
+		" -i -s " CCL_C_K1_OK " -s " CCL_C_K2_OK,  G_MAXUINT);
+	g_debug("%s", com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_DEVICE_NOT_FOUND);
 
 	/* Release command string object. */
 	g_string_free(com, TRUE);
