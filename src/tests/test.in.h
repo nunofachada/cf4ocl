@@ -26,10 +26,11 @@
 
 #include <cf4ocl2.h>
 
-/* The default device to use in tests can be set in a compiler flag. */
-#ifndef CCL_TEST_DEFAULT_DEVICE_IDX
-	#define CCL_TEST_DEFAULT_DEVICE_IDX 0
-#endif
+/* The default device to use in tests is set in the CMake configuration. */
+#define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
+
+#define CCL_TEST_BUILD_DIR "@PROJECT_BINARY_DIR@"
+#define CCL_TEST_SRC_DIR "@PROJECT_SOURCE_DIR@"
 
 /* The efective device to use in tests. */
 extern cl_uint ccl_tests_devidx;

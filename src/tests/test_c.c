@@ -28,15 +28,80 @@
 #include <cf4ocl2.h>
 #include "test.h"
 
-#define CCL_C_COM "." G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S "utils" \
+/* Full path to the ccl_c binary and a string placeholder flag for command
+ * line options. */
+#define CCL_C_COM \
+	CCL_TEST_BUILD_DIR G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S "utils" \
 	G_DIR_SEPARATOR_S "ccl_c %s "
-#define CCL_C_COM_DEV CCL_C_COM " -d %d "
-#define CCL_C_K1_OK ".." G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S "examples" \
-	G_DIR_SEPARATOR_S "canon.cl"
-#define CCL_C_K2_OK ".." G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S "examples" \
-	G_DIR_SEPARATOR_S "ca.cl"
-#define CCL_C_K3_KO ".." G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S "examples" \
-	G_DIR_SEPARATOR_S "ca.c"
+
+/* Full path to the ccl_c binary and a string placeholder flag for command line
+ * options and an integer placeholder flag for command line device
+ * specification. */
+#define CCL_C_COM_DEV \
+	CCL_C_COM "-d %d"
+
+/* Full path to the example binaries and kernels. */
+#define CCL_C_EXAMPLES \
+	CCL_TEST_SRC_DIR G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S \
+	"examples"
+
+/* Full path to the canon.cl kernel */
+#define CCL_C_K1_OK \
+	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "canon.cl"
+
+/* Full path to the ca.cl kernel */
+#define CCL_C_K2_OK \
+	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "ca.cl"
+
+/* Full path to a .c source file which will not compile as an OpenCL kernel. */
+#define CCL_C_K3_KO \
+	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "ca.c"
+
+/**
+ * Tests information requests made to the ccl_c utility.
+ * */
+static void info_test() {
+
+	/* Test variables. */
+	int status;
+	GString* com;
+
+	/* Initialize command string object. */
+	com = g_string_sized_new(strlen(CCL_C_COM) + 10);
+
+	/* Test help, which should return status 0. */
+	g_string_printf(com, CCL_C_COM, "-?");
+	g_debug(com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+
+	g_string_printf(com, CCL_C_COM, "--help");
+	g_debug(com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+
+	/* Test list, which should return status 0. */
+	g_string_printf(com, CCL_C_COM, "-l");
+	g_debug(com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+
+	g_string_printf(com, CCL_C_COM, "--list");
+	g_debug(com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+
+	/* Test version, which should return status 0. */
+	g_string_printf(com, CCL_C_COM, "--version");
+	g_debug(com->str);
+	status = system(com->str);
+	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+
+	/* Release command string object. */
+	g_string_free(com, TRUE);
+
+}
+
 
 /**
  * Tests the build task of the ccl_c utility.
@@ -48,23 +113,7 @@ static void build_test() {
 	GString* com;
 
 	/* Initialize command string object. */
-	com = g_string_sized_new(strlen(CCL_C_COM) + 100);
-
-	/* Test help, list and version, which should return status 0. */
-	g_string_printf(com, CCL_C_COM, "-?");
-	g_debug(com->str);
-	status = system(com->str);
-	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
-
-	g_string_printf(com, CCL_C_COM, "-l");
-	g_debug(com->str);
-	status = system(com->str);
-	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
-
-	g_string_printf(com, CCL_C_COM, "--version");
-	g_debug(com->str);
-	status = system(com->str);
-	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
+	com = g_string_sized_new(strlen(CCL_C_COM_DEV) + 100);
 
 	/* Test simple build with one file. */
 	g_string_printf(com, CCL_C_COM_DEV,
@@ -96,6 +145,10 @@ int main(int argc, char** argv) {
 
 	ccl_test_init_device_index();
 	g_test_init(&argc, &argv, NULL);
+
+	g_test_add_func(
+		"/utils/c/info",
+		info_test);
 
 	g_test_add_func(
 		"/utils/c/build",

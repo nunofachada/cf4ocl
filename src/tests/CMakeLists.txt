@@ -1,3 +1,7 @@
+# Set tests log domain
+remove_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
+add_definitions(-DG_LOG_DOMAIN=\"ccl-tests\")
+
 # Build tests?
 option(BUILD_TESTS "Build tests?" ON)
 
@@ -10,8 +14,13 @@ if (NOT ${BUILD_TESTS})
 endif()
 
 # Allow the user to specify which device to use in generic device tests
-set(TESTS_DEVICE_INDEX "0" CACHE STRING "Index of device to use in generic device tests")
-add_definitions("-DCCL_TEST_DEFAULT_DEVICE_IDX=${TESTS_DEVICE_INDEX}")
+set(TESTS_DEVICE_INDEX "0" CACHE STRING
+	"Index of device to use in generic device tests")
+
+# Configure include file for tests
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.in.h
+	${CMAKE_BINARY_DIR}/tests/test.h @ONLY)
+include_directories(${CMAKE_BINARY_DIR}/tests)
 
 # Set of tests which only work with the OpenCL stub
 set(TESTS_STUBONLY test_profiler_op test_error_handling)
