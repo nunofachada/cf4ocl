@@ -19,8 +19,10 @@ set(TESTS_DEVICE_INDEX "0" CACHE STRING
 
 # Configure include file for tests
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.in.h
-	${CMAKE_BINARY_DIR}/tests/test.h @ONLY)
-include_directories(${CMAKE_BINARY_DIR}/tests)
+	${CMAKE_BINARY_DIR}/generated/test.h @ONLY)
+
+# Specify location of configured include file for tests
+include_directories(${CMAKE_BINARY_DIR}/generated)
 
 # Set of tests which only work with the OpenCL stub
 set(TESTS_STUBONLY test_profiler_op test_error_handling)
@@ -48,7 +50,7 @@ endif()
 add_subdirectory(ocl_stub)
 
 # Static CF4OCL library for tests, will use the OpenCL stub
-set(CCL_LIB_DIR "../cf4ocl2/ccl_")
+set(CCL_LIB_DIR "../lib/ccl_")
 add_library(${PROJECT_NAME}_TESTING STATIC
 	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c
 	${CCL_LIB_DIR}common.c

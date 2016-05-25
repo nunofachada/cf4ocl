@@ -9,11 +9,21 @@ set(SRC ccl_errors.c ccl_profiler.c ccl_common.c ccl_platforms.c
 
 # Setup the configuration header
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ccl_common.in.h
-	${CMAKE_BINARY_DIR}/cf4ocl2/ccl_common.h @ONLY)
+	${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}/ccl_common.h @ONLY)
+
+# Copy headers for compilation purposes
+file(COPY .
+	DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}
+	FILES_MATCHING PATTERN "*.h"
+	PATTERN "*.in.h" EXCLUDE)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
+
+# Generate export header and copy it to the includes folder
 generate_export_header(${PROJECT_NAME} BASE_NAME ccl)
+file(COPY ${CMAKE_BINARY_DIR}/src/lib/ccl_export.h
+	DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 
 # This is required for Windows compilation
 target_link_libraries(${PROJECT_NAME}
@@ -34,12 +44,7 @@ install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Where to install headers
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+install(DIRECTORY ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-	FILES_MATCHING PATTERN "ccl_*.h"
-	PATTERN "*.in.h" EXCLUDE)
+	FILES_MATCHING PATTERN "ccl_*.h")
 
-# Install the common header and the export header
-install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/ccl_common.h
-	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}/ccl_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})

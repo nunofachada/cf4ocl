@@ -71,29 +71,29 @@ static void info_test() {
 
 	/* Test help, which should return status 0. */
 	g_string_printf(com, CCL_C_COM, "-?");
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 
 	g_string_printf(com, CCL_C_COM, "--help");
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 
 	/* Test list, which should return status 0. */
 	g_string_printf(com, CCL_C_COM, "-l");
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 
 	g_string_printf(com, CCL_C_COM, "--list");
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 
 	/* Test version, which should return status 0. */
 	g_string_printf(com, CCL_C_COM, "--version");
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 
@@ -118,14 +118,14 @@ static void build_test() {
 	/* Test simple build with one file. */
 	g_string_printf(com, CCL_C_COM_DEV,
 		" -i -s " CCL_C_K1_OK, ccl_tests_devidx);
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 
 	/* Test build with two files. */
 	g_string_printf(com, CCL_C_COM_DEV,
 		" -i -s " CCL_C_K1_OK " -s " CCL_C_K2_OK,  ccl_tests_devidx);
-	g_debug(com->str);
+	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, 0);
 

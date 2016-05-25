@@ -97,10 +97,11 @@ endif()
 # ########################### #
 # SET LIBRARY INCLUDE FOLDERS #
 # ########################### #
-include_directories(${GLIB_INCLUDE_DIRS} ${OPENCL_INCLUDE_DIRS}
-	${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src
-	${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
-	${CMAKE_BINARY_DIR}/src/${PROJECT_NAME})
+include_directories(
+	${GLIB_INCLUDE_DIRS}                 # GLib headers
+	${OPENCL_INCLUDE_DIRS}               # OpenCL headers
+	${CMAKE_BINARY_DIR}/include/cf4ocl2  # Library headers
+	${CMAKE_BINARY_DIR}/include)         # Aggregate library header
 
 # ###################### #
 # DEFINE INSTALL FOLDERS #
@@ -303,8 +304,8 @@ add_subdirectory(scripts)
 
 # pkg-config support
 configure_file(${CMAKE_SOURCE_DIR}/cf4ocl2.pc.in
-	${CMAKE_BINARY_DIR}/cf4ocl2.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/cf4ocl2.pc
+	${CMAKE_BINARY_DIR}/generated/cf4ocl2.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/generated/cf4ocl2.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 	COMPONENT utilities)
 
