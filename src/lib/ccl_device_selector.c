@@ -1169,7 +1169,7 @@ CCLDevSelDevices ccl_devsel_dep_index(
 
 	/* Check if index is within bounds. */
 	ccl_if_err_create_goto(*err, CCL_ERROR, index >= devices->len,
-		CCL_ERROR_INVALID_DATA, error_handler,
+		CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
 		"%s: No device found at index %d.", CCL_STRD, index);
 
 	/* Select device: remove all devices from list except the selected
