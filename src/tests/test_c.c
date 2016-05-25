@@ -138,7 +138,7 @@ static void build_test() {
 
 	/* Test build with non-existing device. */
 	g_string_printf(com, CCL_C_COM_DEV,
-		" -i -s " CCL_C_K1_OK " -s " CCL_C_K2_OK,  G_MAXUINT);
+		" -i -s " CCL_C_K1_OK " -s " CCL_C_K2_OK, 10000);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, CCL_ERROR_DEVICE_NOT_FOUND);
