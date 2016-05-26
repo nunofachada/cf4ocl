@@ -417,7 +417,7 @@ CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
 	GError* err_internal = NULL;
 
 	/* Context wrapper to create. */
-	CCLContext* ctx;
+	CCLContext* ctx = NULL;
 
 	/* Set of device selection filters. */
 	CCLDevSelFilters filters = NULL;
@@ -541,7 +541,7 @@ CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err) {
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	CCLPlatform* platf = NULL;
-	CCLDevice* dev;
+	CCLDevice* dev = NULL;
 	GError* err_internal = NULL;
 
 	/* Check if platform wrapper already in context object. */
