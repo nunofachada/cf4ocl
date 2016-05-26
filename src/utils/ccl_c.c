@@ -466,7 +466,7 @@ int main(int argc, char* argv[]) {
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL);
-	status = err_build ? CCL_ERROR_PROGRAM_BUILD : CCL_SUCCESS;
+	status = err_build ? EXIT_FAILURE : EXIT_SUCCESS;
 	goto cleanup;
 
 error_handler:
@@ -475,7 +475,7 @@ error_handler:
 	g_assert(err != NULL);
 
 	g_printerr("* Error: %s\n", err->message);
-	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
+	status = EXIT_FAILURE;
 	g_error_free(err);
 
 cleanup:
@@ -496,7 +496,7 @@ cleanup:
 
 	/* Confirm that memory allocated by wrappers has been properly
 	 * freed. */
-	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
+	g_return_val_if_fail(ccl_wrapper_memcheck(), EXIT_FAILURE);
 
 	/* Return status. */
 	return status;
