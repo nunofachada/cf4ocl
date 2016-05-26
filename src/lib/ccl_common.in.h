@@ -223,28 +223,35 @@ typedef struct ccl_platforms CCLPlatforms;
  * */
 typedef enum ccl_error_code {
 	/** Successful operation. */
-	CCL_SUCCESS                = 0,
+	CCL_SUCCESS                    = 0,
 	/** Unable to open file. */
-	CCL_ERROR_OPENFILE         = 1,
-	/** Invalid program or function arguments. */
-	CCL_ERROR_ARGS             = 2,
+	CCL_ERROR_OPENFILE             = 1,
+	/** Invalid function arguments. */
+	CCL_ERROR_ARGS                 = 2,
 	/** Invalid data passed to a function or returned from function. */
-	CCL_ERROR_INVALID_DATA     = 3,
+	CCL_ERROR_INVALID_DATA         = 3,
 	/** Error writing to a stream. */
-	CCL_ERROR_STREAM_WRITE     = 4,
+	CCL_ERROR_STREAM_WRITE         = 4,
 	/** The requested OpenCL device was not found. */
-	CCL_ERROR_DEVICE_NOT_FOUND = 5,
-	/** The operation is not supported by the version of the
-	 * selected OpenCL platform. */
-	CCL_ERROR_UNSUPPORTED_OCL  = 6,
+	CCL_ERROR_DEVICE_NOT_FOUND     = 5,
+	/** The operation is not supported by the version of the selected
+	 * OpenCL platform. */
+	CCL_ERROR_UNSUPPORTED_OCL      = 6,
 	/** Object information is unavailable. */
 	CCL_ERROR_INFO_UNAVAILABLE_OCL = 7,
-	/** Unable to compile/build/link program. */
-	CCL_ERROR_PROGRAM_BUILD = 8,
 	/** Any other errors. */
-	CCL_ERROR_OTHER            = 15
+	CCL_ERROR_OTHER                = 15
 } CCLErrorCode;
 
+#ifdef NDEBUG
+	#define CCL_DEBUG_ERR(err) g_debug(CCL_STRD)
+#else
+	#define CCL_DEBUG_ERR(err) \
+		g_debug("%s: %s [%s, error %d]", \
+			CCL_STRD, (err)->message, \
+			g_quark_to_string((err)->domain), \
+			(err)->code)
+#endif
 
 /**
  * If error is detected (`error_code != no_error_code`),
@@ -261,27 +268,27 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
 	if (error_condition) { \
-		g_debug(CCL_STRD); \
 		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
+		CCL_DEBUG_ERR(err); \
 		goto label; \
 	}
 
 /**
- * If error is detected in `err` object (`err != NULL`),
- * go to the specified label.
+ * If error is detected in `err` object (`err != NULL`), go to the specified
+ * label.
  *
  * @param[in] err GError* object.
  * @param[in] label Label to goto if error is detected.
  * */
 #define ccl_if_err_goto(err, label)	\
 	if ((err) != NULL) { \
-		g_debug(CCL_STRD); \
+		CCL_DEBUG_ERR(err); \
 		goto label; \
 	}
 
 /**
- * Same as ccl_if_err_goto(), but rethrows error in a source
- * GError to a new destination GError object.
+ * Same as ccl_if_err_goto(), but rethrows error in a source GError to a new
+ * destination GError object.
  *
  * @param[out] err_dest Destination GError** object.
  * @param[in] err_src Source GError* object.
@@ -289,30 +296,30 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_propagate_goto(err_dest, err_src, label) \
 	if ((err_src) != NULL) { \
-		g_debug(CCL_STRD); \
+		CCL_DEBUG_ERR(err_src); \
 		g_propagate_error(err_dest, err_src); \
 		goto label; \
 	}
 
-/** Resolves to error category identifying string, in this case an error
- * in _cf4ocl_. */
+/** Resolves to error category identifying string, in this case an error in
+ * _cf4ocl_. */
 #define CCL_ERROR ccl_error_quark()
 
-/** Resolves to error category identifying string, in this case
- * an error in the OpenCL library. */
+/** Resolves to error category identifying string, in this case an error in the
+ * OpenCL library. */
 #define CCL_OCL_ERROR ccl_ocl_error_quark()
 
 /* Print executable version. */
 CCL_EXPORT
 void ccl_common_version_print(const char* exec_name);
 
-/* Resolves to error category identifying string, in this case
- * an error in _cf4ocl_. */
+/* Resolves to error category identifying string, in this case an error in
+ * _cf4ocl_. */
 CCL_EXPORT
 GQuark ccl_error_quark(void);
 
-/* Resolves to error category identifying string, in this case
- * an error in the OpenCL library. */
+/* Resolves to error category identifying string, in this case an error in the
+ * OpenCL library. */
 CCL_EXPORT
 GQuark ccl_ocl_error_quark(void);
 

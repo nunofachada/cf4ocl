@@ -44,11 +44,11 @@ void ccl_common_version_print(const char* exec_name) {
 }
 
 /**
- * Resolves to error category identifying string, in this case an
- * error in _cf4ocl_.
+ * Resolves to error category identifying string, in this case an error in
+ * _cf4ocl_.
  *
- * @return A GQuark structure defined by category identifying string,
- * which identifies the error as a cf4ocl generated error.
+ * @return A GQuark structure defined by category identifying string, which
+ * identifies the error as a _cf4ocl_ generated error.
  */
 CCL_EXPORT
 GQuark ccl_error_quark() {
@@ -56,11 +56,11 @@ GQuark ccl_error_quark() {
 }
 
 /**
- *  Resolves to error category identifying string, in this case
- * an error in the OpenCL library.
+ * Resolves to error category identifying string, in this case an error in the
+ * OpenCL library.
  *
- * @return A GQuark structure defined by category identifying string,
- * which identifies the error as an error in the OpenCL library.
+ * @return A GQuark structure defined by category identifying string, which
+ * identifies the error as an error in the OpenCL library.
  */
 CCL_EXPORT
 GQuark ccl_ocl_error_quark() {
