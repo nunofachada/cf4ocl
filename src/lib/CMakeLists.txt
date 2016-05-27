@@ -11,11 +11,16 @@ set(SRC ccl_errors.c ccl_profiler.c ccl_common.c ccl_platforms.c
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ccl_common.in.h
 	${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}/ccl_common.h @ONLY)
 
+# Copy aggregate header for compilation purposes
+file(COPY ${PROJECT_NAME}.h
+	DESTINATION ${CMAKE_BINARY_DIR}/include)
+
 # Copy headers for compilation purposes
 file(COPY .
 	DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}
 	FILES_MATCHING PATTERN "*.h"
-	PATTERN "*.in.h" EXCLUDE)
+	PATTERN "*.in.h" EXCLUDE
+	PATTERN "${PROJECT_NAME}.h" EXCLUDE)
 
 # Add library
 add_library(${PROJECT_NAME} SHARED ${SRC})
@@ -37,14 +42,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	VERSION ${${PROJECT_NAME}_VERSION}
 	SOVERSION ${${PROJECT_NAME}_VERSION_MAJOR})
 
-# Where to install lib
+# Install library
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-# Where to install headers
+# Install aggregate header
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.h
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Install headers
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 	FILES_MATCHING PATTERN "ccl_*.h")
-
