@@ -30,35 +30,35 @@
 
 /* Full path to the ccl_c binary and a string placeholder flag for command
  * line options. */
-#define CCL_C_COM \
+#define CCL_TEST_C_COM \
 	CCL_TEST_BUILD_DIR G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S "utils" \
 	G_DIR_SEPARATOR_S "ccl_c %s "
 
 /* Full path to the ccl_c binary and a string placeholder flag for command line
  * options and an integer placeholder flag for command line device
  * specification. */
-#define CCL_C_COM_DEV \
-	CCL_C_COM "-d %u"
+#define CCL_TEST_C_COM_DEV \
+	CCL_TEST_C_COM "-d %u"
 
 /* Full path to the example binaries and kernels. */
-#define CCL_C_EXAMPLES \
+#define CCL_TEST_C_EXAMPLES \
 	CCL_TEST_SRC_DIR G_DIR_SEPARATOR_S "src" G_DIR_SEPARATOR_S \
 	"examples"
 
 /* Full path to the canon.cl kernel */
-#define CCL_C_K1_OK \
-	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "canon.cl"
+#define CCL_TEST_C_K1_OK \
+	CCL_TEST_C_EXAMPLES G_DIR_SEPARATOR_S "canon.cl"
 
 /* Full path to the ca.cl kernel */
-#define CCL_C_K2_OK \
-	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "ca.cl"
+#define CCL_TEST_C_K2_OK \
+	CCL_TEST_C_EXAMPLES G_DIR_SEPARATOR_S "ca.cl"
 
 /* Full path to a file which will certainly not compile as an OpenCL kernel. */
-#define CCL_C_K3_KO \
-	CCL_C_EXAMPLES G_DIR_SEPARATOR_S "CMakeLists.txt"
+#define CCL_TEST_C_K3_KO \
+	CCL_TEST_C_EXAMPLES G_DIR_SEPARATOR_S "CMakeLists.txt"
 
 /* Full path to a generated binary file. */
-#define CCL_C_BIN \
+#define CCL_TEST_C_BIN \
 	CCL_TEST_BUILD_DIR G_DIR_SEPARATOR_S "out.bin"
 
 /**
@@ -71,32 +71,32 @@ static void info_test() {
 	GString* com;
 
 	/* Initialize command string object. */
-	com = g_string_sized_new(strlen(CCL_C_COM) + 10);
+	com = g_string_sized_new(strlen(CCL_TEST_C_COM) + 10);
 
 	/* Test help, which should return status 0. */
-	g_string_printf(com, CCL_C_COM, "-?");
+	g_string_printf(com, CCL_TEST_C_COM, "-?");
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
-	g_string_printf(com, CCL_C_COM, "--help");
+	g_string_printf(com, CCL_TEST_C_COM, "--help");
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test list, which should return status 0. */
-	g_string_printf(com, CCL_C_COM, "-l");
+	g_string_printf(com, CCL_TEST_C_COM, "-l");
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
-	g_string_printf(com, CCL_C_COM, "--list");
+	g_string_printf(com, CCL_TEST_C_COM, "--list");
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test version, which should return status 0. */
-	g_string_printf(com, CCL_C_COM, "--version");
+	g_string_printf(com, CCL_TEST_C_COM, "--version");
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
@@ -117,84 +117,88 @@ static void build_test() {
 	GString* com;
 
 	/* Initialize command string object. */
-	com = g_string_sized_new(strlen(CCL_C_COM_DEV) + 100);
+	com = g_string_sized_new(strlen(CCL_TEST_C_COM_DEV) + 100);
 
 	/* Test simple build with one source file. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K1_OK, ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K1_OK, ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test build with two source files. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K1_OK " -s " CCL_C_K2_OK,  ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K1_OK " -s " CCL_TEST_C_K2_OK,  ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test build with one source and create binary. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K1_OK " -o " CCL_C_BIN "1", ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K1_OK " -o " CCL_TEST_C_BIN "1", ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test build with another source and create another binary. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K2_OK " -o " CCL_C_BIN "2", ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K2_OK " -o " CCL_TEST_C_BIN "2", ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test build with one binary. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -b " CCL_C_BIN "1", ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -b " CCL_TEST_C_BIN "1", ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_SUCCESS);
 
 	/* Test build with two binaries. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -b " CCL_C_BIN "1 -b " CCL_C_BIN "2", ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -b " CCL_TEST_C_BIN "1 -b " CCL_TEST_C_BIN "2", ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_FAILURE);
 
 	/* Test build with one binary and one source file. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K1_OK " -b " CCL_C_BIN, ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K1_OK " -b " CCL_TEST_C_BIN, ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_FAILURE);
 
 	/* Test build with source headers. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -h " CCL_C_K1_OK, ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -h " CCL_TEST_C_K1_OK, ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_FAILURE);
 
 	/* Test build with erroneous kernel. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K3_KO,  ccl_tests_devidx);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K3_KO,  ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_FAILURE);
 
 	/* Test build with non-existing device. */
-	g_string_printf(com, CCL_C_COM_DEV,
-		" -s " CCL_C_K1_OK " -s " CCL_C_K2_OK, 100000);
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
+		" -s " CCL_TEST_C_K1_OK " -s " CCL_TEST_C_K2_OK, 100000);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_FAILURE);
 
 	/* Test build with non-existing file. */
-	g_string_printf(com, CCL_C_COM_DEV,
+	g_string_printf(com, CCL_TEST_C_COM_DEV,
 		" -s this_file_does_not_exist.cl", ccl_tests_devidx);
 	g_debug("%s", com->str);
 	status = system(com->str);
 	g_assert_cmpint(WEXITSTATUS(status), ==, EXIT_FAILURE);
+
+	/* Remove binaries. */
+	g_unlink(CCL_TEST_C_BIN "1");
+	g_unlink(CCL_TEST_C_BIN "2");
 
 	/* Release command string object. */
 	g_string_free(com, TRUE);

@@ -25,6 +25,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include <glib/gstdio.h>
 
 /* The default device to use in tests is set in the CMake configuration. */
 #define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
