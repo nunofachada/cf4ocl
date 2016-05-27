@@ -1,2 +1,4 @@
-# Do nothing for now
-message("CLI utils tests will be performed with BATS")
+# Copy tests to build folder
+file(COPY .
+	DESTINATION ${CMAKE_BINARY_DIR}/tests/utils
+	FILES_MATCHING PATTERN "*.bats")
