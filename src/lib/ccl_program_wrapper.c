@@ -1048,8 +1048,6 @@ const char* ccl_program_get_device_build_log(
 		: NULL);
 }
 
-#ifdef CL_VERSION_1_2
-
 /**
  * Compile a program's source code. This function wraps the
  * clCompileProgram() OpenCL function.
@@ -1108,6 +1106,29 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_2
+
+	/* Mark unused variables to avoid compiler warnings. */
+	CCL_UNUSED(err_internal);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(devs);
+	CCL_UNUSED(options);
+	CCL_UNUSED(prg_input_headers);
+	CCL_UNUSED(header_include_names);
+	CCL_UNUSED(pfn_notify);
+	CCL_UNUSED(user_data);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Program compilation requires cf4ocl to be deployed with support "
+		"for OpenCL version 1.2 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -1154,6 +1175,8 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	result = CL_TRUE;
 	goto finish;
 
+#endif
+
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
@@ -1162,7 +1185,11 @@ error_handler:
 	/* Bad result. */
 	result = CL_FALSE;
 
+#ifdef CL_VERSION_1_2
+
 finish:
+
+#endif
 
 	/* Check if necessary to release array of unwrapped devices. */
 	if (cl_devices != NULL) {
@@ -1235,6 +1262,29 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_2
+
+	/* Mark unused variables to avoid compiler warnings. */
+	CCL_UNUSED(err_internal);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(program);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(devs);
+	CCL_UNUSED(options);
+	CCL_UNUSED(input_prgs);
+	CCL_UNUSED(pfn_notify);
+	CCL_UNUSED(user_data);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Program linking requires cf4ocl to be deployed with support "
+		"for OpenCL version 1.2 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -1289,6 +1339,8 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
 
+#endif
+
 error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
@@ -1298,7 +1350,11 @@ error_handler:
 	if (prg) ccl_program_destroy(prg);
 	prg = NULL;
 
+#ifdef CL_VERSION_1_2
+
 finish:
+
+#endif
 
 	/* Check if necessary to release array of unwrapped devices. */
 	if (cl_devices != NULL) {
@@ -1315,7 +1371,6 @@ finish:
 
 }
 
-#endif
 
 /**
  * Get the OpenCL version of the platform associated with this program.

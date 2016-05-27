@@ -322,8 +322,6 @@ CCL_EXPORT
 const char* ccl_program_get_device_build_log(
 	CCLProgram* prg, CCLDevice* dev);
 
-#ifdef CL_VERSION_1_2
-
 /* Compile a program's source code. */
 CCL_EXPORT
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
@@ -337,8 +335,6 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
 	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
 	void* user_data, GError** err);
-
-#endif
 
 /* ********************** */
 /* PROGRAM OPENCL VERSION */
