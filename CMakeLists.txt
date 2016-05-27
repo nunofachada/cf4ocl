@@ -295,6 +295,9 @@ endif()
 # Add src folder
 add_subdirectory(src)
 
+# Add tests folder
+add_subdirectory(tests)
+
 # Add scripts folder
 add_subdirectory(scripts)
 

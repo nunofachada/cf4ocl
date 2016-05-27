@@ -50,7 +50,7 @@ endif()
 add_subdirectory(ocl_stub)
 
 # Static CF4OCL library for tests, will use the OpenCL stub
-set(CCL_LIB_DIR "../lib/ccl_")
+set(CCL_LIB_DIR "${CMAKE_SOURCE_DIR}/src/lib/ccl_")
 add_library(${PROJECT_NAME}_TESTING STATIC
 	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c
 	${CCL_LIB_DIR}common.c
