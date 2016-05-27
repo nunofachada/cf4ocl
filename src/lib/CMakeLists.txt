@@ -7,6 +7,20 @@ set(SRC ccl_errors.c ccl_profiler.c ccl_common.c ccl_platforms.c
 	ccl_abstract_dev_container_wrapper.c ccl_memobj_wrapper.c
 	ccl_buffer_wrapper.c ccl_image_wrapper.c ccl_sampler_wrapper.c)
 
+# Special debug mode
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	option(DEBUG_OBJ_LIFETIME
+		"Log debug messages for wrapper object new/destroy?" OFF)
+else()
+	unset(DEBUG_OBJ_LIFETIME CACHE)
+endif()
+
+if (DEBUG_OBJ_LIFETIME)
+	add_definitions("-DCCL_DEBUG_OBJ_LIFETIME")
+else()
+	remove_definitions("-DCCL_DEBUG_OBJ_LIFETIME")
+endif()
+
 # Setup the configuration header
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ccl_common.in.h
 	${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}/ccl_common.h @ONLY)

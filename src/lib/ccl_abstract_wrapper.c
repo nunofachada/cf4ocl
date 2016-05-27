@@ -165,10 +165,9 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	/* OpenCL status flag. */
 	cl_int ocl_status;
 
-#ifndef NDEBUG
+#ifdef CCL_DEBUG_OBJ_LIFETIME
 
-	/* If cf4ocl is built in Debug mode, log destruction/unreferencing of
-	 * wrapper. */
+	/* Log destruction/unreferencing of wrapper. */
 	g_debug("Destroy/unref. CCL%s(%p)",
 		ccl_wrapper_get_class_name(wrapper), (void*) wrapper->cl_object);
 
@@ -351,9 +350,9 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
 	/* Increment wrapper reference count. */
 	g_atomic_int_inc(&wrapper->ref_count);
 
-#ifndef NDEBUG
+#ifdef CCL_DEBUG_OBJ_LIFETIME
 
-	/* If cf4ocl is built in Debug mode, log creation/referencing of wrapper. */
+	/* Log creation/referencing of wrapper. */
 	g_debug("New/ref. CCL%s(%p)",
 		ccl_wrapper_get_class_name(wrapper), (void*) wrapper->cl_object);
 
