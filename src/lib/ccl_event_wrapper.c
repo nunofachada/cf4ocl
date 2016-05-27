@@ -303,8 +303,8 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
 				final_name = "EGL_FENCE_SYNC_OBJECT_KHR";
 				break;
 			default:
-				final_name = NULL;
-				g_warning("Unknown event command type");
+				final_name = "UNKNOWN";
+				g_warning("Unknown event command type: 0x%x", ct);
 				break;
 		}
 
