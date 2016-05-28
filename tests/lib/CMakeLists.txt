@@ -2,21 +2,6 @@
 remove_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 add_definitions(-DG_LOG_DOMAIN=\"ccl-tests\")
 
-# Build tests?
-option(BUILD_TESTS "Build tests?" ON)
-
-# Stop processing if tests are not to be built
-if (NOT ${BUILD_TESTS})
-	unset(DOC_EXCLUDE_TESTS CACHE)
-	unset(TESTS_USE_OPENCL_STUB CACHE)
-	unset(TESTS_DEVICE_INDEX CACHE)
-	return()
-endif()
-
-# Allow the user to specify which device to use in generic device tests
-set(TESTS_DEVICE_INDEX "0" CACHE STRING
-	"Index of device to use in generic device tests")
-
 # Configure include file for tests
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.in.h
 	${CMAKE_BINARY_DIR}/generated/test.h @ONLY)
@@ -31,7 +16,7 @@ set(TESTS_STUBONLY test_profiler_op test_error_handling)
 # implementation
 set(TESTS_OPT test_profiler test_platforms test_buffer test_devquery
 	test_context test_event test_program test_image test_sampler
-	test_kernel test_queue test_device test_c)
+	test_kernel test_queue test_device)
 
 # Complete set of tests
 set(TESTS ${TESTS_STUBONLY} ${TESTS_OPT})
