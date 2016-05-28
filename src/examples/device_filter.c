@@ -119,11 +119,8 @@ int main(int argc, char* argv[]) {
 			ERROR_MSG_AND_EXIT("No devices were accepted by the filters.");
 		} /* If */
 
-		/* Free array object containing device wrappers. The
-		 * CCLDevSelDevices class is just another name for GPtrArray*,
-		 * which is a GLib pointer array. As such, we use the GLib
-		 * pointer array destructor to release this object. */
-		g_ptr_array_free(devices, TRUE);
+		/* Free array object containing device wrappers. */
+		ccl_devsel_devices_destroy(devices);
 
 	} else {
 

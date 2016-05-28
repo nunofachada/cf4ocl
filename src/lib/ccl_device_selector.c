@@ -96,98 +96,6 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
 
 /**
  * @internal
- * Populate array of device wrapper objects with all OpenCL devices present in
- * the system
- *
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
- * to be ignored.
- * @return One or more OpenCL devices selected based on the provided filters.
- *  */
-static CCLDevSelDevices ccl_devsel_get_devices(GError **err) {
-
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
-
-	/* Platforms wrapper object. */
-	CCLPlatforms* platforms = NULL;
-
-	/* Platform wrapper object. */
-	CCLPlatform* platform = NULL;
-
-	/* Device wrapper object. */
-	CCLDevice* device = NULL;
-
-	/* Array of device wrapper objects. Devices will be selected from
-	 * this array.  */
-	GPtrArray* devices = NULL;
-
-	/* Number of platforms. */
-	guint num_platfs;
-
-	/* Internal error handling object. */
-	GError* err_internal = NULL;
-
-	/* Get all OpenCL platforms in system wrapped in a CCLPlatforms
-	 * object. */
-	platforms = ccl_platforms_new(&err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-
-	/* Determine number of platforms. */
-	num_platfs = ccl_platforms_count(platforms);
-
-	/* Create array of device wrapper objects. */
-	devices = g_ptr_array_new_with_free_func(
-		(GDestroyNotify) ccl_device_destroy);
-
-	/* Cycle through OpenCL platforms. */
-	for (guint i = 0; i < num_platfs; i++) {
-
-		/* Get next platform wrapper. */
-		platform = ccl_platforms_get(platforms, i);
-
-		/* Get number of devices in current platform.*/
-		guint num_devices = ccl_platform_get_num_devices(
-			platform, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
-
-		/* Cycle through devices in current platform. */
-		for (guint j = 0; j < num_devices; j++) {
-
-			/* Get current device wrapper. */
-			device = ccl_platform_get_device(platform, j, &err_internal);
-			ccl_if_err_propagate_goto(err, err_internal, error_handler);
-
-			/* Add device wrapper to array of device wrapper objects. */
-			g_ptr_array_add(devices, (gpointer) device);
-
-			/* Update device reference (because it is kept also in
-			 * the array of device wrapper objects). */
-			ccl_device_ref(device);
-
-		}
-
-	}
-
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
-
-error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-
-finish:
-
-	/* Free platforms wrapper object. */
-	if (platforms != NULL) ccl_platforms_destroy(platforms);
-
-	/* Return the selected devices. */
-	return devices;
-
-}
-
-/**
- * @internal
  * Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the given device
  * array.
@@ -406,6 +314,105 @@ finish:
  */
 
 /**
+ * Create and return an object with device wrappers for all OpenCL devices
+ * present in the system.
+ *
+ * See ::CCLDevSelDevices for information on how to access individual device
+ * wrappers within the object.
+ *
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return An object containing device wrappers for all OpenCL devices present
+ * in the system, or `NULL` if an error occurs. The object should be freed with
+ * ccl_devsel_devices_destroy().
+ * @sa ::CCLDevSelDevices
+ * */
+CCL_EXPORT
+CCLDevSelDevices ccl_devsel_devices_new(GError **err) {
+
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Platforms wrapper object. */
+	CCLPlatforms* platforms = NULL;
+
+	/* Platform wrapper object. */
+	CCLPlatform* platform = NULL;
+
+	/* Device wrapper object. */
+	CCLDevice* device = NULL;
+
+	/* Array of device wrapper objects. Devices will be selected from
+	 * this array.  */
+	GPtrArray* devices = NULL;
+
+	/* Number of platforms. */
+	guint num_platfs;
+
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+
+	/* Get all OpenCL platforms in system wrapped in a CCLPlatforms
+	 * object. */
+	platforms = ccl_platforms_new(&err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* Determine number of platforms. */
+	num_platfs = ccl_platforms_count(platforms);
+
+	/* Create array of device wrapper objects. */
+	devices = g_ptr_array_new_with_free_func(
+		(GDestroyNotify) ccl_device_destroy);
+
+	/* Cycle through OpenCL platforms. */
+	for (guint i = 0; i < num_platfs; i++) {
+
+		/* Get next platform wrapper. */
+		platform = ccl_platforms_get(platforms, i);
+
+		/* Get number of devices in current platform.*/
+		guint num_devices = ccl_platform_get_num_devices(
+			platform, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+		/* Cycle through devices in current platform. */
+		for (guint j = 0; j < num_devices; j++) {
+
+			/* Get current device wrapper. */
+			device = ccl_platform_get_device(platform, j, &err_internal);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+			/* Add device wrapper to array of device wrapper objects. */
+			g_ptr_array_add(devices, (gpointer) device);
+
+			/* Update device reference (because it is kept also in
+			 * the array of device wrapper objects). */
+			ccl_device_ref(device);
+
+		}
+
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
+
+	/* Free platforms wrapper object. */
+	if (platforms != NULL) ccl_platforms_destroy(platforms);
+
+	/* Return the selected devices. */
+	return devices;
+
+}
+
+
+/**
  * Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the system.
  *
@@ -435,7 +442,7 @@ gchar** ccl_devsel_get_device_strings(GError** err) {
 	gchar** dev_strings = NULL;
 
 	/* Get all devices present in the system. */
-	devices = ccl_devsel_get_devices(&err_internal);
+	devices = ccl_devsel_devices_new(&err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get the array of strings describing the devices. */
@@ -568,7 +575,7 @@ CCLDevSelDevices ccl_devsel_select(
 	CCLDevSelDevices devices;
 
 	/* Get all devices present in the system. */
-	devices = ccl_devsel_get_devices(&err_internal);
+	devices = ccl_devsel_devices_new(&err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* *** Filter devices. *** */

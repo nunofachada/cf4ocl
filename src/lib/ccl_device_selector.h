@@ -81,7 +81,7 @@
  * The ::CCLDevSelDevices object represented by `devices` is just a
  * [GLib pointer array](https://developer.gnome.org/glib/stable/glib-Pointer-Arrays.html#GPtrArray),
  * so we have direct access to the list of device wrappers and its size.
- * For example, lets list the filtered devices by name:
+ * For example, let us list the filtered devices by name:
  *
  * @skipline List selected
  * @until &err);
@@ -89,20 +89,26 @@
  * @skipline printf(
  * @until For
  * @skipline If
- * @until g_ptr_array_free
+ * @until ccl_devsel_devices_destroy
  *
- * ::CCLDevSelFilters objects are automatically freed and reset to
- * `NULL` when passed to context wrapper constructors or to the
- * ::ccl_devsel_select() function.
+ * ::CCLDevSelFilters objects are automatically freed and reset to `NULL` when
+ * passed to context wrapper constructors or to the ::ccl_devsel_select()
+ * function.
  *
  * See the complete example @ref device_filter.c "here".
  *
- * The device selector module also offers two additional helper
- * functions which return and print a list of all OpenCL devices
- * available in the system, respectively:
+ * The device selector module provides two additional helper functions which
+ * return and print a list of all OpenCL devices available in the system,
+ * respectively:
  *
  * * ::ccl_devsel_get_device_strings()
  * * ::ccl_devsel_print_device_strings()
+ *
+ * Finally, the device selector module also offers the
+ * ::ccl_devsel_devices_new() function, which returns a ::CCLDevSelDevices
+ * object containing device wrappers for all OpenCL devices in the system. This
+ * array should not be modified directly, and when no longer required, should be
+ * freed with ::ccl_devsel_devices_destroy().
  *
  * @{
  */
@@ -120,8 +126,47 @@ typedef enum ccl_devsel_filter_type {
 
 } CCLDevSelFilterType;
 
-/** A set of device wrappers, used between filtering steps. */
+/**
+ * An object containing device wrappers.
+ *
+ * Objects of this type are mostly used between filtering steps, and client
+ * code will rarely access it directly. ::CCLDevSelDevices objects are in
+ * practice GLib's [pointer arrays](https://developer.gnome.org/glib/stable/glib-Pointer-Arrays.html#GPtrArray),
+ * and contain two fields:
+ *
+ * @code{.c}
+ * void** pdata;
+ * unsigned int len;
+ * @endcode
+ *
+ * The `pdata` field is the array itself, while `len` specifies the length of
+ * the array. For example, the following code fetches the device wrapper at
+ * index 0:
+ *
+ * @code{.c}
+ * CCLDeviceWrapper* dev;
+ * CCLDevSelDevice devices;
+ * @endcode
+ * @code{.c}
+ * dev = (CCLDeviceWrapper*) devices->pdata[0];
+ * @endcode
+ *
+ * Objects of this type will rarely be manipulated directly in client code,
+ * unless if low-level management of device selection is required.
+ * */
 typedef GPtrArray* CCLDevSelDevices;
+
+/**
+ * Destroy an object containing device wrappers.
+ *
+ * This function will rarely be used in client code, unless in cases where
+ * low-level management of device selection is required.
+ *
+ * @param[in] devices Object containing device wrappers.
+ * @return Always returns `NULL`.
+ * */
+#define ccl_devsel_devices_destroy(devices) \
+	g_ptr_array_free(devices, TRUE)
 
 /**
  * Independent filter function: Abstract function for filtering
@@ -152,9 +197,8 @@ typedef CCLDevSelDevices (*ccl_devsel_dep)(
 /**
  * A set of independent and dependent device filters.
  *
- * Use the ccl_devsel_add_indep_filter() function to add independent
- * filters and the ccl_devsel_add_dep_filter() function to add dependent
- * device filters.
+ * Use the ccl_devsel_add_indep_filter() function to add independent filters and
+ * the ccl_devsel_add_dep_filter() function to add dependent device filters.
  *
  * This object should be initialized to NULL:
  *
@@ -169,13 +213,17 @@ typedef CCLDevSelDevices (*ccl_devsel_dep)(
  * */
 typedef GPtrArray* CCLDevSelFilters;
 
-/* Returns a NULL-terminated array of strings, each one
- * containing the name and vendor of each device in the system. */
+/* Create and return an object with device wrappers for all OpenCL devices
+ * present in the system. */
+CCL_EXPORT
+CCLDevSelDevices ccl_devsel_devices_new(GError **err);
+
+/* Returns a NULL-terminated array of strings, each one containing the name and
+ * vendor of each device in the system. */
 CCL_EXPORT
 gchar** ccl_devsel_get_device_strings(GError** err);
 
-/* Print to stdout a device description string for each device
- * in the system. */
+/* Print to stdout a device description string for each device in the system. */
 CCL_EXPORT
 void ccl_devsel_print_device_strings(GError** err);
 
@@ -189,8 +237,7 @@ CCL_EXPORT
 void ccl_devsel_add_dep_filter(
 	CCLDevSelFilters* filters, ccl_devsel_dep filter, void* data);
 
-/* Select one or more OpenCL devices based on the provided
- * filters.  */
+/* Select one or more OpenCL devices based on the provided filters.  */
 CCL_EXPORT
 CCLDevSelDevices ccl_devsel_select(
 	CCLDevSelFilters* filters, GError **err);
