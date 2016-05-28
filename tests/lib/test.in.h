@@ -20,18 +20,14 @@
  * Header for cf4ocl2 tests.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include <cf4ocl2.h>
-#include <glib/gstdio.h>
 
 /* The default device to use in tests is set in the CMake configuration. */
 #define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
-
-#define CCL_TEST_BUILD_DIR "@PROJECT_BINARY_DIR@"
-#define CCL_TEST_SRC_DIR "@PROJECT_SOURCE_DIR@"
 
 /* The efective device to use in tests. */
 extern cl_uint ccl_tests_devidx;
