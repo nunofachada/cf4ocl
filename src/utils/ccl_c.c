@@ -226,8 +226,7 @@ int main(int argc, char* argv[]) {
 
 	} else if (opt_list) {
 
-		/* If user requested a list of available devices,
-		 * present the list. */
+		/* If user requested a list of available devices, present the list. */
 		ccl_devsel_print_device_strings(&err);
 		ccl_if_err_goto(err, error_handler);
 
