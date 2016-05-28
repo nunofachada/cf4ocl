@@ -16,11 +16,20 @@ setup() {
 	# ccl_c binary
 	CCL_C_COM="@CMAKE_BINARY_DIR@/src/utils/ccl_c"
 
+	# ccl_devinfo binary
+	CCL_C_DEVINFO="@CMAKE_BINARY_DIR@/src/utils/ccl_devinfo"
+
+	# How many devices?
+	CCL_C_NDEVS=`${CCL_C_DEVINFO} | grep -c "\[ Device #"`
+
 	# Device index to use in tests
 	if [ -z ${CCL_C_DEV_IDX} ]
 	then
 		CCL_C_DEV_IDX="@TESTS_DEVICE_INDEX@"
 	fi
+
+	# OpenCL version of device platform
+	CCL_C_OCL_VERSION=`${CCL_C_DEVINFO} -o -d ${CCL_C_DEV_IDX} -c VERSION | grep -o "OpenCL [1-9]\.[1-9]" | cut -d " " -f 2`
 
 	# Folder containing example kernels
 	CCL_C_EXAMPLES_FOLDER="@CMAKE_SOURCE_DIR@/src/examples"
@@ -167,7 +176,7 @@ teardown() {
 # Test build with non-existing device.
 @test "Test build with non-existing device" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -d 100000 # TODO Replace value with number of lines returned in -l option + 1
+	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -d ${CCL_C_NDEVS}
 	[ "$status" -ne 0 ]
 
 }
