@@ -2,6 +2,12 @@
 remove_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 add_definitions(-DG_LOG_DOMAIN=\"ccl-tests\")
 
+# Put test kernel in a string to insert into test.h
+file(READ ${PROJECT_SOURCE_DIR}/tests/test_kernels/sum_full.cl
+	TEST_KERNEL_SUM_RAW HEX)
+string(REGEX REPLACE "(..)" "\\\\x\\1"
+	TEST_KERNEL_SUM_SRC ${TEST_KERNEL_SUM_RAW})
+
 # Configure include file for tests
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.in.h
 	${CMAKE_BINARY_DIR}/generated/test.h @ONLY)

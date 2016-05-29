@@ -12,34 +12,37 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cf4ocl. If not, see <http://www.gnu.org/licenses/>.
+ * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
 
 /**
  * @file
- * Header for cf4ocl2 tests.
+ * File containing sum kernel for testing. This kernel delegates the sum to
+ * another function which is declared in the header file.
  *
  * @author Nuno Fachada
  * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include <cf4ocl2.h>
+#include "sum_impl.cl.h"
 
-/* A test kernel. */
-#define CCL_TEST_PROGRAM_SUM_CONTENT "@TEST_KERNEL_SUM_SRC@"
+/**
+ * Performs sum of two vectors plus a constant.
+ *
+ * @param[in] a First vector to sum.
+ * @param[in] b Second vector to sum.
+ * @param[out] c Vector containing sum.
+ * @param[in] d Constant to sum.
+ * */
+__kernel void test_sum(
+	__global const uint *a,
+	__global const uint *b,
+	__global uint *c, uint d) {
 
-/* The default device to use in tests is set in the CMake configuration. */
-#define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
+	/* Get global ID. */
+	int gid = get_global_id(0);
 
-/* The efective device to use in tests. */
-extern cl_uint ccl_tests_devidx;
-
-/* Print handler which redirects output to debug stream. */
-void ccl_print_to_debug(const gchar* string);
-
-/* Determine index of device to use in tests. */
-void ccl_test_init_device_index();
-
-/* Create a context with a device specified at compile time. */
-CCLContext* ccl_test_context_new(GError** err);
+	/* Perform sum. */
+	c[gid] = do_sum(a[gid], b[gid], d);
+}

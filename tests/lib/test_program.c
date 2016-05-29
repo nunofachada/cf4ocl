@@ -28,19 +28,9 @@
 #include <glib/gstdio.h>
 #include "test.h"
 
-#define CCL_TEST_PROGRAM_SUM "sum"
+#define CCL_TEST_PROGRAM_SUM "test_sum_full"
 
 #define CCL_TEST_PROGRAM_SUM_FILENAME CCL_TEST_PROGRAM_SUM ".cl"
-
-#define CCL_TEST_PROGRAM_SUM_CONTENT \
-	"__kernel void " CCL_TEST_PROGRAM_SUM "(\n" \
-	"		__global const uint *a,\n" \
-	"		__global const uint *b,\n" \
-	"		__global uint *c, uint d)\n" \
-	"{\n" \
-	"	int gid = get_global_id(0);\n" \
-	"	c[gid] = a[gid] + b[gid] + d;\n" \
-	"}\n"
 
 #define CCL_TEST_PROGRAM_BUF_SIZE 16
 #define CCL_TEST_PROGRAM_LWS 8 /* Must be a divisor of CCL_TEST_PROGRAM_BUF_SIZE */
@@ -198,7 +188,8 @@ static void create_info_destroy_test() {
 		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
 				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
 				cl_kernel_arg_address_qualifier, &err);
-		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		g_assert(
+			(err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
 		if (err == NULL) {
 			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
 		} else {

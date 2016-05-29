@@ -12,34 +12,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cf4ocl. If not, see <http://www.gnu.org/licenses/>.
+ * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
  * */
 
 /**
  * @file
- * Header for cf4ocl2 tests.
+ * Header file for the do_sum function.
  *
  * @author Nuno Fachada
  * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include <cf4ocl2.h>
+#ifndef _CCL_TEST_KERNEL_DO_SUM_H_
+#define _CCL_TEST_KERNEL_DO_SUM_H_
 
-/* A test kernel. */
-#define CCL_TEST_PROGRAM_SUM_CONTENT "@TEST_KERNEL_SUM_SRC@"
+/* Performs sum of three unsigned integers. */
+uint do_sum(uint a, uint b, uint c);
 
-/* The default device to use in tests is set in the CMake configuration. */
-#define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
-
-/* The efective device to use in tests. */
-extern cl_uint ccl_tests_devidx;
-
-/* Print handler which redirects output to debug stream. */
-void ccl_print_to_debug(const gchar* string);
-
-/* Determine index of device to use in tests. */
-void ccl_test_init_device_index();
-
-/* Create a context with a device specified at compile time. */
-CCLContext* ccl_test_context_new(GError** err);
+#endif

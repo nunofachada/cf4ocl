@@ -31,18 +31,31 @@ setup() {
 	# OpenCL version of device platform
 	CCL_C_OCL_VERSION=`${CCL_C_DEVINFO} -o -d ${CCL_C_DEV_IDX} -c VERSION | grep -o "OpenCL [1-9]\.[1-9]" | cut -d " " -f 2`
 
-	# Folder containing example kernels
-	CCL_C_EXAMPLES_FOLDER="@CMAKE_SOURCE_DIR@/src/examples"
+	# Test kernels folder
+	CCL_C_K_FOLDER="@CMAKE_SOURCE_DIR@/tests/test_kernels"
 
-	# Working kernel 1
-	CCL_C_K1_OK="${CCL_C_EXAMPLES_FOLDER}/canon.cl"
-
-	# Working kernel 2
-	CCL_C_K2_OK="${CCL_C_EXAMPLES_FOLDER}/ca.cl"
+	# Fully working kernels
+	CCL_C_K_SUM="${CCL_C_K_FOLDER}/sum_full.cl"
+	CCL_C_K_XOR="${CCL_C_K_FOLDER}/xor_full.cl"
 
 	# Non-working kernel
-	CCL_C_K3_KO="@CMAKE_CURRENT_BINARY_DIR@/temp.cl"
-	echo "#include <wrong.h>\nint fun(void* x) {return 0;}\n" > ${CCL_C_K3_KO}
+	CCL_C_K_BAD="${CCL_C_K_FOLDER}/not_ok.cl"
+
+	# Kernels requiring header to compile
+	CCL_C_K_NEEDH_SUM="${CCL_C_K_FOLDER}/sum_needs_header.cl"
+	CCL_C_K_NEEDH_XOR="${CCL_C_K_FOLDER}/xor_needs_header.cl"
+
+	# Function headers
+	CCL_C_H_SUM="${CCL_C_K_FOLDER}/sum_impl.cl.h"
+	CCL_C_H_XOR="${CCL_C_K_FOLDER}/xor_impl.cl.h"
+
+	# Header names
+	CCL_C_HNAME_SUM="sum_impl.cl.h"
+	CCL_C_HNAME_XOR="xor_impl.cl.h"
+
+	# Function implementations
+	CCL_C_H_SUM="${CCL_C_K_FOLDER}/sum_impl.cl"
+	CCL_C_H_XOR="${CCL_C_K_FOLDER}/xor_impl.cl"
 
 	# Base name for temporary binary files
 	CCL_C_TMP_BIN="@CMAKE_CURRENT_BINARY_DIR@/temp.bin"
@@ -52,7 +65,6 @@ setup() {
 teardown() {
 
 	# Remove possible temporary files
-	rm -f ${CCL_C_K3_KO}
 	rm -f ${CCL_C_TMP_BIN}{1..2}
 
 }
@@ -98,7 +110,9 @@ teardown() {
 # Test simple build with one source file.
 @test "Test build with one source file" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
 
 }
@@ -106,7 +120,9 @@ teardown() {
 # Test build with two source files.
 @test "Test build with two source files" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -s ${CCL_C_K2_OK} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
 
 }
@@ -115,12 +131,18 @@ teardown() {
 @test "Test build with one source, create binary, then with one binary" {
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
+
+	# Check if binary was created
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test build with one binary.
 	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
 
 }
@@ -129,18 +151,28 @@ teardown() {
 @test "Test build with two binaries created from two different source files" {
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
+
+	# Check if binary was created
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test build with another source and create another binary.
-	run ${CCL_C_COM} -s ${CCL_C_K2_OK} -o ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -o ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
+
+	# Check if binary was created
 	[ -f ${CCL_C_TMP_BIN}2 ]
 
 	# Test build with two binaries. */
 	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}2 -d \
 		${CCL_C_DEV_IDX}
+
+	# Error: builds can only be performed with one binary
 	[ "$status" -ne 0 ]
 
 }
@@ -149,26 +181,38 @@ teardown() {
 @test "Test build with one binary and one source file" {
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
+
+	# Check if binary was created
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test build with one binary and one source file.
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -b ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -b ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+
+	# Error: The build task requires either: 1) one or more source files; or,
+	# 2) one binary file
 	[ "$status" -ne 0 ]
 
 }
 
 # Test build with source headers.
 @test "Test build with source headers" {
-	run ${CCL_C_COM} -h ${CCL_C_K1_OK} -d ${CCL_C_DEV_IDX}
+
+	run ${CCL_C_COM} -h ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+
+	# Error: source headers can only be specified in the compile task
 	[ "$status" -ne 0 ]
 }
 
-# Test build with erroneous kernel.
-@test "Test build with erroneous kernel" {
+# Test build with erroneous source file.
+@test "Test build with erroneous source file" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K3_KO} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -d ${CCL_C_DEV_IDX}
+
+	# Error: build should not be successful with erroneous source file
 	[ "$status" -ne 0 ]
 
 }
@@ -176,7 +220,9 @@ teardown() {
 # Test build with non-existing device.
 @test "Test build with non-existing device" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K1_OK} -d ${CCL_C_NDEVS}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -d ${CCL_C_NDEVS}
+
+	# Error: build should throw error if device does not exist
 	[ "$status" -ne 0 ]
 
 }
@@ -185,6 +231,154 @@ teardown() {
 @test "Test build with non-existing file" {
 
 	run ${CCL_C_COM} -s this_file_does_not_exist.cl -d ${CCL_C_DEV_IDX}
+
+	# Error: build should throw error if source file does not exist
 	[ "$status" -ne 0 ]
 
 }
+
+# Test build with one source file with correct compiler options
+
+# Test build with one source file with incorrect compiler options
+
+
+# ################# #
+# Test compile task #
+# ################# #
+
+# Test compile with one source file.
+@test "Test compile with one source file" {
+
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+}
+
+# Test compile with two source files.
+@test "Test compile with two source files" {
+
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+}
+
+# Test compile with one binary.
+@test "Test compile with one binary" {
+
+	# Test compile with one source and create binary.
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Check if binary was created
+	[ -f ${CCL_C_TMP_BIN}1 ]
+
+	# Test compile with one binary.
+	run ${CCL_C_COM} -t 1 -b ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+
+	# Error: compilation does not support binaries
+	[ "$status" -ne 0 ]
+
+}
+
+# Test compile with one binary and one source file.
+@test "Test compile with one binary and one source file" {
+
+	# Test compile with one source and create binary.
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Check if binary was created
+	[ -f ${CCL_C_TMP_BIN}1 ]
+
+	# Test compile with another source and the generated binary.
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_XOR} -b ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# Error: compilation does not support binaries
+	[ "$status" -ne 0 ]
+
+}
+
+# Test compile with source headers.
+@test "Test compile with source headers" {
+
+	run ${CCL_C_COM} -t 1 -h ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+
+	# Error: at least one source file must be specified
+	[ "$status" -ne 0 ]
+
+}
+
+# Test compile with one source file and one source header.
+@test "Test compile with one source file and one source header" {
+
+	# First, specify source header in -h parameter and header name in -n
+	# parameter
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -h ${CCL_C_H_SUM} \
+		-n ${CCL_C_HNAME_SUM} -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Second, pass include header path in compiler options
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -0 "-I ${CCL_C_K_FOLDER}" \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+}
+
+# Test compile with one source file and one explicitly specified header name.
+
+# Test compile with source file and two source headers with explicitly
+# specified header names.
+
+# Test compile with source file and two correct source headers with explicitly
+# incorrectly specified header names.
+
+# Test compile with source file and two incorrect source headers.
+
+# Test compile with erroneous source file.
+
+# Test compile with non-existing device.
+
+# Test compile with non-existing file.
+
+# Test compile with one source file with compiler options.
+
+# Test compile with one source file with incorrect compiler options.
+
+# ############## #
+# Test link task #
+# ############## #
+
+# Test link with one binary.
+
+# Test link with two binaries.
+
+# Test link with an invalid binary.
+
+# Test link with a source file.
+
+# Test link with one binary and one source.
+
+# Test link with source headers.
+
+# Test link with non-existing device.
+
+# Test link with non-existing file.
+
+# Test link with one binary with compiler options.
+
+# Test link with one binary with incorrect compiler options.
