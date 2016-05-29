@@ -520,30 +520,30 @@ finish:
  * Add an independent filter to the filter set.
  *
  * @param[in] filters The filter set.
- * @param[in] function Indendent filter function.
+ * @param[in] filter Indendent filter function.
  * @param[in] data Filter data.
  * */
 CCL_EXPORT
 void ccl_devsel_add_indep_filter(
-	CCLDevSelFilters* filters, ccl_devsel_indep function, void* data) {
+	CCLDevSelFilters* filters, ccl_devsel_indep filter, void* data) {
 
 	ccl_devsel_add_filter(
-		filters, (ccl_devsel_fp) function, data, CCL_DEVSEL_INDEP);
+		filters, (ccl_devsel_fp) filter, data, CCL_DEVSEL_INDEP);
 }
 
 /**
  * Add a dependent filter to the filter set.
  *
  * @param[in] filters The filter set.
- * @param[in] function Indendent filter function.
+ * @param[in] filter Indendent filter function.
  * @param[in] data Filter data.
  * */
 CCL_EXPORT
 void ccl_devsel_add_dep_filter(
-	CCLDevSelFilters* filters, ccl_devsel_dep function, void* data) {
+	CCLDevSelFilters* filters, ccl_devsel_dep filter, void* data) {
 
 	ccl_devsel_add_filter(
-		filters, (ccl_devsel_fp) function, data, CCL_DEVSEL_DEP);
+		filters, (ccl_devsel_fp) filter, data, CCL_DEVSEL_DEP);
 }
 
 /**
@@ -671,7 +671,7 @@ finish:
  * @param[in] data Filter data, must point to a cl_device_type value.
  * @param[out] err Return location for a GError, or `NULL` if error reporting is
  * to be ignored.
- * @return CL_TRUE if device is of the given type, CL_FALSE otherwise.
+ * @return `CL_TRUE` if device is of the given type, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type(
@@ -724,7 +724,7 @@ finish:
  * @param[in] data Filter data, ignored.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if device is a GPU, CL_FALSE otherwise.
+ * @return `CL_TRUE` if device is a GPU, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_gpu(
@@ -748,7 +748,7 @@ cl_bool ccl_devsel_indep_type_gpu(
  * @param[in] data Filter data, ignored.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if device is a CPU, CL_FALSE otherwise.
+ * @return `CL_TRUE` if device is a CPU, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_cpu(
@@ -773,7 +773,7 @@ cl_bool ccl_devsel_indep_type_cpu(
  * @param[in] data Filter data, ignored.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if device is a accelerator, CL_FALSE otherwise.
+ * @return `CL_TRUE` if device is a accelerator, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_accel(
@@ -798,7 +798,7 @@ cl_bool ccl_devsel_indep_type_accel(
  * @param[in] data Filter data, must be a string.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if device is accepted by filter, CL_FALSE otherwise.
+ * @return `CL_TRUE` if device is accepted by filter, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_string(
@@ -912,7 +912,7 @@ finish:
  * @param[in] data Filter data, must be a cl_platform_id.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if device belongs to the specified platform, CL_FALSE
+ * @return `CL_TRUE` if device belongs to the specified platform, `CL_FALSE`
  * otherwise (or if an error occurs).
  * */
 CCL_EXPORT

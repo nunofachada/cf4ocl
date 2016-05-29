@@ -265,23 +265,23 @@ CCLDevSelDevices ccl_devsel_select(
  * given in the data parameter. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type(
-	CCLDevice* device, void* data, GError **err);
+	CCLDevice* dev, void* data, GError **err);
 
 /* Independent filter function which only accepts GPU devices. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_gpu(
-	CCLDevice* device, void *data, GError **err);
+	CCLDevice* dev, void *data, GError **err);
 
 /* Independent filter function which only accepts CPU devices. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_cpu(
-	CCLDevice* device, void *data, GError **err);
+	CCLDevice* dev, void *data, GError **err);
 
 /* Independent filter function which only accepts accelerator
  * devices. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_accel(
-	CCLDevice* device, void *data, GError **err);
+	CCLDevice* dev, void *data, GError **err);
 
 /* Independent filter which selects devices based on device
  * name, device vendor and/or platform name. */

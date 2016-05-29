@@ -224,8 +224,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * may be used if all devices belong to the same platform (and pass the given
  * filter).
  *
- * @param[in] filter An independent device filter. If NULL, no independent
- * filter is used, and the first found device(s) is used.
+ * @param[in] filter An independent device filter. If `NULL`, no independent
+ * filter is used, and the first found device(s) is selected.
  * @param[in] data Specific filter data.
  * @param[out] err Return location for a GError, or `NULL` if error reporting is
  * to be ignored.
@@ -242,7 +242,9 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * may be used if all devices belong to the same platform (and pass the given
  * filter).
  *
- * @param[in] data If not NULL, can point to a device index, such that the
+ * @param[in] filter A dependent device filter. If `NULL`, no independent filter
+ * is used, and the first found device(s) is selected.
+ * @param[in] data If not `NULL`, can point to a device index, such that the
  * device is automatically selected.
  * @param[out] err Return location for a GError, or `NULL` if error reporting is
  * to be ignored.
