@@ -8,7 +8,7 @@ set(SRC ccl_errors.c ccl_profiler.c ccl_common.c ccl_platforms.c
 	ccl_buffer_wrapper.c ccl_image_wrapper.c ccl_sampler_wrapper.c)
 
 # Special debug mode for logging lifetime (new/destroy) of wrapper objects
-if (DEFINED CMAKE_BUILD_TYPE AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+if ((DEFINED CMAKE_BUILD_TYPE) AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 	option(DEBUG_OBJ_LIFETIME
 		"Log debug messages for wrapper object new/destroy?" OFF)
 else()
