@@ -24,7 +24,7 @@ foreach(HEADER ${HEADERS})
 
 	file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}.cl ${HEADER}_RAW HEX)
 	string(REGEX REPLACE "(..)" "\\\\x\\1" ${HEADER}_KERNEL_SRC
-	${${HEADER}_RAW})
+		${${HEADER}_RAW})
 
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}.in.h
 		${CMAKE_BINARY_DIR}/generated/${HEADER}.h @ONLY)

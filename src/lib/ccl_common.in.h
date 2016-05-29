@@ -22,7 +22,7 @@
  * Common _cf4ocl_ definitions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -36,27 +36,52 @@
 #include "ccl_oclversions.h"
 #include "ccl_export.h"
 
+/** Major _cf4ocl_ version digit. */
 #define CCL_VERSION_MAJOR @cf4ocl2_VERSION_MAJOR@
+
+/** Minor _cf4ocl_ version digit. */
 #define CCL_VERSION_MINOR @cf4ocl2_VERSION_MINOR@
+
+/** Patch/micro _cf4ocl_ version digit. */
 #define CCL_VERSION_PATCH @cf4ocl2_VERSION_PATCH@
+
+/** Tweak _cf4ocl_ version string. */
 #define CCL_VERSION_TWEAK "@cf4ocl2_VERSION_TWEAK@"
+
+/** _cf4ocl_ version string. */
 #define CCL_VERSION_STRING "@cf4ocl2_VERSION_STRING@"
+
+/** Full _cf4ocl_ version string. */
 #define CCL_VERSION_STRING_FULL "@cf4ocl2_VERSION_STRING_FULL@"
 
-#define CCL_KERNELS_PATH "@KERNELS_PATH@"
-
-#define CCL_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGH" \
-	"IJKLMNOPQRSTUVWXYZ0123456789_."
-
-#define CCL_UNUSED(x) (void)(x)
-
-#ifndef CCL_STRD
-	#ifdef NDEBUG
-		#define CCL_STRD G_STRFUNC
-	#else
-		#define CCL_STRD G_STRLOC
-	#endif
+/**
+ * Version of OpenCL headers used to compile _cf4ocl_.
+ *
+ * @def CCL_OPENCL_VERSION
+ * */
+#if defined CL_VERSION_2_1
+	#define CCL_OPENCL_VERSION "2.1"
+#elif defined CL_VERSION_2_0
+	#define CCL_OPENCL_VERSION "2.0"
+#elif defined CL_VERSION_1_2
+	#define CCL_OPENCL_VERSION "1.2"
+#elif defined CL_VERSION_1_1
+	#define CCL_OPENCL_VERSION "1.1"
+#elif defined CL_VERSION_1_0
+	#define CCL_OPENCL_VERSION "1.0"
+#else
+	#define CCL_OPENCL_VERSION "0.0"
 #endif
+
+/** Version of GLib headers used to compile _cf4ocl_. */
+#define CCL_GLIB_VERSION G_STRINGIFY(GLIB_MAJOR_VERSION) "." \
+	G_STRINGIFY(GLIB_MINOR_VERSION) "." G_STRINGIFY(GLIB_MICRO_VERSION)
+
+/** Compiler used to compile _cf4ocl_. */
+#define CCL_COMPILER "@CMAKE_C_COMPILER_ID@"
+
+/** Macro to avoid warning in unused variables. */
+#define CCL_UNUSED(x) (void)(x)
 
 /* These deprecation macros are copied from GLib latest version in
  * order to support Clang. */
@@ -83,7 +108,11 @@
 #define CCL_END_IGNORE_DEPRECATIONS
 #endif
 
-/* Define a g_info() macro for older GLib versions. */
+/**
+ * A `g_info()` macro for older GLib versions which do not provide it.
+ *
+ * @def g_info()
+ * */
 #ifndef g_info
 #define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
 #endif
@@ -243,6 +272,17 @@ typedef enum ccl_error_code {
 	CCL_ERROR_OTHER                = 15
 } CCLErrorCode;
 
+/* Macro which determines part of the information which appears in debug log
+ * messages. */
+#ifndef CCL_STRD
+	#ifdef NDEBUG
+		#define CCL_STRD G_STRFUNC
+	#else
+		#define CCL_STRD G_STRLOC
+	#endif
+#endif
+
+/* Macro which determines how error messages are logged in the debug stream. */
 #ifdef NDEBUG
 	#define CCL_DEBUG_ERR(err) g_debug(CCL_STRD)
 #else

@@ -22,7 +22,7 @@
  * Common _cf4ocl_ implementations.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -35,7 +35,10 @@
  * */
 CCL_EXPORT
 void ccl_common_version_print(const char* exec_name) {
-	g_printf("%s %s\n\nCopyright (C) 2014 Nuno Fachada\n" \
+	g_printf("%s %s "
+		"[" CCL_COMPILER " C Compiler + OpenCL "
+		CCL_OPENCL_VERSION " + GLib " CCL_GLIB_VERSION "]\n"
+		"Copyright (C) 2016 Nuno Fachada\n" \
 		"License GPLv3+: GNU GPL version 3 or later " \
 		"<http://gnu.org/licenses/gpl.html>.\n" \
 		"This is free software: you are free to change and redistribute it.\n" \

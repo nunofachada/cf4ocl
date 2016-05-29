@@ -30,6 +30,10 @@
 #include "ccl_program_wrapper.h"
 #include "_ccl_abstract_dev_container_wrapper.h"
 
+/* Valid file name characters. */
+#define CCL_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGH" \
+	"IJKLMNOPQRSTUVWXYZ0123456789_."
+
 /**
  * Program wrapper class.
  *
