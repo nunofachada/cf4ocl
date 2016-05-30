@@ -20,14 +20,14 @@
  * Utility to query OpenCL platforms and devices header file.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
 #ifndef _CCL_DEVINFO_H_
 #define _CCL_DEVINFO_H_
 
-#include <cf4ocl2.h>
+#include "ccl_utils.h"
 
 #ifndef CCL_DEVINFO_OUT
 	/** Default device information output stream. */

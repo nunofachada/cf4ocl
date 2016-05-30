@@ -31,11 +31,9 @@
  *
  * */
 
-#include <cf4ocl2.h>
-#include <string.h>
+#include "ccl_utils.h"
 
 #define CCL_C_DESCRIPTION "Static kernel compiler and analyzer"
-#define CCL_C_NODEVICE G_MAXUINT
 #define ccl_c_get_build_status_str(build_status) \
 	(build_status) == CL_BUILD_NONE ? "Program not built (unexpected)" : \
 	((build_status) == CL_BUILD_ERROR ? "Error" : \
@@ -57,7 +55,7 @@ typedef enum ccl_c_tasks {
 
 /* Command line arguments and respective default values. */
 static gboolean opt_list = FALSE;
-static guint dev_idx = CCL_C_NODEVICE;
+static guint dev_idx = CCL_UTILS_NODEVICE;
 static guint task = CCL_C_BUILD;
 static gchar* options = NULL;
 static gchar** src_files = NULL;
@@ -233,12 +231,14 @@ int main(int argc, char* argv[]) {
 			? g_strv_length(src_h_names) : 0;
 
 		/* Select a context/device. */
-		if (dev_idx == CCL_C_NODEVICE) {
+		if (dev_idx == CCL_UTILS_NODEVICE) {
 			ctx = ccl_context_new_from_menu(&err);
 		} else {
 			ctx = ccl_context_new_from_device_index(&dev_idx, &err);
 		}
 		ccl_if_err_goto(err, error_handler);
+
+		/* Get device. */
 		dev = ccl_context_get_device(ctx, 0, &err);
 		ccl_if_err_goto(err, error_handler);
 

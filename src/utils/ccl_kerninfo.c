@@ -20,7 +20,7 @@
  * Prints information about an OpenCL kernel.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  *
  */
@@ -32,7 +32,7 @@
  *
  * */
 
-#include <cf4ocl2.h>
+#include "ccl_utils.h"
 
 /**
  * Kernel info main function.
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 	/* Device wrapper. */
 	CCLDevice* dev = NULL;
 	/* Default device index. */
-	cl_int dev_idx = -1;
+	guint dev_idx = CCL_UTILS_NODEVICE;
 	/* OpenCL version. */
 	double ocl_ver;
 	/* Kernel workgroup info variables. */
@@ -81,24 +81,37 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	ccl_if_err_create_goto(err, CCL_ERROR, (argc < 3) || (argc > 4),
+	ccl_if_err_create_goto(err, CCL_ERROR, (argc < 4) || (argc > 5),
 		CCL_ERROR_ARGS, error_handler,
-		"Usage: %s <program_file> <kernel_name> [device_index]\n",
+		"Usage: %s (-s|-b) <program_file> <kernel_name> [device_index]\n",
 		argv[0]);
-	if (argc == 4) dev_idx = atoi(argv[3]);
+	if (argc == 5) dev_idx = atoi(argv[4]);
 
 	/* ********************************************* */
 	/* Initialize OpenCL variables and build program */
 	/* ********************************************* */
 
 	/* Select a context/device. */
-	ctx = ccl_context_new_from_menu_full(
-		(dev_idx == -1) ? NULL : (void*) &dev_idx,
-		&err);
+	if (dev_idx == CCL_UTILS_NODEVICE) {
+		ctx = ccl_context_new_from_menu(&err);
+	} else {
+		ctx = ccl_context_new_from_device_index(&dev_idx, &err);
+	}
+	ccl_if_err_goto(err, error_handler);
+
+	/* Get the device. */
+	dev = ccl_context_get_device(ctx, 0, &err);
 	ccl_if_err_goto(err, error_handler);
 
 	/* Get program which contains kernel. */
-	prg = ccl_program_new_from_source_file(ctx, argv[1], &err);
+	if (strcmp(argv[1], "-s") == 0) {
+		prg = ccl_program_new_from_source_file(ctx, argv[2], &err);
+	} else if (strcmp(argv[1], "-b") == 0) {
+		prg = ccl_program_new_from_binary_file(ctx, dev, argv[2], NULL, &err);
+	} else {
+		err = g_error_new(CCL_ERROR, CCL_ERROR_ARGS,
+			"Unknown option '%s'", argv[1]);
+	}
 	ccl_if_err_goto(err, error_handler);
 
 	/* Build program. */
@@ -106,11 +119,7 @@ int main(int argc, char *argv[]) {
 	ccl_if_err_goto(err, error_handler);
 
 	/* Get kernel */
-	krnl = ccl_program_get_kernel(prg, argv[2], &err);
-	ccl_if_err_goto(err, error_handler);
-
-	/* Get the device. */
-	dev = ccl_context_get_device(ctx, 0, &err);
+	krnl = ccl_program_get_kernel(prg, argv[3], &err);
 	ccl_if_err_goto(err, error_handler);
 
 	/* Check platform  OpenCL version. */
@@ -167,14 +176,14 @@ int main(int argc, char *argv[]) {
 
 	/* If we get here, no need for error checking, jump to cleanup. */
 	g_assert(err == NULL);
-	status = CCL_SUCCESS;
+	status = EXIT_SUCCESS;
 	goto cleanup;
 
 error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
 	g_fprintf(stderr, "%s\n", err->message);
-	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
+	status = EXIT_FAILURE;
 	g_error_free(err);
 
 cleanup:
@@ -186,8 +195,7 @@ cleanup:
 	if (prg != NULL) ccl_program_destroy(prg);
 	if (ctx != NULL) ccl_context_destroy(ctx);
 
-	/* Confirm that memory allocated by wrappers has been properly
-	 * freed. */
+	/* Confirm that memory allocated by wrappers has been properly freed. */
 	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
 
 	/* Return status. */
