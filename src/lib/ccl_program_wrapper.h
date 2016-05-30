@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -283,15 +283,11 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 /* CREATE FROM BUILT-IN KERNELS API */
 /* ******************************** */
 
-#ifdef CL_VERSION_1_2
-
 /* Create a new program wrapper object from device built-in kernels. */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
 	GError** err);
-
-#endif
 
 /* ************************ */
 /* BUILD, COMPILE, LINK API */

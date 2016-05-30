@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -139,8 +139,6 @@ CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer* src_buf,
 	const size_t *dst_origin, const size_t *region,
 	CCLEventWaitList* evt_wait_lst, GError** err);
 
-#ifdef CL_VERSION_1_1
-
 /* Creates a sub-buffer that represents a specific region in the given
  * buffer. */
 CCL_EXPORT
@@ -177,17 +175,11 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst,
 	GError** err);
 
-#endif
-
-#ifdef CL_VERSION_1_2
-
 /* Fill a buffer object with a pattern of a given pattern size. */
 CCL_EXPORT
 CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	const void *pattern, size_t pattern_size, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, GError** err);
-
-#endif
 
 /**
  * Enqueues a command to unmap a previously mapped buffer object. This

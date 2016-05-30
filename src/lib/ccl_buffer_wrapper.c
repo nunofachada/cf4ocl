@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -546,8 +546,6 @@ finish:
 
 }
 
-#ifdef CL_VERSION_1_1
-
 /**
  * Creates a sub-buffer that represents a specific region in the given
  * buffer. This function wraps the clCreateSubBuffer() OpenCL function.
@@ -586,6 +584,26 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(buffer);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(flags);
+	CCL_UNUSED(origin);
+	CCL_UNUSED(size);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Sub-buffers require cf4ocl to be deployed with support "
+		"for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Set options. */
 	const cl_buffer_region br = { .origin = origin, .size = size};
 
@@ -610,6 +628,8 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 
 	/* Wrap the OpenCL sub-buffer. */
 	subbuf = ccl_buffer_new_wrap(buffer);
+
+#endif
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -691,6 +711,34 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(blocking_read);
+	CCL_UNUSED(buffer_origin);
+	CCL_UNUSED(host_origin);
+	CCL_UNUSED(region);
+	CCL_UNUSED(buffer_row_pitch);
+	CCL_UNUSED(buffer_slice_pitch);
+	CCL_UNUSED(host_row_pitch);
+	CCL_UNUSED(host_slice_pitch);
+	CCL_UNUSED(ptr);
+	CCL_UNUSED(evt_wait_lst);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(event);
+	CCL_UNUSED(evt);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Rectangular buffer read requires cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
@@ -721,6 +769,8 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 
 	/* Clear event wait list. */
 	ccl_event_wait_list_clear(evt_wait_lst);
+
+#endif
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -804,6 +854,34 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(blocking_write);
+	CCL_UNUSED(buffer_origin);
+	CCL_UNUSED(host_origin);
+	CCL_UNUSED(region);
+	CCL_UNUSED(buffer_row_pitch);
+	CCL_UNUSED(buffer_slice_pitch);
+	CCL_UNUSED(host_row_pitch);
+	CCL_UNUSED(host_slice_pitch);
+	CCL_UNUSED(ptr);
+	CCL_UNUSED(evt_wait_lst);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(event);
+	CCL_UNUSED(evt);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Rectangular buffer write requires cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
@@ -834,6 +912,8 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 
 	/* Clear event wait list. */
 	ccl_event_wait_list_clear(evt_wait_lst);
+
+#endif
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -915,6 +995,32 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(src_origin);
+	CCL_UNUSED(dst_origin);
+	CCL_UNUSED(region);
+	CCL_UNUSED(src_row_pitch);
+	CCL_UNUSED(src_slice_pitch);
+	CCL_UNUSED(dst_row_pitch);
+	CCL_UNUSED(dst_slice_pitch);
+	CCL_UNUSED(evt_wait_lst);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(event);
+	CCL_UNUSED(evt);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Rectangular buffer copy requires cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) src_buf, &err_internal);
@@ -946,6 +1052,8 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	/* Clear event wait list. */
 	ccl_event_wait_list_clear(evt_wait_lst);
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
@@ -963,10 +1071,6 @@ finish:
 	return evt;
 
 }
-
-#endif
-
-#ifdef CL_VERSION_1_2
 
 /**
  * Fill a buffer object with a pattern of a given pattern size. This
@@ -1014,6 +1118,29 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_2
+
+	CCL_UNUSED(pattern);
+	CCL_UNUSED(pattern_size);
+	CCL_UNUSED(offset);
+	CCL_UNUSED(size);
+	CCL_UNUSED(evt_wait_lst);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(event);
+	CCL_UNUSED(evt);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Buffer fill requires cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
@@ -1043,6 +1170,8 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	/* Clear event wait list. */
 	ccl_event_wait_list_clear(evt_wait_lst);
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
@@ -1060,7 +1189,5 @@ finish:
 	return evt;
 
 }
-
-#endif
 
 /** @} */

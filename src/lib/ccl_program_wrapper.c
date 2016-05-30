@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -733,8 +733,6 @@ finish:
 
 }
 
-#ifdef CL_VERSION_1_2
-
 /**
  * Create a new program wrapper object from device built-in kernels.
  * This function is a wrapper for the
@@ -778,6 +776,26 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_2
+
+	/* Mark unused variables to avoid compiler warnings. */
+	CCL_UNUSED(program);
+	CCL_UNUSED(devs);
+	CCL_UNUSED(kernel_names);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Program creation from built-in kernels requires cf4ocl to be "
+		"deployed with support for OpenCL version 1.2 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -808,6 +826,8 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	/* Wrap OpenCL program object. */
 	prg = ccl_program_new_wrap(program);
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
@@ -827,8 +847,6 @@ finish:
 	return prg;
 
 }
-
-#endif
 
 /**
  * Utility function which builds (compiles and links) a program
@@ -1174,12 +1192,12 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 		"%s: unable to compile program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	result = CL_TRUE;
 	goto finish;
-
-#endif
 
 error_handler:
 
@@ -1189,11 +1207,7 @@ error_handler:
 	/* Bad result. */
 	result = CL_FALSE;
 
-#ifdef CL_VERSION_1_2
-
 finish:
-
-#endif
 
 	/* Check if necessary to release array of unwrapped devices. */
 	if (cl_devices != NULL) {
@@ -1339,11 +1353,11 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		"%s: unable to link program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
-
-#endif
 
 error_handler:
 
@@ -1354,11 +1368,7 @@ error_handler:
 	if (prg) ccl_program_destroy(prg);
 	prg = NULL;
 
-#ifdef CL_VERSION_1_2
-
 finish:
-
-#endif
 
 	/* Check if necessary to release array of unwrapped devices. */
 	if (cl_devices != NULL) {
