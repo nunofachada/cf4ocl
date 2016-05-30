@@ -378,7 +378,7 @@ int main(int argc, char* argv[]) {
 
 					/* Create program from current binary file. */
 					prg_aux = ccl_program_new_from_binary_file(ctx, dev,
-						*bin_files, NULL, &err);
+						bin_files[i], NULL, &err);
 					ccl_if_err_goto(err, error_handler);
 
 					/* Add binary program to array. */

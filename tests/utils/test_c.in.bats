@@ -66,7 +66,7 @@ setup() {
 teardown() {
 
 	# Remove possible temporary files
-	rm -f ${CCL_C_TMP_BIN}{1..2}
+	rm -f ${CCL_C_TMP_BIN}{1..3}
 
 }
 
@@ -473,27 +473,159 @@ teardown() {
 
 }
 
-
 # ############## #
 # Test link task #
 # ############## #
 
 # Test link with one binary.
+@test "Link with one binary" {
 
-# Test link with two binaries.
+	# Create a binary
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Link the one binary
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+}
+
+# Test link with three binaries.
+@test "Link with three binaries" {
+
+	# Compile and save a sum function binary
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Compile and save a xor function binary
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_XOR} -o ${CCL_C_TMP_BIN}2 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Compile and save a binary containing a kernel requiring sum and xor
+	# functions
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -o ${CCL_C_TMP_BIN}3 \
+		-0 "-I ${CCL_C_K_FOLDER}" -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Link three binaries: the kernel and two functions
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}3 -b ${CCL_C_TMP_BIN}1 \
+		-b ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+}
 
 # Test link with an invalid binary.
+@test "Link with invalid binary" {
+
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+
+	# Error: because binary is invalid
+	[ "$status" -ne 0 ]
+
+}
 
 # Test link with a source file.
+@test "Link with a source file" {
+
+	run ${CCL_C_COM} -t 2 -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+
+	# Error: Linking does not support source files
+	[ "$status" -ne 0 ]
+
+}
 
 # Test link with one binary and one source.
+@test "Link with one binary and one source" {
+
+	# Compile and save a sum function binary
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Link with one binary and one source
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -s ${CCL_C_K_SUM} \
+		-d ${CCL_C_DEV_IDX}
+
+	# Error: Linking does not support source files
+	[ "$status" -ne 0 ]
+
+}
 
 # Test link with source headers.
+@test "Link with source headers" {
 
-# Test link with non-existing device.
+	run ${CCL_C_COM} -t 2 -h ${CCL_C_H_SUM} -n ${CCL_C_HNAME_SUM} \
+		-d ${CCL_C_DEV_IDX}
+
+	# Error: Linking does not support source files
+	[ "$status" -ne 0 ]
+
+}
 
 # Test link with non-existing file.
+@test "Link with non-existing file" {
 
-# Test link with one binary with compiler options.
+	# Link with non-existent binary
+	run ${CCL_C_COM} -t 2 -b this_file_does_not_exist.bin \
+		-d ${CCL_C_DEV_IDX}
 
-# Test link with one binary with incorrect compiler options.
+	# Error: binary not found
+	[ "$status" -ne 0 ]
+
+}
+
+# Test link with one binary with linker options.
+@test "Link with one binary with linker options" {
+
+	# Compile and save a sum function binary
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Link with one binary and specify linker options
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -0 "-create-library" \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+}
+
+
+# Test link with one binary with incorrect linker options.
+@test "Link with one binary with incorrect linker options" {
+
+	# Compile and save a sum function binary
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_C_DEV_IDX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Link with one binary and specify linker options
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}1 \
+		-0 "-this-is-an-invalid-option" -d ${CCL_C_DEV_IDX}
+
+	# Error: invalid option
+	[ "$status" -ne 0 ]
+
+}

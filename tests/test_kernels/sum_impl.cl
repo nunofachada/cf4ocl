@@ -24,8 +24,6 @@
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "sum_impl.cl.h"
-
 /**
  * Performs sum of three unsigned integers.
  *
