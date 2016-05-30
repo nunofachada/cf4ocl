@@ -28,8 +28,14 @@ setup() {
 		CCL_C_DEV_IDX="@TESTS_DEVICE_INDEX@"
 	fi
 
-	# OpenCL version of device platform
-	CCL_C_OCL_VERSION=`${CCL_C_DEVINFO} -o -d ${CCL_C_DEV_IDX} -c VERSION | grep -o "OpenCL [1-9]\.[1-9]" | cut -d " " -f 2`
+	# Minimum OpenCL version between device platform and cf4ocl
+	CCL_C_OCL_VERSION_PLATF=`${CCL_C_DEVINFO} -o -d ${CCL_C_DEV_IDX} -c VERSION | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
+	CCL_C_OCL_VERSION_CF4OCL=`${CCL_C_DEVINFO} --version | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
+	CCL_C_OCL_VERSION=`echo "if (${CCL_C_OCL_VERSION_PLATF} < ${CCL_C_OCL_VERSION_CF4OCL}) { ${CCL_C_OCL_VERSION_PLATF} } else { ${CCL_C_OCL_VERSION_CF4OCL} }" | bc`
+
+	# Skip compile and link tests?
+	CCL_C_SKIP=`echo "${CCL_C_OCL_VERSION} < 1.2"| bc`
+	CCL_C_SKIP_MSG="Requires OpenCL >= 1.2"
 
 	# Test kernels folder
 	CCL_C_K_FOLDER="@CMAKE_SOURCE_DIR@/tests/test_kernels"
@@ -267,6 +273,12 @@ teardown() {
 # Test compile with one source file.
 @test "Compile with one source file" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
 
 	# There should be no problems
@@ -276,6 +288,12 @@ teardown() {
 
 # Test compile with two source files.
 @test "Compile with two source files" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} \
 		-d ${CCL_C_DEV_IDX}
@@ -287,6 +305,12 @@ teardown() {
 
 # Test compile with one binary.
 @test "Compile with one binary" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Test compile with one source and create binary.
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
@@ -308,6 +332,12 @@ teardown() {
 
 # Test compile with one binary and one source file.
 @test "Compile with one binary and one source file" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Test compile with one source and create binary.
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
@@ -331,6 +361,12 @@ teardown() {
 # Test compile with source headers.
 @test "Compile with source headers" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 1 -h ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
 
 	# Error: at least one source file must be specified
@@ -340,6 +376,12 @@ teardown() {
 
 # Test compile with one source file and one source header.
 @test "Compile with one source file and one source header" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# First, specify source header in -h parameter and header name in -n
 	# parameter
@@ -361,6 +403,12 @@ teardown() {
 # specified header names.
 @test "Compile with one source file and two headers" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	# First, specify source header in -h parameter and header name in -n
 	# parameter
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -h ${CCL_C_H_SUM} \
@@ -381,6 +429,12 @@ teardown() {
 # Test compile with source file and two correct source headers with explicitly
 # incorrectly specified header names or location.
 @test "Compile with one source file and two incorrectly specified headers" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# First, specify source header in -h parameter but don't specify header
 	# names or location
@@ -411,6 +465,12 @@ teardown() {
 # Test compile with source file and an erroneous source header.
 @test "Compile with source file and an erroneous source header" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	# First, specify source header in -h parameter and header name in -n
 	# parameter
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -h ${CCL_C_K_BAD} \
@@ -424,6 +484,12 @@ teardown() {
 # Test compile with erroneous source file.
 @test "Compile with erroneous source file" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_BAD} -d ${CCL_C_DEV_IDX}
 
 	# Error: compile should not be successful with erroneous source file
@@ -433,6 +499,12 @@ teardown() {
 
 # Test compile with non-existing device.
 @test "Compile with non-existing device" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_C_NDEVS}
 
@@ -444,6 +516,12 @@ teardown() {
 # Test compile with non-existing file.
 @test "Compile with non-existing file" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 1 -s this_file_does_not_exist.cl -d ${CCL_C_DEV_IDX}
 
 	# Error: compile should throw error if source file does not exist
@@ -453,6 +531,12 @@ teardown() {
 
 # Test compile with one source file with correct compiler options
 @test "Compile with one source file with correct compiler options" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -0 "-cl-fast-relaxed-math" \
 		-d ${CCL_C_DEV_IDX}
@@ -464,6 +548,12 @@ teardown() {
 
 # Test compile with one source file with incorrect compiler options
 @test "Compile with one source file with incorrect compiler options" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -0 "-an-incorrect-option" \
 		-d ${CCL_C_DEV_IDX}
@@ -479,6 +569,12 @@ teardown() {
 
 # Test link with one binary.
 @test "Link with one binary" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Create a binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
@@ -497,6 +593,12 @@ teardown() {
 
 # Test link with three binaries.
 @test "Link with three binaries" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
@@ -532,6 +634,12 @@ teardown() {
 # Test link with an invalid binary.
 @test "Link with invalid binary" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
 
 	# Error: because binary is invalid
@@ -542,6 +650,12 @@ teardown() {
 # Test link with a source file.
 @test "Link with a source file" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 2 -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
 
 	# Error: Linking does not support source files
@@ -551,6 +665,12 @@ teardown() {
 
 # Test link with one binary and one source.
 @test "Link with one binary and one source" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
@@ -571,6 +691,12 @@ teardown() {
 # Test link with source headers.
 @test "Link with source headers" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
+
 	run ${CCL_C_COM} -t 2 -h ${CCL_C_H_SUM} -n ${CCL_C_HNAME_SUM} \
 		-d ${CCL_C_DEV_IDX}
 
@@ -581,6 +707,12 @@ teardown() {
 
 # Test link with non-existing file.
 @test "Link with non-existing file" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Link with non-existent binary
 	run ${CCL_C_COM} -t 2 -b this_file_does_not_exist.bin \
@@ -593,6 +725,12 @@ teardown() {
 
 # Test link with one binary with linker options.
 @test "Link with one binary with linker options" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
@@ -613,6 +751,12 @@ teardown() {
 
 # Test link with one binary with incorrect linker options.
 @test "Link with one binary with incorrect linker options" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
