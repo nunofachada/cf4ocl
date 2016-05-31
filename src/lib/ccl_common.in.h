@@ -287,10 +287,14 @@ typedef enum ccl_error_code {
 	#define CCL_DEBUG_ERR(err) g_debug(CCL_STRD)
 #else
 	#define CCL_DEBUG_ERR(err) \
-		g_debug("%s: %s [%s, error %d]", \
-			CCL_STRD, (err)->message, \
-			g_quark_to_string((err)->domain), \
-			(err)->code)
+		if (&(err) != NULL) { \
+			g_debug("%s: %s [%s, error %d]", \
+				CCL_STRD, (err)->message, \
+				g_quark_to_string((err)->domain), \
+				(err)->code); \
+		} else { \
+			g_debug(CCL_STRD); \
+		}
 #endif
 
 /**
