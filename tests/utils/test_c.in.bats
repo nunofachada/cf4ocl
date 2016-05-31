@@ -23,13 +23,13 @@ setup() {
 	CCL_C_NDEVS=`${CCL_C_DEVINFO} | grep -c "\[ Device #"`
 
 	# Device index to use in tests
-	if [ -z ${CCL_C_DEV_IDX} ]
+	if [ -z ${CCL_TEST_DEVICE_INDEX} ]
 	then
-		CCL_C_DEV_IDX="@TESTS_DEVICE_INDEX@"
+		CCL_TEST_DEVICE_INDEX="@TESTS_DEVICE_INDEX@"
 	fi
 
 	# Minimum OpenCL version between device platform and cf4ocl
-	CCL_C_OCL_VERSION_PLATF=`${CCL_C_DEVINFO} -o -d ${CCL_C_DEV_IDX} -c VERSION | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
+	CCL_C_OCL_VERSION_PLATF=`${CCL_C_DEVINFO} -o -d ${CCL_TEST_DEVICE_INDEX} -c VERSION | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
 	CCL_C_OCL_VERSION_CF4OCL=`${CCL_C_DEVINFO} --version | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
 	CCL_C_OCL_VERSION=`echo "if (${CCL_C_OCL_VERSION_PLATF} < ${CCL_C_OCL_VERSION_CF4OCL}) { ${CCL_C_OCL_VERSION_PLATF} } else { ${CCL_C_OCL_VERSION_CF4OCL} }" | bc`
 
@@ -117,7 +117,7 @@ teardown() {
 # Test simple build with one source file.
 @test "Build with one source file" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -127,7 +127,8 @@ teardown() {
 # Test build with two source files.
 @test "Build with two source files" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -138,7 +139,8 @@ teardown() {
 @test "Build with one source, create binary, then with one binary" {
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -147,7 +149,7 @@ teardown() {
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test build with one binary.
-	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -158,7 +160,8 @@ teardown() {
 @test "Build with two binaries created from two different source files" {
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -167,7 +170,8 @@ teardown() {
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test build with another source and create another binary.
-	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -o ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -o ${CCL_C_TMP_BIN}2 \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -177,7 +181,7 @@ teardown() {
 
 	# Test build with two binaries. */
 	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}2 -d \
-		${CCL_C_DEV_IDX}
+		${CCL_TEST_DEVICE_INDEX}
 
 	# Error: builds can only be performed with one binary
 	[ "$status" -ne 0 ]
@@ -188,7 +192,8 @@ teardown() {
 @test "Build with one binary and one source file" {
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -197,7 +202,8 @@ teardown() {
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test build with one binary and one source file.
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -b ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -b ${CCL_C_TMP_BIN}2 \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: The build task requires either: 1) one or more source files; or,
 	# 2) one binary file
@@ -208,7 +214,7 @@ teardown() {
 # Test build with source headers.
 @test "Build with source headers" {
 
-	run ${CCL_C_COM} -h ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -h ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: source headers can only be specified in the compile task
 	[ "$status" -ne 0 ]
@@ -217,7 +223,7 @@ teardown() {
 # Test build with erroneous source file.
 @test "Build with erroneous source file" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: build should not be successful with erroneous source file
 	[ "$status" -ne 0 ]
@@ -237,7 +243,7 @@ teardown() {
 # Test build with non-existing file.
 @test "Build with non-existing file" {
 
-	run ${CCL_C_COM} -s this_file_does_not_exist.cl -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -s this_file_does_not_exist.cl -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: build should throw error if source file does not exist
 	[ "$status" -ne 0 ]
@@ -248,7 +254,7 @@ teardown() {
 @test "Build with one source file with correct compiler options" {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -0 "-cl-fast-relaxed-math" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -259,7 +265,7 @@ teardown() {
 @test "Build with one source file with incorrect compiler options" {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -0 "-an-incorrect-option" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: incorrect compiler options
 	[ "$status" -ne 0 ]
@@ -279,7 +285,7 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -296,7 +302,7 @@ teardown() {
 	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -314,7 +320,7 @@ teardown() {
 
 	# Test compile with one source and create binary.
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -323,7 +329,7 @@ teardown() {
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Test compile with one binary.
-	run ${CCL_C_COM} -t 1 -b ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 1 -b ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: compilation does not support binaries
 	[ "$status" -ne 0 ]
@@ -341,7 +347,7 @@ teardown() {
 
 	# Test compile with one source and create binary.
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -351,7 +357,7 @@ teardown() {
 
 	# Test compile with another source and the generated binary.
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_XOR} -b ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: compilation does not support binaries
 	[ "$status" -ne 0 ]
@@ -367,7 +373,7 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 1 -h ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 1 -h ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: at least one source file must be specified
 	[ "$status" -ne 0 ]
@@ -386,14 +392,14 @@ teardown() {
 	# First, specify source header in -h parameter and header name in -n
 	# parameter
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -h ${CCL_C_H_SUM} \
-		-n ${CCL_C_HNAME_SUM} -d ${CCL_C_DEV_IDX}
+		-n ${CCL_C_HNAME_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Second, pass include header path in compiler options
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -0 "-I ${CCL_C_K_FOLDER}" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -413,14 +419,14 @@ teardown() {
 	# parameter
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -h ${CCL_C_H_SUM} \
 		-h ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} -n ${CCL_C_HNAME_XOR} \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Second, pass include header path in compiler options
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -0 "-I ${CCL_C_K_FOLDER}" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -438,7 +444,7 @@ teardown() {
 	# First, specify source header in -h parameter and header name in -n
 	# parameter
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -h ${CCL_C_K_BAD} \
-		-n ${CCL_C_HNAME_SUM} -d ${CCL_C_DEV_IDX}
+		-n ${CCL_C_HNAME_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: header contains incorrect information
 	[ "$status" -ne 0 ]
@@ -454,7 +460,7 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_BAD} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_BAD} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: compile should not be successful with erroneous source file
 	[ "$status" -ne 0 ]
@@ -486,7 +492,8 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 1 -s this_file_does_not_exist.cl -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 1 -s this_file_does_not_exist.cl \
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: compile should throw error if source file does not exist
 	[ "$status" -ne 0 ]
@@ -503,7 +510,7 @@ teardown() {
 	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -0 "-cl-fast-relaxed-math" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -520,7 +527,7 @@ teardown() {
 	fi
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -0 "-an-incorrect-option" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: incorrect compiler options
 	[ "$status" -ne 0 ]
@@ -542,13 +549,13 @@ teardown() {
 
 	# Create a binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link the one binary
-	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -566,14 +573,14 @@ teardown() {
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Compile and save a xor function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_XOR} -o ${CCL_C_TMP_BIN}2 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -582,14 +589,14 @@ teardown() {
 	# functions
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -o ${CCL_C_TMP_BIN}3 \
 		-h ${CCL_C_H_SUM} -h ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} \
-		-n ${CCL_C_HNAME_XOR} -d ${CCL_C_DEV_IDX}
+		-n ${CCL_C_HNAME_XOR} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link three binaries: the kernel and two functions
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}3 -b ${CCL_C_TMP_BIN}1 \
-		-b ${CCL_C_TMP_BIN}2 -d ${CCL_C_DEV_IDX}
+		-b ${CCL_C_TMP_BIN}2 -d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -605,7 +612,7 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 2 -b ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 2 -b ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: because binary is invalid
 	[ "$status" -ne 0 ]
@@ -621,7 +628,7 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 2 -s ${CCL_C_K_SUM} -d ${CCL_C_DEV_IDX}
+	run ${CCL_C_COM} -t 2 -s ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: Linking does not support source files
 	[ "$status" -ne 0 ]
@@ -639,14 +646,14 @@ teardown() {
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link with one binary and one source
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -s ${CCL_C_K_SUM} \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: Linking does not support source files
 	[ "$status" -ne 0 ]
@@ -663,7 +670,7 @@ teardown() {
 	fi
 
 	run ${CCL_C_COM} -t 2 -h ${CCL_C_H_SUM} -n ${CCL_C_HNAME_SUM} \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: Linking does not support source files
 	[ "$status" -ne 0 ]
@@ -681,7 +688,7 @@ teardown() {
 
 	# Link with non-existent binary
 	run ${CCL_C_COM} -t 2 -b this_file_does_not_exist.bin \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: binary not found
 	[ "$status" -ne 0 ]
@@ -699,14 +706,14 @@ teardown() {
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link with one binary and specify linker options
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -0 "-create-library" \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -725,14 +732,14 @@ teardown() {
 
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
-		-d ${CCL_C_DEV_IDX}
+		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link with one binary and specify linker options
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}1 \
-		-0 "-this-is-an-invalid-option" -d ${CCL_C_DEV_IDX}
+		-0 "-this-is-an-invalid-option" -d ${CCL_TEST_DEVICE_INDEX}
 
 	# Error: invalid option
 	[ "$status" -ne 0 ]
