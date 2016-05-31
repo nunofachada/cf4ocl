@@ -426,42 +426,6 @@ teardown() {
 	[ "$status" -eq 0 ]
 }
 
-# Test compile with source file and two correct source headers with explicitly
-# incorrectly specified header names or location.
-@test "Compile with one source file and two incorrectly specified headers" {
-
-	# Skip if OpenCL < 1.2
-	if [[ ${CCL_C_SKIP} -eq 1 ]]
-	then
-		skip "${CCL_C_SKIP_MSG}"
-	fi
-
-	# First, specify source header in -h parameter but don't specify header
-	# names or location
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -h ${CCL_C_H_SUM} \
-		-h ${CCL_C_H_XOR} -d ${CCL_C_DEV_IDX}
-
-	# Error: program will not find required headers
-	[ "$status" -ne 0 ]
-
-	# Second, specify source header in -h parameter and incorrect header names
-	# in -n parameter
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -h ${CCL_C_H_SUM} \
-		-h ${CCL_C_H_XOR} -n bad_name1.cl.h -n bad_name2.cl.h \
-		-d ${CCL_C_DEV_IDX}
-
-	# Error: program will not find required headers
-	[ "$status" -ne 0 ]
-
-	# Third, pass incorrect include header path in compiler options
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -0 "-I bad/folder" \
-		-d ${CCL_C_DEV_IDX}
-
-	# Error: program will not find required headers
-	[ "$status" -ne 0 ]
-
-}
-
 # Test compile with source file and an erroneous source header.
 @test "Compile with source file and an erroneous source header" {
 
@@ -617,7 +581,8 @@ teardown() {
 	# Compile and save a binary containing a kernel requiring sum and xor
 	# functions
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -o ${CCL_C_TMP_BIN}3 \
-		-0 "-I ${CCL_C_K_FOLDER}" -d ${CCL_C_DEV_IDX}
+		-h ${CCL_C_H_SUM} -h ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} \
+		-n ${CCL_C_HNAME_XOR} -d ${CCL_C_DEV_IDX}
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
