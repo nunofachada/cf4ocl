@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -259,16 +259,12 @@ void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
 	CCLEvent** evt, GError** err);
 
-#ifdef CL_VERSION_1_2
-
 /* Fill an image object with a specified color. This function wraps the
  * clEnqueueFillImage() OpenCL function. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	const void *fill_color, const size_t *origin, const size_t *region,
 	CCLEventWaitList* evt_wait_lst, GError** err);
-
-#endif
 
 /**
  * Enqueues a command to unmap a previously mapped image object. This

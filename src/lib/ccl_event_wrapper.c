@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -436,8 +436,6 @@ finish:
 
 }
 
-#ifdef CL_VERSION_1_1
-
 /**
  * Wrapper for OpenCL clSetEventCallback() function.
  *
@@ -476,6 +474,25 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(command_exec_callback_type);
+	CCL_UNUSED(pfn_notify);
+	CCL_UNUSED(user_data);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Event callbacks require cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -493,6 +510,8 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to set event callback (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
+
+#endif
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -548,6 +567,23 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(event);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: User events require cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -567,6 +603,8 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
 
 	/* Wrap event. */
 	evt = ccl_event_new_wrap(event);
+
+#endif
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -617,6 +655,23 @@ cl_bool ccl_user_event_set_status(
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_1
+
+	CCL_UNUSED(execution_status);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: User events require cf4ocl to be deployed with "
+		"support for OpenCL version 1.1 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -635,6 +690,8 @@ cl_bool ccl_user_event_set_status(
 		"%s: error setting user event status (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	ret_status = CL_TRUE;
@@ -651,8 +708,6 @@ finish:
 	return ret_status;
 
 }
-
-#endif
 
 /**
  * Add event wrapper objects to an event wait list (variable argument

@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -122,8 +122,6 @@ cl_command_type ccl_event_get_command_type(
 CCL_EXPORT
 cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err);
 
-#ifdef CL_VERSION_1_1
-
 /* Wrapper for OpenCL clSetEventCallback() function. */
 CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
@@ -138,8 +136,6 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err);
 CCL_EXPORT
 cl_bool ccl_user_event_set_status(
 	CCLEvent* evt, cl_int execution_status, GError** err);
-
-#endif
 
 /**
  * Get a ::CCLWrapperInfo event information object.

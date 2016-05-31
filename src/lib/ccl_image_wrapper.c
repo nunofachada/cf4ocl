@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -902,8 +902,6 @@ finish:
 
 }
 
-#ifdef CL_VERSION_1_2
-
 /**
  * Fill an image object with a specified color. This function wraps the
  * clEnqueueFillImage() OpenCL function.
@@ -954,6 +952,27 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	/* Internal error handling object. */
 	GError* err_internal = NULL;
 
+#ifndef CL_VERSION_1_2
+
+	CCL_UNUSED(fill_color);
+	CCL_UNUSED(origin);
+	CCL_UNUSED(region);
+	CCL_UNUSED(evt_wait_lst);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(event);
+	CCL_UNUSED(ocl_ver);
+	CCL_UNUSED(err_internal);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Image fill requires cf4ocl to be deployed with "
+		"support for OpenCL version 1.2 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) img, &err_internal);
@@ -983,6 +1002,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	/* Clear event wait list. */
 	ccl_event_wait_list_clear(evt_wait_lst);
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
@@ -1000,8 +1021,6 @@ finish:
 	return evt;
 
 }
-
-#endif
 
 /** @} */
 

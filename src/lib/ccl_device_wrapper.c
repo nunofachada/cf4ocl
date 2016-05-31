@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  *
  * */
@@ -253,7 +253,6 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err) {
 
 }
 
-#ifdef CL_VERSION_1_2
 /**
  * Creates a `NULL`-terminated array of sub-devices that each reference
  * a non-intersecting set of compute units within the given parent
@@ -289,6 +288,22 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 	/* Array for holding sub-devices. */
 	void** subdevs = NULL;
 
+#ifndef CL_VERSION_1_2
+
+	CCL_UNUSED(properties);
+	CCL_UNUSED(ocl_status);
+	CCL_UNUSED(num_devs);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Sub-device creation requires cf4ocl to be deployed with "
+		"support for OpenCL version 1.2 or newer.",
+		CCL_STRD);
+
+#else
+
 	/* How many sub-devices will this partition yield? */
 	ocl_status = clCreateSubDevices(
 		ccl_device_unwrap(dev), properties, 0, NULL, &num_devs);
@@ -315,10 +330,16 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 	for (cl_uint i = 0; subdevs[i] != NULL; ++i)
 		subdevs[i] = ccl_device_new_wrap(subdevs[i]);
 
+	/* Return number of sub-devices? */
+	if (num_devs_ret != NULL) *num_devs_ret = num_devs;
+
+	/* Add new sub-devices to list of sub-devices. */
+	dev->subdev_arrays = g_slist_prepend(dev->subdev_arrays, subdevs);
+
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
-	if (num_devs_ret != NULL) *num_devs_ret = num_devs;
-	dev->subdev_arrays = g_slist_prepend(dev->subdev_arrays, subdevs);
 	goto finish;
 
 error_handler:
@@ -335,6 +356,5 @@ finish:
 	/* Return event. */
 	return (CCLDevice* const*) subdevs;
 }
-#endif
 
 /** @} */

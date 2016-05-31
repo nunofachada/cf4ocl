@@ -89,6 +89,8 @@
 #ifndef CL_VERSION_1_2
 	typedef intptr_t            cl_device_partition_property;
 	typedef cl_bitfield         cl_device_affinity_domain;
+	typedef cl_bitfield         cl_mem_migration_flags;
+	typedef cl_uint             cl_kernel_arg_info;
 	/* Error Codes */
 	#define CL_COMPILE_PROGRAM_FAILURE                  -15
 	#define CL_LINK_PROGRAM_FAILURE                     -17
@@ -135,8 +137,8 @@
 #ifndef CL_VERSION_2_0
 
 	typedef cl_bitfield         cl_device_svm_capabilities;
-	typedef cl_bitfield         cl_sampler_properties;
 	typedef cl_bitfield         cl_queue_properties;
+	typedef cl_bitfield         cl_sampler_properties;
 	/* cl_command_type */
 	#define CL_COMMAND_SVM_FREE                         0x1209
 	#define CL_COMMAND_SVM_MEMCPY                       0x120A

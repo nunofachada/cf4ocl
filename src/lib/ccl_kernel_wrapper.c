@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -247,6 +247,9 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
  * */
 CCL_EXPORT
 void ccl_kernel_set_args(CCLKernel* krnl, ...) {
+
+	/* Make sure krnl is not NULL. */
+	g_return_if_fail(krnl != NULL);
 
 	/* The va_list, which represents the variable argument list. */
 	va_list args_va;
@@ -707,6 +710,8 @@ CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
+	/* Make sure user_func is not NULL. */
+	g_return_val_if_fail(user_func != NULL, NULL);
 	/* Make sure that num_mos == 0 AND mo_list != NULL, OR, that
 	 * num_mos > 0  AND mo_list != NULL */
 	g_return_val_if_fail(((num_mos == 0) && (mo_list == NULL))
@@ -862,7 +867,7 @@ finish:
  * `dims * sizeof(size_t)`, serves a dual purpose: 1) as an input,
  * containing the maximum allowed local work size for each dimension, or
  * zeros if these maximums are to be fetched from the given device
- * CL_DEVICE_MAX_WORK_ITEM_SIZES information (if the specified values
+ * `CL_DEVICE_MAX_WORK_ITEM_SIZES` information (if the specified values
  * are larger than the device limits, the device limits are used
  * instead); 2) as an output, where to place a "nice" local worksize,
  * which is based and respects the limits of the given kernel and device
@@ -1105,6 +1110,8 @@ static cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel,
 		param_name, param_value_size, param_value, param_value_size_ret);
 }
 
+#endif
+
 /**
  * Get a ::CCLWrapperInfo kernel argument information object.
  *
@@ -1125,10 +1132,38 @@ CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	cl_kernel_arg_info param_name, GError** err) {
 
+	/* Make sure krnl is not NULL. */
+	g_return_val_if_fail(krnl != NULL, NULL);
+
+	/* Helper wrapper. */
 	CCLWrapper fake_wrapper;
+
+	/* Kernel information to return. */
 	CCLWrapperInfo* info;
+
+	/* Error handling object. */
 	GError* err_internal = NULL;
+
+	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
+
+#ifndef CL_VERSION_1_2
+
+	CCL_UNUSED(idx);
+	CCL_UNUSED(param_name);
+	CCL_UNUSED(fake_wrapper);
+	CCL_UNUSED(err_internal);
+	CCL_UNUSED(ocl_ver);
+
+	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+	 * error. */
+	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+		"%s: Obtaining kernel argument information requires cf4ocl to be "
+		"deployed with support for OpenCL version 1.2 or newer.",
+		CCL_STRD);
+
+#else
 
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
@@ -1150,6 +1185,8 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 		CL_FALSE, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
+#endif
+
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
 	goto finish;
@@ -1168,8 +1205,6 @@ finish:
 	return info;
 
 }
-
-#endif /* OpenCL >=1.2 */
 
 /** @} */
 

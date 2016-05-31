@@ -23,16 +23,17 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
+#ifndef _CCL_MEMOBJ_WRAPPER_H_
+#define _CCL_MEMOBJ_WRAPPER_H_
+
+#include "ccl_oclversions.h"
 #include "ccl_abstract_wrapper.h"
 #include "ccl_event_wrapper.h"
 #include "ccl_queue_wrapper.h"
-
-#ifndef _CCL_MEMOBJ_WRAPPER_H_
-#define _CCL_MEMOBJ_WRAPPER_H_
 
 /**
  * @defgroup CCL_MEMOBJ_WRAPPER Memory object wrapper
@@ -83,17 +84,11 @@ CCL_EXPORT
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
 	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err);
 
-#ifdef CL_VERSION_1_1
-
 /* Wrapper for OpenCL clSetMemObjectDestructorCallback() function. */
 CCL_EXPORT
 cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	ccl_memobj_destructor_callback pfn_notify,
 	void *user_data, GError** err);
-
-#endif
-
-#ifdef CL_VERSION_1_2
 
 /* Enqueues a command to indicate which device a set of memory objects
  * should be associated with. */
@@ -101,8 +96,6 @@ CCL_EXPORT
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags,
  	CCLEventWaitList* evt_wait_lst, GError** err);
-
-#endif
 
 /**
  * Get a ::CCLWrapperInfo memory object information object.

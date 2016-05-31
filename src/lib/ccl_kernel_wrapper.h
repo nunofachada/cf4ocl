@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -306,8 +306,6 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 		(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo, \
 		CL_FALSE, (err))
 
-#ifdef CL_VERSION_1_2
-
 /* Get a ::CCLWrapperInfo kernel argument information object. */
 CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
@@ -363,8 +361,6 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	? *((param_type*) ccl_kernel_get_arg_info( \
 		(krnl), (idx), (param_name), (err))) \
 	: NULL
-
-#endif /* OpenCL >=1.2 */
 
 /**
  * Increase the reference count of the kernel object.
