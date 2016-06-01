@@ -47,17 +47,17 @@ static const char* ccl_errors[] = {
 	"Linker not available", /* CL_LINKER_NOT_AVAILABLE - 16 */
 	"Link program failure", /* CL_LINK_PROGRAM_FAILURE - 17 */
 	"Device partition failed", /* CL_DEVICE_PARTITION_FAILED - 18 */
-	"Argument information not available", /* CL_CCL_KERNEL_ARG_INFO_NOT_AVAILABLE - 19 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 20 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 21 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 22 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 23 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 24 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 25 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 26 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 27 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 28 */
-	"Unassigned error code", /* Unassigned as of OpenCL 2.0 - 29 */
+	"Argument information not available", /* CL_KERNEL_ARG_INFO_NOT_AVAILABLE - 19 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 20 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 21 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 22 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 23 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 24 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 25 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 26 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 27 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 28 */
+	"Unassigned error code", /* Unassigned as of OpenCL 2.1 - 29 */
 	"Invalid value", /* CL_INVALID_VALUE - 30 */
 	"Invalid device type", /* CL_INVALID_DEVICE_TYPE - 31 */
 	"Invalid platform", /* CL_INVALID_PLATFORM - 32 */

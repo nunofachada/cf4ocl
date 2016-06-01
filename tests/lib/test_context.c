@@ -75,6 +75,7 @@ static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
 		case 0x10DD: return "CL_HALF_FLOAT";
 		case 0x10DE: return "CL_FLOAT";
 		case 0x10DF: return "CL_UNORM_INT24";
+		case 0x10E0: return "CL_UNORM_INT_101010_2";
 	}
 	return "Unknown";
 }

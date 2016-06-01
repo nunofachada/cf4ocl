@@ -52,7 +52,7 @@
 	#define CL_AFFINITY_DOMAIN_L4_CACHE_EXT             0x4
 	#define CL_AFFINITY_DOMAIN_NUMA_EXT                 0x10
 	#define CL_AFFINITY_DOMAIN_NEXT_FISSIONABLE_EXT     0x100
-        #define CL_PROPERTIES_LIST_END_EXT                  ((cl_device_partition_property_ext) 0)
+	#define CL_PROPERTIES_LIST_END_EXT                  ((cl_device_partition_property_ext) 0)
 	#define CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR        0x202B
 	#define CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR        0x202C
 #endif
@@ -169,6 +169,20 @@
 	#define CL_DEVICE_SVM_ATOMICS                       (1 << 3)
 
 #endif
+
+
+/* Define stuff for OpenCL implementations lower than 2.1 */
+#ifndef CL_VERSION_2_1
+
+	/* cl_device_info */
+	#define CL_DEVICE_IL_VERSION                             0x105B
+	#define CL_DEVICE_MAX_NUM_SUB_GROUPS                     0x105C
+	#define CL_DEVICE_SUB_GROUP_INDEPENDENT_FORWARD_PROGRESS 0x105D
+	/* cl_channel_type */
+	#define CL_UNORM_INT_101010_2                       0x10E0
+
+#endif
+
 
 /* Some of these query constants may not be defined in standard
  * OpenCL headers, so we defined them here if necessary. */
