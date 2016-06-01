@@ -188,8 +188,11 @@ static void create_info_destroy_test() {
 		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
 				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
 				cl_kernel_arg_address_qualifier, &err);
-		g_assert(
-			(err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
 		} else {
@@ -198,7 +201,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
 			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
-		g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
 		} else {
@@ -207,6 +214,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
 			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_name, ==, "a");
 		} else {
@@ -217,6 +229,11 @@ static void create_info_destroy_test() {
 		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
 				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
 				cl_kernel_arg_address_qualifier, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
 		} else {
@@ -225,6 +242,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 1,
 			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
 		} else {
@@ -233,6 +255,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 1,
 			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_name, ==, "b");
 		} else {
@@ -243,6 +270,11 @@ static void create_info_destroy_test() {
 		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
 				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
 				cl_kernel_arg_address_qualifier, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
 		} else {
@@ -251,6 +283,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 2,
 			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
 		} else {
@@ -259,6 +296,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 2,
 			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_name, ==, "c");
 		} else {
@@ -269,6 +311,11 @@ static void create_info_destroy_test() {
 		kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
 				CL_KERNEL_ARG_ADDRESS_QUALIFIER,
 				cl_kernel_arg_address_qualifier, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
 		} else {
@@ -277,6 +324,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 3,
 			CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
 		} else {
@@ -285,6 +337,11 @@ static void create_info_destroy_test() {
 
 		kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 3,
 			CL_KERNEL_ARG_NAME, char*, &err);
+		g_assert((err == NULL)
+			|| ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+				&& (err->domain == CCL_ERROR))
+			|| ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+				&& (err->domain == CCL_OCL_ERROR)));
 		if (err == NULL) {
 			g_assert_cmpstr(kernel_arg_name, ==, "d");
 		} else {
