@@ -32,14 +32,8 @@
 /* The default device to use in tests is set in the CMake configuration. */
 #define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
 
-/* The efective device to use in tests. */
-extern cl_uint ccl_tests_devidx;
-
 /* Print handler which redirects output to debug stream. */
 void ccl_print_to_debug(const gchar* string);
-
-/* Determine index of device to use in tests. */
-void ccl_test_init_device_index();
 
 /* Create a context with a device specified at compile time. */
 CCLContext* ccl_test_context_new(GError** err);

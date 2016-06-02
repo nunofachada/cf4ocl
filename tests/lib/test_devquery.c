@@ -20,7 +20,7 @@
  * Tests for device query module.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -200,11 +200,16 @@ static void infomap_test() {
  * @return Result of test run.
  * */
 int main(int argc, char** argv) {
-	ccl_test_init_device_index();
+
 	g_test_init(&argc, &argv, NULL);
+
 	g_test_add_func("/devquery/helpers", helpers_test);
+
 	g_test_add_func("/devquery/name", name_test);
+
 	g_test_add_func("/devquery/infomap", infomap_test);
+
 	return g_test_run();
+
 }
 

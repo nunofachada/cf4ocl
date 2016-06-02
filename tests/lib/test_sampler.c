@@ -20,7 +20,7 @@
  * Test the sampler wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -227,7 +227,6 @@ static void ref_unref_test() {
  * */
 int main(int argc, char** argv) {
 
-	ccl_test_init_device_index();
 	g_test_init(&argc, &argv, NULL);
 
 	g_test_add_func(

@@ -21,7 +21,7 @@
  * module. Can only be performed using the OpenCL stub.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -66,9 +66,10 @@ static void operation_test() {
 	cl_int host_ptr[CCL_TEST_MAXBUF];
 	const char* src = "__kernel void k1(_global int* a){}";
 	void* mapped_ptr;
+	cl_uint devidx = 0;
 
 	/* Create OpenCL wrappers for testing. */
-	ctx = ccl_test_context_new(&err);
+	ctx = ccl_context_new_from_device_index(&devidx, &err);
 	g_assert_no_error(err);
 
 	dev = ccl_context_get_device(ctx, 0, &err);
@@ -358,7 +359,6 @@ static void operation_test() {
  * */
 int main(int argc, char** argv) {
 
-	ccl_test_init_device_index();
 	g_test_init(&argc, &argv, NULL);
 
 	g_test_add_func("/profiler/operation", operation_test);

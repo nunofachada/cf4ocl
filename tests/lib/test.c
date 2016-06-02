@@ -26,9 +26,6 @@
 
 #include "test.h"
 
-/* Efective device index to use in tests. */
-cl_uint ccl_tests_devidx;
-
 /**
  * Print handler which redirects output to debug stream.
  * */
@@ -37,12 +34,20 @@ void ccl_print_to_debug(const gchar* string) {
 }
 
 /**
- * Determine index of device to use in tests.
+ * Create a context with a device specified at compile time.
  * */
-void ccl_test_init_device_index() {
+CCLContext* ccl_test_context_new(GError** err) {
+
+	/* Context wrapper. */
+	CCLContext* ctx = NULL;
+
+	/* Device index string taken from the environment. */
+	const char* devidx_str;
+
+	/* Final device index integer. */
+	cl_uint ccl_tests_devidx;
 
 	/* Is a device index defined as an environment variable? */
-	const char* devidx_str;
 	devidx_str = g_getenv("CCL_TEST_DEVICE_INDEX");
 	if (devidx_str) {
 
@@ -51,18 +56,10 @@ void ccl_test_init_device_index() {
 
 	} else {
 
-		/* Otherwise use default device index. */
+		/* Otherwise use default device index specified at compile time. */
 		ccl_tests_devidx = CCL_TEST_DEFAULT_DEVICE_IDX;
 
 	}
-}
-
-/**
- * Create a context with a device specified at compile time.
- * */
-CCLContext* ccl_test_context_new(GError** err) {
-
-	CCLContext* ctx = NULL;
 
 	/* Create context, error handling is performed by the caller. */
 	ctx = ccl_context_new_from_device_index(&ccl_tests_devidx, err);

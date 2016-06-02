@@ -20,7 +20,7 @@
  * Test the program class. Also tests the kernel class.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -68,6 +68,7 @@ static void create_info_destroy_test() {
 	GError* err = NULL;
 	gchar* tmp_dir_name;
 	gchar* tmp_file_prefix;
+	const char* build_log;
 
 	/* Get a temp. dir. */
 	tmp_dir_name = g_dir_make_tmp("test_program_XXXXXX", &err);
@@ -459,21 +460,30 @@ static void create_info_destroy_test() {
 	info = ccl_program_get_build_info(
 		prg, d, CL_PROGRAM_BUILD_STATUS, &err);
 	g_assert_no_error(err);
-	g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS)
-		|| (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
+	g_assert(*((cl_build_status*) info->value) == CL_BUILD_SUCCESS);
 
 	info = ccl_program_get_build_info(
 		prg, d, CL_PROGRAM_BUILD_LOG, &err);
-	g_assert_no_error(err);
+	g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
+		(err->domain == CCL_ERROR)));
+	g_clear_error(&err);
 
-	g_assert(g_strrstr(
-		ccl_program_get_build_log(prg), (char*) info->value));
+	build_log = ccl_program_get_build_log(prg, &err);
+	g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
+		(err->domain == CCL_ERROR)));
+	if (info) {
+		g_assert(g_strrstr(build_log, (char*) info->value));
+	}
+	g_clear_error(&err);
 
-	char* build_log = ccl_program_get_build_info_array(
+	build_log = ccl_program_get_build_info_array(
 		prg, d, CL_PROGRAM_BUILD_LOG, char*, &err);
-	g_assert_no_error(err);
-
-	g_assert_cmpstr(build_log, ==, (char*) info->value);
+	g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
+		(err->domain == CCL_ERROR)));
+	if (info) {
+		g_assert_cmpstr(build_log, ==, (char*) info->value);
+	}
+	g_clear_error(&err);
 
 	/* Create a command queue. */
 	cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
@@ -765,7 +775,6 @@ static void compile_link_test() {
  * */
 int main(int argc, char** argv) {
 
-	ccl_test_init_device_index();
 	g_test_init(&argc, &argv, NULL);
 
 	g_test_add_func(

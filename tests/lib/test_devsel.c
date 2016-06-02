@@ -71,10 +71,13 @@ static void devices_new_destroy_test() {
  * @return Result of test run.
  * */
 int main(int argc, char** argv) {
-	ccl_test_init_device_index();
+
 	g_test_init(&argc, &argv, NULL);
+
 	g_test_add_func("/devsel/devices_new_destroy_test",
 		devices_new_destroy_test);
+
 	return g_test_run();
+
 }
 
