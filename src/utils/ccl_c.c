@@ -434,7 +434,11 @@ int main(int argc, char* argv[]) {
 		if (!prg) {
 			g_printf(" Unavailable\n");
 		} else {
-			build_log = ccl_program_get_device_build_log(prg, dev);
+			build_log = ccl_program_get_device_build_log(prg, dev, &err);
+			if (err) {
+				g_info("Unable to retrieve build log. %s", err->message);
+				g_clear_error(&err);
+			}
 			if ((build_log) && (strlen(build_log) > 0)) {
 				g_printf("\n%s\n", build_log);
 			} else {
