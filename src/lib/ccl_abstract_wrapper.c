@@ -32,8 +32,7 @@
 
 /* Table of all existing wrappers. */
 static GHashTable* wrappers = NULL;
-/* Define lock for synchronizing access to table of all existing
- * wrappers. */
+/* Define lock for synchronizing access to table of all existing wrappers. */
 G_LOCK_DEFINE(wrappers);
 
 /* Wrapper names ordered by their enum type. */
@@ -433,6 +432,9 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	/* Make sure wrapper1 is not NULL. */
 	g_return_val_if_fail(wrapper1 != NULL, NULL);
 
+	/* Make sure info_fun is not NULL. */
+	g_return_val_if_fail(info_fun != NULL, NULL);
+
 	/* Information object. */
 	CCLWrapperInfo* info = NULL;
 
@@ -561,6 +563,9 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	/* Make sure wrapper1 is not NULL. */
 	g_return_val_if_fail(wrapper1 != NULL, NULL);
 
+	/* Make sure info_fun is not NULL. */
+	g_return_val_if_fail(info_fun != NULL, NULL);
+
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
 		param_name, min_size, info_fun, use_cache, err);
@@ -596,6 +601,9 @@ size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 
 	/* Make sure wrapper1 is not NULL. */
 	g_return_val_if_fail(wrapper1 != NULL, 0);
+
+	/* Make sure info_fun is not NULL. */
+	g_return_val_if_fail(info_fun != NULL, 0);
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
