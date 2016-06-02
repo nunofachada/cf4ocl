@@ -282,21 +282,6 @@ typedef enum ccl_error_code {
 	#endif
 #endif
 
-/* Macro which determines how error messages are logged in the debug stream. */
-#ifdef NDEBUG
-	#define CCL_DEBUG_ERR(err) g_debug(CCL_STRD)
-#else
-	#define CCL_DEBUG_ERR(err) \
-		if (&(err) != NULL) { \
-			g_debug("%s: %s [%s, error %d]", \
-				CCL_STRD, (err)->message, \
-				g_quark_to_string((err)->domain), \
-				(err)->code); \
-		} else { \
-			g_debug(CCL_STRD); \
-		}
-#endif
-
 /**
  * If error is detected (`error_code != no_error_code`),
  * create an error object (GError) and go to the specified label.
@@ -310,10 +295,11 @@ typedef enum ccl_error_code {
  * @param[in] msg Error message in case of error.
  * @param[in] ... Extra parameters for error message.
  * */
-#define ccl_if_err_create_goto(err, quark, error_condition, error_code, label, msg, ...) \
+#define ccl_if_err_create_goto( \
+	err, quark, error_condition, error_code, label, msg, ...) \
 	if (error_condition) { \
 		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
-		CCL_DEBUG_ERR(err); \
+		g_debug(CCL_STRD); \
 		goto label; \
 	}
 
@@ -326,7 +312,7 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_goto(err, label)	\
 	if ((err) != NULL) { \
-		CCL_DEBUG_ERR(err); \
+		g_debug(CCL_STRD); \
 		goto label; \
 	}
 
@@ -340,7 +326,7 @@ typedef enum ccl_error_code {
  * */
 #define ccl_if_err_propagate_goto(err_dest, err_src, label) \
 	if ((err_src) != NULL) { \
-		CCL_DEBUG_ERR(err_src); \
+		g_debug(CCL_STRD); \
 		g_propagate_error(err_dest, err_src); \
 		goto label; \
 	}
