@@ -310,13 +310,13 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 /* Get a general build log of most recent build, compile or link, for
  * all devices. */
 CCL_EXPORT
-const char* ccl_program_get_build_log(CCLProgram* prg);
+const char* ccl_program_get_build_log(CCLProgram* prg, GError** err);
 
 /* Get build log for most recent build, compile or link for the
  * specified device. */
 CCL_EXPORT
 const char* ccl_program_get_device_build_log(
-	CCLProgram* prg, CCLDevice* dev);
+	CCLProgram* prg, CCLDevice* dev, GError** err);
 
 /* Compile a program's source code. */
 CCL_EXPORT

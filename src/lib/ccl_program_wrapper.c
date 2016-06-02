@@ -94,6 +94,30 @@ struct ccl_program_binary {
 
 /**
  * @internal
+ * Destroy table of build logs.
+ *
+ * @private @memberof ccl_program
+ *
+ * @param[in] prg A ::CCLProgram wrapper object.
+ * */
+static void ccl_program_clear_build_logs(CCLProgram* prg) {
+
+	/* Make sure prg is not NULL. */
+	g_return_if_fail(prg != NULL);
+
+	/* If the build logs table was created... */
+	if (prg->build_logs != NULL) {
+
+		/*...free it and the included logs. */
+		g_hash_table_destroy(prg->build_logs);
+
+		/* TODO: Mutex access. */
+
+	}
+}
+
+/**
+ * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
  *
@@ -128,13 +152,8 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 
 	}
 
-	/* If the build logs table was created... */
-	if (prg->build_logs != NULL) {
-
-		/*...free it and the included logs. */
-		g_hash_table_destroy(prg->build_logs);
-
-	}
+	/* Destroy table of build logs. */
+	ccl_program_clear_build_logs(prg);
 
 	/* If there is a concatenated build log... */
 	if (prg->build_logs_concat != NULL) {
@@ -203,80 +222,6 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
 	if (pbin->size > 0)
 		g_free(pbin->data);
 	g_slice_free(CCLProgramBinary, pbin);
-
-}
-
-/**
- * @internal
- * Populate the build log after a build, compile or link.
- *
- * @private @memberof ccl_program
- *
- * @param[in] prg A ::CCLProgram wrapper object.
- * @param[in] build_status The build status.
- * @param[in] num_devices The number of devices listed in `devs`.
- * @param[in] devs List of devices for which to get the build log.
- * If `NULL`, the build log is fetched for all deviecs.
- * */
-static void ccl_program_populate_build_log(CCLProgram* prg,
-	cl_int build_status, cl_uint num_devices, CCLDevice* const* devs) {
-
-	/* Make sure program wrapper is not NULL. */
-	g_return_if_fail(prg != NULL);
-
-	/* Get build log only if it makes sense to do so. */
-	if ((build_status == CL_SUCCESS)
-		|| (build_status == CL_BUILD_PROGRAM_FAILURE)
-		|| (build_status == CL_COMPILE_PROGRAM_FAILURE)) {
-
-		/* Number of devices. */
-		cl_uint real_num_devs = (num_devices != 0)
-			? num_devices
-			: ccl_program_get_num_devices(prg, NULL);
-		/* Device list. */
-		CCLDevice* const* real_devs = (devs != NULL)
-			? devs
-			: ccl_program_get_all_devices(prg, NULL);
-
-		/* Build log for current device.*/
-		char* build_log_dev;
-
-		/* Get build log for each device. */
-		for (cl_uint i = 0; i < real_num_devs; ++i) {
-
-			/* Get build log for current device. */
-			build_log_dev = ccl_program_get_build_info_array(
-				prg, real_devs[i], CL_PROGRAM_BUILD_LOG, char*, NULL);
-
-			/* If build log is not empty, keep it in build logs
-			 * table. */
-			if ((build_log_dev != NULL)
-				&& (strlen(build_log_dev) > 0)) {
-
-				/* Check if build logs table is initialized, if not,
-				 * initialize it. */
-				if (!prg->build_logs) {
-					prg->build_logs = g_hash_table_new(
-						g_direct_hash, g_direct_equal);
-				}
-
-				/* Keep build log for current device in build logs
-				 * table. */
-				g_hash_table_insert(prg->build_logs,
-					(gpointer) real_devs[i],
-					(gpointer) build_log_dev);
-
-				/* If build log is not empty, say something about it. */
-				g_info("Build log for device %d is not empty", i);
-				g_debug("Build log for device %d:\n\n%s\n",
-					i, build_log_dev);
-
-			}
-		}
-	}
-
-	/* Bye. */
-	return;
 
 }
 
@@ -916,6 +861,9 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	/* Result of function call. */
 	cl_bool result;
 
+	/* Destroy table of build logs. */
+	ccl_program_clear_build_logs(prg);
+
 	/* Check if its necessary to unwrap devices. */
 	if ((devs != NULL) && (num_devices > 0)) {
 		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
@@ -927,8 +875,6 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	/* Build program. */
 	ocl_status = clBuildProgram(ccl_program_unwrap(prg),
 		num_devices, cl_devices, options, pfn_notify, user_data);
-	/* Get build log, if possible. */
-	ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
 
 	/* Check for any other errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
@@ -962,112 +908,177 @@ finish:
 }
 
 /**
- * Get a general build log of most recent build, compile or link, for
- * all devices.
+ * Get a general build log of most recent build, compile or link, for all
+ * devices.
  *
  * Individual build logs for each device associated with the program are
- * returned in a concatenated fashion, with a header (identifying the
- * device) and footer separating them.
+ * returned in a concatenated fashion, with a header (identifying the device)
+ * and footer separating them.
  *
  * @param[in] prg Program wrapper object.
- * @return The build log for most recent build, compile or link. May be
- * `NULL` or an empty string if no build, compile or link was performed,
- * or if no build log is available.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return The build log for most recent build, compile or link. May be `NULL`
+ * or an empty string if no build, compile or link was performed, or if no build
+ * log is available.
  * */
 CCL_EXPORT
-const char* ccl_program_get_build_log(CCLProgram* prg) {
+const char* ccl_program_get_build_log(CCLProgram* prg, GError** err) {
 
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
 
 	/* Counter. */
 	cl_uint i = 0;
-
 	/* Number of devices in program. */
 	cl_uint num_devs = 0;
-
 	/* Current device. */
 	CCLDevice* dev = NULL;
-
 	/* Name of current device. */
 	char* dev_name;
-
 	/* Build log for current device.*/
 	const char* build_log;
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
 
 	/* Complete build log string object. */
 	GString* build_log_obj = g_string_new("");
 
 	/* Clear any previously obtained concatenated build log. */
+	/* TODO: Mutex for thread-safe access to this field. */
 	if (prg->build_logs_concat) {
 		g_free(prg->build_logs_concat);
 		prg->build_logs_concat = NULL;
 	}
 
 	/* How many devices in program? */
-	num_devs = ccl_program_get_num_devices(prg, NULL);
+	num_devs = ccl_program_get_num_devices(prg, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* For each device in program: */
 	for (i = 0; i < num_devs; i++) {
 
 		/* Get the respective device wrapper. */
-		dev = ccl_program_get_device(prg, i, NULL);
+		dev = ccl_program_get_device(prg, i, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Is it a valid device? */
 		if (dev) {
 
 			/* If so, get its name. */
 			dev_name = ccl_device_get_info_array(
-				dev, CL_DEVICE_NAME, char*, NULL);
+				dev, CL_DEVICE_NAME, char*, &err_internal);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 			/* Get the respective build log. */
-			build_log = ccl_program_get_device_build_log(prg, dev);
+			build_log = ccl_program_get_device_build_log(
+				prg, dev, &err_internal);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 			/* Append build log to string of concatenated build logs. */
 			g_string_append_printf(build_log_obj, "\n### Build log "
 				"for device '%s'\n\n%s\n\n", dev_name,
-				build_log != NULL ? build_log : "");
+				build_log != NULL ? build_log : "Not available");
 		}
 	}
 
-	/* Clear any previously obtained concatenated build log... */
-	if (prg->build_logs_concat) g_free(prg->build_logs_concat);
+	/* Info/debug messages. */
+	if (strlen(build_log_obj->str)) {
 
-	/* ...and add the newly concatenated build log. */
+		g_info("Build log is not empty");
+		g_debug("\n%s", build_log_obj->str);
+	}
+
+	/* Add the newly concatenated build log. */
+	/* TODO: Mutex for thread-safe access to this field. */
 	prg->build_logs_concat = build_log_obj->str;
 
-	/* Release the string object (but not the underlying character
-	 * array). */
+	/* Release the string object (but not the underlying character array). */
 	g_string_free(build_log_obj, FALSE);
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
 
 	/* Return concatenated build log. */
 	return (const char*) prg->build_logs_concat;
 }
 
 /**
- * Get build log for most recent build, compile or link for the
- * specified device.
+ * Get build log for most recent build, compile or link for the specified
+ * device.
  *
  * @param[in] prg Program wrapper object.
  * @param[in] dev Device for which to get the build log.
- * @return The build log for most recent build, compile or link. May be
- * `NULL` or an empty string if no build, compile or link was performed,
- * or if no build log is available.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return The build log for most recent build, compile or link. May be `NULL`
+ * or an empty string if no build, compile or link was performed, or if no build
+ * log is available.
  * */
 CCL_EXPORT
 const char* ccl_program_get_device_build_log(
-	CCLProgram* prg, CCLDevice* dev) {
+	CCLProgram* prg, CCLDevice* dev, GError** err) {
 
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, NULL);
-
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, NULL);
+	/* Make sure err is NULL or it is not set. */
+	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+
+	/* Build log for current device.*/
+	char* build_log_dev = NULL;
+	/* Error reporting object. */
+	GError* err_internal = NULL;
+
+	/* Get build log for the specified device. */
+	build_log_dev = ccl_program_get_build_info_array(
+		prg, dev, CL_PROGRAM_BUILD_LOG, char*, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	/* If build log is not empty, keep it in build logs table. */
+	if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
+
+		/* Check if build logs table is initialized, if not, initialize it. */
+		/* TODO: Mutex for thread-safe access to this field. */
+		if (!prg->build_logs) {
+			prg->build_logs = g_hash_table_new(
+				g_direct_hash, g_direct_equal);
+		}
+
+		/* Keep build log for current device in build logs table. Previous
+		 * values (logs) are freed automatically. */
+		/* TODO: Mutex for thread-safe access to this field. */
+		g_hash_table_insert(prg->build_logs,
+			(gpointer) dev,
+			(gpointer) build_log_dev);
+
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
 
 	/* Return build log for the specified device, if it exists. */
-	return (const char*) ((prg->build_logs != NULL)
-		? g_hash_table_lookup(prg->build_logs, dev)
-		: NULL);
+	return build_log_dev;
+
 }
 
 /**
@@ -1101,8 +1112,7 @@ const char* ccl_program_get_device_build_log(
  * @param[in] user_data User supplied data for the callback function.
  * @param[out] err Return location for a GError, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
@@ -1161,6 +1171,9 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 		"%s: Program compilation requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
 
+	/* Destroy table of build logs. */
+	ccl_program_clear_build_logs(prg);
+
 	/* Check if its necessary to unwrap devices. */
 	if ((devs != NULL) && (num_devices > 0)) {
 		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
@@ -1183,8 +1196,6 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 		(const cl_device_id*) cl_devices, options, num_input_headers,
 		(const cl_program*) input_headers, header_include_names,
 		pfn_notify, user_data);
-	/* Get build log, if possible. */
-	ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
 
 	/* Check for errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
@@ -1250,8 +1261,8 @@ finish:
  * an application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
@@ -1313,6 +1324,9 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		"%s: Program linking requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
 
+	/* Destroy table of build logs. */
+	ccl_program_clear_build_logs(prg);
+
 	/* Check if its necessary to unwrap devices. */
 	if ((devs != NULL) && (num_devices > 0)) {
 		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
@@ -1336,22 +1350,14 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		(const cl_program*) input_programs, pfn_notify, user_data,
 		&ocl_status);
 
-	/* When link fails, cl_program can be NULL, so we check that before
-	 * wrapping it and getting a build log. */
-	if (program != NULL) {
-
-		/* Wrap OpenCL program object. */
-		prg = ccl_program_new_wrap(program);
-
-		/* Get build log, if possible. */
-		ccl_program_populate_build_log(prg, ocl_status, num_devices, devs);
-	}
-
 	/* Check for errors. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to link program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
+
+	/* Wrap OpenCL program object. */
+	prg = ccl_program_new_wrap(program);
 
 #endif
 
@@ -1363,10 +1369,6 @@ error_handler:
 
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
-
-	/* Return NULL to signal error. */
-	if (prg) ccl_program_destroy(prg);
-	prg = NULL;
 
 finish:
 
@@ -2095,10 +2097,10 @@ CCLDevice* ccl_program_get_device(
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
- * @return The number of devices in program or 0 if an error occurs or
- * is otherwise not possible to get any device.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return The number of devices in program or 0 if an error occurs or is
+ * otherwise not possible to get any device.
  * */
 CCL_EXPORT
 cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
