@@ -111,8 +111,10 @@ static void ccl_program_clear_build_logs(CCLProgram* prg) {
 		/*...free it and the included logs. */
 		g_hash_table_destroy(prg->build_logs);
 
-		/* TODO: Mutex access. */
+		/* Set to NULL to allow reuse. */
+		prg->build_logs = NULL;
 
+		/* TODO: Mutex access. */
 	}
 }
 
@@ -861,7 +863,7 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 	/* Result of function call. */
 	cl_bool result;
 
-	/* Destroy table of build logs. */
+	/* Clear build logs cache. */
 	ccl_program_clear_build_logs(prg);
 
 	/* Check if its necessary to unwrap devices. */
@@ -984,13 +986,6 @@ const char* ccl_program_get_build_log(CCLProgram* prg, GError** err) {
 		}
 	}
 
-	/* Info/debug messages. */
-	if (strlen(build_log_obj->str)) {
-
-		g_info("Build log is not empty");
-		g_debug("\n%s", build_log_obj->str);
-	}
-
 	/* Add the newly concatenated build log. */
 	/* TODO: Mutex for thread-safe access to this field. */
 	prg->build_logs_concat = build_log_obj->str;
@@ -1041,28 +1036,35 @@ const char* ccl_program_get_device_build_log(
 	/* Error reporting object. */
 	GError* err_internal = NULL;
 
-	/* Get build log for the specified device. */
-	build_log_dev = ccl_program_get_build_info_array(
-		prg, dev, CL_PROGRAM_BUILD_LOG, char*, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	/* Is build log for this device already in cache? */
+	/* TODO: Mutex for thread-safe access to this field. */
+	if ((prg->build_logs == NULL) || ((build_log_dev = (char*)
+		g_hash_table_lookup(prg->build_logs, (gconstpointer) dev)) == NULL)) {
 
-	/* If build log is not empty, keep it in build logs table. */
-	if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
+		/* Build log for the specified device is not in cache, get it. */
+		build_log_dev = ccl_program_get_build_info_array(
+			prg, dev, CL_PROGRAM_BUILD_LOG, char*, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
-		/* Check if build logs table is initialized, if not, initialize it. */
-		/* TODO: Mutex for thread-safe access to this field. */
-		if (!prg->build_logs) {
-			prg->build_logs = g_hash_table_new(
-				g_direct_hash, g_direct_equal);
+		/* If build log is not empty, keep it in build logs cache. */
+		if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
+
+			/* Check if build logs cache is initialized, if not, initialize
+			 * it. */
+			/* TODO: Mutex for thread-safe access to this field. */
+			if (!prg->build_logs) {
+				prg->build_logs = g_hash_table_new(
+					g_direct_hash, g_direct_equal);
+			}
+
+			/* Keep build log for current device in build logs cache. Previous
+			 * logs are freed automatically. */
+			/* TODO: Mutex for thread-safe access to this field. */
+			g_hash_table_insert(prg->build_logs,
+				(gpointer) dev,
+				(gpointer) build_log_dev);
+
 		}
-
-		/* Keep build log for current device in build logs table. Previous
-		 * values (logs) are freed automatically. */
-		/* TODO: Mutex for thread-safe access to this field. */
-		g_hash_table_insert(prg->build_logs,
-			(gpointer) dev,
-			(gpointer) build_log_dev);
-
 	}
 
 	/* If we got here, everything is OK. */
@@ -1171,7 +1173,7 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 		"%s: Program compilation requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
 
-	/* Destroy table of build logs. */
+	/* Clear build logs cache. */
 	ccl_program_clear_build_logs(prg);
 
 	/* Check if its necessary to unwrap devices. */
@@ -1324,7 +1326,7 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		"%s: Program linking requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
 
-	/* Destroy table of build logs. */
+	/* Clear build logs cache. */
 	ccl_program_clear_build_logs(prg);
 
 	/* Check if its necessary to unwrap devices. */
