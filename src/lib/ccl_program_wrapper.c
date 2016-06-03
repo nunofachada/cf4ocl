@@ -114,7 +114,6 @@ static void ccl_program_clear_build_logs(CCLProgram* prg) {
 		/* Set to NULL to allow reuse. */
 		prg->build_logs = NULL;
 
-		/* TODO: Mutex access. */
 	}
 }
 
@@ -949,7 +948,6 @@ const char* ccl_program_get_build_log(CCLProgram* prg, GError** err) {
 	GString* build_log_obj = g_string_new("");
 
 	/* Clear any previously obtained concatenated build log. */
-	/* TODO: Mutex for thread-safe access to this field. */
 	if (prg->build_logs_concat) {
 		g_free(prg->build_logs_concat);
 		prg->build_logs_concat = NULL;
@@ -987,7 +985,6 @@ const char* ccl_program_get_build_log(CCLProgram* prg, GError** err) {
 	}
 
 	/* Add the newly concatenated build log. */
-	/* TODO: Mutex for thread-safe access to this field. */
 	prg->build_logs_concat = build_log_obj->str;
 
 	/* Release the string object (but not the underlying character array). */
@@ -1037,7 +1034,6 @@ const char* ccl_program_get_device_build_log(
 	GError* err_internal = NULL;
 
 	/* Is build log for this device already in cache? */
-	/* TODO: Mutex for thread-safe access to this field. */
 	if ((prg->build_logs == NULL) || ((build_log_dev = (char*)
 		g_hash_table_lookup(prg->build_logs, (gconstpointer) dev)) == NULL)) {
 
@@ -1051,7 +1047,6 @@ const char* ccl_program_get_device_build_log(
 
 			/* Check if build logs cache is initialized, if not, initialize
 			 * it. */
-			/* TODO: Mutex for thread-safe access to this field. */
 			if (!prg->build_logs) {
 				prg->build_logs = g_hash_table_new(
 					g_direct_hash, g_direct_equal);
@@ -1059,7 +1054,6 @@ const char* ccl_program_get_device_build_log(
 
 			/* Keep build log for current device in build logs cache. Previous
 			 * logs are freed automatically. */
-			/* TODO: Mutex for thread-safe access to this field. */
 			g_hash_table_insert(prg->build_logs,
 				(gpointer) dev,
 				(gpointer) build_log_dev);
