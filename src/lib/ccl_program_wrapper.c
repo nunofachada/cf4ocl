@@ -1326,9 +1326,6 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		"%s: Program linking requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
 
-	/* Clear build logs cache. */
-	ccl_program_clear_build_logs(prg);
-
 	/* Check if its necessary to unwrap devices. */
 	if ((devs != NULL) && (num_devices > 0)) {
 		cl_devices = g_slice_alloc0(sizeof(cl_device_id) * num_devices);
