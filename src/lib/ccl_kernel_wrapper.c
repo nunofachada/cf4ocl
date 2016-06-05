@@ -911,7 +911,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 	ccl_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: device only supports a max. of %d dimension, but %d were requested.",
+		"%s: device only supports a maximum of %d dimension(s), "
+		"but %d were requested.",
 		CCL_STRD, dev_dims, dims);
 
 	/* Get max. work item sizes for device. */
@@ -943,6 +944,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 			wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
 				krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 				size_t, &err_internal);
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
 		} else {
 			wg_size_mult = wg_size_max;
 		}
