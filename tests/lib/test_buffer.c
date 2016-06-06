@@ -664,7 +664,6 @@ static void fill_test() {
 	/* If not possible to find a 1.2 or better context, finish this
 	 * test. */
 	if (ctx == NULL) {
-		g_test_fail();
 		g_test_message("'%s' test not performed because no platform " \
 			"with OpenCL 1.2 support was found", CCL_STRD);
 		ccl_platforms_destroy(ps);
@@ -743,7 +742,6 @@ static void migrate_test() {
 	/* If not possible to find a 1.2 or better context, finish this
 	 * test. */
 	if (ctx == NULL) {
-		g_test_fail();
 		g_test_message("'%s' test not performed because no platform " \
 			"with OpenCL 1.2 support was found", CCL_STRD);
 		ccl_platforms_destroy(ps);

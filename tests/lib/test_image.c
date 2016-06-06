@@ -673,8 +673,7 @@ static void fill_test(
 	/* Check that a context is set. */
 	if (*ctx_fixt == NULL) {
 		/* If not, skip test. */
-		g_test_fail();
-		g_test_message("An appropriate device for this test was not found.");
+		g_test_message("No device found for fill test.");
 		return;
 	}
 
