@@ -24,23 +24,9 @@ include(GenerateExportHeader)
 # Auto-determine architecture
 include(TargetArch)
 
-# How to get Glib location
-option(GLIB_USE_PKGCONFIG "Use package config for Glib? (will cause problems with MSVC)" ON)
-if(GLIB_USE_PKGCONFIG)
-	# Search for glib with pkg-config (this will cause problems with
-	# Visual Studio). Works on Linux, Mac and MinGW32
-	unset(GLIB_INCLUDE_DIR CACHE)
-	unset(GLIB_CONFIG_INCLUDE_DIR CACHE)
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
-else()
-	# PkgConfig doesnt work well with Visual Studio, so make user
-	# specify location of GLib stuff
-	find_library(GLIB_LIBRARIES glib-2.0)
-	find_path(GLIB_INCLUDE_DIR glib.h)
-	find_path(GLIB_CONFIG_INCLUDE_DIR glibconfig.h)
-	set(GLIB_INCLUDE_DIRS "${GLIB_INCLUDE_DIR}" "${GLIB_CONFIG_INCLUDE_DIR}")
-endif()
+# Search for glib with pkg-config
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Find OpenCL
 find_package(OpenCL REQUIRED)
@@ -55,20 +41,7 @@ find_package(LATEX QUIET)
 
 # Compiler options for GCC/Clang
 # -Wno-comment because of comment within comment in OpenCL headers
-if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
-	# Clang and GCC flags
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
-elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-	# This line is required for glib to work with MSVC
-	add_definitions("-Dinline=__inline")
-	# And this avoids some warnings
-	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-	# Visual Studio flags
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
-	set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
-endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wall -Wno-comment -std=c99")
 
 # Avoid including MinGW dll dependency
 if(MINGW)

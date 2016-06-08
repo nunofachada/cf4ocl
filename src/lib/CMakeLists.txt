@@ -44,9 +44,8 @@ generate_export_header(${PROJECT_NAME} BASE_NAME ccl)
 file(COPY ${CMAKE_BINARY_DIR}/src/lib/ccl_export.h
 	DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 
-# This is required for Windows compilation
-target_link_libraries(${PROJECT_NAME}
-	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
+# Specify dependencies
+target_link_libraries(${PROJECT_NAME} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
 
 # This target is just an alias for cf4ocl
 add_custom_target(lib DEPENDS ${PROJECT_NAME})

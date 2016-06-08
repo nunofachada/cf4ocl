@@ -12,13 +12,10 @@ set(UTILS
 	ccl_kerninfo # Kernel information
 	ccl_c)       # Kernel compiler
 
-# Common libs for utilities
-set(COMMON_LIBS ${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
-
 # Add a target for each utility
 foreach(UTIL ${UTILS})
 	add_executable(${UTIL} ${UTIL}.c)
-	target_link_libraries(${UTIL} ${COMMON_LIBS})
+	target_link_libraries(${UTIL} ${PROJECT_NAME})
 endforeach(UTIL)
 
 # Set utils version

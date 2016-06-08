@@ -40,7 +40,7 @@ endif()
 # Add subdir to build OpenCL stub lib
 add_subdirectory(ocl_stub)
 
-# Static CF4OCL library for tests, will use the OpenCL stub
+# Static cf4ocl library for tests, will use the OpenCL stub
 set(CCL_LIB_DIR "${CMAKE_SOURCE_DIR}/src/lib/ccl_")
 add_library(${PROJECT_NAME}_TESTING STATIC
 	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c
@@ -58,8 +58,8 @@ add_library(${PROJECT_NAME}_TESTING STATIC
 set_target_properties(${PROJECT_NAME}_TESTING PROPERTIES
 	COMPILE_FLAGS "-DCCL_STATIC_DEFINE")
 
-target_link_libraries(${PROJECT_NAME}_TESTING
-	${GLIB_LIBRARIES} ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
+# Dependencies for the static cf4ocl library for tests
+target_link_libraries(${PROJECT_NAME}_TESTING ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
 
 # Use OpenCL stub when possible?
 option(TESTS_USE_OPENCL_STUB "Use OpenCL stub in tests when possible?" ON)
@@ -67,11 +67,11 @@ option(TESTS_USE_OPENCL_STUB "Use OpenCL stub in tests when possible?" ON)
 # Determine general properties for tests which can either use the OpenCL
 # stub or a real OpenCL implementation
 if (TESTS_USE_OPENCL_STUB)
-	set(LIB_OPT ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
-	add_definitions(-DOPENCL_STUB)
+	set(LIB_OPT ${PROJECT_NAME}_TESTING)
+	add_definitions("-DOPENCL_STUB")
 	set(FLAGS_OPT "-DCCL_STATIC_DEFINE")
 else()
-	set(LIB_OPT ${PROJECT_NAME} ${OPENCL_LIBRARIES})
+	set(LIB_OPT ${PROJECT_NAME})
 	set(FLAGS_OPT "")
 endif()
 
@@ -84,14 +84,14 @@ endforeach()
 
 # Set properties for tests which can only use the OpenCL stub
 foreach(TEST_STUBONLY ${TESTS_STUBONLY})
-	set(${TEST_STUBONLY}_LIBS ${PROJECT_NAME}_TESTING OpenCL_STUB_LIB)
+	set(${TEST_STUBONLY}_LIBS ${PROJECT_NAME}_TESTING)
 	set(${TEST_STUBONLY}_FLAGS "-DCCL_STATIC_DEFINE")
 endforeach()
 
 # Add a target for each test
 foreach(TEST ${TESTS})
 	add_executable(${TEST} ${TEST}.c test.c)
-	target_link_libraries(${TEST} ${GLIB_LIBRARIES} ${${TEST}_LIBS})
+	target_link_libraries(${TEST} ${${TEST}_LIBS})
 	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
 		COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR} ${${TEST}_FLAGS}")
 endforeach(TEST)

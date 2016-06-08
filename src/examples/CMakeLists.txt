@@ -39,8 +39,7 @@ include_directories(
 # Add a target for each example
 foreach(EXAMPLE ${EXAMPLES})
 	add_executable(${EXAMPLE} ${EXAMPLE}.c)
-	target_link_libraries(${EXAMPLE}
-		${PROJECT_NAME} ${OPENCL_LIBRARIES} ${GLIB_LIBRARIES})
+	target_link_libraries(${EXAMPLE} ${PROJECT_NAME})
 endforeach()
 
 # The stb_image.h included in image_filter throws some warnings,
