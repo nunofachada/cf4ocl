@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 	/* If version was requested, output version and exit. */
 	if ((argc == 2) && (g_strcmp0("--version", argv[1]) == 0)) {
 		ccl_common_version_print("ccl_kerninfo");
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 
 	ccl_if_err_create_goto(err, CCL_ERROR, (argc < 4) || (argc > 5),
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
 	/*  Get and print kernel info  */
 	/* *************************** */
 
-	g_printf("\n   ======================== Static Kernel Information =======================\n\n");
+	g_printf("\n");
 
 	k_wg_size = ccl_kernel_get_workgroup_info_scalar(
 		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
