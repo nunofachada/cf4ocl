@@ -6,3 +6,6 @@ set(SRC ocl_commandqueue.c ocl_context.c ocl_device.c ocl_env.c
 
 # Add library
 add_library(OpenCL_STUB_LIB ${SRC})
+
+# Dependencies for the OpenCL stub library
+target_link_libraries(OpenCL_STUB_LIB ${GLIB_LDFLAGS})
