@@ -48,6 +48,14 @@ setup() {
 	CCL_KI_K_BAD="${CCL_KI_K_FOLDER}/not_ok.cl"
 	CCL_KI_K_BAD_NAME="fun"
 
+	# Function implementations
+	CCL_C_KIMPL_SUM="${CCL_C_K_FOLDER}/sum_impl.cl"
+	CCL_C_KIMPL_XOR="${CCL_C_K_FOLDER}/xor_impl.cl"
+
+	# Function names
+	CCL_C_KIMPL_SUM_FNAME="do_sum"
+	CCL_C_KIMPL_XOR_FNAME="do_xor"
+
 }
 
 # ########################## #
@@ -102,7 +110,7 @@ setup() {
 }
 
 # Test with valid file and valid kernel
-@test "Invocation with wrong number of valid arguments" {
+@test "Valid file and valid kernel" {
 
 	run ${CCL_KI_COM} -s ${CCL_KI_K_SUM} ${CCL_KI_K_SUM_NAME} \
 		${CCL_TEST_DEVICE_INDEX}
@@ -114,7 +122,7 @@ setup() {
 
 }
 
-# Test with invalid file
+# Test with invalid program
 @test "Invalid program" {
 
 	run ${CCL_KI_COM} -s ${CCL_KI_K_BAD} ${CCL_KI_K_BAD_NAME} \
@@ -123,8 +131,23 @@ setup() {
 
 }
 
-# Test with source file, unknown kernel
+# Test with valid program, unknown kernel
+@test "Valid program, unknown kernel" {
 
-# Test with valid file without a kernel
+	run ${CCL_KI_COM} -s ${CCL_KI_K_SUM} _this_kernel_does_not_exist_ \
+		${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
 
-# Test with unknown kernel name
+}
+
+# Test with valid program without a kernel, just a function
+@test "Valid program without a kernel, just a function" {
+
+	run ${CCL_KI_COM} -s ${CCL_C_KIMPL_SUM} ${CCL_C_KIMPL_SUM_FNAME} \
+		${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
+
+	run ${CCL_KI_COM} -s ${CCL_C_KIMPL_XOR} ${CCL_C_KIMPL_XOR_FNAME} \
+		${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
+}
