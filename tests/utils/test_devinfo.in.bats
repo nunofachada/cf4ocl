@@ -40,15 +40,19 @@ setup() {
 
 	run ${CCL_DI_COM} -?
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "Utility for querying OpenCL platforms and devices" ]]
 
 	run ${CCL_DI_COM} -h
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "-h, --help" ]]
 
 	run ${CCL_DI_COM} --help
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "ccl_devinfo" ]]
 
 	run ${CCL_DI_COM} --version
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "ccl_devinfo v" ]]
 
 }
 
@@ -57,6 +61,9 @@ setup() {
 
 	run ${CCL_DI_COM} --list
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "ADDRESS_BITS" ]]
+	[[ "$output" =~  "DOUBLE_FP_CONFIG" ]]
+	[[ "$output" =~  "ENDIAN_LITTLE" ]]
 
 }
 
@@ -65,15 +72,22 @@ setup() {
 
 	run ${CCL_DI_COM} --verbose
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "Parameter : " ]]
+	[[ "$output" =~  "Description : " ]]
+	[[ "$output" =~  "Value : " ]]
 
 }
-
 
 # Test no options (default behavior)
 @test "No options (default behavior)" {
 
 	run ${CCL_DI_COM}
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "Platform #" ]]
+	[[ "$output" =~  "Device #" ]]
+	[[ "$output" =~  "TYPE" ]]
+	[[ "$output" =~  "VENDOR" ]]
+	[[ "$output" =~  "OPENCL_C_VERSION" ]]
 
 }
 
@@ -90,9 +104,11 @@ setup() {
 
 	run ${CCL_DI_COM} --all
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "EXTENSIONS" ]]
 
 	run ${CCL_DI_COM} --all --notfound
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "IL_VERSION" ]]
 
 }
 
@@ -111,6 +127,7 @@ setup() {
 	run ${CCL_DI_COM} --no-platf -c NAME -c IMAGE_SUPPORT -c VERSION \
 		-d ${CCL_TEST_DEVICE_INDEX}
 	[ "$status" -eq 0 ]
+	[[ "$output" =~  "IMAGE_SUPPORT" ]]
 
 }
 
@@ -121,6 +138,7 @@ setup() {
 	do
 		run ${CCL_DI_COM} -p ${CCL_DI_PIDX}
 		[ "$status" -eq 0 ]
+		[[ "$output" =~  "Platform #${CCL_DI_PIDX}" ]]
 	done
 
 }
@@ -137,6 +155,8 @@ setup() {
 		do
 			run ${CCL_DI_COM} -p ${CCL_DI_PIDX} -d ${CCL_DI_DIDX}
 			[ "$status" -eq 0 ]
+			[[ "$output" =~  "Platform #${CCL_PI_PIDX}" ]]
+			[[ "$output" =~  "Device #${CCL_DI_DIDX}" ]]
 		done
 	done
 	[ ${CCL_DI_TOTPNDEVS} -eq ${CCL_DI_NDEVS} ]
