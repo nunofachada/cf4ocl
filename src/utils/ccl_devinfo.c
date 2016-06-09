@@ -25,13 +25,29 @@
  */
 
 /**
- * @page ccl_devinfo ccl_devinfo
+ * @page ccl_devinfo
  *
  * Man page will be placed here.
  *
  * */
 
-#include "ccl_devinfo.h"
+#include "ccl_utils.h"
+
+#ifndef CCL_DEVINFO_OUT
+	/** Default device information output stream. */
+	#define CCL_DEVINFO_OUT stdout
+#endif
+
+#ifndef CCL_DEVINFO_NA
+	#define CCL_DEVINFO_NA "N/A"
+#endif
+
+/** Program description. */
+#define CCL_DEVINFO_DESCRIPTION "Utility for querying OpenCL \
+platforms and devices"
+
+/** Maximum length of device information output, per parameter. */
+#define CCL_DEVINFO_MAXINFOLEN 500
 
 /* Command line arguments and respective default values. */
 static gboolean opt_all = FALSE;
@@ -90,192 +106,6 @@ static gchar* basic_info[] = {
 	if (opt_all) ccl_devinfo_show_device_info_all(d); \
 	else if (opt_custom) ccl_devinfo_show_device_info_custom(d); \
 	else ccl_devinfo_show_device_info_basic(d);
-
-/**
- * Device info main program function.
- *
- * @param[in] argc Number of command line arguments.
- * @param[in] argv Vector of command line arguments.
- * @return ::CCL_SUCCESS if program returns with no error, or another
- * ::CCLErrorCode value otherwise.
- */
-int main(int argc, char* argv[]) {
-
-	/* Error object. */
-	GError* err = NULL;
-
-	/* List of platform wrapper objects. */
-	CCLPlatforms* platforms = NULL;
-
-	/* List of device wrapper objects. */
-	CCLDevSelDevices devices = NULL;
-
-	/* Current platform and device. */
-	CCLPlatform* p;
-	CCLDevice* d;
-
-	/* Number of devices in platform. */
-	guint num_devs;
-
-	/* Device information value object. */
-	CCLWrapperInfo* info_value = NULL;
-
-	/* Device name. */
-	gchar* dev_name;
-
-	/* Program return status. */
-	gint status;
-
-	/* Parse command line options. */
-	ccl_devinfo_args_parse(argc, argv, &err);
-	ccl_if_err_goto(err, error_handler);
-
-	/* If version was requested, output version and exit. */
-	if (version) {
-		ccl_common_version_print("ccl_devinfo");
-		exit(0);
-	}
-
-	/* Check if user requested a list of known information parameters. */
-	if (opt_list) {
-
-		/*Yes, user requested list, present it. */
-
-		g_fprintf(CCL_DEVINFO_OUT, "\nKnown information parameters:\n\n");
-		for (gint i = 0; i < ccl_devquery_info_map_size; i++) {
-			if (opt_verb) {
-				g_fprintf(CCL_DEVINFO_OUT,
-					"\t%s\n\t\t%s.\n\n",
-					ccl_devquery_info_map[i].param_name,
-					ccl_devquery_info_map[i].description);
-			} else {
-				g_fprintf(CCL_DEVINFO_OUT,
-					"\t%s\n",
-					ccl_devquery_info_map[i].param_name);
-			}
-		}
-		g_fprintf(CCL_DEVINFO_OUT, "\n");
-
-	} else {
-
-		/* User didn't request list, proceed as normal query. */
-
-		/* Ignore platforms and focus only on number of devices in system? */
-		if (no_platf) {
-
-			/* Ignore platform, continue device-wise. */
-
-			/* Get all devices in the system. */
-			devices = ccl_devsel_devices_new(&err);
-			ccl_if_err_goto(err, error_handler);
-
-			/* Cycle through devices. */
-			for (guint j = 0; j < devices->len; j++) {
-
-				/* Get out if this device is not to be queried. */
-				if ((opt_dev != G_MAXUINT) && (j != opt_dev))
-					continue;
-
-				/* Get current device. */
-				d = (CCLDevice*) devices->pdata[j];
-
-				/* Get device name. */
-				info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
-				ccl_if_err_goto(err, error_handler);
-
-				dev_name = (gchar*) info_value->value;
-
-				/* Show device information. */
-				g_fprintf(CCL_DEVINFO_OUT,
-					"\n    [ Device #%d: %s ]\n\n",
-					j, dev_name);
-				ccl_devinfo_show_device_info(d);
-
-			}
-			g_fprintf(CCL_DEVINFO_OUT, "\n");
-
-		} else {
-
-			/* Do not ignore platforms, continue platform-wise. */
-
-			/* Get list of platform wrapper objects. */
-			platforms = ccl_platforms_new(&err);
-			ccl_if_err_goto(err, error_handler);
-
-			/* Cycle through platforms. */
-			for (guint i = 0; i < ccl_platforms_count(platforms); i++) {
-
-				/* Get out if this platform is not to be queried. */
-				if ((opt_platf != G_MAXUINT) && (i != opt_platf))
-					continue;
-
-				/* Get current platform. */
-				p = ccl_platforms_get(platforms, i);
-
-				/* Show platform information. */
-				ccl_devinfo_show_platform_info(p, i);
-
-				/* Get number of devices. */
-				num_devs = ccl_platform_get_num_devices(p, &err);
-				ccl_if_err_goto(err, error_handler);
-
-				/* Cycle through devices. */
-				for (guint j = 0; j < num_devs; j++) {
-
-					/* Get out if this device is not to be queried. */
-					if ((opt_dev != G_MAXUINT) && (j != opt_dev))
-						continue;
-
-					/* Get current device. */
-					d = ccl_platform_get_device(p, j, &err);
-					ccl_if_err_goto(err, error_handler);
-
-					/* Get device name. */
-					info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
-					ccl_if_err_goto(err, error_handler);
-
-					dev_name = (gchar*) info_value->value;
-
-					/* Show device information. */
-					g_fprintf(CCL_DEVINFO_OUT,
-						"\n    [ Device #%d: %s ]\n\n",
-						j, dev_name);
-					ccl_devinfo_show_device_info(d);
-
-				}
-				g_fprintf(CCL_DEVINFO_OUT, "\n");
-			}
-		}
-	}
-
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL);
-	status = CCL_SUCCESS;
-	goto cleanup;
-
-error_handler:
-
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err != NULL);
-	g_fprintf(stderr, "%s\n", err->message);
-	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
-	g_error_free(err);
-
-cleanup:
-
-	/* Free stuff! */
-	if (platforms) ccl_platforms_destroy(platforms);
-	if (devices) ccl_devsel_devices_destroy(devices);
-	g_strfreev(opt_custom);
-
-	/* Confirm that memory allocated by wrappers has been properly
-	 * freed. */
-	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
-
-	/* Return status. */
-	return status;
-
-}
 
 /**
  * Parse and verify command line arguments.
@@ -384,7 +214,6 @@ void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
 			"        %-36.36s | %s\n", \
 			key, value); \
 	}
-
 
 /**
  * Show all available device information.
@@ -581,5 +410,191 @@ void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
 		}
 
 	}
+
+}
+
+/**
+ * Device info main program function.
+ *
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Vector of command line arguments.
+ * @return ::CCL_SUCCESS if program returns with no error, or another
+ * ::CCLErrorCode value otherwise.
+ */
+int main(int argc, char* argv[]) {
+
+	/* Error object. */
+	GError* err = NULL;
+
+	/* List of platform wrapper objects. */
+	CCLPlatforms* platforms = NULL;
+
+	/* List of device wrapper objects. */
+	CCLDevSelDevices devices = NULL;
+
+	/* Current platform and device. */
+	CCLPlatform* p;
+	CCLDevice* d;
+
+	/* Number of devices in platform. */
+	guint num_devs;
+
+	/* Device information value object. */
+	CCLWrapperInfo* info_value = NULL;
+
+	/* Device name. */
+	gchar* dev_name;
+
+	/* Program return status. */
+	gint status;
+
+	/* Parse command line options. */
+	ccl_devinfo_args_parse(argc, argv, &err);
+	ccl_if_err_goto(err, error_handler);
+
+	/* If version was requested, output version and exit. */
+	if (version) {
+		ccl_common_version_print("ccl_devinfo");
+		exit(0);
+	}
+
+	/* Check if user requested a list of known information parameters. */
+	if (opt_list) {
+
+		/*Yes, user requested list, present it. */
+
+		g_fprintf(CCL_DEVINFO_OUT, "\nKnown information parameters:\n\n");
+		for (gint i = 0; i < ccl_devquery_info_map_size; i++) {
+			if (opt_verb) {
+				g_fprintf(CCL_DEVINFO_OUT,
+					"\t%s\n\t\t%s.\n\n",
+					ccl_devquery_info_map[i].param_name,
+					ccl_devquery_info_map[i].description);
+			} else {
+				g_fprintf(CCL_DEVINFO_OUT,
+					"\t%s\n",
+					ccl_devquery_info_map[i].param_name);
+			}
+		}
+		g_fprintf(CCL_DEVINFO_OUT, "\n");
+
+	} else {
+
+		/* User didn't request list, proceed as normal query. */
+
+		/* Ignore platforms and focus only on number of devices in system? */
+		if (no_platf) {
+
+			/* Ignore platform, continue device-wise. */
+
+			/* Get all devices in the system. */
+			devices = ccl_devsel_devices_new(&err);
+			ccl_if_err_goto(err, error_handler);
+
+			/* Cycle through devices. */
+			for (guint j = 0; j < devices->len; j++) {
+
+				/* Get out if this device is not to be queried. */
+				if ((opt_dev != G_MAXUINT) && (j != opt_dev))
+					continue;
+
+				/* Get current device. */
+				d = (CCLDevice*) devices->pdata[j];
+
+				/* Get device name. */
+				info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
+				ccl_if_err_goto(err, error_handler);
+
+				dev_name = (gchar*) info_value->value;
+
+				/* Show device information. */
+				g_fprintf(CCL_DEVINFO_OUT,
+					"\n    [ Device #%d: %s ]\n\n",
+					j, dev_name);
+				ccl_devinfo_show_device_info(d);
+
+			}
+			g_fprintf(CCL_DEVINFO_OUT, "\n");
+
+		} else {
+
+			/* Do not ignore platforms, continue platform-wise. */
+
+			/* Get list of platform wrapper objects. */
+			platforms = ccl_platforms_new(&err);
+			ccl_if_err_goto(err, error_handler);
+
+			/* Cycle through platforms. */
+			for (guint i = 0; i < ccl_platforms_count(platforms); i++) {
+
+				/* Get out if this platform is not to be queried. */
+				if ((opt_platf != G_MAXUINT) && (i != opt_platf))
+					continue;
+
+				/* Get current platform. */
+				p = ccl_platforms_get(platforms, i);
+
+				/* Show platform information. */
+				ccl_devinfo_show_platform_info(p, i);
+
+				/* Get number of devices. */
+				num_devs = ccl_platform_get_num_devices(p, &err);
+				ccl_if_err_goto(err, error_handler);
+
+				/* Cycle through devices. */
+				for (guint j = 0; j < num_devs; j++) {
+
+					/* Get out if this device is not to be queried. */
+					if ((opt_dev != G_MAXUINT) && (j != opt_dev))
+						continue;
+
+					/* Get current device. */
+					d = ccl_platform_get_device(p, j, &err);
+					ccl_if_err_goto(err, error_handler);
+
+					/* Get device name. */
+					info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
+					ccl_if_err_goto(err, error_handler);
+
+					dev_name = (gchar*) info_value->value;
+
+					/* Show device information. */
+					g_fprintf(CCL_DEVINFO_OUT,
+						"\n    [ Device #%d: %s ]\n\n",
+						j, dev_name);
+					ccl_devinfo_show_device_info(d);
+
+				}
+				g_fprintf(CCL_DEVINFO_OUT, "\n");
+			}
+		}
+	}
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL);
+	status = CCL_SUCCESS;
+	goto cleanup;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err != NULL);
+	g_fprintf(stderr, "%s\n", err->message);
+	status = (err->domain == CCL_ERROR) ? err->code : CCL_ERROR_OTHER;
+	g_error_free(err);
+
+cleanup:
+
+	/* Free stuff! */
+	if (platforms) ccl_platforms_destroy(platforms);
+	if (devices) ccl_devsel_devices_destroy(devices);
+	g_strfreev(opt_custom);
+
+	/* Confirm that memory allocated by wrappers has been properly
+	 * freed. */
+	g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
+
+	/* Return status. */
+	return status;
 
 }
