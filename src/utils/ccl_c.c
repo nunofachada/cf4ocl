@@ -62,6 +62,7 @@ static gchar** src_files = NULL;
 static gchar** bin_files = NULL;
 static gchar** src_h_files = NULL;
 static gchar** src_h_names = NULL;
+static gchar** kernel_names = NULL;
 static gchar* output = NULL;
 static gboolean version = FALSE;
 
@@ -85,13 +86,16 @@ static GOptionEntry entries[] = {
 	 "specified multiple times.",                                 "FILE"},
 	{"header-include-names", 'n', 0, G_OPTION_ARG_STRING_ARRAY,   &src_h_names,
 	 "Embedded header include names for the compile task. This option can be "
-	 "specified multiple and has a one to one correspondence with "
+	 "specified multiple times and has a one to one correspondence with "
 	 "--input-headers.",                                          "STRING"},
 	{"bin",                  'b', 0, G_OPTION_ARG_FILENAME_ARRAY, &bin_files,
 	 "Binary input file. This option can be specified multiple times.",
 	                                                              "FILE"},
 	{"output",               'o', 0, G_OPTION_ARG_FILENAME,       &output,
 	 "Binary output file.",                                       "FILE"},
+	{"kernel-info",          'k', 0, G_OPTION_ARG_STRING_ARRAY,   &kernel_names,
+	 "Show information about the specified kernel. This option can be "
+	 "specified multiple times.",                                "STRING"},
 	{"version",               0,  0, G_OPTION_ARG_NONE,           &version,
 	 "Output version information and exit.",                      NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
@@ -102,8 +106,7 @@ static GOptionEntry entries[] = {
  *
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
+ * @param[out] err Return location for a GError object.
  * */
 void ccl_c_args_parse(int argc, char* argv[], GError** err) {
 
@@ -143,6 +146,103 @@ cleanup:
 }
 
 /**
+ * Show kernel information.
+ *
+ * @param[in] prg Program containing kernel.
+ * @param[in] dev Device for which kernel was compiled.
+ * @param[in] kernel Kernel name.
+ * @param[out] err Return location for a GError object.
+ * */
+void ccl_c_kernel_info_show(
+	CCLProgram* prg, CCLDevice* dev, const char* kernel, GError** err) {
+
+	/* OpenCL version. */
+	cl_uint ocl_ver;
+
+	/* Kernel wrapper. */
+	CCLKernel* krnl = NULL;
+
+	/* Kernel workgroup info variables. */
+	size_t k_wg_size;
+	size_t k_pref_wg_size_mult;
+	size_t* k_compile_wg_size;
+	cl_ulong k_loc_mem_size;
+	cl_ulong k_priv_mem_size;
+
+	/* Internal error handling object. */
+	GError* err_internal = NULL;
+
+	/* Get OpenCL version. */
+	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+
+	/* Get kernel. */
+	krnl = ccl_program_get_kernel(prg, kernel, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+	g_printf("\n");
+
+	/* Show CL_KERNEL_WORK_GROUP_SIZE information. */
+	k_wg_size = ccl_kernel_get_workgroup_info_scalar(
+		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_printf("   - Maximum workgroup size                  : %lu\n",
+		(unsigned long) k_wg_size);
+
+	/* Only show info about CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE
+	 * if OpenCL version of the underlying platform is >= 1.1. */
+	if (ocl_ver >= 110) {
+		k_pref_wg_size_mult = ccl_kernel_get_workgroup_info_scalar(krnl,
+			dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+			size_t, &err_internal);
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_printf("   - Preferred multiple of workgroup size    : %lu\n",
+			(unsigned long) k_pref_wg_size_mult);
+	}
+
+	/* Show CL_KERNEL_COMPILE_WORK_GROUP_SIZE information. */
+	k_compile_wg_size = ccl_kernel_get_workgroup_info_array(krnl, dev,
+		CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t*, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_printf("   - WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n",
+		(unsigned long) k_compile_wg_size[0],
+		(unsigned long) k_compile_wg_size[1],
+		(unsigned long) k_compile_wg_size[2]);
+
+	/* Show CL_KERNEL_LOCAL_MEM_SIZE information. */
+	k_loc_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+		CL_KERNEL_LOCAL_MEM_SIZE, cl_ulong, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_printf("   - Local memory used by kernel             : %lu bytes\n",
+		(unsigned long) k_loc_mem_size);
+
+	/* Show CL_KERNEL_PRIVATE_MEM_SIZE information. */
+	k_priv_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+		CL_KERNEL_PRIVATE_MEM_SIZE, cl_ulong, &err_internal);
+	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_printf("   - Min. private mem. used by each workitem : %lu bytes\n",
+		(unsigned long) k_priv_mem_size);
+
+	g_printf("\n");
+
+	/* If we got here, everything is OK. */
+	g_assert(err == NULL || *err == NULL);
+	goto finish;
+
+error_handler:
+
+	/* If we got here there was an error, verify that it is so. */
+	g_assert(err == NULL || *err != NULL);
+
+finish:
+
+	/* Return. */
+	return;
+
+}
+
+/**
  * Kernel analyzer main program function.
  *
  * @param[in] argc Number of command line arguments.
@@ -161,8 +261,9 @@ int main(int argc, char* argv[]) {
 	/* Counter for for loops. */
 	guint i = 0;
 
-	/* Number of types of files and file names. */
-	guint n_src_files, n_bin_files, n_src_h_files, n_src_h_names;
+	/* Number of types of files, file names and kernel names. */
+	guint n_src_files, n_bin_files, n_src_h_files,
+		n_src_h_names, n_kernel_names;
 
 	/* Context wrapper. */
 	CCLContext* ctx = NULL;
@@ -229,6 +330,8 @@ int main(int argc, char* argv[]) {
 			? g_strv_length(src_h_files) : 0;
 		n_src_h_names = src_h_names != NULL
 			? g_strv_length(src_h_names) : 0;
+		n_kernel_names = kernel_names != NULL
+			? g_strv_length(kernel_names) : 0;
 
 		/* Select a context/device. */
 		if (dev_idx == CCL_UTILS_NODEVICE) {
@@ -429,6 +532,20 @@ int main(int argc, char* argv[]) {
 			g_printf("* Additional information: %s\n", err_build->message);
 		}
 
+		/* Show kernel information? */
+		if (kernel_names && !err_build) {
+
+			/* Cycle through kernel names. */
+			for (i = 0; i < n_kernel_names; i++) {
+
+				/* Show information for current kernel name. */
+				g_printf("* Kernel '%s' information:\n", kernel_names[i]);
+				ccl_c_kernel_info_show(prg, dev, kernel_names[i], &err);
+				ccl_if_err_goto(err, error_handler);
+
+			}
+		}
+
 		/* Show build log, if any. */
 		g_printf("* Build log:");
 		if (!prg) {
@@ -471,6 +588,7 @@ cleanup:
 	if (src_files) g_strfreev(src_files);
 	if (src_h_files) g_strfreev(src_h_files);
 	if (src_h_names) g_strfreev(src_h_names);
+	if (kernel_names) g_strfreev(kernel_names);
 	if (bin_files) g_strfreev(bin_files);
 	if (options) g_free(options);
 	if (output) g_free(output);

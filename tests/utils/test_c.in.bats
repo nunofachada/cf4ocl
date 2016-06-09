@@ -44,8 +44,13 @@ setup() {
 	CCL_C_K_SUM="${CCL_C_K_FOLDER}/sum_full.cl"
 	CCL_C_K_XOR="${CCL_C_K_FOLDER}/xor_full.cl"
 
+	# Fully working kernel names
+	CCL_C_K_SUM_NAME="test_sum_full"
+	CCL_C_K_XOR_NAME="test_xor_full"
+
 	# Non-working kernel
 	CCL_C_K_BAD="${CCL_C_K_FOLDER}/not_ok.cl"
+	CCL_C_K_BAD_NAME="fun"
 
 	# Kernels requiring header to compile
 	CCL_C_K_NEEDH_SUM="${CCL_C_K_FOLDER}/sum_needs_header.cl"
@@ -64,6 +69,10 @@ setup() {
 	CCL_C_KIMPL_SUM="${CCL_C_K_FOLDER}/sum_impl.cl"
 	CCL_C_KIMPL_XOR="${CCL_C_K_FOLDER}/xor_impl.cl"
 
+	# Function names
+	CCL_C_KIMPL_SUM_FNAME="do_sum"
+	CCL_C_KIMPL_XOR_FNAME="do_xor"
+
 	# Base name for temporary binary files
 	CCL_C_TMP_BIN="@CMAKE_CURRENT_BINARY_DIR@/temp.bin"
 
@@ -76,9 +85,17 @@ teardown() {
 
 }
 
-# ################################### #
-# Test help, list and version options #
-# ################################### #
+# ################## #
+# Test basic options #
+# ################## #
+
+# Test invocation without arguments
+@test "Invocation without arguments" {
+
+	run ${CCL_C_COM}
+	[ "$status" -ne 0 ]
+
+}
 
 # Test help option, which should return status 0.
 @test "Help options" {
@@ -744,4 +761,53 @@ teardown() {
 	# Error: invalid option
 	[ "$status" -ne 0 ]
 
+}
+
+# ####################### #
+# Test kernel information #
+# ####################### #
+
+# Test with valid source and valid kernel
+@test "Kernel info, valid source and valid kernel" {
+
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -k ${CCL_C_K_SUM_NAME} \
+		-d ${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -eq 0 ]
+
+	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -k ${CCL_C_K_XOR_NAME} \
+		-d ${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -eq 0 ]
+
+}
+
+# Test with valid binary and valid kernel
+
+
+# Test with invalid program
+@test "Kernel info, invalid source" {
+
+	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -k ${CCL_C_K_BAD_NAME} -d ${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
+
+}
+
+# Test with valid source, unknown kernel
+@test "Kernel info, valid source, unknown kernel" {
+
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -k _this_kernel_does_not_exist_ \
+		-d ${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
+
+}
+
+# Test with valid program without a kernel, just a function
+@test "Kernel info, valid source without a kernel, just a function" {
+
+	run ${CCL_C_COM} -s ${CCL_C_KIMPL_SUM} -k ${CCL_C_KIMPL_SUM_FNAME} \
+		-d ${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
+
+	run ${CCL_C_COM} -s ${CCL_C_KIMPL_XOR} -k ${CCL_C_KIMPL_XOR_FNAME} \
+		-d ${CCL_TEST_DEVICE_INDEX}
+	[ "$status" -ne 0 ]
 }

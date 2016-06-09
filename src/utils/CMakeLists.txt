@@ -9,7 +9,6 @@ endif()
 # List of utilities
 set(UTILS
 	ccl_devinfo  # Device information
-	ccl_kerninfo # Kernel information
 	ccl_c)       # Kernel compiler
 
 # Add a target for each utility
