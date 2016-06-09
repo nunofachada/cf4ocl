@@ -20,7 +20,8 @@
 # Plots a Gantt-like chart of OpenCL events using the profiling info
 # exported using the @ref CCL_PROFILER "profiler module".
 #
-# Usage: ccl_plot_events.py file.tsv
+# Usage:
+#   ccl_plot_events.py <FILE.TSV>
 
 import sys
 import os.path

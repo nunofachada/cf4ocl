@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cf4ocl. If not, see <http://www.gnu.org/licenses/>.
  * */
 
 /**
@@ -20,7 +20,7 @@
  * Utility to query OpenCL platforms and devices.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -43,8 +43,8 @@
 #endif
 
 /** Program description. */
-#define CCL_DEVINFO_DESCRIPTION "Utility for querying OpenCL \
-platforms and devices"
+#define CCL_DEVINFO_DESCRIPTION "Utility for querying OpenCL " \
+	"platforms and devices"
 
 /** Maximum length of device information output, per parameter. */
 #define CCL_DEVINFO_MAXINFOLEN 500
@@ -322,8 +322,6 @@ void ccl_devinfo_show_device_info_custom(CCLDevice* d) {
 						CCL_DEVINFO_MAXINFOLEN,
 						info_row->units),
 					info_row->description);
-
-
 
 			} else {
 

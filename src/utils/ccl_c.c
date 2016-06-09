@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cf4ocl.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cf4ocl. If not, see <http://www.gnu.org/licenses/>.
  * */
 
 /**
@@ -326,16 +326,11 @@ int main(int argc, char* argv[]) {
 			"No source or binary input files have been specified.");
 
 		/* How many files of each type? */
-		n_src_files = src_files != NULL
-			? g_strv_length(src_files) : 0;
-		n_bin_files = bin_files != NULL
-			? g_strv_length(bin_files) : 0;
-		n_src_h_files = src_h_files != NULL
-			? g_strv_length(src_h_files) : 0;
-		n_src_h_names = src_h_names != NULL
-			? g_strv_length(src_h_names) : 0;
-		n_kernel_names = kernel_names != NULL
-			? g_strv_length(kernel_names) : 0;
+		n_src_files = src_files != NULL ? g_strv_length(src_files) : 0;
+		n_bin_files = bin_files != NULL ? g_strv_length(bin_files) : 0;
+		n_src_h_files = src_h_files != NULL ? g_strv_length(src_h_files) : 0;
+		n_src_h_names = src_h_names != NULL ? g_strv_length(src_h_names) : 0;
+		n_kernel_names = kernel_names != NULL ? g_strv_length(kernel_names) : 0;
 
 		/* Select a context/device. */
 		if (dev_idx == CCL_UTILS_NODEVICE) {
