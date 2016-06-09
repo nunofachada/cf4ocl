@@ -25,7 +25,7 @@
  */
 
 /**
- * @page ccl_c ccl_devinfo
+ * @page ccl_c
  *
  * Man page will be placed here.
  *
@@ -64,6 +64,7 @@ static gchar** src_h_files = NULL;
 static gchar** src_h_names = NULL;
 static gchar** kernel_names = NULL;
 static gchar* output = NULL;
+static gchar* bld_log_out = NULL;
 static gboolean version = FALSE;
 
 /* Valid command line options. */
@@ -96,6 +97,9 @@ static GOptionEntry entries[] = {
 	{"kernel-info",          'k', 0, G_OPTION_ARG_STRING_ARRAY,   &kernel_names,
 	 "Show information about the specified kernel. This option can be "
 	 "specified multiple times.",                                "STRING"},
+	{"build-log",            'u', 0, G_OPTION_ARG_FILENAME,       &bld_log_out,
+	 "Save build log to the specified file. By default the build log is "
+	 "printed to stderr.",                                       "FILE"},
 	{"version",               0,  0, G_OPTION_ARG_NONE,           &version,
 	 "Output version information and exit.",                      NULL},
 	{ NULL, 0, 0, 0, NULL, NULL, NULL }
@@ -345,11 +349,6 @@ int main(int argc, char* argv[]) {
 		dev = ccl_context_get_device(ctx, 0, &err);
 		ccl_if_err_goto(err, error_handler);
 
-		/* Get and show device name. */
-		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
-		ccl_if_err_goto(err, error_handler);
-		g_printf("* Device: %s\n", dname);
-
 		 /* Perform task. */
 		switch (task) {
 			case CCL_C_BUILD:
@@ -507,29 +506,43 @@ int main(int argc, char* argv[]) {
 					task);
 		}
 
-		/* Get build status. */
+		/* Get and show device name. */
+		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
+		ccl_if_err_goto(err, error_handler);
+		g_printf("* Device                 : %s\n", dname);
+
+		/* Ir program object exists... */
 		if (prg) {
+
+			/* ...get build status and build status string. */
 			build_status = ccl_program_get_build_info_scalar(prg, dev,
 				CL_PROGRAM_BUILD_STATUS, cl_build_status, &err);
 			ccl_if_err_goto(err, error_handler);
 			build_status_str = ccl_c_get_build_status_str(build_status);
+
 		} else {
+
+			/* If program object does not exist, set build status string to
+			 * unavailable. */
 			build_status_str = "Unavailable";
+
 		}
 
 		/* Show build status. */
-		g_printf("* Build status: %s\n", build_status_str);
+		g_printf("* Build status           : %s\n", build_status_str);
 
 		/* If build successful, save binary? */
 		if (output && prg && (build_status == CL_BUILD_SUCCESS)) {
+
 			ccl_program_save_binary(prg, dev, output, &err);
 			ccl_if_err_goto(err, error_handler);
-			g_printf("* Binary output file: %s\n", output);
+			g_printf("* Binary output file     : %s\n", output);
+
 		}
 
 		/* Show build error message, if any. */
 		if (err_build) {
-			g_printf("* Additional information: %s\n", err_build->message);
+			g_printf("* Additional information : %s\n", err_build->message);
 		}
 
 		/* Show kernel information? */
@@ -539,7 +552,7 @@ int main(int argc, char* argv[]) {
 			for (i = 0; i < n_kernel_names; i++) {
 
 				/* Show information for current kernel name. */
-				g_printf("* Kernel '%s' information:\n", kernel_names[i]);
+				g_printf("* Kernel information     : %s\n", kernel_names[i]);
 				ccl_c_kernel_info_show(prg, dev, kernel_names[i], &err);
 				ccl_if_err_goto(err, error_handler);
 
@@ -547,19 +560,49 @@ int main(int argc, char* argv[]) {
 		}
 
 		/* Show build log, if any. */
-		g_printf("* Build log:");
+		g_printf("* Build log              :");
 		if (!prg) {
-			g_printf(" Unavailable\n");
+
+			/* No build log if program object does not exist. */
+			g_printf(" Unavailable.\n");
+
 		} else {
+
+			/* Get build log. */
 			build_log = ccl_program_get_device_build_log(prg, dev, &err);
 			if (err) {
+
+				/* Not possible to retrieve build log due to error. */
 				g_info("Unable to retrieve build log. %s", err->message);
 				g_clear_error(&err);
+
 			}
+
+			/* If build log was retrieved successfully and has length greater
+			 * than zero, output it. */
 			if ((build_log) && (strlen(build_log) > 0)) {
-				g_printf("\n%s\n", build_log);
+
+				/* Should we output print log to file or to stderr? */
+				if (bld_log_out) {
+
+					/* Output to file. */
+					g_printf(" Saved to %s.\n", bld_log_out);
+					g_file_set_contents(bld_log_out, build_log, -1, &err);
+					ccl_if_err_goto(err, error_handler);
+
+				} else {
+
+					/* Output to stderr. */
+					g_printf(" Printed to error output stream.\n");
+					g_fprintf(stderr, "\n%s\n", build_log);
+
+				}
+
 			} else {
-				g_printf(" Empty\n");
+
+				/* No build log or build log is empty. */
+				g_printf(" Empty.\n");
+
 			}
 		}
 
@@ -575,8 +618,11 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err != NULL);
 
-	g_printerr("* Error: %s\n", err->message);
+	/* Show error message and set return status to failure. */
+	g_fprintf(stderr, "* Error                  : %s\n", err->message);
 	status = EXIT_FAILURE;
+
+	/* Release error object. */
 	g_error_free(err);
 
 cleanup:
@@ -591,6 +637,7 @@ cleanup:
 	if (kernel_names) g_strfreev(kernel_names);
 	if (bin_files) g_strfreev(bin_files);
 	if (options) g_free(options);
+	if (bld_log_out) g_free(bld_log_out);
 	if (output) g_free(output);
 	if (ctx) ccl_context_destroy(ctx);
 	if (prg) ccl_program_destroy(prg);
