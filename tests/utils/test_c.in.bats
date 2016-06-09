@@ -770,23 +770,54 @@ teardown() {
 # Test with valid source and valid kernel
 @test "Kernel info, valid source and valid kernel" {
 
+	# Test with sum kernel
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -k ${CCL_C_K_SUM_NAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
 
+	# Test with xor kernel
 	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -k ${CCL_C_K_XOR_NAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# There should be no problems
 	[ "$status" -eq 0 ]
 
 }
 
 # Test with valid binary and valid kernel
+@test "Kernel info, valid binary and valid kernel" {
 
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_C_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_C_SKIP_MSG}"
+	fi
 
-# Test with invalid program
+	# Test build with one source and create binary.
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+	# Check if binary was created
+	[ -f ${CCL_C_TMP_BIN}1 ]
+
+	# Check kernel info from binary.
+	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -k ${CCL_C_K_SUM_NAME} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# There should be no problems
+	[ "$status" -eq 0 ]
+
+}
+
+# Test with invalid source
 @test "Kernel info, invalid source" {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -k ${CCL_C_K_BAD_NAME} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Error due to invalid source
 	[ "$status" -ne 0 ]
 
 }
@@ -796,6 +827,8 @@ teardown() {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -k _this_kernel_does_not_exist_ \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Error due to unknown kernel
 	[ "$status" -ne 0 ]
 
 }
@@ -803,11 +836,18 @@ teardown() {
 # Test with valid program without a kernel, just a function
 @test "Kernel info, valid source without a kernel, just a function" {
 
+	# Test with sum function
 	run ${CCL_C_COM} -s ${CCL_C_KIMPL_SUM} -k ${CCL_C_KIMPL_SUM_FNAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Error due to source not having a kernel
 	[ "$status" -ne 0 ]
 
+	# Test with xor function
 	run ${CCL_C_COM} -s ${CCL_C_KIMPL_XOR} -k ${CCL_C_KIMPL_XOR_FNAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Error due to source not having a kernel
 	[ "$status" -ne 0 ]
+
 }
