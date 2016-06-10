@@ -2,6 +2,8 @@
 #
 # Test suite for ccl_c utility
 #
+# Requires: grep cut bc
+#
 # Author: Nuno Fachada <faken@fakenmc.com>
 # Licence: GNU General Public License version 3 (GPLv3)
 # Date: 2016
@@ -379,10 +381,7 @@ teardown() {
 		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Check output
-	[[ "$output" =~  "Device" ]]
-	[[ "$output" =~  "Build status" ]]
 	[[ "$output" =~  "Error" ]]
-	[[ "$output" =~  "Build log" ]]
 
 	# Error: incorrect compiler options
 	[ "$status" -ne 0 ]
@@ -740,10 +739,7 @@ teardown() {
 		-d ${CCL_TEST_DEVICE_INDEX}
 
 	# Check output
-	[[ "$output" =~  "Device" ]]
-	[[ "$output" =~  "Build status" ]]
 	[[ "$output" =~  "Error" ]]
-	[[ "$output" =~  "Build log" ]]
 
 	# Error: incorrect compiler options
 	[ "$status" -ne 0 ]
@@ -874,11 +870,6 @@ teardown() {
 
 	# Test link with an invalid binary
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
-
-	# Check output
-	[[ "$output" =~  "Device" ]]
-	[[ "$output" =~  "Build status" ]]
-	[[ "$output" =~  "Build log" ]]
 
 	# Error: because binary is invalid
 	[ "$status" -ne 0 ]
@@ -1047,11 +1038,6 @@ teardown() {
 	# Link with one binary and specify linker options
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}1 \
 		-0 "-this-is-an-invalid-option" -d ${CCL_TEST_DEVICE_INDEX}
-
-	# Check output
-	[[ "$output" =~  "Device" ]]
-	[[ "$output" =~  "Build status" ]]
-	[[ "$output" =~  "Build log" ]]
 
 	# Error: invalid option
 	[ "$status" -ne 0 ]

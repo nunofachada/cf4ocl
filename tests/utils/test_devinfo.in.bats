@@ -2,6 +2,8 @@
 #
 # Test suite for ccl_devinfo utility
 #
+# Requires: grep cut bc
+#
 # Author: Nuno Fachada <faken@fakenmc.com>
 # Licence: GNU General Public License version 3 (GPLv3)
 # Date: 2016
