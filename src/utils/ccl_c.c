@@ -82,7 +82,7 @@ static GOptionEntry entries[] = {
 	{"src",                  's', 0, G_OPTION_ARG_FILENAME_ARRAY, &src_files,
 	 "Source input files. This option can be specified multiple times.",
 	                                                              "FILE"},
-	{"input-headers",        'h', 0, G_OPTION_ARG_FILENAME_ARRAY, &src_h_files,
+	{"input-headers",        'i', 0, G_OPTION_ARG_FILENAME_ARRAY, &src_h_files,
 	 "Embedded header input files for the compile task. This option can be "
 	 "specified multiple times.",                                 "FILE"},
 	{"header-include-names", 'n', 0, G_OPTION_ARG_STRING_ARRAY,   &src_h_names,
