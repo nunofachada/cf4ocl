@@ -34,17 +34,23 @@
 #include "ccl_utils.h"
 
 #define CCL_C_DESCRIPTION "Static kernel compiler and analyzer"
+
 #define ccl_c_get_build_status_str(build_status) \
 	(build_status) == CL_BUILD_NONE ? "Program not built (unexpected)" : \
 	((build_status) == CL_BUILD_ERROR ? "Error" : \
 	(((build_status) == CL_BUILD_SUCCESS ? "Success" : \
 	((((build_status) == CL_BUILD_IN_PROGRESS ? "In progress (unexpected)" : \
 	"Unknown"))))))
+
 #define ccl_c_is_build_error(err) \
 	(((err != NULL) && (err->domain == CCL_OCL_ERROR) && \
 	 ((err->code == CL_BUILD_PROGRAM_FAILURE) || \
 	  (err->code == CL_COMPILE_PROGRAM_FAILURE) || \
 	  (err->code == CL_LINK_PROGRAM_FAILURE))))
+
+#define ccl_c_info_unavailable(err) \
+	((err) != NULL) && ((err)->domain == CCL_ERROR) && \
+	((err)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
 
 /* Available tasks. */
 typedef enum ccl_c_tasks {
@@ -190,9 +196,14 @@ void ccl_c_kernel_info_show(
 	/* Show CL_KERNEL_WORK_GROUP_SIZE information. */
 	k_wg_size = ccl_kernel_get_workgroup_info_scalar(
 		krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	g_printf("   - Maximum workgroup size                  : %lu\n",
-		(unsigned long) k_wg_size);
+	if (ccl_c_info_unavailable(err_internal)) {
+		g_clear_error(&err_internal);
+		g_printf("   - Maximum workgroup size                  : N/A\n");
+	} else {
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_printf("   - Maximum workgroup size                  : %lu\n",
+			(unsigned long) k_wg_size);
+	}
 
 	/* Only show info about CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE
 	 * if OpenCL version of the underlying platform is >= 1.1. */
@@ -200,33 +211,54 @@ void ccl_c_kernel_info_show(
 		k_pref_wg_size_mult = ccl_kernel_get_workgroup_info_scalar(krnl,
 			dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 			size_t, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
-		g_printf("   - Preferred multiple of workgroup size    : %lu\n",
-			(unsigned long) k_pref_wg_size_mult);
+		if (ccl_c_info_unavailable(err_internal)) {
+			g_clear_error(&err_internal);
+			g_printf("   - Preferred multiple of workgroup size    : N/A\n");
+		} else {
+			ccl_if_err_propagate_goto(err, err_internal, error_handler);
+			g_printf("   - Preferred multiple of workgroup size    : %lu\n",
+				(unsigned long) k_pref_wg_size_mult);
+		}
 	}
 
 	/* Show CL_KERNEL_COMPILE_WORK_GROUP_SIZE information. */
 	k_compile_wg_size = ccl_kernel_get_workgroup_info_array(krnl, dev,
 		CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t*, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	g_printf("   - WG size in __attribute__ qualifier      : (%lu, %lu, %lu)\n",
-		(unsigned long) k_compile_wg_size[0],
-		(unsigned long) k_compile_wg_size[1],
-		(unsigned long) k_compile_wg_size[2]);
+	if (ccl_c_info_unavailable(err_internal)) {
+		g_clear_error(&err_internal);
+		g_printf("   - WG size in __attribute__ qualifier      : N/A\n");
+	} else {
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_printf("   - WG size in __attribute__ qualifier      : "
+			"(%lu, %lu, %lu)\n",
+			(unsigned long) k_compile_wg_size[0],
+			(unsigned long) k_compile_wg_size[1],
+			(unsigned long) k_compile_wg_size[2]);
+	}
 
 	/* Show CL_KERNEL_LOCAL_MEM_SIZE information. */
 	k_loc_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
 		CL_KERNEL_LOCAL_MEM_SIZE, cl_ulong, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	g_printf("   - Local memory used by kernel             : %lu bytes\n",
-		(unsigned long) k_loc_mem_size);
+	if (ccl_c_info_unavailable(err_internal)) {
+		g_clear_error(&err_internal);
+		g_printf("   - Local memory used by kernel             : N/A\n");
+	} else {
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_printf("   - Local memory used by kernel             : %lu bytes\n",
+			(unsigned long) k_loc_mem_size);
+	}
 
 	/* Show CL_KERNEL_PRIVATE_MEM_SIZE information. */
 	k_priv_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
 		CL_KERNEL_PRIVATE_MEM_SIZE, cl_ulong, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
-	g_printf("   - Min. private mem. used by each workitem : %lu bytes\n",
-		(unsigned long) k_priv_mem_size);
+	if (ccl_c_info_unavailable(err_internal)) {
+		g_clear_error(&err_internal);
+		g_printf("   - Min. private mem. used by each workitem : N/A\n");
+	} else {
+		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_printf("   - Min. private mem. used by each workitem : %lu bytes\n",
+			(unsigned long) k_priv_mem_size);
+	}
 
 	g_printf("\n");
 
