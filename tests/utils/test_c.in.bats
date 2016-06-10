@@ -93,6 +93,12 @@ teardown() {
 @test "Invocation without arguments" {
 
 	run ${CCL_C_COM}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "No source or binary input files have been specified" ]]
+
+	# Error: no source or binary input files have been specified.
 	[ "$status" -ne 0 ]
 
 }
@@ -101,9 +107,15 @@ teardown() {
 @test "Help options" {
 
 	run ${CCL_C_COM} -?
+	[[ "$output" =~  "Static kernel compiler and analyzer" ]]
+	[ "$status" -eq 0 ]
+
+	run ${CCL_C_COM} -h
+	[[ "$output" =~  "-h, --help" ]]
 	[ "$status" -eq 0 ]
 
 	run ${CCL_C_COM} --help
+	[[ "$output" =~  "ccl_c" ]]
 	[ "$status" -eq 0 ]
 
 }
@@ -112,6 +124,7 @@ teardown() {
 @test "Get version" {
 
 	run ${CCL_C_COM} --version
+	[[ "$output" =~  "ccl_c v" ]]
 	[ "$status" -eq 0 ]
 
 }
@@ -120,9 +133,11 @@ teardown() {
 @test "List devices" {
 
 	run ${CCL_C_COM} -l
+	[[ "$output" =~  "0. " ]]
 	[ "$status" -eq 0 ]
 
 	run ${CCL_C_COM} --list
+	[[ "$output" =~  "0. " ]]
 	[ "$status" -eq 0 ]
 
 }
@@ -136,6 +151,12 @@ teardown() {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -146,6 +167,12 @@ teardown() {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -159,6 +186,14 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -167,6 +202,12 @@ teardown() {
 
 	# Test build with one binary.
 	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -180,6 +221,14 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -190,6 +239,14 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -o ${CCL_C_TMP_BIN}2 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}2" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -199,6 +256,9 @@ teardown() {
 	# Test build with two binaries. */
 	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}2 -d \
 		${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
 
 	# Error: builds can only be performed with one binary
 	[ "$status" -ne 0 ]
@@ -212,6 +272,14 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -222,6 +290,9 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -b ${CCL_C_TMP_BIN}2 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Error" ]]
+
 	# Error: The build task requires either: 1) one or more source files; or,
 	# 2) one binary file
 	[ "$status" -ne 0 ]
@@ -231,7 +302,10 @@ teardown() {
 # Test build with source headers.
 @test "Build with source headers" {
 
-	run ${CCL_C_COM} -h ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+	run ${CCL_C_COM} -i ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
 
 	# Error: source headers can only be specified in the compile task
 	[ "$status" -ne 0 ]
@@ -241,6 +315,13 @@ teardown() {
 @test "Build with erroneous source file" {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "Additional information" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: build should not be successful with erroneous source file
 	[ "$status" -ne 0 ]
@@ -252,6 +333,10 @@ teardown() {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -d ${CCL_C_NDEVS}
 
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "No device found" ]]
+
 	# Error: build should throw error if device does not exist
 	[ "$status" -ne 0 ]
 
@@ -261,6 +346,9 @@ teardown() {
 @test "Build with non-existing file" {
 
 	run ${CCL_C_COM} -s this_file_does_not_exist.cl -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
 
 	# Error: build should throw error if source file does not exist
 	[ "$status" -ne 0 ]
@@ -273,6 +361,12 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -0 "-cl-fast-relaxed-math" \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -283,6 +377,12 @@ teardown() {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -0 "-an-incorrect-option" \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: incorrect compiler options
 	[ "$status" -ne 0 ]
@@ -304,6 +404,12 @@ teardown() {
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -320,6 +426,12 @@ teardown() {
 
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -s ${CCL_C_K_XOR} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -339,6 +451,12 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -347,6 +465,10 @@ teardown() {
 
 	# Test compile with one binary.
 	run ${CCL_C_COM} -t 1 -b ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "The 'compile' task requires at least one source file" ]]
 
 	# Error: compilation does not support binaries
 	[ "$status" -ne 0 ]
@@ -366,15 +488,27 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Check if binary was created
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
-	# Test compile with another source and the generated binary.
+	# Test compile with another source and the generated binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_XOR} -b ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "The 'compile' task does not support binaries" ]]
 
 	# Error: compilation does not support binaries
 	[ "$status" -ne 0 ]
@@ -390,7 +524,12 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 1 -h ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+	# Test compile with source headers
+	run ${CCL_C_COM} -t 1 -i ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "The 'compile' task requires at least one source file" ]]
 
 	# Error: at least one source file must be specified
 	[ "$status" -ne 0 ]
@@ -406,10 +545,16 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	# First, specify source header in -h parameter and header name in -n
+	# First, specify source header in -i parameter and header name in -n
 	# parameter
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -h ${CCL_C_H_SUM} \
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -i ${CCL_C_H_SUM} \
 		-n ${CCL_C_HNAME_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -417,6 +562,12 @@ teardown() {
 	# Second, pass include header path in compiler options
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -0 "-I ${CCL_C_K_FOLDER}" \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -432,11 +583,17 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	# First, specify source header in -h parameter and header name in -n
+	# First, specify source header in -i parameter and header name in -n
 	# parameter
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -h ${CCL_C_H_SUM} \
-		-h ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} -n ${CCL_C_HNAME_XOR} \
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -i ${CCL_C_H_SUM} \
+		-i ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} -n ${CCL_C_HNAME_XOR} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -444,6 +601,12 @@ teardown() {
 	# Second, pass include header path in compiler options
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -0 "-I ${CCL_C_K_FOLDER}" \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -458,10 +621,16 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	# First, specify source header in -h parameter and header name in -n
+	# First, specify source header in -i parameter and header name in -n
 	# parameter
-	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -h ${CCL_C_K_BAD} \
+	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUM} -i ${CCL_C_K_BAD} \
 		-n ${CCL_C_HNAME_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: header contains incorrect information
 	[ "$status" -ne 0 ]
@@ -477,7 +646,14 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test compile with erroneous source file
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_BAD} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: compile should not be successful with erroneous source file
 	[ "$status" -ne 0 ]
@@ -493,7 +669,12 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test compile with non-existing device
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -d ${CCL_C_NDEVS}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "No device found" ]]
 
 	# Error: compile should throw error if device does not exist
 	[ "$status" -ne 0 ]
@@ -509,8 +690,12 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test compile with non-existing file
 	run ${CCL_C_COM} -t 1 -s this_file_does_not_exist.cl \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
 
 	# Error: compile should throw error if source file does not exist
 	[ "$status" -ne 0 ]
@@ -526,8 +711,15 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test compile with one source file with correct compiler options
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -0 "-cl-fast-relaxed-math" \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -543,8 +735,15 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test compile with one source file with incorrect compiler options
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -0 "-an-incorrect-option" \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: incorrect compiler options
 	[ "$status" -ne 0 ]
@@ -568,11 +767,25 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link the one binary
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -592,6 +805,14 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
@@ -599,14 +820,30 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_XOR} -o ${CCL_C_TMP_BIN}2 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}2" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Compile and save a binary containing a kernel requiring sum and xor
 	# functions
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_K_NEEDH_SUMXOR} -o ${CCL_C_TMP_BIN}3 \
-		-h ${CCL_C_H_SUM} -h ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} \
+		-i ${CCL_C_H_SUM} -i ${CCL_C_H_XOR} -n ${CCL_C_HNAME_SUM} \
 		-n ${CCL_C_HNAME_XOR} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}3" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -614,6 +851,12 @@ teardown() {
 	# Link three binaries: the kernel and two functions
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}3 -b ${CCL_C_TMP_BIN}1 \
 		-b ${CCL_C_TMP_BIN}2 -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -629,7 +872,13 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test link with an invalid binary
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: because binary is invalid
 	[ "$status" -ne 0 ]
@@ -645,7 +894,12 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
+	# Test link with a source file
 	run ${CCL_C_COM} -t 2 -s ${CCL_C_K_SUM} -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "The 'link' task requires at least one binary file" ]]
 
 	# Error: Linking does not support source files
 	[ "$status" -ne 0 ]
@@ -665,12 +919,24 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link with one binary and one source
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -s ${CCL_C_K_SUM} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "does not support source files" ]]
 
 	# Error: Linking does not support source files
 	[ "$status" -ne 0 ]
@@ -686,8 +952,13 @@ teardown() {
 		skip "${CCL_C_SKIP_MSG}"
 	fi
 
-	run ${CCL_C_COM} -t 2 -h ${CCL_C_H_SUM} -n ${CCL_C_HNAME_SUM} \
+	# Test link with source headers
+	run ${CCL_C_COM} -t 2 -i ${CCL_C_H_SUM} -n ${CCL_C_HNAME_SUM} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "The 'link' task requires at least one binary file" ]]
 
 	# Error: Linking does not support source files
 	[ "$status" -ne 0 ]
@@ -707,6 +978,9 @@ teardown() {
 	run ${CCL_C_COM} -t 2 -b this_file_does_not_exist.bin \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Error" ]]
+
 	# Error: binary not found
 	[ "$status" -ne 0 ]
 
@@ -724,6 +998,14 @@ teardown() {
 	# Compile and save a sum function binary
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -751,12 +1033,25 @@ teardown() {
 	run ${CCL_C_COM} -t 1 -s ${CCL_C_KIMPL_SUM} -o ${CCL_C_TMP_BIN}1 \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Link with one binary and specify linker options
 	run ${CCL_C_COM} -t 2 -b ${CCL_C_TMP_BIN}1 -b ${CCL_C_TMP_BIN}1 \
 		-0 "-this-is-an-invalid-option" -d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error: invalid option
 	[ "$status" -ne 0 ]
@@ -774,12 +1069,28 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -k ${CCL_C_K_SUM_NAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Kernel information" ]]
+	[[ "$output" =~  "${CCL_C_K_SUM_NAME}" ]]
+	[[ "$output" =~  "Build log" ]]
+
 	# There should be no problems
 	[ "$status" -eq 0 ]
 
 	# Test with xor kernel
 	run ${CCL_C_COM} -s ${CCL_C_K_XOR} -k ${CCL_C_K_XOR_NAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Kernel information" ]]
+	[[ "$output" =~  "${CCL_C_K_XOR_NAME}" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -796,7 +1107,16 @@ teardown() {
 	fi
 
 	# Test build with one source and create binary.
-	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 -d ${CCL_TEST_DEVICE_INDEX}
+	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -o ${CCL_C_TMP_BIN}1 \
+		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Binary output file" ]]
+	[[ "$output" =~  "${CCL_C_TMP_BIN}1" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -805,7 +1125,16 @@ teardown() {
 	[ -f ${CCL_C_TMP_BIN}1 ]
 
 	# Check kernel info from binary.
-	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -k ${CCL_C_K_SUM_NAME} -d ${CCL_TEST_DEVICE_INDEX}
+	run ${CCL_C_COM} -b ${CCL_C_TMP_BIN}1 -k ${CCL_C_K_SUM_NAME} \
+		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Kernel information" ]]
+	[[ "$output" =~  "${CCL_C_K_SUM_NAME}" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# There should be no problems
 	[ "$status" -eq 0 ]
@@ -815,7 +1144,14 @@ teardown() {
 # Test with invalid source
 @test "Kernel info, invalid source" {
 
-	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -k ${CCL_C_K_BAD_NAME} -d ${CCL_TEST_DEVICE_INDEX}
+	run ${CCL_C_COM} -s ${CCL_C_K_BAD} -k ${CCL_C_K_BAD_NAME} \
+		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Error" ]]
+	[[ "$output" =~  "Build log" ]]
 
 	# Error due to invalid source
 	[ "$status" -ne 0 ]
@@ -827,6 +1163,14 @@ teardown() {
 
 	run ${CCL_C_COM} -s ${CCL_C_K_SUM} -k _this_kernel_does_not_exist_ \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Kernel information" ]]
+	[[ "$output" =~  "_this_kernel_does_not_exist_" ]]
+	[[ "$output" =~  "Error" ]]
 
 	# Error due to unknown kernel
 	[ "$status" -ne 0 ]
@@ -840,12 +1184,28 @@ teardown() {
 	run ${CCL_C_COM} -s ${CCL_C_KIMPL_SUM} -k ${CCL_C_KIMPL_SUM_FNAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
 
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Kernel information" ]]
+	[[ "$output" =~  "${CCL_C_KIMPL_SUM_FNAME}" ]]
+	[[ "$output" =~  "Error" ]]
+
 	# Error due to source not having a kernel
 	[ "$status" -ne 0 ]
 
 	# Test with xor function
 	run ${CCL_C_COM} -s ${CCL_C_KIMPL_XOR} -k ${CCL_C_KIMPL_XOR_FNAME} \
 		-d ${CCL_TEST_DEVICE_INDEX}
+
+	# Check output
+	[[ "$output" =~  "Device" ]]
+	[[ "$output" =~  "Build status" ]]
+	[[ "$output" =~  "Success" ]]
+	[[ "$output" =~  "Kernel information" ]]
+	[[ "$output" =~  "${CCL_C_KIMPL_XOR_FNAME}" ]]
+	[[ "$output" =~  "Error" ]]
 
 	# Error due to source not having a kernel
 	[ "$status" -ne 0 ]
