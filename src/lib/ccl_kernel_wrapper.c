@@ -840,6 +840,27 @@ finish:
 }
 
 /**
+ * @internal
+ * Helper macro which tests if the error is a CCL_ERROR_INFO_UNAVAILABLE_OCL
+ * error, and if so, generates a warning and clears the error. Otherwise it
+ * tests the error in the same way as ccl_if_err_propagate_goto().
+ *
+ * @param[out] err Destination GError** object.
+ * @param[in] err_internal Source GError* object.
+ * @param[in] error_handler Label to goto if an error other than
+ * CCL_ERROR_INFO_UNAVAILABLE_OCL is detected.
+ * */
+#define ccl_if_err_not_info_unavailable_propagate_goto( \
+			err, err_internal, error_handler) \
+	if (((err_internal) != NULL) && ((err_internal)->domain == CCL_ERROR) && \
+			((err_internal)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) { \
+		g_warning("In %s: %s", CCL_STRD, (err_internal)->message); \
+		g_clear_error(&(err_internal)); \
+	} else { \
+		ccl_if_err_propagate_goto(err, err_internal, error_handler); \
+	}
+
+/**
  * Suggest appropriate local (and optionally global) work sizes for the
  * given real work size, based on device and kernel characteristics.
  *
@@ -895,7 +916,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 
 	/* The preferred workgroup size. */
 	size_t wg_size_mult = 0;
-	size_t wg_size_max;
+	size_t wg_size_max = 0;
 	size_t wg_size = 1, wg_size_aux;
 	size_t* max_wi_sizes;
 	cl_uint dev_dims;
@@ -931,29 +952,50 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	/* If kernel is not NULL, query it about workgroup size preferences
 	 * and capabilities. */
 	if (krnl != NULL) {
+
 		/* Determine maximum workgroup size. */
 		wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
 			CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		ccl_if_err_not_info_unavailable_propagate_goto(
+			err, err_internal, error_handler);
 
 #ifdef CL_VERSION_1_1
+
 		/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
+
+		/* Get OpenCL version of the underlying platform. */
 		cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+
+		/* If OpenCL version of the underlying platform is >= 1.1 ... */
 		if (ocl_ver >= 110) {
+
+			/* ...use CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE... */
 			wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
 				krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 				size_t, &err_internal);
-			ccl_if_err_propagate_goto(err, err_internal, error_handler);
-		} else {
-			wg_size_mult = wg_size_max;
-		}
-#else
-		wg_size_mult = wg_size_max;
-#endif
-	} else {
+			ccl_if_err_not_info_unavailable_propagate_goto(
+				err, err_internal, error_handler);
 
-		/* Kernel is NULL, use values obtained from device. */
+		} else {
+
+			/* ...otherwise just use CL_KERNEL_WORK_GROUP_SIZE. */
+			wg_size_mult = wg_size_max;
+
+		}
+
+#else
+
+		wg_size_mult = wg_size_max;
+
+#endif
+
+	}
+
+	/* If it was not possible to obtain wg_size_mult and wg_size_max, either
+	 * because kernel is NULL or the information was unavailable, use values
+	 * obtained from device. */
+	if ((wg_size_max == 0) && (wg_size_mult == 0)) {
 		wg_size_max = ccl_device_get_info_scalar(
 			dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err_internal);
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
@@ -962,13 +1004,17 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 
 	/* Try to find an appropriate local worksize. */
 	for (cl_uint i = 0; i < dims; ++i) {
+
 		/* Each lws component is at most the preferred workgroup
 		 * multiple or the maximum size of that component in device. */
 		lws[i] = MIN(wg_size_mult, max_wi_sizes[i]);
+
 		/* Update total workgroup size. */
 		wg_size *= lws[i];
+
 		/* Update total real worksize. */
 		real_ws *= real_worksize[i];
+
 	}
 
 	/* Don't let each component of the local worksize to be
