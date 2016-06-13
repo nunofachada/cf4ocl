@@ -96,7 +96,7 @@ static struct ccl_sampler_basic_properties
 
 	/* Cycle through property list. */
 	if (sampler_properties != NULL) {
-		for (guint i = 0; sampler_properties[i] != 0; ++i) {
+		for (guint i = 0; sampler_properties[i] != 0; i = i + 2) {
 			/* Check if property is a basic known property. */
 			switch (sampler_properties[i]) {
 				case CL_SAMPLER_NORMALIZED_COORDS:
@@ -109,8 +109,6 @@ static struct ccl_sampler_basic_properties
 					sbp.filter_mode = (cl_filter_mode) sampler_properties[i + 1];
 					break;
 			}
-			/* Skip to next property. */
-			++i;
 		}
 	}
 
