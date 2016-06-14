@@ -27,16 +27,6 @@ set(TESTS_OPT test_profiler test_platforms test_buffer test_devquery
 # Complete set of tests
 set(TESTS ${TESTS_STUBONLY} ${TESTS_OPT})
 
-# Exclude tests from documentation?
-if (DOC_BUILD)
-	option(DOC_EXCLUDE_TESTS "Exclude tests from API docs?" ON)
-	if (DOC_EXCLUDE_TESTS)
-		# Add tests path to doc exclude path
-		set(DOC_EXCLUDE_PATHS "${CMAKE_CURRENT_SOURCE_DIR} ${DOC_EXCLUDE_PATHS}"
-			CACHE INTERNAL "")
-	endif()
-endif()
-
 # Add subdir to build OpenCL stub lib
 add_subdirectory(ocl_stub)
 

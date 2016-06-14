@@ -139,6 +139,16 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 		option(DOC_GENERATE_MAN "Generate man pages?" OFF)
 	endif()
 
+	# Exclude tests from documentation?
+	if (DOC_BUILD)
+		option(DOC_EXCLUDE_TESTS "Exclude tests from API docs?" ON)
+		if (DOC_EXCLUDE_TESTS)
+			# Add tests path to doc exclude path
+			set(DOX_EXCLUDE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tests"
+				CACHE INTERNAL "")
+		endif()
+	endif()
+
 	# Set doxygen document generation options
 	if (DOC_GENERATE_HTML)
 		set(DOX_GENERATE_HTML "YES")
