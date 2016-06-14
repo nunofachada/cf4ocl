@@ -320,7 +320,7 @@ typedef struct _cl_mem_ion_host_ptr
 *********************************/
 #define cl_khr_sub_groups 1
 
-typedef cl_uint  cl_kernel_sub_group_info;
+typedef cl_uint  cl_kernel_sub_group_info_khr;
 
 /* cl_khr_sub_group_info */
 #define CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE_KHR	0x2033
@@ -329,22 +329,22 @@ typedef cl_uint  cl_kernel_sub_group_info;
 extern CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelSubGroupInfoKHR(cl_kernel /* in_kernel */,
 						   cl_device_id /*in_device*/,
-						   cl_kernel_sub_group_info /* param_name */,
+						   cl_kernel_sub_group_info_khr /* param_name */,
 						   size_t /*input_value_size*/,
 						   const void * /*input_value*/,
 						   size_t /*param_value_size*/,
 						   void* /*param_value*/,
-						   size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0;
+						   size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0_DEPRECATED;
 						   
 typedef CL_API_ENTRY cl_int
      ( CL_API_CALL * clGetKernelSubGroupInfoKHR_fn)(cl_kernel /* in_kernel */,
 						      cl_device_id /*in_device*/,
-						      cl_kernel_sub_group_info /* param_name */,
+						      cl_kernel_sub_group_info_khr /* param_name */,
 						      size_t /*input_value_size*/,
 						      const void * /*input_value*/,
 						      size_t /*param_value_size*/,
 						      void* /*param_value*/,
-						      size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0;
+						      size_t* /*param_value_size_ret*/ ) CL_EXT_SUFFIX__VERSION_2_0_DEPRECATED;
 #endif /* CL_VERSION_2_0 */
 
 #ifdef CL_VERSION_2_1
