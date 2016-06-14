@@ -27,15 +27,59 @@
 /**
  * @page ccl_devinfo
  *
+ * @brief Utility to query OpenCL platforms and devices.
+ *
  * SYNOPSIS
  * ========
  *
- *     **ccl_devinfo** [OPTIONS]...
+ * **ccl_devinfo** [_OPTIONS_]...
  *
  * DESCRIPTION
  * ===========
  *
- * Utility to query OpenCL platforms and devices.
+ * The `ccl_devinfo` program prints information about the OpenCL platforms
+ * and devices available on the system. By default, only basic device
+ * information, such as type, vendor or OpenCL version, is shown, allowing
+ * the user to quickly assess what platforms and devices are available.
+ *
+ * All the available device information can be shown with the `-a` or
+ * `--all` options. The `-c <param>` option, or its long variant,
+ * `--custom=<param>`, allows the user to specify a partial or complete
+ * `cl_device_info` parameter name. All matching parameters will be
+ * printed. This option can be used several times.
+ *
+ * The `-n` or `--notfound` flags will force the program to shown known
+ * parameters even if the respective information is not found in the
+ * device. The `-l` flag, or its long variant `--list`, tells `ccl_devinfo`
+ * to list all known device information parameters.
+ *
+ * Additional information about each listed parameter can be shown with
+ * the `-v` or `--verbose` flags.
+ *
+ * The `ccl_devinfo` utility can also narrow down information to specific
+ * platforms and devices with the `-p` and `-d` options, respectively
+ * (or their long variants, `--platform` and `--device`). These options
+ * accept the platform index or the (platform-wise) device index to perform
+ * the selection.
+ *
+ * AUTHOR
+ * ======
+ *
+ * Written by Nuno Fachada.
+ *
+ * REPORTING BUGS
+ * ==============
+ *
+ * * Report ccl_devinfo bugs at https://github.com/fakenmc/cf4ocl/issues
+ * * cf4ocl home page: http://fakenmc.github.io/cf4ocl/
+ * * cf4ocl wiki: https://github.com/fakenmc/cf4ocl/wiki
+ *
+ * COPYRIGHT
+ * =========
+ * Copyright (C) 2016 Nuno Fachada
+ * License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+ * This is free software: you are free to change and redistribute it.
+ * There is NO WARRANTY, to the extent permitted by law.
  *
  * */
 

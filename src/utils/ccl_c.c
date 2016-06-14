@@ -27,15 +27,37 @@
 /**
  * @page ccl_c
  *
+ * @brief Utility for static compilation and linking of OpenCL kernels.
+ *
  * SYNOPSIS
  * ========
  *
- *     **ccl_c** [OPTIONS]...
+ * **ccl_c** [_OPTIONS_]...
  *
  * DESCRIPTION
  * ===========
  *
- * Utility for static compilation and linking of OpenCL kernels.
+ * The `ccl_c` program performs static compilation and analysis of OpenCL
+ * kernels.
+ *
+ * AUTHOR
+ * ======
+ *
+ * Written by Nuno Fachada.
+ *
+ * REPORTING BUGS
+ * ==============
+ *
+ * * Report ccl_c bugs at https://github.com/fakenmc/cf4ocl/issues
+ * * cf4ocl home page: http://fakenmc.github.io/cf4ocl/
+ * * cf4ocl wiki: https://github.com/fakenmc/cf4ocl/wiki
+ *
+ * COPYRIGHT
+ * =========
+ * Copyright (C) 2016 Nuno Fachada
+ * License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+ * This is free software: you are free to change and redistribute it.
+ * There is NO WARRANTY, to the extent permitted by law.
  *
  * */
 
