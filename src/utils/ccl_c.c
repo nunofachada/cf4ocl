@@ -27,7 +27,15 @@
 /**
  * @page ccl_c
  *
- * Man page will be placed here.
+ * SYNOPSIS
+ * ========
+ *
+ *     **ccl_c** [OPTIONS]...
+ *
+ * DESCRIPTION
+ * ===========
+ *
+ * Utility for static compilation and linking of OpenCL kernels.
  *
  * */
 

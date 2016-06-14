@@ -27,7 +27,7 @@ file called `mysum.cl`, and the host code in `mysum.c`.
 
 ### Getting started
 
-The _cf4ocl_ header should be included at the beggining of the `mysum.c`
+The _cf4ocl_ header should be included at the beginning of the `mysum.c`
 file:
 
 ~~~~~~~~~~~~~~~{.c}

@@ -27,7 +27,15 @@
 /**
  * @page ccl_devinfo
  *
- * Man page will be placed here.
+ * SYNOPSIS
+ * ========
+ *
+ *     **ccl_devinfo** [OPTIONS]...
+ *
+ * DESCRIPTION
+ * ===========
+ *
+ * Utility to query OpenCL platforms and devices.
  *
  * */
 
