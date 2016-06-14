@@ -20,8 +20,51 @@
 # Plots a Gantt-like chart of OpenCL events using the profiling info
 # exported using the @ref CCL_PROFILER "profiler module".
 #
-# Usage:
-#   ccl_plot_events.py <FILE.TSV>
+# @author Nuno Fachada
+# @date 2016
+# @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
+
+##
+# @page ccl_plot_events
+#
+# @brief Plots a Gantt-like chart of OpenCL events using the profiling info
+# exported using the @ref CCL_PROFILER "profiler module".
+#
+# SYNOPSIS
+# ========
+#
+# **ccl_plot_events.py** <FILE.TSV>
+#
+# DESCRIPTION
+# ===========
+#
+# The `ccl_plot_events.py` script accepts a single parameter indicating
+# a file containing profiling info exported using the
+# @ref CCL_PROFILER "profiler module".
+#
+# This script requires a [Python](https://www.python.org/) installation,
+# and depends on the [Matplotlib](http://matplotlib.org/) and
+# [NumPy](http://www.numpy.org/) libraries.
+#
+# AUTHOR
+# ======
+#
+# Written by Nuno Fachada.
+#
+# REPORTING BUGS
+# ==============
+#
+# * Report ccl_plot_events.py bugs at https://github.com/fakenmc/cf4ocl/issues
+# * cf4ocl home page: http://fakenmc.github.io/cf4ocl/
+# * cf4ocl wiki: https://github.com/fakenmc/cf4ocl/wiki
+#
+# COPYRIGHT
+# =========
+# Copyright (C) 2016 Nuno Fachada
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+#
 
 import sys
 import os.path
@@ -90,7 +133,8 @@ for event in pdat:
     width = event['t_end'] - event['t_start']
     # Determine index of event name of which current event is an instance of
     uei = uniq_evts.index(event['event'])
-    # Determine the color for current event (which is the same for the associated event name)
+    # Determine the color for current event (which is the same for the
+    # associated event name)
     color = cmap(uniq_colors[uei])
     # Plot event
     rect = patches.Rectangle((x, y), width, 0.8, edgecolor='none', facecolor=color, fill=True)
