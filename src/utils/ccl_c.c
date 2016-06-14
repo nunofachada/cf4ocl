@@ -32,13 +32,57 @@
  * SYNOPSIS
  * ========
  *
- * **ccl_c** [_OPTIONS_]...
+ * <dl>
+ * <dt>ccl_c</dt>
+ * <dd>-l | --list<br/>
+ * [-t 0 | --task=0] [-d \<DEV\> | --device=\<DEV\>]<br/>
+ * [-d \<DEV\> | --device=\<DEV\>]<br/>
+ * [-d \<DEV\> | --device=\<DEV\>]<br/>
+ * [-d \<DEV\> | --device=\<DEV\>]<br/>
+ * [-d \<DEV\> | --device=\<DEV\>]<br/>
+ * --version
+ * -h | -? | --help</dd></dl>
  *
  * DESCRIPTION
  * ===========
  *
  * The `ccl_c` program performs static compilation and analysis of OpenCL
  * kernels.
+ *
+ * <dl>
+ * <dt>-l, --list</dt>
+ * <dd>List available devices and exit.</dd>
+ * <dt>-d, --device=DEV</dt>
+ * <dd>Specify a device on which to perform the task.</dd>
+ * <dt>-t, --task=TASK</dt>
+ * <dd>0 (Build, default), 1 (Compile) or 2 (Link). Tasks 1 and 2 are only
+ * available for platforms with support for OpenCL 1.2 or higher.</dd>
+ * <dt>-0, --options=OPTIONS</dt>
+ * <dd>Compiler/linker options.</dd>
+ * <dt>-s, --src=FILE</dt>
+ * <dd>Source input files. This option can be specified multiple times.</dd>
+ * <dt>-i, --input-headers=FILE</dt>
+ * <dd>Embedded header input files for the compile task. This option can be
+ * specified multiple times.</dd>
+ * <dt>-n, --header-include-names=STRING</dt>
+ * <dd>Embedded header include names for the compile task. This option can be
+ * specified multiple times and has a one to one correspondence with
+ * --input-headers.</dd>
+ * <dt>-b, --bin=FILE</dt>
+ * <dd>Binary input file. This option can be specified multiple times.</dd>
+ * <dt>-o, --output=FILE</dt>
+ * <dd>Binary output file.</dd>
+ * <dt>-k, --kernel-info=STRING</dt>
+ * <dd>Show information about the specified kernel. This option can be
+ * specified multiple times.</dd>
+ * <dt>-u, --build-log=FILE</dt>
+ * <dd>Save build log to the specified file. By default the build log is
+ * printed to stderr.</dd>
+ * <dt>--version</dt>
+ * <dd>Output version information and exit.</dd>
+ * <dt>-h, --help, -?</dt>
+ * <dd>Show help options and exit.</dd>
+ * </dl>
  *
  * AUTHOR
  * ======
