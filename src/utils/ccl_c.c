@@ -32,22 +32,13 @@
  * SYNOPSIS
  * ========
  *
- * <dl>
- * <dt>ccl_c</dt>
- * <dd>-l | --list<br/>
- * [-t 0 | --task=0] [-d \<DEV\> | --device=\<DEV\>]<br/>
- * [-d \<DEV\> | --device=\<DEV\>]<br/>
- * [-d \<DEV\> | --device=\<DEV\>]<br/>
- * [-d \<DEV\> | --device=\<DEV\>]<br/>
- * [-d \<DEV\> | --device=\<DEV\>]<br/>
- * --version
- * -h | -? | --help</dd></dl>
+ * **ccl_c** [_OPTION_]...
  *
  * DESCRIPTION
  * ===========
  *
- * The `ccl_c` program performs static compilation and analysis of OpenCL
- * kernels.
+ * The `ccl_c` tool performs static compilation and analysis of OpenCL kernels.
+ * Here is a list of the available options:
  *
  * <dl>
  * <dt>-l, --list</dt>
@@ -98,9 +89,11 @@
  *
  * COPYRIGHT
  * =========
- * Copyright (C) 2016 Nuno Fachada
- * License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
- * This is free software: you are free to change and redistribute it.
+ *
+ * Copyright (C) 2016 Nuno Fachada<br/>
+ * License GPLv3+: GNU GPL version 3 or later
+ * <http://gnu.org/licenses/gpl.html>.<br/>
+ * This is free software: you are free to change and redistribute it.<br/>
  * There is NO WARRANTY, to the extent permitted by law.
  *
  * */

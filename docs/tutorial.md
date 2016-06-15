@@ -1,6 +1,8 @@
 Tutorial {#tut}
 ========
 
+@brief Developing an application with _cf4ocl_
+
 ### Introduction
 
 This tutorial is based on the `canon` example available in the

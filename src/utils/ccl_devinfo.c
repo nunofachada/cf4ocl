@@ -42,25 +42,56 @@
  * information, such as type, vendor or OpenCL version, is shown, allowing
  * the user to quickly assess what platforms and devices are available.
  *
- * All the available device information can be shown with the `-a` or
- * `--all` options. The `-c <param>` option, or its long variant,
- * `--custom=<param>`, allows the user to specify a partial or complete
- * `cl_device_info` parameter name. All matching parameters will be
- * printed. This option can be used several times.
+ * All the available device information items can be shown with the
+ * <strong>-a</strong> or <strong>--all</strong> options. The
+ * <strong>-c</strong> <em>cl_device_info</em> option, or its long variant,
+ * <strong>--custom=</strong><em>cl_device_info</em>, allows the user to specify
+ * a partial or complete `cl_device_info` parameter name. All matching
+ * parameters will be printed. This option can be used several times.
  *
- * The `-n` or `--notfound` flags will force the program to shown known
- * parameters even if the respective information is not found in the
- * device. The `-l` flag, or its long variant `--list`, tells `ccl_devinfo`
- * to list all known device information parameters.
+ * The <strong>-l</strong> flag, or its long variant <strong>--list</strong>,
+ * tells <strong>ccl_devinfo</strong> to list all known device information
+ * parameters. The <strong>-n</strong> or <strong>--notfound</strong> flags will
+ * force the program to show known parameters even if the respective information
+ * is not provided by the device.
  *
- * Additional information about each listed parameter can be shown with
- * the `-v` or `--verbose` flags.
+ * Additional information about each listed parameter can be shown with the
+ * <strong>-v</strong> or <strong>--verbose</strong> flags.
  *
- * The `ccl_devinfo` utility can also narrow down information to specific
- * platforms and devices with the `-p` and `-d` options, respectively
- * (or their long variants, `--platform` and `--device`). These options
- * accept the platform index or the (platform-wise) device index to perform
- * the selection.
+ * The **ccl_devinfo** utility can also narrow down information to specific
+ * platforms and devices with the <strong>-p</strong> and <strong>-d</strong>
+ * options, respectively (or their long variants, <strong>--platform</strong>
+ * and <strong>--device</strong>). These options accept the platform index or
+ * the (platform-wise) device index to perform the selection. The
+ * <strong>-o</strong> or <strong>--no-platf</strong> option ignores platforms
+ * and lists available devices independently of their platform. In this case,
+ * the <strong>-d</strong> option will indicate the system-wise device index.
+ *
+ * <dl>
+ * <dt>-a, --all</dt>
+ * <dd>Show all the available device information</dd>
+ * <dt>-b, --basic</dt>
+ * <dd>Show basic device information (default)</dd>
+ * <dt>-c, --custom=cl_device_info</dt>
+ * <dd>Show specific information, repeat as necessary</dd>
+ * <dt>-d, --device=dev_idx</dt>
+ * <dd>Specify the index of a device to query</dd>
+ * <dt>-o, --no-platf</dt>
+ * <dd>Ignore platforms, device index reports to all devices available in the
+ * system</dd>
+ * <dt>-l, --list</dt>
+ * <dd>List known information parameters</dd>
+ * <dt>-p, --platform=platf_idx</dt>
+ * <dd>Specify the index of a platform to query</dd>
+ * <dt>-n, --notfound</dt>
+ * <dd>Show known parameters even if not found in device</dd>
+ * <dt>-v, --verbose</dt>
+ * <dd>Show description of each parameter</dd>
+ * <dt>--version</dt>
+ * <dd>Output version information and exit</dd>
+ * <dt>-h, --help, -?</dt>
+ * <dd>Show help options and exit</dd>
+ * </dl>
  *
  * AUTHOR
  * ======
@@ -76,9 +107,11 @@
  *
  * COPYRIGHT
  * =========
- * Copyright (C) 2016 Nuno Fachada
- * License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
- * This is free software: you are free to change and redistribute it.
+ *
+ * Copyright (C) 2016 Nuno Fachada<br/>
+ * License GPLv3+: GNU GPL version 3 or later
+ * <http://gnu.org/licenses/gpl.html>.<br/>
+ * This is free software: you are free to change and redistribute it.<br/>
  * There is NO WARRANTY, to the extent permitted by law.
  *
  * */

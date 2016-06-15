@@ -139,6 +139,11 @@ FULL_PATH_NAMES        = YES
 # path to strip.
 
 STRIP_FROM_PATH        = @PROJECT_SOURCE_DIR@/src \
+                         @PROJECT_SOURCE_DIR@/doc \
+                         @PROJECT_SOURCE_DIR@/auxbuild \
+                         @PROJECT_SOURCE_DIR@/scripts \
+                         @PROJECT_SOURCE_DIR@/tests \
+                         @PROJECT_SOURCE_DIR@ \
                          @PROJECT_BINARY_DIR@
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of

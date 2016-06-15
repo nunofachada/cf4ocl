@@ -33,12 +33,12 @@
 # SYNOPSIS
 # ========
 #
-# **ccl_plot_events.py** <FILE.TSV>
+# **ccl_plot_events.py** *FILE.TSV*
 #
 # DESCRIPTION
 # ===========
 #
-# The `ccl_plot_events.py` script accepts a single parameter indicating
+# The `ccl_plot_events` script accepts a single parameter indicating
 # a file containing profiling info exported using the
 # @ref CCL_PROFILER "profiler module".
 #
@@ -60,9 +60,11 @@
 #
 # COPYRIGHT
 # =========
-# Copyright (C) 2016 Nuno Fachada
-# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
-# This is free software: you are free to change and redistribute it.
+#
+# Copyright (C) 2016 Nuno Fachada<br/>
+# License GPLv3+: GNU GPL version 3 or later
+# <http://gnu.org/licenses/gpl.html>.<br/>
+# This is free software: you are free to change and redistribute it.<br/>
 # There is NO WARRANTY, to the extent permitted by law.
 #
 
