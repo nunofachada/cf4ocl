@@ -3,286 +3,288 @@ Function list {#funlist}
 
 @brief List of _cf4ocl_ functions and function-like macros.
 
-* ::ccl_arg_destroy() - @copybrief ccl_arg_destroy
-* ::ccl_arg_full() - @copybrief ccl_arg_full
-* ::ccl_arg_local() - @copybrief ccl_arg_local
-* ::ccl_arg_new() - @copybrief ccl_arg_new
-* ::ccl_arg_priv() - @copybrief ccl_arg_priv
-* ::ccl_arg_size() - @copybrief ccl_arg_size
-* ::ccl_arg_value() - @copybrief ccl_arg_value
-* ::ccl_buffer_destroy() - @copybrief ccl_buffer_destroy
-* ::ccl_buffer_enqueue_copy() - @copybrief ccl_buffer_enqueue_copy
-* ::ccl_buffer_enqueue_copy_rect() - @copybrief ccl_buffer_enqueue_copy_rect
-* ::ccl_buffer_enqueue_copy_to_image() - @copybrief ccl_buffer_enqueue_copy_to_image
-* ::ccl_buffer_enqueue_fill() - @copybrief ccl_buffer_enqueue_fill
-* ::ccl_buffer_enqueue_map() - @copybrief ccl_buffer_enqueue_map
-* ::ccl_buffer_enqueue_read() - @copybrief ccl_buffer_enqueue_read
-* ::ccl_buffer_enqueue_read_rect() - @copybrief ccl_buffer_enqueue_read_rect
-* ::ccl_buffer_enqueue_unmap() - @copybrief ccl_buffer_enqueue_unmap
-* ::ccl_buffer_enqueue_write() - @copybrief ccl_buffer_enqueue_write
-* ::ccl_buffer_enqueue_write_rect() - @copybrief ccl_buffer_enqueue_write_rect
-* ::ccl_buffer_new() - @copybrief ccl_buffer_new
-* ::ccl_buffer_new_from_region() - @copybrief ccl_buffer_new_from_region
-* ::ccl_buffer_new_wrap() - @copybrief ccl_buffer_new_wrap
-* ::ccl_buffer_ref() - @copybrief ccl_buffer_ref
-* ::ccl_buffer_unref() - @copybrief ccl_buffer_unref
-* ::ccl_buffer_unwrap() - @copybrief ccl_buffer_unwrap
-* ::ccl_common_version_print() - @copybrief ccl_common_version_print
-* ::ccl_context_destroy() - @copybrief ccl_context_destroy
-* ::ccl_context_get_all_devices() - @copybrief ccl_context_get_all_devices
-* ::ccl_context_get_device() - @copybrief ccl_context_get_device
-* ::ccl_context_get_info() - @copybrief ccl_context_get_info
-* ::ccl_context_get_info_array() - @copybrief ccl_context_get_info_array
-* ::ccl_context_get_info_scalar() - @copybrief ccl_context_get_info_scalar
-* ::ccl_context_get_num_devices() - @copybrief ccl_context_get_num_devices
-* ::ccl_context_get_opencl_version() - @copybrief ccl_context_get_opencl_version
-* ::ccl_context_get_platform() - @copybrief ccl_context_get_platform
-* ::ccl_context_get_supported_image_formats() - @copybrief ccl_context_get_supported_image_formats
-* ::ccl_context_new_accel() - @copybrief ccl_context_new_accel
-* ::ccl_context_new_any() - @copybrief ccl_context_new_any
-* ::ccl_context_new_cpu() - @copybrief ccl_context_new_cpu
-* ::ccl_context_new_from_dep_filter() - @copybrief ccl_context_new_from_dep_filter
-* ::ccl_context_new_from_device_index() - @copybrief ccl_context_new_from_device_index
-* ::ccl_context_new_from_devices() - @copybrief ccl_context_new_from_devices
-* ::ccl_context_new_from_devices_full() - @copybrief ccl_context_new_from_devices_full
-* ::ccl_context_new_from_filter() - @copybrief ccl_context_new_from_filter
-* ::ccl_context_new_from_filters() - @copybrief ccl_context_new_from_filters
-* ::ccl_context_new_from_filters_full() - @copybrief ccl_context_new_from_filters_full
-* ::ccl_context_new_from_indep_filter() - @copybrief ccl_context_new_from_indep_filter
-* ::ccl_context_new_from_menu() - @copybrief ccl_context_new_from_menu
-* ::ccl_context_new_from_menu_full() - @copybrief ccl_context_new_from_menu_full
-* ::ccl_context_new_gpu() - @copybrief ccl_context_new_gpu
-* ::ccl_context_new_wrap() - @copybrief ccl_context_new_wrap
-* ::ccl_context_ref() - @copybrief ccl_context_ref
-* ::ccl_context_unref() - @copybrief ccl_context_unref
-* ::ccl_context_unwrap() - @copybrief ccl_context_unwrap
-* ::ccl_device_create_subdevices() - @copybrief ccl_device_create_subdevices
-* ::ccl_device_destroy() - @copybrief ccl_device_destroy
-* ::ccl_device_get_info() - @copybrief ccl_device_get_info
-* ::ccl_device_get_info_array() - @copybrief ccl_device_get_info_array
-* ::ccl_device_get_info_scalar() - @copybrief ccl_device_get_info_scalar
-* ::ccl_device_get_opencl_c_version() - @copybrief ccl_device_get_opencl_c_version
-* ::ccl_device_get_opencl_version() - @copybrief ccl_device_get_opencl_version
-* ::ccl_device_new_wrap() - @copybrief ccl_device_new_wrap
-* ::ccl_device_ref() - @copybrief ccl_device_ref
-* ::ccl_device_unref() - @copybrief ccl_device_unref
-* ::ccl_device_unwrap() - @copybrief ccl_device_unwrap
-* ::ccl_devquery_get_prefix_final() - @copybrief ccl_devquery_get_prefix_final
-* ::ccl_devquery_match() - @copybrief ccl_devquery_match
-* ::ccl_devquery_name() - @copybrief ccl_devquery_name
-* ::ccl_devquery_prefix() - @copybrief ccl_devquery_prefix
-* ::ccl_devquery_type2str() - @copybrief ccl_devquery_type2str
-* ::ccl_devsel_add_dep_filter() - @copybrief ccl_devsel_add_dep_filter
-* ::ccl_devsel_add_indep_filter() - @copybrief ccl_devsel_add_indep_filter
-* ::ccl_devsel_dep_index() - @copybrief ccl_devsel_dep_index
-* ::ccl_devsel_dep_menu() - @copybrief ccl_devsel_dep_menu
-* ::ccl_devsel_dep_platform() - @copybrief ccl_devsel_dep_platform
-* ::ccl_devsel_devices_destroy() - @copybrief ccl_devsel_devices_destroy
-* ::ccl_devsel_devices_new() - @copybrief ccl_devsel_devices_new
-* ::ccl_devsel_get_device_strings() - @copybrief ccl_devsel_get_device_strings
-* ::ccl_devsel_indep_platform() - @copybrief ccl_devsel_indep_platform
-* ::ccl_devsel_indep_string() - @copybrief ccl_devsel_indep_string
-* ::ccl_devsel_indep_type() - @copybrief ccl_devsel_indep_type
-* ::ccl_devsel_indep_type_accel() - @copybrief ccl_devsel_indep_type_accel
-* ::ccl_devsel_indep_type_cpu() - @copybrief ccl_devsel_indep_type_cpu
-* ::ccl_devsel_indep_type_gpu() - @copybrief ccl_devsel_indep_type_gpu
-* ::ccl_devsel_print_device_strings() - @copybrief ccl_devsel_print_device_strings
-* ::ccl_devsel_select() - @copybrief ccl_devsel_select
-* ::ccl_enqueue_barrier() - @copybrief ccl_enqueue_barrier
-* ::ccl_enqueue_marker() - @copybrief ccl_enqueue_marker
-* ::ccl_err() - @copybrief ccl_err
-* ::ccl_error_quark() - @copybrief ccl_error_quark
-* ::ccl_event_destroy() - @copybrief ccl_event_destroy
-* ::ccl_event_get_command_type() - @copybrief ccl_event_get_command_type
-* ::ccl_event_get_final_name() - @copybrief ccl_event_get_final_name
-* ::ccl_event_get_info() - @copybrief ccl_event_get_info
-* ::ccl_event_get_info_array() - @copybrief ccl_event_get_info_array
-* ::ccl_event_get_info_scalar() - @copybrief ccl_event_get_info_scalar
-* ::ccl_event_get_name() - @copybrief ccl_event_get_name
-* ::ccl_event_get_opencl_version() - @copybrief ccl_event_get_opencl_version
-* ::ccl_event_get_profiling_info() - @copybrief ccl_event_get_profiling_info
-* ::ccl_event_get_profiling_info_array() - @copybrief ccl_event_get_profiling_info_array
-* ::ccl_event_get_profiling_info_scalar() - @copybrief ccl_event_get_profiling_info_scalar
-* ::ccl_event_new_wrap() - @copybrief ccl_event_new_wrap
-* ::ccl_event_ref() - @copybrief ccl_event_ref
-* ::ccl_event_set_callback() - @copybrief ccl_event_set_callback
-* ::ccl_event_set_name() - @copybrief ccl_event_set_name
-* ::ccl_event_unref() - @copybrief ccl_event_unref
-* ::ccl_event_unwrap() - @copybrief ccl_event_unwrap
-* ::ccl_event_wait() - @copybrief ccl_event_wait
-* ::ccl_event_wait_list_add() - @copybrief ccl_event_wait_list_add
-* ::ccl_event_wait_list_add_v() - @copybrief ccl_event_wait_list_add_v
-* ::ccl_event_wait_list_clear() - @copybrief ccl_event_wait_list_clear
-* ::ccl_event_wait_list_get_clevents() - @copybrief ccl_event_wait_list_get_clevents
-* ::ccl_event_wait_list_get_num_events() - @copybrief ccl_event_wait_list_get_num_events
-* ::ccl_ewl() - @copybrief ccl_ewl
-* ::ccl_if_err_create_goto() - @copybrief ccl_if_err_create_goto
-* ::ccl_if_err_goto() - @copybrief ccl_if_err_goto
-* ::ccl_if_err_propagate_goto() - @copybrief ccl_if_err_propagate_goto
-* ::ccl_image_destroy() - @copybrief ccl_image_destroy
-* ::ccl_image_enqueue_copy() - @copybrief ccl_image_enqueue_copy
-* ::ccl_image_enqueue_copy_to_buffer() - @copybrief ccl_image_enqueue_copy_to_buffer
-* ::ccl_image_enqueue_fill() - @copybrief ccl_image_enqueue_fill
-* ::ccl_image_enqueue_map() - @copybrief ccl_image_enqueue_map
-* ::ccl_image_enqueue_read() - @copybrief ccl_image_enqueue_read
-* ::ccl_image_enqueue_unmap() - @copybrief ccl_image_enqueue_unmap
-* ::ccl_image_enqueue_write() - @copybrief ccl_image_enqueue_write
-* ::ccl_image_get_info() - @copybrief ccl_image_get_info
-* ::ccl_image_get_info_array() - @copybrief ccl_image_get_info_array
-* ::ccl_image_get_info_scalar() - @copybrief ccl_image_get_info_scalar
-* ::ccl_image_new() - @copybrief ccl_image_new
-* ::ccl_image_new_v() - @copybrief ccl_image_new_v
-* ::ccl_image_new_wrap() - @copybrief ccl_image_new_wrap
-* ::ccl_image_ref() - @copybrief ccl_image_ref
-* ::ccl_image_unref() - @copybrief ccl_image_unref
-* ::ccl_image_unwrap() - @copybrief ccl_image_unwrap
-* ::ccl_kernel_destroy() - @copybrief ccl_kernel_destroy
-* ::ccl_kernel_enqueue_native() - @copybrief ccl_kernel_enqueue_native
-* ::ccl_kernel_enqueue_ndrange() - @copybrief ccl_kernel_enqueue_ndrange
-* ::ccl_kernel_get_arg_info() - @copybrief ccl_kernel_get_arg_info
-* ::ccl_kernel_get_arg_info_array() - @copybrief ccl_kernel_get_arg_info_array
-* ::ccl_kernel_get_arg_info_scalar() - @copybrief ccl_kernel_get_arg_info_scalar
-* ::ccl_kernel_get_info() - @copybrief ccl_kernel_get_info
-* ::ccl_kernel_get_info_array() - @copybrief ccl_kernel_get_info_array
-* ::ccl_kernel_get_info_scalar() - @copybrief ccl_kernel_get_info_scalar
-* ::ccl_kernel_get_opencl_version() - @copybrief ccl_kernel_get_opencl_version
-* ::ccl_kernel_get_workgroup_info() - @copybrief ccl_kernel_get_workgroup_info
-* ::ccl_kernel_get_workgroup_info_array() - @copybrief ccl_kernel_get_workgroup_info_array
-* ::ccl_kernel_get_workgroup_info_scalar() - @copybrief ccl_kernel_get_workgroup_info_scalar
-* ::ccl_kernel_new() - @copybrief ccl_kernel_new
-* ::ccl_kernel_new_wrap() - @copybrief ccl_kernel_new_wrap
-* ::ccl_kernel_ref() - @copybrief ccl_kernel_ref
-* ::ccl_kernel_set_arg() - @copybrief ccl_kernel_set_arg
-* ::ccl_kernel_set_args() - @copybrief ccl_kernel_set_args
-* ::ccl_kernel_set_args_and_enqueue_ndrange() - @copybrief ccl_kernel_set_args_and_enqueue_ndrange
-* ::ccl_kernel_set_args_and_enqueue_ndrange_v() - @copybrief ccl_kernel_set_args_and_enqueue_ndrange_v
-* ::ccl_kernel_set_args_v() - @copybrief ccl_kernel_set_args_v
-* ::ccl_kernel_suggest_worksizes() - @copybrief ccl_kernel_suggest_worksizes
-* ::ccl_kernel_unref() - @copybrief ccl_kernel_unref
-* ::ccl_kernel_unwrap() - @copybrief ccl_kernel_unwrap
-* ::ccl_memobj_enqueue_migrate() - @copybrief ccl_memobj_enqueue_migrate
-* ::ccl_memobj_enqueue_unmap() - @copybrief ccl_memobj_enqueue_unmap
-* ::ccl_memobj_get_info() - @copybrief ccl_memobj_get_info
-* ::ccl_memobj_get_info_array() - @copybrief ccl_memobj_get_info_array
-* ::ccl_memobj_get_info_scalar() - @copybrief ccl_memobj_get_info_scalar
-* ::ccl_memobj_get_opencl_version() - @copybrief ccl_memobj_get_opencl_version
-* ::ccl_memobj_ref() - @copybrief ccl_memobj_ref
-* ::ccl_memobj_set_destructor_callback() - @copybrief ccl_memobj_set_destructor_callback
-* ::ccl_memobj_unwrap() - @copybrief ccl_memobj_unwrap
-* ::ccl_ocl_error_quark() - @copybrief ccl_ocl_error_quark
-* ::ccl_platform_destroy() - @copybrief ccl_platform_destroy
-* ::ccl_platform_get_all_devices() - @copybrief ccl_platform_get_all_devices
-* ::ccl_platform_get_device() - @copybrief ccl_platform_get_device
-* ::ccl_platform_get_info() - @copybrief ccl_platform_get_info
-* ::ccl_platform_get_info_array() - @copybrief ccl_platform_get_info_array
-* ::ccl_platform_get_info_scalar() - @copybrief ccl_platform_get_info_scalar
-* ::ccl_platform_get_info_string() - @copybrief ccl_platform_get_info_string
-* ::ccl_platform_get_num_devices() - @copybrief ccl_platform_get_num_devices
-* ::ccl_platform_get_opencl_version() - @copybrief ccl_platform_get_opencl_version
-* ::ccl_platform_new_from_device() - @copybrief ccl_platform_new_from_device
-* ::ccl_platform_new_wrap() - @copybrief ccl_platform_new_wrap
-* ::ccl_platform_ref() - @copybrief ccl_platform_ref
-* ::ccl_platform_unref() - @copybrief ccl_platform_unref
-* ::ccl_platform_unwrap() - @copybrief ccl_platform_unwrap
-* ::ccl_platforms_count() - @copybrief ccl_platforms_count
-* ::ccl_platforms_destroy() - @copybrief ccl_platforms_destroy
-* ::ccl_platforms_get() - @copybrief ccl_platforms_get
-* ::ccl_platforms_new() - @copybrief ccl_platforms_new
-* ::ccl_prof_add_queue() - @copybrief ccl_prof_add_queue
-* ::ccl_prof_calc() - @copybrief ccl_prof_calc
-* ::ccl_prof_destroy() - @copybrief ccl_prof_destroy
-* ::ccl_prof_export_info() - @copybrief ccl_prof_export_info
-* ::ccl_prof_export_info_file() - @copybrief ccl_prof_export_info_file
-* ::ccl_prof_get_agg() - @copybrief ccl_prof_get_agg
-* ::ccl_prof_get_duration() - @copybrief ccl_prof_get_duration
-* ::ccl_prof_get_eff_duration() - @copybrief ccl_prof_get_eff_duration
-* ::ccl_prof_get_export_opts() - @copybrief ccl_prof_get_export_opts
-* ::ccl_prof_get_summary() - @copybrief ccl_prof_get_summary
-* ::ccl_prof_iter_agg_init() - @copybrief ccl_prof_iter_agg_init
-* ::ccl_prof_iter_agg_next() - @copybrief ccl_prof_iter_agg_next
-* ::ccl_prof_iter_info_init() - @copybrief ccl_prof_iter_info_init
-* ::ccl_prof_iter_info_next() - @copybrief ccl_prof_iter_info_next
-* ::ccl_prof_iter_inst_init() - @copybrief ccl_prof_iter_inst_init
-* ::ccl_prof_iter_inst_next() - @copybrief ccl_prof_iter_inst_next
-* ::ccl_prof_iter_overlap_init() - @copybrief ccl_prof_iter_overlap_init
-* ::ccl_prof_iter_overlap_next() - @copybrief ccl_prof_iter_overlap_next
-* ::ccl_prof_new() - @copybrief ccl_prof_new
-* ::ccl_prof_print_summary() - @copybrief ccl_prof_print_summary
-* ::ccl_prof_set_export_opts() - @copybrief ccl_prof_set_export_opts
-* ::ccl_prof_start() - @copybrief ccl_prof_start
-* ::ccl_prof_stop() - @copybrief ccl_prof_stop
-* ::ccl_prof_time_elapsed() - @copybrief ccl_prof_time_elapsed
-* ::ccl_program_build() - @copybrief ccl_program_build
-* ::ccl_program_build_full() - @copybrief ccl_program_build_full
-* ::ccl_program_compile() - @copybrief ccl_program_compile
-* ::ccl_program_destroy() - @copybrief ccl_program_destroy
-* ::ccl_program_enqueue_kernel() - @copybrief ccl_program_enqueue_kernel
-* ::ccl_program_enqueue_kernel_v() - @copybrief ccl_program_enqueue_kernel_v
-* ::ccl_program_get_all_devices() - @copybrief ccl_program_get_all_devices
-* ::ccl_program_get_binary() - @copybrief ccl_program_get_binary
-* ::ccl_program_get_build_info() - @copybrief ccl_program_get_build_info
-* ::ccl_program_get_build_info_array() - @copybrief ccl_program_get_build_info_array
-* ::ccl_program_get_build_info_scalar() - @copybrief ccl_program_get_build_info_scalar
-* ::ccl_program_get_build_log() - @copybrief ccl_program_get_build_log
-* ::ccl_program_get_device() - @copybrief ccl_program_get_device
-* ::ccl_program_get_device_build_log() - @copybrief ccl_program_get_device_build_log
-* ::ccl_program_get_info() - @copybrief ccl_program_get_info
-* ::ccl_program_get_info_array() - @copybrief ccl_program_get_info_array
-* ::ccl_program_get_info_scalar() - @copybrief ccl_program_get_info_scalar
-* ::ccl_program_get_kernel() - @copybrief ccl_program_get_kernel
-* ::ccl_program_get_num_devices() - @copybrief ccl_program_get_num_devices
-* ::ccl_program_get_opencl_version() - @copybrief ccl_program_get_opencl_version
-* ::ccl_program_link() - @copybrief ccl_program_link
-* ::ccl_program_new_from_binaries() - @copybrief ccl_program_new_from_binaries
-* ::ccl_program_new_from_binary() - @copybrief ccl_program_new_from_binary
-* ::ccl_program_new_from_binary_file() - @copybrief ccl_program_new_from_binary_file
-* ::ccl_program_new_from_binary_files() - @copybrief ccl_program_new_from_binary_files
-* ::ccl_program_new_from_built_in_kernels() - @copybrief ccl_program_new_from_built_in_kernels
-* ::ccl_program_new_from_source() - @copybrief ccl_program_new_from_source
-* ::ccl_program_new_from_source_file() - @copybrief ccl_program_new_from_source_file
-* ::ccl_program_new_from_source_files() - @copybrief ccl_program_new_from_source_files
-* ::ccl_program_new_from_sources() - @copybrief ccl_program_new_from_sources
-* ::ccl_program_new_wrap() - @copybrief ccl_program_new_wrap
-* ::ccl_program_ref() - @copybrief ccl_program_ref
-* ::ccl_program_save_all_binaries() - @copybrief ccl_program_save_all_binaries
-* ::ccl_program_save_binary() - @copybrief ccl_program_save_binary
-* ::ccl_program_unref() - @copybrief ccl_program_unref
-* ::ccl_program_unwrap() - @copybrief ccl_program_unwrap
-* ::ccl_queue_destroy() - @copybrief ccl_queue_destroy
-* ::ccl_queue_finish() - @copybrief ccl_queue_finish
-* ::ccl_queue_flush() - @copybrief ccl_queue_flush
-* ::ccl_queue_gc() - @copybrief ccl_queue_gc
-* ::ccl_queue_get_context() - @copybrief ccl_queue_get_context
-* ::ccl_queue_get_device() - @copybrief ccl_queue_get_device
-* ::ccl_queue_get_info() - @copybrief ccl_queue_get_info
-* ::ccl_queue_get_info_array() - @copybrief ccl_queue_get_info_array
-* ::ccl_queue_get_info_scalar() - @copybrief ccl_queue_get_info_scalar
-* ::ccl_queue_iter_event_init() - @copybrief ccl_queue_iter_event_init
-* ::ccl_queue_iter_event_next() - @copybrief ccl_queue_iter_event_next
-* ::ccl_queue_new() - @copybrief ccl_queue_new
-* ::ccl_queue_new_full() - @copybrief ccl_queue_new_full
-* ::ccl_queue_new_wrap() - @copybrief ccl_queue_new_wrap
-* ::ccl_queue_produce_event() - @copybrief ccl_queue_produce_event
-* ::ccl_queue_ref() - @copybrief ccl_queue_ref
-* ::ccl_queue_unref() - @copybrief ccl_queue_unref
-* ::ccl_queue_unwrap() - @copybrief ccl_queue_unwrap
-* ::ccl_sampler_destroy() - @copybrief ccl_sampler_destroy
-* ::ccl_sampler_get_info() - @copybrief ccl_sampler_get_info
-* ::ccl_sampler_get_info_array() - @copybrief ccl_sampler_get_info_array
-* ::ccl_sampler_get_info_scalar() - @copybrief ccl_sampler_get_info_scalar
-* ::ccl_sampler_new() - @copybrief ccl_sampler_new
-* ::ccl_sampler_new_full() - @copybrief ccl_sampler_new_full
-* ::ccl_sampler_new_wrap() - @copybrief ccl_sampler_new_wrap
-* ::ccl_sampler_ref() - @copybrief ccl_sampler_ref
-* ::ccl_sampler_unref() - @copybrief ccl_sampler_unref
-* ::ccl_sampler_unwrap() - @copybrief ccl_sampler_unwrap
-* ::ccl_user_event_new() - @copybrief ccl_user_event_new
-* ::ccl_user_event_set_status() - @copybrief ccl_user_event_set_status
-* ::ccl_wrapper_get_class_name() - @copybrief ccl_wrapper_get_class_name
-* ::ccl_wrapper_get_info() - @copybrief ccl_wrapper_get_info
-* ::ccl_wrapper_get_info_size() - @copybrief ccl_wrapper_get_info_size
-* ::ccl_wrapper_get_info_value() - @copybrief ccl_wrapper_get_info_value
-* ::ccl_wrapper_memcheck() - @copybrief ccl_wrapper_memcheck
-* ::ccl_wrapper_ref() - @copybrief ccl_wrapper_ref
-* ::ccl_wrapper_ref_count() - @copybrief ccl_wrapper_ref_count
-* ::ccl_wrapper_unwrap() - @copybrief ccl_wrapper_unwrap
+Function/macro | Description
+---------------|------------
+::ccl_arg_destroy() | @copybrief ccl_arg_destroy
+::ccl_arg_full() | @copybrief ccl_arg_full
+::ccl_arg_local() | @copybrief ccl_arg_local
+::ccl_arg_new() | @copybrief ccl_arg_new
+::ccl_arg_priv() | @copybrief ccl_arg_priv
+::ccl_arg_size() | @copybrief ccl_arg_size
+::ccl_arg_value() | @copybrief ccl_arg_value
+::ccl_buffer_destroy() | @copybrief ccl_buffer_destroy
+::ccl_buffer_enqueue_copy() | @copybrief ccl_buffer_enqueue_copy
+::ccl_buffer_enqueue_copy_rect() | @copybrief ccl_buffer_enqueue_copy_rect
+::ccl_buffer_enqueue_copy_to_image() | @copybrief ccl_buffer_enqueue_copy_to_image
+::ccl_buffer_enqueue_fill() | @copybrief ccl_buffer_enqueue_fill
+::ccl_buffer_enqueue_map() | @copybrief ccl_buffer_enqueue_map
+::ccl_buffer_enqueue_read() | @copybrief ccl_buffer_enqueue_read
+::ccl_buffer_enqueue_read_rect() | @copybrief ccl_buffer_enqueue_read_rect
+::ccl_buffer_enqueue_unmap() | @copybrief ccl_buffer_enqueue_unmap
+::ccl_buffer_enqueue_write() | @copybrief ccl_buffer_enqueue_write
+::ccl_buffer_enqueue_write_rect() | @copybrief ccl_buffer_enqueue_write_rect
+::ccl_buffer_new() | @copybrief ccl_buffer_new
+::ccl_buffer_new_from_region() | @copybrief ccl_buffer_new_from_region
+::ccl_buffer_new_wrap() | @copybrief ccl_buffer_new_wrap
+::ccl_buffer_ref() | @copybrief ccl_buffer_ref
+::ccl_buffer_unref() | @copybrief ccl_buffer_unref
+::ccl_buffer_unwrap() | @copybrief ccl_buffer_unwrap
+::ccl_common_version_print() | @copybrief ccl_common_version_print
+::ccl_context_destroy() | @copybrief ccl_context_destroy
+::ccl_context_get_all_devices() | @copybrief ccl_context_get_all_devices
+::ccl_context_get_device() | @copybrief ccl_context_get_device
+::ccl_context_get_info() | @copybrief ccl_context_get_info
+::ccl_context_get_info_array() | @copybrief ccl_context_get_info_array
+::ccl_context_get_info_scalar() | @copybrief ccl_context_get_info_scalar
+::ccl_context_get_num_devices() | @copybrief ccl_context_get_num_devices
+::ccl_context_get_opencl_version() | @copybrief ccl_context_get_opencl_version
+::ccl_context_get_platform() | @copybrief ccl_context_get_platform
+::ccl_context_get_supported_image_formats() | @copybrief ccl_context_get_supported_image_formats
+::ccl_context_new_accel() | @copybrief ccl_context_new_accel
+::ccl_context_new_any() | @copybrief ccl_context_new_any
+::ccl_context_new_cpu() | @copybrief ccl_context_new_cpu
+::ccl_context_new_from_dep_filter() | @copybrief ccl_context_new_from_dep_filter
+::ccl_context_new_from_device_index() | @copybrief ccl_context_new_from_device_index
+::ccl_context_new_from_devices() | @copybrief ccl_context_new_from_devices
+::ccl_context_new_from_devices_full() | @copybrief ccl_context_new_from_devices_full
+::ccl_context_new_from_filter() | @copybrief ccl_context_new_from_filter
+::ccl_context_new_from_filters() | @copybrief ccl_context_new_from_filters
+::ccl_context_new_from_filters_full() | @copybrief ccl_context_new_from_filters_full
+::ccl_context_new_from_indep_filter() | @copybrief ccl_context_new_from_indep_filter
+::ccl_context_new_from_menu() | @copybrief ccl_context_new_from_menu
+::ccl_context_new_from_menu_full() | @copybrief ccl_context_new_from_menu_full
+::ccl_context_new_gpu() | @copybrief ccl_context_new_gpu
+::ccl_context_new_wrap() | @copybrief ccl_context_new_wrap
+::ccl_context_ref() | @copybrief ccl_context_ref
+::ccl_context_unref() | @copybrief ccl_context_unref
+::ccl_context_unwrap() | @copybrief ccl_context_unwrap
+::ccl_device_create_subdevices() | @copybrief ccl_device_create_subdevices
+::ccl_device_destroy() | @copybrief ccl_device_destroy
+::ccl_device_get_info() | @copybrief ccl_device_get_info
+::ccl_device_get_info_array() | @copybrief ccl_device_get_info_array
+::ccl_device_get_info_scalar() | @copybrief ccl_device_get_info_scalar
+::ccl_device_get_opencl_c_version() | @copybrief ccl_device_get_opencl_c_version
+::ccl_device_get_opencl_version() | @copybrief ccl_device_get_opencl_version
+::ccl_device_new_wrap() | @copybrief ccl_device_new_wrap
+::ccl_device_ref() | @copybrief ccl_device_ref
+::ccl_device_unref() | @copybrief ccl_device_unref
+::ccl_device_unwrap() | @copybrief ccl_device_unwrap
+::ccl_devquery_get_prefix_final() | @copybrief ccl_devquery_get_prefix_final
+::ccl_devquery_match() | @copybrief ccl_devquery_match
+::ccl_devquery_name() | @copybrief ccl_devquery_name
+::ccl_devquery_prefix() | @copybrief ccl_devquery_prefix
+::ccl_devquery_type2str() | @copybrief ccl_devquery_type2str
+::ccl_devsel_add_dep_filter() | @copybrief ccl_devsel_add_dep_filter
+::ccl_devsel_add_indep_filter() | @copybrief ccl_devsel_add_indep_filter
+::ccl_devsel_dep_index() | @copybrief ccl_devsel_dep_index
+::ccl_devsel_dep_menu() | @copybrief ccl_devsel_dep_menu
+::ccl_devsel_dep_platform() | @copybrief ccl_devsel_dep_platform
+::ccl_devsel_devices_destroy() | @copybrief ccl_devsel_devices_destroy
+::ccl_devsel_devices_new() | @copybrief ccl_devsel_devices_new
+::ccl_devsel_get_device_strings() | @copybrief ccl_devsel_get_device_strings
+::ccl_devsel_indep_platform() | @copybrief ccl_devsel_indep_platform
+::ccl_devsel_indep_string() | @copybrief ccl_devsel_indep_string
+::ccl_devsel_indep_type() | @copybrief ccl_devsel_indep_type
+::ccl_devsel_indep_type_accel() | @copybrief ccl_devsel_indep_type_accel
+::ccl_devsel_indep_type_cpu() | @copybrief ccl_devsel_indep_type_cpu
+::ccl_devsel_indep_type_gpu() | @copybrief ccl_devsel_indep_type_gpu
+::ccl_devsel_print_device_strings() | @copybrief ccl_devsel_print_device_strings
+::ccl_devsel_select() | @copybrief ccl_devsel_select
+::ccl_enqueue_barrier() | @copybrief ccl_enqueue_barrier
+::ccl_enqueue_marker() | @copybrief ccl_enqueue_marker
+::ccl_err() | @copybrief ccl_err
+::ccl_error_quark() | @copybrief ccl_error_quark
+::ccl_event_destroy() | @copybrief ccl_event_destroy
+::ccl_event_get_command_type() | @copybrief ccl_event_get_command_type
+::ccl_event_get_final_name() | @copybrief ccl_event_get_final_name
+::ccl_event_get_info() | @copybrief ccl_event_get_info
+::ccl_event_get_info_array() | @copybrief ccl_event_get_info_array
+::ccl_event_get_info_scalar() | @copybrief ccl_event_get_info_scalar
+::ccl_event_get_name() | @copybrief ccl_event_get_name
+::ccl_event_get_opencl_version() | @copybrief ccl_event_get_opencl_version
+::ccl_event_get_profiling_info() | @copybrief ccl_event_get_profiling_info
+::ccl_event_get_profiling_info_array() | @copybrief ccl_event_get_profiling_info_array
+::ccl_event_get_profiling_info_scalar() | @copybrief ccl_event_get_profiling_info_scalar
+::ccl_event_new_wrap() | @copybrief ccl_event_new_wrap
+::ccl_event_ref() | @copybrief ccl_event_ref
+::ccl_event_set_callback() | @copybrief ccl_event_set_callback
+::ccl_event_set_name() | @copybrief ccl_event_set_name
+::ccl_event_unref() | @copybrief ccl_event_unref
+::ccl_event_unwrap() | @copybrief ccl_event_unwrap
+::ccl_event_wait() | @copybrief ccl_event_wait
+::ccl_event_wait_list_add() | @copybrief ccl_event_wait_list_add
+::ccl_event_wait_list_add_v() | @copybrief ccl_event_wait_list_add_v
+::ccl_event_wait_list_clear() | @copybrief ccl_event_wait_list_clear
+::ccl_event_wait_list_get_clevents() | @copybrief ccl_event_wait_list_get_clevents
+::ccl_event_wait_list_get_num_events() | @copybrief ccl_event_wait_list_get_num_events
+::ccl_ewl() | @copybrief ccl_ewl
+::ccl_if_err_create_goto() | @copybrief ccl_if_err_create_goto
+::ccl_if_err_goto() | @copybrief ccl_if_err_goto
+::ccl_if_err_propagate_goto() | @copybrief ccl_if_err_propagate_goto
+::ccl_image_destroy() | @copybrief ccl_image_destroy
+::ccl_image_enqueue_copy() | @copybrief ccl_image_enqueue_copy
+::ccl_image_enqueue_copy_to_buffer() | @copybrief ccl_image_enqueue_copy_to_buffer
+::ccl_image_enqueue_fill() | @copybrief ccl_image_enqueue_fill
+::ccl_image_enqueue_map() | @copybrief ccl_image_enqueue_map
+::ccl_image_enqueue_read() | @copybrief ccl_image_enqueue_read
+::ccl_image_enqueue_unmap() | @copybrief ccl_image_enqueue_unmap
+::ccl_image_enqueue_write() | @copybrief ccl_image_enqueue_write
+::ccl_image_get_info() | @copybrief ccl_image_get_info
+::ccl_image_get_info_array() | @copybrief ccl_image_get_info_array
+::ccl_image_get_info_scalar() | @copybrief ccl_image_get_info_scalar
+::ccl_image_new() | @copybrief ccl_image_new
+::ccl_image_new_v() | @copybrief ccl_image_new_v
+::ccl_image_new_wrap() | @copybrief ccl_image_new_wrap
+::ccl_image_ref() | @copybrief ccl_image_ref
+::ccl_image_unref() | @copybrief ccl_image_unref
+::ccl_image_unwrap() | @copybrief ccl_image_unwrap
+::ccl_kernel_destroy() | @copybrief ccl_kernel_destroy
+::ccl_kernel_enqueue_native() | @copybrief ccl_kernel_enqueue_native
+::ccl_kernel_enqueue_ndrange() | @copybrief ccl_kernel_enqueue_ndrange
+::ccl_kernel_get_arg_info() | @copybrief ccl_kernel_get_arg_info
+::ccl_kernel_get_arg_info_array() | @copybrief ccl_kernel_get_arg_info_array
+::ccl_kernel_get_arg_info_scalar() | @copybrief ccl_kernel_get_arg_info_scalar
+::ccl_kernel_get_info() | @copybrief ccl_kernel_get_info
+::ccl_kernel_get_info_array() | @copybrief ccl_kernel_get_info_array
+::ccl_kernel_get_info_scalar() | @copybrief ccl_kernel_get_info_scalar
+::ccl_kernel_get_opencl_version() | @copybrief ccl_kernel_get_opencl_version
+::ccl_kernel_get_workgroup_info() | @copybrief ccl_kernel_get_workgroup_info
+::ccl_kernel_get_workgroup_info_array() | @copybrief ccl_kernel_get_workgroup_info_array
+::ccl_kernel_get_workgroup_info_scalar() | @copybrief ccl_kernel_get_workgroup_info_scalar
+::ccl_kernel_new() | @copybrief ccl_kernel_new
+::ccl_kernel_new_wrap() | @copybrief ccl_kernel_new_wrap
+::ccl_kernel_ref() | @copybrief ccl_kernel_ref
+::ccl_kernel_set_arg() | @copybrief ccl_kernel_set_arg
+::ccl_kernel_set_args() | @copybrief ccl_kernel_set_args
+::ccl_kernel_set_args_and_enqueue_ndrange() | @copybrief ccl_kernel_set_args_and_enqueue_ndrange
+::ccl_kernel_set_args_and_enqueue_ndrange_v() | @copybrief ccl_kernel_set_args_and_enqueue_ndrange_v
+::ccl_kernel_set_args_v() | @copybrief ccl_kernel_set_args_v
+::ccl_kernel_suggest_worksizes() | @copybrief ccl_kernel_suggest_worksizes
+::ccl_kernel_unref() | @copybrief ccl_kernel_unref
+::ccl_kernel_unwrap() | @copybrief ccl_kernel_unwrap
+::ccl_memobj_enqueue_migrate() | @copybrief ccl_memobj_enqueue_migrate
+::ccl_memobj_enqueue_unmap() | @copybrief ccl_memobj_enqueue_unmap
+::ccl_memobj_get_info() | @copybrief ccl_memobj_get_info
+::ccl_memobj_get_info_array() | @copybrief ccl_memobj_get_info_array
+::ccl_memobj_get_info_scalar() | @copybrief ccl_memobj_get_info_scalar
+::ccl_memobj_get_opencl_version() | @copybrief ccl_memobj_get_opencl_version
+::ccl_memobj_ref() | @copybrief ccl_memobj_ref
+::ccl_memobj_set_destructor_callback() | @copybrief ccl_memobj_set_destructor_callback
+::ccl_memobj_unwrap() | @copybrief ccl_memobj_unwrap
+::ccl_ocl_error_quark() | @copybrief ccl_ocl_error_quark
+::ccl_platform_destroy() | @copybrief ccl_platform_destroy
+::ccl_platform_get_all_devices() | @copybrief ccl_platform_get_all_devices
+::ccl_platform_get_device() | @copybrief ccl_platform_get_device
+::ccl_platform_get_info() | @copybrief ccl_platform_get_info
+::ccl_platform_get_info_array() | @copybrief ccl_platform_get_info_array
+::ccl_platform_get_info_scalar() | @copybrief ccl_platform_get_info_scalar
+::ccl_platform_get_info_string() | @copybrief ccl_platform_get_info_string
+::ccl_platform_get_num_devices() | @copybrief ccl_platform_get_num_devices
+::ccl_platform_get_opencl_version() | @copybrief ccl_platform_get_opencl_version
+::ccl_platform_new_from_device() | @copybrief ccl_platform_new_from_device
+::ccl_platform_new_wrap() | @copybrief ccl_platform_new_wrap
+::ccl_platform_ref() | @copybrief ccl_platform_ref
+::ccl_platform_unref() | @copybrief ccl_platform_unref
+::ccl_platform_unwrap() | @copybrief ccl_platform_unwrap
+::ccl_platforms_count() | @copybrief ccl_platforms_count
+::ccl_platforms_destroy() | @copybrief ccl_platforms_destroy
+::ccl_platforms_get() | @copybrief ccl_platforms_get
+::ccl_platforms_new() | @copybrief ccl_platforms_new
+::ccl_prof_add_queue() | @copybrief ccl_prof_add_queue
+::ccl_prof_calc() | @copybrief ccl_prof_calc
+::ccl_prof_destroy() | @copybrief ccl_prof_destroy
+::ccl_prof_export_info() | @copybrief ccl_prof_export_info
+::ccl_prof_export_info_file() | @copybrief ccl_prof_export_info_file
+::ccl_prof_get_agg() | @copybrief ccl_prof_get_agg
+::ccl_prof_get_duration() | @copybrief ccl_prof_get_duration
+::ccl_prof_get_eff_duration() | @copybrief ccl_prof_get_eff_duration
+::ccl_prof_get_export_opts() | @copybrief ccl_prof_get_export_opts
+::ccl_prof_get_summary() | @copybrief ccl_prof_get_summary
+::ccl_prof_iter_agg_init() | @copybrief ccl_prof_iter_agg_init
+::ccl_prof_iter_agg_next() | @copybrief ccl_prof_iter_agg_next
+::ccl_prof_iter_info_init() | @copybrief ccl_prof_iter_info_init
+::ccl_prof_iter_info_next() | @copybrief ccl_prof_iter_info_next
+::ccl_prof_iter_inst_init() | @copybrief ccl_prof_iter_inst_init
+::ccl_prof_iter_inst_next() | @copybrief ccl_prof_iter_inst_next
+::ccl_prof_iter_overlap_init() | @copybrief ccl_prof_iter_overlap_init
+::ccl_prof_iter_overlap_next() | @copybrief ccl_prof_iter_overlap_next
+::ccl_prof_new() | @copybrief ccl_prof_new
+::ccl_prof_print_summary() | @copybrief ccl_prof_print_summary
+::ccl_prof_set_export_opts() | @copybrief ccl_prof_set_export_opts
+::ccl_prof_start() | @copybrief ccl_prof_start
+::ccl_prof_stop() | @copybrief ccl_prof_stop
+::ccl_prof_time_elapsed() | @copybrief ccl_prof_time_elapsed
+::ccl_program_build() | @copybrief ccl_program_build
+::ccl_program_build_full() | @copybrief ccl_program_build_full
+::ccl_program_compile() | @copybrief ccl_program_compile
+::ccl_program_destroy() | @copybrief ccl_program_destroy
+::ccl_program_enqueue_kernel() | @copybrief ccl_program_enqueue_kernel
+::ccl_program_enqueue_kernel_v() | @copybrief ccl_program_enqueue_kernel_v
+::ccl_program_get_all_devices() | @copybrief ccl_program_get_all_devices
+::ccl_program_get_binary() | @copybrief ccl_program_get_binary
+::ccl_program_get_build_info() | @copybrief ccl_program_get_build_info
+::ccl_program_get_build_info_array() | @copybrief ccl_program_get_build_info_array
+::ccl_program_get_build_info_scalar() | @copybrief ccl_program_get_build_info_scalar
+::ccl_program_get_build_log() | @copybrief ccl_program_get_build_log
+::ccl_program_get_device() | @copybrief ccl_program_get_device
+::ccl_program_get_device_build_log() | @copybrief ccl_program_get_device_build_log
+::ccl_program_get_info() | @copybrief ccl_program_get_info
+::ccl_program_get_info_array() | @copybrief ccl_program_get_info_array
+::ccl_program_get_info_scalar() | @copybrief ccl_program_get_info_scalar
+::ccl_program_get_kernel() | @copybrief ccl_program_get_kernel
+::ccl_program_get_num_devices() | @copybrief ccl_program_get_num_devices
+::ccl_program_get_opencl_version() | @copybrief ccl_program_get_opencl_version
+::ccl_program_link() | @copybrief ccl_program_link
+::ccl_program_new_from_binaries() | @copybrief ccl_program_new_from_binaries
+::ccl_program_new_from_binary() | @copybrief ccl_program_new_from_binary
+::ccl_program_new_from_binary_file() | @copybrief ccl_program_new_from_binary_file
+::ccl_program_new_from_binary_files() | @copybrief ccl_program_new_from_binary_files
+::ccl_program_new_from_built_in_kernels() | @copybrief ccl_program_new_from_built_in_kernels
+::ccl_program_new_from_source() | @copybrief ccl_program_new_from_source
+::ccl_program_new_from_source_file() | @copybrief ccl_program_new_from_source_file
+::ccl_program_new_from_source_files() | @copybrief ccl_program_new_from_source_files
+::ccl_program_new_from_sources() | @copybrief ccl_program_new_from_sources
+::ccl_program_new_wrap() | @copybrief ccl_program_new_wrap
+::ccl_program_ref() | @copybrief ccl_program_ref
+::ccl_program_save_all_binaries() | @copybrief ccl_program_save_all_binaries
+::ccl_program_save_binary() | @copybrief ccl_program_save_binary
+::ccl_program_unref() | @copybrief ccl_program_unref
+::ccl_program_unwrap() | @copybrief ccl_program_unwrap
+::ccl_queue_destroy() | @copybrief ccl_queue_destroy
+::ccl_queue_finish() | @copybrief ccl_queue_finish
+::ccl_queue_flush() | @copybrief ccl_queue_flush
+::ccl_queue_gc() | @copybrief ccl_queue_gc
+::ccl_queue_get_context() | @copybrief ccl_queue_get_context
+::ccl_queue_get_device() | @copybrief ccl_queue_get_device
+::ccl_queue_get_info() | @copybrief ccl_queue_get_info
+::ccl_queue_get_info_array() | @copybrief ccl_queue_get_info_array
+::ccl_queue_get_info_scalar() | @copybrief ccl_queue_get_info_scalar
+::ccl_queue_iter_event_init() | @copybrief ccl_queue_iter_event_init
+::ccl_queue_iter_event_next() | @copybrief ccl_queue_iter_event_next
+::ccl_queue_new() | @copybrief ccl_queue_new
+::ccl_queue_new_full() | @copybrief ccl_queue_new_full
+::ccl_queue_new_wrap() | @copybrief ccl_queue_new_wrap
+::ccl_queue_produce_event() | @copybrief ccl_queue_produce_event
+::ccl_queue_ref() | @copybrief ccl_queue_ref
+::ccl_queue_unref() | @copybrief ccl_queue_unref
+::ccl_queue_unwrap() | @copybrief ccl_queue_unwrap
+::ccl_sampler_destroy() | @copybrief ccl_sampler_destroy
+::ccl_sampler_get_info() | @copybrief ccl_sampler_get_info
+::ccl_sampler_get_info_array() | @copybrief ccl_sampler_get_info_array
+::ccl_sampler_get_info_scalar() | @copybrief ccl_sampler_get_info_scalar
+::ccl_sampler_new() | @copybrief ccl_sampler_new
+::ccl_sampler_new_full() | @copybrief ccl_sampler_new_full
+::ccl_sampler_new_wrap() | @copybrief ccl_sampler_new_wrap
+::ccl_sampler_ref() | @copybrief ccl_sampler_ref
+::ccl_sampler_unref() | @copybrief ccl_sampler_unref
+::ccl_sampler_unwrap() | @copybrief ccl_sampler_unwrap
+::ccl_user_event_new() | @copybrief ccl_user_event_new
+::ccl_user_event_set_status() | @copybrief ccl_user_event_set_status
+::ccl_wrapper_get_class_name() | @copybrief ccl_wrapper_get_class_name
+::ccl_wrapper_get_info() | @copybrief ccl_wrapper_get_info
+::ccl_wrapper_get_info_size() | @copybrief ccl_wrapper_get_info_size
+::ccl_wrapper_get_info_value() | @copybrief ccl_wrapper_get_info_value
+::ccl_wrapper_memcheck() | @copybrief ccl_wrapper_memcheck
+::ccl_wrapper_ref() | @copybrief ccl_wrapper_ref
+::ccl_wrapper_ref_count() | @copybrief ccl_wrapper_ref_count
+::ccl_wrapper_unwrap() | @copybrief ccl_wrapper_unwrap
