@@ -1717,71 +1717,70 @@ const char* ccl_prof_get_summary(
 	/* Current overlap to print. */
 	const CCLProfOverlap* ovlp = NULL;
 	/* The summary string. */
-	GString* str_obj = g_string_new("");
-
-	g_string_append_printf(str_obj, "\n   =========================== Timming/Profiling ===========================\n\n");
+	GString* str_obj = g_string_new("\n");
 
 	/* Show aggregate event times */
-	g_string_append_printf(str_obj, "     Aggregate times by event  :\n");
-	g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
-	g_string_append_printf(str_obj, "       | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
-	g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
+	g_string_append_printf(str_obj, " Aggregate times by event  :\n");
+	g_string_append_printf(str_obj, "   ------------------------------------------------------------------\n");
+	g_string_append_printf(str_obj, "   | Event name                     | Rel. time (%%) | Abs. time (s) |\n");
+	g_string_append_printf(str_obj, "   ------------------------------------------------------------------\n");
 	ccl_prof_iter_agg_init(prof, agg_sort);
 	while ((agg = ccl_prof_iter_agg_next(prof)) != NULL) {
 		g_string_append_printf(str_obj,
-			"       | %-30.30s | %13.4f | %13.4e |\n",
+			"   | %-30.30s | %13.4f | %13.4e |\n",
 			agg->event_name,
 			agg->relative_time * 100.0,
 			agg->absolute_time * 1e-9);
 	}
-	g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
+	g_string_append_printf(str_obj, "   ------------------------------------------------------------------\n");
 
 	/* Show total events time */
 	if (prof->total_events_time > 0) {
 		g_string_append_printf(str_obj,
-			"                                        |         Total | %13.4e |\n",
+			"                                    |         Total | %13.4e |\n",
 			prof->total_events_time * 1e-9);
 		g_string_append_printf(str_obj,
-			"                                        ---------------------------------\n");
+			"                                    ---------------------------------\n");
 	}
 
 	/* *** Show overlaps *** */
 
 	if (g_list_length(prof->overlaps) > 0) {
 		/* Title the several overlaps. */
-		g_string_append_printf(str_obj, "     Event overlaps            :\n");
-		g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
-		g_string_append_printf(str_obj, "       | Event 1                | Event2                 | Overlap (s)  |\n");
-		g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
+		g_string_append_printf(str_obj, " Event overlaps            :\n");
+		g_string_append_printf(str_obj, "   ------------------------------------------------------------------\n");
+		g_string_append_printf(str_obj, "   | Event 1                | Event2                 | Overlap (s)  |\n");
+		g_string_append_printf(str_obj, "   ------------------------------------------------------------------\n");
 		/* Show overlaps table. */
 		ccl_prof_iter_overlap_init(prof, ovlp_sort);
 		while ((ovlp = ccl_prof_iter_overlap_next(prof)) != NULL) {
-			g_string_append_printf(str_obj, "       | %-22.22s | %-22.22s | %12.4e |\n",
+			g_string_append_printf(str_obj, "   | %-22.22s | %-22.22s | %12.4e |\n",
 				ovlp->event1_name, ovlp->event2_name, ovlp->duration * 1e-9);
 		}
-		g_string_append_printf(str_obj, "       ------------------------------------------------------------------\n");
+		g_string_append_printf(str_obj, "   ------------------------------------------------------------------\n");
 		/* Show total events effective time (discount overlaps) */
-		g_string_append_printf(str_obj, "                                |                  Total | %12.4e |\n",
+		g_string_append_printf(str_obj, "                            |                  Total | %12.4e |\n",
 			(prof->total_events_time - prof->total_events_eff_time) * 1e-9);
-		g_string_append_printf(str_obj, "                                -----------------------------------------\n");
-		g_string_append_printf(str_obj, "     Tot. of all events (eff.) : %es\n",
+		g_string_append_printf(str_obj, "                            -----------------------------------------\n");
+		g_string_append_printf(str_obj, " Tot. of all events (eff.) : %es\n",
 			prof->total_events_eff_time * 1e-9);
 	} else {
-		g_string_append_printf(str_obj, "     Event overlaps            : None\n");
+		g_string_append_printf(str_obj, " Event overlaps            : None\n");
 	}
 
 	/* Show total ellapsed time */
 	if (prof->timer) {
 		double t_ellapsed = g_timer_elapsed(prof->timer, NULL);
 		g_string_append_printf(str_obj,
-			"     Total ellapsed time       : %es\n", t_ellapsed);
+			" Total ellapsed time       : %es\n", t_ellapsed);
 		g_string_append_printf(str_obj,
-			"     Time spent in device      : %.2f%%\n",
+			" Time spent in device      : %.2f%%\n",
 			prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 		g_string_append_printf(str_obj,
-			"     Time spent in host        : %.2f%%\n",
+			" Time spent in host        : %.2f%%\n",
 			100 - prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
 	}
+	g_string_append_printf(str_obj, "\n");
 
 	/* If a summary already exists, free it before keeping a new one. */
 	if (prof->summary != NULL)

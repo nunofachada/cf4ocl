@@ -203,10 +203,7 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 		devices, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Print menu. */
-	g_printf("\n   "
-		"=========================== Device Selection "
-		"============================\n\n");
+	g_printf("\n");
 
 	/* Print each device description string. */
 	for (cl_int i = 0; i < (cl_int) devices->len; i++) {
@@ -215,9 +212,9 @@ static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
 		gchar* sel_str;
 
 		/* If a device is pre-selected, show it. */
-		sel_str = "            ";
+		sel_str = "   ";
 		if (i == selected) {
-			sel_str = "  [SELECTED]";
+			sel_str = "(*)";
 		}
 
 		/* Print string. */
@@ -267,6 +264,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	GError* err_internal = NULL;
 
 	/* Print available devices */
+	g_printf("\nList of available OpenCL devices:\n");
 	ccl_devsel_dep_menu_list(devices, -1, &err_internal);
 	ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -276,7 +274,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 	} else {
 		/* Otherwise, query the user. */
 		do {
-			g_printf("\n   (?) Select device (0-%d) > ", devices->len - 1);
+			g_printf("\n (?) Select device (0-%d) > ", devices->len - 1);
 			result = scanf("%u", &index);
 			/* Clean keyboard buffer */
 			int c;
@@ -287,7 +285,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 					break;
 			}
 			/* Result not Ok, print error message */
-			g_printf("   (!) Invalid choice, please insert a value " \
+			g_printf(" (!) Invalid choice, please insert a value " \
 				"between 0 and %u.\n", devices->len - 1);
 		} while (1);
 	}
