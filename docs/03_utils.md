@@ -1,7 +1,7 @@
-Utilities {#ccl_utils}
+Utilities {#utils}
 =========
 
-@brief Useful tools included with _cf4ocl_
+@brief Utilities included with _cf4ocl_.
 
 * @subpage ccl_devinfo
 * @subpage ccl_c

@@ -1,7 +1,7 @@
 Tutorial {#tut}
 ========
 
-@brief Developing an application with _cf4ocl_
+@brief Developing an application with _cf4ocl_.
 
 ### Introduction
 

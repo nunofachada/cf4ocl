@@ -327,7 +327,7 @@ finish:
  * Creates a new image wrapper object using a variable list of key-value
  * pairs which describe the image. The keys are assumed to be of type
  * `const char*`, while the type of each corresponding value depends on
- * the key, as defined in the table bellow (see the ::ccl_image_desc
+ * the key, as defined in the table below (see the ::ccl_image_desc
  * struct for a detailed description of each key or parameter). The list
  * must end with `NULL`.
  *

@@ -1,5 +1,5 @@
 Function list {#funlist}
-=================
+=============
 
 @brief List of _cf4ocl_ functions and function-like macros.
 

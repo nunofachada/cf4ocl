@@ -648,7 +648,7 @@ INPUT                  = @PROJECT_BINARY_DIR@/include \
                          @PROJECT_SOURCE_DIR@/scripts \
                          @PROJECT_SOURCE_DIR@/docs
 
-USE_MDFILE_AS_MAINPAGE = @PROJECT_SOURCE_DIR@/docs/userguide.md
+USE_MDFILE_AS_MAINPAGE = @PROJECT_SOURCE_DIR@/docs/00_mainpage.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

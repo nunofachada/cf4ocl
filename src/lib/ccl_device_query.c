@@ -528,7 +528,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
 	{"EXT_MEM_PADDING_IN_BYTES_QCOM", CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM,
 		"Qualcomm ext.: Amount of padding necessary at the end of the buffer",
 		ccl_devquery_format_sizetbytes, ""},
-	/* The parameter bellow has in fact a length of 16 bytes,
+	/* The parameter below has in fact a length of 16 bytes,
 	 * but due to the lack of documentation, only the first half
 	 * of it is shown for now. */
 	{"GLOBAL_FREE_MEMORY_AMD", CL_DEVICE_GLOBAL_FREE_MEMORY_AMD,

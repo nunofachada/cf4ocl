@@ -12,11 +12,11 @@
 # Get all cf4ocl functions
 macros_to_ignore=G_GNUC_NULL_TERMINATED
 ccl_functions=`LC_ALL=C ctags -I $macros_to_ignore -x --c-kinds=pd ../src/lib/ccl_*.h | cut -f1 -d " " | grep '^[^A-Z_]'`
-FUNLIST_MD="../docs/funlist.md"
+FUNLIST_MD="../docs/04_funlist.md"
 
 # Remove previous page with function list, if any
 echo "Function list {#funlist}" > ${FUNLIST_MD}
-echo "=================" >> ${FUNLIST_MD}
+echo "=============" >> ${FUNLIST_MD}
 echo "" >> ${FUNLIST_MD}
 echo "@brief List of _cf4ocl_ functions and function-like macros." >> \
 	${FUNLIST_MD}
