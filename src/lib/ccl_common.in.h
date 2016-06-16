@@ -48,11 +48,15 @@
 /** Tweak _cf4ocl_ version string. */
 #define CCL_VERSION_TWEAK "@cf4ocl2_VERSION_TWEAK@"
 
-/** _cf4ocl_ version string. */
+/** _cf4ocl_ version string in vx.x.x format. */
 #define CCL_VERSION_STRING "@cf4ocl2_VERSION_STRING@"
 
-/** Full _cf4ocl_ version string. */
+/** Full _cf4ocl_ version string, includes commit SHA, etc. */
 #define CCL_VERSION_STRING_FULL "@cf4ocl2_VERSION_STRING_FULL@"
+
+/** Final _cf4ocl_ version string, either CCL_VERSION_STRING for stable
+ * versions or cf4ocl2_VERSION_STRING_FULL for development versions. */
+#define CCL_VERSION_STRING_FINAL "@cf4ocl2_VERSION_STRING_FINAL@"
 
 /**
  * Version of OpenCL headers used to compile _cf4ocl_.
@@ -72,10 +76,6 @@
 #else
 	#define CCL_OPENCL_VERSION "0.0"
 #endif
-
-/** Version of GLib headers used to compile _cf4ocl_. */
-#define CCL_GLIB_VERSION G_STRINGIFY(GLIB_MAJOR_VERSION) "." \
-	G_STRINGIFY(GLIB_MINOR_VERSION) "." G_STRINGIFY(GLIB_MICRO_VERSION)
 
 /** Compiler used to compile _cf4ocl_. */
 #define CCL_COMPILER "@CMAKE_C_COMPILER_ID@"

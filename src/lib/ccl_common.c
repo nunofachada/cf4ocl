@@ -35,15 +35,14 @@
  * */
 CCL_EXPORT
 void ccl_common_version_print(const char* exec_name) {
-	g_printf("%s %s "
-		"[" CCL_COMPILER " C Compiler + OpenCL "
-		CCL_OPENCL_VERSION " + GLib " CCL_GLIB_VERSION "]\n"
-		"Copyright (C) 2016 Nuno Fachada\n" \
-		"License GPLv3+: GNU GPL version 3 or later " \
-		"<http://gnu.org/licenses/gpl.html>.\n" \
-		"This is free software: you are free to change and redistribute it.\n" \
-		"There is NO WARRANTY, to the extent permitted by law.\n\n" \
-		"Written by Nuno Fachada\n", exec_name, CCL_VERSION_STRING_FULL);
+	g_printf("%s %s - Compiled with %s C Compiler with support for OpenCL %s\n"
+		"Copyright (C) 2016 Nuno Fachada\n"
+		"License GPLv3+: GNU GPL version 3 or later "
+		"<http://gnu.org/licenses/gpl.html>.\n"
+		"This is free software: you are free to change and redistribute it.\n"
+		"There is NO WARRANTY, to the extent permitted by law.\n\n"
+		"Written by Nuno Fachada\n",
+		exec_name, CCL_VERSION_STRING_FINAL, CCL_COMPILER, CCL_OPENCL_VERSION);
 }
 
 /**

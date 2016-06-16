@@ -18,6 +18,8 @@
 # most recent git tag.
 # ${PROJECT_NAME}_VERSION_STRING_FULL - Version string with metadata
 # such as "v2.0.0+3.a23fbc" or "v1.3.1-alpha.2+4.9c4fd1"
+# ${PROJECT_NAME}_VERSION_STRING_FINAL - Equal to ${PROJECT_NAME}_VERSION_STRING
+# for tagged commits, or to ${PROJECT_NAME}_VERSION_STRING_FULL otherwise
 # ${PROJECT_NAME}_VERSION - Same as ${PROJECT_NAME}_VERSION_STRING,
 # without the preceding 'v', e.g. "2.0.0" or "1.2.41-beta.1"
 # ${PROJECT_NAME}_VERSION_MAJOR - Major version integer (e.g. 2 in v2.3.1-RC.2+21.ef12c8)
@@ -41,7 +43,10 @@ if (GIT_FOUND AND VERSION_UPDATE_FROM_GIT)
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 	#How many commits since last tag
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-list master ${${PROJECT_NAME}_VERSION_STRING}^..HEAD --count
+	execute_process(
+		COMMAND
+			${GIT_EXECUTABLE} rev-list master
+			${${PROJECT_NAME}_VERSION_STRING}^..HEAD --count
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -68,8 +73,10 @@ if (GIT_FOUND AND VERSION_UPDATE_FROM_GIT)
 	list(LENGTH ${PROJECT_NAME}_PARTIAL_VERSION_LIST
 		${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN)
 	if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 3)
-		list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST 3 ${PROJECT_NAME}_VERSION_TWEAK)
-		string(SUBSTRING ${${PROJECT_NAME}_VERSION_TWEAK} 1 -1 ${PROJECT_NAME}_VERSION_TWEAK)
+		list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST 3
+			${PROJECT_NAME}_VERSION_TWEAK)
+		string(SUBSTRING ${${PROJECT_NAME}_VERSION_TWEAK} 1 -1
+			${PROJECT_NAME}_VERSION_TWEAK)
 	endif()
 
 	# Unset the list
@@ -81,7 +88,8 @@ if (GIT_FOUND AND VERSION_UPDATE_FROM_GIT)
 
 	# Save version to file (which will be used when Git is not available
 	# or VERSION_UPDATE_FROM_GIT is disabled)
-	file(WRITE ${CMAKE_SOURCE_DIR}/VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL}
+	file(WRITE
+		${CMAKE_SOURCE_DIR}/VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL}
 		"*" ${${PROJECT_NAME}_VERSION_STRING}
 		"*" ${${PROJECT_NAME}_VERSION_MAJOR}
 		"*" ${${PROJECT_NAME}_VERSION_MINOR}
@@ -94,7 +102,8 @@ else()
 
 	# Git not available, get version from file
 	file(STRINGS ${CMAKE_SOURCE_DIR}/VERSION ${PROJECT_NAME}_VERSION_LIST)
-	string(REPLACE "*" ";" ${PROJECT_NAME}_VERSION_LIST ${${PROJECT_NAME}_VERSION_LIST})
+	string(REPLACE "*" ";" ${PROJECT_NAME}_VERSION_LIST
+		${${PROJECT_NAME}_VERSION_LIST})
 	# Set partial versions
 	list(GET ${PROJECT_NAME}_VERSION_LIST 0 ${PROJECT_NAME}_VERSION_STRING_FULL)
 	list(GET ${PROJECT_NAME}_VERSION_LIST 1 ${PROJECT_NAME}_VERSION_STRING)
@@ -107,9 +116,19 @@ else()
 
 endif()
 
-
 # Set project version (without the preceding 'v')
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
 if (${PROJECT_NAME}_VERSION_TWEAK)
 	set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION}-${${PROJECT_NAME}_VERSION_TWEAK})
+endif()
+
+# Set "final" version, depending if this is currently a tagged commit
+if (${${PROJECT_NAME}_VERSION_AHEAD} EQUAL 1)
+	# For tagged commits use regular major.minor.patch-tweak string
+	set(${PROJECT_NAME}_VERSION_STRING_FINAL
+		${${PROJECT_NAME}_VERSION_STRING})
+else()
+	# Otherwise use full string indicating SHA, etc.
+	set(${PROJECT_NAME}_VERSION_STRING_FINAL
+		${${PROJECT_NAME}_VERSION_STRING_FULL})
 endif()
