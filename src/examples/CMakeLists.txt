@@ -12,7 +12,6 @@ SET(EXAMPLES
 	image_filter
 	list_devices
 	ca
-	ca_mt
 	device_filter
 	canon)
 
