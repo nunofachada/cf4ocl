@@ -275,6 +275,7 @@ static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
 		/* Otherwise, query the user. */
 		do {
 			g_printf("\n (?) Select device (0-%d) > ", devices->len - 1);
+			fflush(stdout);
 			result = scanf("%u", &index);
 			/* Clean keyboard buffer */
 			int c;
