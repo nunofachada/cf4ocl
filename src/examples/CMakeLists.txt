@@ -7,10 +7,10 @@ if (NOT ${BUILD_EXAMPLES})
 endif()
 
 # Examples without OpenCL kernel code
-SET(EXAMPLES_NOCL device_filter image_fill list_devices)
+set(EXAMPLES_NOCL device_filter image_fill list_devices)
 
 # Examples to be configured with OpenCL kernel code
-SET(EXAMPLES_CL image_filter ca canon)
+set(EXAMPLES_CL image_filter ca canon)
 
 # Specify location of stb headers for PNG load/save
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
