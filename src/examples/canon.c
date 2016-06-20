@@ -142,7 +142,6 @@ int main(int argc, char** argv) {
 	printf("\n");
 	printf(" * Global worksize: %d\n", (int) gws);
 	printf(" * Local worksize : %d\n", (int) lws);
-	printf("\n");
 
 	/* Initialize host buffers. */
 	a_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
@@ -213,10 +212,10 @@ int main(int argc, char** argv) {
 	}
 	if (check_result)
 		fprintf(stdout,
-			"Kernel execution produced the expected results.\n");
+			" * Kernel execution produced the expected results.\n");
 	else
 		fprintf(stderr,
-			"Kernel execution failed to produce the expected results.\n");
+			" * Kernel execution failed to produce the expected results.\n");
 
 	/* Perform profiling. */
 	prof = ccl_prof_new();
