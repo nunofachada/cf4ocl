@@ -6,37 +6,42 @@ if (NOT ${BUILD_EXAMPLES})
 	return()
 endif()
 
-# List of examples
-SET(EXAMPLES
-	image_fill
-	image_filter
-	list_devices
-	ca
-	device_filter
-	canon)
+# Examples without OpenCL kernel code
+SET(EXAMPLES_NOCL device_filter image_fill list_devices)
 
-# List of headers to be configured with OpenCL source code
-SET(HEADERS image_filter ca canon)
+# Examples to be configured with OpenCL kernel code
+SET(EXAMPLES_CL image_filter ca canon)
 
-# Configure headers
-foreach(HEADER ${HEADERS})
+# Specify location of stb headers for PNG load/save
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-	file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}.cl ${HEADER}_RAW HEX)
-	string(REGEX REPLACE "(..)" "\\\\x\\1" ${HEADER}_KERNEL_SRC
-		${${HEADER}_RAW})
+# Configure examples using OpenCL kernel code
+foreach(EXAMPLE ${EXAMPLES_CL})
 
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}.in.h
-		${CMAKE_BINARY_DIR}/generated/${HEADER}.h @ONLY)
+	# Load kernel code into string
+	#file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl ${EXAMPLE}_RAW)
+
+	#string(REGEX REPLACE "(..)" "\\\\x\\1" ${EXAMPLE}_KERNEL_SRC
+	#	${${EXAMPLE}_RAW})
+
+	# Stringify
+	execute_process(
+		COMMAND "${CMAKE_SOURCE_DIR}/auxbuild/stringify.sh"
+		INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl"
+		OUTPUT_VARIABLE ${EXAMPLE}_KERNEL_SRC)
+
+	# Configure example
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.c
+		${CMAKE_BINARY_DIR}/examples/${EXAMPLE}.c @ONLY)
+
+	# Add target for current example
+	add_executable(${EXAMPLE} ${CMAKE_BINARY_DIR}/examples/${EXAMPLE}.c)
+	target_link_libraries(${EXAMPLE} ${PROJECT_NAME})
 
 endforeach()
 
-# Specify location of headers
-include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}    # Non-modified headers
-	${CMAKE_BINARY_DIR}/generated) # Configured headers
-
-# Add a target for each example
-foreach(EXAMPLE ${EXAMPLES})
+# Add a target for examples without OpenCL kernel code
+foreach(EXAMPLE ${EXAMPLES_NOCL})
 	add_executable(${EXAMPLE} ${EXAMPLE}.c)
 	target_link_libraries(${EXAMPLE} ${PROJECT_NAME})
 endforeach()
@@ -52,4 +57,4 @@ if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 endif()
 
 # Add a target which builds all samples
-add_custom_target(examples DEPENDS ${EXAMPLES})
+add_custom_target(examples DEPENDS ${EXAMPLES_NOCL} ${EXAMPLES_CL})

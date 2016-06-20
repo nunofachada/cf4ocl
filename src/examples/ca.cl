@@ -21,10 +21,13 @@
  * Game of Life).
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
+/*
+ * This is the OpenCL kernel for the cellular automata example ca.c.
+ */
 
 /* Number of neighbors of a CA cell. */
 #define NUM_NEIGHS 8
@@ -48,7 +51,8 @@ __constant uint2 live_rule = (uint2) (2, 3);
 __constant uint2 dead_rule = (uint2) (3, 3);
 
 /* How to read input image. */
-__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_NEAREST;
+__constant sampler_t sampler =
+	CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_NEAREST;
 
 /**
  * Kernel which performs GOL simulation.
@@ -96,9 +100,13 @@ __kernel void ca(__read_only image2d_t in_img, __write_only image2d_t out_img) {
 
 		/* Check if, according to the CA rules, current cell should be
 		 * alive. */
-		if ((alive && (neighs_alive >= live_rule.s0) && (neighs_alive <= live_rule.s1))
-			|| (!alive && (neighs_alive >= dead_rule.s0) && (neighs_alive <= dead_rule.s1))) {
+		if ((alive && (neighs_alive >= live_rule.s0)
+				&& (neighs_alive <= live_rule.s1))
+			|| (!alive && (neighs_alive >= dead_rule.s0)
+				&& (neighs_alive <= dead_rule.s1))) {
+
 			new_state = (uint4) { 0x00, 0x00, 0x00, 0xFF };
+
 		}
 
 		/* Write current cell's new state. */

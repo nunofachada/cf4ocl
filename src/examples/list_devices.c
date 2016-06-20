@@ -17,20 +17,30 @@
 
 /**
  * @file
- * Example which demonstrates getting all platforms and devices in the
- * system, listing them and showing some info about them.
+ * Example which demonstrates getting all platforms and devices in the system,
+ * listing them and showing some info about them.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
+
+/*
+ * Description
+ * -----------
+ *
+ * Example which demonstrates getting all platforms and devices in the system,
+ * listing them and showing some info about them.
+ *
+ * */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <cf4ocl2.h>
 
+/* Error handling macros. */
 #define ERROR_MSG_AND_EXIT(msg) \
-	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
+	do { fprintf(stderr, "\n%s\n", msg); exit(EXIT_FAILURE); } while(0)
 
 #define HANDLE_ERROR(err) \
 	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
@@ -105,7 +115,7 @@ int main() {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 

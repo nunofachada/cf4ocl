@@ -19,27 +19,38 @@
  * @file
  * Example program which demonstrates device selection using filters.
  *
- * The program accepts one command-line argument which specifies if
- * (1) device filtering is to be performed for context creation, or (2)
- * just to list the filtered devices.
- *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
+
+/*
+ * Description
+ * -----------
+ *
+ * Example program which demonstrates advanced usage of device selection using
+ * filters.
+ *
+ * The program accepts one command-line argument which specifies if device
+ * filtering is to be performed for context creation (option 1), or just for
+ * listing the filtered devices (option 2).
+ *
+ * */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <cf4ocl2.h>
 
+/* Error handling macros. */
 #define ERROR_MSG_AND_EXIT(msg) \
-	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
+	do { fprintf(stderr, "\n%s\n", msg); exit(EXIT_FAILURE); } while(0)
 
 #define HANDLE_ERROR(err) \
 	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
 
-#define USAGE "Usage: device_filter 1|2\n\n1 - "\
-			"Create context with filtered devices\n"\
+/* Usage string. */
+#define USAGE "Usage: device_filter 1|2\n\n1 - " \
+			"Create context with filtered devices\n" \
 			"2 - List filtered devices\n"
 
 /**
@@ -133,7 +144,7 @@ int main(int argc, char* argv[]) {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 

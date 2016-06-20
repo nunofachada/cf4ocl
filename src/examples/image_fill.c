@@ -17,15 +17,25 @@
 
 /**
  * @file
- * Sample code which demonstrates image fills. User can pass the device
- * index in the first argument.
+ * Example which demonstrates image fills.
  *
  * @note Requires OpenCL >= 1.2.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
+
+/*
+ * Description
+ * -----------
+ *
+ * This example demonstrates image fills. The program accepts the index of the
+ * device to use as the first command-line argument.
+ *
+ * This example requires OpenCL >= 1.2.
+ *
+ * */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,12 +44,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+/* Image properties. */
 #define IMAGE_WIDTH 128
 #define IMAGE_HEIGHT 128
 #define IMAGE_FILE "out.png"
 
+/* Error handling macros. */
 #define ERROR_MSG_AND_EXIT(msg) \
-	do { fprintf(stderr, "\n%s\n", msg); exit(-1); } while(0)
+	do { fprintf(stderr, "\n%s\n", msg); exit(EXIT_FAILURE); } while(0)
 
 #define HANDLE_ERROR(err) \
 	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
@@ -160,14 +172,14 @@ int main(int argc, char* argv[]) {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 
 #else
 int main() {
 	fprintf(stderr, "This sample requires OpenCL 1.2\n");
-	return -1;
+	return EXIT_FAILURE;
 }
 #endif
 

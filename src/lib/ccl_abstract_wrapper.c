@@ -400,8 +400,8 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 /**
  * Get information about any wrapped OpenCL object.
  *
- * This function should not be called directly, but using the
- * ccl_*_info() macros instead.
+ * This function should not be directly invoked in most circumstances. Use the
+ * `ccl_*_get_info_*()` macros instead.
  *
  * @public @memberof ccl_wrapper
  *
@@ -535,6 +535,9 @@ finish:
 /**
  * Get pointer to information value.
  *
+ * This function should not be directly invoked in most circumstances. Use the
+ * `ccl_*_get_info_*()` macros instead.
+ *  *
  * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper1 The wrapper object to query.
@@ -578,6 +581,8 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * Get information size.
  *
  * @public @memberof ccl_wrapper
+ *
+ * This function should not be directly invoked in most circumstances.
  *
  * @param[in] wrapper1 The wrapper object to query.
  * @param[in] wrapper2 A second wrapper object, required in some

@@ -653,8 +653,11 @@ common functionality, and _cf4ocl_ directly maps this relationship with
 the respective wrappers.
 
 @example ca.c
+@example ca.cl
 @example canon.c
+@example canon.cl
 @example list_devices.c
 @example device_filter.c
 @example image_fill.c
 @example image_filter.c
+@example image_filter.cl

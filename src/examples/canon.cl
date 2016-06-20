@@ -17,12 +17,16 @@
 
 /**
  * @file
- * File containing kernel for cannonical example of how to use _cf4ocl_.
+ * File containing kernel for canonical example of how to use _cf4ocl_.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
+
+/*
+ * This is the OpenCL kernel for the canonical example canon.c.
+ */
 
 /**
  * Performs sum of two vectors plus a constant.

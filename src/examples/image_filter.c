@@ -17,8 +17,22 @@
 
 /**
  * @file
- * Sample code which demonstrates applying a filter to an image using
- * a convolution matrix.
+ * Example which demonstrates applying a filter to an image using a
+ * convolution matrix.
+ *
+ * @note Requires OpenCL >= 1.1.
+ *
+ * @author Nuno Fachada
+ * @date 2016
+ * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
+ */
+
+/*
+ * Description
+ * -----------
+ *
+ * Example which demonstrates applying a filter to an image using a
+ * convolution matrix.
  *
  * The first argument should be the image file to filter, and the second
  * (optional) argument can be the index of the device to use.
@@ -26,14 +40,35 @@
  * The program will save the filtered image to file IMAGE_FILE in PNG
  * format.
  *
- * @note Requires OpenCL >= 1.1.
+ * This example requires OpenCL >= 1.1.
  *
- * @author Nuno Fachada
- * @date 2014
- * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
- */
+ * */
 
-#include "image_filter.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <cf4ocl2.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#define STBI_NO_HDR
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+/* Kernel source string, will be hardwired in this location during the build
+ * process, before compilation. The kernel source is available in
+ * image_filter.cl. */
+#define FILTER_KERNEL \
+@image_filter_KERNEL_SRC@
+
+/* Output image name. */
+#define IMAGE_FILE "out.png"
+
+/* Error handling macros. */
+#define ERROR_MSG_AND_EXIT(msg) \
+	do { fprintf(stderr, "\n%s\n", msg); exit(EXIT_FAILURE); } while(0)
+
+#define HANDLE_ERROR(err) \
+	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
 
 /**
  * Image filter main function.
@@ -203,7 +238,7 @@ int main(int argc, char* argv[]) {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 

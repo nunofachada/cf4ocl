@@ -20,8 +20,12 @@
  * File containing an image filtering kernel.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
+ */
+
+/*
+ * This is the OpenCL kernel for the image filtering example image_filter.c.
  */
 
 /* Filter to apply (a convolution matrix). */
@@ -46,7 +50,9 @@ __kernel void do_filter(__read_only image2d_t input_img,
 	int2 imdim = get_image_dim(input_img);
 	int x = get_global_id(0);
 	int y = get_global_id(1);
+
 	if ((x < imdim.x) && (y < imdim.y)) {
+
 		int half_filter = filter_size / 2;
 		uint4 px_val;
 		float4 px_filt = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -54,12 +60,21 @@ __kernel void do_filter(__read_only image2d_t input_img,
 		int i, j, filter_i, filter_j;
 
 		for(i = -half_filter, filter_i = 0; i <= half_filter; i++, filter_i++) {
-			for(j = -half_filter, filter_j = 0; j <= half_filter; j++, filter_j++) {
-				px_val = read_imageui(input_img, sampler, (int2) (x + i, y + j));
-				px_filt += filter[filter_i * filter_size + filter_j] * convert_float4(px_val);
+			for(j = -half_filter, filter_j = 0;
+				j <= half_filter;
+				j++, filter_j++) {
+
+				px_val =
+					read_imageui(input_img, sampler, (int2) (x + i, y + j));
+				px_filt +=
+					filter[filter_i * filter_size + filter_j]
+					* convert_float4(px_val);
+
 			}
 		}
+
 		px_filt_int = convert_uint4(px_filt);
 		write_imageui(output_img, (int2)(x, y), px_filt_int);
+
 	}
 }

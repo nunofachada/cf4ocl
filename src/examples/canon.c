@@ -17,19 +17,46 @@
 
 /**
  * @file
- * Cannonical example of how to use _cf4ocl_. Perform an element-wise
- * sum of two vectors, also adding a constant.
- *
- * Optional command-line arguments:
- * 1. Device index
- * 2. Buffer size
+ * Cannonical example of how to use _cf4ocl_.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
-#include "canon.h"
+/*
+ * Description
+ * -----------
+ *
+ * Cannonical example of how to use _cf4ocl_. Performs an element-wise sum of
+ * two vectors, also adding a constant.
+ *
+ * Optional command-line arguments:
+ *
+ * 1. Device index
+ * 2. Buffer size
+ *
+ * */
+
+#include <cf4ocl2.h>
+
+/* Kernel source string, will be hardwired in this location during the build
+ * process, before compilation. The kernel source is available in canon.cl. */
+#define KERNEL_SRC \
+@canon_KERNEL_SRC@
+
+/* Kernel name. */
+#define KERNEL_NAME "sum"
+
+/* Default buffer size. Final size can be specified as a command-line option. */
+#define DEF_BUF_N 16;
+
+/* Error handling macros. */
+#define ERROR_MSG_AND_EXIT(msg) \
+	do { fprintf(stderr, "\n%s\n", msg); exit(EXIT_FAILURE); } while(0)
+
+#define HANDLE_ERROR(err) \
+	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
 
 /**
  * Canonical example main function.
@@ -223,7 +250,7 @@ int main(int argc, char** argv) {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 

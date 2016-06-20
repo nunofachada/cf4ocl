@@ -57,12 +57,15 @@ if (NOT APPLE) # Not for Apple, which handles these headers differently
 
 	option(OPENCL_USE_LOCAL_HEADERS "Use local OpenCL headers?" OFF)
 
-	set(OPENCL_LOCAL_HEADERS "1.2" CACHE STRING "OpenCL header version selected at CMake configure time")
+	set(OPENCL_LOCAL_HEADERS "1.2"
+		CACHE STRING "OpenCL header version selected at CMake configure time")
 
-	set_property(CACHE OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0" "2.1")
+	set_property(CACHE
+		OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0" "2.1")
 
 	if (OPENCL_USE_LOCAL_HEADERS)
-		SET(OPENCL_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/ocl/${OPENCL_LOCAL_HEADERS}")
+		SET(OPENCL_INCLUDE_DIRS
+			"${CMAKE_SOURCE_DIR}/ocl/${OPENCL_LOCAL_HEADERS}")
 	endif()
 
 endif()
@@ -128,9 +131,11 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 
 	# Document generation options
 	option(DOC_GENERATE_HTML "Generate HTML documentation?" ON)
-	option(DOC_INTERNAL "Generate internal documentation (for cf4ocl development only)?" OFF)
+	option(DOC_INTERNAL
+		"Generate internal documentation (for cf4ocl development only)?" OFF)
 	option(DOC_GENERATE_LATEX "Generate Latex documentation?" OFF)
-	if (DOC_GENERATE_LATEX AND CMAKE_MAKE_PROGRAM AND PDFLATEX_COMPILER AND MAKEINDEX_COMPILER)
+	if (DOC_GENERATE_LATEX AND CMAKE_MAKE_PROGRAM
+		AND PDFLATEX_COMPILER AND MAKEINDEX_COMPILER)
 		option(DOC_GENERATE_PDF "Generate PDF documentation?" OFF)
 	else()
 		unset(DOC_GENERATE_PDF CACHE)
@@ -200,10 +205,12 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 
 		# Create links to OpenCL API when OpenCL functions are mentioned?
 		# This is slow and requires Bash and other command-line utilties
-		option(DOC_OPENCL_FUNCTION_URLS "Create links to OpenCL API (much slower)?" OFF)
+		option(DOC_OPENCL_FUNCTION_URLS
+			"Create links to OpenCL API (much slower)?" OFF)
 		if (DOC_OPENCL_FUNCTION_URLS)
 			# Create those links
-			set(DOX_OPENCL_FUNCTION_URLS_FILTER "${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
+			set(DOX_OPENCL_FUNCTION_URLS_FILTER
+				"${PROJECT_SOURCE_DIR}/auxbuild/docfilter.sh")
 		endif()
 
 	endif()

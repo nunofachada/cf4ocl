@@ -17,26 +17,56 @@
 
 /**
  * @file
- * Sample code which runs a cellular automata simulation (Conway's
- * Game of Life) in OpenCL using _cf4ocl_. This code demonstrates the
- * use of double-buffering with images, multiple command queues and
- * profiling.
  *
- * A series of images will be saved in the folder where this program
- * runs.
+ * Example of a cellular automata simulation (Conway's Game of Life) in OpenCL
+ * using _cf4ocl_.
+ *
+ * @author Nuno Fachada
+ * @date 2016
+ * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
+ */
+
+/*
+ * Description
+ * -----------
+ *
+ * This example performs a cellular automata simulation, namely Conway's Game of
+ * Life, in OpenCL using _cf4ocl_. It demonstrates the use of double-buffering
+ * with images, multiple command queues and profiling.
  *
  * The program accepts two command-line arguments:
  *
  * 1. Device index
  * 2. RNG seed
  *
- * @author Nuno Fachada
- * @date 2014
- * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
+ * A series of images will be saved in the folder where this program runs. The
+ * images can be converted to a video with the following command:
+ *
+ * ffmpeg -framerate 6 -i out%05d.png -vcodec libx264 -crf 20 -pix_fmt yuv420p out.mp4
+ *
  */
 
-#include "ca.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <cf4ocl2.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+/* Kernel source string, will be hardwired in this location during the build
+ * process, before compilation. The kernel source is available in ca.cl. */
+#define CA_KERNEL \
+@ca_KERNEL_SRC@
+
+/* Error handling macros. */
+#define ERROR_MSG_AND_EXIT(msg) \
+	do { fprintf(stderr, "\n%s\n", msg); exit(EXIT_FAILURE); } while(0)
+
+#define HANDLE_ERROR(err) \
+	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
+
+/* Simulation settings. */
 #define IMAGE_FILE_PREFIX "out"
 #define IMAGE_FILE_NUM_DIGITS 5
 
@@ -281,7 +311,7 @@ int main(int argc, char* argv[]) {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 
