@@ -55,17 +55,20 @@ endif()
 # Use provided OpenCL headers or system OpenCL headers?
 if (NOT APPLE) # Not for Apple, which handles these headers differently
 
-	option(OPENCL_USE_LOCAL_HEADERS "Use local OpenCL headers?" OFF)
+	option(OpenCL_USE_LOCAL_HEADERS "Use local OpenCL headers?" OFF)
 
-	set(OPENCL_LOCAL_HEADERS "1.2"
+	set(OpenCL_LOCAL_HEADERS "1.2"
 		CACHE STRING "OpenCL header version selected at CMake configure time")
 
 	set_property(CACHE
-		OPENCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0" "2.1")
+		OpenCL_LOCAL_HEADERS PROPERTY STRINGS "1.0" "1.1" "1.2" "2.0" "2.1")
 
-	if (OPENCL_USE_LOCAL_HEADERS)
-		SET(OPENCL_INCLUDE_DIRS
-			"${CMAKE_SOURCE_DIR}/ocl/${OPENCL_LOCAL_HEADERS}")
+	if (OpenCL_USE_LOCAL_HEADERS)
+		set(OpenCL_INCLUDE_DIRS
+			"${CMAKE_SOURCE_DIR}/ocl/${OpenCL_LOCAL_HEADERS}")
+		set(OpenCL_VERSION_STRING ${OpenCL_LOCAL_HEADERS})
+		string(SUBSTRING ${OpenCL_VERSION_STRING} 0 1 OpenCL_VERSION_MAJOR)
+		string(SUBSTRING ${OpenCL_VERSION_STRING} 2 1 OpenCL_VERSION_MINOR)
 	endif()
 
 endif()
@@ -75,7 +78,7 @@ endif()
 # ########################### #
 include_directories(
 	${GLIB_INCLUDE_DIRS}                 # GLib headers
-	${OPENCL_INCLUDE_DIRS}               # OpenCL headers
+	${OpenCL_INCLUDE_DIRS}               # OpenCL headers
 	${CMAKE_BINARY_DIR}/include/cf4ocl2  # Library headers
 	${CMAKE_BINARY_DIR}/include)         # Aggregate library header
 

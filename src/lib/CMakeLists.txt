@@ -45,7 +45,7 @@ file(COPY ${CMAKE_BINARY_DIR}/src/lib/ccl_export.h
 	DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 
 # Specify dependencies
-target_link_libraries(${PROJECT_NAME} ${GLIB_LDFLAGS} ${OPENCL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLIB_LDFLAGS} ${OpenCL_LIBRARIES})
 
 # This target is just an alias for cf4ocl
 add_custom_target(lib DEPENDS ${PROJECT_NAME})
