@@ -395,14 +395,18 @@ methods. For example, the ::CCLContext* class provides the
 ## ccl_devinfo program {#ug_devinfo}
 
 @copybrief ccl_devinfo
+A detailed description of this command is available @ref ccl_devinfo "here".
 
 ## ccl_c program {#ug_c}
 
 @copybrief ccl_c
+A detailed description of this utility is available @ref ccl_c "here".
 
 ## ccl_plot_events.py script {#ug_plot_events}
 
 @copybrief ccl_plot_events.py
+More details on how to use this script are available
+@ref ccl_plot_events "here".
 
 # Advanced {#ug_advanced}
 
