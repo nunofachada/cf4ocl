@@ -4,6 +4,3 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_c.in.bats
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_devinfo.in.bats
 	${CMAKE_CURRENT_BINARY_DIR}/test_devinfo.bats @ONLY)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_all_devices.in.sh
-	${CMAKE_CURRENT_BINARY_DIR}/test_all_devices.sh @ONLY)

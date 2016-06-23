@@ -17,3 +17,7 @@ set(TESTS_DEVICE_INDEX "0" CACHE STRING
 add_subdirectory(examples)
 add_subdirectory(lib)
 add_subdirectory(utils)
+
+# Configure helper script to perform all tests in all available devices
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_all.in.sh
+	${CMAKE_CURRENT_BINARY_DIR}/test_all.sh @ONLY)
