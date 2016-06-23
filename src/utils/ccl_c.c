@@ -618,6 +618,7 @@ int main(int argc, char* argv[]) {
 
 			/* If program object does not exist, set build status string to
 			 * unavailable. */
+			build_status = CL_BUILD_NONE;
 			build_status_str = "Unavailable";
 
 		}
