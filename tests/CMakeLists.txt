@@ -13,6 +13,7 @@ endif()
 set(TESTS_DEVICE_INDEX "0" CACHE STRING
 	"Index of device to use in generic device tests")
 
-# Add lib and utils test folders
+# Add test folders
+add_subdirectory(examples)
 add_subdirectory(lib)
 add_subdirectory(utils)

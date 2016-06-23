@@ -69,6 +69,9 @@ int main(int argc, char** argv) {
 	/* Device selected specified in the command line. */
 	int dev_idx = -1;
 
+	/* Program return value. */
+	int ret_val;
+
 	/* Check if a device was specified in the command line. */
 	if (argc >= 2) {
 		dev_idx = atoi(argv[1]);
@@ -210,12 +213,15 @@ int main(int argc, char** argv) {
 			break;
 		}
 	}
-	if (check_result)
-		fprintf(stdout,
-			" * Kernel execution produced the expected results.\n");
-	else
+
+	if (check_result) {
+		fprintf(stdout, " * Kernel execution produced the expected results.\n");
+		ret_val = EXIT_SUCCESS;
+	} else {
 		fprintf(stderr,
 			" * Kernel execution failed to produce the expected results.\n");
+		ret_val = EXIT_FAILURE;
+	}
 
 	/* Perform profiling. */
 	prof = ccl_prof_new();
@@ -249,7 +255,7 @@ int main(int argc, char** argv) {
 	g_assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
-	return EXIT_SUCCESS;
+	return ret_val;
 }
 
 
