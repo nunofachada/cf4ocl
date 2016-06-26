@@ -328,6 +328,7 @@ typedef enum ccl_error_code {
 	if ((err_src) != NULL) { \
 		g_debug(CCL_STRD); \
 		g_propagate_error(err_dest, err_src); \
+		err_src = NULL; \
 		goto label; \
 	}
 
