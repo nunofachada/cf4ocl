@@ -1173,9 +1173,6 @@ teardown() {
 	# Check output
 	[[ "$output" =~  "Device" ]]
 	[[ "$output" =~  "Build status" ]]
-	[[ "$output" =~  "Success" ]]
-	[[ "$output" =~  "Kernel information" ]]
-	[[ "$output" =~  "${CCL_C_KIMPL_SUM_FNAME}" ]]
 	[[ "$output" =~  "Error" ]]
 
 	# Error due to source not having a kernel
@@ -1188,9 +1185,6 @@ teardown() {
 	# Check output
 	[[ "$output" =~  "Device" ]]
 	[[ "$output" =~  "Build status" ]]
-	[[ "$output" =~  "Success" ]]
-	[[ "$output" =~  "Kernel information" ]]
-	[[ "$output" =~  "${CCL_C_KIMPL_XOR_FNAME}" ]]
 	[[ "$output" =~  "Error" ]]
 
 	# Error due to source not having a kernel
