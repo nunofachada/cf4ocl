@@ -136,7 +136,6 @@ set(OpenCL_INCLUDE_DIRS ${OpenCL_INCLUDE_DIR})
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   OpenCL
-  FOUND_VAR OpenCL_FOUND
   REQUIRED_VARS OpenCL_LIBRARY OpenCL_INCLUDE_DIR
   VERSION_VAR OpenCL_VERSION_STRING)
 
