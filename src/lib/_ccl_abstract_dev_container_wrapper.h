@@ -21,11 +21,11 @@
  * @file
  *
  * Implementation of an abstract device container wrapper class and
- * specification of its methods. This file is only for building
- * _cf4ocl_. Is is not part of its public API.
+ * specification of its methods. This file is only for building _cf4ocl_. Is is
+ * not part of its public API.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -40,9 +40,8 @@
 #include "_ccl_abstract_wrapper.h"
 
 /**
- * Base class for wrappers which contain devices, i.e.,
- * ::CCLPlatform, ::CCLProgram and ::CCLContext. This class extends
- * ::CCLWrapper.
+ * Base class for wrappers which contain devices, i.e., ::CCLPlatform,
+ * ::CCLProgram and ::CCLContext. This class extends ::CCLWrapper.
  *
  * @extends ccl_wrapper
  * */
@@ -55,13 +54,13 @@ struct ccl_dev_container {
 	CCLWrapper base;
 
 	/**
-	 * Number of devices in context (can be lazy initialized).
+	 * Number of devices in container (can be lazy initialized).
 	 * @private
 	 * */
 	cl_uint num_devices;
 
 	/**
-	 * Devices in context (can be lazy initialized).
+	 * Devices in container (can be lazy initialized).
 	 * @private
 	 * */
 	CCLDevice** devices;
@@ -79,10 +78,10 @@ struct ccl_dev_container {
  * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container wrapper.
- * @param[out] err Return location for a GError, or `NULL` if error
- * reporting is to be ignored.
- * @return List of cl_device_id OpenCL objects in the OpenCL device
- * container object wrapped by the given device container wrapper.
+ * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * to be ignored.
+ * @return List of cl_device_id OpenCL objects in the OpenCL device container
+ * object wrapped by the given device container wrapper.
  * */
 typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
 	CCLDevContainer* devcon, GError** err);
