@@ -280,7 +280,8 @@ void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
 	}
 
 	/*  Send info to defined stream. */
-	g_fprintf(CCL_DEVINFO_OUT, "\n* Platform #%d: %s (%s)\n               %s, %s\n",
+	g_fprintf(CCL_DEVINFO_OUT,
+		"\n* Platform #%d: %s (%s)\n               %s, %s\n",
 		idx, name, vendor, version, profile);
 
 	/* Bye. */
@@ -622,6 +623,21 @@ int main(int argc, char* argv[]) {
 
 				/* Get number of devices. */
 				num_devs = ccl_platform_get_num_devices(p, &err);
+
+				/* Is this a platform without devices? */
+				if ((err) && (err->domain == CCL_OCL_ERROR) &&
+						(err->code == CL_DEVICE_NOT_FOUND)) {
+
+					/* Clear "device not found" error. */
+					g_clear_error(&err);
+
+					/* Inform about non-existing devices. */
+					g_fprintf(CCL_DEVINFO_OUT,
+						"\n    [ No devices found ]\n\n");
+
+					/* Skip this platform. */
+					break;
+				}
 				ccl_if_err_goto(err, error_handler);
 
 				/* Cycle through devices. */

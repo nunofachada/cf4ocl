@@ -372,6 +372,17 @@ CCLDevSelDevices ccl_devsel_devices_new(GError **err) {
 		/* Get number of devices in current platform.*/
 		guint num_devices = ccl_platform_get_num_devices(
 			platform, &err_internal);
+
+		/* Is this a platform without devices? */
+		if ((err_internal) && (err_internal->domain == CCL_OCL_ERROR) &&
+				(err_internal->code == CL_DEVICE_NOT_FOUND)) {
+
+			/* Clear "device not found" error. */
+			g_clear_error(&err_internal);
+
+			/* Skip this platform. */
+			break;
+		}
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Cycle through devices in current platform. */
