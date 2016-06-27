@@ -3,7 +3,7 @@
 #
 # Test suite for cf4ocl examples
 #
-# Requires: wc grep
+# Requires: wc grep bc cut
 #
 # Author: Nuno Fachada <faken@fakenmc.com>
 # Licence: GNU General Public License version 3 (GPLv3)
@@ -27,6 +27,15 @@ setup() {
 
 	# ccl_devinfo binary
 	CCL_EX_DEVINFO="@CMAKE_BINARY_DIR@/src/utils/ccl_devinfo"
+
+	# Minimum OpenCL version between device platform and cf4ocl
+	CCL_EX_OCL_VERSION_PLATF=`${CCL_EX_DEVINFO} -o -d ${CCL_TEST_DEVICE_INDEX} -c VERSION | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
+	CCL_EX_OCL_VERSION_CF4OCL=`${CCL_EX_DEVINFO} --version | grep -o "OpenCL [0-9]\.[0-9]" | cut -d " " -f 2`
+	CCL_EX_OCL_VERSION=`echo "if (${CCL_EX_OCL_VERSION_PLATF} < ${CCL_EX_OCL_VERSION_CF4OCL}) { ${CCL_EX_OCL_VERSION_PLATF} } else { ${CCL_EX_OCL_VERSION_CF4OCL} }" | bc`
+
+	# Skip examples which require OpenCL >= 1.2?
+	CCL_12_SKIP=`echo "${CCL_EX_OCL_VERSION} < 1.2"| bc`
+	CCL_12_SKIP_MSG="Requires OpenCL >= 1.2"
 
 }
 
@@ -96,6 +105,12 @@ setup() {
 
 # Test image fill example
 @test "Image fill example" {
+
+	# Skip if OpenCL < 1.2
+	if [[ ${CCL_12_SKIP} -eq 1 ]]
+	then
+		skip "${CCL_12_SKIP_MSG}"
+	fi
 
 	run ${CCL_EXBIN_PATH}/image_fill ${CCL_TEST_DEVICE_INDEX}
 

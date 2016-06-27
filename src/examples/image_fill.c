@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
 #else
 int main() {
 	fprintf(stderr, "This sample requires OpenCL 1.2\n");
-	return EXIT_SUCCESS;
+	return EXIT_FAILURE;
 }
 #endif
 
