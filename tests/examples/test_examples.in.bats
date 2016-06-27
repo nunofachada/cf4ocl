@@ -3,7 +3,7 @@
 #
 # Test suite for cf4ocl examples
 #
-# Requires: wc
+# Requires: wc grep
 #
 # Author: Nuno Fachada <faken@fakenmc.com>
 # Licence: GNU General Public License version 3 (GPLv3)
@@ -24,6 +24,9 @@ setup() {
 	then
 		CCL_TEST_DEVICE_INDEX="@TESTS_DEVICE_INDEX@"
 	fi
+
+	# ccl_devinfo binary
+	CCL_EX_DEVINFO="@CMAKE_BINARY_DIR@/src/utils/ccl_devinfo"
 
 }
 
@@ -62,17 +65,22 @@ setup() {
 # Test device filter example
 @test "Device filter example" {
 
-	# Test create context with filtered devices
-	run ${CCL_EXBIN_PATH}/device_filter 1
+	if ${CCL_EX_DEVINFO} -c TYPE -o | grep CPU
+	then
+	        # Test create context with filtered devices
+        	run ${CCL_EXBIN_PATH}/device_filter 1
 
-	# There should be no problems
-	[ "$status" -eq 0 ]
+	        # There should be no problems
+	        [ "$status" -eq 0 ]
 
-	# Test listing of filtered devices
-	run ${CCL_EXBIN_PATH}/device_filter 2
+        	# Test listing of filtered devices
+	        run ${CCL_EXBIN_PATH}/device_filter 2
 
-	# There should be no problems
-	[ "$status" -eq 0 ]
+        	# There should be no problems
+	        [ "$status" -eq 0 ]
+	else
+		skip "This test requires a CPU device"
+	fi
 
 }
 
