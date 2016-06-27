@@ -636,7 +636,7 @@ int main(int argc, char* argv[]) {
 						"\n    [ No devices found ]\n\n");
 
 					/* Skip this platform. */
-					break;
+					continue;
 				}
 				ccl_if_err_goto(err, error_handler);
 

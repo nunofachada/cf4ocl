@@ -381,7 +381,7 @@ CCLDevSelDevices ccl_devsel_devices_new(GError **err) {
 			g_clear_error(&err_internal);
 
 			/* Skip this platform. */
-			break;
+			continue;
 		}
 		ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
