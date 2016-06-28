@@ -466,6 +466,7 @@ static void ref_unref_test() {
 	CCLDevSelFilters filters = NULL;
 	cl_uint num_devs;
 	cl_device_type dev_type;
+	cl_uint ndevs_ctx, ndevs_p;
 
 	/* ********************************************* */
 	/* **** Test context creating from_devices. **** */
@@ -606,19 +607,23 @@ static void ref_unref_test() {
 		/* Check that the context ref count is 1. */
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
 
-		/* The next instruction lazy initializes device wrappers array
-		 * in context, increasing the device wrappers ref count.*/
+		/* The next instruction lazy initializes device wrappers array in
+		 * context, increasing the device wrappers ref count.*/
 		d = ccl_context_get_device(ctx, 0, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 2);
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 2);
 
-		/* The first device in context should be the same as the first
-		 * device in platform. */
-		g_assert_cmphex(GPOINTER_TO_UINT(d), ==, GPOINTER_TO_UINT(d_1));
+		/* The number of devices in context should be the same as the number of
+		 * devices in platform. */
+		ndevs_ctx = ccl_context_get_num_devices(ctx, &err);
+		g_assert_no_error(err);
+		ndevs_p = ccl_platform_get_num_devices(p, &err);
+		g_assert_no_error(err);
+		g_assert_cmpuint(ndevs_ctx, ==, ndevs_p);
 
-		/* The next instruction increases the ref count of the platform
-		 * wrapper, which should now be 2. */
+		/* The next instruction increases the ref count of the platform wrapper,
+		 * which should now be 2. */
 		p_1 = ccl_platform_new_from_device(d, &err);
 		g_assert_no_error(err);
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 2);
@@ -672,7 +677,8 @@ static void ref_unref_test() {
 		d = ccl_context_get_device(ctx, 0, &err);
 		g_assert_no_error(err);
 		/* Check that its a GPU and ref it. */
-		dev_type = ccl_device_get_info_scalar(d, CL_DEVICE_TYPE, cl_device_type, &err);
+		dev_type = ccl_device_get_info_scalar(
+			d, CL_DEVICE_TYPE, cl_device_type, &err);
 		g_assert_no_error(err);
 		g_assert_cmphex(dev_type & CL_DEVICE_TYPE_GPU, ==, CL_DEVICE_TYPE_GPU);
 		ccl_device_ref(d);
@@ -693,8 +699,7 @@ static void ref_unref_test() {
 	ctx = ccl_context_new_from_filters(&filters, &err);
 	g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 
-	/* If an error occurred and where here its because a CPU wasn't
-	 * found. */
+	/* If an error occurred and where here its because a CPU wasn't found. */
 	if (err != NULL) {
 		/* Take note of error and clear it. */
 		g_test_message("%s", err->message);
@@ -706,7 +711,8 @@ static void ref_unref_test() {
 		d = ccl_context_get_device(ctx, 0, &err);
 		g_assert_no_error(err);
 		/* Check that its a CPU and ref it. */
-		dev_type = ccl_device_get_info_scalar(d, CL_DEVICE_TYPE, cl_device_type, &err);
+		dev_type = ccl_device_get_info_scalar(
+			d, CL_DEVICE_TYPE, cl_device_type, &err);
 		g_assert_no_error(err);
 		g_assert_cmphex(dev_type & CL_DEVICE_TYPE_CPU, ==, CL_DEVICE_TYPE_CPU);
 		ccl_device_ref(d);
@@ -738,31 +744,29 @@ static void ref_unref_test() {
 	d = ccl_context_get_device(ctx, 0, &err);
 	ccl_device_ref(d);
 
-	/* Create a new context wrapper from the wrapped OpenCL context
-	 * object, and check that the wrapper is also the same, but that its
-	 * reference count is now 2. */
+	/* Create a new context wrapper from the wrapped OpenCL context object, and
+	 * check that the wrapper is also the same, but that its reference count is
+	 * now 2. */
 	ctx_cmp = ccl_context_new_wrap(ccl_context_unwrap(ctx));
 
 	g_assert_cmphex(GPOINTER_TO_UINT(ctx_cmp), ==, GPOINTER_TO_UINT(ctx));
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 2);
 
-	/* Unref context. We must do it twice, so as to maintain the logic
-	 * that for each _new function, a _destroy (or _unref) function
-	 * must be called. */
+	/* Unref context. We must do it twice, so as to maintain the logic that for
+	 * each _new function, a _destroy (or _unref) function must be called. */
 	ccl_context_unref(ctx);
 	ccl_context_unref(ctx);
-	/* We could have done these two unrefs with the ctx_cmp variable,
-	 * because it represents the same object. */
+	/* We could have done these two unrefs with the ctx_cmp variable, because it
+	 * represents the same object. */
 
-	/* We ref'ed device, so it ref count should be 1, though we
-	 * destroyed the enclosing context. */
+	/* We ref'ed device, so it ref count should be 1, though we destroyed the
+	 * enclosing context. */
 	g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
 
 	/* Unref device. */
 	ccl_device_unref(d);
 
-	/* Confirm that memory allocated by wrappers has been properly
-	 * freed. */
+	/* Confirm that memory allocated by wrappers has been properly freed. */
 	g_assert(ccl_wrapper_memcheck());
 
 }
