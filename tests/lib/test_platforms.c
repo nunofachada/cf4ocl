@@ -58,6 +58,8 @@ static void ccl_test_platforms_check_error(GError** err) {
 		status = TRUE;
 	} else {
 		status = FALSE;
+		g_debug("%s (Value=%d,Domain='%s')",
+			(*err)->message, (*err)->code, g_quark_to_string((*err)->domain));
 	}
 	g_assert(status);
 }
@@ -218,7 +220,7 @@ static void create_info_destroy_test() {
 
 			info = ccl_device_get_info(d, CL_DEVICE_EXECUTION_CAPABILITIES, &err);
 			ccl_test_platforms_check_error(&err);
-			ccl_test_platforms_msg("...... FP config (Single) :", "%lx",
+			ccl_test_platforms_msg("...... Execution capabilities :", "%lx",
 				(unsigned long) ccl_info_scalar(info, cl_device_exec_capabilities));
 
 			info = ccl_device_get_info(d, CL_DEVICE_EXTENSIONS, &err);
