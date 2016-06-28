@@ -19,11 +19,10 @@
 /**
  * @file
  *
- * Implementation of a wrapper class and its methods for OpenCL context
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL context objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -53,8 +52,8 @@ struct ccl_context {
 
 /**
  * @internal
- * Implementation of ccl_wrapper_release_fields() function for
- * ::CCLContext wrapper objects.
+ * Implementation of ccl_wrapper_release_fields() function for ::CCLContext
+ * wrapper objects.
  *
  * @private @memberof ccl_context
  *
@@ -342,7 +341,8 @@ CCLContext* ccl_context_new_from_devices_full(
 	GError* err_internal = NULL;
 
 	/* Allocate memory for devices. */
-	cl_devices = (cl_device_id*) g_slice_alloc(sizeof(cl_device_id) * num_devices);
+	cl_devices =
+		(cl_device_id*) g_slice_alloc(sizeof(cl_device_id) * num_devices);
 
 	/* Unwrap devices. */
 	for (guint i = 0; i < num_devices; i++)

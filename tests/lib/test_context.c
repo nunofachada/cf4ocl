@@ -516,7 +516,8 @@ static void ref_unref_test() {
 			if (j == 0) {
 				d_1 = d;
 				ccl_device_ref(d_1);
-				/* Device ref count should be 1 (1 from platform + 1 from d_1). */
+				/* Device ref count should be 1 (1 from platform + 1 from
+				 * d_1). */
 				g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
 			}
 
@@ -529,10 +530,13 @@ static void ref_unref_test() {
 				if (num_devs == 1) {
 					/* ...then the total ref count of current (last)
 					 * device should be 3 (1 from platform + 1 d_1 + 1 d_l). */
-					g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 3);
+					g_assert_cmpuint(
+						ccl_wrapper_ref_count((CCLWrapper*) d), ==, 3);
 				} else {
-					/* Otherwise it should be 2 (1 from platform + 1 from d_l). */
-					g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
+					/* Otherwise it should be 2 (1 from platform + 1 from
+					 * d_l). */
+					g_assert_cmpuint(
+						ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
 				}
 			}
 
@@ -544,22 +548,23 @@ static void ref_unref_test() {
 
 		/* If first and last device are the same... */
 		if (num_devs == 1) {
-			/* ...then the ref count of this device should be 3 (from first, last and platform). */
+			/* ...then the ref count of this device should be 3 (from first,
+			 * last and platform). */
 			g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 3);
 			/* ...and d_1 and d_l should be the same. */
 			g_assert_cmphex(GPOINTER_TO_UINT(d_1), ==, GPOINTER_TO_UINT(d_l));
 		} else {
-			/* Otherwise it should be 2 for each device (from itself and from platform). */
+			/* Otherwise it should be 2 for each device (from itself and from
+			 * platform). */
 			g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 2);
 			g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 2);
 			/* ...and d_1 and d_l should be the different. */
 			g_assert_cmphex(GPOINTER_TO_UINT(d_1), !=, GPOINTER_TO_UINT(d_l));
 		}
 
-		/* Check that the platform wrappers associated with the first
-		 * and last devices in platform are the same object and that
-		 * its ref. count is 3 (2 from new_wrap + 1 from reference in
-		 * platforms set). */
+		/* Check that the platform wrappers associated with the first and last
+		 * devices in platform are the same object and that its ref. count is 3
+		 * (2 from new_wrap + 1 from reference in platforms set). */
 		cl_p_1 = ccl_device_get_info_scalar(
 			d_1, CL_DEVICE_PLATFORM, cl_platform_id, &err);
 		g_assert_no_error(err);
@@ -585,12 +590,12 @@ static void ref_unref_test() {
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 1);
 		g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 1);
 
-		/* At this time there is still a reference to each device held
-		 * in the platform wrapper. */
+		/* At this time there is still a reference to each device held in the
+		 * platform wrapper. */
 
-		/* Create a context with all devices in current platform. The
-		 * devices ref. count should be the same because devices were
-		 * already requested (thus lazy initialized) from this platform. */
+		/* Create a context with all devices in current platform. The devices
+		 * ref. count should be the same because devices were already requested
+		 * (thus lazy initialized) from this platform. */
 		ds = ccl_platform_get_all_devices(p, &err);
 		g_assert_no_error(err);
 		ctx = ccl_context_new_from_devices(num_devs, (CCLDevice**) ds, &err);

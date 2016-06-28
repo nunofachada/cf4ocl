@@ -19,11 +19,10 @@
 /**
  * @file
  *
- * Implementation of the methods of the abstract device container
- * wrapper class.
+ * Implementation of the methods of the abstract device container wrapper class.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -93,8 +92,8 @@ finish:
 
 /**
  * @internal
- * Release the devices held by the given ::CCLDevContainer
- * object. Implements the ccl_wrapper_release_fields() function.
+ * Release the devices held by the given ::CCLDevContainer object. Implements
+ * the ccl_wrapper_release_fields() function.
  *
  * @protected @memberof ccl_dev_container
  *
@@ -105,8 +104,7 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 	/* Make sure devcon wrapper object is not NULL. */
 	g_return_if_fail(devcon != NULL);
 
-	/* Check if any devices are associated with this device
-	 * container. */
+	/* Check if any devices are associated with this device container. */
 	if (devcon->devices != NULL) {
 
 		/* Release devices in device container. */
