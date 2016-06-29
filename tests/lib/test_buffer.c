@@ -771,6 +771,10 @@ static void migrate_test() {
 		CL_MIGRATE_MEM_OBJECT_HOST, NULL, &err);
 	g_assert_no_error(err);
 
+	/* Wait for queue to finish... */
+	ccl_queue_finish(q, &err);
+	g_assert_no_error(err);
+
 	/* Free stuff. */
 	ccl_buffer_destroy(b);
 	ccl_queue_destroy(q);

@@ -361,8 +361,8 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		"newer.",
 		CCL_STRD);
 
-	/* Allocate mmemory for memory objects. */
-	mem_objects = (cl_mem*)g_slice_alloc(sizeof(cl_mem) * num_mos);
+	/* Allocate memory for memory objects. */
+	mem_objects = (cl_mem*) g_slice_alloc(sizeof(cl_mem) * num_mos);
 
 	/* Gather OpenCL memory objects in a array. */
 	for (cl_uint i = 0; i < num_mos; ++i) {
