@@ -63,7 +63,9 @@
  *
  * @def CCL_OPENCL_VERSION
  * */
-#if defined CL_VERSION_2_1
+#if defined CL_VERSION_2_2
+	#define CCL_OPENCL_VERSION "2.2"
+#elif defined CL_VERSION_2_1
 	#define CCL_OPENCL_VERSION "2.1"
 #elif defined CL_VERSION_2_0
 	#define CCL_OPENCL_VERSION "2.0"
@@ -74,7 +76,7 @@
 #elif defined CL_VERSION_1_0
 	#define CCL_OPENCL_VERSION "1.0"
 #else
-	#define CCL_OPENCL_VERSION "0.0"
+	#error "OpenCL version is not defined"
 #endif
 
 /** Compiler used to compile _cf4ocl_. */
@@ -82,40 +84,6 @@
 
 /** Macro to avoid warning in unused variables. */
 #define CCL_UNUSED(x) (void)(x)
-
-/* These deprecation macros are copied from GLib latest version in
- * order to support Clang. */
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
-#define CCL_BEGIN_IGNORE_DEPRECATIONS \
-	_Pragma ("GCC diagnostic push") \
-	_Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#define CCL_END_IGNORE_DEPRECATIONS \
-	_Pragma ("GCC diagnostic pop")
-#elif defined (_MSC_VER) && (_MSC_VER >= 1500)
-#define CCL_BEGIN_IGNORE_DEPRECATIONS \
-	__pragma (warning (push)) \
-	__pragma (warning (disable : 4996))
-#define CCL_END_IGNORE_DEPRECATIONS \
-	__pragma (warning (pop))
-#elif defined (__clang__)
-#define CCL_BEGIN_IGNORE_DEPRECATIONS \
-	_Pragma("clang diagnostic push") \
-	_Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
-#define CCL_END_IGNORE_DEPRECATIONS \
-	_Pragma("clang diagnostic pop")
-#else
-#define CCL_BEGIN_IGNORE_DEPRECATIONS
-#define CCL_END_IGNORE_DEPRECATIONS
-#endif
-
-/**
- * A `g_info()` macro for older GLib versions which do not provide it.
- *
- * @def g_info()
- * */
-#ifndef g_info
-#define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
-#endif
 
 /**
  * Class or type of wrapped OpenCL object.

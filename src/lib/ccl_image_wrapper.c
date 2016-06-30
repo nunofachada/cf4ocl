@@ -30,6 +30,7 @@
 #include "ccl_image_wrapper.h"
 #include "ccl_buffer_wrapper.h"
 #include "_ccl_memobj_wrapper.h"
+#include "_ccl_defs.h"
 
 /**
  * Image wrapper class.

@@ -22,7 +22,7 @@
  * Header for normalizing OpenCL versions within _cf4ocl_.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -170,7 +170,6 @@
 
 #endif
 
-
 /* Define stuff for OpenCL implementations lower than 2.1 */
 #ifndef CL_VERSION_2_1
 
@@ -182,7 +181,6 @@
 	#define CL_UNORM_INT_101010_2                       0x10E0
 
 #endif
-
 
 /* Some of these query constants may not be defined in standard
  * OpenCL headers, so we defined them here if necessary. */
