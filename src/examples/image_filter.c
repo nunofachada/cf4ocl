@@ -132,8 +132,7 @@ int main(int argc, char* argv[]) {
 	input_image = stbi_load(argv[1], &width, &height, &n_channels, 4);
 	if (!input_image) ERROR_MSG_AND_EXIT(stbi_failure_reason());
 
-	printf("\n * Image size: %d x %d, %d channels\n",
-		width, height, n_channels);
+	/* Real work size. */
 	real_ws[0] = width; real_ws[1] = height;
 
 	/* Set image region. */
@@ -191,6 +190,9 @@ int main(int argc, char* argv[]) {
 	ccl_kernel_suggest_worksizes(krnl, dev, 2, real_ws, gws, lws, &err);
 	HANDLE_ERROR(err);
 
+	/* Show information to user. */
+	printf("\n * Image size: %d x %d, %d channels\n",
+		width, height, n_channels);
 	printf(" * Global work-size: (%d, %d)\n", (int) gws[0], (int) gws[1]);
 	printf(" * Local work-size: (%d, %d)\n", (int) lws[0], (int) lws[1]);
 
