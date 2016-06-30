@@ -20,14 +20,14 @@
  * OpenCL command queue stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include "ocl_env.h"
 #include "utils.h"
 #include "ccl_common.h"
-
+#include "_ccl_defs.h"
 
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueue(cl_context context, cl_device_id device,

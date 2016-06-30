@@ -18,6 +18,7 @@
 
 #include "ccl_memobj_wrapper.h"
 #include "_ccl_memobj_wrapper.h"
+#include "_ccl_defs.h"
 
  /**
  * @file

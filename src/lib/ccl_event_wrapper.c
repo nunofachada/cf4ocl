@@ -30,6 +30,7 @@
 #include "ccl_event_wrapper.h"
 #include "ccl_queue_wrapper.h"
 #include "_ccl_abstract_wrapper.h"
+#include "_ccl_defs.h"
 
 /**
  * Event wrapper class.

@@ -19,8 +19,7 @@
  /**
  * @file
  *
- * Implementation of a wrapper class and its methods for OpenCL queue
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL queue objects.
  *
  * @author Nuno Fachada
  * @date 2016

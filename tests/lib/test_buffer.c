@@ -26,6 +26,7 @@
 
 #include <cf4ocl2.h>
 #include "test.h"
+#include "_ccl_defs.h"
 
 #define CCL_TEST_BUFFER_SIZE 512
 

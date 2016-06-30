@@ -19,15 +19,16 @@
 /**
  * @file
  *
- * Implementation of a class which represents the list of OpenCL
- * platforms available in the system and respective methods.
+ * Implementation of a class which represents the list of OpenCL platforms
+ * available in the system and respective methods.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
 #include "ccl_platforms.h"
+#include "_ccl_defs.h"
 
 /**
  * Class which represents the OpenCL platforms available

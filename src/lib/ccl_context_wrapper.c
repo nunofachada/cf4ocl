@@ -28,6 +28,7 @@
 
 #include "ccl_context_wrapper.h"
 #include "_ccl_abstract_dev_container_wrapper.h"
+#include "_ccl_defs.h"
 
 /**
  * The context wrapper class.

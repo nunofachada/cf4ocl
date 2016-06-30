@@ -19,16 +19,16 @@
  /**
  * @file
  *
- * Implementation of a wrapper class and its methods for OpenCL sampler
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL sampler objects.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
 #include "ccl_sampler_wrapper.h"
 #include "_ccl_abstract_wrapper.h"
+#include "_ccl_defs.h"
 
 /**
  * Sampler wrapper class.

@@ -29,6 +29,7 @@
 
 #include <cf4ocl2.h>
 #include <string.h>
+#include "_ccl_defs.h"
 
 #define CCL_UTILS_NODEVICE G_MAXUINT
 

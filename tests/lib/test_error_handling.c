@@ -26,6 +26,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include "_ccl_defs.h"
 
 /** Resolves to error category identifying string, in this case an error
  * in the GErrorf tests. */

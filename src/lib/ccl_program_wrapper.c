@@ -19,8 +19,7 @@
  /**
  * @file
  *
- * Implementation of a wrapper class and its methods for OpenCL program
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL program objects.
  *
  * @author Nuno Fachada
  * @date 2016
@@ -29,6 +28,7 @@
 
 #include "ccl_program_wrapper.h"
 #include "_ccl_abstract_dev_container_wrapper.h"
+#include "_ccl_defs.h"
 
 /* Valid file name characters. */
 #define CCL_VALIDFILECHARS "abcdefghijklmnopqrstuvwxyzABCDEFGH" \

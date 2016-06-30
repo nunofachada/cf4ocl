@@ -20,12 +20,12 @@
  * @internal
  * @file
  *
- * Implementation of a wrapper class for OpenCL memory objects and
- * declaration of some of this methods. This file is only for building
- * _cf4ocl_. Is is not part of its public API.
+ * Implementation of a wrapper class for OpenCL memory objects and declaration
+ * of some of this methods. This file is only for building _cf4ocl_. Is is not
+ * part of its public API.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2016
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
