@@ -40,6 +40,25 @@ G_LOCK_DEFINE(wrappers);
 static const char* ccl_class_names[] = {"Buffer", "Context", "Device", "Event",
 	"Image", "Kernel", "Platform", "Program", "Sampler", "Queue", "None", NULL};
 
+/* Information functions. */
+static const ccl_wrapper_info_fp[] info_funs = {
+	clGetContextInfo,
+	clGetDeviceInfo,
+	clGetEventInfo,
+	clGetEventProfilingInfo,
+	clGetImageInfo,
+	clGetKernelInfo,
+	ccl_kernel_get_arg_info_adapter,
+	clGetKernelWorkGroupInfo,
+	NULL, /* clKernelSubGroupInfo */
+	clGetMemObjectInfo,
+	clGetPlatformInfo,
+	clGetProgramInfo,
+	clGetProgramBuildInfo,
+	clGetSamplerInfo,
+	clGetQueueInfo,
+	NULL /* clGetPipeInfo */ };
+
 /**
  * Information about wrapped OpenCL objects.
  * */
@@ -425,7 +444,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
+	ccl_info info_type, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -433,14 +452,17 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	/* Make sure wrapper1 is not NULL. */
 	g_return_val_if_fail(wrapper1 != NULL, NULL);
 
-	/* Make sure info_fun is not NULL. */
-	g_return_val_if_fail(info_fun != NULL, NULL);
+	/* Make sure info_type has a valid value. */
+	g_return_val_if_fail((info_type >= 0) && (info_type < CCL_INFO_END), NULL);
 
 	/* Information object. */
 	CCLWrapperInfo* info = NULL;
 
 	/* Does info table cache contain requested information? */
 	gboolean contains;
+
+	/* Information function to use. */
+	ccl_wrapper_info_fp info_fun = info_funs[info_type];
 
 	/* Check if info table cache contains requested information. */
 	g_mutex_lock(&wrapper1->info->mutex);
@@ -559,7 +581,7 @@ finish:
 CCL_EXPORT
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
+	ccl_info info_type, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -572,7 +594,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
-		param_name, min_size, info_fun, use_cache, err);
+		param_name, min_size, info_type, use_cache, err);
 
 	/* Return value if information object is not NULL. */
 	return diw != NULL ? diw->value : NULL;
@@ -600,7 +622,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * */
 size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_wrapper_info_fp info_fun, cl_bool use_cache, GError** err) {
+	ccl_info info_type, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -613,7 +635,7 @@ size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
-		param_name, min_size, info_fun, use_cache, err);
+		param_name, min_size, info_type, use_cache, err);
 
 	/* Return value if information object is not NULL. */
 	return diw != NULL ? diw->size : 0;

@@ -105,6 +105,33 @@ typedef enum ccl_class {
 } CCLClass;
 
 /**
+ * Type of information to obtain using ccl_wrapper_get_info(),
+ * ccl_wrapper_get_info_value() and ccl_wrapper_get_info_size(). This
+ * enumeration is used by the `ccl_*_get_info()` macros and should rarely be
+ * used in client code.
+ * */
+typedef enum ccl_info {
+
+	CCL_INFO_CONTEXT          = 0,
+	CCL_INFO_DEVICE           = 1,
+	CCL_INFO_EVENT            = 2,
+	CCL_INFO_EVENT_PROFILING  = 3,
+	CCL_INFO_IMAGE            = 4,
+	CCL_INFO_KERNEL           = 5,
+	CCL_INFO_KERNEL_ARG       = 6,
+	CCL_INFO_KERNEL_WORKGROUP = 7,
+	CCL_INFO_KERNEL_SUBGROUP  = 8,
+	CCL_INFO_MEMOBJ           = 9,
+	CCL_INFO_PLATFORM         = 10,
+	CCL_INFO_PROGRAM          = 11,
+	CCL_INFO_PROGRAM_BUILD    = 12,
+	CCL_INFO_SAMPLER          = 13,
+	CCL_INFO_QUEUE            = 14,
+	CCL_INFO_PIPE             = 15,
+	CCL_INFO_END              = 16
+} CCLInfo;
+
+/**
  * Base class for all OpenCL wrappers.
  * */
 typedef struct ccl_wrapper CCLWrapper;
