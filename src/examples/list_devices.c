@@ -36,6 +36,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <cf4ocl2.h>
 
 /* Error handling macros. */
@@ -112,7 +113,7 @@ int main() {
 	ccl_platforms_destroy(platf_list);
 
 	/* Check all wrappers have been destroyed. */
-	g_assert(ccl_wrapper_memcheck());
+	assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
 	return EXIT_SUCCESS;

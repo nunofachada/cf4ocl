@@ -39,6 +39,7 @@
  * */
 
 #include <cf4ocl2.h>
+#include <assert.h>
 
 /* Kernel source string, will be hardwired in this location during the build
  * process, before compilation. The kernel source is available in canon.cl. */
@@ -64,7 +65,7 @@
 int main(int argc, char** argv) {
 
 	/* Number of elements in buffer. */
-	cl_uint buf_n = DEF_BUF_N;
+	size_t buf_n = DEF_BUF_N;
 
 	/* Device selected specified in the command line. */
 	int dev_idx = -1;
@@ -87,6 +88,7 @@ int main(int argc, char** argv) {
 	CCLProgram* prg = NULL;
 	CCLDevice* dev = NULL;
 	CCLQueue* queue = NULL;
+	CCLKernel* krnl = NULL;
 	CCLBuffer* a_dev;
 	CCLBuffer* b_dev;
 	CCLBuffer* c_dev;
@@ -99,8 +101,8 @@ int main(int argc, char** argv) {
 	CCLProf* prof;
 
 	/* Global and local worksizes. */
-	size_t gws;
-	size_t lws;
+	size_t gws = 0;
+	size_t lws = 0;
 
 	/* Host buffers. */
 	cl_uint* a_host = NULL;
@@ -134,22 +136,23 @@ int main(int argc, char** argv) {
 	queue = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
 	HANDLE_ERROR(err);
 
-	/* Get local worksize. */
-	lws = ccl_device_get_info_scalar(
-		dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err);
+	/* Get kernel object. */
+	krnl = ccl_program_get_kernel(prg, KERNEL_NAME, &err);
 	HANDLE_ERROR(err);
-	lws = MIN(buf_n, lws);
 
-	/* Get global worksize, make it a multiple of local worksize. */
-	gws = lws * ((buf_n / lws) + ((buf_n % lws) > 0));
+	/* Get worksizes. */
+	lws = ccl_kernel_suggest_worksizes(krnl, dev, 1, &buf_n, &gws, &lws, &err);
+	HANDLE_ERROR(err);
+
+	/* Show worksizes. */
 	printf("\n");
 	printf(" * Global worksize: %d\n", (int) gws);
 	printf(" * Local worksize : %d\n", (int) lws);
 
 	/* Initialize host buffers. */
-	a_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
-	b_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
-	c_host = (cl_uint*)malloc(sizeof(cl_uint) * buf_n);
+	a_host = (cl_uint*) malloc(sizeof(cl_uint) * buf_n);
+	b_host = (cl_uint*) malloc(sizeof(cl_uint) * buf_n);
+	c_host = (cl_uint*) malloc(sizeof(cl_uint) * buf_n);
 
 	/* Fill host buffers. */
 	for (cl_uint i = 0; i < buf_n; ++i) {
@@ -250,9 +253,8 @@ int main(int argc, char** argv) {
 	ccl_program_destroy(prg);
 	ccl_context_destroy(ctx);
 
-	/* Confirm that memory allocated by wrappers has been properly
-	 * freed. */
-	g_assert(ccl_wrapper_memcheck());
+	/* Confirm that memory allocated by wrappers has been properly freed. */
+	assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
 	return ret_val;

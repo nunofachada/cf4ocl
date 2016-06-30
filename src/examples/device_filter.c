@@ -39,6 +39,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <cf4ocl2.h>
 
 /* Error handling macros. */
@@ -49,9 +50,10 @@
 	if (err != NULL) { ERROR_MSG_AND_EXIT(err->message); }
 
 /* Usage string. */
-#define USAGE "Usage: device_filter 1|2\n\n1 - " \
-			"Create context with filtered devices\n" \
-			"2 - List filtered devices\n"
+#define USAGE \
+	"Usage: device_filter 1|2\n\n1 - " \
+	"Create context with filtered devices\n" \
+	"2 - List filtered devices\n"
 
 /**
  * Device filter example main function.
@@ -141,7 +143,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	/* Check all wrappers have been destroyed. */
-	g_assert(ccl_wrapper_memcheck());
+	assert(ccl_wrapper_memcheck());
 
 	/* Bye. */
 	return EXIT_SUCCESS;

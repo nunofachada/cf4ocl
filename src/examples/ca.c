@@ -49,6 +49,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <assert.h>
 #include <cf4ocl2.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -260,13 +261,15 @@ int main(int argc, char* argv[]) {
 
 	/* Allocate space for base filename. */
 	filename = (char*) malloc(
-		(strlen(IMAGE_FILE_PREFIX ".png") + IMAGE_FILE_NUM_DIGITS + 1) * sizeof(char));
+		(strlen(IMAGE_FILE_PREFIX ".png") + IMAGE_FILE_NUM_DIGITS + 1)
+		* sizeof(char));
 
 	/* Write results to image files. */
 	for (cl_uint i = 0; i < CA_ITERS; ++i) {
 
 		/* Determine next filename. */
-		sprintf(filename, "%s%0" G_STRINGIFY(IMAGE_FILE_NUM_DIGITS) "d.png", IMAGE_FILE_PREFIX, i);
+		sprintf(filename, "%s%0" G_STRINGIFY(IMAGE_FILE_NUM_DIGITS) "d.png",
+			IMAGE_FILE_PREFIX, i);
 
 		/* Save next image. */
 		file_write_status = stbi_write_png(filename, CA_WIDTH, CA_HEIGHT, 4,
@@ -308,7 +311,7 @@ int main(int argc, char* argv[]) {
 	ccl_prof_destroy(prof);
 
 	/* Check all wrappers have been destroyed. */
-	g_assert(ccl_wrapper_memcheck());
+	assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
 	return EXIT_SUCCESS;

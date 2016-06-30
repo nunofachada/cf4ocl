@@ -46,6 +46,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <cf4ocl2.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -131,7 +132,8 @@ int main(int argc, char* argv[]) {
 	input_image = stbi_load(argv[1], &width, &height, &n_channels, 4);
 	if (!input_image) ERROR_MSG_AND_EXIT(stbi_failure_reason());
 
-	printf("\n * Image size: %d x %d, %d channels\n", width, height, n_channels);
+	printf("\n * Image size: %d x %d, %d channels\n",
+		width, height, n_channels);
 	real_ws[0] = width; real_ws[1] = height;
 
 	/* Set image region. */
@@ -236,7 +238,7 @@ int main(int argc, char* argv[]) {
 	ccl_context_destroy(ctx);
 
 	/* Check all wrappers have been destroyed. */
-	g_assert(ccl_wrapper_memcheck());
+	assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
 	return EXIT_SUCCESS;
