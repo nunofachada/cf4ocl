@@ -150,7 +150,7 @@ cl_bool ccl_user_event_set_status(
  * */
 #define ccl_event_get_info(evt, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) evt, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetEventInfo, CL_FALSE, err)
+		CCL_INFO_EVENT, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar event information value.
@@ -170,8 +170,7 @@ cl_bool ccl_user_event_set_status(
  * */
 #define ccl_event_get_info_scalar(evt, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
-		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetEventInfo, CL_FALSE, err))
+		NULL, param_name, sizeof(param_type), CCL_INFO_EVENT, CL_FALSE, err))
 
 /**
  * Macro which returns an array event information value.
@@ -191,9 +190,7 @@ cl_bool ccl_user_event_set_status(
  * */
 #define ccl_event_get_info_array(evt, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
-		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetEventInfo, \
-		CL_FALSE, err)
+		NULL, param_name, sizeof(param_type), CCL_INFO_EVENT, CL_FALSE, err)
 
 /**
  * Get a ::CCLWrapperInfo event profiling information object.
@@ -208,7 +205,7 @@ cl_bool ccl_user_event_set_status(
  * */
 #define ccl_event_get_profiling_info(evt, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) evt, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err)
+		CCL_INFO_EVENT_PROFILING, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar event profiling information value.
@@ -229,7 +226,7 @@ cl_bool ccl_user_event_set_status(
 #define ccl_event_get_profiling_info_scalar(evt, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err))
+		CCL_INFO_EVENT_PROFILING, CL_FALSE, err))
 
 /**
  * Macro which returns an array event profiling information value.
@@ -250,7 +247,7 @@ cl_bool ccl_user_event_set_status(
 #define ccl_event_get_profiling_info_array(evt, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
 		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetEventProfilingInfo, CL_FALSE, err)
+		CCL_INFO_EVENT_PROFILING, CL_FALSE, err)
 
 /**
  * Increase the reference count of the event object.

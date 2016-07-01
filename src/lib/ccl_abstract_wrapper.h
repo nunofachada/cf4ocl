@@ -54,19 +54,6 @@ typedef struct ccl_wrapper_info {
 
 } CCLWrapperInfo;
 
-
-/**
- * Generic function pointer for OpenCL clget**Info() functions
- * used to point to ccl_wrapper_info_fp1() and ccl_wrapper_info_fp2()
- * concrete implementations.
- *
- * @protected @memberof ccl_wrapper
- *
- * Concrete implementations of this function are provided by the OpenCL
- * implementation.
- * */
-typedef cl_int (*ccl_wrapper_info_fp)(void);
-
 /* Increase the reference count of the wrapper object. */
 CCL_EXPORT
 void ccl_wrapper_ref(CCLWrapper* wrapper);
@@ -84,19 +71,19 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_info info_type, cl_bool use_cache, GError** err);
+	CCLInfo info_type, cl_bool use_cache, GError** err);
 
 /* Get pointer to information value. */
 CCL_EXPORT
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_info info_type, cl_bool use_cache, GError** err);
+	CCLInfo info_type, cl_bool use_cache, GError** err);
 
 /* Get information size. */
 CCL_EXPORT
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_info info_type, cl_bool use_cache, GError** err);
+	CCLInfo info_type, cl_bool use_cache, GError** err);
 
 /* Debug function which checks if memory allocated by wrappers
  * has been properly freed. */

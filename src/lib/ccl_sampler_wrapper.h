@@ -117,7 +117,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * */
 #define ccl_sampler_get_info(smplr, param_name, err) \
 	ccl_wrapper_get_info((CCLWrapper*) smplr, NULL, param_name, 0, \
-		(ccl_wrapper_info_fp) clGetSamplerInfo, CL_FALSE, err)
+		CCL_INFO_SAMPLER, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar sampler information value.
@@ -137,8 +137,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * */
 #define ccl_sampler_get_info_scalar(smplr, param_name, param_type, err) \
 	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) smplr, \
-		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetSamplerInfo, CL_FALSE, err))
+		NULL, param_name, sizeof(param_type), CCL_INFO_SAMPLER, CL_FALSE, err))
 
 /**
  * Macro which returns an array sampler information value.
@@ -161,8 +160,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * */
 #define ccl_sampler_get_info_array(smplr, param_name, param_type, err) \
 	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) smplr, \
-		NULL, param_name, sizeof(param_type), \
-		(ccl_wrapper_info_fp) clGetSamplerInfo, CL_FALSE, err)
+		NULL, param_name, sizeof(param_type), CCL_INFO_SAMPLER, CL_FALSE, err)
 
 /**
  * Increase the reference count of the sampler wrapper object.

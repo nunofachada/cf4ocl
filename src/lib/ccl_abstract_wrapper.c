@@ -29,7 +29,11 @@
 
 #include "ccl_abstract_wrapper.h"
 #include "_ccl_abstract_wrapper.h"
+#include "_ccl_kernel_wrapper.h"
 #include "_ccl_defs.h"
+
+/* Generic function pointer for OpenCL clget**Info() functions. */
+typedef cl_int (*ccl_wrapper_info_fp)(void);
 
 /* Table of all existing wrappers. */
 static GHashTable* wrappers = NULL;
@@ -40,24 +44,38 @@ G_LOCK_DEFINE(wrappers);
 static const char* ccl_class_names[] = {"Buffer", "Context", "Device", "Event",
 	"Image", "Kernel", "Platform", "Program", "Sampler", "Queue", "None", NULL};
 
-/* Information functions. */
-static const ccl_wrapper_info_fp[] info_funs = {
-	clGetContextInfo,
-	clGetDeviceInfo,
-	clGetEventInfo,
-	clGetEventProfilingInfo,
-	clGetImageInfo,
-	clGetKernelInfo,
-	ccl_kernel_get_arg_info_adapter,
-	clGetKernelWorkGroupInfo,
-	NULL, /* clKernelSubGroupInfo */
-	clGetMemObjectInfo,
-	clGetPlatformInfo,
-	clGetProgramInfo,
-	clGetProgramBuildInfo,
-	clGetSamplerInfo,
-	clGetQueueInfo,
-	NULL /* clGetPipeInfo */ };
+/* Information functions. They must be in the same order as defined in the
+ * CCLInfo enum. */
+static const ccl_wrapper_info_fp info_funs[] = {
+	(ccl_wrapper_info_fp) clGetContextInfo,
+	(ccl_wrapper_info_fp) clGetDeviceInfo,
+	(ccl_wrapper_info_fp) clGetEventInfo,
+	(ccl_wrapper_info_fp) clGetEventProfilingInfo,
+	(ccl_wrapper_info_fp) clGetImageInfo,
+	(ccl_wrapper_info_fp) clGetKernelInfo,
+#ifdef CL_VERSION_1_2
+	(ccl_wrapper_info_fp) ccl_kernel_get_arg_info_adapter,
+#else
+	NULL,
+#endif
+	(ccl_wrapper_info_fp) clGetKernelWorkGroupInfo,
+#ifdef CL_VERSION_2_1
+	NULL /* clKernelSubGroupInfo - not implemented yet. */,
+#else
+	NULL,
+#endif
+	(ccl_wrapper_info_fp) clGetMemObjectInfo,
+	(ccl_wrapper_info_fp) clGetPlatformInfo,
+	(ccl_wrapper_info_fp) clGetProgramInfo,
+	(ccl_wrapper_info_fp) clGetProgramBuildInfo,
+	(ccl_wrapper_info_fp) clGetSamplerInfo,
+	(ccl_wrapper_info_fp) clGetCommandQueueInfo,
+#ifdef CL_VERSION_2_0
+	NULL /* clGetPipeInfo - not implemented yet. */
+#else
+	NULL,
+#endif
+};
 
 /**
  * Information about wrapped OpenCL objects.
@@ -444,7 +462,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_info info_type, cl_bool use_cache, GError** err) {
+	CCLInfo info_type, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -581,7 +599,7 @@ finish:
 CCL_EXPORT
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_info info_type, cl_bool use_cache, GError** err) {
+	CCLInfo info_type, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -589,8 +607,8 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	/* Make sure wrapper1 is not NULL. */
 	g_return_val_if_fail(wrapper1 != NULL, NULL);
 
-	/* Make sure info_fun is not NULL. */
-	g_return_val_if_fail(info_fun != NULL, NULL);
+	/* Make sure info_type has a valid value. */
+	g_return_val_if_fail((info_type >= 0) && (info_type < CCL_INFO_END), NULL);
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
@@ -622,7 +640,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * */
 size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	ccl_info info_type, cl_bool use_cache, GError** err) {
+	CCLInfo info_type, cl_bool use_cache, GError** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -630,8 +648,8 @@ size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	/* Make sure wrapper1 is not NULL. */
 	g_return_val_if_fail(wrapper1 != NULL, 0);
 
-	/* Make sure info_fun is not NULL. */
-	g_return_val_if_fail(info_fun != NULL, 0);
+	/* Make sure info_type has a valid value. */
+	g_return_val_if_fail((info_type >= 0) && (info_type < CCL_INFO_END), 0);
 
 	/* Get information object. */
 	CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
