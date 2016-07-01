@@ -80,12 +80,11 @@ int main(int argc, char* argv[]) {
 		op = atoi(argv[1]);
 
 	/* Add independent filter which accepts CPU devices. */
-	ccl_devsel_add_indep_filter(
-		&filters, ccl_devsel_indep_type_cpu, NULL);
+	ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_cpu, NULL);
 
-	/* Add "same platform" dependent filter. This filter should always
-	 * be added (usually in last position) for context creation, because
-	 * all devices in a context must belong to the same platform. */
+	/* Add "same platform" dependent filter. This filter should always be added
+	 * (usually in last position) for context creation, because all devices in a
+	 * context must belong to the same platform. */
 	ccl_devsel_add_dep_filter(&filters, ccl_devsel_dep_platform, NULL);
 
 	/* Proceed depending on user option. */
@@ -108,11 +107,10 @@ int main(int argc, char* argv[]) {
 		ccl_context_destroy(ctx);
 
 	} else if (op == 2) {
-		/* Option 2: use set of filters for explicit device selection
-		 * and listing. Here we manipulate a CCLDevSelDevices object
-		 * directly, which will be uncommon in client code, except in
-		 * cases were the the final purpose of device selection is not
-		 * context creation. */
+		/* Option 2: use set of filters for explicit device selection and
+		 * listing. Here we manipulate a CCLDevSelDevices object directly, which
+		 * will be uncommon in client code, except in cases were the the final
+		 * purpose of device selection is not context creation. */
 
 		/* Perform device selection. */
 		devices = ccl_devsel_select(&filters, &err);
@@ -120,8 +118,7 @@ int main(int argc, char* argv[]) {
 
 		/* List selected devices. */
 		if (devices->len > 0) {
-			printf("%d devices were accepted by the filters:\n",
-				devices->len);
+			printf("%d devices were accepted by the filters:\n", devices->len);
 			for (guint i = 0; i < devices->len; ++i) {
 				dev_name = ccl_device_get_info_array(
 					devices->pdata[i], CL_DEVICE_NAME, char*, &err);

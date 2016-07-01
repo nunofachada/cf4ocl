@@ -36,9 +36,6 @@ static void devices_new_destroy_test() {
 	/* Error reporting object. */
 	GError* err = NULL;
 
-	/* Internal pointer array. */
-	gpointer* ptr_array = NULL;
-
 	/* Object containing device wrappers. */
 	CCLDevSelDevices devs = NULL;
 
@@ -54,10 +51,7 @@ static void devices_new_destroy_test() {
 
 	/* Destroy object containing device wrappers for all OpenCL devices in the
 	 * system. */
-	ptr_array = ccl_devsel_devices_destroy(devs);
-
-	/* Check that devs is null. */
-	g_assert_cmphex(GPOINTER_TO_UINT(ptr_array), ==, GPOINTER_TO_UINT(NULL));
+	ccl_devsel_devices_destroy(devs);
 
 	/* Confirm that memory allocated by wrappers has been properly freed. */
 	g_assert(ccl_wrapper_memcheck());

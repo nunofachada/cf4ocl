@@ -157,18 +157,6 @@ typedef enum ccl_devsel_filter_type {
 typedef GPtrArray* CCLDevSelDevices;
 
 /**
- * Destroy an object containing device wrappers.
- *
- * This function will rarely be used in client code, unless in cases where
- * low-level management of device selection is required.
- *
- * @param[in] devices Object containing device wrappers.
- * @return Always returns `NULL`.
- * */
-#define ccl_devsel_devices_destroy(devices) \
-	g_ptr_array_free(devices, TRUE)
-
-/**
  * Independent filter function: Abstract function for filtering
  * one OpenCL device at a time.
  *
@@ -217,6 +205,10 @@ typedef GPtrArray* CCLDevSelFilters;
  * present in the system. */
 CCL_EXPORT
 CCLDevSelDevices ccl_devsel_devices_new(GError **err);
+
+/* Destroy an object containing device wrappers. */
+CCL_EXPORT
+void ccl_devsel_devices_destroy(CCLDevSelDevices devices);
 
 /* Returns a NULL-terminated array of strings, each one containing the name and
  * vendor of each device in the system. */

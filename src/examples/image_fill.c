@@ -39,6 +39,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <cf4ocl2.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -169,7 +170,7 @@ int main(int argc, char* argv[]) {
 	ccl_context_destroy(ctx);
 
 	/* Check all wrappers have been destroyed. */
-	g_assert(ccl_wrapper_memcheck());
+	assert(ccl_wrapper_memcheck());
 
 	/* Terminate. */
 	return EXIT_SUCCESS;

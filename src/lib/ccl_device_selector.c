@@ -422,6 +422,19 @@ finish:
 
 }
 
+/**
+ * Destroy an object containing device wrappers.
+ *
+ * This function will rarely be used in client code, unless in cases where
+ * low-level management of device selection is required.
+ *
+ * @param[in] devices Object containing device wrappers.
+ * @return Always returns `NULL`.
+ * */
+CCL_EXPORT
+void ccl_devsel_devices_destroy(CCLDevSelDevices devices) {
+	g_ptr_array_free(devices, TRUE);
+}
 
 /**
  * Returns a NULL-terminated array of strings, each one
