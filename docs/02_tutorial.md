@@ -36,13 +36,12 @@ file:
 #include <cf4ocl2.h>
 ~~~~~~~~~~~~~~~
 
-The next step is to get an context with an OpenCL device where we can
-perform our computation. _cf4ocl_ has several constructor functions for
-creating contexts with different types of devices, some very simple,
-some very flexible. For example, ::ccl_context_new_from_menu() lets
-the user select the OpenCL device if more than one is available in the
-system, and returns a context containing the selected device. Let's use
-it:
+The next step is to create a context with an OpenCL device where we can perform
+our computation. _cf4ocl_ has several constructor functions for creating
+contexts with different types of devices, some very simple, some very flexible.
+For example, ::ccl_context_new_from_menu() allows the user to select the OpenCL
+device if more than one is available in the system, and returns a context
+containing the selected device. For example:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -56,28 +55,28 @@ int main() {
 
 ~~~~~~~~~~~~~~~
 
-Where we pass `NULL` we could have passed an error management object,
-which we'll discuss in detail further ahead. Error-throwing _cf4ocl_
-signal errors in two ways: 1) using the return value; and, 2) populating
-the error management object. In this case, because we're not passing
-this object, we have to rely on the return value to check for errors. A
-`NULL` return value indicates an error in all _cf4ocl_ constructors:
+Where we pass `NULL` we could have passed an error management object, which
+we'll discuss in detail further ahead. Error-throwing _cf4ocl_ functions signal
+errors in two ways: 1) using the return value; and, 2) populating the error
+management object. In this case, because we're not passing this object, we have
+to rely on the return value to check for errors. A `NULL` return value indicates
+an error in all _cf4ocl_ constructors:
 
 ~~~~~~~~~~~~~~~{.c}
     if (ctx == NULL) exit(-1);
 ~~~~~~~~~~~~~~~
 
-In _cf4ocl_, all objects created with `new` constructors must be
-release using the respective `destroy` destructors. For contexts, this
-is the ::ccl_context_destroy() function:
+In _cf4ocl_, all objects created with `new` constructors must be released using
+the respective `destroy` destructors. For contexts, this is the
+::ccl_context_destroy() function:
 
 ~~~~~~~~~~~~~~~{.c}
     /* Destroy context wrapper. */
     ccl_context_destroy(ctx);
 ~~~~~~~~~~~~~~~
 
-We now have compilable, leak-free _cf4ocl_ program, although it doesn't
-do very much yet:
+We now have compilable, leak-free _cf4ocl_ program, although it doesn't do very
+much yet:
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -109,9 +108,10 @@ With Clang the command is the same, just replace `gcc` with `clang`.
 
 ### Host and device buffers
 
-The goal of the program is to sum two vectors and a constant. Let's
-declare two host vectors with some values, a third host vector which
-will hold the result, three device buffers and the constant.
+The goal of the program is to sum two vectors and a constant. As such, we need
+to declare three host vectors, two of which will be initialized with some values
+to sum, and the third one will be used to hold the final result. We also need to
+declare the respective device buffers and the constant.
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -130,8 +130,8 @@ will hold the result, three device buffers and the constant.
 
 ~~~~~~~~~~~~~~~
 
-It's necessary to instantiate the device buffers, of which `a` and `b`
-will be initialized with the values in the respective host vectors:
+Two of the device buffers, `a` and `b`, will be initialized with the values of
+the corresponding host vectors:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -174,8 +174,8 @@ Don't forget the destructors at the end:
 
 ~~~~~~~~~~~~~~~
 
-The complete program so far, which can be compiled and executed. Still
-doesn't do anything useful, but we're getting close.
+The complete program so far can be compiled and executed. Still doesn't do
+anything useful, but we're getting close.
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -222,10 +222,9 @@ int main() {
 
 ### Creating the command queue
 
-The ::ccl_queue_new() constructor provides the simplest way to create a
-command queue. However, command queue creation requires a device. At
-this time, only the context has the memory address of the selected
-device. To get a pointer to the device, one can use the
+The ::ccl_queue_new() constructor provides the simplest way to create a command
+queue. However, command queue creation requires a device. The context contains a
+reference to the selected device, which can be fetched using the
 ::ccl_context_get_device() function:
 
 ~~~~~~~~~~~~~~~{.c}
@@ -239,12 +238,12 @@ device. To get a pointer to the device, one can use the
     if (dev == NULL) exit(-1);
 ~~~~~~~~~~~~~~~
 
-There's no need to release the device object. It will be automatically
-released when the context is destroyed, in accordance to the
+There's no need to release the device object. It will be automatically released
+when the context is destroyed, in accordance with the
 @ref ug_new_destroy "new/destroy" rule.
 
-Now we can create the command queue. We don't require any special
-queue properties for now, so we pass `0` in the third argument:
+Now we can create the command queue. We don't require any special queue
+properties for now, so we pass `0` as the third argument to ::ccl_queue_new():
 
 ~~~~~~~~~~~~~~~{.c}
     /* Variables. */
@@ -263,10 +262,10 @@ queue properties for now, so we pass `0` in the third argument:
     ccl_queue_destroy(queue);
 ~~~~~~~~~~~~~~~
 
-Both ::ccl_context_get_device() and ::ccl_queue_new() expect an error
-handling object as the last argument. By passing `NULL` we must rely
-on the return value of these functions in order to check for errors.
-Here's the complete program so far:
+Both ::ccl_context_get_device() and ::ccl_queue_new() expect an error handling
+object as the last argument. By passing `NULL` we must rely on the return value
+of these functions in order to check for errors. Here's the complete code so
+far:
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -322,13 +321,13 @@ int main() {
 }
 ~~~~~~~~~~~~~~~
 
-Compile it and run it. As expected, nothing special happens yet.
+Compile and run the code. As expected, nothing special happens yet.
 
 ### Creating and building the program
 
 _cf4ocl_ provides several constructors for creating
-@ref CCL_PROGRAM_WRAPPER "program objects". When a single OpenCL C
-kernel source file is involved, the most adequate constructor is
+@ref CCL_PROGRAM_WRAPPER "program objects". When a single OpenCL C kernel source
+file is involved, the most adequate constructor is
 ::ccl_program_new_from_source_file():
 
 ~~~~~~~~~~~~~~~{.c}
@@ -349,7 +348,7 @@ kernel source file is involved, the most adequate constructor is
 
 ~~~~~~~~~~~~~~~
 
-Building the program is just as easy. For this purpose, we use the
+Building the program object is just as easy. For this purpose, we use the
 ::ccl_program_build() function which returns `CL_TRUE` if the build is
 successful or `CL_FALSE` otherwise:
 
@@ -366,7 +365,7 @@ successful or `CL_FALSE` otherwise:
 
 ~~~~~~~~~~~~~~~
 
-Here's the current state of our program:
+Here's the current state of our code:
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -433,27 +432,17 @@ int main() {
 }
 ~~~~~~~~~~~~~~~
 
-Compile and run it. Don't forget to put the `mysum.cl` file containing
-the kernel source code in the same folder, otherwise the program will
-not be successfully created.
-
-**Pro tip:** To get the build log automatically printed to screen, set
-the `G_MESSAGES_DEBUG` environment variable to `cf4ocl2`. For example:
-
-~~~~~~~~~~~~~~~
-$ G_MESSAGES_DEBUG=cf4ocl2 ./mysum
-~~~~~~~~~~~~~~~
-
-Add some junk to the kernel source code, run our program and check the
-build log.
+Compile and run the code. Don't forget to put the `mysum.cl` file containing the
+kernel source code in the same folder, otherwise the program object will not be
+successfully created.
 
 ### Setting kernel arguments and running the program
 
-_cf4ocl_ greatly simplifies the execution of OpenCL programs. Instead
-of creating a kernel with clCreateKernel(), setting kernel arguments
-one-by-one with clSetKernelArg(), and finally executing the kernel with
-clEnqueueNDRangeKernel(), _cf4ocl_ allows client code to do this using
-a single function:
+_cf4ocl_ greatly simplifies the execution of OpenCL programs. Instead of
+creating a kernel with clCreateKernel(), setting kernel arguments one-by-one
+with clSetKernelArg(), and finally executing the kernel with
+clEnqueueNDRangeKernel(), _cf4ocl_ allows client code to do this using a single
+function:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -471,31 +460,29 @@ a single function:
 
 ~~~~~~~~~~~~~~~
 
-Buffer, image and sampler objects can be passed directly as kernel
-arguments. Local and private variables are passed using the
-::ccl_arg_local() and ::ccl_arg_priv() macros, respectively.
+Buffer, image and sampler objects can be passed directly as kernel arguments.
+Local and private variables are passed using the ::ccl_arg_local() and
+::ccl_arg_priv() macros, respectively.
 
 A local work size vector is expected as the 6th argument to
-::ccl_program_enqueue_kernel(). In this example, we pass `NULL`, which
-means that the local work size is to be automatically determined by the
-OpenCL implementation (as specified in the clEnqueueNDRangeKernel()
-documentation). Often we need more control over this value, because
-OpenCL implementations don't let us know what local work size was
-effectively used. It can be a bit of a chore to determine a local work
-size, especially when multiple dimensions are involved. Among other
-things, it's necessary to check kernel and device limits. The
-::ccl_kernel_suggest_worksizes() is a very versatile function which can
-help in this regard.
+::ccl_program_enqueue_kernel(). In this example, we pass `NULL`, which means
+that the local work size is to be automatically determined by the OpenCL
+implementation (as specified in the clEnqueueNDRangeKernel() documentation).
+Often we need more control over this value, because OpenCL implementations don't
+let us know what local work size was effectively used. It can be a bit of a
+chore to determine a local work size, especially when multiple dimensions are
+involved. Among other things, it's necessary to check kernel and device limits.
+The ::ccl_kernel_suggest_worksizes() is a very versatile function which can help
+in this regard.
 
 While the ::ccl_program_enqueue_kernel() simplifies executing a kernel
-(including setting its arguments), _cf4ocl_ provides additional
-functions which allow client code to have finer control over this
-process.
+(including setting its arguments), _cf4ocl_ provides additional functions which
+allow client code to have finer control over this process.
 
 ### Checking results
 
-To check the results of the kernel execution, it's necessary to first
-read the `c` output buffer from the device:
+To check the results of the kernel execution, it's necessary to read the
+contents of device buffer `c` into host buffer `vec_c`:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -624,18 +611,17 @@ int main() {
 
 ### A better way to check for errors
 
-Our program may be correctly implemented, but a number of OpenCL errors
-can still occur. Checking the return values of _cf4ocl_ functions
-allows us only to determine that something went wrong, not what went
-wrong. Fortunately, all error-throwing _cf4ocl_ functions accept the
-memory location of [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
-error handling object, usually the last function argument. If given,
-this object will be populated with an error code and an error domain, as
-well as an error message, if an error occurs. In our program we're
-passing `NULL` where the `GError` object memory location was expected,
-so no information about errors is made available to the caller. To
-change the way we're handling errors, we must first declare a `GError`
-object, and initialize it to `NULL`:
+Our code may be correctly implemented, but a number of OpenCL errors can still
+occur. Checking the return values of _cf4ocl_ functions allows us to determine
+that something went wrong, but not what went wrong. Fortunately, all
+error-throwing _cf4ocl_ functions accept the memory location of a
+[GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
+error handling object, usually as the last argument. If given, this object will
+be populated with an error code and an error domain, as well as an error
+message, if an error occurs. In our program we're passing `NULL` where the
+`GError` object memory location was expected, so no information about errors is
+made available to the caller. To change the way we're handling errors, we must
+first declare a `GError` object, and initialize it to `NULL`:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -661,17 +647,17 @@ error-throwing functions, e.g.:
     //...
 ~~~~~~~~~~~~~~~
 
-Now we can check this object after _cf4ocl_ function calls. Let's create
-a small macro to do so:
+Now we can check this object after _cf4ocl_ function calls. Let's create a small
+macro to do so:
 
 ~~~~~~~~~~~~~~~{.c}
 #define CHECK_ERROR(err) \
     if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
 ~~~~~~~~~~~~~~~
 
-We can also remove the `status` and `evt` variables, because we don't
-rely on them anymore for error checking. Here's the complete program,
-with more informative error checking:
+We can also remove the `status` and `evt` variables, because we don't rely on
+them anymore for error checking. Here's the complete code, with more informative
+error checking:
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -767,17 +753,16 @@ int main() {
 }
 ~~~~~~~~~~~~~~~
 
-The error checking strategy in our program is just an example. Client
-code can implement any strategy. More information about this topic is
-available in the @ref ug_errorhandle "user guide".
+The error checking strategy in our code is just an example. Client code can
+implement any strategy. More information about this topic is available in the
+@ref ug_errorhandle "user guide".
 
 ### Profiling your program the easy way
 
-Profiling OpenCL code by hand, i.e. by gathering and processing
-information about all `cl_event` objects, is an extremely verbose and
-error-prone process. However, it comes for free with _cf4ocl_. Well,
-mostly. The first change we must perform on our program is to enable
-profiling when the command queue is created:
+Profiling OpenCL code by hand, i.e. by gathering and processing information
+about all `cl_event` objects, is an extremely verbose and error-prone process.
+However, it comes for free with _cf4ocl_. Well, mostly. The first change we must
+perform on our program is to enable profiling when the command queue is created:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -786,10 +771,9 @@ profiling when the command queue is created:
 
 ~~~~~~~~~~~~~~~
 
-Additionally, we copied host vectors to device implicitly during device
-buffer creation. These implicit transfers don't produce OpenCL events,
-and are thus unavailable for profiling. As such, we must make these
-operations explicit:
+Additionally, we copied host vectors to device implicitly during device buffer
+creation. These implicit transfers don't produce OpenCL events, and are thus
+unavailable for profiling. As such, we should make these operations explicit:
 
 ~~~~~~~~~~~~~~~{.c}
 
@@ -815,7 +799,7 @@ operations explicit:
 
 ~~~~~~~~~~~~~~~
 
-We can now profile our program using functionality provided by the
+We can now profile our code using functionality provided by the
 @ref CCL_PROFILER "profiler module":
 
 ~~~~~~~~~~~~~~~{.c}
@@ -840,7 +824,7 @@ We can now profile our program using functionality provided by the
 
 ~~~~~~~~~~~~~~~
 
-Our final program, with error checking and profiling, is as follows:
+Our final code, with error checking and profiling, is as follows:
 
 ~~~~~~~~~~~~~~~{.c}
 #include <cf4ocl2.h>
@@ -959,8 +943,8 @@ int main() {
 
 ~~~~~~~~~~~~~~~
 
-Compile and run the program. A profiling summary will be printed on the
-screen, something like:
+Compile and run the code. A profiling summary will be printed on the screen,
+something like:
 
 @verbatim
 

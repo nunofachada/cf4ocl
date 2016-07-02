@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Utility for static compilation and linking of OpenCL kernels.
+ * Utility for offline compilation and linking of OpenCL kernels.
  *
  * @author Nuno Fachada
  * @date 2016
@@ -27,7 +27,7 @@
 /**
  * @page ccl_c
  *
- * @brief Utility for static compilation and linking of OpenCL kernels.
+ * @brief Utility for offline compilation and linking of OpenCL kernels.
  *
  * SYNOPSIS
  * ========
@@ -37,7 +37,7 @@
  * DESCRIPTION
  * ===========
  *
- * The `ccl_c` tool performs static compilation and analysis of OpenCL kernels.
+ * The `ccl_c` tool performs offline compilation and analysis of OpenCL kernels.
  * Here is a list of the available options:
  *
  * <dl>

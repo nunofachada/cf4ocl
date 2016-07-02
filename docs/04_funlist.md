@@ -118,9 +118,6 @@ Function/macro | Description
 ::ccl_event_wait_list_get_clevents() | @copybrief ccl_event_wait_list_get_clevents
 ::ccl_event_wait_list_get_num_events() | @copybrief ccl_event_wait_list_get_num_events
 ::ccl_ewl() | @copybrief ccl_ewl
-::ccl_if_err_create_goto() | @copybrief ccl_if_err_create_goto
-::ccl_if_err_goto() | @copybrief ccl_if_err_goto
-::ccl_if_err_propagate_goto() | @copybrief ccl_if_err_propagate_goto
 ::ccl_image_destroy() | @copybrief ccl_image_destroy
 ::ccl_image_enqueue_copy() | @copybrief ccl_image_enqueue_copy
 ::ccl_image_enqueue_copy_to_buffer() | @copybrief ccl_image_enqueue_copy_to_buffer
