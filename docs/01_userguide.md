@@ -600,15 +600,13 @@ The management of OpenCL object information is also handled by the
 two wrapper objects, the first being the object to query; the second is
 an auxiliary object required by some lower-level OpenCL info functions,
 such clGetKernelWorkGroupInfo(), which requires a device object besides
-the kernel object. ::ccl_wrapper_get_info() also requires a pointer to
-a OpenCL `clGet*Info()` function (with type defined as
-::ccl_wrapper_info_fp) in order to perform the desired query.
-::ccl_wrapper_get_info() returns a ::CCLWrapperInfo* object, which
-contains two public properties: the queried value and its size. To be
-useful, the value must be cast to the correct type. The
-::ccl_wrapper_get_info_value() and ::ccl_wrapper_get_info_size() methods
-call ::ccl_wrapper_get_info(), but directly return the value and size of
-the ::CCLWrapper* object, respectively.
+the kernel object. ::ccl_wrapper_get_info() also requires the specification of
+the type of query to perform via the ::CCLInfo enumeration.
+::ccl_wrapper_get_info() returns a ::CCLWrapperInfo* object, which contains two
+public properties: the queried value and its size. To be useful, the value must
+be cast to the correct type. The ::ccl_wrapper_get_info_value() and
+::ccl_wrapper_get_info_size() methods call ::ccl_wrapper_get_info(), but
+directly return the value and size of the ::CCLWrapper* object, respectively.
 
 The requested information is kept in the information table of the
 respective wrapper object. When the wrapper object is destroyed, all the

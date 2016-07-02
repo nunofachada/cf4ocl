@@ -449,7 +449,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * @param[in] param_name Name of information/parameter to get.
  * @param[in] min_size Minimum size of returned information object in
  * case of error.
- * @param[in] info_fun OpenCL clGet*Info function.
+ * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -586,7 +586,7 @@ finish:
  * queries.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] min_size Minimum size of returned value in case of error.
- * @param[in] info_fun OpenCL clGet*Info function.
+ * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
  * @param[out] err Return location for a GError, or `NULL` if error
@@ -630,7 +630,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * queries.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] min_size Minimum size returned in case of error.
- * @param[in] info_fun OpenCL clGet*Info function.
+ * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
  * @param[out] err Return location for a GError, or `NULL` if error
