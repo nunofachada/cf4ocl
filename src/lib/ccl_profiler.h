@@ -37,32 +37,32 @@
 /**
  * @defgroup CCL_PROFILER Profiler
  *
- * The profiler module provides classes and methods for
- * profiling wrapped OpenCL events and queues.
+ * The profiler module provides classes and methods for profiling wrapped OpenCL
+ * events and queues.
  *
  * @warning The functions in this module are not thread-safe.
  *
- * The profiling module offers two methods for obtaining information
- * about the performed computations:
+ * The profiling module offers two methods for obtaining information about the
+ * performed computations:
  *
- * 1. Detailed profiling of OpenCL events using the
- * ::ccl_prof_add_queue() function.
- * 2. Simple (and optional) timming of the performed computations using
- * the ::ccl_prof_start() and ::ccl_prof_stop() functions. If this
- * timming is measured it will be taken into account by the
+ * 1. Detailed profiling of OpenCL events using the ::ccl_prof_add_queue()
+ * function.
+ * 2. Simple (and optional) timming of the performed computations using the
+ * ::ccl_prof_start() and ::ccl_prof_stop() functions. If these function are
+ * used, the measured time will be taken into account by the
  * `ccl_prof_*_summary()` functions.
  *
- * In order to use the first method, the `CL_QUEUE_PROFILING_ENABLE`
- * property should be specified when creating command queue wrappers
- * with ::ccl_queue_new().
+ * In order to use the first method, the `CL_QUEUE_PROFILING_ENABLE` property
+ * should be specified when creating command queue wrappers with
+ * ::ccl_queue_new() or ::ccl_queue_new_full().
  *
- * After the computations take place, all the (finished) queue wrappers
- * are passed to the profiler using the ::ccl_prof_add_queue()
- * function. The ccl_prof_calc() function can then be called to
- * perform the required analysis.
+ * After all the computations and memory transfers take place, the utilized
+ * queue wrappers are passed to the profiler using the ::ccl_prof_add_queue()
+ * function. The ccl_prof_calc() function can then be called to perform the
+ * required analysis.
  *
- * At this stage, different types of profiling information become
- * available, and can be iterated over:
+ * At this stage, different types of profiling information become available, and
+ * can be iterated over:
  *
  * 1. _Aggregate event information_: absolute and relative durations of
  * all events with same name, represented by the ::CCLProfAgg* class. If
@@ -75,7 +75,7 @@
  * 2. _Non-aggregate event information_: event-specific information,
  * represented by the ::CCLProfInfo* class, such as event name (or type,
  * if no name is given), the queue the event is associated with, and
- * submit, queued, start and end instants. A sequence of ::CCLProfInfo*
+ * submit, queue, start and end instants. A sequence of ::CCLProfInfo*
  * objects can be iterated over using the ::ccl_prof_iter_info_init()
  * and ::ccl_prof_iter_info_next() functions.
  * 3. _Event instants_: specific start and end event instants, represented
@@ -384,9 +384,8 @@ typedef struct ccl_prof_inst {
 	cl_ulong instant;
 
 	/**
-	 * Type of event instant
-	 * (CCLProfInstType::CCL_PROF_INST_TYPE_START or
-	 * CCLProfInstType::CCL_PROF_INST_TYPE_END).
+	 * Type of event instant (::CCL_PROF_INST_TYPE_START or
+	 * ::CCL_PROF_INST_TYPE_END).
 	 * @public
 	 * */
 	CCLProfInstType type;

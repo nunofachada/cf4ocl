@@ -35,25 +35,23 @@
 /**
  * @defgroup CCL_IMAGE_WRAPPER Image wrapper
  *
- * The image wrapper module provides functionality for simple
- * handling of OpenCL image objects.
+ * The image wrapper module provides functionality for simple handling of OpenCL
+ * image objects.
  *
- * All the functions in this module are direct wrappers of the
- * respective OpenCL image functions. The ::ccl_image_new() constructor
- * accepts a variable list of arguments which describe the image to be
- * created. There is also the ::ccl_image_new_v(), which accepts the
- * image description arguments given in a ::CCLImageDesc* object. Both
- * constructors will automatically use the old style
- * clCreateImage2D()/clCreateImage3D() constructors if the underlying
- * platform OpenCL version is less or equal than 1.1, or the new
- * clCreateImage() constructor otherwise. Instantiation and destruction
- * of image wrappers follows the _cf4ocl_
- * @ref ug_new_destroy "new/destroy" rule; as such, images should be
+ * All the functions in this module are direct wrappers of the respective OpenCL
+ * image functions. The ::ccl_image_new() constructor accepts a variable list of
+ * arguments which describe the image to be created. There is also the
+ * ::ccl_image_new_v() constructor, which accepts the image description
+ * arguments given in a ::CCLImageDesc* object. Both constructors will
+ * automatically use the old style clCreateImage2D()/clCreateImage3D() OpenCL
+ * functions if the OpenCL version of the underlying platform is less or equal
+ * than 1.1, or the new clCreateImage() constructor otherwise. Instantiation and
+ * destruction of image wrappers follows the
+ * _cf4ocl_ @ref ug_new_destroy "new/destroy" rule; as such, images should be
  * freed with the ::ccl_image_destroy() destructor.
  *
- * Image wrapper objects can be directly passed as kernel arguments to
- * functions such as ::ccl_program_enqueue_kernel() or
- * ::ccl_kernel_set_arg().
+ * Image wrapper objects can be directly passed as kernel arguments to functions
+ * such as ::ccl_program_enqueue_kernel() or ::ccl_kernel_set_arg().
  *
  * Information about image objects can be fetched using the image
  * @ref ug_getinfo "info macros":

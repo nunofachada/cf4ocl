@@ -38,10 +38,10 @@
 /**
  * @defgroup CCL_EVENT_WRAPPER Event wrapper
  *
- * The event wrapper module provides functionality for simple
- * handling of OpenCL event objects.
+ * The event wrapper module provides functionality for simple handling of OpenCL
+ * event objects.
  *
- * Typical event wrappers are not directly created by client code. They
+ * Typically, event wrappers will not be directly created by client code. They
  * are returned by event producing functions (such as
  * ::ccl_image_enqueue_write(), which wraps the clEnqueueWriteImage()
  * OpenCL function). As such, and in accordance with the

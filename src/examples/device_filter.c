@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
 		/* List selected devices. */
 		if (devices->len > 0) {
 			printf("%d devices were accepted by the filters:\n", devices->len);
-			for (guint i = 0; i < devices->len; ++i) {
+			for (unsigned int i = 0; i < devices->len; ++i) {
 				dev_name = ccl_device_get_info_array(
 					devices->pdata[i], CL_DEVICE_NAME, char*, &err);
 				HANDLE_ERROR(err);

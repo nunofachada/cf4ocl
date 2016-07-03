@@ -39,15 +39,14 @@
 /**
  * @defgroup CCL_CONTEXT_WRAPPER Context wrapper
  *
- * The context wrapper module provides functionality for simple
- * handling of OpenCL context objects.
+ * The context wrapper module provides functionality for simple handling of
+ * OpenCL context objects.
  *
  * Context wrappers can be created using three different approaches:
  *
  * 1. From a list of ::CCLDevice* device wrappers, using the
  * ::ccl_context_new_from_devices_full() function or the
- * ::ccl_context_new_from_devices() macro. This is the approach usually
- * followed when using the clCreateContext() OpenCL function directly.
+ * ::ccl_context_new_from_devices() macro.
  * 2. From a list of ::CCLDevSelFilters* device filters, using the
  * ccl_context_new_from_filters_full() function or the
  * ccl_context_new_from_filters() macro. This is a very flexible

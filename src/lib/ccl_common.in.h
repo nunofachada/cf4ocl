@@ -90,16 +90,27 @@
  * */
 typedef enum ccl_class {
 
+	/** Buffer object. */
 	CCL_BUFFER    = 0,
+	/** Context object. */
 	CCL_CONTEXT   = 1,
+	/** Device object. */
 	CCL_DEVICE    = 2,
+	/** Event object. */
 	CCL_EVENT     = 3,
+	/** Image object. */
 	CCL_IMAGE     = 4,
+	/** Kernel object. */
 	CCL_KERNEL    = 5,
+	/** Platform object. */
 	CCL_PLATFORM  = 6,
+	/** Program object. */
 	CCL_PROGRAM   = 7,
+	/** Sampler object. */
 	CCL_SAMPLER   = 8,
+	/** Queue object. */
 	CCL_QUEUE     = 9,
+	/** No object, enumeration termination marker. */
 	CCL_NONE      = 10
 
 } CCLClass;
@@ -112,23 +123,41 @@ typedef enum ccl_class {
  * */
 typedef enum ccl_info {
 
+	/** Request information about context objects. */
 	CCL_INFO_CONTEXT          = 0,
+	/** Request information about device objects. */
 	CCL_INFO_DEVICE           = 1,
+	/** Request information about event objects. */
 	CCL_INFO_EVENT            = 2,
+	/** Request information about event profiling. */
 	CCL_INFO_EVENT_PROFILING  = 3,
+	/** Request information about image objects. */
 	CCL_INFO_IMAGE            = 4,
+	/** Request information about kernel objects. */
 	CCL_INFO_KERNEL           = 5,
+	/** Request information about kernel arguments. */
 	CCL_INFO_KERNEL_ARG       = 6,
+	/** Request information about kernel work-groups. */
 	CCL_INFO_KERNEL_WORKGROUP = 7,
+	/** Request information about kernel sub-groups. */
 	CCL_INFO_KERNEL_SUBGROUP  = 8,
+	/** Request information about memory objects. */
 	CCL_INFO_MEMOBJ           = 9,
+	/** Request information about platform objects. */
 	CCL_INFO_PLATFORM         = 10,
+	/** Request information about program objects. */
 	CCL_INFO_PROGRAM          = 11,
+	/** Request information about program builds. */
 	CCL_INFO_PROGRAM_BUILD    = 12,
+	/** Request information about sampler objects. */
 	CCL_INFO_SAMPLER          = 13,
+	/** Request information about queue objects. */
 	CCL_INFO_QUEUE            = 14,
+	/** Request information about pipe objects. */
 	CCL_INFO_PIPE             = 15,
+	/** Enumeration termination marker. */
 	CCL_INFO_END              = 16
+
 } CCLInfo;
 
 /**

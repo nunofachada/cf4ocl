@@ -124,7 +124,7 @@
  * * ::ccl_program_get_build_info()
  *
  * For simple programs and kernels, the program wrapper module offers
- * three functions, which can be used onced a program is built:
+ * three functions, which can be used after a program is built:
  *
  * * ::ccl_program_get_kernel() - Get the kernel wrapper object for the
  * given program kernel function.

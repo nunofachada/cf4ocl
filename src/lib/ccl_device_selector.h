@@ -38,27 +38,26 @@
 /**
  * @defgroup CCL_DEVICE_SELECTOR Device selector
  *
- * This module offers a mechanism for selecting OpenCL devices, mainly
- * for context creation, although its functionality can be used for
- * other purposes.
+ * This module offers a mechanism for selecting OpenCL devices, mainly for
+ * context creation, although its functionality can be used for other purposes.
  *
- * The ::ccl_context_new_from_filters_full() context wrapper constructor
- * (and the ::ccl_context_new_from_filters() macro) accepts a
- * ::CCLDevSelFilters object containing a set of filters. These filters
- * define which devices can be used in the context. Instances of
- * ::CCLDevSelFilters must be initialized to NULL:
+ * The ::ccl_context_new_from_filters_full() context wrapper constructor (and
+ * the ::ccl_context_new_from_filters() macro) accepts a ::CCLDevSelFilters
+ * object containing a set of filters. These filters define which devices can be
+ * used in the context. Instances of ::CCLDevSelFilters must be initialized to
+ * NULL:
  *
  * @dontinclude device_filter.c
  * @skipline cf4ocl objects
  * @until CCLDevSelDevices devices
  *
- * Filters can then be added to the ::CCLDevSelFilters object with
- * the ::ccl_devsel_add_dep_filter() and ::ccl_devsel_add_indep_filter()
- * functions, which add @ref CCL_DEVICE_SELECTOR_DEP_FILTERS "dependent" or
- * @ref CCL_DEVICE_SELECTOR_INDEP_FILTERS "independent" filters,
- * respectively. Filters are processed in the order in which they are
- * added. For example, lets add an independent and a dependent filter to
- * the ::CCLDevSelFilters object:
+ * Filters can then be added to the ::CCLDevSelFilters object with the
+ * ::ccl_devsel_add_dep_filter() and ::ccl_devsel_add_indep_filter() functions,
+ * which add @ref CCL_DEVICE_SELECTOR_DEP_FILTERS "dependent" or
+ * @ref CCL_DEVICE_SELECTOR_INDEP_FILTERS "independent" filters, respectively.
+ * Filters are processed in the order in which they are added. The next example
+ * shows how to add an independent and a dependent filter to the
+ * ::CCLDevSelFilters object:
  *
  * @skipline Add indep
  * @until ccl_devsel_add_dep

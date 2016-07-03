@@ -35,15 +35,14 @@
 /**
  * @defgroup CCL_BUFFER_WRAPPER Buffer wrapper
  *
- * The buffer wrapper module provides functionality for simple
- * handling of OpenCL buffer objects.
+ * The buffer wrapper module provides functionality for simple handling of
+ * OpenCL buffer objects.
  *
- * All the functions in this module are direct wrappers of the
- * respective OpenCL buffer functions, except for the
- * ::ccl_buffer_new_from_region() function. This function wraps
- * clCreateSubBuffer() but assumes that the sub-buffer will represent a
- * specific region in the original buffer (which is the only sub-buffer
- * type, up to OpenCL 2.0).
+ * All the functions in this module are direct wrappers of the respective OpenCL
+ * buffer functions, except for the ::ccl_buffer_new_from_region() function.
+ * This function wraps clCreateSubBuffer() but assumes that the sub-buffer will
+ * represent a specific region in the original buffer (which is the only
+ * sub-buffer type, up to OpenCL 2.1).
  *
  * Buffer wrapper objects can be directly passed as kernel arguments to
  * functions such as ::ccl_kernel_set_args_and_enqueue_ndrange() or

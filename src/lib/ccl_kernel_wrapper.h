@@ -75,7 +75,7 @@
  * * ::ccl_kernel_get_info()
  *
  * Six additional macros are provided for getting kernel workgroup info
- * and kernel argument info (the later is only available from OpenCL
+ * and kernel argument info (the later are only available from OpenCL
  * 1.2 onwards). These work in the same way as the regular info macros:
  *
  * * ::ccl_kernel_get_workgroup_info_scalar()

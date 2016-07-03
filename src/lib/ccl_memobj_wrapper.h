@@ -38,14 +38,13 @@
 /**
  * @defgroup CCL_MEMOBJ_WRAPPER Memory object wrapper
  *
- * The memory object wrapper module provides functionality for simple
- * handling of generic OpenCL memory objects.
+ * The memory object wrapper module provides functionality for simple handling
+ * of generic OpenCL memory objects.
  *
- * All the functions in this module are direct wrappers of the
- * respective OpenCL memory object functions, except for the
- * ::ccl_memobj_get_opencl_version() function, which returns the OpenCL
- * version of the platform to which the memory object is associated
- * with.
+ * All the functions in this module are direct wrappers of the respective OpenCL
+ * memory object functions, with the exception of
+ * ::ccl_memobj_get_opencl_version(), which returns the OpenCL version of the
+ * platform associated with the memory object.
  *
  * For specific buffer and image handling, see the
  * @ref CCL_BUFFER_WRAPPER "buffer wrapper" and

@@ -54,7 +54,7 @@ Additional modules are also available:
 | _cf4ocl_ module                                | Description                                                                                        |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | @ref CCL_DEVICE_SELECTOR "Device selector module"  | Automatically select devices using filters.                                                        |
-| @ref CCL_DEVICE_QUERY "Device query module"        | Helpers for querying device information, mainly used by the @ref ug_devinfo "ccl_devinfo" program. |
+| @ref CCL_DEVICE_QUERY "Device query module"        | Helpers for querying device information, mainly used by the @ref ccl_devinfo "ccl_devinfo" program. |
 | @ref CCL_ERRORS "Errors module"                    | Convert OpenCL error codes into human-readable strings.                                            |
 | @ref CCL_PLATFORMS "Platforms module"              | Management of the OpencL platforms available in the system.                                        |
 | @ref CCL_PROFILER "Profiler module"                | Simple, convenient and thorough profiling of OpenCL events.                                        |
@@ -182,20 +182,19 @@ if (err) {
 }
 ~~~~~~~~~~~~~~~
 
-An error domain and error code are also available in the `GError`
-object. The domain indicates the module the error-reporting function is
-located in, while the code indicates the specific error that occurred.
-Three kinds of domain can be returned by error-reporting _cf4ocl_
-functions, each of them associated with distinct error codes:
+An error domain and error code are also available in the `GError` object. The
+domain indicates the module or library in which the error was generated, while
+the code indicates the specific error that occurred. Three kinds of domain can
+be returned by error-reporting _cf4ocl_ functions, each of them associated with
+distinct error codes:
 
-| Domain          | Codes                                                             | Description                                           |
-| --------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
-| ::CCL_ERROR     | ::ccl_error_code enum                                             | Error in _cf4ocl_ not related with external libraries |
-| ::CCL_OCL_ERROR | [cl.h](http://www.khronos.org/registry/cl/api/2.0/cl.h)           | Error in OpenCL function calls                        |
-| A GLib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent | Error in GLib function call (file open/save, etc)     |
+| Domain          | Codes                                                                   | Description                                           |
+| --------------- | ----------------------------------------------------------------------- | ----------------------------------------------------- |
+| ::CCL_ERROR     | ::ccl_error_code enum                                                   | Error in _cf4ocl_ not related with external libraries |
+| ::CCL_OCL_ERROR | [cl.h](https://github.com/KhronosGroup/OpenCL-Headers/blob/master/cl.h) | Error in OpenCL function calls                        |
+| A GLib domain   | [GLib-module](https://developer.gnome.org/glib/stable/) dependent       | Error in GLib function call (file open/save, etc)     |
 
-For example, it is possible for client code to act on different OpenCL
-errors:
+For example, it is possible for client code to act on different OpenCL errors:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
@@ -225,11 +224,11 @@ if (err) {
 }
 ~~~~~~~~~~~~~~~
 
-Finally, if client code wants to continue execution after an error was
-caught, it is mandatory to use the [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
-function to free the error object and reset its value to `NULL`. Not
-doing so is a bug, especially if more error-reporting functions are to
-be called moving forward. For example:
+Finally, if client code wants to continue execution after an error was caught,
+it is mandatory to use the [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
+function to free the error object and reset its value to `NULL`. Not doing so is
+a bug, especially if more error-reporting functions are to be called moving
+forward. For example:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
@@ -245,8 +244,10 @@ if (err) {
 }
 ~~~~~~~~~~~~~~~
 
-Even if the program terminates due to an error, the [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
-function can be still be called to destroy the error object.
+Even if the program terminates due to an error, the
+[g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
+function can be still be called to destroy the error object, avoiding memory
+leaks to be reported by tools such as [Valgrind](http://valgrind.org/).
 
 ### Log messages {#ug_log}
 
@@ -281,15 +282,14 @@ g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RE
 
 ## Wrapper modules {#ug_wrappers}
 
-Each [OpenCL class](http://www.khronos.org/registry/cl/sdk/2.0/docs/man/xhtml/classDiagram.html)
-is associated with a _cf4ocl_ module. At the most basic level, each
-module offers a wrapper class and functions which wrap or map their
-OpenCL equivalents. This, in itself, already simplifies working with
-OpenCL in C, because the _cf4ocl_ wrapper classes internally manages
-directly related objects, which may be created during the course of a
-program. As such, client code just needs to follow the
-@ref ug_new_destroy "new/destroy" rule for directly created objects,
-thus not having to worry with memory allocation/deallocation of
+Each [OpenCL class](http://www.khronos.org/registry/cl/sdk/2.1/docs/man/xhtml/classDiagram.html)
+is associated with a _cf4ocl_ [module](modules.html). At the most basic level,
+each module offers a wrapper class and functions which wrap or map their
+OpenCL equivalents. This, in itself, already simplifies working with OpenCL in
+C, because the _cf4ocl_ wrapper classes internally manage related objects, which
+may be created during the course of a program. As such, client code just needs
+to follow the @ref ug_new_destroy "new/destroy" rule for directly created
+objects, thus not having to worry with memory allocation/deallocation of
 intermediate objects.
 
 In most cases, however, each _cf4ocl_ module also provides methods for
@@ -390,23 +390,13 @@ methods. For example, the ::CCLContext* class provides the
 
 @copydoc CCL_PROFILER
 
-# Using the utilities {#ug_utils}
+# Bundled utilities {#ug_utils}
 
-## ccl_devinfo program {#ug_devinfo}
+_cf4ocl_ is bundled with the following utilities:
 
-@copybrief ccl_devinfo
-A detailed description of this command is available @ref ccl_devinfo "here".
-
-## ccl_c program {#ug_c}
-
-@copybrief ccl_c
-A detailed description of this utility is available @ref ccl_c "here".
-
-## ccl_plot_events.py script {#ug_plot_events}
-
-@copybrief ccl_plot_events.py
-More details on how to use this script are available
-@ref ccl_plot_events "here".
+* @ref ccl_devinfo "ccl_devinfo" - @copybrief ccl_devinfo
+* @ref ccl_c "ccl_c" - @copybrief ccl_c
+* @ref ccl_plot_events "ccl_plot_events" - @copybrief ccl_plot_events.py
 
 # Advanced {#ug_advanced}
 
@@ -440,6 +430,9 @@ the definitions of the abstract ::CCLWrapper* class and of the concrete
 @code{.c}
 /* Base class for all OpenCL wrappers. */
 struct ccl_wrapper {
+
+	/* The class or type of wrapped OpenCL object. */
+	CCLClass class;
 
 	/* The wrapped OpenCL object. */
 	void* cl_object;
@@ -477,7 +470,7 @@ struct ccl_event {
 
 Methods are implemented as functions which accept the object on which
 they operate as the first parameter. When useful, function-like macros
-are also used as object methods, such as the case of the
+are also used as class methods, such as the case of the
 @ref ug_getinfo "info macros". Polymorphism is not used, as the so
 called "abstract" methods are just functions which provide common
 operations to concrete methods, named differently for each concrete
@@ -523,8 +516,8 @@ digraph cf4ocl {
 
 ## The CCLWrapper base class {#ug_cclwrapper}
 
-The ::CCLWrapper* base class holds several low-level responsibilities
-for wrapper objects:
+The ::CCLWrapper* base class is responsible for common functionality of wrapper
+objects, namely:
 
 * Wrapping/unwrapping of OpenCL objects and maintaining a one-to-one
 relationship between wrapped objects and wrapper objects
@@ -617,7 +610,7 @@ boolean argument, which if true, causes the methods to first search
 for the information in the wrappers information table, in case it has
 already been requested; if not, they proceed with the query as normal.
 
-Client code will usually use the @ref ug_getinfo "info macros" of each
+Client code will commonly use the @ref ug_getinfo "info macros" of each
 wrapper in order to fetch information about the underlying OpenCL
 object. These macros expand into the `ccl_wrapper_get_info*()` methods,
 automatically casting objects and values to the appropriate type,
@@ -640,16 +633,16 @@ index.
 * @c ccl_dev_container_get_num_devices() : return number of devices in
 device container object.
 
-Concrete wrapper implementations rely on this functionality, which
-is exposed to client code via specific methods methods, e.g. in the case
-of ::CCLProgram* objects, these are ::ccl_program_get_all_devices(),
-::ccl_program_get_device() and ::ccl_program_get_num_devices(),
-respectively.
+Concrete wrapper implementations rely on this functionality, which is exposed to
+client code via specific methods, e.g. in the case of ::CCLProgram* objects,
+these are ::ccl_program_get_all_devices(), ::ccl_program_get_device() and
+::ccl_program_get_num_devices(), respectively.
 
 ## The CCLMemObj class {#ug_cclmemobj}
 
 The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
-::CCLImage* classes follows that of the respective [OpenCL types](http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/classDiagram.html).
+::CCLImage* classes follows that of the respective
+[OpenCL types](http://www.khronos.org/registry/cl/sdk/2.1/docs/man/xhtml/classDiagram.html).
 In other words, both OpenCL images and buffers are memory objects with
 common functionality, and _cf4ocl_ directly maps this relationship with
 the respective wrappers.

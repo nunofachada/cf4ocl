@@ -43,20 +43,18 @@
  * handling of OpenCL command queue objects.
  *
  * Queue wrappers can be instantiated with the ::ccl_queue_new() and
- * ::ccl_queue_new_full() constructors. While both constructors can be
- * used with any OpenCL version, the later is targeted for OpenCL 2.0,
- * exposing OpenCL 2.0 features, such as on-device queues, to client
- * code. If "OpenCL 2.0 only" features are requested for platforms with
- * OpenCL version <= 2.0, a warning will be logged and the queue will be
- * created without the unsupported features.
+ * ::ccl_queue_new_full() constructors. While both constructors can be used with
+ * any OpenCL version, the later is targeted for OpenCL >= 2.0, exposing
+ * features such as on-device queues to client code. If OpenCL >= 2.0 features
+ * are requested for platforms which do not support them, a warning will be
+ * logged and the queue will be created without the unsupported features.
  *
  * Instantiation and destruction of queue wrappers follows the _cf4ocl_
- * @ref ug_new_destroy "new/destroy" rule; as such, queues should be
- * freed with the ::ccl_queue_destroy() destructor.
+ * @ref ug_new_destroy "new/destroy" rule; as such, queues should be freed with
+ * the ::ccl_queue_destroy() destructor.
  *
- * Queue wrappers created with the `CL_QUEUE_PROFILING_ENABLE`
- * property can be automatically profiled with the
- * @ref CCL_PROFILER "profiler module".
+ * Queue wrappers created with the `CL_QUEUE_PROFILING_ENABLE` property can be
+ * automatically profiled with the @ref CCL_PROFILER "profiler module".
  *
  * Information about queue objects can be fetched using the
  * @ref ug_getinfo "info macros":

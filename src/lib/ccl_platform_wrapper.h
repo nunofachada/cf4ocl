@@ -36,10 +36,10 @@
 /**
  * @defgroup CCL_PLATFORM_WRAPPER Platform wrapper
  *
- * The platform wrapper module provides functionality for simple
- * handling of OpenCL platform objects.
+ * The platform wrapper module provides functionality for simple handling of
+ * OpenCL platform objects.
  *
- * Platform wrappers can be obtain in two ways:
+ * Platform wrappers can be obtained in two ways:
  *
  * 1. From a given ::CCLDevice* device wrapper, using the
  * ::ccl_platform_new_from_device() function (in which case, the object
