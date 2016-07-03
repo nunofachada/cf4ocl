@@ -120,7 +120,7 @@ struct ccl_prof {
 	 * Total number of events.
 	 * @private
 	 * */
-	guint num_events;
+	cl_uint num_events;
 
 	/**
 	 * Instants (start and end) of all events.
@@ -230,7 +230,7 @@ static CCLProfExportOptions export_options = {
  * @return A new event instant.
  */
 static CCLProfInst* ccl_prof_inst_new(const char* event_name,
-	const char* queue_name, guint id, cl_ulong instant,
+	const char* queue_name, cl_uint id, cl_ulong instant,
 	CCLProfInstType type) {
 
 	/* Allocate memory for event instant data structure. */
@@ -594,9 +594,9 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	g_return_if_fail(evt != NULL);
 
 	/* Event name ID. */
-	guint* event_name_id;
+	cl_uint* event_name_id;
 	/* Specific event ID. */
-	guint event_id;
+	cl_uint event_id;
 	/* Event instants. */
 	cl_ulong instant_queued, instant_submit, instant_start, instant_end;
 	/* Type of command which produced the event. */
@@ -900,7 +900,7 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 	/* Overlap matrix. */
 	cl_ulong* overlap_matrix = NULL;
 	/* Number of event names. */
-	guint num_event_names;
+	cl_uint num_event_names;
 	/* Helper table to account for all overlapping events. */
 	GHashTable* overlaps = NULL;
 	/* Occurring events table. */
@@ -945,7 +945,7 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 		 * name ID for occurring event. */
 		gpointer key_eid, ueid_curr_ev, ueid_occu_ev;
 		/* Keys for start and end event instants. */
-		guint eid_key1, eid_key2;
+		cl_uint eid_key1, eid_key2;
 		/* Event overlap in nanoseconds. */
 		cl_ulong eff_overlap;
 
@@ -962,13 +962,13 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 			while (g_hash_table_iter_next (&iter, &key_eid, NULL)) {
 
 				/* The first hash table key will be the smaller event id. */
-				eid_key1 = curr_evinst->id <= *((guint*) key_eid)
+				eid_key1 = curr_evinst->id <= *((cl_uint*) key_eid)
 					? curr_evinst->id
-					: *((guint*) key_eid);
+					: *((cl_uint*) key_eid);
 				/* The second hash table key will be the larger event id. */
-				eid_key2 = curr_evinst->id > *((guint*) key_eid)
+				eid_key2 = curr_evinst->id > *((cl_uint*) key_eid)
 					? curr_evinst->id
-					: *((guint*) key_eid);
+					: *((cl_uint*) key_eid);
 				/* Check if the first key (smaller id) is already in the
 				 * hash table... */
 				if (!g_hash_table_lookup_extended(overlaps,
@@ -1009,13 +1009,13 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 			g_hash_table_iter_init(&iter, occurring_events);
 			while (g_hash_table_iter_next(&iter, &key_eid, &ueid_occu_ev)) {
 				/* The first hash table key will be the smaller event id. */
-				eid_key1 = curr_evinst->id <= *((guint*) key_eid)
+				eid_key1 = curr_evinst->id <= *((cl_uint*) key_eid)
 					? curr_evinst->id
-					: *((guint*) key_eid);
+					: *((cl_uint*) key_eid);
 				/* The second hash table key will be the larger event id. */
-				eid_key2 = curr_evinst->id > *((guint*) key_eid)
+				eid_key2 = curr_evinst->id > *((cl_uint*) key_eid)
 					? curr_evinst->id
-					: *((guint*) key_eid);
+					: *((cl_uint*) key_eid);
 				/* Get effective overlap in nanoseconds. */
 				inner_table = g_hash_table_lookup(
 					overlaps, GUINT_TO_POINTER(eid_key1));
@@ -1027,11 +1027,11 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 				/* Add overlap to overlap matrix. */
 				ueid_curr_ev = g_hash_table_lookup(
 					prof->event_names, curr_evinst->event_name);
-				guint ueid_min =
+				cl_uint ueid_min =
 					GPOINTER_TO_UINT(ueid_curr_ev) <= GPOINTER_TO_UINT(ueid_occu_ev)
 					? GPOINTER_TO_UINT(ueid_curr_ev)
 					: GPOINTER_TO_UINT(ueid_occu_ev);
-				guint ueid_max =
+				cl_uint ueid_max =
 					GPOINTER_TO_UINT(ueid_curr_ev) > GPOINTER_TO_UINT(ueid_occu_ev)
 					? GPOINTER_TO_UINT(ueid_curr_ev)
 					: GPOINTER_TO_UINT(ueid_occu_ev);
@@ -1045,8 +1045,8 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 	}
 
 	/* Populate list of overlaps. */
-	for (guint i = 0; i < num_event_names; i++) {
-		for (guint j = 0; j < num_event_names; j++) {
+	for (cl_uint i = 0; i < num_event_names; i++) {
+		for (cl_uint j = 0; j < num_event_names; j++) {
 			if (overlap_matrix[i * num_event_names + j] > 0) {
 				/* There is an overlap here, create overlap object... */
 				CCLProfOverlap* ovlp = ccl_prof_overlap_new(

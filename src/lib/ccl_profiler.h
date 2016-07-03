@@ -375,7 +375,7 @@ typedef struct ccl_prof_inst {
 	 * Event instant ID.
 	 * @public
 	 * */
-	guint id;
+	cl_uint id;
 
 	/**
 	 * Event instant in nanoseconds from current device time counter.
