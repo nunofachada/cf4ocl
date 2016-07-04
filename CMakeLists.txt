@@ -30,6 +30,7 @@ pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.1)
 
 # Find OpenCL
 find_package(OpenCL REQUIRED)
+set(OpenCL_SYSTEM_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS})
 
 # Find optional executables for creating docs
 find_package(Doxygen 1.8.3 QUIET)
