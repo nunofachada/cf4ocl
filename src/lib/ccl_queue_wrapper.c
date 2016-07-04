@@ -146,14 +146,14 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * @param[in] ctx Context wrapper object.
  * @param[in] dev Device wrapper object, must be associated with `ctx`.
  * @param[in] prop_full A zero-terminated list of `cl_queue_properties`.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return The ::CCLQueue wrapper for the given device and context, or `NULL` if
  * an error occurs.
  * */
 CCL_EXPORT
 CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
-	const cl_queue_properties* prop_full, GError** err) {
+	const cl_queue_properties* prop_full, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -167,7 +167,7 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 	/* The command queue wrapper object. */
 	CCLQueue* cq = NULL;
 	/* Internal error object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	/* OpenCL <= 1.2 properties. */
 	cl_command_queue_properties properties = 0;
 	/* Are there any OpenCL >= 2.0 properties? */
@@ -324,14 +324,14 @@ finish:
  * @param[in] ctx Context wrapper object.
  * @param[in] dev Device wrapper object, must be associated with `ctx`.
  * @param[in] properties Bitfield of command queue properties.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLQueue wrapper for the given device and context,
  * or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-	cl_command_queue_properties properties, GError** err) {
+	cl_command_queue_properties properties, CCLErr** err) {
 
 	const cl_queue_properties prop_full[] =
 		{ CL_QUEUE_PROPERTIES, properties, 0 };
@@ -365,13 +365,13 @@ void ccl_queue_destroy(CCLQueue* cq) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The context associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err) {
+CCLContext* ccl_queue_get_context(CCLQueue* cq, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -381,7 +381,7 @@ CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err) {
 	CCLContext* ctx = NULL;
 
 	/* Internal error object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Check if context wrapper is already kept by the queue wrapper. */
 	if (cq->ctx != NULL) {
@@ -418,13 +418,13 @@ finish:
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The device associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err) {
+CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -435,7 +435,7 @@ CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err) {
 	CCLDevice* dev = NULL;
 
 	/* Internal error object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Check if device wrapper is already kept by the queue wrapper. */
 	if (cq->dev != NULL) {
@@ -568,13 +568,13 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_queue_flush(CCLQueue* cq, GError** err) {
+cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
@@ -603,13 +603,13 @@ cl_bool ccl_queue_flush(CCLQueue* cq, GError** err) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_queue_finish(CCLQueue* cq, GError** err) {
+cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
@@ -680,13 +680,13 @@ void ccl_queue_gc(CCLQueue* cq) {
  *
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return An OpenCL marker event (will be wrapped by the calling
  * function).
  * */
 static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* OpenCL status. */
 	cl_int ocl_status;
@@ -762,14 +762,14 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return An event wrapper object that identifies this particular
  * command.
  * */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -781,7 +781,7 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 	/* OpenCL event object. */
 	cl_event event;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
@@ -874,13 +874,13 @@ finish:
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list. Must be `NULL` or a
  * warning will be generated.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return An OpenCL marker event (will be wrapped by the calling
  * function).
  * */
 static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* OpenCL status. */
 	cl_int ocl_status;
@@ -941,14 +941,14 @@ finish:
  * before this command can be executed. The list will be cleared and
  * can be reused by client code. Must be `NULL` if OpenCL platform
  * version is <= 1.1.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return An event wrapper object that identifies this particular
  * command.
  * */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -960,7 +960,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 	/* OpenCL event object. */
 	cl_event event;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 

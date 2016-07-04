@@ -578,11 +578,11 @@ static gint ccl_prof_overlap_comp(
  * @param[in] prof Profile object.
  * @param[in] cq_name Command queue name.
  * @param[in] evt Event wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * */
 static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
-	CCLEvent* evt, GError** err) {
+	CCLEvent* evt, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail(err == NULL || *err == NULL);
@@ -605,7 +605,7 @@ static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
 	CCLProfInst* evinst_start;
 	CCLProfInst* evinst_end;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Event name. */
 	const char* event_name;
@@ -708,10 +708,10 @@ finish:
  * @private @memberof ccl_prof
  *
  * @param[in] prof Profile object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  */
-static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
+static void ccl_prof_process_queues(CCLProf* prof, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail(err == NULL || *err == NULL);
@@ -726,7 +726,7 @@ static void ccl_prof_process_queues(CCLProf* prof, GError** err) {
 	/* Queue properties. */
 	cl_command_queue_properties qprop;
 	/* Internal error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Iterate over the command queues. */
 	g_hash_table_iter_init(&iter, prof->queues);
@@ -1268,13 +1268,13 @@ void ccl_prof_add_queue(
  * @public @memberof ccl_prof
  *
  * @param[in] prof A profile object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, or CL_FALSE
  * otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_prof_calc(CCLProf* prof, GError** err) {
+cl_bool ccl_prof_calc(CCLProf* prof, CCLErr** err) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, CL_FALSE);
@@ -1286,7 +1286,7 @@ cl_bool ccl_prof_calc(CCLProf* prof, GError** err) {
 	g_return_val_if_fail(prof->queues != NULL, CL_FALSE);
 
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Function return status flag. */
 	cl_bool status;
@@ -1833,13 +1833,13 @@ const char* ccl_prof_get_summary(
  *
  * @param[in] prof Profile object.
  * @param[out] stream Stream where export info to.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, GError** err) {
+cl_bool ccl_prof_export_info(CCLProf* prof, FILE* stream, CCLErr** err) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, CL_FALSE);
@@ -1919,14 +1919,14 @@ finish:
  *
  * @param[in] prof Profile object.
  * @param[in] filename Name of file where information will be saved to.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_prof_export_info_file(
-	CCLProf* prof, const char* filename, GError** err) {
+	CCLProf* prof, const char* filename, CCLErr** err) {
 
 	/* Make sure prof is not NULL. */
 	g_return_val_if_fail(prof != NULL, CL_FALSE);
@@ -1940,8 +1940,8 @@ cl_bool ccl_prof_export_info_file(
 	/* Aux. var. */
 	cl_bool status;
 
-	/* Internal GError object. */
-	GError* err_internal = NULL;
+	/* Internal CCLErr object. */
+	CCLErr* err_internal = NULL;
 
 	/* Open file. */
 	FILE* fp = fopen(filename, "w");

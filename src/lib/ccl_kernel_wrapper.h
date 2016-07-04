@@ -118,7 +118,7 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel);
 /* Create a new kernel wrapper object. */
 CCL_EXPORT
 CCLKernel* ccl_kernel_new(
-	CCLProgram* prg, const char* kernel_name, GError** err);
+	CCLProgram* prg, const char* kernel_name, CCLErr** err);
 
 /* Decrements the reference count of the kernel wrapper object.
  * If it reaches 0, the kernel wrapper object is destroyed. */
@@ -144,14 +144,14 @@ CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Set kernel arguments and enqueue it for execution. */
 CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, GError** err, ...)
+	CCLEventWaitList* evt_wait_lst, CCLErr** err, ...)
 	G_GNUC_NULL_TERMINATED;
 
 /* Set kernel arguments and enqueue it for execution. */
@@ -159,7 +159,7 @@ CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, void** args, GError** err);
+	CCLEventWaitList* evt_wait_lst, void** args, CCLErr** err);
 
 /* Enqueues a command to execute a native C/C++ function not compiled
  * using the OpenCL compiler. */
@@ -168,26 +168,26 @@ CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
 	void (CL_CALLBACK * user_func)(void*), void* args, size_t cb_args,
 	cl_uint num_mos, CCLMemObj* const* mo_list,
 	const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
-	GError** err);
+	CCLErr** err);
 
 /* Get the OpenCL version of the platform associated with this
  * kernel. */
 CCL_EXPORT
-cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err);
+cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, CCLErr** err);
 
 /* Suggest appropriate global and local worksizes for the given real
  * work size, based on device and kernel characteristics. */
 CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
-	GError** err);
+	CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo kernel information object.
  *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel information object. This object will
  * be automatically freed when the kernel wrapper object is
@@ -207,7 +207,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel information value. This value will be
  * automatically freed when the kernel wrapper object is destroyed.
@@ -228,7 +228,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel information value. This value will be
  * automatically freed when the kernel wrapper object is destroyed.
@@ -245,7 +245,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel workgroup information object. This
  * object will be automatically freed when the kernel wrapper object is
@@ -267,7 +267,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel workgroup information value. This value
  * will be automatically freed when the kernel wrapper object is
@@ -291,7 +291,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel workgroup information value. This value
  * will be automatically freed when the kernel wrapper object is
@@ -306,7 +306,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 /* Get a ::CCLWrapperInfo kernel argument information object. */
 CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
-	cl_kernel_arg_info param_name, GError** err);
+	cl_kernel_arg_info param_name, CCLErr** err);
 
 /**
  * Macro which returns a scalar kernel argument information
@@ -320,7 +320,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel argument information value. This value
  * will be automatically freed when the kernel wrapper object is
@@ -346,7 +346,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel argument information value. This value
  * will be automatically freed when the kernel wrapper object is

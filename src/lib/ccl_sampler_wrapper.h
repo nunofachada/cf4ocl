@@ -73,7 +73,7 @@
  * @dontinclude image_filter.c
  * @skipline CCLContext*
  * @skipline CCLSampler*
- * @skipline GError*
+ * @skipline CCLErr*
  *
  * @skipline smplr =
  * @until CL_FILTER_NEAREST,
@@ -97,19 +97,19 @@ void ccl_sampler_destroy(CCLSampler* smplr);
 CCL_EXPORT
 CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
 	cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
-	GError** err);
+	CCLErr** err);
 
 /* Create a new sampler wrapper object using a list of properties. */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
-	const cl_sampler_properties *sampler_properties, GError** err);
+	const cl_sampler_properties *sampler_properties, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo sampler information object.
  *
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested sampler information object. This object will
  * be automatically freed when the sampler wrapper object is
@@ -129,7 +129,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested sampler information value. This value will be
  * automatically freed when the sampler wrapper object is destroyed.
@@ -152,7 +152,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested sampler information value. This value will be
  * automatically freed when the sampler wrapper object is destroyed.

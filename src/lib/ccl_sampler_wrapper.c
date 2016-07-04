@@ -172,14 +172,14 @@ void ccl_sampler_destroy(CCLSampler* smplr) {
  * @param[in] normalized_coords Are the image coordinates normalized?
  * @param[in] addressing_mode How to handle out-of-range coordinates.
  * @param[in] filter_mode Filter to apply when reading an image.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
 	cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
-	GError** err) {
+	CCLErr** err) {
 
 	const cl_sampler_properties sp[] = {
 		CL_SAMPLER_NORMALIZED_COORDS, normalized_coords,
@@ -219,13 +219,13 @@ CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
  * with 0. If a supported property is not specified, its default value
  * will be used. If `NULL`, default values for supported sampler
  * properties will be used.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
-	const cl_sampler_properties *sampler_properties, GError** err) {
+	const cl_sampler_properties *sampler_properties, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -244,7 +244,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 	/* OpenCL platform version. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Get context platform version. */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);

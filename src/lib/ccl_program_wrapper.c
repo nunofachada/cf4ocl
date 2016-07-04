@@ -174,13 +174,13 @@ static void ccl_program_release_fields(CCLProgram* prg) {
  * @private @memberof ccl_program
  *
  * @param[in] devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
  * */
 static CCLWrapperInfo* ccl_program_get_cldevices(
-	CCLDevContainer* devcon, GError** err) {
+	CCLDevContainer* devcon, CCLErr** err) {
 
 	return ccl_program_get_info(devcon, CL_PROGRAM_DEVICES, err);
 }
@@ -290,13 +290,13 @@ void ccl_program_destroy(CCLProgram* prg) {
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] filename Path to source file.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
-	const char* filename, GError** err) {
+	const char* filename, CCLErr** err) {
 
 	return ccl_program_new_from_source_files(ctx, 1, &(filename), err);
 
@@ -312,13 +312,13 @@ CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
  * @param[in] ctx The context wrapper object.
  * @param[in] count Number of source files.
  * @param[in] filenames List of source file paths.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
-	cl_uint count, const char** filenames, GError** err) {
+	cl_uint count, const char** filenames, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -330,7 +330,7 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 	g_return_val_if_fail(count > 0, NULL);
 
 	/* Error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	/* Program wrapper object to return. */
 	CCLProgram* prg = NULL;
 	/* Source files contents. */
@@ -390,13 +390,13 @@ finish:
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] string Null-terminated source string.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
-	const char* string, GError** err) {
+	const char* string, CCLErr** err) {
 
 	return ccl_program_new_from_sources(ctx, 1, &string, NULL, err);
 }
@@ -415,14 +415,14 @@ CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
  * (the string length). If an element in lengths is zero, its
  * accompanying string is null-terminated. If lengths is `NULL`, all
  * strings in the strings argument are considered null-terminated.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	cl_uint count, const char** strings, const size_t* lengths,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -474,14 +474,14 @@ finish:
  * @param[in] filename Path to binary file.
  * @param[out] binary_status Returns whether the program binary was
  * loaded successfully or not.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
 	CCLDevice* dev, const char* filename, cl_int *binary_status,
-	GError** err) {
+	CCLErr** err) {
 
 	return ccl_program_new_from_binary_files(
 		ctx, 1, &(dev), &(filename), binary_status, err);
@@ -502,14 +502,14 @@ CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
  * @param[in] filenames Path to binary files, one per device.
  * @param[out] binary_status Returns whether the program binary for each
  * device specified in `devs` was loaded successfully or not.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char** filenames,
-	cl_int *binary_status, GError** err) {
+	cl_int *binary_status, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -522,7 +522,7 @@ CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 	/* Make sure num_devices > 0. */
 	g_return_val_if_fail(num_devices > 0, NULL);
 
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	CCLProgramBinary** bins = NULL;
 	CCLProgram* prg = NULL;
 
@@ -580,13 +580,13 @@ finish:
  * @param[in] binary Binary code.
  * @param[out] binary_status Returns whether the program binary was
  * loaded successfully or not.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
-	CCLProgramBinary* binary, cl_int *binary_status, GError** err) {
+	CCLProgramBinary* binary, cl_int *binary_status, CCLErr** err) {
 
 	return ccl_program_new_from_binaries(ctx, 1, &dev, &binary,
 		binary_status, err);
@@ -607,14 +607,14 @@ CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
  * @param[in] bins List of binary code strings, one per device.
  * @param[out] binary_status Returns whether the program binary for each
  * device specified in `devs` was loaded successfully or not.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, CCLProgramBinary** bins,
-	cl_int *binary_status, GError** err) {
+	cl_int *binary_status, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -693,14 +693,14 @@ finish:
  * on which all the built-in kernels can be executed.
  * @param[in] kernel_names A semi-colon separated list of built-in
  * kernel names.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -720,7 +720,7 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	/* OpenCL version of underlying platform. */
 	cl_uint ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -808,14 +808,14 @@ finish:
  * @param[in] options A null-terminated string of characters that
  * describes the build options to be used for building the program
  * executable.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_program_build(
-	CCLProgram* prg, const char* options, GError** err) {
+	CCLProgram* prg, const char* options, CCLErr** err) {
 
 	return ccl_program_build_full(
 		prg, 0, NULL, options, NULL, NULL, err);
@@ -840,7 +840,7 @@ cl_bool ccl_program_build(
  * which will be called when the program executable has been built
  * (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -848,7 +848,7 @@ cl_bool ccl_program_build(
 CCL_EXPORT
 cl_bool ccl_program_build_full(CCLProgram* prg,
 	cl_uint num_devices, CCLDevice* const* devs, const char *options,
-	ccl_program_callback pfn_notify, void *user_data, GError** err) {
+	ccl_program_callback pfn_notify, void *user_data, CCLErr** err) {
 
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, CL_FALSE);
@@ -917,14 +917,14 @@ finish:
  * and footer separating them.
  *
  * @param[in] prg Program wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return The build log for most recent build, compile or link. May be `NULL`
  * or an empty string if no build, compile or link was performed, or if no build
  * log is available.
  * */
 CCL_EXPORT
-const char* ccl_program_get_build_log(CCLProgram* prg, GError** err) {
+const char* ccl_program_get_build_log(CCLProgram* prg, CCLErr** err) {
 
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, NULL);
@@ -942,7 +942,7 @@ const char* ccl_program_get_build_log(CCLProgram* prg, GError** err) {
 	/* Build log for current device.*/
 	const char* build_log;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Complete build log string object. */
 	GString* build_log_obj = g_string_new("");
@@ -1011,7 +1011,7 @@ finish:
  *
  * @param[in] prg Program wrapper object.
  * @param[in] dev Device for which to get the build log.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return The build log for most recent build, compile or link. May be `NULL`
  * or an empty string if no build, compile or link was performed, or if no build
@@ -1019,7 +1019,7 @@ finish:
  * */
 CCL_EXPORT
 const char* ccl_program_get_device_build_log(
-	CCLProgram* prg, CCLDevice* dev, GError** err) {
+	CCLProgram* prg, CCLDevice* dev, CCLErr** err) {
 
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, NULL);
@@ -1031,7 +1031,7 @@ const char* ccl_program_get_device_build_log(
 	/* Build log for current device.*/
 	char* build_log_dev = NULL;
 	/* Error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Is build log for this device already in cache? */
 	if ((prg->build_logs == NULL) || ((build_log_dev = (char*)
@@ -1106,7 +1106,7 @@ finish:
  * an application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
@@ -1114,7 +1114,7 @@ CCL_EXPORT
 cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_headers,
 	CCLProgram** prg_input_headers, const char** header_include_names,
-	ccl_program_callback pfn_notify, void* user_data, GError** err) {
+	ccl_program_callback pfn_notify, void* user_data, CCLErr** err) {
 
 	/* Make sure prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, CL_FALSE);
@@ -1132,7 +1132,7 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 	/* OpenCL version of underlying platform. */
 	cl_uint ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -1257,7 +1257,7 @@ finish:
  * an application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -1265,7 +1265,7 @@ CCL_EXPORT
 CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
 	CCLProgram** input_prgs, ccl_program_callback pfn_notify,
-	void* user_data, GError** err) {
+	void* user_data, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, CL_FALSE);
@@ -1285,7 +1285,7 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 	/* OpenCL version of underlying platform. */
 	cl_uint ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -1394,13 +1394,13 @@ finish:
  * @public @memberof ccl_program
  *
  * @param[in] prg A program wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * program as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err) {
+cl_uint ccl_program_get_opencl_version(CCLProgram* prg, CCLErr** err) {
 
 	/* Make sure number prg is not NULL. */
 	g_return_val_if_fail(prg != NULL, 0);
@@ -1409,7 +1409,7 @@ cl_uint ccl_program_get_opencl_version(CCLProgram* prg, GError** err) {
 
 	cl_context context;
 	CCLContext* ctx;
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	cl_uint ocl_ver;
 
 	/* Get cl_context object for this program. */
@@ -1460,14 +1460,14 @@ finish:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] kernel_name Name of kernel function.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The kernel wrapper object for the given program kernel
  * function.
  * */
 CCL_EXPORT
 CCLKernel* ccl_program_get_kernel(
-	CCLProgram* prg, const char* kernel_name, GError** err) {
+	CCLProgram* prg, const char* kernel_name, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -1477,7 +1477,7 @@ CCLKernel* ccl_program_get_kernel(
 	g_return_val_if_fail(kernel_name != NULL, NULL);
 
 	/* Internal error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	/* Kernel wrapper object. */
 	CCLKernel* krnl = NULL;
 
@@ -1562,7 +1562,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
@@ -1572,7 +1572,7 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
 	const size_t* global_work_offset, const size_t* global_work_size,
 	const size_t* local_work_size, CCLEventWaitList* evt_wait_lst,
-	GError** err, ...) {
+	CCLErr** err, ...) {
 
 	/* Event wrapper. */
 	CCLEvent* evt;
@@ -1674,7 +1674,7 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
  * @param[in] args A `NULL`-terminated array of arguments to set.
  * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
  * ::CCLSampler*.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -1683,7 +1683,7 @@ CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
 	const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
 	const size_t* global_work_offset, const size_t* global_work_size,
 	const size_t* local_work_size, CCLEventWaitList* evt_wait_lst,
-	void** args, GError** err) {
+	void** args, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -1708,10 +1708,10 @@ CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
  * @private @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * */
-static void ccl_program_load_binaries(CCLProgram* prg, GError** err) {
+static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail((err) == NULL || *(err) == NULL);
@@ -1727,7 +1727,7 @@ static void ccl_program_load_binaries(CCLProgram* prg, GError** err) {
 	size_t* binary_sizes;
 	CCLWrapperInfo* info;
 	unsigned char** bins_raw;
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	cl_int ocl_status;
 
 	/* Get number of program devices. */
@@ -1795,7 +1795,7 @@ error_handler:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The program's binary object for the the specified device.
  * The returned object will be freed when the associated program is
@@ -1803,7 +1803,7 @@ error_handler:
  * */
 CCL_EXPORT
 CCLProgramBinary* ccl_program_get_binary(
-	CCLProgram* prg, CCLDevice* dev, GError** err) {
+	CCLProgram* prg, CCLDevice* dev, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -1813,7 +1813,7 @@ CCLProgramBinary* ccl_program_get_binary(
 	g_return_val_if_fail(dev != NULL, NULL);
 
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	/* Binary code object. */
 	CCLProgramBinary* binary = NULL;
 
@@ -1880,14 +1880,14 @@ finish:
  * @param[in] dev The device wrapper object.
  * @param[in] filename Name of file where to save the program's binary
  * code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
-	const char* filename, GError** err) {
+	const char* filename, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
@@ -1899,7 +1899,7 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	/* OpenCL function status. */
 	cl_bool status;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	/* The binary code object. */
 	CCLProgramBinary* binary = NULL;
 
@@ -1962,7 +1962,7 @@ finish:
  * ::ccl_program_get_num_devices() function. If not `NULL` the value
  * pointed to by this variable should be freed with GLib's
  * _g_strfreev()_ function.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -1970,7 +1970,7 @@ finish:
 CCL_EXPORT
 cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 	const char* file_prefix, const char* file_suffix, char*** filenames,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
@@ -1981,7 +1981,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		(file_prefix != NULL) && (file_suffix != NULL), CL_FALSE);
 
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	/* Number of devices. */
 	guint num_devices;
 	/* OpenCL function return status. */
@@ -2071,14 +2071,14 @@ finish:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] index Index of device in program.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
 CCL_EXPORT
 CCLDevice* ccl_program_get_device(
-	CCLProgram* prg, cl_uint index, GError** err) {
+	CCLProgram* prg, cl_uint index, CCLErr** err) {
 
 	return ccl_dev_container_get_device(
 		(CCLDevContainer*) prg, ccl_program_get_cldevices, index, err);
@@ -2090,13 +2090,13 @@ CCLDevice* ccl_program_get_device(
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return The number of devices in program or 0 if an error occurs or is
  * otherwise not possible to get any device.
  * */
 CCL_EXPORT
-cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
+cl_uint ccl_program_get_num_devices(CCLProgram* prg, CCLErr** err) {
 
 	return ccl_dev_container_get_num_devices(
 		(CCLDevContainer*) prg, ccl_program_get_cldevices, err);
@@ -2113,14 +2113,14 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, GError** err) {
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given program, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
-	GError** err) {
+	CCLErr** err) {
 
 	return ccl_dev_container_get_all_devices((CCLDevContainer*) prg,
 		ccl_program_get_cldevices, err);

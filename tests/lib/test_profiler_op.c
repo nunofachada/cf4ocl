@@ -61,7 +61,7 @@ static void operation_test() {
 	CCLProgram* prg;
 	CCLKernel* krnl;
 	CCLProf* prof;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_event ev_unwrapped;
 	cl_int host_ptr[CCL_TEST_MAXBUF];
 	const char* src = "__kernel void k1(_global int* a){}";

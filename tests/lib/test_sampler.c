@@ -38,7 +38,7 @@ static void create_info_destroy_test() {
 	CCLContext* ctx = NULL;
 	CCLSampler* s = NULL;
 	cl_sampler sampler = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_int ocl_status;
 	const cl_sampler_properties sampler_properties[] = {
 		CL_SAMPLER_NORMALIZED_COORDS, CL_TRUE,
@@ -134,7 +134,7 @@ static void create_full_info_destroy_test() {
 		CL_SAMPLER_FILTER_MODE, CL_FILTER_NEAREST,
 		0};
 
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
@@ -188,7 +188,7 @@ static void ref_unref_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLSampler* s = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);

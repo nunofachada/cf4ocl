@@ -56,13 +56,13 @@ struct ccl_platform {
  *
  * @param[in] devcon A ::CCLPlatform wrapper, passed as a
  * ::CCLDevContainer.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
  * */
 static CCLWrapperInfo* ccl_platform_get_cldevices(
-	CCLDevContainer* devcon, GError** err) {
+	CCLDevContainer* devcon, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -155,13 +155,13 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
  *
  * @param[in] dev The device wrapper from where to get a platform
  * wrapper.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The platform wrapper for the given device wrapper or NULL in
  * case an error occurs.
  * */
 CCL_EXPORT
-CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err) {
+CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, CCLErr** err) {
 
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, NULL);
@@ -173,7 +173,7 @@ CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err) {
 	/* The platform wrapper to return. */
 	CCLPlatform* platf = NULL;
 	/* Internal error object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Get OpenCL platform_id object from device. */
 	platform_id = ccl_device_get_info_scalar(
@@ -228,14 +228,14 @@ void ccl_platform_destroy(CCLPlatform* platf) {
  * @public @memberof ccl_platform
  *
  * @param[in] platf The platform wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return OpenCL version of platform as an integer. If an error
  * occurs, 0 is returned.
  * */
 CCL_EXPORT
 cl_uint ccl_platform_get_opencl_version(
-	CCLPlatform* platf, GError** err) {
+	CCLPlatform* platf, CCLErr** err) {
 
 	/* Make sure platf is not NULL. */
 	g_return_val_if_fail(platf != NULL, 0);
@@ -267,13 +267,13 @@ cl_uint ccl_platform_get_opencl_version(
  * @public @memberof ccl_platform
  *
  * @param[in] platf The platform wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * this platform, or `NULL` if an error occurs.
  */
 CCLDevice* const* ccl_platform_get_all_devices(
-	CCLPlatform* platf, GError** err) {
+	CCLPlatform* platf, CCLErr** err) {
 
 	return ccl_dev_container_get_all_devices(
 		(CCLDevContainer*) platf, ccl_platform_get_cldevices, err);
@@ -286,14 +286,14 @@ CCLDevice* const* ccl_platform_get_all_devices(
  *
  * @param[in] platf The platform wrapper object.
  * @param[in] index Index of device in platform.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
 CCL_EXPORT
 CCLDevice* ccl_platform_get_device(
-	CCLPlatform* platf, cl_uint index, GError** err) {
+	CCLPlatform* platf, cl_uint index, CCLErr** err) {
 
 	return ccl_dev_container_get_device((CCLDevContainer*) platf,
 		ccl_platform_get_cldevices, index, err);
@@ -306,13 +306,13 @@ CCLDevice* ccl_platform_get_device(
  * @public @memberof ccl_platform
  *
  * @param[in] platf The platform wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The number of devices in platform or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
 CCL_EXPORT
-cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err) {
+cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, CCLErr** err) {
 
 	return ccl_dev_container_get_num_devices((CCLDevContainer*) platf,
 		ccl_platform_get_cldevices, err);

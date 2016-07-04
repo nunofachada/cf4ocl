@@ -43,7 +43,7 @@ static void create_info_destroy_test() {
 	cl_device_id device = NULL;
 	CCLQueue* cq = NULL;
 	cl_command_queue command_queue = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_command_queue_properties prop;
 	const cl_queue_properties prop_full[] =
 		{ CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0 };
@@ -142,7 +142,7 @@ static void ref_unref_test() {
 	CCLContext* ctx = NULL;
 	CCLQueue* cq = NULL;
 	CCLDevice* dev = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
@@ -193,7 +193,7 @@ static void barrier_marker_test() {
 	CCLEvent* evt_unmap = NULL;
 	CCLEvent* evt_barrier = NULL;
 	CCLEvent* evt_marker = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_ulong* host_buf;
 	CCLEventWaitList ewl = NULL;
 	cl_int exec_status = -1;

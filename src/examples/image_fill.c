@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 	int dev_idx = -1;
 
 	/* Error handling object (must be initialized to NULL). */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Does selected device support images? */
 	cl_bool image_ok;

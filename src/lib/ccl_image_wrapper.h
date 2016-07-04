@@ -211,13 +211,13 @@ void ccl_image_destroy(CCLImage* img);
 CCL_EXPORT
 CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
-	void* host_ptr, GError** err);
+	void* host_ptr, CCLErr** err);
 
 /* Creates a new image wrapper object using a variable list of key-value
  * pairs which describe the image.  */
 CCL_EXPORT
 CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
-	const cl_image_format* image_format, void* host_ptr, GError** err,
+	const cl_image_format* image_format, void* host_ptr, CCLErr** err,
 	...);
 
 /* Read from an image or image array object to host memory. */
@@ -225,28 +225,28 @@ CCL_EXPORT
 CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t row_pitch, size_t slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Write to an image or image array object from host memory. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Copy image objects. This function wraps the clEnqueueCopyImage()
  * OpenCL function. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
 	CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
-	const size_t* region, CCLEventWaitList* evt_wait_lst, GError** err);
+	const size_t* region, CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Copy an image object to a buffer object. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
 	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *region, size_t dst_offset,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Map a region of the image into the host address space and return a
  * pointer to this mapped region. */
@@ -255,14 +255,14 @@ void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
 	const size_t* region, size_t *image_row_pitch,
 	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
-	CCLEvent** evt, GError** err);
+	CCLEvent** evt, CCLErr** err);
 
 /* Fill an image object with a specified color. This function wraps the
  * clEnqueueFillImage() OpenCL function. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	const void *fill_color, const size_t *origin, const size_t *region,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /**
  * Enqueues a command to unmap a previously mapped image object. This
@@ -276,7 +276,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in,out] ewl List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -288,7 +288,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  *
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information object. This object will
  * be automatically freed when the image wrapper object is
@@ -308,7 +308,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information value. This value will be
  * automatically freed when the image wrapper object is destroyed.
@@ -328,7 +328,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information value. This value will be
  * automatically freed when the image wrapper object is destroyed.

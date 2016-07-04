@@ -135,7 +135,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * the given set of filters.
  *
  * @param[in] filters Filters for selecting device.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -151,7 +151,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  *
  * @param[in] num_devices Number of cl_devices_id's in list.
  * @param[in] devices Array of ::CCLDevice wrappers.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -165,7 +165,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found CPU device is used. More than one CPU might be used if all
  * CPUs belong to the same platform.
  *
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -179,7 +179,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found GPU device is used. More than one GPU might be used
  * if all GPUs belong to the same platform.
  *
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -193,7 +193,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found Accelerator device is used. More than one Accelerator
  * might be used if all Accelerators belong to the same platform.
  *
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -207,7 +207,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * The first found device is used. More than one device might be used if all
  * devices belong to the same platform.
  *
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -225,7 +225,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @param[in] filter An independent device filter. If `NULL`, no independent
  * filter is used, and the first found device(s) is selected.
  * @param[in] data Specific filter data.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -244,7 +244,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * is used, and the first found device(s) is selected.
  * @param[in] data If not `NULL`, can point to a device index, such that the
  * device is automatically selected.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -258,7 +258,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * of devices within the platforms.
  *
  * @param[in] data Must point to a valid device index of type `cl_uint`.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -270,7 +270,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  *
  * @param[in] data If not NULL, can point to a device index, such that the
  * device is automatically selected.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -280,7 +280,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 /**
  * Creates a context wrapper from a device selected by the user from a menu.
  *
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
@@ -292,7 +292,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
-	ccl_context_callback pfn_notify, void* user_data, GError **err);
+	ccl_context_callback pfn_notify, void* user_data, CCLErr **err);
 
 /* Creates a context wrapper given an array of ::CCLDevice wrappers and the
  * remaining parameters required by the clCreateContext() function. */
@@ -300,13 +300,13 @@ CCL_EXPORT
 CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, cl_uint num_devices,
 	CCLDevice* const* devices, ccl_context_callback pfn_notify,
-	void* user_data, GError** err);
+	void* user_data, CCLErr** err);
 
 /* Creates a context wrapper using one device filter specified in the function
  * parameters. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
-	void* filter, void* data, GError** err);
+	void* filter, void* data, CCLErr** err);
 
 /* Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
@@ -315,38 +315,38 @@ void ccl_context_destroy(CCLContext* ctx);
 
 /* Get the OpenCL version of the platform associated with this context. */
 CCL_EXPORT
-cl_uint ccl_context_get_opencl_version(CCLContext* ctx, GError** err);
+cl_uint ccl_context_get_opencl_version(CCLContext* ctx, CCLErr** err);
 
 /* Get the platform associated with the context devices. */
 CCL_EXPORT
-CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err);
+CCLPlatform* ccl_context_get_platform(CCLContext* ctx, CCLErr** err);
 
 /* Get the list of image formats supported by a given context. */
 CCL_EXPORT
 const cl_image_format* ccl_context_get_supported_image_formats(
 	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
-	cl_uint* num_image_formats, GError** err);
+	cl_uint* num_image_formats, CCLErr** err);
 
 /* Get ::CCLDevice wrapper at given index. */
 CCL_EXPORT
 CCLDevice* ccl_context_get_device(
-	CCLContext* ctx, cl_uint index, GError** err);
+	CCLContext* ctx, cl_uint index, CCLErr** err);
 
 /* Return number of devices in context. */
 CCL_EXPORT
-cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err);
+cl_uint ccl_context_get_num_devices(CCLContext* ctx, CCLErr** err);
 
 /* Get all device wrappers in context. */
 CCL_EXPORT
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
-	GError** err);
+	CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo context information object.
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information object. This object will
  * be automatically freed when the context wrapper object is
@@ -366,7 +366,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information value. This value will be
  * automatically freed when the context wrapper object is destroyed.
@@ -387,7 +387,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information value. This value will be
  * automatically freed when the context wrapper object is destroyed.

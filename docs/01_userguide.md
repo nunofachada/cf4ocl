@@ -514,7 +514,7 @@ digraph cf4ocl {
 }
 @enddot
 
-## The CCLWrapper base class {#ug_cclwrapper}
+### The CCLWrapper base class {#ug_cclwrapper}
 
 The ::CCLWrapper* base class is responsible for common functionality of wrapper
 objects, namely:
@@ -617,7 +617,7 @@ automatically casting objects and values to the appropriate type,
 selecting the correct `clGet*Info()` function for the object being
 queried. The cache is never used by the  @ref ug_getinfo "info macros".
 
-## The CCLDevContainer class {#ug_ccldevcontainer}
+### The CCLDevContainer class {#ug_ccldevcontainer}
 
 The intermediate ::CCLDevContainer* class provides functionality for
 managing a set of ::CCLDevice* wrapper instances, abstracting code
@@ -638,7 +638,7 @@ client code via specific methods, e.g. in the case of ::CCLProgram* objects,
 these are ::ccl_program_get_all_devices(), ::ccl_program_get_device() and
 ::ccl_program_get_num_devices(), respectively.
 
-## The CCLMemObj class {#ug_cclmemobj}
+### The CCLMemObj class {#ug_cclmemobj}
 
 The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
 ::CCLImage* classes follows that of the respective
@@ -646,6 +646,10 @@ The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
 In other words, both OpenCL images and buffers are memory objects with
 common functionality, and _cf4ocl_ directly maps this relationship with
 the respective wrappers.
+
+## The GLib and OpenCL dependencies {#ug_deps}
+
+TODO
 
 @example ca.c
 @example ca.cl
@@ -656,3 +660,4 @@ the respective wrappers.
 @example image_fill.c
 @example image_filter.c
 @example image_filter.cl
+

@@ -36,4 +36,4 @@
 void ccl_print_to_debug(const gchar* string);
 
 /* Create a context with a device specified at compile time. */
-CCLContext* ccl_test_context_new(GError** err);
+CCLContext* ccl_test_context_new(CCLErr** err);

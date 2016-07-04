@@ -29,7 +29,7 @@
 #include "_ccl_defs.h"
 
 /** Resolves to error category identifying string, in this case an error
- * in the GErrorf tests. */
+ * in the CCLErrf tests. */
 #define TEST_CCL_ERROR test_error_handling_error_quark()
 
 /**
@@ -43,7 +43,7 @@ enum test_error_handling_error_codes {
 
 /**
  * Resolves to error category identifying string, in this case an
- * error in the GErrorf tests.
+ * error in the CCLErrf tests.
  *
  * @return A GQuark structure defined by category identifying string,
  * which identifies the error as a gerrof tests generated error.
@@ -58,7 +58,7 @@ GQuark test_error_handling_error_quark() {
 
 /* This function can create an error. */
 static cl_bool error_l2_aux(
-	int code, const char* xtramsg, GError **err) {
+	int code, const char* xtramsg, CCLErr **err) {
 
 	/* Return status variable. */
 	cl_bool status;
@@ -87,13 +87,13 @@ finish:
 }
 
 /* This function can propagate an error created by another function. */
-static cl_bool error_l1_aux(int code, GError **err) {
+static cl_bool error_l1_aux(int code, CCLErr **err) {
 
 	/* Return status variable. */
 	cl_bool status;
 
 	/* Internal error handling variable. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Call sub-function, check for error. */
 	error_l2_aux(code, "called by error_l1_aux", &err_internal);
@@ -127,7 +127,7 @@ finish:
 static void error_one_level_test() {
 
 	/* Error handling object. */
-	GError *err = NULL;
+	CCLErr *err = NULL;
 
 	/* Status variable. */
 	cl_bool status;
@@ -164,7 +164,7 @@ finish:
 static void error_two_level_test() {
 
 	/* Error handling object. */
-	GError *err = NULL;
+	CCLErr *err = NULL;
 
 	/* Status variable. */
 	cl_bool status;
@@ -200,7 +200,7 @@ finish:
 static void error_none_test() {
 
 	/* Error handling object. */
-	GError *err = NULL;
+	CCLErr *err = NULL;
 
 	/* Status variable. */
 	cl_bool status;
@@ -234,7 +234,7 @@ finish:
 static void error_no_vargs_test() {
 
 	/* Error handling object. */
-	GError *err = NULL;
+	CCLErr *err = NULL;
 
 	/* Create an error without additional arguments. */
 	ccl_if_err_create_goto(err, TEST_CCL_ERROR, 1,

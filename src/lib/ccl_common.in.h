@@ -272,6 +272,14 @@ typedef struct ccl_queue CCLQueue;
 typedef struct ccl_platforms CCLPlatforms;
 
 /**
+ * Error handling class.
+ *
+ * @see @ref ug_errorhandle "Error handling" in _cf4ocl_.
+ * @see @ref ug_deps "The GLib and OpenCL dependencies".
+ */
+typedef GError CCLErr;
+
+/**
  * Error codes.
  * */
 typedef enum ccl_error_code {
@@ -307,6 +315,11 @@ typedef enum ccl_error_code {
 /* Print executable version. */
 CCL_EXPORT
 void ccl_common_version_print(const char* exec_name);
+
+/* If `err` or `*err` is `NULL`, does nothing. Otherwise, releases memory
+ * occupied by `*err` and sets `*err` to `NULL`. */
+CCL_EXPORT
+void ccl_err_clear(CCLErr** err);
 
 /* Resolves to error category identifying string, in this case an error in
  * _cf4ocl_. */

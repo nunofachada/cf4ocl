@@ -110,13 +110,13 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
  *
  * @param[in] prg A program wrapper object.
  * @param[in] kernel_name The kernel name.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new kernel wrapper object.
  * */
 CCL_EXPORT
 CCLKernel* ccl_kernel_new(
-	CCLProgram* prg, const char* kernel_name, GError** err) {
+	CCLProgram* prg, const char* kernel_name, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -385,7 +385,7 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -393,7 +393,7 @@ CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -507,7 +507,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
@@ -516,7 +516,7 @@ CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 	cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, GError** err, ...) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err, ...) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -627,7 +627,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * @param[in] args A `NULL`-terminated list of arguments to set.
  * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
  * ::CCLSampler*.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -635,7 +635,7 @@ CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
 	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, void** args, GError** err) {
+	CCLEventWaitList* evt_wait_lst, void** args, CCLErr** err) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -644,7 +644,7 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	CCLEvent* evt = NULL;
 
@@ -698,7 +698,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -707,7 +707,7 @@ CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
 	void (CL_CALLBACK * user_func)(void*), void* args, size_t cb_args,
 	cl_uint num_mos, CCLMemObj* const* mo_list,
 	const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -790,13 +790,13 @@ finish:
  * @public @memberof ccl_kernel
  *
  * @param[in] krnl A kernel wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * kernel as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
+cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, CCLErr** err) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, 0);
@@ -805,7 +805,7 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, GError** err) {
 
 	cl_context context;
 	CCLContext* ctx;
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 	cl_uint ocl_ver;
 
 	/* Get cl_context object for this kernel. */
@@ -846,8 +846,8 @@ finish:
  * error, and if so, generates a warning and clears the error. Otherwise it
  * tests the error in the same way as ccl_if_err_propagate_goto().
  *
- * @param[out] err Destination GError** object.
- * @param[in] err_internal Source GError* object.
+ * @param[out] err Destination CCLErr** object.
+ * @param[in] err_internal Source CCLErr* object.
  * @param[in] error_handler Label to goto if an error other than
  * CCL_ERROR_INFO_UNAVAILABLE_OCL is detected.
  * */
@@ -894,7 +894,7 @@ finish:
  * instead); 2) as an output, where to place a "nice" local worksize,
  * which is based and respects the limits of the given kernel and device
  * (and of the non-zero values given as input).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if function returns successfully, `CL_FALSE`
  * otherwise.
@@ -902,7 +902,7 @@ finish:
 CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, CL_FALSE);
@@ -925,7 +925,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 	size_t real_ws = 1;
 
 	/* Error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Check if device supports the requested dims. */
 	dev_dims = ccl_device_get_info_scalar(
@@ -1168,7 +1168,7 @@ cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel argument information object. This
  * object will be automatically freed when the kernel wrapper object is
@@ -1176,7 +1176,7 @@ cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
  * */
 CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
-	cl_kernel_arg_info param_name, GError** err) {
+	cl_kernel_arg_info param_name, CCLErr** err) {
 
 	/* Make sure krnl is not NULL. */
 	g_return_val_if_fail(krnl != NULL, NULL);
@@ -1188,7 +1188,7 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
 	CCLWrapperInfo* info;
 
 	/* Error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;

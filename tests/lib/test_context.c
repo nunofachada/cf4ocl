@@ -84,7 +84,7 @@ static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
  * Independent pass-all filter for testing.
  * */
 static cl_bool ccl_devsel_indep_test_true(
-	CCLDevice* device, void *data, GError **err) {
+	CCLDevice* device, void *data, CCLErr **err) {
 
 	CCL_UNUSED(device);
 	CCL_UNUSED(data);
@@ -100,7 +100,7 @@ static cl_bool ccl_devsel_indep_test_true(
 static void create_info_destroy_test() {
 
 	CCLContext* ctx = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLPlatforms* ps = NULL;
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
@@ -452,7 +452,7 @@ static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
 	CCLContext* ctx_cmp = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLPlatforms* ps = NULL;
 	CCLPlatform* p = NULL;
 	CCLPlatform* p_1 = NULL;
@@ -784,7 +784,7 @@ static void get_supported_image_formats_test() {
 	const cl_image_format* image_formats;
 	cl_uint num_image_formats;
 	char* p_name;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get all platforms. */
 	ps = ccl_platforms_new(&err);
@@ -850,7 +850,7 @@ static void device_container_test() {
 
 	/* Test variables. */
 	CCLContext* ctx = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Create some context. */
 	ctx = ccl_test_context_new(&err);

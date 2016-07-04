@@ -39,7 +39,7 @@ static void create_info_destroy_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLBuffer* b = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
 	/* Get the test context with the pre-defined device. */
@@ -101,7 +101,7 @@ static void ref_unref_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLBuffer* b = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
 	/* Get the test context with the pre-defined device. */
@@ -151,7 +151,7 @@ static void wrap_unwrap_test() {
 	CCLBuffer* b = NULL;
 	CCLBuffer* b_aux = NULL;
 	cl_mem buffer = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 	cl_int status;
 
@@ -208,7 +208,7 @@ static void read_write_test() {
 	cl_uint h_in[CCL_TEST_BUFFER_SIZE];
 	cl_uint h_out[CCL_TEST_BUFFER_SIZE];
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Create a host array, put some stuff in it. */
 	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -283,7 +283,7 @@ static void copy_test() {
 	cl_long h1[CCL_TEST_BUFFER_SIZE];
 	cl_long h2[CCL_TEST_BUFFER_SIZE];
 	size_t buf_size = sizeof(cl_long) * CCL_TEST_BUFFER_SIZE;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Create a host array, put some stuff in it. */
 	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -351,7 +351,7 @@ static void map_unmap_test() {
 	cl_uint h_in[CCL_TEST_BUFFER_SIZE];
 	cl_uint* h_out;
 	size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Create a host array, put some stuff in it. */
 	for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -422,7 +422,7 @@ static void destructor_callback_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLBuffer* b = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	GTimer* timer = NULL;
 	cl_bool test_var = CL_FALSE;
 
@@ -476,7 +476,7 @@ static void rect_read_write_copy_test() {
 	cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
 	size_t buf_size = sizeof(cl_uchar) * sizeof(cl_uchar)
 		* CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	const size_t origin[] = {0, 0, 0};
 	const size_t region[] = {CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
 		CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar), 1};
@@ -549,7 +549,7 @@ static void create_from_region_test() {
 	CCLBuffer* subbuf = NULL;
 	CCLEvent* evt = NULL;
 	CCLEventWaitList ewl = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_ulong* hbuf;
 	cl_ulong* hsubbuf;
 	cl_uint min_align;
@@ -644,7 +644,7 @@ static void fill_test() {
 	cl_char8 h[CCL_TEST_BUFFER_SIZE];
 	cl_char8 pattern = {{ 1, -1, 5, 4, -12, 3, 7, -20 }};
 	size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get a context which supports OpenCL 1.2, if possible. */
 	ps = ccl_platforms_new(&err);
@@ -722,7 +722,7 @@ static void migrate_test() {
 	CCLBuffer* b = NULL;
 	CCLQueue* q;
 	size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get a context which supports OpenCL 1.2 if possible. */
 	ps = ccl_platforms_new(&err);

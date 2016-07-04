@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 	int op;
 
 	/* Error handling object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Check command-line arguments. */
 	if (argc < 2)

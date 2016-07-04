@@ -114,7 +114,7 @@
  * @until queue_comm
  * @skipline CCLProf
  * @skipline Error handling
- * @until GError*
+ * @until CCLErr*
  *
  * @skipline Create command queues
  * @skipline queue_exec
@@ -512,7 +512,7 @@ void ccl_prof_add_queue(
 
 /* Determine aggregate statistics for the given profile object. */
 CCL_EXPORT
-cl_bool ccl_prof_calc(CCLProf* prof, GError** err);
+cl_bool ccl_prof_calc(CCLProf* prof, CCLErr** err);
 
 /* Return aggregate statistics for events with the given name. */
 CCL_EXPORT
@@ -578,14 +578,14 @@ const char* ccl_prof_get_summary(
 
 /* Export profiling info to a given stream. */
 CCL_EXPORT
-cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, GError** err);
+cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, CCLErr** err);
 
 /* Helper function which exports profiling info to a given file,
  * automatically opening and closing the file. Check the
  * ccl_prof_export_info() for more information. */
 CCL_EXPORT
 cl_bool ccl_prof_export_info_file(
-	CCLProf* profile, const char* filename, GError** err);
+	CCLProf* profile, const char* filename, CCLErr** err);
 
 /* Set export options using a ::CCLProfExportOptions struct. */
 CCL_EXPORT

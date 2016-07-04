@@ -78,13 +78,13 @@ struct ccl_dev_container {
  * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container wrapper.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return List of cl_device_id OpenCL objects in the OpenCL device container
  * object wrapped by the given device container wrapper.
  * */
 typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
-	CCLDevContainer* devcon, GError** err);
+	CCLDevContainer* devcon, CCLErr** err);
 
 /* Release the devices held by the given #CCLDevContainer
  * object. */
@@ -93,16 +93,16 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon);
 /* Get all ::CCLDevice wrappers in device container. */
 CCLDevice* const* ccl_dev_container_get_all_devices(
 	CCLDevContainer* devcon,
-	ccl_dev_container_get_cldevices get_devices, GError** err);
+	ccl_dev_container_get_cldevices get_devices, CCLErr** err);
 
 /* Get ::CCLDevice wrapper at given index. */
 CCLDevice* ccl_dev_container_get_device(CCLDevContainer* devcon,
 	ccl_dev_container_get_cldevices get_devices,
-	cl_uint index, GError** err);
+	cl_uint index, CCLErr** err);
 
 /* Return number of devices in device container. */
 cl_uint ccl_dev_container_get_num_devices(CCLDevContainer* devcon,
-	ccl_dev_container_get_cldevices get_devices, GError** err);
+	ccl_dev_container_get_cldevices get_devices, CCLErr** err);
 
 #endif
 

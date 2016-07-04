@@ -70,13 +70,13 @@ struct ccl_image {
  * describes type and dimensions of the image to be allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
  * allocated by the application.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new OpenCL image object.
  * */
 static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
-	void* host_ptr, GError** err) {
+	void* host_ptr, CCLErr** err) {
 
 	/* OpenCL image object. */
 	cl_mem image = NULL;
@@ -218,14 +218,14 @@ void ccl_image_destroy(CCLImage* img) {
  * describes type and dimensions of the image to be allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
  * allocated by the application.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
-	void* host_ptr, GError** err) {
+	void* host_ptr, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -239,7 +239,7 @@ CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
 	/* OpenCL image object. */
 	cl_mem image;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
@@ -381,7 +381,7 @@ finish:
  * allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
  * allocated by the application.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of key-value pairs which
  * describe the type and dimensions of the image to be allocated.
@@ -389,7 +389,7 @@ finish:
  * */
 CCL_EXPORT
 CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
-	const cl_image_format* image_format, void* host_ptr, GError** err,
+	const cl_image_format* image_format, void* host_ptr, CCLErr** err,
 	...) {
 
 	/* Make sure ctx is not NULL. */
@@ -477,7 +477,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
@@ -485,7 +485,7 @@ CCL_EXPORT
 CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_read, const size_t* origin, const size_t* region,
 	size_t row_pitch, size_t slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -567,7 +567,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command.
  * */
@@ -575,7 +575,7 @@ CCL_EXPORT
 CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_write, const size_t* origin, const size_t* region,
 	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -654,7 +654,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -662,7 +662,7 @@ CCL_EXPORT
 CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
 	CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
 	const size_t* region, CCLEventWaitList* evt_wait_lst,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -742,7 +742,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -750,7 +750,7 @@ CCL_EXPORT
 CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
 	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
 	const size_t *region, size_t dst_offset,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -840,7 +840,7 @@ finish:
  * can be reused by client code.
  * @param[out] evt An event wrapper object that identifies this
  * particular map command. If NULL, no event will be returned.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
@@ -849,7 +849,7 @@ void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
 	const size_t* region, size_t *image_row_pitch,
 	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
-	CCLEvent** evt, GError** err) {
+	CCLEvent** evt, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -926,14 +926,14 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	const void *fill_color, const size_t *origin, const size_t *region,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -951,7 +951,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 

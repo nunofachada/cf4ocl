@@ -61,7 +61,7 @@ static void create_info_destroy_test() {
 	cl_uint host_buf[CCL_TEST_KERNEL_BUF_SIZE];
 	cl_uint host_buf_aux[CCL_TEST_KERNEL_BUF_SIZE];
 	CCLBuffer* buf;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLEvent* evt = NULL;
 	CCLEventWaitList ewl = NULL;
 	const char* krnl_name;
@@ -294,7 +294,7 @@ static void create_info_destroy_test() {
 static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLProgram* prg = NULL;
 	CCLKernel* krnl1 = NULL;
 	CCLKernel* krnl2 = NULL;
@@ -373,7 +373,7 @@ static void ref_unref_test() {
 static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
 
 	/* Error handling object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Max device workgroup size. */
 	size_t max_wgsize = ccl_device_get_info_scalar(
@@ -411,7 +411,7 @@ static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
 static void suggest_worksizes_aux(CCLDevice* dev, CCLKernel* krnl) {
 
 	/* Test variables. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	size_t rws[3], gws[3], lws[3], lws_max[3];
 
 	/* Perform test 20 times with different values. */
@@ -595,7 +595,7 @@ static void suggest_worksizes_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLDevice* dev = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get the test context with the pre-defined device. */
 	ctx = ccl_test_context_new(&err);
@@ -691,7 +691,7 @@ static void args_test() {
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 	union {cl_uint u; cl_uchar c[4];} himg[CCL_TEST_KERNEL_ARGS_BUF_SIZE];
 	cl_uint hbuf[CCL_TEST_KERNEL_ARGS_BUF_SIZE];
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	size_t gws = CCL_TEST_KERNEL_ARGS_BUF_SIZE;
 	size_t lws = CCL_TEST_KERNEL_ARGS_LWS;
 	void* args[6];
@@ -1094,7 +1094,7 @@ static void native_test() {
 	CCLDevice* dev = NULL;
 	CCLBuffer* buf = NULL;
 	CCLQueue* cq = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_int hbuf[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
 	cl_int hbuf_out[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
 	size_t bs = CCL_TEST_KERNEL_NATIVE_BUF_SIZE * sizeof(cl_int);

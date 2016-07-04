@@ -62,7 +62,7 @@ int main() {
 	char* info;
 
 	/* Error handling object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get all platforms in system. */
 	platf_list = ccl_platforms_new(&err);

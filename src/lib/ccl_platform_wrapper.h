@@ -110,7 +110,7 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform);
 
 /* Get the platform wrapper for the given device wrapper. */
 CCL_EXPORT
-CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, GError** err);
+CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, CCLErr** err);
 
 /* Decrements the reference count of the platform wrapper
  * object. If it reaches 0, the platform wrapper object is destroyed. */
@@ -120,14 +120,14 @@ void ccl_platform_destroy(CCLPlatform* platf);
 /* Get integer OpenCL version of platform. */
 CCL_EXPORT
 cl_uint ccl_platform_get_opencl_version(
-	CCLPlatform* platf, GError** err);
+	CCLPlatform* platf, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo platform information object.
  *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested platform information object. This object will
  * be automatically freed when the platform wrapper object is
@@ -147,7 +147,7 @@ cl_uint ccl_platform_get_opencl_version(
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested platform information value. This value will be
  * automatically freed when the platform wrapper object is destroyed.
@@ -168,7 +168,7 @@ cl_uint ccl_platform_get_opencl_version(
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested platform information value. This value will be
  * automatically freed when the platform wrapper object is destroyed.
@@ -186,7 +186,7 @@ cl_uint ccl_platform_get_opencl_version(
  *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested platform information string. This information
  * will be automatically freed when the platform wrapper object is
@@ -223,16 +223,16 @@ cl_uint ccl_platform_get_opencl_version(
 /* Get all device wrappers in platform. */
 CCL_EXPORT
 CCLDevice* const* ccl_platform_get_all_devices(
-	CCLPlatform* platf, GError** err);
+	CCLPlatform* platf, CCLErr** err);
 
 /* Get ::CCLDevice wrapper at given index. */
 CCL_EXPORT
 CCLDevice* ccl_platform_get_device(
-	CCLPlatform* platf, cl_uint index, GError** err);
+	CCLPlatform* platf, cl_uint index, CCLErr** err);
 
 /* Return number of devices in platform. */
 CCL_EXPORT
-cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, GError** err);
+cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, CCLErr** err);
 
 /** @} */
 

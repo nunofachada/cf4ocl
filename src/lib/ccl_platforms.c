@@ -60,12 +60,12 @@ struct ccl_platforms {
  *
  * @public @memberof ccl_platforms
  *
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new ::CCLPlatforms object, or NULL in case an error occurs.
  * */
 CCL_EXPORT
-CCLPlatforms* ccl_platforms_new(GError **err) {
+CCLPlatforms* ccl_platforms_new(CCLErr **err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);

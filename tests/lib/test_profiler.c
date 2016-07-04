@@ -35,7 +35,7 @@
 static void create_add_destroy_test() {
 
 	/* Test variables. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLBuffer* buf1 = NULL;
 	CCLBuffer* buf2 = NULL;
 	CCLProf* prof = NULL;

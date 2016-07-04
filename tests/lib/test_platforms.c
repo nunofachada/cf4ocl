@@ -46,7 +46,7 @@
 	} \
 	g_debug("%s %s", base_msg, info_str);
 
-static void ccl_test_platforms_check_error(GError** err) {
+static void ccl_test_platforms_check_error(CCLErr** err) {
 	gboolean status;
 	if  (*err == NULL) {
 		status = TRUE;
@@ -95,7 +95,7 @@ static void create_info_destroy_test() {
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
 	CCLDevice* const* ds = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLWrapperInfo* info;
 	gchar* platf_info;
 	guint num_devs;
@@ -590,7 +590,7 @@ static void ref_unref_test() {
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get platforms. */
 	platfs = ccl_platforms_new(&err);

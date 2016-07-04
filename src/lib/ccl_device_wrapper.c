@@ -184,13 +184,13 @@ void ccl_device_destroy(CCLDevice* dev) {
  * * etc.
  *
  * @param[in] dev The device wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version supported by the device. If an error
  * occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_device_get_opencl_version(CCLDevice* dev, GError** err) {
+cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
 
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, 0);
@@ -225,13 +225,13 @@ cl_uint ccl_device_get_opencl_version(CCLDevice* dev, GError** err) {
  * * etc.
  *
  * @param[in] dev The device wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The supported OpenCL C version  supported by the device. If
  * an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err) {
+cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
 
 	/* Make sure dev is not NULL. */
 	g_return_val_if_fail(dev != NULL, 0);
@@ -269,7 +269,7 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err) {
  * in the returned array of sub-devices. If `NULL`, this parameter is
  * ignored and client code will have to check for the `NULL` termination
  * in the returned array.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A `NULL`-terminated array of sub-devices. Sub-devices will
  * be automatically disposed of when parent device is destroyed.
@@ -277,7 +277,7 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err) {
 CCL_EXPORT
 CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 	const cl_device_partition_property *properties,
-	cl_uint *num_devs_ret, GError** err) {
+	cl_uint *num_devs_ret, CCLErr** err) {
 
 	/* Make sure device wrapper object is not NULL. */
 	g_return_val_if_fail(dev != NULL, NULL);

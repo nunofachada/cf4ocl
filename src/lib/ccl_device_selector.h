@@ -161,12 +161,12 @@ typedef GPtrArray* CCLDevSelDevices;
  *
  * @param[in] device OpenCL device to filter.
  * @param[in] data Filter data, implementation dependent.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if filter accepts device, CL_FALSE otherwise.
  */
 typedef cl_bool (*ccl_devsel_indep)(
-	CCLDevice* device, void *data, GError **err);
+	CCLDevice* device, void *data, CCLErr **err);
 
 /**
  * Dependent filter function: Abstract function for filtering
@@ -174,12 +174,12 @@ typedef cl_bool (*ccl_devsel_indep)(
  *
  * @param[in] devices OpenCL devices to filter.
  * @param[in] data Filter data, implementation dependent.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  */
 typedef CCLDevSelDevices (*ccl_devsel_dep)(
-	CCLDevSelDevices devices, void *data, GError **err);
+	CCLDevSelDevices devices, void *data, CCLErr **err);
 
 /**
  * A set of independent and dependent device filters.
@@ -203,7 +203,7 @@ typedef GPtrArray* CCLDevSelFilters;
 /* Create and return an object with device wrappers for all OpenCL devices
  * present in the system. */
 CCL_EXPORT
-CCLDevSelDevices ccl_devsel_devices_new(GError **err);
+CCLDevSelDevices ccl_devsel_devices_new(CCLErr **err);
 
 /* Destroy an object containing device wrappers. */
 CCL_EXPORT
@@ -212,11 +212,11 @@ void ccl_devsel_devices_destroy(CCLDevSelDevices devices);
 /* Returns a NULL-terminated array of strings, each one containing the name and
  * vendor of each device in the system. */
 CCL_EXPORT
-gchar** ccl_devsel_get_device_strings(GError** err);
+gchar** ccl_devsel_get_device_strings(CCLErr** err);
 
 /* Print to stdout a device description string for each device in the system. */
 CCL_EXPORT
-void ccl_devsel_print_device_strings(GError** err);
+void ccl_devsel_print_device_strings(CCLErr** err);
 
 /* Add a independent device filter to the filter set. */
 CCL_EXPORT
@@ -231,7 +231,7 @@ void ccl_devsel_add_dep_filter(
 /* Select one or more OpenCL devices based on the provided filters.  */
 CCL_EXPORT
 CCLDevSelDevices ccl_devsel_select(
-	CCLDevSelFilters* filters, GError **err);
+	CCLDevSelFilters* filters, CCLErr **err);
 
 /**
  * @defgroup CCL_DEVICE_SELECTOR_INDEP_FILTERS Independent filters
@@ -256,35 +256,35 @@ CCLDevSelDevices ccl_devsel_select(
  * given in the data parameter. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type(
-	CCLDevice* dev, void* data, GError **err);
+	CCLDevice* dev, void* data, CCLErr **err);
 
 /* Independent filter function which only accepts GPU devices. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_gpu(
-	CCLDevice* dev, void *data, GError **err);
+	CCLDevice* dev, void *data, CCLErr **err);
 
 /* Independent filter function which only accepts CPU devices. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_cpu(
-	CCLDevice* dev, void *data, GError **err);
+	CCLDevice* dev, void *data, CCLErr **err);
 
 /* Independent filter function which only accepts accelerator
  * devices. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_type_accel(
-	CCLDevice* dev, void *data, GError **err);
+	CCLDevice* dev, void *data, CCLErr **err);
 
 /* Independent filter which selects devices based on device
  * name, device vendor and/or platform name. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_string(
-	CCLDevice* dev, void *data, GError **err);
+	CCLDevice* dev, void *data, CCLErr **err);
 
 /* Independent filter function which only accepts devices of a
  * specified platform. */
 CCL_EXPORT
 cl_bool ccl_devsel_indep_platform(
-	CCLDevice* device, void *data, GError **err);
+	CCLDevice* device, void *data, CCLErr **err);
 
 /** @} */
 
@@ -312,19 +312,19 @@ cl_bool ccl_devsel_indep_platform(
  * same platform (the platform to which the first device belong to). */
 CCL_EXPORT
 CCLDevSelDevices ccl_devsel_dep_platform(
-	CCLDevSelDevices devices, void *data, GError **err);
+	CCLDevSelDevices devices, void *data, CCLErr **err);
 
 /* Dependent filter function which presents a menu to the user
  * allowing him to select the desired device. */
 CCL_EXPORT
 CCLDevSelDevices ccl_devsel_dep_menu(
-	CCLDevSelDevices devices, void *data, GError **err);
+	CCLDevSelDevices devices, void *data, CCLErr **err);
 
 /* Dependent filter function which selects the device at the specified
  * index, failing if no device is found at that index. */
 CCL_EXPORT
 CCLDevSelDevices ccl_devsel_dep_index(
-	CCLDevSelDevices devices, void *data, GError **err);
+	CCLDevSelDevices devices, void *data, CCLErr **err);
 
 /** @} */
 

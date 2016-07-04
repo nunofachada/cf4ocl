@@ -197,10 +197,10 @@ static gchar* basic_info[] = {
  *
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * */
-void ccl_devinfo_args_parse(int argc, char* argv[], GError** err) {
+void ccl_devinfo_args_parse(int argc, char* argv[], CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail(err == NULL || *err == NULL);
@@ -249,7 +249,7 @@ void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
 	gchar *profile, *version, *name, *vendor;
 
 	/* Error location. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Get platform profile. */
 	profile = ccl_platform_get_info_string(p, CL_PLATFORM_PROFILE, &err);
@@ -315,7 +315,7 @@ void ccl_devinfo_show_device_info_all(CCLDevice* d) {
 	gchar param_value_str[CCL_DEVINFO_MAXINFOLEN];
 
 	/* Error reporting object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Cycle through all supported device information names. */
 	for (gint k = 0; k < ccl_devquery_info_map_size; k++) {
@@ -370,7 +370,7 @@ void ccl_devinfo_show_device_info_custom(CCLDevice* d) {
 	gchar param_value_str[CCL_DEVINFO_MAXINFOLEN];
 
 	/* Error reporting object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Custom parameter name in proper format. */
 	gchar* custom_param_name;
@@ -452,7 +452,7 @@ void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
 	gchar param_value_str[CCL_DEVINFO_MAXINFOLEN];
 
 	/* Error reporting object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Cycle through the pre-defined basic information array. */
 	for (guint i = 0; basic_info[i] != NULL; i++) {
@@ -508,7 +508,7 @@ void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
 int main(int argc, char* argv[]) {
 
 	/* Error object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* List of platform wrapper objects. */
 	CCLPlatforms* platforms = NULL;

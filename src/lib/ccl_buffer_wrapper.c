@@ -105,13 +105,13 @@ void ccl_buffer_destroy(CCLBuffer* buf) {
  * @param[in] host_ptr A pointer to the buffer data that may already be
  * allocated by the application. The size of the buffer that host_ptr
  * points to must be >= size bytes.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new wrapper object.
  * */
 CCL_EXPORT
 CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
-	size_t size, void* host_ptr, GError** err) {
+	size_t size, void* host_ptr, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -167,14 +167,14 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
 CCL_EXPORT
 CCLEvent* ccl_buffer_enqueue_read(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_read, size_t offset, size_t size, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -241,7 +241,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
@@ -249,7 +249,7 @@ finish:
 CCL_EXPORT
 CCLEvent* ccl_buffer_enqueue_write(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_write, size_t offset, size_t size, void *ptr,
- 	CCLEventWaitList* evt_wait_lst, GError** err) {
+ 	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -320,7 +320,7 @@ finish:
  * can be reused by client code.
  * @param[out] evt An event wrapper object that identifies this
  * particular map command. If NULL, no event will be returned.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
@@ -328,7 +328,7 @@ CCL_EXPORT
 void* ccl_buffer_enqueue_map(CCLBuffer* buf, CCLQueue* cq,
 	cl_bool blocking_map, cl_map_flags map_flags, size_t offset,
 	size_t size, CCLEventWaitList* evt_wait_lst, CCLEvent** evt,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -400,7 +400,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -408,7 +408,7 @@ CCL_EXPORT
 CCLEvent* ccl_buffer_enqueue_copy(CCLBuffer* src_buf,
 	CCLBuffer* dst_buf, CCLQueue* cq, size_t src_offset,
 	size_t dst_offset, size_t size, CCLEventWaitList* evt_wait_lst,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -484,7 +484,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -492,7 +492,7 @@ CCL_EXPORT
 CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer* src_buf,
 	CCLImage* dst_img, CCLQueue* cq, size_t src_offset,
 	const size_t *dst_origin, const size_t *region,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -560,14 +560,14 @@ finish:
  * sub-buffer memory object.
  * @param[in] origin Offset relative to the parent buffer.
  * @param[in] size Sub-buffer size.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new buffer wrapper object which represents a specific
  * region in the original buffer.
  * */
 CCL_EXPORT
 CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
-	cl_mem_flags flags, size_t origin, size_t size, GError** err) {
+	cl_mem_flags flags, size_t origin, size_t size, CCLErr** err) {
 
 	/* Make sure buf is not NULL. */
 	g_return_val_if_fail(buf != NULL, NULL);
@@ -583,7 +583,7 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -682,7 +682,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
@@ -692,7 +692,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -710,7 +710,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -824,7 +824,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
@@ -835,7 +835,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	const size_t* host_origin, const size_t* region,
 	size_t buffer_row_pitch, size_t buffer_slice_pitch,
 	size_t host_row_pitch, size_t host_slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, GError** err) {
+	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -853,7 +853,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -964,7 +964,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -974,7 +974,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	const size_t *dst_origin, const size_t *region,
 	size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch,
 	size_t dst_slice_pitch, CCLEventWaitList* evt_wait_lst,
-	GError** err) {
+	CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -994,7 +994,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -1092,14 +1092,14 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */
 CCL_EXPORT
 CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	const void *pattern, size_t pattern_size, size_t offset,
-	size_t size, CCLEventWaitList* evt_wait_lst, GError** err) {
+	size_t size, CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure cq is not NULL. */
 	g_return_val_if_fail(cq != NULL, NULL);
@@ -1117,7 +1117,7 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 

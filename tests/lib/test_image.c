@@ -41,7 +41,7 @@ static void context_with_image_support_setup(
 	CCLPlatforms* ps;
 	CCLPlatform* p;
 	CCLDevice* d;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_uint num_devs;
 	*ctx_fixt = NULL;
 	cl_uint min_ocl_ver = 0;
@@ -125,7 +125,7 @@ static void create_info_destroy_test(
 	/* Test variables. */
 	CCLImage* img = NULL;
 	cl_mem image = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_int ocl_status;
 	CCL_UNUSED(user_data);
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
@@ -249,7 +249,7 @@ static void ref_unref_test(
 
 	/* Test variables. */
 	CCLImage* img = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCL_UNUSED(user_data);
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 
@@ -314,7 +314,7 @@ static void read_write_test(
 	cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 	size_t origin[3] = {0, 0, 0};
 	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCL_UNUSED(user_data);
 
 	/* Check that a context is set. */
@@ -398,7 +398,7 @@ static void copy_test(
 	size_t dst_origin[3] =
 		{CCL_TEST_IMAGE_WIDTH / 2, CCL_TEST_IMAGE_WIDTH / 2, 0};
 	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCL_UNUSED(user_data);
 
 	/* Check that a context is set. */
@@ -480,7 +480,7 @@ static void map_unmap_test(
 	size_t origin[3] = {0, 0, 0};
 	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
 	size_t image_row_pitch;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCL_UNUSED(user_data);
 
 	/* Check that a context is set. */
@@ -564,7 +564,7 @@ static void copy_buffer_test(
 	cl_uint himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
 	size_t origin[3] = {0, 0, 0};
 	size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCL_UNUSED(user_data);
 
 	/* Check that a context is set. */
@@ -661,7 +661,7 @@ static void fill_test(
 	gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
 	const size_t origin[3] = {0, 0, 0};
 	const size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCL_UNUSED(user_data);
 	/* Create a random color 4-channel 8-bit color (i.e. color has 32
 	 * bits). */

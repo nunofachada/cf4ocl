@@ -37,7 +37,7 @@ static void sub_devices_test() {
 	/* Test variables. */
 	CCLContext* ctx = NULL;
 	CCLDevice* pdev = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_uint ocl_ver;
 	cl_device_partition_property* dpp;
 	cl_uint i;

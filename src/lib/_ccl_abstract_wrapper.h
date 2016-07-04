@@ -160,7 +160,7 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size);
  * If it reaches 0, the wrapper object is destroyed. */
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
-	ccl_wrapper_release_cl_object rel_cl_fun, GError** err);
+	ccl_wrapper_release_cl_object rel_cl_fun, CCLErr** err);
 
 /* Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper. */

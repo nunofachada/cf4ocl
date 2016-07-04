@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
 	cl_uint d_host;
 
 	/* Error reporting object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Check results flag. */
 	cl_bool check_result;

@@ -177,7 +177,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
 		/* Name is NULL, determine a final name based on type of
 		 * command which produced the event. */
 
-		GError* err_internal = NULL;
+		CCLErr* err_internal = NULL;
 
 		cl_command_type ct =
 			ccl_event_get_command_type(evt, &err_internal);
@@ -327,14 +327,14 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
  * @public @memberof ccl_event
  *
  * @param[in] evt Event wrapper.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The command type which fired the given event or 0 if an error
  * occurs.
  * */
 CCL_EXPORT
 cl_command_type ccl_event_get_command_type(
-	CCLEvent* evt, GError** err) {
+	CCLEvent* evt, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -375,13 +375,13 @@ cl_command_type ccl_event_get_command_type(
  * @public @memberof ccl_event
  *
  * @param[in] evt An event wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * event object as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err) {
+cl_uint ccl_event_get_opencl_version(CCLEvent* evt, CCLErr** err) {
 
 	/* Make sure number evt is not NULL. */
 	g_return_val_if_fail(evt != NULL, 0);
@@ -397,7 +397,7 @@ cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err) {
 
 	cl_context context;
 	CCLContext* ctx;
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	context = ccl_event_get_info_scalar(
 		evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
@@ -451,7 +451,7 @@ finish:
  * registered by the application.
  * @param[in] user_data Will be passed as the user_data argument when
  * pfn_notify is called.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -459,7 +459,7 @@ finish:
 CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
 	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
-	void *user_data, GError** err) {
+	void *user_data, CCLErr** err) {
 
 	/* Make sure evt is not NULL. */
 	g_return_val_if_fail(evt != NULL, CL_FALSE);
@@ -473,7 +473,7 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -543,13 +543,13 @@ finish:
  * @note Requires OpenCL >= 1.1
  *
  * @param[in] ctx Context where to associate the user event.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new user event, which should be freed using
  * ccl_event_destroy().
  * */
 CCL_EXPORT
-CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
+CCLEvent* ccl_user_event_new(CCLContext* ctx, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -566,7 +566,7 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err) {
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -632,14 +632,14 @@ finish:
  * @param[in] evt Event wrapper object.
  * @param[in] execution_status The new execution status to be set, can
  * be `CL_COMPLETE` or a negative integer value to indicate an error.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_user_event_set_status(
-	CCLEvent* evt, cl_int execution_status, GError** err) {
+	CCLEvent* evt, cl_int execution_status, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
@@ -654,7 +654,7 @@ cl_bool ccl_user_event_set_status(
 	/* OpenCL version of the underlying platform. */
 	double ocl_ver;
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -820,13 +820,13 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err) {
+cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);

@@ -101,14 +101,14 @@ static void ccl_context_release_fields(CCLContext* ctx) {
  * that a new default properties object should be created.
  * @param[in] device Reference device to build the context properties
  * for.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The properties parameter if not NULL, or a default set of
  * context properties.
  * */
 static cl_context_properties* ccl_context_properties_default(
 	const cl_context_properties* properties,
-	cl_device_id device, GError** err) {
+	cl_device_id device, CCLErr** err) {
 
 	/* Make sure device is not NULL. */
 	g_return_val_if_fail(device != NULL, NULL);
@@ -175,13 +175,13 @@ finish:
  *
  * @param[in] devcon A ::CCLContext wrapper, passed as a
  * ::CCLDevContainer .
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
  * */
 static CCLWrapperInfo* ccl_context_get_cldevices(
-	CCLDevContainer* devcon, GError** err) {
+	CCLDevContainer* devcon, CCLErr** err) {
 
 	return ccl_context_get_info(devcon, CL_CONTEXT_DEVICES, err);
 }
@@ -238,14 +238,14 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
  * creation as well as errors that occur at runtime in this context.
  * Ignored if NULL.
  * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filters_full(
 	const cl_context_properties* properties, CCLDevSelFilters* filters,
-	ccl_context_callback pfn_notify, void* user_data, GError **err) {
+	ccl_context_callback pfn_notify, void* user_data, CCLErr **err) {
 
 	/* Make sure number ds is not NULL. */
 	g_return_val_if_fail(filters != NULL, NULL);
@@ -253,7 +253,7 @@ CCLContext* ccl_context_new_from_filters_full(
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	/* Error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Array of selected/filtered CCL device wrappers. */
 	GPtrArray* devices = NULL;
@@ -311,7 +311,7 @@ finish:
  * to report information on errors during context creation as well as errors
  * that occur at runtime in this context. Ignored if NULL.
  * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object.
  * */
@@ -319,7 +319,7 @@ CCL_EXPORT
 CCLContext* ccl_context_new_from_devices_full(
 	const cl_context_properties* properties, cl_uint num_devices,
 	CCLDevice* const* devices, ccl_context_callback pfn_notify,
-	void* user_data, GError** err) {
+	void* user_data, CCLErr** err) {
 
 	/* Make sure number of devices is not zero. */
 	g_return_val_if_fail(num_devices > 0, NULL);
@@ -339,7 +339,7 @@ CCLContext* ccl_context_new_from_devices_full(
 	/* New context wrapper. */
 	CCLContext* ctx = NULL;
 	/* Error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Allocate memory for devices. */
 	cl_devices =
@@ -403,19 +403,19 @@ finish:
  * @param[in] filter Filter used to select device(s). If `NULL`, no filter is
  * used, and the first found device(s) is selected.
  * @param[in] data Specific filter data.
- * @param[out] err Return location for a GError, or `NULL` if error reporting is
+ * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
  * to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
-	void* filter, void* data, GError** err) {
+	void* filter, void* data, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
 	/* Error reporting object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Context wrapper to create. */
 	CCLContext* ctx = NULL;
@@ -497,13 +497,13 @@ void ccl_context_destroy(CCLContext* ctx) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * context as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_context_get_opencl_version(CCLContext* ctx, GError** err) {
+cl_uint ccl_context_get_opencl_version(CCLContext* ctx, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, 0);
@@ -528,13 +528,13 @@ cl_uint ccl_context_get_opencl_version(CCLContext* ctx, GError** err) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLPlatform wrapper associated with the context
  * devices or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err) {
+CCLPlatform* ccl_context_get_platform(CCLContext* ctx, CCLErr** err) {
 
 	/* Make sure context is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -543,7 +543,7 @@ CCLPlatform* ccl_context_get_platform(CCLContext* ctx, GError** err) {
 
 	CCLPlatform* platf = NULL;
 	CCLDevice* dev = NULL;
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Check if platform wrapper already in context object. */
 	if (ctx->platf != NULL) {
@@ -588,7 +588,7 @@ finish:
  * OpenCL version.
  * @param[out] num_image_formats Return location for number of image
  * formats in list, which will be zero if an error occurs.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of supported image formats, or `NULL` if an error
  * occurs. Doesn't need to be freed.
@@ -596,7 +596,7 @@ finish:
 CCL_EXPORT
 const cl_image_format* ccl_context_get_supported_image_formats(
 	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
-	cl_uint* num_image_formats, GError** err) {
+	cl_uint* num_image_formats, CCLErr** err) {
 
 	/* Make sure ctx is not NULL. */
 	g_return_val_if_fail(ctx != NULL, NULL);
@@ -668,14 +668,14 @@ finish:
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] index Index of device in context.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
 CCL_EXPORT
 CCLDevice* ccl_context_get_device(
-	CCLContext* ctx, cl_uint index, GError** err) {
+	CCLContext* ctx, cl_uint index, CCLErr** err) {
 
 	return ccl_dev_container_get_device((CCLDevContainer*) ctx,
 		ccl_context_get_cldevices, index, err);
@@ -687,13 +687,13 @@ CCLDevice* ccl_context_get_device(
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The number of devices in context or 0 if an error occurs or
  * is otherwise not possible to get any device.
  * */
 CCL_EXPORT
-cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
+cl_uint ccl_context_get_num_devices(CCLContext* ctx, CCLErr** err) {
 
 	return ccl_dev_container_get_num_devices((CCLDevContainer*) ctx,
 		ccl_context_get_cldevices, err);
@@ -710,14 +710,14 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, GError** err) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[in] err Return location for a GError, or NULL if error
+ * @param[in] err Return location for a CCLErr, or NULL if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given context, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
-	GError** err) {
+	CCLErr** err) {
 
 	return ccl_dev_container_get_all_devices((CCLDevContainer*) ctx,
 		ccl_context_get_cldevices, err);

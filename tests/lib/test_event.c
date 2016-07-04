@@ -40,7 +40,7 @@ static void create_info_destroy_test() {
 	CCLEvent* evt = NULL;
 	CCLBuffer* buf = NULL;
 	cl_float hbuf[] = {1.2, 2.4, 0.021, -44.23};
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_int ocl_status;
 	cl_uint ocl_ver;
 	cl_event event = NULL;
@@ -157,7 +157,7 @@ static void user_event_test() {
 	/* Test variables. */
 	CCLEvent* uevt = NULL;
 	CCLContext* ctx = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_command_queue clcq = NULL;
 	cl_context clctx = NULL;
 	cl_command_type clct = 0;
@@ -252,7 +252,7 @@ static void callback_test() {
 	CCLQueue* cq = NULL;
 	CCLBuffer* buf = NULL;
 	CCLEvent* evt = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	GTimer* timer = NULL;
 	cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
 	cl_bool test_var = CL_FALSE;
@@ -321,7 +321,7 @@ static void name_test() {
 	CCLQueue* cq = NULL;
 	CCLBuffer* buf = NULL;
 	CCLEvent* evt = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_ulong* host_buf;
 	CCLEventWaitList ewl = NULL;
 	cl_int exec_status = -1;
@@ -430,7 +430,7 @@ static void event_wait_lists_test() {
 	CCLQueue* cq2 = NULL;
 	CCLBuffer* buf = NULL;
 	CCLEvent* evt = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_float host_buf1[8] = { 2.0, 3.5, 4.2, 5.0, 2.2, 199.0, -12.9, -0.01 };
 	cl_float host_buf2[8];
 	CCLEvent* evt_array[2] = { NULL, NULL };

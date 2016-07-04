@@ -179,7 +179,7 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
  * @param[in] rel_fields_fun Function for releasing specific wrapper
  * fields.
  * @param[in] rel_cl_fun Function for releasing OpenCL object.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored. The only error which may be reported by
  * this function is if some problem occurred when releasing the OpenCL
  * object.
@@ -188,7 +188,7 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
  * */
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 	ccl_wrapper_release_fields rel_fields_fun,
-	ccl_wrapper_release_cl_object rel_cl_fun, GError** err) {
+	ccl_wrapper_release_cl_object rel_cl_fun, CCLErr** err) {
 
 	/* Make sure wrapper object is not NULL. */
 	g_return_val_if_fail(wrapper != NULL, CL_FALSE);
@@ -452,7 +452,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested information object. This object will
  * be automatically freed when the respective wrapper object is
@@ -462,7 +462,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	CCLInfo info_type, cl_bool use_cache, GError** err) {
+	CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -589,7 +589,7 @@ finish:
  * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer to the requested information value. This
  * value will be automatically freed when the wrapper object is
@@ -599,7 +599,7 @@ finish:
 CCL_EXPORT
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	CCLInfo info_type, cl_bool use_cache, GError** err) {
+	CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -633,14 +633,14 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested information size. If an error occurs, a size of
  * `min_size` is returned.
  * */
 size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	CCLInfo info_type, cl_bool use_cache, GError** err) {
+	CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_val_if_fail(err == NULL || *err == NULL, 0);

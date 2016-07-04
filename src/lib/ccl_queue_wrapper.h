@@ -69,7 +69,7 @@
  * @skipline Wrappers for
  * @skipline CCLQueue*
  * @skipline Error handling
- * @skipline GError*
+ * @skipline CCLErr*
  *
  * @skipline Create a command queue
  * @skipline queue =
@@ -88,12 +88,12 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 /* Create a new command queue wrapper object. */
 CCL_EXPORT
 CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
-	const cl_queue_properties* prop_full, GError** err);
+	const cl_queue_properties* prop_full, CCLErr** err);
 
 /* Create a new command queue wrapper object. */
 CCL_EXPORT
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-	cl_command_queue_properties properties, GError** err);
+	cl_command_queue_properties properties, CCLErr** err);
 
 /* Decrements the reference count of the command queue wrapper
  * object. If it reaches 0, the command queue wrapper object is
@@ -104,12 +104,12 @@ void ccl_queue_destroy(CCLQueue* cq);
 /* Get the context associated with the given command queue wrapper
  * object. */
 CCL_EXPORT
-CCLContext* ccl_queue_get_context(CCLQueue* cq, GError** err);
+CCLContext* ccl_queue_get_context(CCLQueue* cq, CCLErr** err);
 
 /* Get the device associated with the given command queue wrapper
  * object. */
 CCL_EXPORT
-CCLDevice* ccl_queue_get_device(CCLQueue* cq, GError** err);
+CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err);
 
 /* Create an event wrapper from a given OpenCL event object and
  * associate it with the command queue. */
@@ -128,12 +128,12 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq);
 /* Issues all previously queued commands in a command queue to the
  * associated device. */
 CCL_EXPORT
-cl_bool ccl_queue_flush(CCLQueue* cq, GError** err);
+cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err);
 
 /* Blocks until all previously queued OpenCL commands in a command-queue
  * are issued to the associated device and have completed. */
 CCL_EXPORT
-cl_bool ccl_queue_finish(CCLQueue* cq, GError** err);
+cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err);
 
 /* Release all events associated with the command queue. */
 CCL_EXPORT
@@ -142,19 +142,19 @@ void ccl_queue_gc(CCLQueue* cq);
 /* Enqueues a barrier command on the given command queue. */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Enqueues a marker command on the given command queue. */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, GError** err);
+	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo command queue information object.
  *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested command queue information object. This object
  * will be automatically freed when the command queue wrapper object is
@@ -174,7 +174,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested command queue information value. This value
  * will be automatically freed when the command queue wrapper object is
@@ -194,7 +194,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested command queue information value. This value
  * will be automatically freed when the command queue wrapper object is

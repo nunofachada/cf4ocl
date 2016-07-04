@@ -83,25 +83,25 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device);
 
 /* Get the OpenCL version supported by the device. */
 CCL_EXPORT
-cl_uint ccl_device_get_opencl_version(CCLDevice* dev, GError** err);
+cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err);
 
 /* Get the OpenCL version of the device. */
 CCL_EXPORT
-cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, GError** err);
+cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err);
 
 /* Creates an array of sub-devices that each reference a
  * non-intersecting set of compute units within the given device. */
 CCL_EXPORT
 CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 	const cl_device_partition_property *properties,
-	cl_uint *num_devs_ret, GError** err);
+	cl_uint *num_devs_ret, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo device information object.
  *
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information object. This object will
  * be automatically freed when the device wrapper object is
@@ -121,7 +121,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be
  * automatically freed when the device wrapper object is destroyed.
@@ -142,7 +142,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be
  * automatically freed when the device wrapper object is destroyed.

@@ -65,7 +65,7 @@ static void create_info_destroy_test() {
 	CCLEvent* evt_kr;
 	CCLEvent* evt_r1;
 	CCLEventWaitList ewl = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	gchar* tmp_dir_name;
 	gchar* tmp_file_prefix;
 	const char* build_log;
@@ -586,7 +586,7 @@ static void create_info_destroy_test() {
 static void ref_unref_test() {
 
 	CCLContext* ctx = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	CCLProgram* prg = NULL;
 	CCLKernel* krnl1 = NULL;
 	CCLKernel* krnl2 = NULL;
@@ -680,7 +680,7 @@ static void compile_link_test() {
 	cl_char hbuf_in[8] = {-3, -2, -1, 0, 1, 2, 3, 4};
 	cl_char hbuf_out[8];
 	size_t ws = 8;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	cl_uint ocl_ver;
 
 	/* Get the test context with the pre-defined device. */

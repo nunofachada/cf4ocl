@@ -77,9 +77,9 @@
 
 /**
  * If error is detected (`error_code != no_error_code`),
- * create an error object (GError) and go to the specified label.
+ * create an error object (CCLErr) and go to the specified label.
  *
- * @param[out] err GError* object.
+ * @param[out] err CCLErr* object.
  * @param[in] quark Quark indicating the error domain.
  * @param[in] error_condition Must result to true in order to create
  * error.
@@ -100,7 +100,7 @@
  * If error is detected in `err` object (`err != NULL`), go to the specified
  * label.
  *
- * @param[in] err GError* object.
+ * @param[in] err CCLErr* object.
  * @param[in] label Label to goto if error is detected.
  * */
 #define ccl_if_err_goto(err, label)	\
@@ -110,11 +110,11 @@
 	}
 
 /**
- * Same as ccl_if_err_goto(), but rethrows error in a source GError to a new
- * destination GError object.
+ * Same as ccl_if_err_goto(), but rethrows error in a source CCLErr to a new
+ * destination CCLErr object.
  *
- * @param[out] err_dest Destination GError** object.
- * @param[in] err_src Source GError* object.
+ * @param[out] err_dest Destination CCLErr** object.
+ * @param[in] err_src Source CCLErr* object.
  * @param[in] label Label to goto if error is detected.
  * */
 #define ccl_if_err_propagate_goto(err_dest, err_src, label) \

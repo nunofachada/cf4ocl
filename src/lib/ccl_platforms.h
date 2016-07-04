@@ -53,7 +53,7 @@
  *
  * @skipline Other variables
  * @until cl_uint num_platfs;
- * @skipline GError* err = NULL;
+ * @skipline CCLErr* err = NULL;
  *
  * @skipline Get all platforms in system
  * @until platf_list = ccl_platforms_new(&err);
@@ -73,7 +73,7 @@
 /* Creates a new CCLPlatforms* object, which contains the list
  * of OpenCL platforms available in the system. */
 CCL_EXPORT
-CCLPlatforms* ccl_platforms_new(GError **err);
+CCLPlatforms* ccl_platforms_new(CCLErr **err);
 
 /* Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data. */

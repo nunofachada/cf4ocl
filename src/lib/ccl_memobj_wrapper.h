@@ -75,33 +75,33 @@ typedef void (CL_CALLBACK *ccl_memobj_destructor_callback)(
 /* Get the OpenCL version of the platform associated with this memory
  * object. */
 CCL_EXPORT
-cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, GError** err);
+cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, CCLErr** err);
 
 /* Enqueues a command to unmap a previously mapped region of a memory
  * object. */
 CCL_EXPORT
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
-	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, GError** err);
+	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Wrapper for OpenCL clSetMemObjectDestructorCallback() function. */
 CCL_EXPORT
 cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	ccl_memobj_destructor_callback pfn_notify,
-	void *user_data, GError** err);
+	void *user_data, CCLErr** err);
 
 /* Enqueues a command to indicate which device a set of memory objects
  * should be associated with. */
 CCL_EXPORT
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  	CCLQueue* cq, cl_mem_migration_flags flags,
- 	CCLEventWaitList* evt_wait_lst, GError** err);
+ 	CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo memory object information object.
  *
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested memory object information object. This object will
  * be automatically freed when the memory object wrapper object is
@@ -121,7 +121,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested memory object information value. This value will be
  * automatically freed when the memory object wrapper object is destroyed.
@@ -141,7 +141,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested memory object information value. This value will be
  * automatically freed when the memory object wrapper object is destroyed.

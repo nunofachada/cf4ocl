@@ -115,34 +115,34 @@ const char* ccl_event_get_final_name(CCLEvent* evt);
 /* Get the command type which fired the given event. */
 CCL_EXPORT
 cl_command_type ccl_event_get_command_type(
-	CCLEvent* evt, GError** err);
+	CCLEvent* evt, CCLErr** err);
 
 /* Get the OpenCL version of the platform associated with this event
  * object. */
 CCL_EXPORT
-cl_uint ccl_event_get_opencl_version(CCLEvent* evt, GError** err);
+cl_uint ccl_event_get_opencl_version(CCLEvent* evt, CCLErr** err);
 
 /* Wrapper for OpenCL clSetEventCallback() function. */
 CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
 	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
-	void *user_data, GError** err);
+	void *user_data, CCLErr** err);
 
 /* Create a new user event. */
 CCL_EXPORT
-CCLEvent* ccl_user_event_new(CCLContext* ctx, GError** err);
+CCLEvent* ccl_user_event_new(CCLContext* ctx, CCLErr** err);
 
 /* Sets the execution status of a user event object. */
 CCL_EXPORT
 cl_bool ccl_user_event_set_status(
-	CCLEvent* evt, cl_int execution_status, GError** err);
+	CCLEvent* evt, cl_int execution_status, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo event information object.
  *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event information object. This object will
  * be automatically freed when the event wrapper object is
@@ -162,7 +162,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event information value. This value will be
  * automatically freed when the event wrapper object is destroyed.
@@ -182,7 +182,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event information value. This value will be
  * automatically freed when the event wrapper object is destroyed.
@@ -197,7 +197,7 @@ cl_bool ccl_user_event_set_status(
  *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event profiling information object. This object
  * will be automatically freed when the event wrapper object is
@@ -217,7 +217,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event profiling information value. This value
  * will be automatically freed when the event wrapper object is destroyed.
@@ -238,7 +238,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a GError, or `NULL` if error
+ * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested event profiling information value. This value
  * will be automatically freed when the event wrapper object is
@@ -380,7 +380,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
 /* Waits on the host thread for commands identified by events in the
  * wait list to complete. */
 CCL_EXPORT
-cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, GError** err);
+cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /** @} */
 

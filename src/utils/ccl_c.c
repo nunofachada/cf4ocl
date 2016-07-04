@@ -183,9 +183,9 @@ static GOptionEntry entries[] = {
  *
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
- * @param[out] err Return location for a GError object.
+ * @param[out] err Return location for a CCLErr object.
  * */
-void ccl_c_args_parse(int argc, char* argv[], GError** err) {
+void ccl_c_args_parse(int argc, char* argv[], CCLErr** err) {
 
 	/* Make sure err is NULL or it is not set. */
 	g_return_if_fail(err == NULL || *err == NULL);
@@ -228,10 +228,10 @@ cleanup:
  * @param[in] prg Program containing kernel.
  * @param[in] dev Device for which kernel was compiled.
  * @param[in] kernel Kernel name.
- * @param[out] err Return location for a GError object.
+ * @param[out] err Return location for a CCLErr object.
  * */
 void ccl_c_kernel_info_show(
-	CCLProgram* prg, CCLDevice* dev, const char* kernel, GError** err) {
+	CCLProgram* prg, CCLDevice* dev, const char* kernel, CCLErr** err) {
 
 	/* OpenCL version. */
 	cl_uint ocl_ver;
@@ -247,7 +247,7 @@ void ccl_c_kernel_info_show(
 	cl_ulong k_priv_mem_size;
 
 	/* Internal error handling object. */
-	GError* err_internal = NULL;
+	CCLErr* err_internal = NULL;
 
 	/* Get OpenCL version. */
 	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
@@ -356,7 +356,7 @@ finish:
 int main(int argc, char* argv[]) {
 
 	/* Error object. */
-	GError* err = NULL, *err_build = NULL;
+	CCLErr* err = NULL, *err_build = NULL;
 
 	/* Program return status. */
 	gint status;

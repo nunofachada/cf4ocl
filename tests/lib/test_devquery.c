@@ -37,7 +37,7 @@ static void helpers_test() {
 	CCLPlatforms* platfs = NULL;
 	CCLPlatform* p = NULL;
 	CCLDevice* d = NULL;
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	guint num_devs;
 	guint num_platfs;
 	CCLWrapperInfo* info;

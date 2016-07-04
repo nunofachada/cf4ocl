@@ -34,7 +34,7 @@
 static void devices_new_destroy_test() {
 
 	/* Error reporting object. */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 
 	/* Object containing device wrappers. */
 	CCLDevSelDevices devs = NULL;

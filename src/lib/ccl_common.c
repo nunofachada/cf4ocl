@@ -46,6 +46,20 @@ void ccl_common_version_print(const char* exec_name) {
 }
 
 /**
+ * If `err` or `*err` is `NULL`, does nothing. Otherwise, releases memory
+ * occupied by `*err` and sets `*err` to `NULL`.
+ *
+ * @param[in] err A ::CCLErr return location.
+
+ * @see @ref ug_errorhandle "Error handling" in _cf4ocl_.
+ * @see @ref ug_deps "The GLib and OpenCL dependencies".
+ * */
+CCL_EXPORT
+void ccl_err_clear(CCLErr** err) {
+	g_clear_error(err);
+}
+
+/**
  * Resolves to error category identifying string, in this case an error in
  * _cf4ocl_.
  *

@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
 	/* Selected device, may be given in command line. */
 	int dev_idx = -1;
 	/* Error handling object (must be NULL). */
-	GError* err = NULL;
+	CCLErr* err = NULL;
 	/* Does selected device support images? */
 	cl_bool image_ok;
 	/* Initial sim state. */
