@@ -93,6 +93,7 @@ Function/macro | Description
 ::ccl_enqueue_barrier() | @copybrief ccl_enqueue_barrier
 ::ccl_enqueue_marker() | @copybrief ccl_enqueue_marker
 ::ccl_err() | @copybrief ccl_err
+::ccl_err_clear() | @copybrief ccl_err_clear
 ::ccl_error_quark() | @copybrief ccl_error_quark
 ::ccl_event_destroy() | @copybrief ccl_event_destroy
 ::ccl_event_get_command_type() | @copybrief ccl_event_get_command_type
@@ -275,6 +276,7 @@ Function/macro | Description
 ::ccl_sampler_ref() | @copybrief ccl_sampler_ref
 ::ccl_sampler_unref() | @copybrief ccl_sampler_unref
 ::ccl_sampler_unwrap() | @copybrief ccl_sampler_unwrap
+::ccl_strv_clear() | @copybrief ccl_strv_clear
 ::ccl_user_event_new() | @copybrief ccl_user_event_new
 ::ccl_user_event_set_status() | @copybrief ccl_user_event_set_status
 ::ccl_wrapper_get_class_name() | @copybrief ccl_wrapper_get_class_name

@@ -1,7 +1,7 @@
 News
 ====
 
-*3 July 2016*
+*4 July 2016*
 
 Version 2.1.0 is available for download in the [releases][] page.
 
