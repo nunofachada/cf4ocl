@@ -103,10 +103,12 @@ static struct ccl_sampler_basic_properties
 					sbp.normalized_coords = (cl_bool) sampler_properties[i + 1];
 					break;
 				case CL_SAMPLER_ADDRESSING_MODE:
-					sbp.addressing_mode = (cl_addressing_mode) sampler_properties[i + 1];
+					sbp.addressing_mode =
+						(cl_addressing_mode) sampler_properties[i + 1];
 					break;
 				case CL_SAMPLER_FILTER_MODE:
-					sbp.filter_mode = (cl_filter_mode) sampler_properties[i + 1];
+					sbp.filter_mode =
+						(cl_filter_mode) sampler_properties[i + 1];
 					break;
 			}
 		}
@@ -172,7 +174,7 @@ void ccl_sampler_destroy(CCLSampler* smplr) {
  * @param[in] normalized_coords Are the image coordinates normalized?
  * @param[in] addressing_mode How to handle out-of-range coordinates.
  * @param[in] filter_mode Filter to apply when reading an image.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
@@ -219,7 +221,7 @@ CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
  * with 0. If a supported property is not specified, its default value
  * will be used. If `NULL`, default values for supported sampler
  * properties will be used.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */

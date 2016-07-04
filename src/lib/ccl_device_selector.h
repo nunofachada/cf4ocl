@@ -161,7 +161,7 @@ typedef GPtrArray* CCLDevSelDevices;
  *
  * @param[in] device OpenCL device to filter.
  * @param[in] data Filter data, implementation dependent.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if filter accepts device, CL_FALSE otherwise.
  */
@@ -174,7 +174,7 @@ typedef cl_bool (*ccl_devsel_indep)(
  *
  * @param[in] devices OpenCL devices to filter.
  * @param[in] data Filter data, implementation dependent.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  */

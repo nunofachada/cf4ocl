@@ -60,7 +60,7 @@ struct ccl_platforms {
  *
  * @public @memberof ccl_platforms
  *
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new ::CCLPlatforms object, or NULL in case an error occurs.
  * */

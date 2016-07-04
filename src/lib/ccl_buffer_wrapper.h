@@ -192,7 +192,7 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
  * @param[in,out] ewl List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */

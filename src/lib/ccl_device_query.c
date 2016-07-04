@@ -432,7 +432,8 @@ static char* ccl_devquery_format_queueprop(CCLWrapperInfo* info,
 	cl_command_queue_properties qp =
 		*((cl_command_queue_properties*) info->value);
 	g_snprintf(out, (gulong) size, "%s%s",
-		qp & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ? "OUT_OF_ORDER_EXEC_MODE_ENABLE " : "",
+		qp & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE
+			? "OUT_OF_ORDER_EXEC_MODE_ENABLE " : "",
 		qp & CL_QUEUE_PROFILING_ENABLE ? "PROFILING_ENABLE " : "");
 	return out;
 

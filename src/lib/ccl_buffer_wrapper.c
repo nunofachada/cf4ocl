@@ -105,7 +105,7 @@ void ccl_buffer_destroy(CCLBuffer* buf) {
  * @param[in] host_ptr A pointer to the buffer data that may already be
  * allocated by the application. The size of the buffer that host_ptr
  * points to must be >= size bytes.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new wrapper object.
  * */
@@ -167,7 +167,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
@@ -241,7 +241,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
@@ -320,7 +320,7 @@ finish:
  * can be reused by client code.
  * @param[out] evt An event wrapper object that identifies this
  * particular map command. If NULL, no event will be returned.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
@@ -400,7 +400,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -484,7 +484,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -560,7 +560,7 @@ finish:
  * sub-buffer memory object.
  * @param[in] origin Offset relative to the parent buffer.
  * @param[in] size Sub-buffer size.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new buffer wrapper object which represents a specific
  * region in the original buffer.
@@ -682,7 +682,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
@@ -824,7 +824,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command, or
  * NULL if an error occurs.
@@ -964,7 +964,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -1092,7 +1092,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */

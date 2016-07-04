@@ -70,7 +70,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * @public @memberof ccl_memobj
  *
  * @param[in] mo A memory object wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * memory object as an integer. If an error occurs, 0 is returned.
@@ -134,7 +134,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -204,7 +204,7 @@ finish:
  * @param[in] pfn_notify The callback function that can be registered
  * by the application.
  * @param[in] user_data A pointer to user supplied data.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if device if operation completes successfully,
  * `CL_FALSE` otherwise.
@@ -262,7 +262,8 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 		pfn_notify, user_data);
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to set memory object destructor callback (OpenCL error %d: %s).",
+		"%s: unable to set memory object destructor callback "
+		"(OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 #endif
@@ -301,7 +302,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return
  * */

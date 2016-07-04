@@ -109,7 +109,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  *
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested sampler information object. This object will
  * be automatically freed when the sampler wrapper object is
@@ -129,7 +129,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested sampler information value. This value will be
  * automatically freed when the sampler wrapper object is destroyed.
@@ -152,7 +152,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested sampler information value. This value will be
  * automatically freed when the sampler wrapper object is destroyed.

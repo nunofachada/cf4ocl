@@ -146,8 +146,8 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * @param[in] ctx Context wrapper object.
  * @param[in] dev Device wrapper object, must be associated with `ctx`.
  * @param[in] prop_full A zero-terminated list of `cl_queue_properties`.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return The ::CCLQueue wrapper for the given device and context, or `NULL` if
  * an error occurs.
  * */
@@ -324,7 +324,7 @@ finish:
  * @param[in] ctx Context wrapper object.
  * @param[in] dev Device wrapper object, must be associated with `ctx`.
  * @param[in] properties Bitfield of command queue properties.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLQueue wrapper for the given device and context,
  * or `NULL` if an error occurs.
@@ -365,7 +365,7 @@ void ccl_queue_destroy(CCLQueue* cq) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The context associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
@@ -418,7 +418,7 @@ finish:
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The device associated with the given command queue wrapper
  * object, or `NULL` if an error occurs.
@@ -568,7 +568,7 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -603,7 +603,7 @@ cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err) {
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -680,7 +680,7 @@ void ccl_queue_gc(CCLQueue* cq) {
  *
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return An OpenCL marker event (will be wrapped by the calling
  * function).
@@ -762,7 +762,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return An event wrapper object that identifies this particular
  * command.
@@ -811,7 +811,8 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
 			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
 		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: error in clEnqueueBarrierWithWaitList() (OpenCL error %d: %s).",
+			"%s: error in clEnqueueBarrierWithWaitList() "
+			"(OpenCL error %d: %s).",
 			CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	} else {
@@ -874,7 +875,7 @@ finish:
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list. Must be `NULL` or a
  * warning will be generated.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return An OpenCL marker event (will be wrapped by the calling
  * function).
@@ -941,7 +942,7 @@ finish:
  * before this command can be executed. The list will be cleared and
  * can be reused by client code. Must be `NULL` if OpenCL platform
  * version is <= 1.1.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return An event wrapper object that identifies this particular
  * command.

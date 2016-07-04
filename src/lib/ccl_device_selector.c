@@ -102,7 +102,7 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
  * array.
  *
  * @param[in] devices Array of devices.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A NULL-terminated array of strings, each one containing the
  * name and vendor of each device in the device array. The array of
@@ -181,7 +181,7 @@ finish:
  * @param[in] selected Index of selected device (a message will appear
  * near the device name indicating the device is selected). Pass -1 to
  * ignore it.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * */
 static void ccl_devsel_dep_menu_list(CCLDevSelDevices devices,
@@ -244,7 +244,7 @@ finish:
  * from a list.
  *
  * @param[in] devices Array of devices.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The list index of the selected device or -1 if an error
  * ocurrs.
@@ -320,8 +320,8 @@ finish:
  * See ::CCLDevSelDevices for information on how to access individual device
  * wrappers within the object.
  *
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return An object containing device wrappers for all OpenCL devices present
  * in the system, or `NULL` if an error occurs. The object should be freed with
  * ccl_devsel_devices_destroy().
@@ -443,7 +443,7 @@ void ccl_devsel_devices_destroy(CCLDevSelDevices devices) {
  * The array of strings should be freed with the g_strfreev() function
  * from GLib.
  *
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A NULL-terminated array of strings, each one containing the
  * name and vendor of each device in the system. The array of strings
@@ -500,7 +500,7 @@ finish:
  * Print to stdout a device description string for each device in
  * the system.
  *
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * */
 CCL_EXPORT
@@ -578,7 +578,7 @@ void ccl_devsel_add_dep_filter(
  * frequently.
  *
  * @param[in] filters Filters used to select device(s).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return One or more OpenCL devices selected based on the provided
  * filters.
@@ -693,8 +693,8 @@ finish:
  *
  * @param[in] dev OpenCL device to filter depending on type.
  * @param[in] data Filter data, must point to a cl_device_type value.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return `CL_TRUE` if device is of the given type, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
@@ -746,7 +746,7 @@ finish:
  *
  * @param[in] dev OpenCL device to check for GPU type.
  * @param[in] data Filter data, ignored.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if device is a GPU, `CL_FALSE` otherwise.
  * */
@@ -770,7 +770,7 @@ cl_bool ccl_devsel_indep_type_gpu(
  *
  * @param[in] dev OpenCL device to check for CPU type.
  * @param[in] data Filter data, ignored.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if device is a CPU, `CL_FALSE` otherwise.
  * */
@@ -795,7 +795,7 @@ cl_bool ccl_devsel_indep_type_cpu(
  *
  * @param[in] dev OpenCL device to check for accelerator type.
  * @param[in] data Filter data, ignored.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if device is a accelerator, `CL_FALSE` otherwise.
  * */
@@ -820,7 +820,7 @@ cl_bool ccl_devsel_indep_type_accel(
  *
  * @param[in] dev OpenCL device to filter by platform.
  * @param[in] data Filter data, must be a string.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if device is accepted by filter, `CL_FALSE` otherwise.
  * */
@@ -934,7 +934,7 @@ finish:
  *
  * @param[in] device OpenCL device to filter by platform.
  * @param[in] data Filter data, must be a cl_platform_id.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if device belongs to the specified platform, `CL_FALSE`
  * otherwise (or if an error occurs).
@@ -1002,7 +1002,7 @@ finish:
  *
  * @param[in] devices Currently available OpenCL devices.
  * @param[in] data Filter data, ignored.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
@@ -1086,7 +1086,7 @@ finish:
  * @param[in] devices List of devices.
  * @param[in] data If not NULL, can contain a device index, such that
  * the device is automatically selected by this filter.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL devices which were accepted by the filter.
  * */
@@ -1170,8 +1170,8 @@ finish:
  *
  * @param[in] devices List of devices.
  * @param[in] data Must point to a valid device index of type `cl_uint`.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return The OpenCL device which was selected by the filter.
  * */
 CCL_EXPORT

@@ -276,7 +276,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in,out] ewl List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -288,7 +288,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  *
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information object. This object will
  * be automatically freed when the image wrapper object is
@@ -308,7 +308,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information value. This value will be
  * automatically freed when the image wrapper object is destroyed.
@@ -328,7 +328,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information value. This value will be
  * automatically freed when the image wrapper object is destroyed.

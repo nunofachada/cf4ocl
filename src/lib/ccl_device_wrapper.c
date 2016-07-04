@@ -184,7 +184,7 @@ void ccl_device_destroy(CCLDevice* dev) {
  * * etc.
  *
  * @param[in] dev The device wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version supported by the device. If an error
  * occurs, 0 is returned.
@@ -225,7 +225,7 @@ cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
  * * etc.
  *
  * @param[in] dev The device wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The supported OpenCL C version  supported by the device. If
  * an error occurs, 0 is returned.
@@ -269,7 +269,7 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
  * in the returned array of sub-devices. If `NULL`, this parameter is
  * ignored and client code will have to check for the `NULL` termination
  * in the returned array.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A `NULL`-terminated array of sub-devices. Sub-devices will
  * be automatically disposed of when parent device is destroyed.

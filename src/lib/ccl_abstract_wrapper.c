@@ -179,7 +179,7 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
  * @param[in] rel_fields_fun Function for releasing specific wrapper
  * fields.
  * @param[in] rel_cl_fun Function for releasing OpenCL object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored. The only error which may be reported by
  * this function is if some problem occurred when releasing the OpenCL
  * object.
@@ -452,7 +452,7 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested information object. This object will
  * be automatically freed when the respective wrapper object is
@@ -589,7 +589,7 @@ finish:
  * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer to the requested information value. This
  * value will be automatically freed when the wrapper object is
@@ -633,7 +633,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @param[in] info_type Type of information query to perform.
  * @param[in] use_cache TRUE if cached information is to be used, FALSE
  * to force a new query even if information is in cache.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested information size. If an error occurs, a size of
  * `min_size` is returned.

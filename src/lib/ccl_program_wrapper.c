@@ -174,7 +174,7 @@ static void ccl_program_release_fields(CCLProgram* prg) {
  * @private @memberof ccl_program
  *
  * @param[in] devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
@@ -290,7 +290,7 @@ void ccl_program_destroy(CCLProgram* prg) {
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] filename Path to source file.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -312,7 +312,7 @@ CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
  * @param[in] ctx The context wrapper object.
  * @param[in] count Number of source files.
  * @param[in] filenames List of source file paths.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -390,7 +390,7 @@ finish:
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] string Null-terminated source string.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -415,7 +415,7 @@ CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
  * (the string length). If an element in lengths is zero, its
  * accompanying string is null-terminated. If lengths is `NULL`, all
  * strings in the strings argument are considered null-terminated.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -474,7 +474,7 @@ finish:
  * @param[in] filename Path to binary file.
  * @param[out] binary_status Returns whether the program binary was
  * loaded successfully or not.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -502,7 +502,7 @@ CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
  * @param[in] filenames Path to binary files, one per device.
  * @param[out] binary_status Returns whether the program binary for each
  * device specified in `devs` was loaded successfully or not.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -580,7 +580,7 @@ finish:
  * @param[in] binary Binary code.
  * @param[out] binary_status Returns whether the program binary was
  * loaded successfully or not.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -607,7 +607,7 @@ CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
  * @param[in] bins List of binary code strings, one per device.
  * @param[out] binary_status Returns whether the program binary for each
  * device specified in `devs` was loaded successfully or not.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -693,7 +693,7 @@ finish:
  * on which all the built-in kernels can be executed.
  * @param[in] kernel_names A semi-colon separated list of built-in
  * kernel names.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
@@ -766,7 +766,8 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 	/* Create kernel from built-in kernels. */
 	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to create cl_program from built-in kernels (OpenCL error %d: %s).",
+		"%s: unable to create cl_program from built-in kernels "
+		"(OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 	/* Wrap OpenCL program object. */
@@ -808,7 +809,7 @@ finish:
  * @param[in] options A null-terminated string of characters that
  * describes the build options to be used for building the program
  * executable.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -840,7 +841,7 @@ cl_bool ccl_program_build(
  * which will be called when the program executable has been built
  * (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -917,8 +918,8 @@ finish:
  * and footer separating them.
  *
  * @param[in] prg Program wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return The build log for most recent build, compile or link. May be `NULL`
  * or an empty string if no build, compile or link was performed, or if no build
  * log is available.
@@ -1011,8 +1012,8 @@ finish:
  *
  * @param[in] prg Program wrapper object.
  * @param[in] dev Device for which to get the build log.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return The build log for most recent build, compile or link. May be `NULL`
  * or an empty string if no build, compile or link was performed, or if no build
  * log is available.
@@ -1106,7 +1107,7 @@ finish:
  * an application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
@@ -1257,8 +1258,8 @@ finish:
  * an application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
@@ -1394,7 +1395,7 @@ finish:
  * @public @memberof ccl_program
  *
  * @param[in] prg A program wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * program as an integer. If an error occurs, 0 is returned.
@@ -1460,7 +1461,7 @@ finish:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] kernel_name Name of kernel function.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The kernel wrapper object for the given program kernel
  * function.
@@ -1562,7 +1563,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
@@ -1674,7 +1675,7 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
  * @param[in] args A `NULL`-terminated array of arguments to set.
  * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
  * ::CCLSampler*.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
@@ -1708,7 +1709,7 @@ CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
  * @private @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * */
 static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
@@ -1795,7 +1796,7 @@ error_handler:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The program's binary object for the the specified device.
  * The returned object will be freed when the associated program is
@@ -1880,7 +1881,7 @@ finish:
  * @param[in] dev The device wrapper object.
  * @param[in] filename Name of file where to save the program's binary
  * code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -1962,7 +1963,7 @@ finish:
  * ::ccl_program_get_num_devices() function. If not `NULL` the value
  * pointed to by this variable should be freed with GLib's
  * _g_strfreev()_ function.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -2071,7 +2072,7 @@ finish:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] index Index of device in program.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
@@ -2090,8 +2091,8 @@ CCLDevice* ccl_program_get_device(
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return The number of devices in program or 0 if an error occurs or is
  * otherwise not possible to get any device.
  * */
@@ -2113,7 +2114,7 @@ cl_uint ccl_program_get_num_devices(CCLProgram* prg, CCLErr** err) {
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given program, or `NULL` if an error occurs.

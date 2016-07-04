@@ -578,7 +578,7 @@ static gint ccl_prof_overlap_comp(
  * @param[in] prof Profile object.
  * @param[in] cq_name Command queue name.
  * @param[in] evt Event wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * */
 static void ccl_prof_add_event(CCLProf* prof, const char* cq_name,
@@ -708,7 +708,7 @@ finish:
  * @private @memberof ccl_prof
  *
  * @param[in] prof Profile object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  */
 static void ccl_prof_process_queues(CCLProf* prof, CCLErr** err) {
@@ -1028,14 +1028,17 @@ static void ccl_prof_calc_overlaps(CCLProf* prof) {
 				ueid_curr_ev = g_hash_table_lookup(
 					prof->event_names, curr_evinst->event_name);
 				cl_uint ueid_min =
-					GPOINTER_TO_UINT(ueid_curr_ev) <= GPOINTER_TO_UINT(ueid_occu_ev)
+					GPOINTER_TO_UINT(ueid_curr_ev)
+						<= GPOINTER_TO_UINT(ueid_occu_ev)
 					? GPOINTER_TO_UINT(ueid_curr_ev)
 					: GPOINTER_TO_UINT(ueid_occu_ev);
 				cl_uint ueid_max =
-					GPOINTER_TO_UINT(ueid_curr_ev) > GPOINTER_TO_UINT(ueid_occu_ev)
+					GPOINTER_TO_UINT(ueid_curr_ev)
+						> GPOINTER_TO_UINT(ueid_occu_ev)
 					? GPOINTER_TO_UINT(ueid_curr_ev)
 					: GPOINTER_TO_UINT(ueid_occu_ev);
-				overlap_matrix[ueid_min * num_event_names + ueid_max] += eff_overlap;
+				overlap_matrix[ueid_min * num_event_names + ueid_max] +=
+					eff_overlap;
 				total_overlap += eff_overlap;
 			}
 		}
@@ -1268,7 +1271,7 @@ void ccl_prof_add_queue(
  * @public @memberof ccl_prof
  *
  * @param[in] prof A profile object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, or CL_FALSE
  * otherwise.
@@ -1833,7 +1836,7 @@ const char* ccl_prof_get_summary(
  *
  * @param[in] prof Profile object.
  * @param[out] stream Stream where export info to.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.
@@ -1919,7 +1922,7 @@ finish:
  *
  * @param[in] prof Profile object.
  * @param[in] filename Name of file where information will be saved to.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return CL_TRUE if function terminates successfully, CL_FALSE
  * otherwise.

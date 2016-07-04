@@ -101,7 +101,7 @@ static void ccl_context_release_fields(CCLContext* ctx) {
  * that a new default properties object should be created.
  * @param[in] device Reference device to build the context properties
  * for.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The properties parameter if not NULL, or a default set of
  * context properties.
@@ -175,7 +175,7 @@ finish:
  *
  * @param[in] devcon A ::CCLContext wrapper, passed as a
  * ::CCLDevContainer .
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
  * object.
@@ -238,7 +238,7 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
  * creation as well as errors that occur at runtime in this context.
  * Ignored if NULL.
  * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
@@ -311,8 +311,8 @@ finish:
  * to report information on errors during context creation as well as errors
  * that occur at runtime in this context. Ignored if NULL.
  * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
 CCL_EXPORT
@@ -403,8 +403,8 @@ finish:
  * @param[in] filter Filter used to select device(s). If `NULL`, no filter is
  * used, and the first found device(s) is selected.
  * @param[in] data Specific filter data.
- * @param[out] err Return location for a CCLErr, or `NULL` if error reporting is
- * to be ignored.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
@@ -497,7 +497,7 @@ void ccl_context_destroy(CCLContext* ctx) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * context as an integer. If an error occurs, 0 is returned.
@@ -528,7 +528,7 @@ cl_uint ccl_context_get_opencl_version(CCLContext* ctx, CCLErr** err) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLPlatform wrapper associated with the context
  * devices or `NULL` if an error occurs.
@@ -588,7 +588,7 @@ finish:
  * OpenCL version.
  * @param[out] num_image_formats Return location for number of image
  * formats in list, which will be zero if an error occurs.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A list of supported image formats, or `NULL` if an error
  * occurs. Doesn't need to be freed.
@@ -668,7 +668,7 @@ finish:
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] index Index of device in context.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
@@ -687,7 +687,7 @@ CCLDevice* ccl_context_get_device(
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The number of devices in context or 0 if an error occurs or
  * is otherwise not possible to get any device.
@@ -710,7 +710,7 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, CCLErr** err) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[in] err Return location for a CCLErr, or NULL if error
+ * @param[in] err Return location for a ::CCLErr object, or NULL if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given context, or `NULL` if an error occurs.

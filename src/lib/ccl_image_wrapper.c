@@ -70,7 +70,7 @@ struct ccl_image {
  * describes type and dimensions of the image to be allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
  * allocated by the application.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new OpenCL image object.
  * */
@@ -218,7 +218,7 @@ void ccl_image_destroy(CCLImage* img) {
  * describes type and dimensions of the image to be allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
  * allocated by the application.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
@@ -381,7 +381,7 @@ finish:
  * allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
  * allocated by the application.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of key-value pairs which
  * describe the type and dimensions of the image to be allocated.
@@ -477,7 +477,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this read command.
  * */
@@ -567,7 +567,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this write command.
  * */
@@ -654,7 +654,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -742,7 +742,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this copy command.
  * */
@@ -840,7 +840,7 @@ finish:
  * can be reused by client code.
  * @param[out] evt An event wrapper object that identifies this
  * particular map command. If NULL, no event will be returned.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
@@ -926,7 +926,7 @@ finish:
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this fill command.
  * */

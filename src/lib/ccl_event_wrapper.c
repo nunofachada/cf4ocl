@@ -327,7 +327,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
  * @public @memberof ccl_event
  *
  * @param[in] evt Event wrapper.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The command type which fired the given event or 0 if an error
  * occurs.
@@ -375,7 +375,7 @@ cl_command_type ccl_event_get_command_type(
  * @public @memberof ccl_event
  *
  * @param[in] evt An event wrapper object.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The OpenCL version of the platform associated with this
  * event object as an integer. If an error occurs, 0 is returned.
@@ -451,7 +451,7 @@ finish:
  * registered by the application.
  * @param[in] user_data Will be passed as the user_data argument when
  * pfn_notify is called.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -543,7 +543,7 @@ finish:
  * @note Requires OpenCL >= 1.1
  *
  * @param[in] ctx Context where to associate the user event.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new user event, which should be freed using
  * ccl_event_destroy().
@@ -632,7 +632,7 @@ finish:
  * @param[in] evt Event wrapper object.
  * @param[in] execution_status The new execution status to be set, can
  * be `CL_COMPLETE` or a negative integer value to indicate an error.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.
@@ -820,7 +820,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
  * @param[in,out] evt_wait_lst List of events that need to complete
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
  * otherwise.

@@ -101,7 +101,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  *
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information object. This object will
  * be automatically freed when the device wrapper object is
@@ -121,7 +121,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be
  * automatically freed when the device wrapper object is destroyed.
@@ -142,7 +142,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
- * @param[out] err Return location for a CCLErr, or `NULL` if error
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be
  * automatically freed when the device wrapper object is destroyed.
