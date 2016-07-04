@@ -139,16 +139,15 @@ Error-reporting _cf4ocl_ functions provide two methods for client-side
 error handling:
 
 1. The return value.
-2. [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)-based
-error-reporting.
+2. ::CCLErr-based error reporting.
 
 The first method consists of analysing the return value of a function.
-Error-throwing functions which return a pointer will return `NULL` if
-an error occurs. The remaining error-reporting functions return
-`CL_FALSE` if an error occurs (or `CL_TRUE` otherwise). Client code can
-check for errors by looking for `NULL` or `CL_FALSE` return values,
-depending on the function. This error handling method does not provide
-additional information about the reported error. For example:
+Error-throwing functions which return a pointer will return `NULL` if an error
+occurs. The remaining error-reporting functions return `CL_FALSE` if an error
+occurs (or `CL_TRUE` otherwise). Client code can check for errors by looking for
+`NULL` or `CL_FALSE` return values, depending on the function. This error
+handling method does not provide additional information about the reported
+error. For example:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
@@ -162,17 +161,16 @@ if (!prg) {
 }
 ~~~~~~~~~~~~~~~
 
-The second method uses the [GLib Error Reporting](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html)
-approach and is more flexible. A `GError` object is initialized to
-`NULL`, and a pointer to it is passed as the last argument to the
-function being called. If the `GError` object is still `NULL` after the
-function call, no error has occurred. Otherwise, an error occurred
-and it is possible to get a user-friendly error message:
+The second method is more flexible. A ::CCLErr object is initialized to `NULL`,
+and a pointer to it is passed as the last argument to the function being called.
+If the ::CCLErr object is still `NULL` after the function call, no error has
+occurred. Otherwise, an error occurred and it is possible to get a user-friendly
+error message:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
 CCLProgram* prg;
-GError* err = NULL;
+CCLErr* err = NULL;
 ~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~{.c}
 prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
@@ -182,7 +180,7 @@ if (err) {
 }
 ~~~~~~~~~~~~~~~
 
-An error domain and error code are also available in the `GError` object. The
+An error domain and error code are also available in the ::CCLErr object. The
 domain indicates the module or library in which the error was generated, while
 the code indicates the specific error that occurred. Three kinds of domain can
 be returned by error-reporting _cf4ocl_ functions, each of them associated with
@@ -199,7 +197,7 @@ For example, it is possible for client code to act on different OpenCL errors:
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
 CCLBuffer* buf;
-GError* err = NULL;
+CCLErr* err = NULL;
 ~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~{.c}
 buf = ccl_buffer_new(ctx, flags, size, host_ptr, &err);
@@ -225,60 +223,30 @@ if (err) {
 ~~~~~~~~~~~~~~~
 
 Finally, if client code wants to continue execution after an error was caught,
-it is mandatory to use the [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
-function to free the error object and reset its value to `NULL`. Not doing so is
-a bug, especially if more error-reporting functions are to be called moving
-forward. For example:
+it is mandatory to use the ::ccl_err_clear() function to free the error object
+and reset its value to `NULL`. Not doing so is a bug, especially if more
+error-reporting functions are to be called moving forward. For example:
 
 ~~~~~~~~~~~~~~~{.c}
 CCLContext* ctx;
 CCLProgram* prg;
-GError* err = NULL;
+CCLError* err = NULL;
 ~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~{.c}
 prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
 if (err) {
     /* Print the error message, but don't terminate program. */
     fprintf(stderr, "%s", err->message);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 }
 ~~~~~~~~~~~~~~~
 
-Even if the program terminates due to an error, the
-[g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error)
-function can be still be called to destroy the error object, avoiding memory
-leaks to be reported by tools such as [Valgrind](http://valgrind.org/).
+Even if the program terminates due to an error, the ::ccl_err_clear() function
+can be still be called to destroy the error object, avoiding memory leaks to be
+reported by tools such as [Valgrind](http://valgrind.org/).
 
-### Log messages {#ug_log}
-
-_cf4ocl_ uses the [GLib message logging framework](https://developer.gnome.org/glib/stable/glib-Message-Logging.html)
-to log messages and warnings. _cf4ocl_ log output is handled by
-[GLib's default log handler](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-default-handler),
-which outputs warnings and messages to `stderr`. If client code wishes
-to redirect this output, it can do so by specifying another
-[log function](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#GLogFunc)
-for the `cf4ocl2` log domain with
-[g_log_set_handler()](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-set-handler).
-For example:
-
-@code{.c}
-/* Log function which outputs messages to a stream specified in user_data. */
-void my_log_function(const gchar *log_domain, GLogLevelFlags log_level,
-	const gchar *message, gpointer user_data) {
-
-	g_fprintf((FILE*) user_data, "[%s](%d)>%s\n",
-		log_domain, log_level, message);
-
-}
-@endcode
-@code{.c}
-FILE* my_file;
-@endcode
-@code{.c}
-/* Add log handler for all messages from cf4ocl. */
-g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
-	my_log_function, my_file);
-@endcode
+The internals of ::CCLErr-based error handling are discussed in further detail
+in section @ref ug_deps "The GLib and OpenCL dependencies".
 
 ## Wrapper modules {#ug_wrappers}
 
@@ -649,7 +617,86 @@ the respective wrappers.
 
 ## The GLib and OpenCL dependencies {#ug_deps}
 
-TODO
+_cf4ocl_ relies heavily on its two dependencies:
+[GLib](https://developer.gnome.org/glib/stable/) and
+[OpenCL](https://www.khronos.org/opencl/). In previous versions of _cf4ocl_
+no special care was taken to shield client code from these dependencies, and in
+some cases client applications were required to link against them during the
+build process. However, developers may not wish to tackle additional libraries,
+and keeping _cf4ocl_ self-contained promotes a cleaner build process. As such,
+since version 2.1.0, client applications are not required to link against either
+GLib or OpenCL, except if they specifically wish to use the functionality
+provided by these libraries.
+
+One feature of GLib previously exposed to _cf4ocl_ client code was its
+[error reporting framework](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html),
+since _cf4ocl_ uses it for internal and external error handling. From version
+2.1.0 onwards, this framework is no longer directly exposed to client code. Two
+backward-compatible changes were implemented:
+
+* ::CCLErr directly replaces
+  [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
+  (both represent the same underlying structure).
+* ::ccl_err_clear() directly replaces (i.e., wraps)
+  [g_clear_error()](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error).
+
+Newly written client code should use the ::CCLErr class and the
+::ccl_err_clear() function in order to avoid a direct dependency on GLib.
+
+A second aspect of GLib indirectly exposed to client code is the use of its
+[pointer arrays](https://developer.gnome.org/glib/stable/glib-Pointer-Arrays.html)
+as the underlying type for the ::CCLDevSelDevices, ::CCLDevSelFilters and
+::CCLEventWaitList classes. The last two are automatically freed in typical
+client code usage, but there can be situations in which ::CCLDevSelDevices
+objects may have to be explicitly released. This is can be accomplished with the
+::ccl_devsel_devices_destroy() function, which is a wrapper for GLib's
+[g_ptr_array_free()](https://developer.gnome.org/glib/stable/glib-Pointer-Arrays.html#g-ptr-array-free)
+function. Thus, client code never needs to directly or explicitly manage GLib
+[pointer arrays](https://developer.gnome.org/glib/stable/glib-Pointer-Arrays.html).
+
+Finally, several _cf4ocl_ functions, such as ::ccl_devsel_get_device_strings(),
+return a `NULL`-terminated array of strings. Previously, these arrays were
+released using the
+[g_strfreev()](https://developer.gnome.org/glib/stable/glib-String-Utility-Functions.html#g-strfreev)
+GLib function. From version 2.1.0 onwards,  _cf4ocl_ provides the
+::ccl_strv_clear() for this purpose. In practice this function is just a wrapper
+for [g_strfreev()](https://developer.gnome.org/glib/stable/glib-String-Utility-Functions.html#g-strfreev).
+Thus, this change does not break compatibility with existing client code.
+
+## Log messages {#ug_log}
+
+_cf4ocl_ internally uses the
+[GLib message logging framework](https://developer.gnome.org/glib/stable/glib-Message-Logging.html)
+to log messages and warnings. _cf4ocl_ log output is handled by
+[GLib's default log handler](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-default-handler),
+which outputs warnings and messages to `stderr`. Debug messages are also shown
+if the `G_MESSAGES_DEBUG` environment variable is set to `cf4ocl2`. If client
+code wishes to redirect this output, it can do so by specifying another
+[log function](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#GLogFunc)
+for the `cf4ocl2` log domain with
+[g_log_set_handler()](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-set-handler).
+For example:
+
+@code{.c}
+/* Log function which outputs messages to a stream specified in user_data. */
+void my_log_function(const gchar *log_domain, GLogLevelFlags log_level,
+	const gchar *message, gpointer user_data) {
+
+	g_fprintf((FILE*) user_data, "[%s](%d)>%s\n",
+		log_domain, log_level, message);
+
+}
+@endcode
+@code{.c}
+FILE* my_file;
+@endcode
+@code{.c}
+/* Add log handler for all messages from cf4ocl. */
+g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
+	my_log_function, my_file);
+@endcode
+
+This requires the client application to be linked against GLib..
 
 @example ca.c
 @example ca.cl

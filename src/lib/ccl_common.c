@@ -46,6 +46,21 @@ void ccl_common_version_print(const char* exec_name) {
 }
 
 /**
+ * Frees a `NULL`-terminated array of strings, as well as each string it
+ * contains.
+ *
+ * @param[in] str_array A `NULL`-terminated array of strings to free.
+
+ * @see @ref ug_deps "The GLib and OpenCL dependencies".
+ * */
+CCL_EXPORT
+void ccl_strv_clear(char** str_array) {
+	g_strfreev(str_array);
+}
+
+/**
+ * Releases a ::CCLErr object and set is to `NULL`.
+ *
  * If `err` or `*err` is `NULL`, does nothing. Otherwise, releases memory
  * occupied by `*err` and sets `*err` to `NULL`.
  *

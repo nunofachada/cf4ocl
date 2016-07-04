@@ -614,20 +614,18 @@ int main() {
 Our code may be correctly implemented, but a number of OpenCL errors can still
 occur. Checking the return values of _cf4ocl_ functions allows us to determine
 that something went wrong, but not what went wrong. Fortunately, all
-error-throwing _cf4ocl_ functions accept the memory location of a
-[GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
-error handling object, usually as the last argument. If given, this object will
-be populated with an error code and an error domain, as well as an error
-message, if an error occurs. In our program we're passing `NULL` where the
-`GError` object memory location was expected, so no information about errors is
-made available to the caller. To change the way we're handling errors, we must
-first declare a `GError` object, and initialize it to `NULL`:
+error-throwing _cf4ocl_ functions accept the memory location of a ::CCLErr error
+handling object, usually as the last argument. If given, this object will be
+populated with an error code and an error domain, as well as an error message,
+if an error occurs. In our program we're passing `NULL` where the ::CCLErr
+object memory location was expected, so no information about errors is made
+available to the caller. To change the way we're handling errors, we must first
+declare a ::CCLErr object, and initialize it to `NULL`:
 
 ~~~~~~~~~~~~~~~{.c}
-
     /* Variables. */
     //...
-    GError * err = NULL;
+    CCLErr * err = NULL;
 ~~~~~~~~~~~~~~~
 
 Then, we should pass the memory location of this object to all _cf4ocl_
@@ -681,7 +679,7 @@ int main() {
     cl_uint d = SUM_CONST;
     size_t gws = VECSIZE;
     int i;
-    GError * err = NULL;
+    CCLErr * err = NULL;
 
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(&err);
@@ -848,7 +846,7 @@ int main() {
     cl_uint d = SUM_CONST;
     size_t gws = VECSIZE;
     int i;
-    GError * err = NULL;
+    CCLErr * err = NULL;
     CCLProf* prof = NULL;
 
     /* Create context with user selected device. */

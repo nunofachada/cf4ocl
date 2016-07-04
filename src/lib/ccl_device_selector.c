@@ -97,17 +97,16 @@ static void ccl_devsel_add_filter(CCLDevSelFilters* filters,
 
 /**
  * @internal
- * Returns a NULL-terminated array of strings, each one
- * containing the name and vendor of each device in the given device
- * array.
+ * Returns a `NULL`-terminated array of strings, each one containing the name
+ * and vendor of each device in the given device array.
  *
  * @param[in] devices Array of devices.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A NULL-terminated array of strings, each one containing the
- * name and vendor of each device in the device array. The array of
- * strings should be freed with the g_strfreev() function from GLib. If
- * an error occurs, NULL is returned.
+ * @return A `NULL`-terminated array of strings, each one containing the name
+ * and vendor of each device in the device array. The array of strings should be
+ * freed with the g_strfreev() function from GLib or with its _cf4ocl_ wrapper,
+ * ::ccl_strv_clear(). If an error occurs, `NULL` is returned.
  *  */
 static gchar** ccl_get_device_strings_from_array(
 	CCLDevSelDevices devices, CCLErr** err) {
@@ -440,15 +439,13 @@ void ccl_devsel_devices_destroy(CCLDevSelDevices devices) {
  * Returns a NULL-terminated array of strings, each one
  * containing the name and vendor of each device in the system.
  *
- * The array of strings should be freed with the g_strfreev() function
- * from GLib.
+ * The array of strings should be freed with the ::ccl_strv_clear() function.
  *
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A NULL-terminated array of strings, each one containing the
- * name and vendor of each device in the system. The array of strings
- * should be freed with the g_strfreev() function from GLib. If an error
- * occurs, NULL is returned.
+ * @return A NULL-terminated array of strings, each one containing the name and
+ * vendor of each device in the system. The array of strings should be freed
+ * with the ::ccl_strv_clear() function. If an error occurs, `NULL` is returned.
  * */
 CCL_EXPORT
 gchar** ccl_devsel_get_device_strings(CCLErr** err) {

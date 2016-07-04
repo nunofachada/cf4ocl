@@ -396,7 +396,7 @@ static void create_info_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Destroy the filenames string array. */
-	g_strfreev(filenames);
+	ccl_strv_clear(filenames);
 
 	/* Destroy program created with saved binary files. */
 	ccl_program_destroy(prg2);

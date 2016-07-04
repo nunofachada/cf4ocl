@@ -274,6 +274,17 @@ typedef struct ccl_platforms CCLPlatforms;
 /**
  * Error handling class.
  *
+ * This class is a wrapper for the
+ * [GError](https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#GError)
+ * structure from [GLib](https://developer.gnome.org/glib/stable/), and has the
+ * following fields:
+ *
+ * ~~~~~~~~~~~~~~~{.c}
+ * GQuark domain;
+ * int    code;
+ * char*  message;
+ * ~~~~~~~~~~~~~~~
+ *
  * @see @ref ug_errorhandle "Error handling" in _cf4ocl_.
  * @see @ref ug_deps "The GLib and OpenCL dependencies".
  */
@@ -315,6 +326,11 @@ typedef enum ccl_error_code {
 /* Print executable version. */
 CCL_EXPORT
 void ccl_common_version_print(const char* exec_name);
+
+/* Frees a `NULL`-terminated array of strings, as well as each string it
+ * contains. */
+CCL_EXPORT
+void ccl_strv_clear(char** str_array);
 
 /* If `err` or `*err` is `NULL`, does nothing. Otherwise, releases memory
  * occupied by `*err` and sets `*err` to `NULL`. */

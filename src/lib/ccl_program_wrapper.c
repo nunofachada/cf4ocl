@@ -1961,8 +1961,8 @@ finish:
  * to an array containg *n* strings, where *n* is the number of devices
  * associated with the program, obtained with the
  * ::ccl_program_get_num_devices() function. If not `NULL` the value
- * pointed to by this variable should be freed with GLib's
- * _g_strfreev()_ function.
+ * pointed to by this variable should be freed with the ::ccl_strv_clear()
+ * function.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
@@ -2041,8 +2041,8 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		g_free(file_middle);
 	}
 
-	/* Signal the end of the array with NULL, so it can be freed with
-	 * GLib's g_strfreev() function. */
+	/* Signal the end of the array with NULL, so it can be freed with GLib's
+	 * g_strfreev() function or with its cf4ocl wrapper, ccl_strv_clear(). */
 	if (filenames != NULL)
 		(*filenames)[num_devices] = NULL;
 
