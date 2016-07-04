@@ -47,7 +47,8 @@ Documentation
 Feedback and collaboration
 ==========================
 
-Download or clone _cf4ocl_, [build and install it](wiki/Build-and-install-from-source),
+Download or clone _cf4ocl_,
+[build and install it](https://github.com/fakenmc/cf4ocl/wiki/Build-and-install-from-source),
 and [code](https://github.com/fakenmc/cf4ocl/wiki/Using-cf4ocl-in-a-new-project)
 a small example, such as the one below, which shows a clean and fast way to
 create an OpenCL context with a user-selected device:
