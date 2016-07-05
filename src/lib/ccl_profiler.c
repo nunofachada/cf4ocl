@@ -300,7 +300,8 @@ static gint ccl_prof_inst_comp(
 				return sort.order ? -1 : 1;
 		/* We shouldn't get here. */
 		default:
-			g_return_val_if_reached(0);
+			g_warning("Unknown PROF_INST sort criteria/order.");
+			return 0;
 	}
 }
 
@@ -368,7 +369,8 @@ static gint ccl_prof_agg_comp(
 
 		/* We shouldn't get here. */
 		default:
-			g_return_val_if_reached(0);
+			g_warning("Unknown PROF_AGG sort criteria/order.");
+			return 0;
 	}
 
 }
@@ -479,7 +481,8 @@ static gint ccl_prof_info_comp(
 
 		/* We shouldn't get here. */
 		default:
-			g_return_val_if_reached(0);
+			g_warning("Unknown PROF_INFO sort criteria/order.");
+			return 0;
 	}
 
 }
@@ -564,7 +567,8 @@ static gint ccl_prof_overlap_comp(
 
 		/* We shouldn't get here. */
 		default:
-			g_return_val_if_reached(0);
+			g_warning("Unknown PROF_OVERLAP sort criteria/order.");
+			return 0;
 	}
 
 }
@@ -740,7 +744,7 @@ static void ccl_prof_process_queues(CCLProf* prof, CCLErr** err) {
 			(qprop & CL_QUEUE_PROFILING_ENABLE) == 0, CCL_ERROR_OTHER,
 			error_handler,
 			"%s: the '%s' queue does not have profiling enabled.",
-			G_STRLOC, (char*) cq_name);
+			CCL_STRD, (char*) cq_name);
 
 		/* Iterate over the events in current command queue. */
 		CCLEvent* evt;

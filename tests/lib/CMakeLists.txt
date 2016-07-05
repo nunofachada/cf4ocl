@@ -2,6 +2,10 @@
 remove_definitions(-DG_LOG_DOMAIN=\"${PROJECT_NAME}\")
 add_definitions(-DG_LOG_DOMAIN=\"ccl-tests\")
 
+# Remove disabling of assertions and checks for release builds
+remove_definitions("-DG_DISABLE_ASSERT")
+remove_definitions("-DG_DISABLE_CHECKS")
+
 # Put test kernel in a string to insert into test.h
 file(READ ${PROJECT_SOURCE_DIR}/tests/test_kernels/sum_full.cl
 	TEST_KERNEL_SUM_RAW HEX)

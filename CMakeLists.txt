@@ -49,6 +49,22 @@ if(MINGW)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
 endif()
 
+# Definitions for release builds
+if ((DEFINED CMAKE_BUILD_TYPE) AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+
+	# Disable assertions on release builds
+	add_definitions("-DG_DISABLE_ASSERT")
+
+elseif((DEFINED CMAKE_BUILD_TYPE) AND (CMAKE_BUILD_TYPE STREQUAL "MinSizeRel"))
+
+	# Disable assertions (e.g. g_return_if_fail) on minimum size release builds
+	add_definitions("-DG_DISABLE_ASSERT")
+
+	# Disable checks on minimum size release builds
+	add_definitions("-DG_DISABLE_CHECKS")
+
+endif()
+
 # ################################### #
 # OPTIONALLY USE LOCAL OPENCL HEADERS #
 # ################################### #
