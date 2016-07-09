@@ -501,12 +501,11 @@ functions. These accept the OpenCL object, and in turn call the
 the size in bytes of the wrapper to be created. The
 @c ccl_wrapper_new() function allocates memory for the wrapper
 (initializing this memory to zero), and keeps the OpenCL object
-(wrapping it) in the created wrapper instance. For example, the
-::ccl_kernel_new() creates the `cl_kernel` object with the
-clCreateKernel() OpenCL function, but then relies on the
-::ccl_kernel_new_wrap() function (and thus, on @c ccl_wrapper_new())
-for allocation and initialization of the new ::CCLKernel* wrapper object
-memory.
+(wrapping it) in the created wrapper instance. For example, ::ccl_kernel_new()
+creates the `cl_kernel` object with the clCreateKernel() OpenCL function, but
+then relies on the ::ccl_kernel_new_wrap() function (and thus, on
+@c ccl_wrapper_new()) for allocation and initialization of the new ::CCLKernel*
+wrapper object memory.
 
 The destruction of wrapper objects and respective memory deallocation
 is performed in a similar fashion. Each wrapper class has its own
@@ -535,7 +534,7 @@ special constructor must be released with the respective
 OpenCL objects directly with OpenCL functions, and then wrap the objects
 to take advantage of _cf4ocl_ functionality and features. The OpenCL
 object can be retrieved from its wrapper at all times with the
-respective `ccl_<class>_unwrap` method.
+respective `ccl_<class>_unwrap()` method.
 
 If `ccl_<class>_new_wrap()` functions are passed an OpenCL object which
 is already wrapped, a new wrapper will not be created. Instead, the
