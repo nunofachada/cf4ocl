@@ -79,9 +79,9 @@ projects:
 
 * [Simple OpenCL][]
 * [The OpenCL utility library][]
-* [Computing Language Utility][]
 * [OCL-MLA][]
 * [oclkit][]
+* [hiCL][]
 * [ocl-ke][]
 
 [OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
@@ -91,7 +91,7 @@ projects:
 [enhancements]: https://github.com/fakenmc/cf4ocl/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
 [Simple OpenCL]: https://github.com/morousg/simple-opencl "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
-[Computing Language Utility]: https://github.com/Computing-Language-Utility/CLU "Computing Language Utility"
 [OCL-MLA]: http://tuxfan.github.io/ocl-mla/ "OCL-MLA"
 [oclkit]: https://github.com/matze/oclkit "oclkit"
+[hiCL]: https://github.com/issamsaid/hiCL "high level OpenCL abstraction layer for scientific computing"
 [ocl-ke]: https://github.com/anyc/ocl-ke "OpenCL kernel extractor"
