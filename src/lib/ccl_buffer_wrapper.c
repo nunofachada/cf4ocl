@@ -99,7 +99,7 @@ void ccl_buffer_destroy(CCLBuffer* buf) {
  * @public @memberof ccl_buffer
  *
  * @param[in] ctx Context wrapper.
- * @param[in] flags OpenCL memory flags.
+ * @param[in] flags OpenCL memory flags as used in clCreateBuffer().
  * @param[in] size The size in bytes of the buffer memory object to be
  * allocated.
  * @param[in] host_ptr A pointer to the buffer data that may already be
