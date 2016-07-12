@@ -171,7 +171,7 @@
                                |                  Total |   1.3618e-04 |
                                -----------------------------------------
     Tot. of all events (eff.) : 3.838198e-02s
-    Total ellapsed time       : 4.295200e-02s
+    Total elapsed time        : 4.295200e-02s
     Time spent in device      : 89.36%
     Time spent in host        : 10.64%
  @endverbatim
@@ -489,7 +489,7 @@ CCL_EXPORT
 void ccl_prof_destroy(CCLProf* prof);
 
 /* Starts the global profiler timer. Only required if client
-* wishes to compare the effectively ellapsed time with the OpenCL
+* wishes to compare the effectively elapsed time with the OpenCL
 * kernels time. */
 CCL_EXPORT
 void ccl_prof_start(CCLProf* prof);

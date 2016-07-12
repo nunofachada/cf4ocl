@@ -1170,7 +1170,7 @@ void ccl_prof_destroy(CCLProf* prof) {
 
 /**
  * Starts the global profiler timer. Only required if client
- * wishes to compare the effectively ellapsed time with the OpenCL
+ * wishes to compare the effectively elapsed time with the OpenCL
  * kernels time.
  *
  * @public @memberof ccl_prof
@@ -1790,17 +1790,17 @@ const char* ccl_prof_get_summary(
 			" Event overlaps            : None\n");
 	}
 
-	/* Show total ellapsed time */
+	/* Show total elapsed time */
 	if (prof->timer) {
-		double t_ellapsed = g_timer_elapsed(prof->timer, NULL);
+		double t_elapsed = g_timer_elapsed(prof->timer, NULL);
 		g_string_append_printf(str_obj,
-			" Total ellapsed time       : %es\n", t_ellapsed);
+			" Total elapsed time        : %es\n", t_elapsed);
 		g_string_append_printf(str_obj,
 			" Time spent in device      : %.2f%%\n",
-			prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
+			prof->total_events_eff_time * 1e-9 * 100 / t_elapsed);
 		g_string_append_printf(str_obj,
 			" Time spent in host        : %.2f%%\n",
-			100 - prof->total_events_eff_time * 1e-9 * 100 / t_ellapsed);
+			100 - prof->total_events_eff_time * 1e-9 * 100 / t_elapsed);
 	}
 	g_string_append_printf(str_obj, "\n");
 

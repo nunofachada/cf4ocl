@@ -48,7 +48,7 @@ static void create_add_destroy_test() {
 	size_t buf_size = 8 * sizeof(cl_short);
 	cl_short hbuf[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 	cl_ulong duration, eff_duration;
-	double time_ellapsed;
+	double time_elapsed;
 
 	/* Create a new profile object. */
 	prof = ccl_prof_new();
@@ -102,13 +102,13 @@ static void create_add_destroy_test() {
 	g_assert_no_error(err);
 
 	/* Request some profiling information. */
-	time_ellapsed = ccl_prof_time_elapsed(prof);
+	time_elapsed = ccl_prof_time_elapsed(prof);
 	duration = ccl_prof_get_duration(prof);
 	eff_duration = ccl_prof_get_eff_duration(prof);
 
-	g_debug("Profilling time ellapsed: %lf", time_ellapsed);
-	g_debug("Profilling duration: %d", (cl_int) duration);
-	g_debug("Profilling eff. duration: %d", (cl_int) eff_duration);
+	g_debug("Profiling time elapsed: %lf", time_elapsed);
+	g_debug("Profiling duration: %d", (cl_int) duration);
+	g_debug("Profiling eff. duration: %d", (cl_int) eff_duration);
 
 	/* Destroy buffers. */
 	ccl_buffer_destroy(buf1);
