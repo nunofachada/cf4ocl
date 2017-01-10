@@ -1,3 +1,7 @@
+[![Latest release](https://img.shields.io/github/release/fakenmc/cf4ocl.svg)](https://github.com/fakenmc/cf4ocl/releases)
+[![LGPL Licence](https://img.shields.io/badge/license-LGPLv3-yellowgreen.svg)](https://opensource.org/licenses/LGPL-3.0/)
+![Supported platforms](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux%20%7C%20bsd-lightgrey.svg)
+
 News
 ====
 
