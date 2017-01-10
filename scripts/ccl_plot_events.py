@@ -74,7 +74,6 @@ import numpy
 import pylab
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import matplotlib.ticker as ticker
 
 # Check command-line arguments
 if len(sys.argv) < 2:
