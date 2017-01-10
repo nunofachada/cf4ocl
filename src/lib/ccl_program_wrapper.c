@@ -22,7 +22,7 @@
  * Implementation of a wrapper class and its methods for OpenCL program objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -345,14 +345,14 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
 
 		g_file_get_contents(
 			filenames[i], &strings[i], NULL, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	}
 
 	/* Create program from sources. */
 	prg = ccl_program_new_from_sources(ctx, count,
 		(const char**) strings, NULL, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -436,7 +436,7 @@ CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 	/* Build program from sources. */
 	program = clCreateProgramWithSource(
 		ccl_context_unwrap(ctx), count, strings, lengths, &ocl_status);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create cl_program with source (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -532,13 +532,13 @@ CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
 		bins[i] = ccl_program_binary_new_empty();
 		g_file_get_contents(filenames[i], (char**) &bins[i]->data,
 			&bins[i]->size, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 
 	/* Create program. */
 	prg = ccl_program_new_from_binaries(
 		ctx, num_devices, devs, bins, binary_status, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -647,7 +647,7 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
 		num_devices, device_list, lengths,
 		(const unsigned char**) bins_raw,
 		binary_status, &ocl_status);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create cl_program from binaries (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -734,7 +734,7 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Program creation from built-in kernels requires cf4ocl to be "
 		"deployed with support for OpenCL version 1.2 or newer.",
@@ -744,10 +744,10 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.2, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Program creation with built-in kernels requires OpenCL " \
 		"version 1.2 or newer.", CCL_STRD);
@@ -764,7 +764,7 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
 		&ocl_status);
 
 	/* Create kernel from built-in kernels. */
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create cl_program from built-in kernels "
 		"(OpenCL error %d: %s).",
@@ -879,7 +879,7 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
 		num_devices, cl_devices, options, pfn_notify, user_data);
 
 	/* Check for any other errors. */
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to build program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -956,14 +956,14 @@ const char* ccl_program_get_build_log(CCLProgram* prg, CCLErr** err) {
 
 	/* How many devices in program? */
 	num_devs = ccl_program_get_num_devices(prg, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* For each device in program: */
 	for (i = 0; i < num_devs; i++) {
 
 		/* Get the respective device wrapper. */
 		dev = ccl_program_get_device(prg, i, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Is it a valid device? */
 		if (dev) {
@@ -971,12 +971,12 @@ const char* ccl_program_get_build_log(CCLProgram* prg, CCLErr** err) {
 			/* If so, get its name. */
 			dev_name = ccl_device_get_info_array(
 				dev, CL_DEVICE_NAME, char*, &err_internal);
-			ccl_if_err_propagate_goto(err, err_internal, error_handler);
+			g_if_err_propagate_goto(err, err_internal, error_handler);
 
 			/* Get the respective build log. */
 			build_log = ccl_program_get_device_build_log(
 				prg, dev, &err_internal);
-			ccl_if_err_propagate_goto(err, err_internal, error_handler);
+			g_if_err_propagate_goto(err, err_internal, error_handler);
 
 			/* Append build log to string of concatenated build logs. */
 			g_string_append_printf(build_log_obj, "\n### Build log "
@@ -1041,7 +1041,7 @@ const char* ccl_program_get_device_build_log(
 		/* Build log for the specified device is not in cache, get it. */
 		build_log_dev = ccl_program_get_build_info_array(
 			prg, dev, CL_PROGRAM_BUILD_LOG, char*, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* If build log is not empty, keep it in build logs cache. */
 		if ((build_log_dev != NULL) && (strlen(build_log_dev) > 0)) {
@@ -1150,7 +1150,7 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Program compilation requires cf4ocl to be deployed with support "
 		"for OpenCL version 1.2 or newer.",
@@ -1160,10 +1160,10 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.2, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Program compilation requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
@@ -1195,7 +1195,7 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 		pfn_notify, user_data);
 
 	/* Check for errors. */
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to compile program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -1303,7 +1303,7 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Program linking requires cf4ocl to be deployed with support "
 		"for OpenCL version 1.2 or newer.",
@@ -1313,10 +1313,10 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.2, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Program linking requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
@@ -1345,7 +1345,7 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 		&ocl_status);
 
 	/* Check for errors. */
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to link program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -1416,14 +1416,14 @@ cl_uint ccl_program_get_opencl_version(CCLProgram* prg, CCLErr** err) {
 	/* Get cl_context object for this program. */
 	context = ccl_program_get_info_scalar(
 		prg, CL_PROGRAM_CONTEXT, cl_context, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get context wrapper. */
 	ctx = ccl_context_new_wrap(context);
 
 	/* Get OpenCL version. */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Unref. the context wrapper. */
 	ccl_context_unref(ctx);
@@ -1502,7 +1502,7 @@ CCLKernel* ccl_program_get_kernel(
 
 		/* Otherwise, get it from OpenCL program object.*/
 		krnl = ccl_kernel_new(prg, kernel_name, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Keep new kernel wrapper in table. */
 		g_hash_table_insert(prg->krnls, (gpointer) kernel_name, krnl);
@@ -1733,17 +1733,17 @@ static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
 
 	/* Get number of program devices. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 	num_devices = *((cl_uint*) info->value);
 
 	/* Get program devices. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_DEVICES, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 	devices = (cl_device_id*) info->value;
 
 	/* Get binary sizes. */
 	info = ccl_program_get_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 	binary_sizes = (size_t*) info->value;
 
 	/* Allocate memory for binaries. */
@@ -1758,7 +1758,7 @@ static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
 	ocl_status = clGetProgramInfo(ccl_program_unwrap(prg),
 		CL_PROGRAM_BINARIES, num_devices * sizeof(unsigned char*),
 		bins_raw, NULL);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to get binaries from program (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -1828,7 +1828,7 @@ CCLProgramBinary* ccl_program_get_binary(
 
 		/* Load binaries. */
 		ccl_program_load_binaries(prg, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 	}
 
 	/* Check if given device exists in the list of program devices. */
@@ -1841,7 +1841,7 @@ CCLProgramBinary* ccl_program_get_binary(
 		/* If NULL, then perform a new binary fetch on the CL program
 		 * object... */
 		ccl_program_load_binaries(prg, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* ...and get it again. If it's NULL it's because binary isn't
 		 * compiled for given device. */
@@ -1851,7 +1851,7 @@ CCLProgramBinary* ccl_program_get_binary(
 	} else {
 
 		/* Device does not exist in list of program devices. */
-		ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+		g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 			CCL_ERROR_DEVICE_NOT_FOUND,
 			error_handler, "%s: device is not part of program devices.",
 			CCL_STRD);
@@ -1907,16 +1907,16 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
 	/* Get the binary code object for the specified device and check
 	 * for associated errors. */
 	binary = ccl_program_get_binary(prg, dev, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	ccl_if_err_create_goto(*err, CCL_ERROR, binary->size == 0,
+	g_if_err_create_goto(*err, CCL_ERROR, binary->size == 0,
 		CCL_ERROR_INVALID_DATA, error_handler,
 		"%s: binary for given device has size 0.", CCL_STRD);
 
 	/* Save binary code to specified file. */
 	g_file_set_contents(filename, (const gchar*) binary->data,
 		binary->size, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If we got here, everything is OK. */
 	g_assert(err == NULL || *err == NULL);
@@ -1990,7 +1990,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 	/* Get number of devices. */
 	num_devices = ccl_program_get_num_devices(prg, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Allocate space for filenames. */
 	if (filenames != NULL)
@@ -2011,13 +2011,13 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 		/* Get next device associated with program. */
 		dev = ccl_program_get_device(prg, i, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Determine the variable part of current filename. */
 		file_middle = g_strdup(
 			ccl_device_get_info_array(
 				dev, CL_DEVICE_NAME, char*, &err_internal));
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		g_strcanon(file_middle, CCL_VALIDFILECHARS, '_');
 
@@ -2027,7 +2027,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 		/* Save current binary to file. */
 		ccl_program_save_binary(prg, dev, filename, &err_internal);
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Keep filename or free it, depending if the filenames
 		 * variable is NULL or not. */
@@ -2129,4 +2129,3 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 }
 
 /** @}*/
-

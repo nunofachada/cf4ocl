@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  *
  * */
@@ -297,7 +297,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Sub-device creation requires cf4ocl to be deployed with "
 		"support for OpenCL version 1.2 or newer.",
@@ -308,7 +308,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 	/* How many sub-devices will this partition yield? */
 	ocl_status = clCreateSubDevices(
 		ccl_device_unwrap(dev), properties, 0, NULL, &num_devs);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to determine how many sub-devices can be created " \
 		"(OpenCL error %d: %s).",
@@ -322,7 +322,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 	ocl_status = clCreateSubDevices(
 		ccl_device_unwrap(dev), properties, num_devs,
 		(cl_device_id*) subdevs, NULL);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create sub-devices (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));

@@ -20,7 +20,7 @@
  * Utility to query OpenCL platforms and devices.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -216,7 +216,7 @@ void ccl_devinfo_args_parse(int argc, char* argv[], CCLErr** err) {
 
 	/* Use context to parse command line options. */
 	g_option_context_parse(context, &argc, &argv, err);
-	ccl_if_err_goto(*err, error_handler);
+	g_if_err_goto(*err, error_handler);
 
 	/* If we get here, no need for error treatment, jump to cleanup. */
 	g_assert(*err == NULL);
@@ -534,7 +534,7 @@ int main(int argc, char* argv[]) {
 
 	/* Parse command line options. */
 	ccl_devinfo_args_parse(argc, argv, &err);
-	ccl_if_err_goto(err, error_handler);
+	g_if_err_goto(err, error_handler);
 
 	/* If version was requested, output version and exit. */
 	if (version) {
@@ -573,7 +573,7 @@ int main(int argc, char* argv[]) {
 
 			/* Get all devices in the system. */
 			devices = ccl_devsel_devices_new(&err);
-			ccl_if_err_goto(err, error_handler);
+			g_if_err_goto(err, error_handler);
 
 			/* Cycle through devices. */
 			for (guint j = 0; j < devices->len; j++) {
@@ -587,7 +587,7 @@ int main(int argc, char* argv[]) {
 
 				/* Get device name. */
 				info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
-				ccl_if_err_goto(err, error_handler);
+				g_if_err_goto(err, error_handler);
 
 				dev_name = (gchar*) info_value->value;
 
@@ -606,7 +606,7 @@ int main(int argc, char* argv[]) {
 
 			/* Get list of platform wrapper objects. */
 			platforms = ccl_platforms_new(&err);
-			ccl_if_err_goto(err, error_handler);
+			g_if_err_goto(err, error_handler);
 
 			/* Cycle through platforms. */
 			for (guint i = 0; i < ccl_platforms_count(platforms); i++) {
@@ -638,7 +638,7 @@ int main(int argc, char* argv[]) {
 					/* Skip this platform. */
 					continue;
 				}
-				ccl_if_err_goto(err, error_handler);
+				g_if_err_goto(err, error_handler);
 
 				/* Cycle through devices. */
 				for (guint j = 0; j < num_devs; j++) {
@@ -649,11 +649,11 @@ int main(int argc, char* argv[]) {
 
 					/* Get current device. */
 					d = ccl_platform_get_device(p, j, &err);
-					ccl_if_err_goto(err, error_handler);
+					g_if_err_goto(err, error_handler);
 
 					/* Get device name. */
 					info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
-					ccl_if_err_goto(err, error_handler);
+					g_if_err_goto(err, error_handler);
 
 					dev_name = (gchar*) info_value->value;
 

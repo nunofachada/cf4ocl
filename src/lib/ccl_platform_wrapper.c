@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -77,7 +77,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	/* Determine number of devices. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object,
 		CL_DEVICE_TYPE_ALL, 0, NULL, &devcon->num_devices);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get number of devices (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -89,7 +89,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
 	/* Get existing device IDs. */
 	ocl_status = clGetDeviceIDs(devcon->base.cl_object,
 		CL_DEVICE_TYPE_ALL, devcon->num_devices, info->value, NULL);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: get device IDs (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -178,7 +178,7 @@ CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, CCLErr** err) {
 	/* Get OpenCL platform_id object from device. */
 	platform_id = ccl_device_get_info_scalar(
 		dev, CL_DEVICE_PLATFORM, cl_platform_id, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Create/get the platform wrapper. */
 	platf = ccl_platform_new_wrap(platform_id);

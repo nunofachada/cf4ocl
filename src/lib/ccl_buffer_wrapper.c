@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -125,7 +125,7 @@ CCLBuffer* ccl_buffer_new(CCLContext* ctx, cl_mem_flags flags,
 	/* Create OpenCL buffer. */
 	buffer = clCreateBuffer(ccl_context_unwrap(ctx), flags, size,
 		host_ptr, &ocl_status);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create buffer (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -191,7 +191,7 @@ CCLEvent* ccl_buffer_enqueue_read(CCLBuffer* buf, CCLQueue* cq,
 		ccl_memobj_unwrap(buf), blocking_read, offset, size, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to read buffer (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -266,7 +266,7 @@ CCLEvent* ccl_buffer_enqueue_write(CCLBuffer* buf, CCLQueue* cq,
 		ccl_memobj_unwrap(buf), blocking_write, offset, size, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to write buffer (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -348,7 +348,7 @@ void* ccl_buffer_enqueue_map(CCLBuffer* buf, CCLQueue* cq,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst),
 		&event, &ocl_status);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to map buffer (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -428,7 +428,7 @@ CCLEvent* ccl_buffer_enqueue_copy(CCLBuffer* src_buf,
 		src_offset, dst_offset, size,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to write buffer (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -516,7 +516,7 @@ CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer* src_buf,
 		src_offset, dst_origin, region,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to copy buffer to image (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -597,7 +597,7 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Sub-buffers require cf4ocl to be deployed with support "
 		"for OpenCL version 1.1 or newer.",
@@ -611,10 +611,10 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.1, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: sub-buffers require OpenCL version 1.1 or newer.",
 		CCL_STRD);
@@ -622,7 +622,7 @@ CCLBuffer* ccl_buffer_new_from_region(CCLBuffer* buf,
 	/* Create the OpenCL sub-buffer. */
 	buffer = clCreateSubBuffer(ccl_memobj_unwrap(buf), flags,
 		CL_BUFFER_CREATE_TYPE_REGION, (const void*) &br, &ocl_status);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable create sub-buffer (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -732,7 +732,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Rectangular buffer read requires cf4ocl to be deployed with "
 		"support for OpenCL version 1.1 or newer.",
@@ -743,10 +743,10 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.1, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: rect. buffer reads require OpenCL version 1.1 or newer.",
 		CCL_STRD);
@@ -758,7 +758,7 @@ CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer* buf, CCLQueue* cq,
 		host_row_pitch, host_slice_pitch, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a rectangular buffer read (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -875,7 +875,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Rectangular buffer write requires cf4ocl to be deployed with "
 		"support for OpenCL version 1.1 or newer.",
@@ -886,10 +886,10 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.1, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: rect. buffer writes require OpenCL version 1.1 or newer.",
 		CCL_STRD);
@@ -901,7 +901,7 @@ CCLEvent* ccl_buffer_enqueue_write_rect(CCLBuffer* buf, CCLQueue* cq,
 		host_row_pitch, host_slice_pitch, ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a rectangular buffer write (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -1014,7 +1014,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Rectangular buffer copy requires cf4ocl to be deployed with "
 		"support for OpenCL version 1.1 or newer.",
@@ -1025,10 +1025,10 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) src_buf, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.1, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: rect. buffer copy requires OpenCL version 1.1 or newer.",
 		CCL_STRD);
@@ -1040,7 +1040,7 @@ CCLEvent* ccl_buffer_enqueue_copy_rect(CCLBuffer* src_buf,
 		dst_row_pitch, dst_slice_pitch,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a rectangular buffer copy (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -1134,7 +1134,7 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Buffer fill requires cf4ocl to be deployed with "
 		"support for OpenCL version 1.1 or newer.",
@@ -1145,10 +1145,10 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_memobj_get_opencl_version(
 		(CCLMemObj*) buf, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.2, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Buffer fill requires OpenCL version 1.2 or newer.",
 		CCL_STRD);
@@ -1158,7 +1158,7 @@ CCLEvent* ccl_buffer_enqueue_fill(CCLBuffer* buf, CCLQueue* cq,
 		ccl_memobj_unwrap(buf), pattern, pattern_size, offset, size,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to enqueue a fill buffer command (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));

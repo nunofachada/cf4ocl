@@ -27,7 +27,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -91,14 +91,14 @@ cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, CCLErr** err) {
 	/* Get cl_context object for this memory object. */
 	context = ccl_memobj_get_info_scalar(
 		mo, CL_MEM_CONTEXT, cl_context, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Get context wrapper. */
 	ctx = ccl_context_new_wrap(context);
 
 	/* Get OpenCL version. */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Unref. the context wrapper. */
 	ccl_context_unref(ctx);
@@ -161,7 +161,7 @@ CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
 		ccl_memobj_unwrap(mo), mapped_ptr,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to unmap memory object (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -238,7 +238,7 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Setting destructor callbacks requires cf4ocl to be "
 		"deployed with support for OpenCL version 1.1 or newer.",
@@ -248,10 +248,10 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 
 	/* Check that context platform is >= OpenCL 1.1 */
 	ocl_ver = ccl_memobj_get_opencl_version(mo, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.1, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: memory object destructor callbacks require OpenCL " \
 		"version 1.1 or newer.",
@@ -260,7 +260,7 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
 	/* Set destructor callback. */
 	ocl_status = clSetMemObjectDestructorCallback(ccl_memobj_unwrap(mo),
 		pfn_notify, user_data);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to set memory object destructor callback "
 		"(OpenCL error %d: %s).",
@@ -344,7 +344,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 
 	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
 	 * error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
+	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: Memory object migration requires cf4ocl to be "
 		"deployed with support for OpenCL version 1.2 or newer.",
@@ -354,10 +354,10 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 
 	/* Check that context platform is >= OpenCL 1.2 */
 	ocl_ver = ccl_memobj_get_opencl_version(mos[0], &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* If OpenCL version is not >= 1.2, throw error. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
 		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
 		"%s: memory object migration requires OpenCL version 1.2 or " \
 		"newer.",
@@ -376,7 +376,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
 		num_mos, (const cl_mem*) mem_objects, flags,
 		ccl_event_wait_list_get_num_events(evt_wait_lst),
 		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to migrate memory objects (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));

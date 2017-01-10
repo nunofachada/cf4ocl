@@ -22,7 +22,7 @@
  * Implementation of a wrapper class and its methods for OpenCL sampler objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -250,7 +250,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 
 	/* Get context platform version. */
 	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Create the OpenCL sampler object. */
 	if (ocl_ver >= 200) {
@@ -280,7 +280,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
 #endif
 
 	/* Check for errors. */
-	ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create sampler (OpenCL error %d: %s).",
 		CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -307,5 +307,3 @@ finish:
 
 
 /** @} */
-
-

@@ -22,7 +22,7 @@
  * Implementation of the methods of the abstract device container wrapper class.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -59,7 +59,7 @@ static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
 
 	/* Get device IDs. */
 	info_devs = get_devices(devcon, &err_internal);
-	ccl_if_err_propagate_goto(err, err_internal, error_handler);
+	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* Determine number of devices. */
 	devcon->num_devices = (cl_uint) (info_devs->size / sizeof(cl_device_id));
@@ -199,12 +199,12 @@ CCLDevice* ccl_dev_container_get_device(
 			devcon, get_devices, &err_internal);
 
 		/* Check for errors. */
-		ccl_if_err_propagate_goto(err, err_internal, error_handler);
+		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	}
 
 	/* Make sure device index is less than the number of devices. */
-	ccl_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices,
+	g_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices,
 		CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
 		"%s: device index (%d) out of bounds (%d devices in list).",
 		 CCL_STRD, index, devcon->num_devices);
@@ -263,4 +263,3 @@ cl_uint ccl_dev_container_get_num_devices(
 	return devcon->num_devices;
 
 }
-

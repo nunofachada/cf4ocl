@@ -23,7 +23,7 @@
  * the public API.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -65,64 +65,26 @@
 #define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
 #endif
 
-/* Macro which determines part of the information which appears in debug log
+/* The CCL_STRD macro determines which debug information appear in error
  * messages. */
 #ifndef CCL_STRD
 	#ifdef NDEBUG
+		/* If the NDEBUG macro is set, CCL_STRD will expand to a string
+		 * identifying the current code position. */
 		#define CCL_STRD G_STRFUNC
 	#else
+		/* Otherwise it will expand to a string identifying the current
+		 * function. */
 		#define CCL_STRD G_STRLOC
 	#endif
 #endif
 
-/**
- * If error is detected (`error_code != no_error_code`),
- * create an error object (CCLErr) and go to the specified label.
- *
- * @param[out] err ::CCLErr* object.
- * @param[in] quark Quark indicating the error domain.
- * @param[in] error_condition Must result to true in order to create
- * error.
- * @param[in] error_code Error code to set.
- * @param[in] label Label to goto if error is detected.
- * @param[in] msg Error message in case of error.
- * @param[in] ... Extra parameters for error message.
- * */
-#define ccl_if_err_create_goto( \
-	err, quark, error_condition, error_code, label, msg, ...) \
-	if (error_condition) { \
-		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
-		g_debug(CCL_STRD); \
-		goto label; \
-	}
+/* The error-handling macros output to the debug log the stack trace when an
+ * error occurs. This will be either the code position or function, as defined
+ * by CCL_STRD. */
+#define G_ERR_DEBUG_STR CCL_STRD
 
-/**
- * If error is detected in `err` object (`err != NULL`), go to the specified
- * label.
- *
- * @param[in] err ::CCLErr* object.
- * @param[in] label Label to goto if error is detected.
- * */
-#define ccl_if_err_goto(err, label)	\
-	if ((err) != NULL) { \
-		g_debug(CCL_STRD); \
-		goto label; \
-	}
-
-/**
- * Same as ccl_if_err_goto(), but rethrows error in a source ::CCLErr object to
- * a new destination ::CCLErr object.
- *
- * @param[out] err_dest Destination CCLErr** object.
- * @param[in] err_src Source CCLErr* object.
- * @param[in] label Label to goto if error is detected.
- * */
-#define ccl_if_err_propagate_goto(err_dest, err_src, label) \
-	if ((err_src) != NULL) { \
-		g_debug(CCL_STRD); \
-		g_propagate_error(err_dest, err_src); \
-		err_src = NULL; \
-		goto label; \
-	}
+/* Include error handling macros. */
+#include "_g_err_macros.h"
 
 #endif /* _CCL_DEFS_H_ */

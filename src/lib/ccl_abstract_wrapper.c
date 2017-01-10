@@ -23,7 +23,7 @@
  * OpenCL objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -514,11 +514,11 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 			ocl_status = CL_SUCCESS;
 #endif
 
-		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+		g_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get info [size] (OpenCL error %d: %s).",
 			CCL_STRD, ocl_status, ccl_err(ocl_status));
-		ccl_if_err_create_goto(*err, CCL_ERROR, size_ret == 0,
+		g_if_err_create_goto(*err, CCL_ERROR, size_ret == 0,
 			CCL_ERROR_INFO_UNAVAILABLE_OCL, error_handler,
 			"%s: the requested info is unavailable (info size is 0).",
 			CCL_STRD);
@@ -533,7 +533,7 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
 			: ((ccl_wrapper_info_fp2) info_fun)(wrapper1->cl_object,
 				wrapper2->cl_object, param_name, size_ret, info->value,
 				NULL);
-		ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
+		g_if_err_create_goto(*err, CCL_OCL_ERROR,
 			CL_SUCCESS != ocl_status, ocl_status, error_handler,
 			"%s: get context info [info] (OpenCL error %d: %s).",
 			CCL_STRD, ocl_status, ccl_err(ocl_status));

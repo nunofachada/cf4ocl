@@ -20,7 +20,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.in.h
 include_directories(${CMAKE_BINARY_DIR}/generated)
 
 # Set of tests which only work with the OpenCL stub
-set(TESTS_STUBONLY test_profiler_op test_error_handling)
+set(TESTS_STUBONLY test_profiler_op)
 
 # Set of tests which work with either the OpenCL stub or a real OpenCL
 # implementation
