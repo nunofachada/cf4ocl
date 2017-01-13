@@ -1,6 +1,6 @@
 /*
  * The MIT License (MIT)
- * Copyright (c) 2016 Nuno Fachada
+ * Copyright (c) 2017 Nuno Fachada
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
  * Error-handling macros for applications using Glib.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2017
  * @copyright [The MIT License (MIT)](https://opensource.org/licenses/MIT)
 */
 
