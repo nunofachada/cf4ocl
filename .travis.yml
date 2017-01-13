@@ -1,0 +1,16 @@
+language: C
+sudo: required
+dist: trusty
+compiler:
+  - gcc
+  - clang
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y -qq build-essential cmake libglib2.0-dev ocl-icd-libopencl1 bats
+script:
+  - mkdir build
+  - pushd build
+  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D  OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D TESTS_USE_OPENCL_STUB=1 ..
+  - make
+  - gtester ./tests/lib/test_*
+  - popd
