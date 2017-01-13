@@ -6,11 +6,13 @@ compiler:
   - clang
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y -qq build-essential cmake libglib2.0-dev ocl-icd-libopencl1
+  - sudo apt-get install -y -qq build-essential cmake libglib2.0-dev ocl-icd-libopencl1 opencl-headers
+  - wget http://mirrors.kernel.org/ubuntu/pool/universe/b/bats/bats_0.4.0-1ubuntu4_all.deb
+  - sudo dpkg -i bats_0.4.0-1ubuntu4_all.deb
 script:
   - mkdir build
   - pushd build
-  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D  OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D TESTS_USE_OPENCL_STUB=1 ..
-  - make
+  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D  OpenCL_LOCAL_HEADERS=1.2 -D OpenCL_USE_LOCAL_HEADERS=1 -D TESTS_USE_OPENCL_STUB=1 ..
+  - make tests
   - gtester ./tests/lib/test_*
   - popd
