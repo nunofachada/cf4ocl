@@ -1,35 +1,28 @@
 language: C
-sudo: required
-dist: trusty
-compiler:
-  - gcc
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      env: CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D OpenCL_LIBRARY=/usr/lib/x86_64-linux-gnu/libOpenCL.so.1"
+    - os: osx
+      osx_image: xcode8.2
+      env: CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0"
+
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y -qq build-essential cmake libglib2.0-dev #opencl-headers ocl-icd-libopencl1
-  - wget http://mirrors.kernel.org/ubuntu/pool/universe/b/bats/bats_0.4.0-1ubuntu4_all.deb
-  - sudo dpkg -i bats_0.4.0-1ubuntu4_all.deb
-  - wget http://mirrors.kernel.org/ubuntu/pool/main/o/ocl-icd/ocl-icd-libopencl1_2.2.9-1_amd64.deb
-  - sudo dpkg -i ocl-icd-libopencl1_2.2.9-1_amd64.deb
-  - wget http://mirrors.kernel.org/ubuntu/pool/main/k/khronos-opencl-headers/opencl-headers_2.0~svn32091-2_all.deb
-  - sudo dpkg -i opencl-headers_2.0~svn32091-2_all.deb
-  - bash .travis/amd_sdk.sh
-  - tar -xjf AMD-SDK.tar.bz2
-  - export AMDAPPSDK=${HOME}/AMDAPPSDK
-  - sudo mkdir -p /etc/OpenCL/vendors
-  - mkdir -p ${AMDAPPSDK}
-  - sh AMD-APP-SDK*.sh --tar -xf -C ${AMDAPPSDK}
-  - echo ${AMDAPPSDK}/lib/x86_64/sdk/libamdocl64.so | sudo tee /etc/OpenCL/vendors/amdocl64.icd
-  - export LD_LIBRARY_PATH=${AMDAPPSDK}/lib/x86_64:${AMDAPPSDK}/lib/x86_64/sdk:${LD_LIBRARY_PATH}
-  - sudo cat /etc/OpenCL/vendors/amdocl64.icd
+  - bash .travis/install_deps.sh
+
 script:
   - mkdir build
   - pushd build
-  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D TESTS_USE_OPENCL_STUB=0 -D OpenCL_LIBRARY=/usr/lib/x86_64-linux-gnu/libOpenCL.so.1 ..
+  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} ..
   - make
   - ./src/utils/ccl_devinfo
   - ./tests/test_all.sh
   - make clean
-  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D TESTS_USE_OPENCL_STUB=1 -D OpenCL_LIBRARY=/usr/lib/x86_64-linux-gnu/libOpenCL.so.1 ..
+  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=1 ${CMAKEOPTIONS} ..
   - make tests
   - gtester ./tests/lib/test_*
   - popd
