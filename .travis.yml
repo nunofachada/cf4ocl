@@ -1,22 +1,44 @@
 language: C
 
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "JJTfVCdQbYipAYc60EHI+HR7cb4573TMg5v3TAJLCqT3Y4C02m70cXjMLr58VklpheqlTPEv4o385z0RLeqHZ9yIiostn2SMEqBPxvdjHlLUkgVA2S9Q2HR8X2yqdmxT7jUH1+BBy0aakA7UwrYAxHGa4lpJNn9PbQmnY+IAbeKP+aVMhJT6dq2nyUiXsbdj3ugXvDlE3VHqqFaW5Lz7Z4Zq3lUXjD4Q35enbgWZZESUcv5IFKwDhBylsCpefexqRwkiU+VozEAppEWPcn0GwiWk+SxReSYlC7RVxZI1Y0cOVmt+J1lNsT/7Yn1/ebOJS+yHlvSWaDOoUOt3P0yMo5a868hFNfv2qJybljZbS3jXHu+yVK0rz7pKjqwDnQtWpIRZhhBe71isJxrd0xU6TwyHu8xcPlqgfL5A7qfgMLTem5LbnVvl6EZuVkpDLRLXQr4PxpuL3RjD2xzqQaCZxU/g/A9BGfbFg1Op+wx0Ip/YCwhetWlA7t0ohdmHwPpkonjudgs9c4zQ1dZfBw5MQS30Rp7Qd0q6tREAthxmA4ayYnH8/li0D0JTKxWv8dHW0W9ziBzpTw8p2e7Bn8hlNsfSwCAO0b6hE/EDyfbwMP2B34VSB2sMVm8Sb3A/4AOU4leAaxN01gNSVi4CP3I7+NWdwrvCwmIVpfOc0pUcToo="
+
 matrix:
   include:
     - os: linux
       dist: trusty
       sudo: required
       compiler: gcc
-      env: CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D OpenCL_LIBRARY=/usr/lib/x86_64-linux-gnu/libOpenCL.so.1"
+      env: CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D OpenCL_LIBRARY=${HOME}/AMDAPPSDK/lib/x86_64/sdk/libOpenCL.so -D OpenCL_INCLUDE_DIR=${HOME}/AMDAPPSDK/include"
+      before_install:
+        - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+        - bash .travis/install_deps.sh
+      addons:
+        apt:
+          packages:
+          - libglib2.0-dev
+        coverity_scan:
+          project:
+            name: "fakenmc/cf4ocl"
+            description: "Build submitted via Travis CI"
+          notification_email: faken@fakenmc.com
+          build_command_prepend: "cmake -G\"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} .."
+          build_command: "make"
+          branch_pattern: coverity_scan
     - os: osx
       osx_image: xcode8.2
       env: CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0"
-
-before_install:
-  - bash .travis/install_deps.sh
+      before_install:
+        - brew update
+        - brew install glib bats
 
 script:
   - mkdir build
   - pushd build
+  - echo ${CMAKEOPTIONS}
   - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} ..
   - make
   - ./src/utils/ccl_devinfo
