@@ -91,4 +91,11 @@ foreach(TEST ${TESTS})
 endforeach(TEST)
 
 # Add a target which builds all tests
-add_custom_target(tests DEPENDS ${TESTS})
+#add_custom_target(tests DEPENDS ${TESTS})
+
+add_test(
+	NAME TestAllDebug
+	COMMAND gtester ${TESTS} #${varioustests}
+	#WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/lib
+	#CONFIGURATIONS Debug
+)

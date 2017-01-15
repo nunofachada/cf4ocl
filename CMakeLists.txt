@@ -306,6 +306,7 @@ endif()
 add_subdirectory(src)
 
 # Add tests folder
+enable_testing()
 add_subdirectory(tests)
 
 # Add scripts folder
@@ -366,5 +367,3 @@ elseif(UNIX)
 endif()
 
 include (CPack)
-
-
