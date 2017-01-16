@@ -9,6 +9,9 @@ if (NOT ${BUILD_TESTS})
 	return()
 endif()
 
+# Try to find BATS for testing utilities and examples
+find_program(BATSEXEC bats)
+
 # Allow the user to specify which device to use in generic device tests
 set(TESTS_DEVICE_INDEX "0" CACHE STRING
 	"Index of device to use in generic device tests")

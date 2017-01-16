@@ -88,14 +88,8 @@ foreach(TEST ${TESTS})
 	target_link_libraries(${TEST} ${${TEST}_LIBS})
 	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
 		COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR} ${${TEST}_FLAGS}")
-endforeach(TEST)
+	add_test(NAME ${TEST} COMMAND ${TEST})
+endforeach()
 
 # Add a target which builds all tests
-#add_custom_target(tests DEPENDS ${TESTS})
-
-add_test(
-	NAME TestAllDebug
-	COMMAND gtester ${TESTS} #${varioustests}
-	#WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/lib
-	#CONFIGURATIONS Debug
-)
+add_custom_target(tests DEPENDS ${TESTS})

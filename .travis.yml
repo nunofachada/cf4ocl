@@ -42,7 +42,7 @@ script:
   - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} ..
   - make
   - ./src/utils/ccl_devinfo
-  - ./tests/test_all.sh
+  - make test
   - make clean
   - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=1 ${CMAKEOPTIONS} ..
   - make tests
