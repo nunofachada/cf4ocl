@@ -6,6 +6,9 @@ add_definitions(-DG_LOG_DOMAIN=\"ccl-tests\")
 remove_definitions("-DG_DISABLE_ASSERT")
 remove_definitions("-DG_DISABLE_CHECKS")
 
+# Library code files to be tested
+file(GLOB CODE2TEST "${CMAKE_SOURCE_DIR}/src/lib/*.c")
+
 # Put test kernel in a string to insert into test.h
 file(READ ${PROJECT_SOURCE_DIR}/tests/test_kernels/sum_full.cl
 	TEST_KERNEL_SUM_RAW HEX)
@@ -35,19 +38,7 @@ set(TESTS ${TESTS_STUBONLY} ${TESTS_OPT})
 add_subdirectory(ocl_stub)
 
 # Static cf4ocl library for tests, will use the OpenCL stub
-set(CCL_LIB_DIR "${CMAKE_SOURCE_DIR}/src/lib/ccl_")
-add_library(${PROJECT_NAME}_TESTING STATIC
-	${CCL_LIB_DIR}errors.c ${CCL_LIB_DIR}profiler.c
-	${CCL_LIB_DIR}common.c
-	${CCL_LIB_DIR}platforms.c ${CCL_LIB_DIR}kernel_arg.c
-	${CCL_LIB_DIR}device_query.c ${CCL_LIB_DIR}device_selector.c
-	${CCL_LIB_DIR}platform_wrapper.c ${CCL_LIB_DIR}device_wrapper.c
-	${CCL_LIB_DIR}context_wrapper.c ${CCL_LIB_DIR}kernel_wrapper.c
-	${CCL_LIB_DIR}program_wrapper.c ${CCL_LIB_DIR}queue_wrapper.c
-	${CCL_LIB_DIR}event_wrapper.c ${CCL_LIB_DIR}abstract_wrapper.c
-	${CCL_LIB_DIR}abstract_dev_container_wrapper.c
-	${CCL_LIB_DIR}memobj_wrapper.c ${CCL_LIB_DIR}buffer_wrapper.c
-	${CCL_LIB_DIR}image_wrapper.c ${CCL_LIB_DIR}sampler_wrapper.c)
+add_library(${PROJECT_NAME}_TESTING STATIC ${CODE2TEST})
 
 set_target_properties(${PROJECT_NAME}_TESTING PROPERTIES
 	COMPILE_FLAGS "-DCCL_STATIC_DEFINE")
@@ -88,8 +79,18 @@ foreach(TEST ${TESTS})
 	target_link_libraries(${TEST} ${${TEST}_LIBS})
 	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
 		COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR} ${${TEST}_FLAGS}")
+	# Add test to ctest
 	add_test(NAME ${TEST} COMMAND ${TEST})
 endforeach()
 
 # Add a target which builds all tests
 add_custom_target(tests DEPENDS ${TESTS})
+
+# We probably don't want this to run on every build.
+option(TESTS_COVERALLS "Generate coveralls data" OFF)
+
+if (TESTS_COVERALLS)
+	include(Coveralls)
+	coveralls_turn_on_coverage()
+	coveralls_setup("${CODE2TEST}" ON)
+endif()

@@ -6,11 +6,13 @@ if (NOT ${BUILD_TESTS})
 	unset(DOC_EXCLUDE_TESTS CACHE)
 	unset(TESTS_USE_OPENCL_STUB CACHE)
 	unset(TESTS_DEVICE_INDEX CACHE)
+	unset(TESTS_COVERALLS CACHE)
 	return()
 endif()
 
 # Try to find BATS for testing utilities and examples
 find_program(BATSEXEC bats)
+mark_as_advanced(BATSEXEC)
 
 # Allow the user to specify which device to use in generic device tests
 set(TESTS_DEVICE_INDEX "0" CACHE STRING
