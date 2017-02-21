@@ -647,7 +647,7 @@ A second aspect of GLib indirectly exposed to client code is the use of its
 as the underlying type for the ::CCLDevSelDevices, ::CCLDevSelFilters and
 ::CCLEventWaitList classes. The last two are automatically freed in typical
 client code usage, but there can be situations in which ::CCLDevSelDevices
-objects may have to be explicitly released. This is can be accomplished with the
+objects may have to be explicitly released. This can be accomplished with the
 ::ccl_devsel_devices_destroy() function, which is a wrapper for GLib's
 [g_ptr_array_free()](https://developer.gnome.org/glib/stable/glib-Pointer-Arrays.html#g-ptr-array-free)
 function. Thus, client code never needs to directly or explicitly manage GLib
