@@ -1413,7 +1413,8 @@ void ccl_prof_iter_agg_init(CCLProf* prof, int sort) {
  * @public @memberof ccl_prof
  *
  * @param[in] prof Profile object.
- * @return The next aggregate statistic instance.
+ * @return The next aggregate statistic instance or `NULL` if no more instances
+ * are left.
  * */
 CCL_EXPORT
 const CCLProfAgg* ccl_prof_iter_agg_next(CCLProf* prof) {
@@ -1471,7 +1472,8 @@ void ccl_prof_iter_info_init(CCLProf* prof, int sort) {
  * @public @memberof ccl_prof
  *
  * @param[in] prof Profile object.
- * @return The next event profiling info instance.
+ * @return The next event profiling info instance or `NULL` if no more instances
+ * are left.
  * */
 CCL_EXPORT
 const CCLProfInfo* ccl_prof_iter_info_next(CCLProf* prof) {
@@ -1530,7 +1532,8 @@ void ccl_prof_iter_inst_init(CCLProf* prof, int sort) {
  * @public @memberof ccl_prof
  *
  * @param[in] prof Profile object.
- * @return The next event instant instance.
+ * @return The next event instant instance or `NULL` if no more instances
+ * are left.
  * */
 CCL_EXPORT
 const CCLProfInst* ccl_prof_iter_inst_next(CCLProf* prof) {
@@ -1589,7 +1592,8 @@ void ccl_prof_iter_overlap_init(CCLProf* prof, int sort) {
  * @public @memberof ccl_prof
  *
  * @param[in] prof Profile object.
- * @return The next overlap instance.
+ * @return The next overlap instance or `NULL` if no more instances
+ * are left.
  * */
 CCL_EXPORT
 const CCLProfOverlap* ccl_prof_iter_overlap_next(CCLProf* prof) {
