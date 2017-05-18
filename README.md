@@ -89,6 +89,16 @@ A few OpenCL API calls, most of which introduced with OpenCL 2.1, are
 still available to client code, because _cf4ocl_ can be used simultaneously with
 raw OpenCL objects and functions.
 
+Reference
+=========
+
+* Fachada, N., Lopes, V.V., Martins, R.C., Rosa, A.C., (2017)
+cf4ocl: A C framework for OpenCL,
+[Science of Computer Programming](https://www.journals.elsevier.com/science-of-computer-programming),
+143:9–19,
+http://www.sciencedirect.com/science/article/pii/S0167642317300540
+([arXiv preprint](https://arxiv.org/abs/1609.01257))
+
 License
 =======
 
