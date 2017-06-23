@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/fakenmc/cf4ocl.svg?branch=master)](https://travis-ci.org/fakenmc/cf4ocl)
+[![Coverage Status](https://coveralls.io/repos/github/fakenmc/cf4ocl/badge.svg?branch=master)](https://coveralls.io/github/fakenmc/cf4ocl?branch=master)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/11475/badge.svg)](https://scan.coverity.com/projects/fakenmc-cf4ocl)
 [![Latest release](https://img.shields.io/github/release/fakenmc/cf4ocl.svg)](https://github.com/fakenmc/cf4ocl/releases)
 [![LGPL Licence](https://img.shields.io/badge/license-LGPLv3-yellowgreen.svg)](https://opensource.org/licenses/LGPL-3.0/)
 [![Supported platforms](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux%20%7C%20bsd-orange.svg)](https://en.wikipedia.org/wiki/Cross-platform)
@@ -95,8 +97,7 @@ Reference
 * Fachada, N., Lopes, V.V., Martins, R.C., Rosa, A.C., (2017)
 cf4ocl: A C framework for OpenCL,
 [Science of Computer Programming](https://www.journals.elsevier.com/science-of-computer-programming),
-143:9–19,
-http://www.sciencedirect.com/science/article/pii/S0167642317300540
+143:9–19, http://www.sciencedirect.com/science/article/pii/S0167642317300540
 ([arXiv preprint](https://arxiv.org/abs/1609.01257))
 
 License
