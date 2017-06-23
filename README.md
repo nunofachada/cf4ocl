@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/fakenmc/cf4ocl.svg?branch=master)](https://travis-ci.org/fakenmc/cf4ocl)
-[![Coverage Status](https://coveralls.io/repos/github/fakenmc/cf4ocl/badge.svg?branch=master)](https://coveralls.io/github/fakenmc/cf4ocl?branch=master)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11475/badge.svg)](https://scan.coverity.com/projects/fakenmc-cf4ocl)
 [![Latest release](https://img.shields.io/github/release/fakenmc/cf4ocl.svg)](https://github.com/fakenmc/cf4ocl/releases)
 [![LGPL Licence](https://img.shields.io/badge/license-LGPLv3-yellowgreen.svg)](https://opensource.org/licenses/LGPL-3.0/)

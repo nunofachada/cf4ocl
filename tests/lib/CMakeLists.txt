@@ -85,12 +85,3 @@ endforeach()
 
 # Add a target which builds all tests
 add_custom_target(tests DEPENDS ${TESTS})
-
-# We probably don't want this to run on every build.
-option(TESTS_COVERALLS "Generate coveralls data" OFF)
-
-if (TESTS_COVERALLS)
-	include(Coveralls)
-	coveralls_turn_on_coverage()
-	coveralls_setup("${CODE2TEST}" ON)
-endif()
