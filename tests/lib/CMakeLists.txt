@@ -85,3 +85,16 @@ endforeach()
 
 # Add a target which builds all tests
 add_custom_target(tests DEPENDS ${TESTS})
+
+# We don't want this to run by default
+option(TESTS_CODECOV "Generate Codecov.io data" OFF)
+
+if (TESTS_CODECOV)
+	include(CodeCoverage)
+	set(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+	setup_target_for_coverage(
+		codecov   # Name for custom target.
+		ctest    # Name of the test driver executable that runs the tests.
+		coverage # Name of output directory.
+	)
+endif()

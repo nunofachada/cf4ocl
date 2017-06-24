@@ -12,9 +12,14 @@ matrix:
       dist: trusty
       sudo: required
       compiler: gcc
-      env: CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1 -D OpenCL_LIBRARY=${HOME}/AMDAPPSDK/lib/x86_64/sdk/libOpenCL.so -D OpenCL_INCLUDE_DIR=${HOME}/AMDAPPSDK/include -D TESTS_COVERALLS=1"
+      env: CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0 -D OpenCL_USE_LOCAL_HEADERS=1
+           -D OpenCL_LIBRARY=${HOME}/AMDAPPSDK/lib/x86_64/sdk/libOpenCL.so
+           -D OpenCL_INCLUDE_DIR=${HOME}/AMDAPPSDK/include
+           -D TESTS_CODECOV=1"
       before_install:
-        - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+        - echo -n | openssl s_client -connect scan.coverity.com:443 |
+          sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' |
+          sudo tee -a /etc/ssl/certs/ca-
         - bash .travis/install_deps.sh
       addons:
         apt:
@@ -26,12 +31,16 @@ matrix:
             name: "fakenmc/cf4ocl"
             description: "Build submitted via Travis CI"
           notification_email: faken@fakenmc.com
-          build_command_prepend: "cmake -G\"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} .."
+          build_command_prepend: "cmake -G\"Unix Makefiles\"
+                                 -D CMAKE_BUILD_TYPE=Debug
+                                 -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} .."
           build_command: "make"
           branch_pattern: coverity_scan
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
     - os: osx
       osx_image: xcode8.2
-      env: CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D TESTS_COVERALLS=0"
+      env: CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D TESTS_CODECOV=0"
       before_install:
         - brew update
         - brew install glib bats
@@ -40,13 +49,15 @@ script:
   - mkdir build
   - pushd build
   - echo ${CMAKEOPTIONS}
-  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} ..
+  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug
+    -D TESTS_USE_OPENCL_STUB=0 ${CMAKEOPTIONS} ..
   - make
   - ./src/utils/ccl_devinfo
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make coveralls   ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make test          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make codecov   ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make test        ; fi
   - make clean
-  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D TESTS_USE_OPENCL_STUB=1 ${CMAKEOPTIONS} ..
+  - cmake -G"Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug
+    -D TESTS_USE_OPENCL_STUB=1 ${CMAKEOPTIONS} ..
   - make tests
   - gtester ./tests/lib/test_*
   - popd
