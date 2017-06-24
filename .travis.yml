@@ -13,8 +13,7 @@ matrix:
       sudo: required
       compiler: gcc
       env:
-        - CMAKEOPTIONS="-G\"Unix Makefiles\
-          -D OpenCL_LOCAL_HEADERS=2.0
+        - CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0
           -D OpenCL_USE_LOCAL_HEADERS=1
           -D OpenCL_LIBRARY=${HOME}/AMDAPPSDK/lib/x86_64/sdk/libOpenCL.so
           -D OpenCL_INCLUDE_DIR=${HOME}/AMDAPPSDK/include
@@ -35,7 +34,7 @@ matrix:
             name: "fakenmc/cf4ocl"
             description: "Build submitted via Travis CI"
           notification_email: faken@fakenmc.com
-          build_command_prepend: "cmake ${CMAKEOPTIONS}
+          build_command_prepend: "cmake -G\"Unix Makefiles\" ${CMAKEOPTIONS}
                                  -D TESTS_USE_OPENCL_STUB=0 .."
           build_command: "make"
           branch_pattern: coverity_scan
@@ -44,9 +43,7 @@ matrix:
     - os: osx
       osx_image: xcode8.2
       env:
-        - CMAKEOPTIONS="-G\"Unix Makefiles\
-          -D OpenCL_USE_LOCAL_HEADERS=0
-          -D CMAKE_BUILD_TYPE=Debug"
+        - CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D CMAKE_BUILD_TYPE=Debug"
         - CMAKE_TEST_TARGET=test
       before_install:
         - brew update
@@ -56,12 +53,12 @@ script:
   - mkdir build
   - pushd build
   - echo ${CMAKEOPTIONS}
-  - cmake ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=0 ..
+  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=0 ..
   - make
   - ./src/utils/ccl_devinfo
   - make ${CMAKE_TEST_TARGET}
   - make clean
-  - cmake ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=1 ..
+  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=1 ..
   - make tests
   - gtester ./tests/lib/test_*
   - popd
