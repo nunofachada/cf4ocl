@@ -23,6 +23,8 @@ include(GetVersionFromGitTag)
 include(GenerateExportHeader)
 # Auto-determine architecture
 include(TargetArch)
+# Include code coverage build type
+include(CodeCoverage)
 
 # Search for glib with pkg-config
 find_package(PkgConfig REQUIRED)
