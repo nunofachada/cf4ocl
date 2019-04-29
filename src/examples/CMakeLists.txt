@@ -13,7 +13,7 @@ else()
 	set(EXAMPLES_STRINGIFY_DEFAULT "text")
 endif()
 set(EXAMPLES_STRINGIFY ${EXAMPLES_STRINGIFY_DEFAULT}
-	CACHE 
+	CACHE
 	STRING "Example kernel stringification: hex (cross-platform, ugly) or text (requires GNU sed and awk)")
 set_property(CACHE EXAMPLES_STRINGIFY PROPERTY STRINGS "hex" "text")
 
@@ -32,20 +32,20 @@ foreach(EXAMPLE ${EXAMPLES_CL})
 	# Kernel stringification
 	if (${EXAMPLES_STRINGIFY} STREQUAL "hex")
 		# Hex stringification, cross-platform but ugly
-	
+
 		# Load kernel code into string
 		file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.cl ${EXAMPLE}_RAW HEX)
 
 		# Escape hex character codes to be recognized as such within C source
 		string(REGEX REPLACE "(..)" "\\\\x\\1" ${EXAMPLE}_KERNEL_SRC
 			${${EXAMPLE}_RAW})
-			
+
 		# Pad string with double quotes
 		set(${EXAMPLE}_KERNEL_SRC "\"${${EXAMPLE}_KERNEL_SRC}\"")
-	
+
 	else()
 		# Text stringification, better looking but requires awk and sed
-		
+
 		# Execute stringification script
 		execute_process(
 			COMMAND "${CMAKE_SOURCE_DIR}/auxbuild/stringify.sh"
@@ -53,7 +53,7 @@ foreach(EXAMPLE ${EXAMPLES_CL})
 			OUTPUT_VARIABLE ${EXAMPLE}_KERNEL_SRC)
 
 	endif()
-	
+
 	# Configure example
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE}.c
 		${CMAKE_BINARY_DIR}/examples/${EXAMPLE}.c @ONLY)
@@ -76,7 +76,7 @@ if((${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 	OR (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
 
 	set_target_properties(image_filter PROPERTIES
-		COMPILE_FLAGS "-Wno-unused-parameter -Wno-sign-compare")
+		COMPILE_FLAGS "-Wno-type-limits")
 
 endif()
 
