@@ -298,6 +298,8 @@ static gint ccl_prof_inst_comp(
 				return sort.order ? 1 : -1;
 			if (ev_inst1->type == CCL_PROF_INST_TYPE_END)
 				return sort.order ? -1 : 1;
+			g_warning("Expecting sort criteria by ID to be START or END.");
+			return 0;
 		/* We shouldn't get here. */
 		default:
 			g_warning("Unknown PROF_INST sort criteria/order.");
