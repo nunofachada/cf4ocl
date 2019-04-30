@@ -60,7 +60,6 @@ matrix:
       after_success:
         - bash <(curl -s https://codecov.io/bash)
     - os: osx
-      osx_image: xcode8.2
       env:
         - CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D CMAKE_BUILD_TYPE=Debug"
         - CMAKE_TEST_TARGET=test
