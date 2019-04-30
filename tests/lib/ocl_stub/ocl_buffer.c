@@ -34,10 +34,17 @@ clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 
 	cl_mem memobj = NULL;
 
+	cl_mem_flags valid_flags = CL_MEM_READ_WRITE | CL_MEM_WRITE_ONLY
+		| CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR | CL_MEM_ALLOC_HOST_PTR
+		| CL_MEM_COPY_HOST_PTR
+#ifdef CL_VERSION_1_2
+		| CL_MEM_HOST_WRITE_ONLY | CL_MEM_HOST_READ_ONLY | CL_MEM_HOST_NO_ACCESS
+#endif
+		;
+
 	if (context == NULL) {
 		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
-	} else if ((flags & CL_MEM_COPY_HOST_PTR & flags & CL_MEM_USE_HOST_PTR)
-		|| (flags & CL_MEM_ALLOC_HOST_PTR & flags & CL_MEM_USE_HOST_PTR)) {
+	} else if (flags & !valid_flags) {
 		seterrcode(errcode_ret, CL_INVALID_VALUE);
 	} else if (((host_ptr == NULL) && (flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))
 		|| ((host_ptr != NULL) && !(flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))) {
