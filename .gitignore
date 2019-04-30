@@ -11,3 +11,5 @@ build*/
 CMakeFiles/
 CMakeCache*
 auxbuild/*.txt
+.vscode
+.vs
