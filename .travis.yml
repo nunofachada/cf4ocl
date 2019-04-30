@@ -53,8 +53,8 @@ matrix:
             name: "fakenmc/cf4ocl"
             description: "Build submitted via Travis CI"
           notification_email: faken@fakenmc.com
-          build_command_prepend: "cmake -G\"Unix Makefiles\" ${CMAKEOPTIONS}
-                                 -D TESTS_USE_OPENCL_STUB=0 .."
+          build_command_prepend: mkdir b && cd b && cmake -G\"Unix Makefiles\"
+                                 ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=0 ..
           build_command: "make"
           branch_pattern: coverity_scan
       after_success:
