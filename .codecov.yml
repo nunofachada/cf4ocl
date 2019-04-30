@@ -1,4 +1,3 @@
-coverage:
-  ignore:
-    - "src/examples/.*"
-    - "tests/.*"
+ignore:
+  - "src/examples/.*"
+  - "tests/.*"
