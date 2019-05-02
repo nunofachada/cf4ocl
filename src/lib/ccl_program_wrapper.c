@@ -22,7 +22,7 @@
  * Implementation of a wrapper class and its methods for OpenCL program objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -1616,6 +1616,10 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 		va_end(args_va);
 		args_array[num_args] = NULL;
 
+	} else {
+
+		/* Close the variable argument list if no arguments are given. */
+		va_end(args_va);
 	}
 
 	/* Enqueue kernel using the array of arguments version of this
