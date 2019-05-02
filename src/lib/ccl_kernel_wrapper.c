@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -291,6 +291,10 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 		va_end(args_va);
 		args_array[num_args] = NULL;
 
+	} else {
+
+		/* Close the variable argument list if no arguments are given. */
+		va_end(args_va);
 	}
 
 	/* If any arguments are given... */
@@ -566,6 +570,10 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 		va_end(args_va);
 		args_array[num_args] = NULL;
 
+	} else {
+
+		/* Close the variable argument list if no arguments are given. */
+		va_end(args_va);
 	}
 
 	/* Set kernel arguments and run it. */
