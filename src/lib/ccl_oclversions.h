@@ -147,6 +147,8 @@
 	#define CL_COMMAND_SVM_UNMAP                        0x120D
 	/* cl_device_info */
 	#define CL_DEVICE_QUEUE_ON_HOST_PROPERTIES              0x102A
+	#define CL_DEVICE_IMAGE_PITCH_ALIGNMENT                 0x104A
+	#define CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT          0x104B
 	#define CL_DEVICE_MAX_READ_WRITE_IMAGE_ARGS             0x104C
 	#define CL_DEVICE_MAX_GLOBAL_VARIABLE_SIZE              0x104D
 	#define CL_DEVICE_QUEUE_ON_DEVICE_PROPERTIES            0x104E
