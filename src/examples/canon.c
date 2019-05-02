@@ -17,10 +17,10 @@
 
 /**
  * @file
- * Cannonical example of how to use _cf4ocl_.
+ * Canonical example of how to use _cf4ocl_.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -28,7 +28,7 @@
  * Description
  * -----------
  *
- * Cannonical example of how to use _cf4ocl_. Performs an element-wise sum of
+ * Canonical example of how to use _cf4ocl_. Performs an element-wise sum of
  * two vectors, also adding a constant.
  *
  * Optional command-line arguments:
@@ -76,11 +76,14 @@ int main(int argc, char** argv) {
 	/* Check if a device was specified in the command line. */
 	if (argc >= 2) {
 		dev_idx = atoi(argv[1]);
+		if (dev_idx < 0) ERROR_MSG_AND_EXIT("Device ID must be >= 0");
 	}
 
 	/* Check if a new buffer size was specified in the command line. */
 	if (argc >= 3) {
-		buf_n = atoi(argv[2]);
+		int ibuf_n = atoi(argv[2]);
+		if (ibuf_n < 1) ERROR_MSG_AND_EXIT("Buffer size must be > 0");
+		buf_n = ibuf_n;
 	}
 
 	/* Wrappers. */
