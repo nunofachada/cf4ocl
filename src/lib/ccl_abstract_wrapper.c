@@ -638,7 +638,8 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @return The requested information size. If an error occurs, a size of
  * `min_size` is returned.
  * */
-size_t CCL_EXPORT ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
+CCL_EXPORT
+size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
 	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
 	CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
 
