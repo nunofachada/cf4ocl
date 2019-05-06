@@ -81,9 +81,8 @@ int main(int argc, char** argv) {
 
 	/* Check if a new buffer size was specified in the command line. */
 	if (argc >= 3) {
-		int ibuf_n = atoi(argv[2]);
-		if (ibuf_n < 1) ERROR_MSG_AND_EXIT("Buffer size must be > 0");
-		buf_n = ibuf_n;
+		buf_n = atoi(argv[2]);
+		if (buf_n < 1) ERROR_MSG_AND_EXIT("Buffer size must be > 0");
 	}
 
 	/* Wrappers. */
