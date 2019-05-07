@@ -290,7 +290,7 @@ void ccl_c_kernel_info_show(
 
 	/* Show CL_KERNEL_COMPILE_WORK_GROUP_SIZE information. */
 	k_compile_wg_size = ccl_kernel_get_workgroup_info_array(krnl, dev,
-		CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t*, &err_internal);
+		CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t, &err_internal);
 	if (ccl_c_info_unavailable(err_internal)) {
 		g_clear_error(&err_internal);
 		g_printf("   - WG size in __attribute__ qualifier      : N/A\n");
