@@ -53,7 +53,10 @@ clCreateCommandQueueWithProperties(cl_context context,
 
 	cl_queue_properties final_properties = 0;
 
-	if (properties) final_properties = *properties;
+	/* Use only CL_QUEUE_PROPERTIES properties if they are available in the
+	 * first slot of the properties array. */
+	if (properties && properties[0] == CL_QUEUE_PROPERTIES)
+		final_properties = properties[1];
 
 	CCL_BEGIN_IGNORE_DEPRECATIONS
 	return clCreateCommandQueue(

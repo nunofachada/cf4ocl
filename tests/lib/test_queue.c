@@ -44,9 +44,10 @@ static void create_info_destroy_test() {
 	CCLQueue* cq = NULL;
 	cl_command_queue command_queue = NULL;
 	CCLErr* err = NULL;
-	cl_command_queue_properties prop;
+	cl_command_queue_properties prop_probed, prop_used;
+	cl_command_queue_properties prop_base = CL_QUEUE_PROFILING_ENABLE;
 	const cl_queue_properties prop_full[] =
-		{ CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0 };
+		{ CL_QUEUE_PROPERTIES, prop_base, 0 };
 	cl_int ocl_status;
 
 	/* Get the test context with the pre-defined device. */
@@ -57,28 +58,36 @@ static void create_info_destroy_test() {
 	dev = ccl_context_get_device(ctx, 0, &err);
 	g_assert_no_error(err);
 
-	/* Test three ways to create a queue. */
-	for (cl_uint i = 0; i < 3; ++i) {
+	/* Test four ways to create a queue. */
+	for (cl_uint i = 0; i < 4; ++i) {
 
 		/* Create command queue wrapper. */
 		switch (i) {
 			case 0:
 				/* The regular way. */
-				cq = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE,
-					&err);
+				prop_used = prop_base;
+				cq = ccl_queue_new(ctx, dev, prop_base, &err);
 				g_assert_no_error(err);
 				break;
 			case 1:
 				/* Using the "full" constructor. */
+				prop_used = prop_base;
 				cq = ccl_queue_new_full(ctx, dev, prop_full, &err);
 				g_assert_no_error(err);
 				break;
 			case 2:
+				/* Using the "full" constructor with NULL properties. */
+				prop_used = 0;
+				cq = ccl_queue_new_full(ctx, dev, NULL, &err);
+				g_assert_no_error(err);
+				break;
+			case 3:
 				/* Using the "wrap" constructor. */
+				prop_used = prop_base;
 				CCL_BEGIN_IGNORE_DEPRECATIONS
 				command_queue = clCreateCommandQueue(
 					ccl_context_unwrap(ctx), ccl_device_unwrap(dev),
-					CL_QUEUE_PROFILING_ENABLE, &ocl_status);
+					prop_base, &ocl_status);
 				g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
 				CCL_END_IGNORE_DEPRECATIONS
 				cq = ccl_queue_new_wrap(command_queue);
@@ -114,10 +123,10 @@ static void create_info_destroy_test() {
 		g_assert_cmphex(
 			GPOINTER_TO_UINT(dev), ==, GPOINTER_TO_UINT(dev_aux));
 
-		prop = ccl_queue_get_info_scalar(
+		prop_probed = ccl_queue_get_info_scalar(
 			cq, CL_QUEUE_PROPERTIES, cl_command_queue_properties, &err);
 		g_assert_no_error(err);
-		g_assert_cmphex(prop, ==, CL_QUEUE_PROFILING_ENABLE);
+		g_assert_cmphex(prop_probed, ==, prop_used);
 
 		/* Destroy queue. */
 		ccl_queue_destroy(cq);
