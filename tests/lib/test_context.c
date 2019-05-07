@@ -21,7 +21,7 @@
  * device selection filters, device wrappers and platform wrappers.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -186,7 +186,7 @@ static void create_info_destroy_test() {
 	 * that it corresponds to the cl_device_id with which the context
 	 * was created. */
 	d_ids = ccl_context_get_info_array(
-		ctx, CL_CONTEXT_DEVICES, cl_device_id*, &err);
+		ctx, CL_CONTEXT_DEVICES, cl_device_id, &err);
 	g_assert_no_error(err);
 	g_assert(d_ids[0] == d_id);
 

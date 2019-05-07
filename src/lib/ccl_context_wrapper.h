@@ -22,7 +22,7 @@
  * Definition of a wrapper class and its methods for OpenCL context objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -386,7 +386,8 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested context information value. This value will be
@@ -394,7 +395,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_context_get_info_array(ctx, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
 		NULL, param_name, sizeof(param_type), \
 		CCL_INFO_CONTEXT, CL_FALSE, err)
 /**
