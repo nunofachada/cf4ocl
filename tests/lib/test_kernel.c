@@ -122,7 +122,7 @@ static void create_info_destroy_test() {
 		/* Get kernel function name from kernel info, compare it with the
 		 * expected value. */
 		krnl_name = ccl_kernel_get_info_array(
-			krnl, CL_KERNEL_FUNCTION_NAME, char*, &err);
+			krnl, CL_KERNEL_FUNCTION_NAME, char, &err);
 		g_assert_no_error(err);
 		g_assert_cmpstr(krnl_name, ==, CCL_TEST_KERNEL_NAME);
 
@@ -754,7 +754,7 @@ static void args_test() {
 	/* Get kernel function name from kernel info, compare it with the
 	 * expected value. */
 	krnl_name = ccl_kernel_get_info_array(
-		krnl, CL_KERNEL_FUNCTION_NAME, char*, &err);
+		krnl, CL_KERNEL_FUNCTION_NAME, char, &err);
 	g_assert_no_error(err);
 	g_assert_cmpstr(krnl_name, ==, CCL_TEST_KERNEL_ARGS_NAME);
 

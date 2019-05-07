@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -227,7 +227,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in the array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel information value. This value will be
@@ -235,7 +236,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_kernel_get_info_array(krnl, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
 		NULL, (param_name), sizeof(param_type), \
 		CCL_INFO_KERNEL, CL_FALSE, (err))
 
