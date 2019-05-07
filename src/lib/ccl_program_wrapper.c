@@ -1962,7 +1962,7 @@ finish:
  * @param[out] filenames Location where to place array of strings
  * containing the saved binaries filenames, or `NULL` if this
  * information is not required. If not `NULL` this variable will point
- * to an array containg *n* strings, where *n* is the number of devices
+ * to an array containing *n* strings, where *n* is the number of devices
  * associated with the program, obtained with the
  * ::ccl_program_get_num_devices() function. If not `NULL` the value
  * pointed to by this variable should be freed with the ::ccl_strv_clear()
@@ -1998,7 +1998,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 
 	/* Allocate space for filenames. */
 	if (filenames != NULL)
-		*filenames = g_malloc((num_devices + 1) * sizeof(char**));
+		*filenames = g_malloc((num_devices + 1) * sizeof(char *));
 
 	/* Allocate space for*/
 	/* Cycle through each device. */
