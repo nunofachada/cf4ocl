@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -327,7 +327,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  *
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in the array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested image information value. This value will be
@@ -335,7 +336,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_image_get_info_array(img, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) img, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) img, \
 		NULL, param_name, sizeof(param_type), CCL_INFO_IMAGE, CL_FALSE, err)
 
 /**
