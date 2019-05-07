@@ -49,7 +49,7 @@
  * Output formatting function.
  *
  * @param[in] info CL device information bitfield.
- * @param[out] out Char buffer (pre-allocated) were to write formatted
+ * @param[out] out Char buffer (pre-allocated) where to write formatted
  * output.
  * @param[in] size Maximum output length.
  * @param[in] units Parameter units suffix.
@@ -73,7 +73,6 @@ typedef struct ccl_devquery_map {
 	 * CL device information bitfield.
 	 * @public
 	 * */
-
 	const cl_device_info device_info;
 
 	/**

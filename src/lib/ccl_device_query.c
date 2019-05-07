@@ -77,7 +77,8 @@ static char* ccl_devquery_format_hex(CCLWrapperInfo* info,
 static char* ccl_devquery_format_sizet(CCLWrapperInfo* info,
 	char* out, size_t size, const char* units) {
 
-	g_snprintf(out, (gulong) size, "%lu %s", (gulong) *((size_t*) info->value), units);
+	g_snprintf(
+		out, (gulong) size, "%lu %s", (gulong) *((size_t*) info->value), units);
 	return out;
 
 }
@@ -277,10 +278,11 @@ static char* ccl_devquery_format_locmemtype(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_local_mem_type lmt =
 		*((cl_device_local_mem_type*) info->value);
-	g_snprintf(out, (gulong) size, "%s%s%s",
-		lmt & CL_LOCAL ? "LOCAL" : "",
-		lmt & CL_GLOBAL ? "GLOBAL" : "",
-		lmt & CL_NONE ? "NONE" : "");
+	g_snprintf(out, (gulong) size, "%s",
+		lmt == CL_LOCAL ? "LOCAL" :
+		lmt == CL_GLOBAL ? "GLOBAL" :
+		lmt == CL_NONE ? "NONE" :
+		"");
 	return out;
 }
 
@@ -413,10 +415,11 @@ static char* ccl_devquery_format_cachetype(CCLWrapperInfo* info,
 	CCL_UNUSED(units);
 	cl_device_mem_cache_type mct =
 		*((cl_device_mem_cache_type*) info->value);
-	g_snprintf(out, (gulong) size, "%s%s%s",
-		mct & CL_READ_ONLY_CACHE ? "READ_ONLY" : "",
-		mct & CL_READ_WRITE_CACHE ? "READ_WRITE" : "",
-		mct & CL_NONE ? "NONE" : "");
+	g_snprintf(out, (gulong) size, "%s",
+		mct == CL_READ_ONLY_CACHE ? "READ_ONLY" :
+		mct == CL_READ_WRITE_CACHE ? "READ_WRITE" :
+		mct == CL_NONE ? "NONE" :
+		"");
 	return out;
 }
 
