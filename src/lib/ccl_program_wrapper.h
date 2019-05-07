@@ -457,27 +457,28 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 /**
  * Macro which returns an array program information value. To get
  * the program binaries use the ::ccl_program_get_binary() function
- * instead, as this macro will return NULL when the CL_PROGRAM_BINARIES
+ * instead, as this macro will return `NULL` when the `CL_PROGRAM_BINARIES`
  * parameter is requested.
  *
- * Use with care. In case an error occurs, NULL is returned, which
- * might be ambiguous if NULL is a valid return value. In this case, it
+ * Use with care. In case an error occurs, `NULL` is returned, which
+ * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested program information value. This value will be
  * automatically freed when the program wrapper object is destroyed.
- * If an error occurs or if the CL_PROGRAM_BINARIES parameter is
- * requested, NULL is returned.
+ * If an error occurs or if the `CL_PROGRAM_BINARIES` parameter is
+ * requested, `NULL` is returned.
  * */
 #define ccl_program_get_info_array(prg, param_name, param_type, err) \
 	(param_name == CL_PROGRAM_BINARIES) \
 	? NULL \
-	: (param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+	: (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) prg, \
 		NULL, param_name, sizeof(param_type), \
 		CCL_INFO_PROGRAM, CL_FALSE, err)
 
@@ -523,23 +524,24 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
 /**
  * Macro which returns an array program build information value.
  *
- * Use with care. In case an error occurs, NULL is returned, which
- * might be ambiguous if NULL is a valid return value. In this case, it
+ * Use with care. In case an error occurs, `NULL` is returned, which
+ * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested program build information value. This value
  * will be automatically freed when the program wrapper object is
- * destroyed. If an error occurs, NULL is returned.
+ * destroyed. If an error occurs, `NULL` is returned.
  * */
 #define ccl_program_get_build_info_array(prg, dev, param_name, \
 	param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) prg, \
 		(CCLWrapper*) dev, param_name, sizeof(param_type), \
 		CCL_INFO_PROGRAM_BUILD, CL_FALSE, err)
 

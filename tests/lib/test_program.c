@@ -416,7 +416,7 @@ static void create_info_destroy_test() {
 	g_assert_cmphex(GPOINTER_TO_UINT(d), ==, GPOINTER_TO_UINT(d2));
 
 	cl_device_id* devices = ccl_program_get_info_array(
-		prg2, CL_PROGRAM_DEVICES, cl_device_id*, &err);
+		prg2, CL_PROGRAM_DEVICES, cl_device_id, &err);
 	g_assert_no_error(err);
 	g_assert_cmphex(GPOINTER_TO_UINT(devices[0]),
 		==, GPOINTER_TO_UINT(ccl_device_unwrap(d)));
