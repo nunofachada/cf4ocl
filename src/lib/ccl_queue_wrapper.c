@@ -183,7 +183,7 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 			/* Check if current property name is known in OpenCL <= 1.2. */
 			if (prop_full[i] == CL_QUEUE_PROPERTIES) {
 
-				/* Yes, current property name (CL_QUEUE_PROPERTIES) is know in
+				/* Yes, current property name (CL_QUEUE_PROPERTIES) is known in
 				 * OpenCL <= 1.2. */
 				properties = prop_full[i + 1];
 
@@ -275,7 +275,7 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 
 #endif
 
-	/* Check for erros in queue creation. */
+	/* Check for errors in queue creation. */
 	g_if_err_create_goto(*err, CCL_OCL_ERROR,
 		CL_SUCCESS != ocl_status, ocl_status, error_handler,
 		"%s: unable to create queue (OpenCL error %d: %s).",

@@ -43,7 +43,6 @@ clCreateCommandQueue(cl_context context, cl_device_id device,
 	queue->ref_count = 1;
 
 	return queue;
-
 }
 
 #ifdef CL_VERSION_2_0
@@ -52,11 +51,14 @@ clCreateCommandQueueWithProperties(cl_context context,
 	cl_device_id device, const cl_queue_properties* properties,
 	cl_int* errcode_ret) {
 
-	CCL_BEGIN_IGNORE_DEPRECATIONS
-	return clCreateCommandQueue(context, device, *properties,
-		errcode_ret);
-	CCL_END_IGNORE_DEPRECATIONS
+	cl_queue_properties final_properties = 0;
 
+	if (properties) final_properties = *properties;
+
+	CCL_BEGIN_IGNORE_DEPRECATIONS
+	return clCreateCommandQueue(
+		context, device, final_properties, errcode_ret);
+	CCL_END_IGNORE_DEPRECATIONS
 }
 #endif
 
