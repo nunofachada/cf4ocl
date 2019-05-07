@@ -20,15 +20,12 @@
  * OpenCL program stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include "ocl_env.h"
 #include "utils.h"
-
-#ifdef CL_VERSION_1_2
-#endif
 
 static cl_program clCreateProgram(cl_context context,
 	cl_uint num_devices, const cl_device_id* device_list, char* source,
@@ -55,9 +52,9 @@ static cl_program clCreateProgram(cl_context context,
 	program->binary_type = g_slice_alloc0(
 		program->num_devices * sizeof(cl_program_binary_type));
 #endif
-	if (binaries != NULL) {
+	if (binaries != NULL && lengths != NULL) {
 		for (cl_uint i = 0; i < program->num_devices; ++i) {
-			if ((binaries[i] != NULL) && (lengths[i] > 0)) {
+			if (binaries[i] != NULL && lengths[i] > 0) {
 				program->binaries[i] = (unsigned char*)
 					g_strndup((const char*) binaries[i], lengths[i]);
 #ifdef CL_VERSION_1_2
@@ -205,7 +202,6 @@ clRetainProgram(cl_program program) {
 
 	g_atomic_int_inc(&program->ref_count);
 	return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
