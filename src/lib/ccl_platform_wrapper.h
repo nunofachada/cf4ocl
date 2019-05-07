@@ -22,7 +22,7 @@
  * Definition of a wrapper class and its methods for OpenCL platform objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -167,7 +167,8 @@ cl_uint ccl_platform_get_opencl_version(
  *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested platform information value. This value will be
@@ -175,14 +176,14 @@ cl_uint ccl_platform_get_opencl_version(
  * If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info_array(platf, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) platf, \
 		NULL, param_name, sizeof(param_type), \
 		CCL_INFO_PLATFORM, CL_FALSE, err)
 
 /**
  * Helper macro which gets a platform information string. This
  * macro simply wraps the ccl_platform_get_info_array() macro, because
- * (as of OpenCL 2.0) all platform information return types are char*.
+ * (as of OpenCL 2.0) all platform information return types are `char *`.
  *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
@@ -193,7 +194,7 @@ cl_uint ccl_platform_get_opencl_version(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info_string(platf, param_name, err) \
-	ccl_platform_get_info_array(platf, param_name, char*, err)
+	ccl_platform_get_info_array(platf, param_name, char, err)
 
 /**
  * Increase the reference count of the platform wrapper object.
