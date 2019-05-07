@@ -22,7 +22,7 @@
  * Definition of a wrapper class and its methods for OpenCL queue objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -187,13 +187,14 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 /**
  * Macro which returns an array command queue information value.
  *
- * Use with care. In case an error occurs, NULL is returned, which
- * might be ambiguous if NULL is a valid return value. In this case, it
+ * Use with care. In case an error occurs, `NULL` is returned, which
+ * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested command queue information value. This value
@@ -201,7 +202,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_queue_get_info_array(cq, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) cq, \
 		NULL, param_name, sizeof(param_type), CCL_INFO_QUEUE, CL_FALSE, err)
 
 /**
