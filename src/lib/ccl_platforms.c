@@ -23,7 +23,7 @@
  * available in the system and respective methods.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -132,11 +132,9 @@ error_handler:
 	/* If we got here there was an error, verify that it is so. */
 	g_assert(err == NULL || *err != NULL);
 
-	/* Destroy the CCLPlatforms object, or what was possible to build
-	 * of it. */
-	if (platforms) {
-		ccl_platforms_destroy(platforms);
-	}
+	/* Destroy the CCLPlatforms object (no need to check for NULL since to get
+	 * here, the object must have been created). */
+	ccl_platforms_destroy(platforms);
 
 	/* Set platforms to NULL, indicating an error occurred.*/
 	platforms = NULL;
