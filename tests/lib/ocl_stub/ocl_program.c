@@ -226,7 +226,7 @@ clReleaseProgram(cl_program program) {
 					g_free(program->build_options[i]);
 			}
 			g_slice_free1(
-				program->num_devices * sizeof(char**),
+				program->num_devices * sizeof(char *),
 				program->build_options);
 		}
 		if (program->build_log != NULL) {
@@ -235,7 +235,7 @@ clReleaseProgram(cl_program program) {
 					g_free(program->build_log[i]);
 			}
 			g_slice_free1(
-				program->num_devices * sizeof(char**),
+				program->num_devices * sizeof(char *),
 				program->build_log);
 		}
 		/* Free binaries. */
