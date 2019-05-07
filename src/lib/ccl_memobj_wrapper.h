@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -140,7 +140,8 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  *
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested memory object information value. This value will be
@@ -148,7 +149,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_memobj_get_info_array(mo, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) mo, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) mo, \
 		NULL, param_name, sizeof(param_type), CCL_INFO_MEMOBJ, CL_FALSE, err)
 
 /**

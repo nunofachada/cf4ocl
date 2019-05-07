@@ -236,7 +236,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_kernel_get_info_array(krnl, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper*) (krnl), \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) (krnl), \
 		NULL, (param_name), sizeof(param_type), \
 		CCL_INFO_KERNEL, CL_FALSE, (err))
 
