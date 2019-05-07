@@ -20,7 +20,7 @@
  * Test the device wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -77,7 +77,7 @@ static void sub_devices_test() {
 
 	/* Get device partition properties. */
 	dpp = ccl_device_get_info_array(pdev, CL_DEVICE_PARTITION_PROPERTIES,
-		cl_device_partition_property*, &err);
+		cl_device_partition_property, &err);
 
 	/* Make sure device is partitionable. */
 	if ((err != NULL) && (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)

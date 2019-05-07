@@ -23,7 +23,7 @@
  * and associated devices.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -131,7 +131,7 @@ static gchar** ccl_get_device_strings_from_array(
 
 		/* Get device name. */
 		gchar* name = ccl_device_get_info_array(
-				devices->pdata[i], CL_DEVICE_NAME, char*, &err_internal);
+				devices->pdata[i], CL_DEVICE_NAME, char, &err_internal);
 		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* Get device platform wrapper. */
@@ -850,7 +850,7 @@ cl_bool ccl_devsel_indep_string(
 
 	/* Compare with device name. */
 	complt_info = ccl_device_get_info_array(
-		dev, CL_DEVICE_NAME, char*, &err_internal);
+		dev, CL_DEVICE_NAME, char, &err_internal);
 	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	complt_info_lowr = g_ascii_strdown(complt_info, -1);
@@ -863,7 +863,7 @@ cl_bool ccl_devsel_indep_string(
 
 		/* Compare with device vendor. */
 		complt_info = ccl_device_get_info_array(
-			dev, CL_DEVICE_VENDOR, char*, &err_internal);
+			dev, CL_DEVICE_VENDOR, char, &err_internal);
 		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		complt_info_lowr = g_ascii_strdown(complt_info, -1);

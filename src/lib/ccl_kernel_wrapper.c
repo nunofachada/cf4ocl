@@ -947,7 +947,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
 
 	/* Get max. work item sizes for device. */
 	max_wi_sizes = ccl_device_get_info_array(
-		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err_internal);
+		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err_internal);
 	g_if_err_propagate_goto(err, err_internal, error_handler);
 
 	/* For each dimension, if the user specified a maximum local work

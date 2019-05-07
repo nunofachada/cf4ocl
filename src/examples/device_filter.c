@@ -20,7 +20,7 @@
  * Example program which demonstrates device selection using filters.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
 			printf("%d devices were accepted by the filters:\n", devices->len);
 			for (unsigned int i = 0; i < devices->len; ++i) {
 				dev_name = ccl_device_get_info_array(
-					devices->pdata[i], CL_DEVICE_NAME, char*, &err);
+					devices->pdata[i], CL_DEVICE_NAME, char, &err);
 				HANDLE_ERROR(err);
 				printf("\t%d - %s\n", i + 1, dev_name);
 			} /* For */

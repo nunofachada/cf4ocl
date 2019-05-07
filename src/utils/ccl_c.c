@@ -20,7 +20,7 @@
  * Utility for offline compilation and linking of OpenCL kernels.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -601,7 +601,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		/* Get and show device name. */
-		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, &err);
+		dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char, &err);
 		g_if_err_goto(err, error_handler);
 		g_printf("* Device                 : %s\n", dname);
 

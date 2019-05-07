@@ -21,7 +21,7 @@
  * device wrapper classes.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -527,7 +527,8 @@ static void create_info_destroy_test() {
 				ccl_info_array(info, char*));
 
 			/* Special check for info_value_array macro. */
-			info_check_array = ccl_device_get_info_array(d, CL_DEVICE_VENDOR, char*, &err);
+			info_check_array =
+				ccl_device_get_info_array(d, CL_DEVICE_VENDOR, char, &err);
 			ccl_test_platforms_check_error(&err);
 			g_assert_cmpstr((char*) info->value, ==, info_check_array);
 

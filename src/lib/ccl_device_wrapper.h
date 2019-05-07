@@ -141,7 +141,8 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  *
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
+ * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested device information value. This value will be
@@ -149,7 +150,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_device_get_info_array(dev, param_name, param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
+	(param_type*) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
 		NULL, param_name, sizeof(param_type), \
 		CCL_INFO_DEVICE, CL_FALSE, err)
 

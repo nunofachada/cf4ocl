@@ -20,7 +20,7 @@
  * Test the kernel wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -382,7 +382,7 @@ static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
 
 	/* Max device workitem sizes. */
 	size_t* max_wisizes = ccl_device_get_info_array(
-		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t*, &err);
+		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err);
 	g_assert_no_error(err);
 
 	/* Suggested work group size. */

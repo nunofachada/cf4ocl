@@ -23,7 +23,7 @@
  * objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  *
  * */
@@ -181,6 +181,7 @@ void ccl_device_destroy(CCLDevice* dev) {
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @param[in] dev The device wrapper object.
@@ -201,8 +202,7 @@ cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
 	cl_uint ver = 0;
 
 	/* Get version string which has the format "OpenCL x.x ..." */
-	ver_str = ccl_device_get_info_array(
-		dev, CL_DEVICE_VERSION, char*, err);
+	ver_str = ccl_device_get_info_array(dev, CL_DEVICE_VERSION, char, err);
 
 	if (ver_str != NULL) {
 		ver = /* strlen("OpenCL ") == 7 */
@@ -243,7 +243,7 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
 
 	/* Get version string which has the format "OpenCL C x.x ..." */
 	ver_str = ccl_device_get_info_array(
-		dev, CL_DEVICE_OPENCL_C_VERSION, char*, err);
+		dev, CL_DEVICE_OPENCL_C_VERSION, char, err);
 
 	if (ver_str != NULL) {
 		ver = /* strlen("OpenCL C ") == 9 */

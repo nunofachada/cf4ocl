@@ -970,7 +970,7 @@ const char* ccl_program_get_build_log(CCLProgram* prg, CCLErr** err) {
 
 			/* If so, get its name. */
 			dev_name = ccl_device_get_info_array(
-				dev, CL_DEVICE_NAME, char*, &err_internal);
+				dev, CL_DEVICE_NAME, char, &err_internal);
 			g_if_err_propagate_goto(err, err_internal, error_handler);
 
 			/* Get the respective build log. */
@@ -2020,7 +2020,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
 		/* Determine the variable part of current filename. */
 		file_middle = g_strdup(
 			ccl_device_get_info_array(
-				dev, CL_DEVICE_NAME, char*, &err_internal));
+				dev, CL_DEVICE_NAME, char, &err_internal));
 		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		g_strcanon(file_middle, CCL_VALIDFILECHARS, '_');

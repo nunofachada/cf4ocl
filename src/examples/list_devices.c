@@ -21,7 +21,7 @@
  * listing them and showing some info about them.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -97,8 +97,7 @@ int main() {
 			HANDLE_ERROR(err);
 
 			/* Get device name. */
-			info = ccl_device_get_info_array(
-				dev, CL_DEVICE_NAME, char*, &err);
+			info = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char, &err);
 			HANDLE_ERROR(err);
 
 			/* Print device name. */
