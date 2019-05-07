@@ -20,18 +20,18 @@
  * Utilities used by the OpenCL testing stub.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include "utils.h"
 
-guint veclen(void* vector, size_t elem_size) {
+guint veclen(void * vector, size_t elem_size) {
 	cl_ulong value;
 	guint len = 0;
 	do {
 		value = 0;
-		g_memmove(&value, ((char*) vector) + elem_size * len, elem_size);
+		g_memmove(&value, ((char *) vector) + elem_size * len, elem_size);
 		len++;
 	} while (value != 0);
 	return len;

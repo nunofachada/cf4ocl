@@ -20,7 +20,7 @@
  * OpenCL event stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -117,7 +117,7 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 	cl_kernel_work_group_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret) {
+	void* param_value, size_t * param_value_size_ret) {
 
 	cl_int status = CL_SUCCESS;
 
@@ -128,7 +128,7 @@ clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 			case CL_KERNEL_WORK_GROUP_SIZE:
 				ccl_test_basic_info(size_t, device, max_work_group_size);
 			case CL_KERNEL_COMPILE_WORK_GROUP_SIZE: /* This is incorrect. */
-				ccl_test_vector_info(size_t*, device, max_work_item_sizes);
+				ccl_test_vector_info(size_t, device, max_work_item_sizes);
 			case CL_KERNEL_LOCAL_MEM_SIZE: /* This is incorrect. */
 				ccl_test_basic_info(cl_ulong, device, local_mem_size);
 #ifdef CL_VERSION_1_2
