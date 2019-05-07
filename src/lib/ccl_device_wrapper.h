@@ -150,7 +150,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_device_get_info_array(dev, param_name, param_type, err) \
-	(param_type*) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) dev, \
 		NULL, param_name, sizeof(param_type), \
 		CCL_INFO_DEVICE, CL_FALSE, err)
 

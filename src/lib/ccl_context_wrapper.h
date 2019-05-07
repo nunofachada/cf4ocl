@@ -395,7 +395,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_context_get_info_array(ctx, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) ctx, \
 		NULL, param_name, sizeof(param_type), \
 		CCL_INFO_CONTEXT, CL_FALSE, err)
 /**
