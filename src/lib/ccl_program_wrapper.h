@@ -22,7 +22,7 @@
  * Definition of a wrapper class and its methods for OpenCL program objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -539,7 +539,7 @@ CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
  * */
 #define ccl_program_get_build_info_array(prg, dev, param_name, \
 	param_type, err) \
-	(param_type) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
+	(param_type *) ccl_wrapper_get_info_value((CCLWrapper*) prg, \
 		(CCLWrapper*) dev, param_name, sizeof(param_type), \
 		CCL_INFO_PROGRAM_BUILD, CL_FALSE, err)
 

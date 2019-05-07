@@ -20,7 +20,7 @@
  * Test the program class. Also tests the kernel class.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -477,7 +477,7 @@ static void create_info_destroy_test() {
 	g_clear_error(&err);
 
 	build_log = ccl_program_get_build_info_array(
-		prg, d, CL_PROGRAM_BUILD_LOG, char*, &err);
+		prg, d, CL_PROGRAM_BUILD_LOG, char, &err);
 	g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
 		(err->domain == CCL_ERROR)));
 	if (info) {

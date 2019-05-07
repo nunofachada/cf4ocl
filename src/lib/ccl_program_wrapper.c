@@ -1040,7 +1040,7 @@ const char* ccl_program_get_device_build_log(
 
 		/* Build log for the specified device is not in cache, get it. */
 		build_log_dev = ccl_program_get_build_info_array(
-			prg, dev, CL_PROGRAM_BUILD_LOG, char*, &err_internal);
+			prg, dev, CL_PROGRAM_BUILD_LOG, char, &err_internal);
 		g_if_err_propagate_goto(err, err_internal, error_handler);
 
 		/* If build log is not empty, keep it in build logs cache. */
