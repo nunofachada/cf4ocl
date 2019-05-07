@@ -68,9 +68,9 @@ static cl_program clCreateProgram(cl_context context,
 	program->build_status =
 		g_slice_alloc(program->num_devices * sizeof(cl_build_status));
 	program->build_log =
-		g_slice_alloc(program->num_devices * sizeof(char**));
+		g_slice_alloc(program->num_devices * sizeof(char *));
 	program->build_options =
-		g_slice_alloc(program->num_devices * sizeof(char**));
+		g_slice_alloc(program->num_devices * sizeof(char *));
 	for (cl_uint i = 0; i < program->num_devices; ++i) {
 		program->build_status[i] = CL_BUILD_NONE;
 		program->build_options[i] = NULL;
