@@ -42,8 +42,8 @@
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * */
-static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
-    ccl_dev_container_get_cldevices get_devices, CCLErr **err) {
+static void ccl_dev_container_init_devices(CCLDevContainer * devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_if_fail(err == NULL || *err == NULL);
@@ -54,8 +54,8 @@ static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
     /* Make sure device list is not initialized. */
     g_return_if_fail(devcon->devices == NULL);
 
-    CCLWrapperInfo* info_devs;
-    CCLErr* err_internal = NULL;
+    CCLWrapperInfo * info_devs;
+    CCLErr * err_internal = NULL;
 
     /* Get device IDs. */
     info_devs = get_devices(devcon, &err_internal);
@@ -73,7 +73,7 @@ static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
 
         /* Add device wrapper object to array of wrapper objects. */
         devcon->devices[i] = ccl_device_new_wrap(
-            ((cl_device_id*) info_devs->value)[i]);
+            ((cl_device_id *) info_devs->value)[i]);
     }
 
     /* If we got here, everything is OK. */
@@ -100,7 +100,7 @@ finish:
  *
  * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
-void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
+void ccl_dev_container_release_devices(CCLDevContainer * devcon) {
 
     /* Make sure devcon wrapper object is not NULL. */
     g_return_if_fail(devcon != NULL);
@@ -115,7 +115,7 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
         }
 
         /* Free device wrapper array. */
-        g_slice_free1(devcon->num_devices * sizeof(CCLDevice*),
+        g_slice_free1(devcon->num_devices * sizeof(CCLDevice *),
             devcon->devices);
     }
 
@@ -128,16 +128,16 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
  * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
- * @param[in] get_devices Function to get cl_device_id's from wrapped
+ * @param[in] get_devices Function to get `cl_device_id`s from wrapped
  * object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return All ::CCLDevice wrappers in device container or NULL if an
+ * @return All ::CCLDevice wrappers in device container or `NULL` if an
  * error occurs.
  * */
-CCLDevice* const* ccl_dev_container_get_all_devices(
-    CCLDevContainer* devcon,
-    ccl_dev_container_get_cldevices get_devices, CCLErr** err) {
+CCLDevice * const * ccl_dev_container_get_all_devices(
+    CCLDevContainer * devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -154,8 +154,7 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
     }
 
     /* Return all devices in platform. */
-    return (CCLDevice* const*) devcon->devices;
-
+    return (CCLDevice * const *) devcon->devices;
 }
 
 
@@ -166,7 +165,7 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
  * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
- * @param[in] get_devices Function to get cl_device_id's from wrapped
+ * @param[in] get_devices Function to get `cl_device_id`s from wrapped
  * object.
  * @param[in] index Index of device in device container.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -175,9 +174,9 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
  * occurs.
  * */
 CCLDevice* ccl_dev_container_get_device(
-    CCLDevContainer* devcon,
+    CCLDevContainer * devcon,
     ccl_dev_container_get_cldevices get_devices, cl_uint index,
-    CCLErr** err) {
+    CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -186,10 +185,10 @@ CCLDevice* ccl_dev_container_get_device(
     g_return_val_if_fail(devcon != NULL, NULL);
 
     /* The return value. */
-    CCLDevice* device_ret;
+    CCLDevice * device_ret;
 
     /* Internal error object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Check if device list is already initialized. */
     if (devcon->devices == NULL) {
@@ -224,7 +223,6 @@ finish:
 
     /* Return list of device wrappers. */
     return device_ret;
-
 }
 
 /**
@@ -234,7 +232,7 @@ finish:
  * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
- * @param[in] get_devices Function to get cl_device_id's from wrapped
+ * @param[in] get_devices Function to get `cl_device_id`s from wrapped
  * object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
@@ -242,8 +240,8 @@ finish:
  * occurs or is otherwise not possible to get any device.
  * */
 cl_uint ccl_dev_container_get_num_devices(
-    CCLDevContainer* devcon,
-    ccl_dev_container_get_cldevices get_devices, CCLErr** err) {
+    CCLDevContainer * devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr ** err) {
 
     /* Make sure devcon is not NULL. */
     g_return_val_if_fail(devcon != NULL, 0);
@@ -261,5 +259,4 @@ cl_uint ccl_dev_container_get_num_devices(
 
     /* Return the number of devices in context. */
     return devcon->num_devices;
-
 }

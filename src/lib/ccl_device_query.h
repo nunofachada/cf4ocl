@@ -55,8 +55,8 @@
  * @param[in] units Parameter units suffix.
  * @return Formatted output (same address as parameter out).
  * */
-typedef char* (*ccl_devquery_format)(CCLWrapperInfo* info, char* out,
-    size_t size, const char* units);
+typedef char * (*ccl_devquery_format)(CCLWrapperInfo * info, char * out,
+    size_t size, const char * units);
 
 /**
  * Maps a string to a cl_device_info bitfield.
@@ -67,7 +67,7 @@ typedef struct ccl_devquery_map {
      * Parameter name string.
      * @public
      * */
-    const char* const param_name;
+    const char * const param_name;
 
     /**
      * CL device information bitfield.
@@ -79,7 +79,7 @@ typedef struct ccl_devquery_map {
      * Long description of parameter.
      * @public
      * */
-    const char* const description;
+    const char * const description;
 
     /**
      * Output formatting function.
@@ -91,7 +91,7 @@ typedef struct ccl_devquery_map {
      * Parameter units suffix.
      * @public
      * */
-    const char* const units;
+    const char * const units;
 
 } CCLDevQueryMap;
 
@@ -108,21 +108,21 @@ extern const CCLDevQueryMap ccl_devquery_info_map[];
 /* Get a final device info prefix in the same format as
  * kept in the ccl_devquery_info_map. */
 CCL_EXPORT
-gchar* ccl_devquery_get_prefix_final(const char* prefix);
+gchar * ccl_devquery_get_prefix_final(const char * prefix);
 
 /* Return a cl_device_info object given its name. */
 CCL_EXPORT
-cl_device_info ccl_devquery_name(const char* name);
+cl_device_info ccl_devquery_name(const char * name);
 
 /* Get a list of device information parameters which have the
  * given prefix. */
 CCL_EXPORT
-const CCLDevQueryMap* ccl_devquery_prefix(const char* prefix, int* size);
+const CCLDevQueryMap * ccl_devquery_prefix(const char * prefix, int * size);
 
 /* Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. */
 CCL_EXPORT
-const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx);
+const CCLDevQueryMap * ccl_devquery_match(const char * substr, int * idx);
 
 /**
  * Map an OpenCL cl_device_type object to a string identifying

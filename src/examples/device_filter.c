@@ -58,10 +58,10 @@
 /**
  * Device filter example main function.
  * */
-int main(int argc, char* argv[]) {
+int main(int argc, char * argv[]) {
 
     /* cf4ocl objects. */
-    CCLContext* ctx;
+    CCLContext * ctx;
     CCLDevSelFilters filters = NULL;
     CCLDevSelDevices devices;
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     int op;
 
     /* Error handling object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Check command-line arguments. */
     if (argc < 2)

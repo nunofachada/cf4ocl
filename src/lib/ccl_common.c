@@ -34,7 +34,7 @@
  * @param[in] exec_name Executable name.
  * */
 CCL_EXPORT
-void ccl_common_version_print(const char* exec_name) {
+void ccl_common_version_print(const char * exec_name) {
     g_printf("%s %s - Compiled with %s C Compiler with support for OpenCL %s\n"
         "Copyright (C) 2019 Nuno Fachada\n"
         "License GPLv3+: GNU GPL version 3 or later "
@@ -54,7 +54,7 @@ void ccl_common_version_print(const char* exec_name) {
  * @see @ref ug_deps "The GLib and OpenCL dependencies".
  * */
 CCL_EXPORT
-void ccl_strv_clear(char** str_array) {
+void ccl_strv_clear(char ** str_array) {
     g_strfreev(str_array);
 }
 
@@ -70,7 +70,7 @@ void ccl_strv_clear(char** str_array) {
  * @see @ref ug_deps "The GLib and OpenCL dependencies".
  * */
 CCL_EXPORT
-void ccl_err_clear(CCLErr** err) {
+void ccl_err_clear(CCLErr ** err) {
     g_clear_error(err);
 }
 

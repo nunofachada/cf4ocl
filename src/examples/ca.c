@@ -78,36 +78,36 @@
 /**
  * Cellular automata sample main function.
  * */
-int main(int argc, char* argv[]) {
+int main(int argc, char * argv[]) {
 
     /* Wrappers for OpenCL objects. */
-    CCLContext* ctx;
-    CCLDevice* dev;
-    CCLImage* img1;
-    CCLImage* img2;
-    CCLImage* img_aux;
-    CCLQueue* queue_exec;
-    CCLQueue* queue_comm;
-    CCLProgram* prg;
-    CCLKernel* krnl;
-    CCLEvent* evt_comm;
-    CCLEvent* evt_exec;
+    CCLContext * ctx;
+    CCLDevice * dev;
+    CCLImage * img1;
+    CCLImage * img2;
+    CCLImage * img_aux;
+    CCLQueue * queue_exec;
+    CCLQueue * queue_comm;
+    CCLProgram * prg;
+    CCLKernel * krnl;
+    CCLEvent * evt_comm;
+    CCLEvent * evt_exec;
     /* Other variables. */
     CCLEventWaitList ewl = NULL;
     /* Profiler object. */
-    CCLProf* prof;
+    CCLProf * prof;
     /* Output images filename. */
-    char* filename;
+    char * filename;
     /* Selected device, may be given in command line. */
     int dev_idx = -1;
     /* Error handling object (must be NULL). */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     /* Does selected device support images? */
     cl_bool image_ok;
     /* Initial sim state. */
-    cl_uchar4* input_image;
+    cl_uchar4 * input_image;
     /* Simulation states. */
-    cl_uchar4** output_images;
+    cl_uchar4 ** output_images;
     /* RNG seed, may be given in command line. */
     unsigned int seed;
     /* Image file write status. */
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
     srand(seed);
 
     /* Create random initial state. */
-    input_image = (cl_uchar4*)
+    input_image = (cl_uchar4 *)
         malloc(CA_WIDTH * CA_HEIGHT * sizeof(cl_uchar4));
     for (cl_uint i = 0; i < CA_WIDTH * CA_HEIGHT; ++i) {
         cl_uchar state = (rand() & 0x3) ? 0xFF : 0x00;
@@ -148,10 +148,10 @@ int main(int argc, char* argv[]) {
     }
 
     /* Allocate space for simulation results. */
-    output_images = (cl_uchar4**)
-        malloc((CA_ITERS + 1) * sizeof(cl_uchar4*));
+    output_images = (cl_uchar4 **)
+        malloc((CA_ITERS + 1) * sizeof(cl_uchar4 *));
     for (cl_uint i = 0; i < CA_ITERS + 1; ++i)
-        output_images[i] = (cl_uchar4*)
+        output_images[i] = (cl_uchar4 *)
             malloc(CA_WIDTH * CA_HEIGHT * sizeof(cl_uchar4));
 
     /* Create context using device selected from menu. */
@@ -260,7 +260,7 @@ int main(int argc, char* argv[]) {
     ccl_prof_add_queue(prof, "Exec", queue_exec);
 
     /* Allocate space for base filename. */
-    filename = (char*) malloc(
+    filename = (char *) malloc(
         (strlen(IMAGE_FILE_PREFIX ".png") + IMAGE_FILE_NUM_DIGITS + 1)
         * sizeof(char));
 
@@ -317,5 +317,4 @@ int main(int argc, char* argv[]) {
     return EXIT_SUCCESS;
 
 }
-
 

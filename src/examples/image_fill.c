@@ -62,13 +62,13 @@
 /**
  * Image fill main function.
  * */
-int main(int argc, char* argv[]) {
+int main(int argc, char * argv[]) {
 
     /* Wrappers for OpenCL objects. */
-    CCLContext* ctx;
-    CCLDevice* dev;
-    CCLImage* img;
-    CCLQueue* queue;
+    CCLContext * ctx;
+    CCLDevice * dev;
+    CCLImage * img;
+    CCLQueue * queue;
 
     /* Image file write status. */
     int file_write_status;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
     int dev_idx = -1;
 
     /* Error handling object (must be initialized to NULL). */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Does selected device support images? */
     cl_bool image_ok;

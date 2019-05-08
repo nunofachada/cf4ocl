@@ -29,19 +29,19 @@ API using wrapper classes and methods (or structs and functions, in C
 terms), grouped into modules of the same name, as shown in the following
 table:
 
-| _cf4ocl_ module                         | _cf4ocl_ wrapper class | Wrapped OpenCL type |
-| --------------------------------------- | ---------------------- | ------------------- |
-| @ref CCL_PLATFORM_WRAPPER "Platform module" | ::CCLPlatform*         | cl_platform_id      |
-| @ref CCL_DEVICE_WRAPPER "Device module"     | ::CCLDevice*           | cl_device_id        |
-| @ref CCL_CONTEXT_WRAPPER "Context module"   | ::CCLContext*          | cl_context          |
-| @ref CCL_QUEUE_WRAPPER "Queue module"       | ::CCLQueue*            | cl_command_queue    |
-| @ref CCL_PROGRAM_WRAPPER "Program module"   | ::CCLProgram*          | cl_program          |
-| @ref CCL_KERNEL_WRAPPER "Kernel module"     | ::CCLKernel*           | cl_kernel           |
-| @ref CCL_EVENT_WRAPPER "Event module"       | ::CCLEvent*            | cl_event            |
-| @ref CCL_MEMOBJ_WRAPPER "MemObj module"     | ::CCLMemObj*           | cl_mem              |
-| @ref CCL_BUFFER_WRAPPER "Buffer module"     | ::CCLBuffer*           | cl_mem              |
-| @ref CCL_IMAGE_WRAPPER "Image module"       | ::CCLImage*            | cl_mem              |
-| @ref CCL_SAMPLER_WRAPPER "Sampler module"   | ::CCLSampler*          | cl_sampler          |
+| _cf4ocl_ module                         | _cf4ocl_ wrapper class | Wrapped OpenCL type   |
+| --------------------------------------- | ---------------------- | --------------------- |
+| @ref CCL_PLATFORM_WRAPPER "Platform module" | ::CCLPlatform *    | `cl_platform_id`      |
+| @ref CCL_DEVICE_WRAPPER "Device module"     | ::CCLDevice *      | `cl_device_id`        |
+| @ref CCL_CONTEXT_WRAPPER "Context module"   | ::CCLContext *     | `cl_context`          |
+| @ref CCL_QUEUE_WRAPPER "Queue module"       | ::CCLQueue *       | `cl_command_queue`    |
+| @ref CCL_PROGRAM_WRAPPER "Program module"   | ::CCLProgram *     | `cl_program`          |
+| @ref CCL_KERNEL_WRAPPER "Kernel module"     | ::CCLKernel *      | `cl_kernel`           |
+| @ref CCL_EVENT_WRAPPER "Event module"       | ::CCLEvent *       | `cl_event`            |
+| @ref CCL_MEMOBJ_WRAPPER "MemObj module"     | ::CCLMemObj *      | `cl_mem`              |
+| @ref CCL_BUFFER_WRAPPER "Buffer module"     | ::CCLBuffer *      | `cl_mem`              |
+| @ref CCL_IMAGE_WRAPPER "Image module"       | ::CCLImage *       | `cl_mem`              |
+| @ref CCL_SAMPLER_WRAPPER "Sampler module"   | ::CCLSampler *     | `cl_sampler`          |
 
 Some of the provided methods directly wrap OpenCL functions (e.g.
 ::ccl_buffer_enqueue_copy()), while others perform a number of OpenCL
@@ -76,24 +76,26 @@ destroyed by client code.
 For example, it is possible to get a kernel belonging to a program
 using the ::ccl_program_get_kernel() function:
 
-~~~~~~~~~~~~~~~{.c}
-CCLProgram* prg;
-CCLKernel* krnl;
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
+```c
+CCLProgram * prg;
+CCLKernel * krnl;
+```
+
+```c
 prg = ccl_program_new_from_source_file(ctx, "myprog.cl", NULL);
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
+```
+
+```c
 krnl = ccl_program_get_kernel(prg, "someKernel", NULL);
-~~~~~~~~~~~~~~~
+```
 
 The returned kernel wrapper object will be freed when the program
 is destroyed; as such, there is no need to free it. Destroying the program will
 suffice:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 ccl_program_destroy(prg);
-~~~~~~~~~~~~~~~
+```
 
 ### Getting info about OpenCL objects {#ug_getinfo}
 
@@ -106,15 +108,16 @@ type).
 For example, to get the name and the number of compute cores on a
 device:
 
-~~~~~~~~~~~~~~~{.c}
-CCLDevice* dev;
-char* name;
+```c
+CCLDevice * dev;
+char * name;
 cl_uint n_cores;
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
-name = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char*, NULL);
+```
+
+```c
+name = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char *, NULL);
 n_cores = ccl_device_get_info_scalar(dev, CL_DEVICE_MAX_COMPUTE_UNITS, cl_uint, NULL);
-~~~~~~~~~~~~~~~
+```
 
 The `ccl_<class>_get_info()` macros serve more specific scenarios, and
 are likely to be used less often. These macros return a
@@ -141,7 +144,7 @@ error handling:
 1. The return value.
 2. ::CCLErr-based error reporting.
 
-The first method consists of analysing the return value of a function.
+The first method consists of analyzing the return value of a function.
 Error-throwing functions which return a pointer will return `NULL` if an error
 occurs. The remaining error-reporting functions return `CL_FALSE` if an error
 occurs (or `CL_TRUE` otherwise). Client code can check for errors by looking for
@@ -149,17 +152,18 @@ occurs (or `CL_TRUE` otherwise). Client code can check for errors by looking for
 handling method does not provide additional information about the reported
 error. For example:
 
-~~~~~~~~~~~~~~~{.c}
-CCLContext* ctx;
-CCLProgram* prg;
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
+```c
+CCLContext * ctx;
+CCLProgram * prg;
+```
+
+```c
 prg = ccl_program_new_from_source_file(ctx, "program.cl", NULL);
 if (!prg) {
     fprintf(stderr, "An error ocurred");
     exit(-1);
 }
-~~~~~~~~~~~~~~~
+```
 
 The second method is more flexible. A ::CCLErr object is initialized to `NULL`,
 and a pointer to it is passed as the last argument to the function being called.
@@ -167,18 +171,19 @@ If the ::CCLErr object is still `NULL` after the function call, no error has
 occurred. Otherwise, an error occurred and it is possible to get a user-friendly
 error message:
 
-~~~~~~~~~~~~~~~{.c}
-CCLContext* ctx;
-CCLProgram* prg;
-CCLErr* err = NULL;
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
+```c
+CCLContext * ctx;
+CCLProgram * prg;
+CCLErr * err = NULL;
+```
+
+```c
 prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
 if (err) {
     fprintf(stderr, "%s", err->message);
     exit(-1);
 }
-~~~~~~~~~~~~~~~
+```
 
 An error domain and error code are also available in the ::CCLErr object. The
 domain indicates the module or library in which the error was generated, while
@@ -194,12 +199,13 @@ distinct error codes:
 
 For example, it is possible for client code to act on different OpenCL errors:
 
-~~~~~~~~~~~~~~~{.c}
-CCLContext* ctx;
-CCLBuffer* buf;
-CCLErr* err = NULL;
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
+```c
+CCLContext * ctx;
+CCLBuffer * buf;
+CCLErr * err = NULL;
+```
+
+```c
 buf = ccl_buffer_new(ctx, flags, size, host_ptr, &err);
 if (err) {
     if (err->domain == CCL_OCL_ERROR) {
@@ -220,26 +226,27 @@ if (err) {
         /* Handle other errors */
     }
 }
-~~~~~~~~~~~~~~~
+```
 
 Finally, if client code wants to continue execution after an error was caught,
 it is mandatory to use the ::ccl_err_clear() function to free the error object
 and reset its value to `NULL`. Not doing so is a bug, especially if more
 error-reporting functions are to be called moving forward. For example:
 
-~~~~~~~~~~~~~~~{.c}
-CCLContext* ctx;
-CCLProgram* prg;
-CCLError* err = NULL;
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~{.c}
+```c
+CCLContext * ctx;
+CCLProgram * prg;
+CCLError * err = NULL;
+```
+
+```c
 prg = ccl_program_new_from_source_file(ctx, "program.cl", &err);
 if (err) {
     /* Print the error message, but don't terminate program. */
     fprintf(stderr, "%s", err->message);
     ccl_err_clear(&err);
 }
-~~~~~~~~~~~~~~~
+```
 
 Even if the program terminates due to an error, the ::ccl_err_clear() function
 can be still be called to destroy the error object, avoiding memory leaks to be
@@ -394,8 +401,9 @@ the parent class `struct`. An example of this approach can be shown with
 the definitions of the abstract ::CCLWrapper* class and of the concrete
 ::CCLEvent* class, which extends ::CCLWrapper*:
 
-<em>In @c %_ccl_abstract_wrapper.h (not part of public API):</em>
-@code{.c}
+*In **%_ccl_abstract_wrapper.h** (not part of public API):*
+
+```c
 /* Base class for all OpenCL wrappers. */
 struct ccl_wrapper {
 
@@ -403,27 +411,27 @@ struct ccl_wrapper {
     CCLClass class;
 
     /* The wrapped OpenCL object. */
-    void* cl_object;
+    void * cl_object;
 
     /* Information about the wrapped OpenCL object. */
-    CCLWrapperInfoTable* info;
+    CCLWrapperInfoTable * info;
 
     /* Reference count. */
     int ref_count;
 
 };
-@endcode
+```
 
-_In ccl_common.h:_
+*In ccl_common.h:*
 
-@code{.c}
+```c
 /* Event wrapper class type declaration. */
 typedef struct ccl_event CCLEvent;
-@endcode
+```
 
-_In ccl_event_wrapper.c:_
+*In ccl_event_wrapper.c:*
 
-@code{.c}
+```c
 /* Event wrapper class, extends CCLWrapper */
 struct ccl_event {
 
@@ -431,10 +439,10 @@ struct ccl_event {
     CCLWrapper base;
 
     /* Event name, for profiling purposes only. */
-    const char* name;
+    const char * name;
 
 };
-@endcode
+```
 
 Methods are implemented as functions which accept the object on which
 they operate as the first parameter. When useful, function-like macros
@@ -676,26 +684,29 @@ for the `cf4ocl2` log domain with
 [g_log_set_handler()](https://developer.gnome.org/glib/stable/glib-Message-Logging.html#g-log-set-handler).
 For example:
 
-@code{.c}
+```c
 /* Log function which outputs messages to a stream specified in user_data. */
-void my_log_function(const gchar *log_domain, GLogLevelFlags log_level,
-    const gchar *message, gpointer user_data) {
+void my_log_function(const gchar * log_domain, GLogLevelFlags log_level,
+    const gchar * message, gpointer user_data) {
 
-    g_fprintf((FILE*) user_data, "[%s](%d)>%s\n",
+    g_fprintf((FILE *) user_data, "[%s](%d)>%s\n",
         log_domain, log_level, message);
 
 }
-@endcode
-@code{.c}
-FILE* my_file;
-@endcode
-@code{.c}
-/* Add log handler for all messages from cf4ocl. */
-g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
-    my_log_function, my_file);
-@endcode
+```
 
-This requires the client application to be linked against GLib..
+```c
+FILE * my_file;
+```
+
+```c
+/* Add log handler for all messages from cf4ocl. */
+g_log_set_handler("cf4ocl2",
+    G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
+    my_log_function, my_file);
+```
+
+This requires the client application to be linked against GLib.
 
 @example ca.c
 @example ca.cl

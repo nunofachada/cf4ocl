@@ -44,7 +44,6 @@ struct ccl_image {
      * @private
      * */
     CCLMemObj mo;
-
 };
 
 /**
@@ -63,7 +62,7 @@ struct ccl_image {
  * object is to be created.
  * @param[in] flags Specifies allocation and usage information about the
  * image wrapper object being created.
- * @param[in] image_format A pointer to the OpenCL cl_image_format
+ * @param[in] image_format A pointer to the OpenCL `cl_image_format`
  * structure, which describes format properties of the image to be
  * allocated.
  * @param[in] img_dsc A pointer to a ::CCLImageDesc object which
@@ -74,9 +73,9 @@ struct ccl_image {
  * reporting is to be ignored.
  * @return A new OpenCL image object.
  * */
-static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
-    const cl_image_format* image_format, const CCLImageDesc* img_dsc,
-    void* host_ptr, CCLErr** err) {
+static cl_mem ccl_image_new_deprecated(CCLContext * ctx, cl_mem_flags flags,
+    const cl_image_format * image_format, const CCLImageDesc * img_dsc,
+    void * host_ptr, CCLErr ** err) {
 
     /* OpenCL image object. */
     cl_mem image = NULL;
@@ -120,7 +119,6 @@ static cl_mem ccl_image_new_deprecated(CCLContext* ctx, cl_mem_flags flags,
             CCL_ERROR_UNSUPPORTED_OCL, error_handler,
             "%s: unknown or unsuported image type (%x)", CCL_STRD,
             img_dsc->image_type);
-
     }
 
     CCL_END_IGNORE_DEPRECATIONS
@@ -138,7 +136,6 @@ finish:
 
     /* Return OpenCL image object. */
     return image;
-
 }
 
 /**
@@ -158,11 +155,10 @@ finish:
  * @return The ::CCLImage wrapper for the given OpenCL image.
  * */
 CCL_EXPORT
-CCLImage* ccl_image_new_wrap(cl_mem mem_object) {
+CCLImage * ccl_image_new_wrap(cl_mem mem_object) {
 
-    return (CCLImage*) ccl_wrapper_new(
-        CCL_IMAGE, (void*) mem_object, sizeof(CCLImage));
-
+    return (CCLImage *) ccl_wrapper_new(
+        CCL_IMAGE, (void *) mem_object, sizeof(CCLImage));
 }
 
 /**
@@ -174,12 +170,11 @@ CCLImage* ccl_image_new_wrap(cl_mem mem_object) {
  * @param[in] img The image wrapper object.
  * */
 CCL_EXPORT
-void ccl_image_destroy(CCLImage* img) {
+void ccl_image_destroy(CCLImage * img) {
 
-    ccl_wrapper_unref((CCLWrapper*) img, sizeof(CCLImage),
+    ccl_wrapper_unref((CCLWrapper *) img, sizeof(CCLImage),
         (ccl_wrapper_release_fields) ccl_memobj_release_fields,
         (ccl_wrapper_release_cl_object) clReleaseMemObject, NULL);
-
 }
 
 /**
@@ -188,18 +183,17 @@ void ccl_image_destroy(CCLImage* img) {
  *
  * **Usage example**
  *
- * @code{.c}
- * ...
- * CCLImage* img;
- * ...
+ * ```c
+ * // ...
+ * CCLImage * img;
+ * // ...
  * CCLImageDesc image_desc = CCL_IMAGE_DESC_BLANK;
  * image_desc.image_width = 1024;
  * image_desc.image_height = 512;
  * image_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
- * ...
- * img = ccl_image_new_v(
- *     ctx, flags, image_format, img_dsc, NULL, NULL);
- * @endcode
+ * // ...
+ * img = ccl_image_new_v(ctx, flags, image_format, img_dsc, NULL, NULL);
+ * ```
  *
  * The underlying OpenCL image object is created using the
  * clCreateImage2D() and clCreateImage3D() if the platform's OpenCL
@@ -211,7 +205,7 @@ void ccl_image_destroy(CCLImage* img) {
  * object is to be created.
  * @param[in] flags Specifies allocation and usage information about the
  * image wrapper object being created.
- * @param[in] image_format A pointer to the OpenCL cl_image_format
+ * @param[in] image_format A pointer to the OpenCL `cl_image_format`
  * structure, which describes format properties of the image to be
  * allocated.
  * @param[in] img_dsc A pointer to a ::CCLImageDesc object which
@@ -223,9 +217,9 @@ void ccl_image_destroy(CCLImage* img) {
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
-    const cl_image_format* image_format, const CCLImageDesc* img_dsc,
-    void* host_ptr, CCLErr** err) {
+CCLImage * ccl_image_new_v(CCLContext * ctx, cl_mem_flags flags,
+    const cl_image_format * image_format, const CCLImageDesc * img_dsc,
+    void * host_ptr, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
@@ -235,11 +229,11 @@ CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Image wrapper object. */
-    CCLImage* img = NULL;
+    CCLImage * img = NULL;
     /* OpenCL image object. */
     cl_mem image;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
@@ -286,14 +280,12 @@ CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
             "%s: unable to create image with clCreateImage() " \
             "(OpenCL error %d: %s).",
             CCL_STRD, ocl_status, ccl_err(ocl_status));
-
     } else {
         /* OpenCL is < 1.2, use "old" API. */
 
         image = ccl_image_new_deprecated(ctx, flags, image_format,
             img_dsc, host_ptr, &err_internal);
         g_if_err_propagate_goto(err, err_internal, error_handler);
-
     }
 
 #else
@@ -321,7 +313,6 @@ finish:
 
     /* Return image wrapper. */
     return img;
-
 }
 
 /**
@@ -336,29 +327,29 @@ finish:
  *
  * Key                 | Value type
  * --------------------|--------------------
- * "image_type"        | cl_mem_object_type
- * "image_width"       | size_t
- * "image_height"      | size_t
- * "image_depth"       | size_t
- * "image_array_size"  | size_t
- * "image_row_pitch"   | size_t
- * "image_slice_pitch" | size_t
- * "num_mip_levels"    | cl_uint
- * "num_samples"       | cl_uint
- * "memobj"            | ::CCLMemObj*
+ * "image_type"        | `cl_mem_object_type`
+ * "image_width"       | `size_t`
+ * "image_height"      | `size_t`
+ * "image_depth"       | `size_t`
+ * "image_array_size"  | `size_t`
+ * "image_row_pitch"   | `size_t`
+ * "image_slice_pitch" | `size_t`
+ * "num_mip_levels"    | `cl_uint`
+ * "num_samples"       | `cl_uint`
+ * "memobj"            | ::CCLMemObj *
  *
  * **Usage example**
  *
- * @code{.c}
- * ...
- * CCLImage* img;
- * ...
+ * ```c
+ * //...
+ * CCLImage * img;
+ * //...
  * img = ccl_image_new(ctx, flags, image_format, NULL, NULL,
  *     "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D
  *     "image_width", (size_t) 1024,
  *     "image_height", (size_t) 512,
  *     NULL);
- * @endcode
+ * ```
  *
  * @attention Make sure the values passed in the variable argument list
  * are of the expected type (as defined by the corresponding key). This
@@ -376,7 +367,7 @@ finish:
  * object is to be created.
  * @param[in] flags Specifies allocation and usage information about the
  * image wrapper object being created.
- * @param[in] image_format A pointer to the OpenCL cl_image_format
+ * @param[in] image_format A pointer to the OpenCL `cl_image_format`
  * structure, which describes format properties of the image to be
  * allocated.
  * @param[in] host_ptr A pointer to the image data that may already be
@@ -388,8 +379,8 @@ finish:
  * @return A new image wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
-    const cl_image_format* image_format, void* host_ptr, CCLErr** err,
+CCLImage * ccl_image_new(CCLContext * ctx, cl_mem_flags flags,
+    const cl_image_format * image_format, void * host_ptr, CCLErr ** err,
     ...) {
 
     /* Make sure ctx is not NULL. */
@@ -400,7 +391,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
     /* The va_list, which represents the variable argument list. */
     va_list args_va;
     /* A key. */
-    const char* key;
+    const char * key;
     /* The image description object, initialized to zeros. */
     CCLImageDesc image_dsc = CCL_IMAGE_DESC_BLANK;
 
@@ -409,7 +400,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 
     /* Check if any arguments are given, and if so, populate
      * image_dsc. */
-    while ((key = va_arg(args_va, const char*)) != NULL) {
+    while ((key = va_arg(args_va, const char *)) != NULL) {
 
         if (g_strcmp0(key, "image_type") == 0) {
             image_dsc.image_type = va_arg(args_va, cl_mem_object_type);
@@ -444,7 +435,7 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
 
     /* Create the image using the vector version of this function. */
     return ccl_image_new_v(ctx, flags, image_format,
-        (const CCLImageDesc*) &image_dsc, host_ptr, err);
+        (const CCLImageDesc *) &image_dsc, host_ptr, err);
 
 }
 
@@ -482,10 +473,10 @@ CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
  * @return Event wrapper object that identifies this read command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
-    cl_bool blocking_read, const size_t* origin, const size_t* region,
-    size_t row_pitch, size_t slice_pitch, void *ptr,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_image_enqueue_read(CCLImage * img, CCLQueue * cq,
+    cl_bool blocking_read, const size_t * origin, const size_t * region,
+    size_t row_pitch, size_t slice_pitch, void * ptr,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -499,7 +490,7 @@ CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
     /* OpenCL event object. */
     cl_event event = NULL;
     /* Event wrapper object. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
 
     /* Read image from device into host. */
     ocl_status = clEnqueueReadImage(ccl_queue_unwrap(cq),
@@ -535,7 +526,6 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /**
@@ -572,10 +562,10 @@ finish:
  * @return Event wrapper object that identifies this write command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
-    cl_bool blocking_write, const size_t* origin, const size_t* region,
-    size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_image_enqueue_write(CCLImage * img, CCLQueue * cq,
+    cl_bool blocking_write, const size_t * origin, const size_t * region,
+    size_t input_row_pitch, size_t input_slice_pitch, void * ptr,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -589,7 +579,7 @@ CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
     /* OpenCL event object. */
     cl_event event = NULL;
     /* Event wrapper object. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
 
     /* Write image to device from host. */
     ocl_status = clEnqueueWriteImage(ccl_queue_unwrap(cq),
@@ -625,7 +615,6 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /**
@@ -659,10 +648,10 @@ finish:
  * @return Event wrapper object that identifies this copy command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
-    CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
-    const size_t* region, CCLEventWaitList* evt_wait_lst,
-    CCLErr** err) {
+CCLEvent * ccl_image_enqueue_copy(CCLImage * src_img, CCLImage * dst_img,
+    CCLQueue * cq, const size_t * src_origin, const size_t * dst_origin,
+    const size_t * region, CCLEventWaitList * evt_wait_lst,
+    CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -678,7 +667,7 @@ CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
     /* OpenCL event object. */
     cl_event event = NULL;
     /* Event wrapper object. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
 
     /* Copy image. */
     ocl_status = clEnqueueCopyImage(ccl_queue_unwrap(cq),
@@ -714,7 +703,6 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /**
@@ -747,10 +735,10 @@ finish:
  * @return Event wrapper object that identifies this copy command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
-    CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
-    const size_t *region, size_t dst_offset,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_image_enqueue_copy_to_buffer(CCLImage * src_img,
+    CCLBuffer * dst_buf, CCLQueue * cq, const size_t * src_origin,
+    const size_t * region, size_t dst_offset,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -766,7 +754,7 @@ CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
     /* OpenCL event object. */
     cl_event event = NULL;
     /* Event wrapper object. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
 
     /* Copy image to buffer. */
     ocl_status = clEnqueueCopyImageToBuffer(ccl_queue_unwrap(cq),
@@ -802,7 +790,6 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /**
@@ -839,17 +826,17 @@ finish:
  * before this command can be executed. The list will be cleared and
  * can be reused by client code.
  * @param[out] evt An event wrapper object that identifies this
- * particular map command. If NULL, no event will be returned.
+ * particular map command. If `NULL`, no event will be returned.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer in the host address space for the mapped region.
  * */
 CCL_EXPORT
-void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
-    cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
-    const size_t* region, size_t *image_row_pitch,
-    size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
-    CCLEvent** evt, CCLErr** err) {
+void * ccl_image_enqueue_map(CCLImage * img, CCLQueue * cq,
+    cl_bool blocking_map, cl_map_flags map_flags, const size_t * origin,
+    const size_t * region, size_t * image_row_pitch,
+    size_t * image_slice_pitch, CCLEventWaitList * evt_wait_lst,
+    CCLEvent ** evt, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -860,7 +847,7 @@ void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
 
     cl_int ocl_status;
     cl_event event = NULL;
-    CCLEvent* evt_inner = NULL;
+    CCLEvent * evt_inner = NULL;
     void* ptr = NULL;
 
     /* Perform image map. */
@@ -900,7 +887,6 @@ finish:
 
     /* Return host pointer. */
     return ptr;
-
 }
 
 /**
@@ -931,9 +917,9 @@ finish:
  * @return Event wrapper object that identifies this fill command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
-    const void *fill_color, const size_t *origin, const size_t *region,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
+    const void * fill_color, const size_t * origin, const size_t * region,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -947,7 +933,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
     /* OpenCL event object. */
     cl_event event = NULL;
     /* Event wrapper object. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
     /* Internal error handling object. */
@@ -1020,7 +1006,6 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /** @} */

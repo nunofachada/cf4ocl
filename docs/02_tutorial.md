@@ -10,8 +10,8 @@ examples folder. The goal is to add two vectors, `a` and `b`, as well as
 a constant `d`, and save the result in a third vector, `c`. The OpenCL
 kernel which performs this operation is given in the following code:
 
-~~~~~~~~~~~~~~~{.c}
-__kernel void sum(__global const uint *a, __global const uint *b,
+```c
+__kernel void sum(__global const uint * a, __global const uint * b,
     __global uint * c, uint d, uint buf_size) {
 
     /* Get global ID. */
@@ -22,7 +22,7 @@ __kernel void sum(__global const uint *a, __global const uint *b,
     if (gid < buf_size)
         c[gid] = a[gid] + b[gid] + d;
 }
-~~~~~~~~~~~~~~~
+```
 
 For the purpose of this tutorial, we'll assume the kernel code is in a
 file called `mysum.cl`, and the host code in `mysum.c`.
@@ -32,9 +32,9 @@ file called `mysum.cl`, and the host code in `mysum.c`.
 The _cf4ocl_ header should be included at the beginning of the `mysum.c`
 file:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
-~~~~~~~~~~~~~~~
+```
 
 The next step is to create a context with an OpenCL device where we can perform
 our computation. _cf4ocl_ has several constructor functions for creating
@@ -43,8 +43,7 @@ For example, ::ccl_context_new_from_menu() allows the user to select the OpenCL
 device if more than one is available in the system, and returns a context
 containing the selected device. For example:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
 int main() {
 
     /* Variables. */
@@ -52,8 +51,7 @@ int main() {
 
     /* Code. */
     ctx = ccl_context_new_from_menu(NULL);
-
-~~~~~~~~~~~~~~~
+```
 
 Where we pass `NULL` we could have passed an error management object, which
 we'll discuss in detail further ahead. Error-throwing _cf4ocl_ functions signal
@@ -62,23 +60,23 @@ management object. In this case, because we're not passing this object, we have
 to rely on the return value to check for errors. A `NULL` return value indicates
 an error in all _cf4ocl_ constructors:
 
-~~~~~~~~~~~~~~~{.c}
+```c
     if (ctx == NULL) exit(-1);
-~~~~~~~~~~~~~~~
+```
 
 In _cf4ocl_, all objects created with `new` constructors must be released using
 the respective `destroy` destructors. For contexts, this is the
 ::ccl_context_destroy() function:
 
-~~~~~~~~~~~~~~~{.c}
+```c
     /* Destroy context wrapper. */
     ccl_context_destroy(ctx);
-~~~~~~~~~~~~~~~
+```
 
 We now have compilable, leak-free _cf4ocl_ program, although it doesn't do very
 much yet:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 int main() {
@@ -95,14 +93,14 @@ int main() {
 
     return 0;
 }
-~~~~~~~~~~~~~~~
+```
 
 We can compile the program with `gcc` (or `clang`), and run it:
 
-~~~~~~~~~~~~~~~
+```c
 $ gcc `pkg-config --cflags cf4ocl2` mysum.c -o mysum `pkg-config --libs cf4ocl2`
 $ ./mysum
-~~~~~~~~~~~~~~~
+```
 
 With Clang the command is the same, just replace `gcc` with `clang`.
 
@@ -113,8 +111,7 @@ to declare three host vectors, two of which will be initialized with some values
 to sum, and the third one will be used to hold the final result. We also need to
 declare the respective device buffers and the constant.
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
 #define VECSIZE 8
 #define SUM_CONST 3
 
@@ -127,14 +124,12 @@ declare the respective device buffers and the constant.
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
     cl_uint vec_c[VECSIZE];
     cl_uint d = SUM_CONST;
-
-~~~~~~~~~~~~~~~
+```
 
 Two of the device buffers, `a` and `b`, will be initialized with the values of
 the corresponding host vectors:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     //...
 
     /* Code. */
@@ -155,13 +150,11 @@ the corresponding host vectors:
     if (c == NULL) exit(-1);
 
     //...
-
-~~~~~~~~~~~~~~~
+```
 
 Don't forget the destructors at the end:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     //...
 
     /* Destroy cf4ocl wrappers. */
@@ -171,13 +164,12 @@ Don't forget the destructors at the end:
     ccl_context_destroy(ctx);
 
     return 0;
-
-~~~~~~~~~~~~~~~
+```
 
 The complete program so far can be compiled and executed. Still doesn't do
 anything useful, but we're getting close.
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 #define VECSIZE 8
@@ -218,7 +210,7 @@ int main() {
 
     return 0;
 }
-~~~~~~~~~~~~~~~
+```
 
 ### Creating the command queue
 
@@ -227,16 +219,16 @@ queue. However, command queue creation requires a device. The context contains a
 reference to the selected device, which can be fetched using the
 ::ccl_context_get_device() function:
 
-~~~~~~~~~~~~~~~{.c}
+```c
     /* Variables. */
     CCLContext * ctx = NULL;
-    CCLDevice* dev = NULL;
+    CCLDevice * dev = NULL;
     //...
 
     /* Get the selected device. */
     dev = ccl_context_get_device(ctx, 0, NULL);
     if (dev == NULL) exit(-1);
-~~~~~~~~~~~~~~~
+```
 
 There's no need to release the device object. It will be automatically released
 when the context is destroyed, in accordance with the
@@ -245,11 +237,11 @@ when the context is destroyed, in accordance with the
 Now we can create the command queue. We don't require any special queue
 properties for now, so we pass `0` as the third argument to ::ccl_queue_new():
 
-~~~~~~~~~~~~~~~{.c}
+```c
     /* Variables. */
     CCLContext * ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* queue = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
     //...
 
     /* Create a command queue. */
@@ -260,14 +252,14 @@ properties for now, so we pass `0` as the third argument to ::ccl_queue_new():
     /* Destroy cf4ocl wrappers. */
     //...
     ccl_queue_destroy(queue);
-~~~~~~~~~~~~~~~
+```
 
 Both ::ccl_context_get_device() and ::ccl_queue_new() expect an error handling
 object as the last argument. By passing `NULL` we must rely on the return value
 of these functions in order to check for errors. Here's the complete code so
 far:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 #define VECSIZE 8
@@ -319,7 +311,7 @@ int main() {
 
     return 0;
 }
-~~~~~~~~~~~~~~~
+```
 
 Compile and run the code. As expected, nothing special happens yet.
 
@@ -330,11 +322,10 @@ _cf4ocl_ provides several constructors for creating
 file is involved, the most adequate constructor is
 ::ccl_program_new_from_source_file():
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Variables. */
     //...
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
 
     //...
     /* Create program. */
@@ -345,15 +336,13 @@ file is involved, the most adequate constructor is
     /* Destroy cf4ocl wrappers. */
     ccl_program_destroy(prg);
     //...
-
-~~~~~~~~~~~~~~~
+```
 
 Building the program object is just as easy. For this purpose, we use the
 ::ccl_program_build() function which returns `CL_TRUE` if the build is
 successful or `CL_FALSE` otherwise:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Variables. */
     //...
     cl_bool status;
@@ -362,12 +351,11 @@ successful or `CL_FALSE` otherwise:
     /* Build program. */
     status = ccl_program_build(prg, NULL, NULL);
     if (!status) exit(-1);
-
-~~~~~~~~~~~~~~~
+```
 
 Here's the current state of our code:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 #define VECSIZE 8
@@ -379,7 +367,7 @@ int main() {
     CCLContext * ctx = NULL;
     CCLDevice * dev = NULL;
     CCLQueue * queue = NULL;
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     CCLBuffer * a = NULL, * b = NULL, * c = NULL;
     cl_uint vec_a[VECSIZE] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_uint vec_b[VECSIZE] = {3, 2, 1, 0, 1, 2, 3, 4};
@@ -430,7 +418,7 @@ int main() {
 
     return 0;
 }
-~~~~~~~~~~~~~~~
+```
 
 Compile and run the code. Don't forget to put the `mysum.cl` file containing the
 kernel source code in the same folder, otherwise the program object will not be
@@ -444,12 +432,11 @@ with clSetKernelArg(), and finally executing the kernel with
 clEnqueueNDRangeKernel(), _cf4ocl_ allows client code to do this using a single
 function:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Variables. */
     //...
     size_t gws = VECSIZE;
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
 
     //...
     /* Set kernel arguments and run kernel. */
@@ -457,8 +444,7 @@ function:
         NULL, NULL, NULL, a, b, c, ccl_arg_priv(d, cl_uint),
         ccl_arg_priv(gws, cl_uint), NULL);
     if (!evt) exit(-1);
-
-~~~~~~~~~~~~~~~
+```
 
 Buffer, image and sampler objects can be passed directly as kernel arguments.
 Local and private variables are passed using the ::ccl_arg_local() and
@@ -484,19 +470,16 @@ allow client code to have finer control over this process.
 To check the results of the kernel execution, it's necessary to read the
 contents of device buffer `c` into host buffer `vec_c`:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Read the output buffer from the device. */
     evt = ccl_buffer_enqueue_read(c, queue, CL_TRUE, 0,
         VECSIZE * sizeof(cl_uint), vec_c, NULL, NULL);
     if (!evt) exit(-1);
-
-~~~~~~~~~~~~~~~
+```
 
 Now we can check the results:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Variables. */
     //...
     int i;
@@ -511,12 +494,11 @@ Now we can check the results:
     }
     /* No errors found. */
     printf("Results OK!\n");
-
-~~~~~~~~~~~~~~~
+```
 
 We now have a fully working OpenCL program, simplified with _cf4ocl_:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 #define VECSIZE 8
@@ -597,7 +579,7 @@ int main() {
     /* No errors found. */
     printf("Results OK!\n");
 
-   /* Destroy cf4ocl wrappers. */
+    /* Destroy cf4ocl wrappers. */
     ccl_program_destroy(prg);
     ccl_buffer_destroy(c);
     ccl_buffer_destroy(b);
@@ -607,7 +589,7 @@ int main() {
 
     return 0;
 }
-~~~~~~~~~~~~~~~
+```
 
 ### A better way to check for errors
 
@@ -622,16 +604,16 @@ object memory location was expected, so no information about errors is made
 available to the caller. To change the way we're handling errors, we must first
 declare a ::CCLErr object, and initialize it to `NULL`:
 
-~~~~~~~~~~~~~~~{.c}
+```c
     /* Variables. */
     //...
     CCLErr * err = NULL;
-~~~~~~~~~~~~~~~
+```
 
 Then, we should pass the memory location of this object to all _cf4ocl_
 error-throwing functions, e.g.:
 
-~~~~~~~~~~~~~~~{.c}
+```c
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(&err);
     //...
@@ -643,21 +625,21 @@ error-throwing functions, e.g.:
     /* Create a command queue. */
     queue = ccl_queue_new(ctx, dev, 0, &err);
     //...
-~~~~~~~~~~~~~~~
+```
 
 Now we can check this object after _cf4ocl_ function calls. Let's create a small
 macro to do so:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #define CHECK_ERROR(err) \
     if (err != NULL) { fprintf(stderr, "\n%s\n", err->message); exit(-1); }
-~~~~~~~~~~~~~~~
+```
 
 We can also remove the `status` and `evt` variables, because we don't rely on
 them anymore for error checking. Here's the complete code, with more informative
 error checking:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 #define VECSIZE 8
@@ -749,7 +731,7 @@ int main() {
 
     return 0;
 }
-~~~~~~~~~~~~~~~
+```
 
 The error checking strategy in our code is just an example. Client code can
 implement any strategy. More information about this topic is available in the
@@ -762,19 +744,16 @@ about all `cl_event` objects, is an extremely verbose and error-prone process.
 However, it comes for free with _cf4ocl_. Well, mostly. The first change we must
 perform on our program is to enable profiling when the command queue is created:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Create a command queue. */
     queue = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
-
-~~~~~~~~~~~~~~~
+```
 
 Additionally, we copied host vectors to device implicitly during device buffer
 creation. These implicit transfers don't produce OpenCL events, and are thus
 unavailable for profiling. As such, we should make these operations explicit:
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Instantiate device buffers. */
     a = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
         VECSIZE * sizeof(cl_uint), NULL, &err);
@@ -794,17 +773,15 @@ unavailable for profiling. As such, we should make these operations explicit:
     ccl_buffer_enqueue_write(b, queue, CL_TRUE, 0,
         VECSIZE * sizeof(cl_uint), vec_b, NULL, &err);
     CHECK_ERROR(err);
-
-~~~~~~~~~~~~~~~
+```
 
 We can now profile our code using functionality provided by the
 @ref CCL_PROFILER "profiler module":
 
-~~~~~~~~~~~~~~~{.c}
-
+```c
     /* Variables. */
     //...
-    CCLProf* prof = NULL;
+    CCLProf * prof = NULL;
 
     //...
 
@@ -819,12 +796,11 @@ We can now profile our code using functionality provided by the
 
     /* Destroy profiler object. */
     ccl_prof_destroy(prof);
-
-~~~~~~~~~~~~~~~
+```
 
 Our final code, with error checking and profiling, is as follows:
 
-~~~~~~~~~~~~~~~{.c}
+```c
 #include <cf4ocl2.h>
 
 #define VECSIZE 8
@@ -847,7 +823,7 @@ int main() {
     size_t gws = VECSIZE;
     int i;
     CCLErr * err = NULL;
-    CCLProf* prof = NULL;
+    CCLProf * prof = NULL;
 
     /* Create context with user selected device. */
     ctx = ccl_context_new_from_menu(&err);
@@ -938,14 +914,12 @@ int main() {
 
     return 0;
 }
-
-~~~~~~~~~~~~~~~
+```
 
 Compile and run the code. A profiling summary will be printed on the screen,
 something like:
 
-@verbatim
-
+```
  Aggregate times by event  :
    ------------------------------------------------------------------
    | Event name                     | Rel. time (%) | Abs. time (s) |
@@ -957,8 +931,7 @@ something like:
                                     |         Total |    2.7742e-05 |
                                     ---------------------------------
  Event overlaps            : None
-
-@endverbatim
+```
 
 While this profiling summary is useful, the
 @ref CCL_PROFILER "profiler module" can do much more.

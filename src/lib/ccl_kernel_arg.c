@@ -39,7 +39,7 @@
  * a real ::CCLWrapper object.
  * */
 #define ccl_arg_is_local(arg) \
-     (arg->info == (void*) &arg_local_marker)
+     (arg->info == (void *) &arg_local_marker)
 
 /**
  * @internal
@@ -59,7 +59,7 @@ static const CCLArg arg_skip = { CCL_NONE, NULL, NULL, 0 };
 /* Use this constant to skip kernel arguments in ::ccl_kernel_set_args()
  * and ::ccl_kernel_set_args_v() functions. */
 CCL_EXPORT
-const CCLArg* ccl_arg_skip = &arg_skip;
+const CCLArg * ccl_arg_skip = &arg_skip;
 
 /**
  * Create a new kernel argument.
@@ -73,19 +73,18 @@ const CCLArg* ccl_arg_skip = &arg_skip;
  * @return A new kernel argument.
  * */
 CCL_EXPORT
-CCLArg* ccl_arg_new(void* value, size_t size) {
+CCLArg * ccl_arg_new(void * value, size_t size) {
 
     /* Make sure size is > 0. */
     g_return_val_if_fail(size > 0, NULL);
 
-    CCLArg* arg = g_slice_new(CCLArg);
+    CCLArg * arg = g_slice_new(CCLArg);
 
-    arg->cl_object = g_memdup((const void*) value, (guint) size);
-    arg->info = (void*) &arg_local_marker;
+    arg->cl_object = g_memdup((const void *) value, (guint) size);
+    arg->info = (void *) &arg_local_marker;
     arg->ref_count = (gint) size;
 
     return arg;
-
 }
 
 /**
@@ -97,7 +96,7 @@ CCLArg* ccl_arg_new(void* value, size_t size) {
  * @param[in] arg Argument to destroy.
  * */
 CCL_EXPORT
-void ccl_arg_destroy(CCLArg* arg) {
+void ccl_arg_destroy(CCLArg * arg) {
 
     /* Make sure arg is not NULL. */
     g_return_if_fail(arg != NULL);
@@ -118,14 +117,14 @@ void ccl_arg_destroy(CCLArg* arg) {
  * @return Argument size in bytes.
  * */
 CCL_EXPORT
-size_t ccl_arg_size(CCLArg* arg) {
+size_t ccl_arg_size(CCLArg * arg) {
 
     /* Make sure arg is not NULL. */
     g_return_val_if_fail(arg != NULL, 0);
 
     return ccl_arg_is_local(arg)
         ? (size_t) arg->ref_count
-        : sizeof(void*);
+        : sizeof(void *);
 }
 
 /**
@@ -138,7 +137,7 @@ size_t ccl_arg_size(CCLArg* arg) {
  * @return Argument value.
  * */
 CCL_EXPORT
-void* ccl_arg_value(CCLArg* arg) {
+void* ccl_arg_value(CCLArg * arg) {
 
     /* Make sure arg is not NULL. */
     g_return_val_if_fail(arg != NULL, NULL);

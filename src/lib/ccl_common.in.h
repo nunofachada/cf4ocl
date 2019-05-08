@@ -325,17 +325,17 @@ typedef enum ccl_error_code {
 
 /* Print executable version. */
 CCL_EXPORT
-void ccl_common_version_print(const char* exec_name);
+void ccl_common_version_print(const char * exec_name);
 
 /* Frees a `NULL`-terminated array of strings, as well as each string it
  * contains. */
 CCL_EXPORT
-void ccl_strv_clear(char** str_array);
+void ccl_strv_clear(char ** str_array);
 
 /* If `err` or `*err` is `NULL`, does nothing. Otherwise, releases memory
  * occupied by `*err` and sets `*err` to `NULL`. */
 CCL_EXPORT
-void ccl_err_clear(CCLErr** err);
+void ccl_err_clear(CCLErr ** err);
 
 /* Resolves to error category identifying string, in this case an error in
  * _cf4ocl_. */

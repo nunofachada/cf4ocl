@@ -62,7 +62,7 @@
 /**
  * Canonical example main function.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char * argv[]) {
 
     /* Number of elements in buffer. */
     size_t buf_n = DEF_BUF_N;
@@ -86,34 +86,34 @@ int main(int argc, char** argv) {
     }
 
     /* Wrappers. */
-    CCLContext* ctx = NULL;
-    CCLProgram* prg = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* queue = NULL;
-    CCLKernel* krnl = NULL;
-    CCLBuffer* a_dev;
-    CCLBuffer* b_dev;
-    CCLBuffer* c_dev;
-    CCLEvent* evt_write1;
-    CCLEvent* evt_write2;
-    CCLEvent* evt_exec;
+    CCLContext * ctx = NULL;
+    CCLProgram * prg = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * queue = NULL;
+    CCLKernel * krnl = NULL;
+    CCLBuffer * a_dev;
+    CCLBuffer * b_dev;
+    CCLBuffer * c_dev;
+    CCLEvent * evt_write1;
+    CCLEvent * evt_write2;
+    CCLEvent * evt_exec;
     CCLEventWaitList ewl = NULL;
 
     /* Profiler. */
-    CCLProf* prof;
+    CCLProf * prof;
 
     /* Global and local worksizes. */
     size_t gws = 0;
     size_t lws = 0;
 
     /* Host buffers. */
-    cl_uint* a_host = NULL;
-    cl_uint* b_host = NULL;
-    cl_uint* c_host = NULL;
+    cl_uint * a_host = NULL;
+    cl_uint * b_host = NULL;
+    cl_uint * c_host = NULL;
     cl_uint d_host;
 
     /* Error reporting object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Check results flag. */
     cl_bool check_result;
@@ -152,9 +152,9 @@ int main(int argc, char** argv) {
     printf(" * Local worksize : %d\n", (int) lws);
 
     /* Initialize host buffers. */
-    a_host = (cl_uint*) malloc(sizeof(cl_uint) * buf_n);
-    b_host = (cl_uint*) malloc(sizeof(cl_uint) * buf_n);
-    c_host = (cl_uint*) malloc(sizeof(cl_uint) * buf_n);
+    a_host = (cl_uint *) malloc(sizeof(cl_uint) * buf_n);
+    b_host = (cl_uint *) malloc(sizeof(cl_uint) * buf_n);
+    c_host = (cl_uint *) malloc(sizeof(cl_uint) * buf_n);
 
     /* Fill host buffers. */
     for (cl_uint i = 0; i < buf_n; ++i) {

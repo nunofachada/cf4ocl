@@ -56,7 +56,7 @@
 
 /* Convert OpenCL error code to a readable string. */
 CCL_EXPORT
-const char* ccl_err(int code);
+const char * ccl_err(int code);
 
 /** @} */
 

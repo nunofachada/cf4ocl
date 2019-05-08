@@ -52,9 +52,9 @@
 int main() {
 
     /* cf4ocl objects. */
-    CCLPlatforms* platf_list;
-    CCLPlatform* platf;
-    CCLDevice* dev;
+    CCLPlatforms * platf_list;
+    CCLPlatform * platf;
+    CCLDevice * dev;
 
     /* Other variables. */
     cl_uint num_platfs;
@@ -116,7 +116,5 @@ int main() {
 
     /* Bye. */
     return EXIT_SUCCESS;
-
 }
-
 

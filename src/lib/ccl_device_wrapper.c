@@ -19,8 +19,7 @@
 /**
  * @file
  *
- * Implementation of a wrapper class and its methods for OpenCL device
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL device objects.
  *
  * @author Nuno Fachada
  * @date 2019
@@ -51,7 +50,7 @@ struct ccl_device {
      * List of sub-device arrays.
      * @private
      * */
-    GSList* subdev_arrays;
+    GSList * subdev_arrays;
 #endif
 
 };
@@ -72,7 +71,7 @@ static void ccl_device_release_subdev_arrays(gpointer data) {
     g_return_if_fail(data != NULL);
 
     /* Convert data to array of sub-devices. */
-    CCLDevice** subdevs = (CCLDevice**) data;
+    CCLDevice ** subdevs = (CCLDevice **) data;
 
     /* Destroy sub-devices. */
     for (cl_uint i = 0; subdevs[i] != NULL; ++i)
@@ -91,7 +90,7 @@ static void ccl_device_release_subdev_arrays(gpointer data) {
  *
  * @param[in] dev A ::CCLDevice wrapper object.
  * */
-static void ccl_device_release_fields(CCLDevice* dev) {
+static void ccl_device_release_fields(CCLDevice * dev) {
 
     /* Make sure device wrapper object is not NULL. */
     g_return_if_fail(dev != NULL);
@@ -126,10 +125,10 @@ static void ccl_device_release_fields(CCLDevice* dev) {
  * @return The device wrapper for the given OpenCL device.
  * */
 CCL_EXPORT
-CCLDevice* ccl_device_new_wrap(cl_device_id device) {
+CCLDevice * ccl_device_new_wrap(cl_device_id device) {
 
-    return (CCLDevice*) ccl_wrapper_new(
-        CCL_DEVICE, (void*) device, sizeof(CCLDevice));
+    return (CCLDevice *) ccl_wrapper_new(
+        CCL_DEVICE, (void *) device, sizeof(CCLDevice));
 
 }
 
@@ -142,7 +141,7 @@ CCLDevice* ccl_device_new_wrap(cl_device_id device) {
  * @param[in] dev The device wrapper object.
  * */
 CCL_EXPORT
-void ccl_device_destroy(CCLDevice* dev) {
+void ccl_device_destroy(CCLDevice * dev) {
 
 #ifdef CL_VERSION_1_2
 
@@ -151,23 +150,22 @@ void ccl_device_destroy(CCLDevice* dev) {
     /* Device destruction depends on device OpenCL version. */
     if (ver >= 120) {
 
-        /* If OpenCL >= 1.2, then pass clReleaseDevice to release
+        /* If OpenCL >= 1.2, then pass clReleaseDevice() to release
          * device (will only matter for sub-devices). */
-        ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
+        ccl_wrapper_unref((CCLWrapper *) dev, sizeof(CCLDevice),
             (ccl_wrapper_release_fields) ccl_device_release_fields,
             (ccl_wrapper_release_cl_object) clReleaseDevice, NULL);
 
     } else {
 
         /* If OpenCL < 1.2, don't pass OpenCL specific destructors. */
-        ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
+        ccl_wrapper_unref((CCLWrapper *) dev, sizeof(CCLDevice),
             NULL, NULL, NULL);
     }
 
 #else
 
-    ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
-        NULL, NULL, NULL);
+    ccl_wrapper_unref((CCLWrapper *) dev, sizeof(CCLDevice), NULL, NULL, NULL);
 
 #endif
 }
@@ -191,14 +189,14 @@ void ccl_device_destroy(CCLDevice* dev) {
  * occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
+cl_uint ccl_device_get_opencl_version(CCLDevice * dev, CCLErr ** err) {
 
     /* Make sure dev is not NULL. */
     g_return_val_if_fail(dev != NULL, 0);
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-    char* ver_str;
+    char * ver_str;
     cl_uint ver = 0;
 
     /* Get version string which has the format "OpenCL x.x ..." */
@@ -215,13 +213,14 @@ cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
 
 /**
  * Get the OpenCL C version supported by the device. This information
- * is parsed from the CL_DEVICE_OPENCL_C_VERSION parameter name. The
+ * is parsed from the `CL_DEVICE_OPENCL_C_VERSION` parameter name. The
  * version is returned as an integer, in the following format:
  *
  * * 100 for OpenCL 1.0
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @param[in] dev The device wrapper object.
@@ -231,14 +230,14 @@ cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
  * an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
+cl_uint ccl_device_get_opencl_c_version(CCLDevice * dev, CCLErr ** err) {
 
     /* Make sure dev is not NULL. */
     g_return_val_if_fail(dev != NULL, 0);
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-    char* ver_str;
+    char * ver_str;
     cl_uint ver = 0;
 
     /* Get version string which has the format "OpenCL C x.x ..." */
@@ -275,9 +274,9 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
  * be automatically disposed of when parent device is destroyed.
  * */
 CCL_EXPORT
-CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
-    const cl_device_partition_property *properties,
-    cl_uint *num_devs_ret, CCLErr** err) {
+CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
+    const cl_device_partition_property * properties,
+    cl_uint * num_devs_ret, CCLErr ** err) {
 
     /* Make sure device wrapper object is not NULL. */
     g_return_val_if_fail(dev != NULL, NULL);
@@ -287,7 +286,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
     /* Number of sub-devices the partition may yield. */
     cl_uint num_devs;
     /* Array for holding sub-devices. */
-    void** subdevs = NULL;
+    void ** subdevs = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -316,12 +315,12 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
 
     /* Create array for holding sub-devices. The last element should
      * be NULL. */
-    subdevs = g_new0(void*, num_devs + 1);
+    subdevs = g_new0(void *, num_devs + 1);
 
     /* Create sub-devices. */
     ocl_status = clCreateSubDevices(
         ccl_device_unwrap(dev), properties, num_devs,
-        (cl_device_id*) subdevs, NULL);
+        (cl_device_id *) subdevs, NULL);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to create sub-devices (OpenCL error %d: %s).",
@@ -355,7 +354,7 @@ error_handler:
 finish:
 
     /* Return event. */
-    return (CCLDevice* const*) subdevs;
+    return (CCLDevice * const *) subdevs;
 }
 
 /** @} */

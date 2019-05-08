@@ -49,7 +49,7 @@ struct ccl_event {
      * Event name, for profiling purposes only.
      * @private
      * */
-    const char* name;
+    const char * name;
 
 };
 
@@ -74,13 +74,12 @@ struct ccl_event {
  * @return The event wrapper for the given OpenCL event.
  * */
 CCL_EXPORT
-CCLEvent* ccl_event_new_wrap(cl_event event) {
+CCLEvent * ccl_event_new_wrap(cl_event event) {
 
-    CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
+    CCLEvent * evt = (CCLEvent *) ccl_wrapper_new(
         CCL_EVENT, (void*) event, sizeof(CCLEvent));
 
     return evt;
-
 }
 
 /**
@@ -92,11 +91,10 @@ CCLEvent* ccl_event_new_wrap(cl_event event) {
  * @param[in] evt The event wrapper object.
  * */
 CCL_EXPORT
-void ccl_event_destroy(CCLEvent* evt) {
+void ccl_event_destroy(CCLEvent * evt) {
 
-    ccl_wrapper_unref((CCLWrapper*) evt, sizeof(CCLEvent),
+    ccl_wrapper_unref((CCLWrapper *) evt, sizeof(CCLEvent),
         NULL, (ccl_wrapper_release_cl_object) clReleaseEvent, NULL);
-
 }
 
 /**
@@ -111,19 +109,18 @@ void ccl_event_destroy(CCLEvent* evt) {
  * @param[in] name Name to associate with event.
  * */
 CCL_EXPORT
-void ccl_event_set_name(CCLEvent* evt, const char* name) {
+void ccl_event_set_name(CCLEvent * evt, const char * name) {
 
     /* Make sure evt wrapper object is not NULL. */
     g_return_if_fail(evt != NULL);
 
     /* Set event name. */
     evt->name = name;
-
 }
 
 /**
  * Get the event name for profiling purposes. If not explicitly set
- * with ccl_event_set_name(), it will return NULL.
+ * with ccl_event_set_name(), it will return `NULL`.
  *
  * This is used to distinguish from different event is profiling is to
  * be performed using the @ref CCL_PROFILER "profiler module".
@@ -134,7 +131,7 @@ void ccl_event_set_name(CCLEvent* evt, const char* name) {
  * @return Name associated with event.
  * */
 CCL_EXPORT
-const char* ccl_event_get_name(CCLEvent* evt) {
+const char* ccl_event_get_name(CCLEvent * evt) {
 
     /* Make sure evt wrapper object is not NULL. */
     g_return_val_if_fail(evt != NULL, NULL);
@@ -158,13 +155,13 @@ const char* ccl_event_get_name(CCLEvent* evt) {
  * @return Final name associated with event.
  * */
 CCL_EXPORT
-const char* ccl_event_get_final_name(CCLEvent* evt) {
+const char * ccl_event_get_final_name(CCLEvent * evt) {
 
     /* Make sure evt wrapper object is not NULL. */
     g_return_val_if_fail(evt != NULL, NULL);
 
     /* Final name to return. */
-    const char* final_name;
+    const char * final_name;
 
     /* Check if name is not NULL. */
     if (evt->name != NULL) {
@@ -177,7 +174,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
         /* Name is NULL, determine a final name based on type of
          * command which produced the event. */
 
-        CCLErr* err_internal = NULL;
+        CCLErr * err_internal = NULL;
 
         cl_command_type ct =
             ccl_event_get_command_type(evt, &err_internal);
@@ -314,7 +311,6 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
                 g_warning("Unknown event command type: 0x%x", ct);
                 break;
         }
-
     }
 
     /* Return final name. */
@@ -333,8 +329,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
  * occurs.
  * */
 CCL_EXPORT
-cl_command_type ccl_event_get_command_type(
-    CCLEvent* evt, CCLErr** err) {
+cl_command_type ccl_event_get_command_type(CCLEvent * evt, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -346,7 +341,7 @@ cl_command_type ccl_event_get_command_type(
     cl_command_type ct;
 
     /* Determine the command type. */
-    CCLWrapperInfo* info =
+    CCLWrapperInfo * info =
         ccl_event_get_info(evt, CL_EVENT_COMMAND_TYPE, err);
 
     if (info == NULL) {
@@ -354,7 +349,7 @@ cl_command_type ccl_event_get_command_type(
         ct = 0;
     } else {
         /* Get the command type. */
-        ct = *((cl_command_type*) info->value);
+        ct = *((cl_command_type *) info->value);
     }
 
     /* Return the command type. */
@@ -370,6 +365,7 @@ cl_command_type ccl_event_get_command_type(
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @public @memberof ccl_event
@@ -381,7 +377,7 @@ cl_command_type ccl_event_get_command_type(
  * event object as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_event_get_opencl_version(CCLEvent* evt, CCLErr** err) {
+cl_uint ccl_event_get_opencl_version(CCLEvent * evt, CCLErr ** err) {
 
     /* Make sure number evt is not NULL. */
     g_return_val_if_fail(evt != NULL, 0);
@@ -396,8 +392,8 @@ cl_uint ccl_event_get_opencl_version(CCLEvent* evt, CCLErr** err) {
      * isn't defined for version 1.0. */
 
     cl_context context;
-    CCLContext* ctx;
-    CCLErr* err_internal = NULL;
+    CCLContext * ctx;
+    CCLErr * err_internal = NULL;
 
     context = ccl_event_get_info_scalar(
         evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
@@ -434,7 +430,6 @@ finish:
 
     /* Return event wrapper. */
     return ocl_ver;
-
 }
 
 /**
@@ -449,17 +444,16 @@ finish:
  * or `CL_COMPLETE`).
  * @param[in] pfn_notify The event callback function that can be
  * registered by the application.
- * @param[in] user_data Will be passed as the user_data argument when
+ * @param[in] user_data Will be passed as the `user_data` argument when
  * pfn_notify is called.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_event_set_callback(CCLEvent* evt,
+cl_bool ccl_event_set_callback(CCLEvent * evt,
     cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
-    void *user_data, CCLErr** err) {
+    void * user_data, CCLErr ** err) {
 
     /* Make sure evt is not NULL. */
     g_return_val_if_fail(evt != NULL, CL_FALSE);
@@ -473,7 +467,7 @@ cl_bool ccl_event_set_callback(CCLEvent* evt,
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -530,12 +524,10 @@ finish:
 
     /* Return status. */
     return ret_status;
-
 }
 
 /**
- * Create a new user event. Wraps the clCreateUserEvent() OpenCL
- * function.
+ * Create a new user event. Wraps the clCreateUserEvent() OpenCL function.
  *
  * Returned event wrapper should be freed using ccl_event_destroy().
  *
@@ -545,11 +537,10 @@ finish:
  * @param[in] ctx Context where to associate the user event.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A new user event, which should be freed using
- * ccl_event_destroy().
+ * @return A new user event, which should be freed using ccl_event_destroy().
  * */
 CCL_EXPORT
-CCLEvent* ccl_user_event_new(CCLContext* ctx, CCLErr** err) {
+CCLEvent * ccl_user_event_new(CCLContext * ctx, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -560,7 +551,7 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, CCLErr** err) {
     /* OpenCL status. */
     cl_int ocl_status;
     /* Event wrapper object. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
     /* OpenCL event object. */
     cl_event event;
     /* OpenCL version of the underlying platform. */
@@ -619,7 +610,6 @@ finish:
 
     /* Return event wrapper. */
     return evt;
-
 }
 
 /**
@@ -639,7 +629,7 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_user_event_set_status(
-    CCLEvent* evt, cl_int execution_status, CCLErr** err) {
+    CCLEvent * evt, cl_int execution_status, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
@@ -707,7 +697,6 @@ finish:
 
     /* Return status. */
     return ret_status;
-
 }
 
 /**
@@ -719,8 +708,8 @@ finish:
  * @return Event wait list populated with the given events.
  * */
 CCL_EXPORT
-CCLEventWaitList* ccl_event_wait_list_add(
-    CCLEventWaitList* evt_wait_lst, ...) {
+CCLEventWaitList * ccl_event_wait_list_add(
+    CCLEventWaitList * evt_wait_lst, ...) {
 
     /* Check that evt_wait_lst is not NULL. */
     g_return_val_if_fail(evt_wait_lst != NULL, NULL);
@@ -729,7 +718,7 @@ CCLEventWaitList* ccl_event_wait_list_add(
     va_list al;
 
     /* Current event wrapper object. */
-    CCLEvent* evt;
+    CCLEvent * evt;
 
     /* Initialize list if required. */
     if (*evt_wait_lst == NULL)
@@ -739,7 +728,7 @@ CCLEventWaitList* ccl_event_wait_list_add(
     va_start(al, evt_wait_lst);
 
     /* Get arguments (i.e. event wrapper objects). */
-    while ((evt = va_arg(al, CCLEvent*)) != NULL) {
+    while ((evt = va_arg(al, CCLEvent *)) != NULL) {
 
         /* Add event wrapper to array. */
         g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evt));
@@ -754,7 +743,6 @@ CCLEventWaitList* ccl_event_wait_list_add(
 
     /* Return event wait list. */
     return evt_wait_lst;
-
 }
 
 /**
@@ -765,8 +753,8 @@ CCLEventWaitList* ccl_event_wait_list_add(
  * @return Event wait list populated with the given events.
  * */
 CCL_EXPORT
-CCLEventWaitList* ccl_event_wait_list_add_v(
-    CCLEventWaitList* evt_wait_lst, CCLEvent** evts) {
+CCLEventWaitList * ccl_event_wait_list_add_v(
+    CCLEventWaitList * evt_wait_lst, CCLEvent ** evts) {
 
     /* Check that evt_wait_lst is not NULL. */
     g_return_val_if_fail(evt_wait_lst != NULL, NULL);
@@ -791,7 +779,6 @@ CCLEventWaitList* ccl_event_wait_list_add_v(
 
     /* Return event wait list. */
     return evt_wait_lst;
-
 }
 
 /**
@@ -804,7 +791,7 @@ CCLEventWaitList* ccl_event_wait_list_add_v(
  * @param[out] evt_wait_lst Event wait list.
  * */
 CCL_EXPORT
-void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
+void ccl_event_wait_list_clear(CCLEventWaitList * evt_wait_lst) {
 
     if ((evt_wait_lst != NULL) && (*evt_wait_lst != NULL)) {
         g_ptr_array_free(*evt_wait_lst, TRUE);
@@ -826,7 +813,7 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
  * otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+cl_bool ccl_event_wait(CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
@@ -862,7 +849,6 @@ finish:
 
     /* Return status. */
     return ret_status;
-
 }
 
 /** @} */

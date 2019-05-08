@@ -70,8 +70,8 @@ struct ccl_dev_container {
 /**
  * @internal
  * Returns the list of cl_device_id OpenCL objects in the
- * wrapped OpenCL device container object (i.e. cl_platform_id,
- * cl_program and cl_context). This is an abstract function prototype
+ * wrapped OpenCL device container object (i.e. `cl_platform_id`,
+ * `cl_program` and `cl_context`). This is an abstract function prototype
  * which must be implemented by device container wrappers, i.e.,
  * ::CCLPlatform, ::CCLProgram and ::CCLContext.
  *
@@ -80,29 +80,29 @@ struct ccl_dev_container {
  * @param[in] devcon The device container wrapper.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return List of cl_device_id OpenCL objects in the OpenCL device container
+ * @return List of `cl_device_id` OpenCL objects in the OpenCL device container
  * object wrapped by the given device container wrapper.
  * */
-typedef CCLWrapperInfo* (*ccl_dev_container_get_cldevices)(
-    CCLDevContainer* devcon, CCLErr** err);
+typedef CCLWrapperInfo * (*ccl_dev_container_get_cldevices)(
+    CCLDevContainer * devcon, CCLErr ** err);
 
 /* Release the devices held by the given #CCLDevContainer
  * object. */
-void ccl_dev_container_release_devices(CCLDevContainer* devcon);
+void ccl_dev_container_release_devices(CCLDevContainer * devcon);
 
 /* Get all ::CCLDevice wrappers in device container. */
-CCLDevice* const* ccl_dev_container_get_all_devices(
-    CCLDevContainer* devcon,
-    ccl_dev_container_get_cldevices get_devices, CCLErr** err);
+CCLDevice * const * ccl_dev_container_get_all_devices(
+    CCLDevContainer * devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr ** err);
 
 /* Get ::CCLDevice wrapper at given index. */
-CCLDevice* ccl_dev_container_get_device(CCLDevContainer* devcon,
+CCLDevice* ccl_dev_container_get_device(CCLDevContainer * devcon,
     ccl_dev_container_get_cldevices get_devices,
     cl_uint index, CCLErr** err);
 
 /* Return number of devices in device container. */
-cl_uint ccl_dev_container_get_num_devices(CCLDevContainer* devcon,
-    ccl_dev_container_get_cldevices get_devices, CCLErr** err);
+cl_uint ccl_dev_container_get_num_devices(CCLDevContainer * devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr ** err);
 
 #endif
 

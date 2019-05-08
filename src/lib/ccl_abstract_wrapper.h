@@ -44,7 +44,7 @@ typedef struct ccl_wrapper_info {
      * Object information.
      * @public
      * */
-    void* value;
+    void * value;
 
     /**
      * Size in bytes of object information.
@@ -56,34 +56,34 @@ typedef struct ccl_wrapper_info {
 
 /* Increase the reference count of the wrapper object. */
 CCL_EXPORT
-void ccl_wrapper_ref(CCLWrapper* wrapper);
+void ccl_wrapper_ref(CCLWrapper * wrapper);
 
 /* Returns the wrapper object reference count. For debugging and
  * testing purposes only. */
 CCL_EXPORT
-int ccl_wrapper_ref_count(CCLWrapper* wrapper);
+int ccl_wrapper_ref_count(CCLWrapper * wrapper);
 
 /* Get the wrapped OpenCL object. */
 CCL_EXPORT
-void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
+void * ccl_wrapper_unwrap(CCLWrapper * wrapper);
 
 /* Get information about any wrapped OpenCL object. */
 CCL_EXPORT
-CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
-    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-    CCLInfo info_type, cl_bool use_cache, CCLErr** err);
+CCLWrapperInfo * ccl_wrapper_get_info(CCLWrapper * wrapper1,
+    CCLWrapper * wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr ** err);
 
 /* Get pointer to information value. */
 CCL_EXPORT
-void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
-    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-    CCLInfo info_type, cl_bool use_cache, CCLErr** err);
+void * ccl_wrapper_get_info_value(CCLWrapper * wrapper1,
+    CCLWrapper * wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr ** err);
 
 /* Get information size. */
 CCL_EXPORT
-size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
-    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-    CCLInfo info_type, cl_bool use_cache, CCLErr** err);
+size_t ccl_wrapper_get_info_size(CCLWrapper * wrapper1,
+    CCLWrapper * wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr ** err);
 
 /* Debug function which checks if memory allocated by wrappers
  * has been properly freed. */
@@ -92,7 +92,7 @@ cl_bool ccl_wrapper_memcheck();
 
 /* Get wrapper class or type name. */
 CCL_EXPORT
-const char* ccl_wrapper_get_class_name(CCLWrapper* wrapper);
+const char * ccl_wrapper_get_class_name(CCLWrapper * wrapper);
 
 #endif
 

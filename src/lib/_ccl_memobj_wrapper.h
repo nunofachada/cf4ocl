@@ -54,12 +54,12 @@ struct ccl_memobj {
      * Context wrapper.
      * @private
      * */
-    CCLContext* ctx;
+    CCLContext * ctx;
 
 };
 
 /* Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects. */
-void ccl_memobj_release_fields(CCLMemObj* mo);
+void ccl_memobj_release_fields(CCLMemObj * mo);
 
 #endif

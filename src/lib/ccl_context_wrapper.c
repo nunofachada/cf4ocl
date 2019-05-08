@@ -47,7 +47,7 @@ struct ccl_context {
      * Platform (can be lazy initialized).
      * @private
      * */
-    CCLPlatform* platf;
+    CCLPlatform * platf;
 
 };
 
@@ -60,13 +60,13 @@ struct ccl_context {
  *
  * @param[in] ctx A ::CCLContext wrapper object.
  * */
-static void ccl_context_release_fields(CCLContext* ctx) {
+static void ccl_context_release_fields(CCLContext * ctx) {
 
     /* Make sure context wrapper object is not NULL. */
     g_return_if_fail(ctx != NULL);
 
     /* Release devices. */
-    ccl_dev_container_release_devices((CCLDevContainer*) ctx);
+    ccl_dev_container_release_devices((CCLDevContainer *) ctx);
 
     /* Release platform. */
     if (ctx->platf) {
@@ -80,8 +80,8 @@ static void ccl_context_release_fields(CCLContext* ctx) {
  *
  * @private @memberof ccl_context
  *
- * @param[in] properties The original const properties, may be NULL, in
- * which case the ctx_props parameter will be freed.
+ * @param[in] properties The original const properties, may be `NULL`, in
+ * which case the `ctx_props` parameter will be freed.
  * @param[in] ctx_props Context properties to be freed, if different
  * than the original const properties parameter.
  * */
@@ -93,22 +93,21 @@ static void ccl_context_release_fields(CCLContext* ctx) {
  * @internal
  * Create a default context properties object, if required. The
  * only property set in the default properties object is the OpenCL
- * cl_platform_id object.
+ * `cl_platform_id` object.
  *
  * @private @memberof ccl_context
  *
- * @param[in] properties Original const properties, which if NULL imply
+ * @param[in] properties Original const properties, which if `NULL` imply
  * that a new default properties object should be created.
- * @param[in] device Reference device to build the context properties
- * for.
+ * @param[in] device Reference device to build the context properties for.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The properties parameter if not NULL, or a default set of
+ * @return The properties parameter if not `NULL`, or a default set of
  * context properties.
  * */
-static cl_context_properties* ccl_context_properties_default(
-    const cl_context_properties* properties,
-    cl_device_id device, CCLErr** err) {
+static cl_context_properties * ccl_context_properties_default(
+    const cl_context_properties * properties,
+    cl_device_id device, CCLErr ** err) {
 
     /* Make sure device is not NULL. */
     g_return_val_if_fail(device != NULL, NULL);
@@ -116,7 +115,7 @@ static cl_context_properties* ccl_context_properties_default(
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Context properties. */
-    cl_context_properties* ctx_props = NULL;
+    cl_context_properties * ctx_props = NULL;
 
     /* The OpenCL platform object. */
     cl_platform_id platform;
@@ -148,7 +147,7 @@ static cl_context_properties* ccl_context_properties_default(
     } else {
 
         /* If properties parameter is not NULL, use it instead. */
-        ctx_props = (cl_context_properties*) properties;
+        ctx_props = (cl_context_properties *) properties;
     }
 
     /* If we got here, everything is OK. */
@@ -163,7 +162,6 @@ finish:
 
     /* Return properties. */
     return ctx_props;
-
 }
 
 /**
@@ -173,15 +171,14 @@ finish:
  *
  * @private @memberof ccl_context
  *
- * @param[in] devcon A ::CCLContext wrapper, passed as a
- * ::CCLDevContainer .
+ * @param[in] devcon A ::CCLContext wrapper, passed as a ::CCLDevContainer.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
+ * @return A list of `cl_device_id` objects inside a ::CCLWrapperInfo
  * object.
  * */
-static CCLWrapperInfo* ccl_context_get_cldevices(
-    CCLDevContainer* devcon, CCLErr** err) {
+static CCLWrapperInfo * ccl_context_get_cldevices(
+    CCLDevContainer * devcon, CCLErr ** err) {
 
     return ccl_context_get_info(devcon, CL_CONTEXT_DEVICES, err);
 }
@@ -209,11 +206,10 @@ static CCLWrapperInfo* ccl_context_get_cldevices(
  * @return The context wrapper for the given OpenCL context.
  * */
 CCL_EXPORT
-CCLContext* ccl_context_new_wrap(cl_context context) {
+CCLContext * ccl_context_new_wrap(cl_context context) {
 
-    return (CCLContext*) ccl_wrapper_new(
+    return (CCLContext *) ccl_wrapper_new(
         CCL_CONTEXT, (void*) context, sizeof(CCLContext));
-
 }
 
 /**
@@ -233,19 +229,18 @@ CCLContext* ccl_context_new_wrap(cl_context context) {
  *
  * @param[in] properties A set of OpenCL context properties.
  * @param[in] filters Filters for selecting device.
- * @param[in] pfn_notify A callback function used by the OpenCL
- * implementation to report information on errors during context
- * creation as well as errors that occur at runtime in this context.
- * Ignored if NULL.
- * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
+ * @param[in] pfn_notify A callback function used by the OpenCL implementation
+ * to report information on errors during context creation as well as errors
+ * that occur at runtime in this context. Ignored if `NULL`.
+ * @param[in] user_data Passed as argument to `pfn_notify`, can be `NULL`.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
 CCL_EXPORT
-CCLContext* ccl_context_new_from_filters_full(
-    const cl_context_properties* properties, CCLDevSelFilters* filters,
-    ccl_context_callback pfn_notify, void* user_data, CCLErr **err) {
+CCLContext * ccl_context_new_from_filters_full(
+    const cl_context_properties * properties, CCLDevSelFilters * filters,
+    ccl_context_callback pfn_notify, void * user_data, CCLErr ** err) {
 
     /* Make sure number ds is not NULL. */
     g_return_val_if_fail(filters != NULL, NULL);
@@ -253,13 +248,13 @@ CCLContext* ccl_context_new_from_filters_full(
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Array of selected/filtered CCL device wrappers. */
-    GPtrArray* devices = NULL;
+    GPtrArray * devices = NULL;
 
     /* Context wrapper to create. */
-    CCLContext* ctx = NULL;
+    CCLContext * ctx = NULL;
 
     /* Get selected/filtered devices. */
     devices = ccl_devsel_select(filters, &err_internal);
@@ -273,7 +268,7 @@ CCLContext* ccl_context_new_from_filters_full(
 
     /* Create context wrapper. */
     ctx = ccl_context_new_from_devices_full(properties, devices->len,
-        (CCLDevice**) devices->pdata, pfn_notify, user_data,
+        (CCLDevice **) devices->pdata, pfn_notify, user_data,
         &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -299,27 +294,27 @@ finish:
  * Creates a context wrapper given an array of ::CCLDevice wrappers and the
  * remaining parameters required by the clCreateContext() function.
  *
- * If the properties parameter is NULL, this function obtains the cl_platform_id
- * object from the first device.
+ * If the properties parameter is `NULL`, this function obtains the
+ * `cl_platform_id` object from the first device.
  *
  * @public @memberof ccl_context
  *
- * @param[in] properties Context properties, may be NULL.
+ * @param[in] properties Context properties, may be `NULL`.
  * @param[in] num_devices Number of ::CCLDevice wrappers in array.
  * @param[in] devices Array of ::CCLDevice wrappers.
  * @param[in] pfn_notify A callback function used by the OpenCL implementation
  * to report information on errors during context creation as well as errors
- * that occur at runtime in this context. Ignored if NULL.
- * @param[in] user_data Passed as argument to pfn_notify, can be NULL.
+ * that occur at runtime in this context. Ignored if `NULL`.
+ * @param[in] user_data Passed as argument to `pfn_notify`, can be `NULL`.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new context wrapper object.
  * */
 CCL_EXPORT
-CCLContext* ccl_context_new_from_devices_full(
-    const cl_context_properties* properties, cl_uint num_devices,
-    CCLDevice* const* devices, ccl_context_callback pfn_notify,
-    void* user_data, CCLErr** err) {
+CCLContext * ccl_context_new_from_devices_full(
+    const cl_context_properties * properties, cl_uint num_devices,
+    CCLDevice * const * devices, ccl_context_callback pfn_notify,
+    void * user_data, CCLErr ** err) {
 
     /* Make sure number of devices is not zero. */
     g_return_val_if_fail(num_devices > 0, NULL);
@@ -329,21 +324,21 @@ CCLContext* ccl_context_new_from_devices_full(
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Array of unwrapped devices. */
-    cl_device_id* cl_devices = NULL;
+    cl_device_id * cl_devices = NULL;
     /* Context properties, in case the properties parameter is NULL. */
-    cl_context_properties* ctx_props = NULL;
+    cl_context_properties * ctx_props = NULL;
     /* Return status of OpenCL function calls. */
     cl_int ocl_status;
     /* OpenCL context. */
     cl_context context = NULL;
     /* New context wrapper. */
-    CCLContext* ctx = NULL;
+    CCLContext * ctx = NULL;
     /* Error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Allocate memory for devices. */
     cl_devices =
-        (cl_device_id*) g_slice_alloc(sizeof(cl_device_id) * num_devices);
+        (cl_device_id *) g_slice_alloc(sizeof(cl_device_id) * num_devices);
 
     /* Unwrap devices. */
     for (guint i = 0; i < num_devices; i++)
@@ -355,8 +350,8 @@ CCLContext* ccl_context_new_from_devices_full(
 
     /* Create OpenCL context. */
     context = clCreateContext(
-        (const cl_context_properties*) ctx_props, num_devices,
-        (const cl_device_id*) cl_devices, pfn_notify, user_data,
+        (const cl_context_properties *) ctx_props, num_devices,
+        (const cl_device_id *) cl_devices, pfn_notify, user_data,
         &ocl_status);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
@@ -386,7 +381,6 @@ finish:
 
     /* Return result of function call. */
     return ctx;
-
 }
 
 /**
@@ -408,17 +402,17 @@ finish:
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
-    void* filter, void* data, CCLErr** err) {
+CCLContext * ccl_context_new_from_filter(CCLDevSelFilterType ftype,
+    void * filter, void * data, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Context wrapper to create. */
-    CCLContext* ctx = NULL;
+    CCLContext * ctx = NULL;
 
     /* Set of device selection filters. */
     CCLDevSelFilters filters = NULL;
@@ -463,7 +457,6 @@ finish:
 
     /* Return new context wrapper. */
     return ctx;
-
 }
 
 /**
@@ -475,12 +468,11 @@ finish:
  * @param[in] ctx The context wrapper object.
  * */
 CCL_EXPORT
-void ccl_context_destroy(CCLContext* ctx) {
+void ccl_context_destroy(CCLContext * ctx) {
 
-    ccl_wrapper_unref((CCLWrapper*) ctx, sizeof(CCLContext),
+    ccl_wrapper_unref((CCLWrapper *) ctx, sizeof(CCLContext),
         (ccl_wrapper_release_fields) ccl_context_release_fields,
         (ccl_wrapper_release_cl_object) clReleaseContext, NULL);
-
 }
 
 /**
@@ -503,14 +495,14 @@ void ccl_context_destroy(CCLContext* ctx) {
  * context as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_context_get_opencl_version(CCLContext* ctx, CCLErr** err) {
+cl_uint ccl_context_get_opencl_version(CCLContext * ctx, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, 0);
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-    CCLPlatform* platf;
+    CCLPlatform * platf;
     cl_uint ver;
 
     platf = ccl_context_get_platform(ctx, err);
@@ -534,16 +526,16 @@ cl_uint ccl_context_get_opencl_version(CCLContext* ctx, CCLErr** err) {
  * devices or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLPlatform* ccl_context_get_platform(CCLContext* ctx, CCLErr** err) {
+CCLPlatform * ccl_context_get_platform(CCLContext * ctx, CCLErr ** err) {
 
     /* Make sure context is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-    CCLPlatform* platf = NULL;
-    CCLDevice* dev = NULL;
-    CCLErr* err_internal = NULL;
+    CCLPlatform * platf = NULL;
+    CCLDevice * dev = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Check if platform wrapper already in context object. */
     if (ctx->platf != NULL) {
@@ -572,7 +564,6 @@ finish:
 
     /* Return platform wrapper. */
     return platf;
-
 }
 
 /**
@@ -594,9 +585,9 @@ finish:
  * occurs. Doesn't need to be freed.
  * */
 CCL_EXPORT
-const cl_image_format* ccl_context_get_supported_image_formats(
-    CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
-    cl_uint* num_image_formats, CCLErr** err) {
+const cl_image_format * ccl_context_get_supported_image_formats(
+    CCLContext * ctx, cl_mem_flags flags, cl_mem_object_type image_type,
+    cl_uint * num_image_formats, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
@@ -608,10 +599,10 @@ const cl_image_format* ccl_context_get_supported_image_formats(
     /* Information object. We use it to keep image format information
      * in the information table, so that it can be automatically
      * destroyed when the context is destroyed. */
-    CCLWrapperInfo* info = NULL;
+    CCLWrapperInfo * info = NULL;
 
     /* Variable to return. */
-    const cl_image_format* image_formats = NULL;
+    const cl_image_format * image_formats = NULL;
 
     /* Let's query OpenCL object.*/
     cl_int ocl_status;
@@ -635,14 +626,14 @@ const cl_image_format* ccl_context_get_supported_image_formats(
     /* Get image formats. */
     ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
         flags, image_type, *num_image_formats,
-        (cl_image_format*) info->value, NULL);
+        (cl_image_format *) info->value, NULL);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: get supported image formats (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
 
     /* Keep information in information table for latter disposal. */
-    ccl_wrapper_add_info((CCLWrapper*) ctx, CL_IMAGE_FORMAT, info);
+    ccl_wrapper_add_info((CCLWrapper *) ctx, CL_IMAGE_FORMAT, info);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -674,10 +665,10 @@ finish:
  * occurs.
  * */
 CCL_EXPORT
-CCLDevice* ccl_context_get_device(
-    CCLContext* ctx, cl_uint index, CCLErr** err) {
+CCLDevice * ccl_context_get_device(
+    CCLContext * ctx, cl_uint index, CCLErr ** err) {
 
-    return ccl_dev_container_get_device((CCLDevContainer*) ctx,
+    return ccl_dev_container_get_device((CCLDevContainer *) ctx,
         ccl_context_get_cldevices, index, err);
 }
 
@@ -693,11 +684,10 @@ CCLDevice* ccl_context_get_device(
  * is otherwise not possible to get any device.
  * */
 CCL_EXPORT
-cl_uint ccl_context_get_num_devices(CCLContext* ctx, CCLErr** err) {
+cl_uint ccl_context_get_num_devices(CCLContext * ctx, CCLErr ** err) {
 
-    return ccl_dev_container_get_num_devices((CCLDevContainer*) ctx,
+    return ccl_dev_container_get_num_devices((CCLDevContainer *) ctx,
         ccl_context_get_cldevices, err);
-
 }
 
 /**
@@ -710,18 +700,17 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, CCLErr** err) {
  * @public @memberof ccl_context
  *
  * @param[in] ctx The context wrapper object.
- * @param[in] err Return location for a ::CCLErr object, or NULL if error
+ * @param[in] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return An array containing the ::CCLDevice wrappers which belong to
  * the given context, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
-    CCLErr** err) {
+CCLDevice * const * ccl_context_get_all_devices(
+    CCLContext * ctx, CCLErr ** err) {
 
-    return ccl_dev_container_get_all_devices((CCLDevContainer*) ctx,
-        ccl_context_get_cldevices, err);
-
+    return ccl_dev_container_get_all_devices(
+        (CCLDevContainer *) ctx, ccl_context_get_cldevices, err);
 }
 
 /** @}*/

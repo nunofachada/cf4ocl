@@ -36,7 +36,7 @@
 typedef cl_int (*ccl_wrapper_info_fp)(void);
 
 /* Table of all existing wrappers. */
-static GHashTable* wrappers = NULL;
+static GHashTable * wrappers = NULL;
 /* Define lock for synchronizing access to table of all existing wrappers. */
 G_LOCK_DEFINE(wrappers);
 
@@ -86,13 +86,13 @@ struct ccl_wrapper_info_table {
      * Table containing information about the wrapped OpenCL object.
      * @private
      * */
-    GHashTable* table;
+    GHashTable * table;
 
     /**
      * List of replaced information about the wrapped OpenCL object.
      * @private
      * */
-    GSList* old_info;
+    GSList * old_info;
 
     /**
      * Mutex for controlling thread access to the OpenCL object
@@ -119,13 +119,13 @@ struct ccl_wrapper_info_table {
  * @param[in] size Size in bytes of wrapper.
  * @return A new wrapper object.
  * */
-CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
+CCLWrapper * ccl_wrapper_new(CCLClass class, void * cl_object, size_t size) {
 
     /* Make sure OpenCL object is not NULL. */
     g_return_val_if_fail(cl_object != NULL, NULL);
 
     /* The new wrapper object. */
-    CCLWrapper* w;
+    CCLWrapper * w;
 
     /* Lock access to table of all existing wrappers. */
     G_LOCK(wrappers);
@@ -143,7 +143,7 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
     if (w == NULL) {
 
         /* Wrapper doesn't yet exist, create it. */
-        w = (CCLWrapper*) g_slice_alloc0(size);
+        w = (CCLWrapper *) g_slice_alloc0(size);
         w->class = class;
         w->cl_object = cl_object;
 
@@ -183,12 +183,12 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size) {
  * reporting is to be ignored. The only error which may be reported by
  * this function is if some problem occurred when releasing the OpenCL
  * object.
- * @return CL_TRUE if wrapper was destroyed (i.e. its ref. count reached
- * zero), CL_FALSE otherwise.
+ * @return `CL_TRUE` if wrapper was destroyed (i.e. its ref. count reached
+ * zero), `CL_FALSE` otherwise.
  * */
-cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
+cl_bool ccl_wrapper_unref(CCLWrapper * wrapper, size_t size,
     ccl_wrapper_release_fields rel_fields_fun,
-    ccl_wrapper_release_cl_object rel_cl_fun, CCLErr** err) {
+    ccl_wrapper_release_cl_object rel_cl_fun, CCLErr ** err) {
 
     /* Make sure wrapper object is not NULL. */
     g_return_val_if_fail(wrapper != NULL, CL_FALSE);
@@ -206,7 +206,7 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 
     /* Log destruction/unreferencing of wrapper. */
     g_debug("Destroy/unref. CCL%s(%p)",
-        ccl_wrapper_get_class_name(wrapper), (void*) wrapper->cl_object);
+        ccl_wrapper_get_class_name(wrapper), (void *) wrapper->cl_object);
 
 #endif
 
@@ -259,7 +259,6 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
 
     /* Return flag indicating if wrapper was destroyed. */
     return destroyed;
-
 }
 
 /**
@@ -274,8 +273,8 @@ cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
  * info.
  * @param[in] info Info object to add.
  * */
-void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
-    CCLWrapperInfo* info) {
+void ccl_wrapper_add_info(CCLWrapper * wrapper, cl_uint param_name,
+    CCLWrapperInfo * info) {
 
     /* Make sure wrapper is not NULL. */
     g_return_if_fail(wrapper != NULL);
@@ -302,8 +301,8 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
          * table. */
 
         /* Get existing information... */
-        CCLWrapperInfo* info_old =
-            (CCLWrapperInfo*) g_hash_table_lookup(
+        CCLWrapperInfo * info_old =
+            (CCLWrapperInfo *) g_hash_table_lookup(
                 wrapper->info->table, GUINT_TO_POINTER(param_name));
 
         /* ...and put it in table of old information. */
@@ -322,7 +321,6 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
 
     /* Unlock access to info table. */
     g_mutex_unlock(&wrapper->info->mutex);
-
 }
 
 /**
@@ -332,11 +330,11 @@ void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
  * @protected @memberof ccl_wrapper_info
  *
  * @param[in] size Parameter size in bytes.
- * @return A new CCLWrapperInfo* object.
+ * @return A new CCLWrapperInfo * object.
  * */
-CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
+CCLWrapperInfo * ccl_wrapper_info_new(size_t size) {
 
-    CCLWrapperInfo* info = g_slice_new(CCLWrapperInfo);
+    CCLWrapperInfo * info = g_slice_new(CCLWrapperInfo);
 
     if (size > 0)
         info->value = g_slice_alloc0(size);
@@ -356,7 +354,7 @@ CCLWrapperInfo* ccl_wrapper_info_new(size_t size) {
  *
  * @param[in] info Object to destroy.
  * */
-void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
+void ccl_wrapper_info_destroy(CCLWrapperInfo * info) {
 
     /* Make sure info is not NULL. */
     g_return_if_fail(info != NULL);
@@ -379,7 +377,7 @@ void ccl_wrapper_info_destroy(CCLWrapperInfo* info) {
  * @param[in] wrapper The wrapper object.
  * */
 CCL_EXPORT
-void ccl_wrapper_ref(CCLWrapper* wrapper) {
+void ccl_wrapper_ref(CCLWrapper * wrapper) {
 
     /* Make sure wrapper object is not NULL. */
     g_return_if_fail(wrapper != NULL);
@@ -391,7 +389,7 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
 
     /* Log creation/referencing of wrapper. */
     g_debug("New/ref. CCL%s(%p)",
-        ccl_wrapper_get_class_name(wrapper), (void*) wrapper->cl_object);
+        ccl_wrapper_get_class_name(wrapper), (void *) wrapper->cl_object);
 
 #endif
 
@@ -404,17 +402,16 @@ void ccl_wrapper_ref(CCLWrapper* wrapper) {
  * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper The wrapper object.
- * @return The wrapper object reference count or -1 if wrapper is NULL.
+ * @return The wrapper object reference count or -1 if wrapper is `NULL`.
  * */
 CCL_EXPORT
-int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
+int ccl_wrapper_ref_count(CCLWrapper * wrapper) {
 
     /* Make sure wrapper is not NULL. */
     g_return_val_if_fail(wrapper != NULL, -1);
 
     /* Return reference count. */
     return wrapper->ref_count;
-
 }
 
 /**
@@ -426,7 +423,7 @@ int ccl_wrapper_ref_count(CCLWrapper* wrapper) {
  * @return The wrapped OpenCL object.
  * */
 CCL_EXPORT
-void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
+void* ccl_wrapper_unwrap(CCLWrapper * wrapper) {
 
     /* Make sure wrapper is not NULL. */
     g_return_val_if_fail(wrapper != NULL, NULL);
@@ -450,19 +447,19 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper) {
  * @param[in] min_size Minimum size of returned information object in
  * case of error.
  * @param[in] info_type Type of information query to perform.
- * @param[in] use_cache TRUE if cached information is to be used, FALSE
- * to force a new query even if information is in cache.
+ * @param[in] use_cache `CL_TRUE` if cached information is to be used,
+ * `CL_FALSE` to force a new query even if information is in cache.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested information object. This object will
  * be automatically freed when the respective wrapper object is
- * destroyed. If an error occurs, either `NULL` (if `min_size` == 0), or
- * a `min_size`d information object is returned (if `min_size` > 0).
+ * destroyed. If an error occurs, either `NULL` (if `min_size == 0`), or
+ * a `min_size`d information object is returned (if `min_size > 0`).
  * */
 CCL_EXPORT
-CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
-    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-    CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
+CCLWrapperInfo * ccl_wrapper_get_info(CCLWrapper * wrapper1,
+    CCLWrapper * wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -474,7 +471,7 @@ CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
     g_return_val_if_fail((info_type >= 0) && (info_type < CCL_INFO_END), NULL);
 
     /* Information object. */
-    CCLWrapperInfo* info = NULL;
+    CCLWrapperInfo * info = NULL;
 
     /* Does info table cache contain requested information? */
     gboolean contains;
@@ -587,19 +584,19 @@ finish:
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] min_size Minimum size of returned value in case of error.
  * @param[in] info_type Type of information query to perform.
- * @param[in] use_cache TRUE if cached information is to be used, FALSE
- * to force a new query even if information is in cache.
+ * @param[in] use_cache `CL_TRUE` if cached information is to be used,
+ * `CL_FALSE` to force a new query even if information is in cache.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A pointer to the requested information value. This
  * value will be automatically freed when the wrapper object is
- * destroyed. If an error occurs, either `NULL` (if `min_size` == 0), or
- * a pointer to a `min_size`d zero value is returned (if `min_size` > 0).
+ * destroyed. If an error occurs, either `NULL` (if `min_size == 0`), or
+ * a pointer to a `min_size`d zero value is returned (if `min_size > 0`).
  * */
 CCL_EXPORT
-void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
-    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-    CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
+void * ccl_wrapper_get_info_value(CCLWrapper * wrapper1,
+    CCLWrapper * wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -611,7 +608,7 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
     g_return_val_if_fail((info_type >= 0) && (info_type < CCL_INFO_END), NULL);
 
     /* Get information object. */
-    CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
+    CCLWrapperInfo * diw = ccl_wrapper_get_info(wrapper1, wrapper2,
         param_name, min_size, info_type, use_cache, err);
 
     /* Return value if information object is not NULL. */
@@ -631,17 +628,17 @@ void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] min_size Minimum size returned in case of error.
  * @param[in] info_type Type of information query to perform.
- * @param[in] use_cache TRUE if cached information is to be used, FALSE
- * to force a new query even if information is in cache.
+ * @param[in] use_cache `CL_TRUE` if cached information is to be used,
+ * `CL_FALSE` to force a new query even if information is in cache.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested information size. If an error occurs, a size of
  * `min_size` is returned.
  * */
 CCL_EXPORT
-size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
-    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-    CCLInfo info_type, cl_bool use_cache, CCLErr** err) {
+size_t ccl_wrapper_get_info_size(CCLWrapper * wrapper1,
+    CCLWrapper * wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
@@ -653,7 +650,7 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
     g_return_val_if_fail((info_type >= 0) && (info_type < CCL_INFO_END), 0);
 
     /* Get information object. */
-    CCLWrapperInfo* diw = ccl_wrapper_get_info(wrapper1, wrapper2,
+    CCLWrapperInfo * diw = ccl_wrapper_get_info(wrapper1, wrapper2,
         param_name, min_size, info_type, use_cache, err);
 
     /* Return value if information object is not NULL. */
@@ -669,8 +666,8 @@ size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
  * This function is merely a debug helper and shouldn't replace proper leak
  * checks with Valgrind or similar tool.
  *
- * @return CL_TRUE if memory allocated by wrappers has been properly freed,
- * CL_FALSE otherwise.
+ * @return `CL_TRUE` if memory allocated by wrappers has been properly freed,
+ * `CL_FALSE` otherwise.
  */
 CCL_EXPORT
 cl_bool ccl_wrapper_memcheck() {
@@ -684,13 +681,13 @@ cl_bool ccl_wrapper_memcheck() {
     GHashTableIter iter;
 
     /* Current wrapper. */
-    CCLWrapper* obj = NULL;
+    CCLWrapper * obj = NULL;
 
     /* Current wrapper address. */
     gpointer addr;
 
     /* Log string. */
-    GString* logstr = NULL;
+    GString * logstr = NULL;
 
 #endif
 
@@ -754,7 +751,7 @@ cl_bool ccl_wrapper_memcheck() {
  * @return
  * */
 CCL_EXPORT
-const char* ccl_wrapper_get_class_name(CCLWrapper* wrapper) {
+const char * ccl_wrapper_get_class_name(CCLWrapper * wrapper) {
 
     /* Make sure wrapper is not NULL. */
     g_return_val_if_fail(wrapper != NULL, NULL);

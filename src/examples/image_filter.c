@@ -75,30 +75,30 @@
 /**
  * Image filter main function.
  * */
-int main(int argc, char* argv[]) {
+int main(int argc, char * argv[]) {
 
     /* Wrappers for OpenCL objects. */
-    CCLContext* ctx;
-    CCLDevice* dev;
-    CCLImage* img_in;
-    CCLImage* img_out;
-    CCLQueue* queue;
-    CCLProgram* prg;
-    CCLKernel* krnl;
-    CCLSampler* smplr;
+    CCLContext * ctx;
+    CCLDevice * dev;
+    CCLImage * img_in;
+    CCLImage * img_out;
+    CCLQueue * queue;
+    CCLProgram * prg;
+    CCLKernel * krnl;
+    CCLSampler * smplr;
 
     /* Device selected specified in the command line. */
     int dev_idx = -1;
 
     /* Error handling object (must be initialized to NULL). */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Does selected device support images? */
     cl_bool image_ok;
 
     /* Image data in host. */
-    unsigned char* input_image;
-    unsigned char* output_image;
+    unsigned char * input_image;
+    unsigned char * output_image;
 
     /* Image properties. */
     int width, height, n_channels;
@@ -208,7 +208,7 @@ int main(int argc, char* argv[]) {
     HANDLE_ERROR(err);
 
     /* Allocate space for output image. */
-    output_image = (unsigned char*)
+    output_image = (unsigned char *)
         malloc(width * height * 4 * sizeof(unsigned char));
 
     /* Read image data back to host. */
@@ -244,7 +244,4 @@ int main(int argc, char* argv[]) {
 
     /* Terminate. */
     return EXIT_SUCCESS;
-
 }
-
-

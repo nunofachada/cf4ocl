@@ -134,7 +134,7 @@ typedef enum ccl_devsel_filter_type {
  * and contain two fields:
  *
  * @code{.c}
- * void** pdata;
+ * void ** pdata;
  * unsigned int len;
  * @endcode
  *
@@ -143,7 +143,7 @@ typedef enum ccl_devsel_filter_type {
  * index 0:
  *
  * @code{.c}
- * CCLDeviceWrapper* dev;
+ * CCLDeviceWrapper * dev;
  * CCLDevSelDevice devices;
  * @endcode
  * @code{.c}
@@ -153,20 +153,20 @@ typedef enum ccl_devsel_filter_type {
  * Objects of this type will rarely be manipulated directly in client code,
  * unless if low-level management of device selection is required.
  * */
-typedef GPtrArray* CCLDevSelDevices;
+typedef GPtrArray * CCLDevSelDevices;
 
 /**
- * Independent filter function: Abstract function for filtering
- * one OpenCL device at a time.
+ * Independent filter function: Abstract function for filtering one OpenCL
+ * device at a time.
  *
  * @param[in] device OpenCL device to filter.
  * @param[in] data Filter data, implementation dependent.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return CL_TRUE if filter accepts device, CL_FALSE otherwise.
+ * @return `CL_TRUE` if filter accepts device, `CL_FALSE` otherwise.
  */
 typedef cl_bool (*ccl_devsel_indep)(
-    CCLDevice* device, void *data, CCLErr **err);
+    CCLDevice * device, void * data, CCLErr ** err);
 
 /**
  * Dependent filter function: Abstract function for filtering
@@ -179,26 +179,31 @@ typedef cl_bool (*ccl_devsel_indep)(
  * @return The OpenCL devices which were accepted by the filter.
  */
 typedef CCLDevSelDevices (*ccl_devsel_dep)(
-    CCLDevSelDevices devices, void *data, CCLErr **err);
+    CCLDevSelDevices devices, void * data, CCLErr ** err);
 
 /**
  * A set of independent and dependent device filters.
  *
- * Use the ccl_devsel_add_indep_filter() function to add independent filters and
- * the ccl_devsel_add_dep_filter() function to add dependent device filters.
+ * Use the ccl_devsel_add_indep_filter() function to add independent filters
+ * and the ccl_devsel_add_dep_filter() function to add dependent device
+ * filters.
  *
- * This object should be initialized to NULL:
+ * This object should be initialized to `NULL`:
  *
- *     CCLDevSelFilters filters = NULL;
+ * @code{.c}
+ * CCLDevSelFilters filters = NULL;
+ * @endcode
  *
  * And its location should be passed to the ccl_devsel_add_*_filter()
  * functions:
  *
- *     ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_cpu, NULL);
+ * @code{.c}
+ * ccl_devsel_add_indep_filter(&filters, ccl_devsel_indep_type_cpu, NULL);
+ * @endcode
  *
  * Filters are processed in the order they are added to the set.
  * */
-typedef GPtrArray* CCLDevSelFilters;
+typedef GPtrArray * CCLDevSelFilters;
 
 /* Create and return an object with device wrappers for all OpenCL devices
  * present in the system. */
