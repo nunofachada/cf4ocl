@@ -49,7 +49,7 @@ struct ccl_kernel {
      * Kernel arguments.
      * @private
      * */
-    GHashTable* args;
+    GHashTable * args;
 
 };
 
@@ -62,7 +62,7 @@ struct ccl_kernel {
  *
  * @param[in] krnl A ::CCLKernel wrapper object.
  * */
-static void ccl_kernel_release_fields(CCLKernel* krnl) {
+static void ccl_kernel_release_fields(CCLKernel * krnl) {
 
     /* Make sure krnl wrapper object is not NULL. */
     g_return_if_fail(krnl != NULL);
@@ -96,10 +96,10 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
  * @return The ::CCLKernel wrapper for the given OpenCL kernel.
  * */
 CCL_EXPORT
-CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
+CCLKernel * ccl_kernel_new_wrap(cl_kernel kernel) {
 
-    return (CCLKernel*) ccl_wrapper_new(
-        CCL_KERNEL, (void*) kernel, sizeof(CCLKernel));
+    return (CCLKernel *) ccl_wrapper_new(
+        CCL_KERNEL, (void *) kernel, sizeof(CCLKernel));
 
 }
 
@@ -115,8 +115,8 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
  * @return A new kernel wrapper object.
  * */
 CCL_EXPORT
-CCLKernel* ccl_kernel_new(
-    CCLProgram* prg, const char* kernel_name, CCLErr** err) {
+CCLKernel * ccl_kernel_new(
+    CCLProgram * prg, const char * kernel_name, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -128,7 +128,7 @@ CCLKernel* ccl_kernel_new(
     g_return_val_if_fail(kernel_name != NULL, NULL);
 
     /* Kernel wrapper object. */
-    CCLKernel* krnl = NULL;
+    CCLKernel * krnl = NULL;
 
     /* OpenCL return status. */
     cl_int ocl_status;
@@ -162,7 +162,6 @@ finish:
 
     /* Return kernel wrapper. */
     return krnl;
-
 }
 
 /**
@@ -174,16 +173,15 @@ finish:
  * @param[in] krnl The kernel wrapper object.
  * */
 CCL_EXPORT
-void ccl_kernel_destroy(CCLKernel* krnl) {
+void ccl_kernel_destroy(CCLKernel * krnl) {
 
-    ccl_wrapper_unref((CCLWrapper*) krnl, sizeof(CCLKernel),
+    ccl_wrapper_unref((CCLWrapper *) krnl, sizeof(CCLKernel),
         (ccl_wrapper_release_fields) ccl_kernel_release_fields,
         (ccl_wrapper_release_cl_object) clReleaseKernel, NULL);
-
 }
 
 /**
- * Set one kernel argument. The argument is not immediatly set with the
+ * Set one kernel argument. The argument is not immediately set with the
  * clSetKernelArg() OpenCL function, but is instead kept in an argument
  * table for this kernel. The clSetKernelArg() function is called only
  * before kernel execution for arguments which have not yet been set or
@@ -202,7 +200,7 @@ void ccl_kernel_destroy(CCLKernel* krnl) {
  * ::CCLBuffer*, ::CCLImage* or ::CCLSampler*.
  * */
 CCL_EXPORT
-void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
+void ccl_kernel_set_arg(CCLKernel * krnl, cl_uint arg_index, void * arg) {
 
     /* Make sure krnl is not NULL. */
     g_return_if_fail(krnl != NULL);
@@ -216,7 +214,6 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
     /* Keep argument in table. */
     g_hash_table_replace(krnl->args, GUINT_TO_POINTER(arg_index),
         (gpointer) arg);
-
 }
 
 /**
@@ -247,7 +244,7 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
  * ::CCLSampler*.
  * */
 CCL_EXPORT
-void ccl_kernel_set_args(CCLKernel* krnl, ...) {
+void ccl_kernel_set_args(CCLKernel * krnl, ...) {
 
     /* Make sure krnl is not NULL. */
     g_return_if_fail(krnl != NULL);
@@ -255,17 +252,17 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
     /* The va_list, which represents the variable argument list. */
     va_list args_va;
     /* Array of arguments, created from the va_list. */
-    void** args_array = NULL;
+    void ** args_array = NULL;
     /* Number of arguments. */
     guint num_args = 0;
     /* Aux. arg. when cycling through the va_list. */
-    void* aux_arg;
+    void * aux_arg;
 
     /* Initialize the va_list. */
     va_start(args_va, krnl);
 
     /* Get first argument. */
-    aux_arg = va_arg(args_va, void*);
+    aux_arg = va_arg(args_va, void *);
 
     /* Check if any arguments are given, and if so, populate array
      * of arguments. */
@@ -275,17 +272,17 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 
         while (aux_arg != NULL) {
             num_args++;
-            aux_arg = va_arg(args_va, void*);
+            aux_arg = va_arg(args_va, void *);
         }
         va_end(args_va);
 
         /* 2. Populate array of arguments. */
 
-        args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
+        args_array = g_slice_alloc((num_args + 1) * sizeof(void *));
         va_start(args_va, krnl);
 
         for (guint i = 0; i < num_args; ++i) {
-            aux_arg = va_arg(args_va, void*);
+            aux_arg = va_arg(args_va, void *);
             args_array[i] = aux_arg;
         }
         va_end(args_va);
@@ -304,7 +301,7 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
         ccl_kernel_set_args_v(krnl, args_array);
 
         /* Free the array of arguments. */
-        g_slice_free1((num_args + 1) * sizeof(void*), args_array);
+        g_slice_free1((num_args + 1) * sizeof(void *), args_array);
 
     }
 
@@ -335,7 +332,7 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
  * ::CCLSampler*.
  * */
 CCL_EXPORT
-void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
+void ccl_kernel_set_args_v(CCLKernel * krnl, void ** args) {
 
     /* Make sure krnl is not NULL. */
     g_return_if_fail(krnl != NULL);
@@ -346,16 +343,14 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
     for (guint i = 0; args[i] != NULL; ++i) {
 
         /* Get next argument. */
-        CCLArg* arg = args[i];
+        CCLArg * arg = args[i];
 
         /* Ignore "skip" arguments. */
         if (arg == ccl_arg_skip) continue;
 
         /* Set the i^th kernel argument. */
         ccl_kernel_set_arg(krnl, i, arg);
-
     }
-
 }
 
 /**
@@ -394,10 +389,10 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
-    cl_uint work_dim, const size_t* global_work_offset,
-    const size_t* global_work_size, const size_t* local_work_size,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_kernel_enqueue_ndrange(CCLKernel * krnl, CCLQueue * cq,
+    cl_uint work_dim, const size_t * global_work_offset,
+    const size_t * global_work_size, const size_t * local_work_size,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure krnl is not NULL. */
     g_return_val_if_fail(krnl != NULL, NULL);
@@ -412,7 +407,7 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
     /* OpenCL event. */
     cl_event event;
     /* Event wrapper. */
-    CCLEvent* evt;
+    CCLEvent * evt;
 
     /* Iterator for table of kernel arguments. */
     GHashTableIter iter;
@@ -423,7 +418,7 @@ CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
         g_hash_table_iter_init(&iter, krnl->args);
         while (g_hash_table_iter_next(&iter, &arg_index_ptr, &arg_ptr)) {
             cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
-            CCLArg* arg = (CCLArg*) arg_ptr;
+            CCLArg * arg = (CCLArg *) arg_ptr;
             ocl_status = clSetKernelArg(ccl_kernel_unwrap(krnl), arg_index,
                 ccl_arg_size(arg), ccl_arg_value(arg));
             g_if_err_create_goto(*err, CCL_OCL_ERROR,
@@ -469,7 +464,6 @@ finish:
 
     /* Return evt. */
     return evt;
-
 }
 
 /**
@@ -517,10 +511,11 @@ finish:
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
-    cl_uint work_dim, const size_t* global_work_offset,
-    const size_t* global_work_size, const size_t* local_work_size,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err, ...) {
+CCLEvent * ccl_kernel_set_args_and_enqueue_ndrange(
+    CCLKernel * krnl, CCLQueue * cq,
+    cl_uint work_dim, const size_t * global_work_offset,
+    const size_t * global_work_size, const size_t * local_work_size,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err, ...) {
 
     /* Make sure krnl is not NULL. */
     g_return_val_if_fail(krnl != NULL, NULL);
@@ -530,21 +525,21 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Event wrapper. */
-    CCLEvent* evt;
+    CCLEvent * evt;
     /* The va_list, which represents the variable argument list. */
     va_list args_va;
     /* Array of arguments, to be created from the va_list. */
-    void** args_array = NULL;
+    void ** args_array = NULL;
     /* Number of arguments. */
     guint num_args = 0;
     /* Aux. arg. when cycling through the va_list. */
-    void* aux_arg;
+    void * aux_arg;
 
     /* Initialize the va_list. */
     va_start(args_va, err);
 
     /* Get first argument. */
-    aux_arg = va_arg(args_va, void*);
+    aux_arg = va_arg(args_va, void *);
 
     /* Check if any arguments are given, and if so, populate array
      * of arguments. */
@@ -554,17 +549,17 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
 
         while (aux_arg != NULL) {
             num_args++;
-            aux_arg = va_arg(args_va, void*);
+            aux_arg = va_arg(args_va, void *);
         }
         va_end(args_va);
 
         /* 2. Populate array of arguments. */
 
-        args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
+        args_array = g_slice_alloc((num_args + 1) * sizeof(void *));
         va_start(args_va, err);
 
         for (guint i = 0; i < num_args; ++i) {
-            aux_arg = va_arg(args_va, void*);
+            aux_arg = va_arg(args_va, void *);
             args_array[i] = aux_arg;
         }
         va_end(args_va);
@@ -585,13 +580,12 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
     if (num_args > 0) {
 
         /* Free the array of arguments. */
-        g_slice_free1((num_args + 1) * sizeof(void*), args_array);
+        g_slice_free1((num_args + 1) * sizeof(void *), args_array);
 
     }
 
     /* Return event wrapper. */
     return evt;
-
 }
 
 /**
@@ -640,10 +634,10 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
-    CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
-    const size_t* global_work_size, const size_t* local_work_size,
-    CCLEventWaitList* evt_wait_lst, void** args, CCLErr** err) {
+CCLEvent * ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel * krnl,
+    CCLQueue * cq, cl_uint work_dim, const size_t * global_work_offset,
+    const size_t * global_work_size, const size_t * local_work_size,
+    CCLEventWaitList * evt_wait_lst, void ** args, CCLErr ** err) {
 
     /* Make sure krnl is not NULL. */
     g_return_val_if_fail(krnl != NULL, NULL);
@@ -652,9 +646,9 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
 
     /* Set kernel arguments. */
     ccl_kernel_set_args_v(krnl, args);
@@ -677,7 +671,6 @@ finish:
 
     /* Return event wrapper. */
     return evt;
-
 }
 
 /**
@@ -692,30 +685,28 @@ finish:
  * @param[in] user_func A pointer to a host-callable user function.
  * @param[in] args A pointer to the args list that `user_func` should be
  * called with.
- * @param[in] cb_args The size in bytes of the args list that args
- * points to.
+ * @param[in] cb_args The size in bytes of the args list that `args` points to.
  * @param[in] num_mos The number of ::CCLMemObj* objects that are passed
  * in `mo_list`.
- * @param[in] mo_list A list of ::CCLMemObj* objects (or `NULL`
- * references), if num_mos > 0.
- * @param[in] args_mem_loc A pointer to appropriate locations that
- * `args` points to where `cl_mem` values (unwrapped from the respective
- * ::CCLMemObj* objects) are stored. Before the user function is
- * executed, the `cl_mem` values are replaced by pointers to global
- * memory.
- * @param[in,out] evt_wait_lst List of events that need to complete
- * before this command can be executed. The list will be cleared and
- * can be reused by client code.
+ * @param[in] mo_list A list of ::CCLMemObj* objects (or `NULL` references),
+ * if `num_mos > 0`.
+ * @param[in] args_mem_loc A pointer to appropriate locations that `args`
+ * points to where `cl_mem` values (unwrapped from the respective ::CCLMemObj*
+ * objects) are stored. Before the user function is executed, the `cl_mem`
+ * values are replaced by pointers to global memory.
+ * @param[in,out] evt_wait_lst List of events that need to complete before
+ * this command can be executed. The list will be cleared and can be reused by
+ * client code.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
-    void (CL_CALLBACK * user_func)(void*), void* args, size_t cb_args,
-    cl_uint num_mos, CCLMemObj* const* mo_list,
-    const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
-    CCLErr** err) {
+CCLEvent * ccl_kernel_enqueue_native(CCLQueue * cq,
+    void (CL_CALLBACK * user_func)(void *), void * args, size_t cb_args,
+    cl_uint num_mos, CCLMemObj * const * mo_list,
+    const void ** args_mem_loc, CCLEventWaitList * evt_wait_lst,
+    CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -733,9 +724,9 @@ CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
     /* OpenCL event. */
     cl_event event = NULL;
     /* Event wrapper. */
-    CCLEvent* evt = NULL;
+    CCLEvent * evt = NULL;
     /* List of cl_mem objects. */
-    cl_mem* mem_list = NULL;
+    cl_mem * mem_list = NULL;
 
     /* Unwrap memory objects. */
     if (num_mos > 0) {
@@ -749,7 +740,7 @@ CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
 
     /* Enqueue kernel. */
     ocl_status = clEnqueueNativeKernel(ccl_queue_unwrap(cq), user_func,
-        args, cb_args, num_mos, (const cl_mem*) mem_list, args_mem_loc,
+        args, cb_args, num_mos, (const cl_mem *) mem_list, args_mem_loc,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
@@ -782,7 +773,6 @@ finish:
 
     /* Return event wrapper. */
     return evt;
-
 }
 
 /**
@@ -793,6 +783,7 @@ finish:
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 200 for OpenCL 2.1
  * * etc.
  *
  * @public @memberof ccl_kernel
@@ -804,7 +795,7 @@ finish:
  * kernel as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, CCLErr** err) {
+cl_uint ccl_kernel_get_opencl_version(CCLKernel * krnl, CCLErr ** err) {
 
     /* Make sure krnl is not NULL. */
     g_return_val_if_fail(krnl != NULL, 0);
@@ -812,8 +803,8 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, CCLErr** err) {
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
     cl_context context;
-    CCLContext* ctx;
-    CCLErr* err_internal = NULL;
+    CCLContext * ctx;
+    CCLErr * err_internal = NULL;
     cl_uint ocl_ver;
 
     /* Get cl_context object for this kernel. */
@@ -845,19 +836,18 @@ finish:
 
     /* Return event wrapper. */
     return ocl_ver;
-
 }
 
 /**
  * @internal
- * Helper macro which tests if the error is a CCL_ERROR_INFO_UNAVAILABLE_OCL
+ * Helper macro which tests if the error is a `CCL_ERROR_INFO_UNAVAILABLE_OCL`
  * error, and if so, generates a warning and clears the error. Otherwise it
  * tests the error in the same way as g_if_err_propagate_goto().
  *
  * @param[out] err Destination CCLErr** object.
  * @param[in] err_internal Source CCLErr* object.
  * @param[in] error_handler Label to goto if an error other than
- * CCL_ERROR_INFO_UNAVAILABLE_OCL is detected.
+ * `CCL_ERROR_INFO_UNAVAILABLE_OCL` is detected.
  * */
 #define g_if_err_not_info_unavailable_propagate_goto( \
             err, err_internal, error_handler) \
@@ -893,24 +883,22 @@ finish:
  * be pre-allocated with space for `dims` values of size `size_t`. If
  * `NULL` it is assumed that the global worksize must be equal to
  * `real_worksize`.
- * @param[in,out] lws This memory location, of size
- * `dims * sizeof(size_t)`, serves a dual purpose: 1) as an input,
- * containing the maximum allowed local work size for each dimension, or
- * zeros if these maximums are to be fetched from the given device
- * `CL_DEVICE_MAX_WORK_ITEM_SIZES` information (if the specified values
- * are larger than the device limits, the device limits are used
- * instead); 2) as an output, where to place a "nice" local worksize,
- * which is based and respects the limits of the given kernel and device
- * (and of the non-zero values given as input).
+ * @param[in,out] lws This memory location, of size `dims * sizeof(size_t)`,
+ * serves a dual purpose: 1) as an input, containing the maximum allowed local
+ * work size for each dimension, or zeros if these maximums are to be fetched
+ * from the given device `CL_DEVICE_MAX_WORK_ITEM_SIZES` information (if the
+ * specified values are larger than the device limits, the device limits are
+ * used instead); 2) as an output, where to place a "nice" local worksize,
+ * which is based and respects the limits of the given kernel and device (and
+ * of the non-zero values given as input).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if function returns successfully, `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if function returns successfully, `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
-    cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
-    CCLErr** err) {
+cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
+    cl_uint dims, const size_t * real_worksize, size_t * gws, size_t * lws,
+    CCLErr ** err) {
 
     /* Make sure dev is not NULL. */
     g_return_val_if_fail(dev != NULL, CL_FALSE);
@@ -927,13 +915,13 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
     size_t wg_size_mult = 0;
     size_t wg_size_max = 0;
     size_t wg_size = 1, wg_size_aux;
-    size_t* max_wi_sizes;
+    size_t * max_wi_sizes;
     cl_uint dev_dims;
     cl_bool ret_status;
     size_t real_ws = 1;
 
     /* Error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Check if device supports the requested dims. */
     dev_dims = ccl_device_get_info_scalar(
@@ -1092,7 +1080,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
                 if ((real_worksize[i] % lws[i] != 0)
                     || (lws[i] * wg_size > wg_size_max))
                 {
-                    /* Previoulsy found lws[i] not usable, find
+                    /* Previously found lws[i] not usable, find
                      * new one. Must be a divisor of real_worksize[i]
                      * and respect the kernel and device maximum lws.*/
                     cl_uint best_lws_i = 1;
@@ -1132,7 +1120,6 @@ finish:
 
     /* Return status. */
     return ret_status;
-
 }
 
 #ifdef CL_VERSION_1_2
@@ -1148,16 +1135,16 @@ finish:
  * @param[in] ptr_arg_indx The kernel argument index, stuffed in a pointer.
  * @param[in] param_name Name of information/parameter to get.
  * @param[in] param_value_size Size in bytes of memory pointed to by
- * param_value.
+ * `param_value`.
  * @param[out] param_value A pointer to memory where the appropriate result
  * being queried is returned.
  * @param[out] param_value_size_ret Returns the actual size in bytes of data
  * copied to param_value.
- * @return CL_SUCCESS if the function is executed successfully, or an OpenCL
+ * @return `CL_SUCCESS` if the function is executed successfully, or an OpenCL
  * error code otherwise.
  * */
-cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
-    cl_kernel_arg_info param_name, size_t param_value_size, void *param_value,
+cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void * ptr_arg_indx,
+    cl_kernel_arg_info param_name, size_t param_value_size, void * param_value,
     size_t* param_value_size_ret) {
 
     return clGetKernelArgInfo(kernel, GPOINTER_TO_UINT(ptr_arg_indx),
@@ -1180,11 +1167,12 @@ cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
  * reporting is to be ignored.
  * @return The requested kernel argument information object. This
  * object will be automatically freed when the kernel wrapper object is
- * destroyed. If an error occurs, NULL is returned.
+ * destroyed. If an error occurs, `NULL` is returned.
  * */
 CCL_EXPORT
-CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
-    cl_kernel_arg_info param_name, CCLErr** err) {
+CCLWrapperInfo * ccl_kernel_get_arg_info(
+    CCLKernel * krnl, cl_uint idx,
+    cl_kernel_arg_info param_name, CCLErr ** err) {
 
     /* Make sure krnl is not NULL. */
     g_return_val_if_fail(krnl != NULL, NULL);
@@ -1193,10 +1181,10 @@ CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
     CCLWrapper fake_wrapper;
 
     /* Kernel information to return. */
-    CCLWrapperInfo* info;
+    CCLWrapperInfo * info;
 
     /* Error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
@@ -1256,7 +1244,6 @@ finish:
 
     /* Return argument info. */
     return info;
-
 }
 
 /** @} */
