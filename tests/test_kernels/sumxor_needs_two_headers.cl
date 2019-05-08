@@ -37,17 +37,17 @@
  * @param[in] d Constant to sum.
  * */
 __kernel void test_sum(
-	__global const uint *a,
-	__global const uint *b,
-	__global uint *c, uint d) {
+    __global const uint *a,
+    __global const uint *b,
+    __global uint *c, uint d) {
 
-	uint aux;
+    uint aux;
 
-	/* Get global ID. */
-	int gid = get_global_id(0);
+    /* Get global ID. */
+    int gid = get_global_id(0);
 
-	/* Perform sum. */
-	aux = do_sum(a[gid], b[gid], d);
-	/* Perform xor. */
-	c[gid] = do_xor(aux, b[gid], d * 2);
+    /* Perform sum. */
+    aux = do_sum(a[gid], b[gid], d);
+    /* Perform xor. */
+    c[gid] = do_xor(aux, b[gid], d * 2);
 }

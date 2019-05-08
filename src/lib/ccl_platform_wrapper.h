@@ -120,7 +120,7 @@ void ccl_platform_destroy(CCLPlatform* platf);
 /* Get integer OpenCL version of platform. */
 CCL_EXPORT
 cl_uint ccl_platform_get_opencl_version(
-	CCLPlatform* platf, CCLErr** err);
+    CCLPlatform* platf, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo platform information object.
@@ -134,8 +134,8 @@ cl_uint ccl_platform_get_opencl_version(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info(platf, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) platf, NULL, param_name, 0, \
-		CCL_INFO_PLATFORM, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) platf, NULL, param_name, 0, \
+        CCL_INFO_PLATFORM, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar platform information value.
@@ -154,9 +154,9 @@ cl_uint ccl_platform_get_opencl_version(
  * If an error occurs, zero is returned.
  * */
 #define ccl_platform_get_info_scalar(platf, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_PLATFORM, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) platf, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_PLATFORM, CL_FALSE, err))
 
 /**
  * Macro which returns an array platform information value.
@@ -176,9 +176,9 @@ cl_uint ccl_platform_get_opencl_version(
  * If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info_array(platf, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) platf, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_PLATFORM, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) platf, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_PLATFORM, CL_FALSE, err)
 
 /**
  * Helper macro which gets a platform information string. This
@@ -194,7 +194,7 @@ cl_uint ccl_platform_get_opencl_version(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_platform_get_info_string(platf, param_name, err) \
-	ccl_platform_get_info_array(platf, param_name, char, err)
+    ccl_platform_get_info_array(platf, param_name, char, err)
 
 /**
  * Increase the reference count of the platform wrapper object.
@@ -202,7 +202,7 @@ cl_uint ccl_platform_get_opencl_version(
  * @param[in] platform The platform wrapper object.
  * */
 #define ccl_platform_ref(platform) \
-	ccl_wrapper_ref((CCLWrapper*) platform)
+    ccl_wrapper_ref((CCLWrapper*) platform)
 
 /**
  * Alias to ccl_platform_destroy().
@@ -219,17 +219,17 @@ cl_uint ccl_platform_get_opencl_version(
  * @return The OpenCL platform object.
  * */
 #define ccl_platform_unwrap(platform) \
-	((cl_platform_id) ccl_wrapper_unwrap((CCLWrapper*) platform))
+    ((cl_platform_id) ccl_wrapper_unwrap((CCLWrapper*) platform))
 
 /* Get all device wrappers in platform. */
 CCL_EXPORT
 CCLDevice* const* ccl_platform_get_all_devices(
-	CCLPlatform* platf, CCLErr** err);
+    CCLPlatform* platf, CCLErr** err);
 
 /* Get ::CCLDevice wrapper at given index. */
 CCL_EXPORT
 CCLDevice* ccl_platform_get_device(
-	CCLPlatform* platf, cl_uint index, CCLErr** err);
+    CCLPlatform* platf, cl_uint index, CCLErr** err);
 
 /* Return number of devices in platform. */
 CCL_EXPORT

@@ -40,17 +40,17 @@
  * */
 typedef struct ccl_wrapper_info {
 
-	/**
-	 * Object information.
-	 * @public
-	 * */
-	void* value;
+    /**
+     * Object information.
+     * @public
+     * */
+    void* value;
 
-	/**
-	 * Size in bytes of object information.
-	 * @public
-	 * */
-	size_t size;
+    /**
+     * Size in bytes of object information.
+     * @public
+     * */
+    size_t size;
 
 } CCLWrapperInfo;
 
@@ -70,20 +70,20 @@ void* ccl_wrapper_unwrap(CCLWrapper* wrapper);
 /* Get information about any wrapped OpenCL object. */
 CCL_EXPORT
 CCLWrapperInfo* ccl_wrapper_get_info(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	CCLInfo info_type, cl_bool use_cache, CCLErr** err);
+    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr** err);
 
 /* Get pointer to information value. */
 CCL_EXPORT
 void* ccl_wrapper_get_info_value(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	CCLInfo info_type, cl_bool use_cache, CCLErr** err);
+    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr** err);
 
 /* Get information size. */
 CCL_EXPORT
 size_t ccl_wrapper_get_info_size(CCLWrapper* wrapper1,
-	CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
-	CCLInfo info_type, cl_bool use_cache, CCLErr** err);
+    CCLWrapper* wrapper2, cl_uint param_name, size_t min_size,
+    CCLInfo info_type, cl_bool use_cache, CCLErr** err);
 
 /* Debug function which checks if memory allocated by wrappers
  * has been properly freed. */

@@ -93,8 +93,8 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err);
  * non-intersecting set of compute units within the given device. */
 CCL_EXPORT
 CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
-	const cl_device_partition_property *properties,
-	cl_uint *num_devs_ret, CCLErr** err);
+    const cl_device_partition_property *properties,
+    cl_uint *num_devs_ret, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo device information object.
@@ -108,8 +108,8 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_device_get_info(dev, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) dev, NULL, param_name, 0, \
-		CCL_INFO_DEVICE, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) dev, NULL, param_name, 0, \
+        CCL_INFO_DEVICE, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar device information value.
@@ -128,9 +128,9 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * If an error occurs, zero is returned.
  * */
 #define ccl_device_get_info_scalar(dev, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_DEVICE, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) dev, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_DEVICE, CL_FALSE, err))
 
 /**
  * Macro which returns an array device information value.
@@ -150,9 +150,9 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_device_get_info_array(dev, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) dev, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_DEVICE, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) dev, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_DEVICE, CL_FALSE, err)
 
 /**
  * Increase the reference count of the device wrapper object.
@@ -160,7 +160,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * @param[in] dev The device wrapper object.
  * */
 #define ccl_device_ref(dev) \
-	ccl_wrapper_ref((CCLWrapper*) dev)
+    ccl_wrapper_ref((CCLWrapper*) dev)
 
 /**
  * Alias to ccl_device_destroy().
@@ -177,7 +177,7 @@ CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
  * @return The OpenCL device_id object.
  * */
 #define ccl_device_unwrap(dev) \
-	((cl_device_id) ccl_wrapper_unwrap((CCLWrapper*) dev))
+    ((cl_device_id) ccl_wrapper_unwrap((CCLWrapper*) dev))
 
 /** @} */
 

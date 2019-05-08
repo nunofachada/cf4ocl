@@ -35,14 +35,14 @@
  * */
 CCL_EXPORT
 void ccl_common_version_print(const char* exec_name) {
-	g_printf("%s %s - Compiled with %s C Compiler with support for OpenCL %s\n"
-		"Copyright (C) 2019 Nuno Fachada\n"
-		"License GPLv3+: GNU GPL version 3 or later "
-		"<http://gnu.org/licenses/gpl.html>.\n"
-		"This is free software: you are free to change and redistribute it.\n"
-		"There is NO WARRANTY, to the extent permitted by law.\n\n"
-		"Written by Nuno Fachada\n",
-		exec_name, CCL_VERSION_STRING_FINAL, CCL_COMPILER, CCL_OPENCL_VERSION);
+    g_printf("%s %s - Compiled with %s C Compiler with support for OpenCL %s\n"
+        "Copyright (C) 2019 Nuno Fachada\n"
+        "License GPLv3+: GNU GPL version 3 or later "
+        "<http://gnu.org/licenses/gpl.html>.\n"
+        "This is free software: you are free to change and redistribute it.\n"
+        "There is NO WARRANTY, to the extent permitted by law.\n\n"
+        "Written by Nuno Fachada\n",
+        exec_name, CCL_VERSION_STRING_FINAL, CCL_COMPILER, CCL_OPENCL_VERSION);
 }
 
 /**
@@ -55,7 +55,7 @@ void ccl_common_version_print(const char* exec_name) {
  * */
 CCL_EXPORT
 void ccl_strv_clear(char** str_array) {
-	g_strfreev(str_array);
+    g_strfreev(str_array);
 }
 
 /**
@@ -71,7 +71,7 @@ void ccl_strv_clear(char** str_array) {
  * */
 CCL_EXPORT
 void ccl_err_clear(CCLErr** err) {
-	g_clear_error(err);
+    g_clear_error(err);
 }
 
 /**
@@ -83,7 +83,7 @@ void ccl_err_clear(CCLErr** err) {
  */
 CCL_EXPORT
 GQuark ccl_error_quark() {
-	return g_quark_from_static_string("ccl-error-quark");
+    return g_quark_from_static_string("ccl-error-quark");
 }
 
 /**
@@ -95,5 +95,5 @@ GQuark ccl_error_quark() {
  */
 CCL_EXPORT
 GQuark ccl_ocl_error_quark() {
-	return g_quark_from_static_string("ccl-ocl-error-quark");
+    return g_quark_from_static_string("ccl-ocl-error-quark");
 }

@@ -37,8 +37,8 @@
 /* Kernel argument information adapter between a ccl_wrapper_info_fp() function
  * and the clGetKernelArgInfo() function. */
 cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
-	cl_kernel_arg_info param_name, size_t param_value_size, void *param_value,
-	size_t* param_value_size_ret);
+    cl_kernel_arg_info param_name, size_t param_value_size, void *param_value,
+    size_t* param_value_size_ret);
 
 #endif /* CL_VERSION_1_2 */
 

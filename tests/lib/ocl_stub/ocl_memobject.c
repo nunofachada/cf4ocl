@@ -28,125 +28,125 @@
 #include "utils.h"
 
 struct cl_memobject_callbacks {
-	void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data);
-	void* user_data;
+    void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data);
+    void* user_data;
 };
 
 CL_API_ENTRY cl_int CL_API_CALL
 clRetainMemObject(cl_mem memobj) {
 
-	g_atomic_int_inc(&memobj->ref_count);
-	return CL_SUCCESS;
+    g_atomic_int_inc(&memobj->ref_count);
+    return CL_SUCCESS;
 
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clReleaseMemObject(cl_mem memobj) {
 
-	/* Decrement reference count and check if it reaches 0. */
-	if (g_atomic_int_dec_and_test(&memobj->ref_count)) {
+    /* Decrement reference count and check if it reaches 0. */
+    if (g_atomic_int_dec_and_test(&memobj->ref_count)) {
 
-		/* Call callback functions. */
-		GSList* curr = memobj->callbacks;
-		while (curr != NULL) {
-			struct cl_memobject_callbacks* cb =
-				(struct cl_memobject_callbacks*) curr->data;
-			cb->pfn_notify(memobj, cb->user_data);
-			curr = g_slist_next(curr);
-		}
+        /* Call callback functions. */
+        GSList* curr = memobj->callbacks;
+        while (curr != NULL) {
+            struct cl_memobject_callbacks* cb =
+                (struct cl_memobject_callbacks*) curr->data;
+            cb->pfn_notify(memobj, cb->user_data);
+            curr = g_slist_next(curr);
+        }
 
-		/* Free callback list. */
-		g_slist_free_full(memobj->callbacks, g_free);
+        /* Free callback list. */
+        g_slist_free_full(memobj->callbacks, g_free);
 
-		/* Check if this is a regular buffer or a sub-buffer. */
-		if (memobj->associated_object == NULL) {
-			/* It's a regular buffer. */
+        /* Check if this is a regular buffer or a sub-buffer. */
+        if (memobj->associated_object == NULL) {
+            /* It's a regular buffer. */
 
-			/* Destroy allocated memory. */
-			if ((memobj->mem != NULL) && !(memobj->flags & CL_MEM_USE_HOST_PTR))
-				g_free(memobj->mem);
+            /* Destroy allocated memory. */
+            if ((memobj->mem != NULL) && !(memobj->flags & CL_MEM_USE_HOST_PTR))
+                g_free(memobj->mem);
 
-		} else {
-			/* It's a sub-buffer. */
+        } else {
+            /* It's a sub-buffer. */
 
-			/* Decrease ref. count of parent buffer, possibly
-			 * destroying it. */
-			clReleaseMemObject(memobj->associated_object);
+            /* Decrease ref. count of parent buffer, possibly
+             * destroying it. */
+            clReleaseMemObject(memobj->associated_object);
 
-		}
+        }
 
-		/* Release memory object.*/
-		g_slice_free(struct _cl_mem, memobj);
+        /* Release memory object.*/
+        g_slice_free(struct _cl_mem, memobj);
 
-	}
+    }
 
-	return CL_SUCCESS;
+    return CL_SUCCESS;
 
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
-	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret) {
+    size_t param_value_size, void* param_value,
+    size_t* param_value_size_ret) {
 
-	cl_int status = CL_SUCCESS;
+    cl_int status = CL_SUCCESS;
 
-	if (memobj == NULL) {
-		status = CL_INVALID_MEM_OBJECT;
-	} else {
-		switch (param_name) {
-			case CL_MEM_TYPE:
-				ccl_test_basic_info(cl_mem_object_type, memobj, type);
-			case CL_MEM_FLAGS:
-				ccl_test_basic_info(cl_mem_flags, memobj, flags);
-			case CL_MEM_SIZE:
-				ccl_test_basic_info(size_t, memobj, size);
-			case CL_MEM_HOST_PTR:
-				ccl_test_basic_info(void*, memobj, host_ptr);
-			case CL_MEM_MAP_COUNT:
-				ccl_test_basic_info(cl_uint, memobj, map_count);
-			case CL_MEM_REFERENCE_COUNT:
-				ccl_test_basic_info(cl_uint, memobj, ref_count);
-			case CL_MEM_CONTEXT:
-				ccl_test_basic_info(cl_context, memobj, context);
+    if (memobj == NULL) {
+        status = CL_INVALID_MEM_OBJECT;
+    } else {
+        switch (param_name) {
+            case CL_MEM_TYPE:
+                ccl_test_basic_info(cl_mem_object_type, memobj, type);
+            case CL_MEM_FLAGS:
+                ccl_test_basic_info(cl_mem_flags, memobj, flags);
+            case CL_MEM_SIZE:
+                ccl_test_basic_info(size_t, memobj, size);
+            case CL_MEM_HOST_PTR:
+                ccl_test_basic_info(void*, memobj, host_ptr);
+            case CL_MEM_MAP_COUNT:
+                ccl_test_basic_info(cl_uint, memobj, map_count);
+            case CL_MEM_REFERENCE_COUNT:
+                ccl_test_basic_info(cl_uint, memobj, ref_count);
+            case CL_MEM_CONTEXT:
+                ccl_test_basic_info(cl_context, memobj, context);
 #ifdef CL_VERSION_1_1
-			case CL_MEM_ASSOCIATED_MEMOBJECT:
-				ccl_test_basic_info(cl_mem, memobj, associated_object);
-			case CL_MEM_OFFSET:
-				ccl_test_basic_info(size_t, memobj, offset);
+            case CL_MEM_ASSOCIATED_MEMOBJECT:
+                ccl_test_basic_info(cl_mem, memobj, associated_object);
+            case CL_MEM_OFFSET:
+                ccl_test_basic_info(size_t, memobj, offset);
 #endif
-			default:
-				status = CL_INVALID_VALUE;
-		}
-	}
+            default:
+                status = CL_INVALID_VALUE;
+        }
+    }
 
-	return status;
+    return status;
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetMemObjectDestructorCallback(cl_mem memobj,
-	void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data),
-	void* user_data) {
+    void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data),
+    void* user_data) {
 
-	cl_int status;
+    cl_int status;
 
-	if (memobj == NULL) {
-		status = CL_INVALID_MEM_OBJECT;
-	} else if (pfn_notify == NULL) {
-		status = CL_INVALID_VALUE;
-	} else {
+    if (memobj == NULL) {
+        status = CL_INVALID_MEM_OBJECT;
+    } else if (pfn_notify == NULL) {
+        status = CL_INVALID_VALUE;
+    } else {
 
-		struct cl_memobject_callbacks* cb =
-			g_new0(struct cl_memobject_callbacks, 1);
+        struct cl_memobject_callbacks* cb =
+            g_new0(struct cl_memobject_callbacks, 1);
 
-		cb->pfn_notify = pfn_notify;
-		cb->user_data = user_data;
+        cb->pfn_notify = pfn_notify;
+        cb->user_data = user_data;
 
-		memobj->callbacks = g_slist_prepend(
-			memobj->callbacks, (gpointer) cb);
+        memobj->callbacks = g_slist_prepend(
+            memobj->callbacks, (gpointer) cb);
 
-		status = CL_SUCCESS;
-	}
-	return status;
+        status = CL_SUCCESS;
+    }
+    return status;
 
 }

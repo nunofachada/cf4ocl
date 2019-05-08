@@ -33,12 +33,12 @@
  * @param[in] d Constant to sum.
  * */
 __kernel void test_sum_full(
-	__global const uint *a,
-	__global const uint *b,
-	__global uint *c, uint d) {
+    __global const uint *a,
+    __global const uint *b,
+    __global uint *c, uint d) {
 
-		/* Get global ID. */
-		int gid = get_global_id(0);
-		/* Perform sum. */
-		c[gid] = a[gid] + b[gid] + d;
+        /* Get global ID. */
+        int gid = get_global_id(0);
+        /* Perform sum. */
+        c[gid] = a[gid] + b[gid] + d;
 }

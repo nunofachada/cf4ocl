@@ -27,5 +27,5 @@
 #include <wrong.h>
 
 int fun(void* x) {
-	return 0;
+    return 0;
 }

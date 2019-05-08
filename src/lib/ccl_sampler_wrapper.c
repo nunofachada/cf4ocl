@@ -37,11 +37,11 @@
  * */
 struct ccl_sampler {
 
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
+    /**
+     * Parent wrapper object.
+     * @private
+     * */
+    CCLWrapper base;
 
 };
 
@@ -57,14 +57,14 @@ struct ccl_sampler {
  * */
 struct ccl_sampler_basic_properties {
 
-	/** Are the image coordinates normalized? */
-	cl_bool normalized_coords;
+    /** Are the image coordinates normalized? */
+    cl_bool normalized_coords;
 
-	/** How to handle out-of-range coordinates. */
-	cl_addressing_mode addressing_mode;
+    /** How to handle out-of-range coordinates. */
+    cl_addressing_mode addressing_mode;
 
-	/** Filter to apply when reading an image. */
-	cl_filter_mode filter_mode;
+    /** Filter to apply when reading an image. */
+    cl_filter_mode filter_mode;
 
 };
 
@@ -87,35 +87,35 @@ struct ccl_sampler_basic_properties {
  * properties.
  * */
 static struct ccl_sampler_basic_properties
-	ccl_sampler_get_basic_properties(
-		const cl_sampler_properties *sampler_properties) {
+    ccl_sampler_get_basic_properties(
+        const cl_sampler_properties *sampler_properties) {
 
-	/* Set defaults. */
-	struct ccl_sampler_basic_properties sbp =
-		{ CL_TRUE, CL_ADDRESS_CLAMP, CL_FILTER_NEAREST };
+    /* Set defaults. */
+    struct ccl_sampler_basic_properties sbp =
+        { CL_TRUE, CL_ADDRESS_CLAMP, CL_FILTER_NEAREST };
 
-	/* Cycle through property list. */
-	if (sampler_properties != NULL) {
-		for (guint i = 0; sampler_properties[i] != 0; i = i + 2) {
-			/* Check if property is a basic known property. */
-			switch (sampler_properties[i]) {
-				case CL_SAMPLER_NORMALIZED_COORDS:
-					sbp.normalized_coords = (cl_bool) sampler_properties[i + 1];
-					break;
-				case CL_SAMPLER_ADDRESSING_MODE:
-					sbp.addressing_mode =
-						(cl_addressing_mode) sampler_properties[i + 1];
-					break;
-				case CL_SAMPLER_FILTER_MODE:
-					sbp.filter_mode =
-						(cl_filter_mode) sampler_properties[i + 1];
-					break;
-			}
-		}
-	}
+    /* Cycle through property list. */
+    if (sampler_properties != NULL) {
+        for (guint i = 0; sampler_properties[i] != 0; i = i + 2) {
+            /* Check if property is a basic known property. */
+            switch (sampler_properties[i]) {
+                case CL_SAMPLER_NORMALIZED_COORDS:
+                    sbp.normalized_coords = (cl_bool) sampler_properties[i + 1];
+                    break;
+                case CL_SAMPLER_ADDRESSING_MODE:
+                    sbp.addressing_mode =
+                        (cl_addressing_mode) sampler_properties[i + 1];
+                    break;
+                case CL_SAMPLER_FILTER_MODE:
+                    sbp.filter_mode =
+                        (cl_filter_mode) sampler_properties[i + 1];
+                    break;
+            }
+        }
+    }
 
-	/* Return properties. */
-	return sbp;
+    /* Return properties. */
+    return sbp;
 
 }
 
@@ -138,8 +138,8 @@ static struct ccl_sampler_basic_properties
 CCL_EXPORT
 CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler) {
 
-	return (CCLSampler*) ccl_wrapper_new(
-		CCL_SAMPLER, (void*) sampler, sizeof(CCLSampler));
+    return (CCLSampler*) ccl_wrapper_new(
+        CCL_SAMPLER, (void*) sampler, sizeof(CCLSampler));
 
 }
 
@@ -154,8 +154,8 @@ CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler) {
 CCL_EXPORT
 void ccl_sampler_destroy(CCLSampler* smplr) {
 
-	ccl_wrapper_unref((CCLWrapper*) smplr, sizeof(CCLSampler),
-		NULL, (ccl_wrapper_release_cl_object) clReleaseSampler, NULL);
+    ccl_wrapper_unref((CCLWrapper*) smplr, sizeof(CCLSampler),
+        NULL, (ccl_wrapper_release_cl_object) clReleaseSampler, NULL);
 
 }
 
@@ -180,17 +180,17 @@ void ccl_sampler_destroy(CCLSampler* smplr) {
  * */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
-	cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
-	CCLErr** err) {
+    cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
+    CCLErr** err) {
 
-	const cl_sampler_properties sp[] = {
-		CL_SAMPLER_NORMALIZED_COORDS, normalized_coords,
-		CL_SAMPLER_ADDRESSING_MODE, addressing_mode,
-		CL_SAMPLER_FILTER_MODE, filter_mode,
-		0
-	};
+    const cl_sampler_properties sp[] = {
+        CL_SAMPLER_NORMALIZED_COORDS, normalized_coords,
+        CL_SAMPLER_ADDRESSING_MODE, addressing_mode,
+        CL_SAMPLER_FILTER_MODE, filter_mode,
+        0
+    };
 
-	return ccl_sampler_new_full(ctx, sp, err);
+    return ccl_sampler_new_full(ctx, sp, err);
 }
 
 
@@ -227,80 +227,80 @@ CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
  * */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
-	const cl_sampler_properties *sampler_properties, CCLErr** err) {
+    const cl_sampler_properties *sampler_properties, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+    /* Make sure ctx is not NULL. */
+    g_return_val_if_fail(ctx != NULL, NULL);
 
-	/* New sampler wrapper object to create. */
-	CCLSampler* smplr = NULL;
-	/* OpenCL sampler object to create and wrap. */
-	cl_sampler sampler;
-	/* OpenCL function status. */
-	cl_int ocl_status;
+    /* New sampler wrapper object to create. */
+    CCLSampler* smplr = NULL;
+    /* OpenCL sampler object to create and wrap. */
+    cl_sampler sampler;
+    /* OpenCL function status. */
+    cl_int ocl_status;
 
 #ifdef CL_VERSION_2_0
 
-	/* OpenCL platform version. */
-	double ocl_ver;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* OpenCL platform version. */
+    double ocl_ver;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
-	/* Get context platform version. */
-	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get context platform version. */
+    ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Create the OpenCL sampler object. */
-	if (ocl_ver >= 200) {
-		/* Platform is OpenCL >= 2.0, use "new" API. */
-		sampler = clCreateSamplerWithProperties(
-			ccl_context_unwrap(ctx), sampler_properties, &ocl_status);
-	} else {
-		/* Platform is OpenCL <= 1.2, use "old" API. */
-		struct ccl_sampler_basic_properties sbp =
-			ccl_sampler_get_basic_properties(sampler_properties);
-		CCL_BEGIN_IGNORE_DEPRECATIONS
-		sampler = clCreateSampler(ccl_context_unwrap(ctx),
-			sbp.normalized_coords, sbp.addressing_mode, sbp.filter_mode,
-			&ocl_status);
-		CCL_END_IGNORE_DEPRECATIONS
-	}
+    /* Create the OpenCL sampler object. */
+    if (ocl_ver >= 200) {
+        /* Platform is OpenCL >= 2.0, use "new" API. */
+        sampler = clCreateSamplerWithProperties(
+            ccl_context_unwrap(ctx), sampler_properties, &ocl_status);
+    } else {
+        /* Platform is OpenCL <= 1.2, use "old" API. */
+        struct ccl_sampler_basic_properties sbp =
+            ccl_sampler_get_basic_properties(sampler_properties);
+        CCL_BEGIN_IGNORE_DEPRECATIONS
+        sampler = clCreateSampler(ccl_context_unwrap(ctx),
+            sbp.normalized_coords, sbp.addressing_mode, sbp.filter_mode,
+            &ocl_status);
+        CCL_END_IGNORE_DEPRECATIONS
+    }
 
 #else
 
-	/* Create OpenCL sampler object. */
-	struct ccl_sampler_basic_properties sbp =
-		ccl_sampler_get_basic_properties(sampler_properties);
-	sampler = clCreateSampler(ccl_context_unwrap(ctx),
-		sbp.normalized_coords, sbp.addressing_mode, sbp.filter_mode,
-		&ocl_status);
+    /* Create OpenCL sampler object. */
+    struct ccl_sampler_basic_properties sbp =
+        ccl_sampler_get_basic_properties(sampler_properties);
+    sampler = clCreateSampler(ccl_context_unwrap(ctx),
+        sbp.normalized_coords, sbp.addressing_mode, sbp.filter_mode,
+        &ocl_status);
 
 #endif
 
-	/* Check for errors. */
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to create sampler (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Check for errors. */
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to create sampler (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Create sampler wrapper. */
-	smplr = ccl_sampler_new_wrap(sampler);
+    /* Create sampler wrapper. */
+    smplr = ccl_sampler_new_wrap(sampler);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Return sampler wrapper. */
-	return smplr;
+    /* Return sampler wrapper. */
+    return smplr;
 
 
 }

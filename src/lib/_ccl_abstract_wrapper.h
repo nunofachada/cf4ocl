@@ -46,29 +46,29 @@ typedef struct ccl_wrapper_info_table CCLWrapperInfoTable;
  * */
 struct ccl_wrapper {
 
-	/**
-	 * The class or type of wrapped OpenCL object.
-	 * @private
-	 * */
-	CCLClass class;
+    /**
+     * The class or type of wrapped OpenCL object.
+     * @private
+     * */
+    CCLClass class;
 
-	/**
-	 * The wrapped OpenCL object.
-	 * @private
-	 * */
-	void* cl_object;
+    /**
+     * The wrapped OpenCL object.
+     * @private
+     * */
+    void* cl_object;
 
-	/**
-	 * Information about the wrapped OpenCL object.
-	 * @private
-	 * */
-	CCLWrapperInfoTable* info;
+    /**
+     * Information about the wrapped OpenCL object.
+     * @private
+     * */
+    CCLWrapperInfoTable* info;
 
-	/**
-	 * Reference count.
-	 * @private
-	 * */
-	int ref_count;
+    /**
+     * Reference count.
+     * @private
+     * */
+    int ref_count;
 
 };
 
@@ -97,7 +97,7 @@ typedef void (*ccl_wrapper_release_fields)(CCLWrapper* wrapper);
  * or an OpenCL error code otherwise.
  * */
 typedef CL_API_ENTRY cl_int
-	(CL_API_CALL* ccl_wrapper_release_cl_object)(void* cl_object);
+    (CL_API_CALL* ccl_wrapper_release_cl_object)(void* cl_object);
 
 /**
  * @internal
@@ -121,8 +121,8 @@ typedef CL_API_ENTRY cl_int
  * or an error code otherwise.
  * */
 typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp1)(
-	void* cl_object, cl_uint param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret);
+    void* cl_object, cl_uint param_name, size_t param_value_size,
+    void* param_value, size_t* param_value_size_ret);
 
 /**
  * @internal
@@ -148,9 +148,9 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp1)(
  * or an error code otherwise.
  * */
 typedef CL_API_ENTRY cl_int (CL_API_CALL* ccl_wrapper_info_fp2)(
-	void* cl_object1, void* cl_object2, cl_uint param_name,
-	size_t param_value_size, void* param_value,
-	size_t* param_value_size_ret);
+    void* cl_object1, void* cl_object2, cl_uint param_name,
+    size_t param_value_size, void* param_value,
+    size_t* param_value_size_ret);
 
 /* Create a new wrapper object. This function is called by the
  * concrete wrapper constructors. */
@@ -159,13 +159,13 @@ CCLWrapper* ccl_wrapper_new(CCLClass class, void* cl_object, size_t size);
 /* Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed. */
 cl_bool ccl_wrapper_unref(CCLWrapper* wrapper, size_t size,
-	ccl_wrapper_release_fields rel_fields_fun,
-	ccl_wrapper_release_cl_object rel_cl_fun, CCLErr** err);
+    ccl_wrapper_release_fields rel_fields_fun,
+    ccl_wrapper_release_cl_object rel_cl_fun, CCLErr** err);
 
 /* Add a ::CCLWrapperInfo object to the info table of the
  * given wrapper. */
 void ccl_wrapper_add_info(CCLWrapper* wrapper, cl_uint param_name,
-	CCLWrapperInfo* info);
+    CCLWrapperInfo* info);
 
 /* Create a new CCLWrapperInfo* object with a given value size. */
 CCLWrapperInfo* ccl_wrapper_info_new(size_t size);

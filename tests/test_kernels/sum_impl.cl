@@ -33,7 +33,7 @@
  * */
 uint do_sum(uint a, uint b, uint c) {
 
-	/* Perform sum. */
-	return a + b + c;
+    /* Perform sum. */
+    return a + b + c;
 
 }

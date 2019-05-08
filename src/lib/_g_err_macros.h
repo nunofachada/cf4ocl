@@ -38,11 +38,11 @@
 /* Macro which determines part of the information which appears in debug log
  * messages. */
 #ifndef G_ERR_DEBUG_STR
-	#ifdef NDEBUG
-		#define G_ERR_DEBUG_STR G_STRFUNC
-	#else
-		#define G_ERR_DEBUG_STR G_STRLOC
-	#endif
+    #ifdef NDEBUG
+        #define G_ERR_DEBUG_STR G_STRFUNC
+    #else
+        #define G_ERR_DEBUG_STR G_STRLOC
+    #endif
 #endif
 
 /**
@@ -59,12 +59,12 @@
  * @param[in] ... Extra parameters for error message.
  * */
 #define g_if_err_create_goto( \
-	err, quark, error_condition, error_code, label, msg, ...) \
-	if (error_condition) { \
-		g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
-		g_debug(G_ERR_DEBUG_STR); \
-		goto label; \
-	}
+    err, quark, error_condition, error_code, label, msg, ...) \
+    if (error_condition) { \
+        g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
+        g_debug(G_ERR_DEBUG_STR); \
+        goto label; \
+    }
 
 /**
  * If error is detected in `err` object (`err != NULL`), go to the specified
@@ -74,10 +74,10 @@
  * @param[in] label Label to goto if error is detected.
  * */
 #define g_if_err_goto(err, label) \
-	if ((err) != NULL) { \
-		g_debug(G_ERR_DEBUG_STR); \
-		goto label; \
-	}
+    if ((err) != NULL) { \
+        g_debug(G_ERR_DEBUG_STR); \
+        goto label; \
+    }
 
 /**
  * Same as g_if_err_goto(), but rethrows error in a source GError object to
@@ -88,11 +88,11 @@
  * @param[in] label Label to goto if error is detected.
  * */
 #define g_if_err_propagate_goto(err_dest, err_src, label) \
-	if ((err_src) != NULL) { \
-		g_debug(G_ERR_DEBUG_STR); \
-		g_propagate_error((err_dest), (err_src)); \
-		err_src = NULL; \
-		goto label; \
-	}
+    if ((err_src) != NULL) { \
+        g_debug(G_ERR_DEBUG_STR); \
+        g_propagate_error((err_dest), (err_src)); \
+        err_src = NULL; \
+        goto label; \
+    }
 
 #endif

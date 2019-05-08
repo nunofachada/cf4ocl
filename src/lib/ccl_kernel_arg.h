@@ -139,7 +139,7 @@ extern const CCLArg* ccl_arg_skip;
  * @return A private ::CCLArg* kernel argument.
  * */
 #define ccl_arg_priv(value, type) \
-	ccl_arg_new(&value, sizeof(type))
+    ccl_arg_new(&value, sizeof(type))
 
 /**
  * Defines a local kernel argument, which allocates local memory
@@ -154,7 +154,7 @@ extern const CCLArg* ccl_arg_skip;
  * @return A local ::CCLArg* kernel argument.
  * */
 #define ccl_arg_local(count, type) \
-	ccl_arg_new(NULL, count * sizeof(type))
+    ccl_arg_new(NULL, count * sizeof(type))
 
 /**
  * Defines a kernel argument with more control.
@@ -168,7 +168,7 @@ extern const CCLArg* ccl_arg_skip;
  * @return A private or local ::CCLArg* kernel argument.
  * */
 #define ccl_arg_full(value, size) \
-	ccl_arg_new(value, size)
+    ccl_arg_new(value, size)
 
 /** @} */
 

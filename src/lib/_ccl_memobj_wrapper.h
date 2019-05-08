@@ -44,17 +44,17 @@
  * */
 struct ccl_memobj {
 
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
+    /**
+     * Parent wrapper object.
+     * @private
+     * */
+    CCLWrapper base;
 
-	/**
-	 * Context wrapper.
-	 * @private
-	 * */
-	CCLContext* ctx;
+    /**
+     * Context wrapper.
+     * @private
+     * */
+    CCLContext* ctx;
 
 };
 

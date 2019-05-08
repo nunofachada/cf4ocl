@@ -43,51 +43,51 @@
  * reporting is to be ignored.
  * */
 static void ccl_dev_container_init_devices(CCLDevContainer* devcon,
-	ccl_dev_container_get_cldevices get_devices, CCLErr **err) {
+    ccl_dev_container_get_cldevices get_devices, CCLErr **err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_if_fail(err == NULL || *err == NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_if_fail(err == NULL || *err == NULL);
 
-	/* Make sure devcon is not NULL. */
-	g_return_if_fail(devcon != NULL);
+    /* Make sure devcon is not NULL. */
+    g_return_if_fail(devcon != NULL);
 
-	/* Make sure device list is not initialized. */
-	g_return_if_fail(devcon->devices == NULL);
+    /* Make sure device list is not initialized. */
+    g_return_if_fail(devcon->devices == NULL);
 
-	CCLWrapperInfo* info_devs;
-	CCLErr* err_internal = NULL;
+    CCLWrapperInfo* info_devs;
+    CCLErr* err_internal = NULL;
 
-	/* Get device IDs. */
-	info_devs = get_devices(devcon, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get device IDs. */
+    info_devs = get_devices(devcon, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Determine number of devices. */
-	devcon->num_devices = (cl_uint) (info_devs->size / sizeof(cl_device_id));
+    /* Determine number of devices. */
+    devcon->num_devices = (cl_uint) (info_devs->size / sizeof(cl_device_id));
 
-	/* Allocate memory for array of device wrapper objects. */
-	devcon->devices = g_slice_alloc(
-		devcon->num_devices * sizeof(CCLDevice*));
+    /* Allocate memory for array of device wrapper objects. */
+    devcon->devices = g_slice_alloc(
+        devcon->num_devices * sizeof(CCLDevice*));
 
-	/* Wrap device IDs in device wrapper objects. */
-	for (guint i = 0; i < devcon->num_devices; ++i) {
+    /* Wrap device IDs in device wrapper objects. */
+    for (guint i = 0; i < devcon->num_devices; ++i) {
 
-		/* Add device wrapper object to array of wrapper objects. */
-		devcon->devices[i] = ccl_device_new_wrap(
-			((cl_device_id*) info_devs->value)[i]);
-	}
+        /* Add device wrapper object to array of wrapper objects. */
+        devcon->devices[i] = ccl_device_new_wrap(
+            ((cl_device_id*) info_devs->value)[i]);
+    }
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Terminate function. */
-	return;
+    /* Terminate function. */
+    return;
 
 }
 
@@ -102,22 +102,22 @@ finish:
  * */
 void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
 
-	/* Make sure devcon wrapper object is not NULL. */
-	g_return_if_fail(devcon != NULL);
+    /* Make sure devcon wrapper object is not NULL. */
+    g_return_if_fail(devcon != NULL);
 
-	/* Check if any devices are associated with this device container. */
-	if (devcon->devices != NULL) {
+    /* Check if any devices are associated with this device container. */
+    if (devcon->devices != NULL) {
 
-		/* Release devices in device container. */
-		for (guint i = 0; i < devcon->num_devices; ++i) {
-			if (devcon->devices[i])
-				ccl_device_unref(devcon->devices[i]);
-		}
+        /* Release devices in device container. */
+        for (guint i = 0; i < devcon->num_devices; ++i) {
+            if (devcon->devices[i])
+                ccl_device_unref(devcon->devices[i]);
+        }
 
-		/* Free device wrapper array. */
-		g_slice_free1(devcon->num_devices * sizeof(CCLDevice*),
-			devcon->devices);
-	}
+        /* Free device wrapper array. */
+        g_slice_free1(devcon->num_devices * sizeof(CCLDevice*),
+            devcon->devices);
+    }
 
 }
 
@@ -136,25 +136,25 @@ void ccl_dev_container_release_devices(CCLDevContainer* devcon) {
  * error occurs.
  * */
 CCLDevice* const* ccl_dev_container_get_all_devices(
-	CCLDevContainer* devcon,
-	ccl_dev_container_get_cldevices get_devices, CCLErr** err) {
+    CCLDevContainer* devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Make sure devcon is not NULL. */
-	g_return_val_if_fail(devcon != NULL, NULL);
+    /* Make sure devcon is not NULL. */
+    g_return_val_if_fail(devcon != NULL, NULL);
 
-	/* Check if device list is already initialized. */
-	if (devcon->devices == NULL) {
+    /* Check if device list is already initialized. */
+    if (devcon->devices == NULL) {
 
-		/* Not initialized, initialize it. */
-		ccl_dev_container_init_devices(devcon, get_devices, err);
+        /* Not initialized, initialize it. */
+        ccl_dev_container_init_devices(devcon, get_devices, err);
 
-	}
+    }
 
-	/* Return all devices in platform. */
-	return (CCLDevice* const*) devcon->devices;
+    /* Return all devices in platform. */
+    return (CCLDevice* const*) devcon->devices;
 
 }
 
@@ -175,55 +175,55 @@ CCLDevice* const* ccl_dev_container_get_all_devices(
  * occurs.
  * */
 CCLDevice* ccl_dev_container_get_device(
-	CCLDevContainer* devcon,
-	ccl_dev_container_get_cldevices get_devices, cl_uint index,
-	CCLErr** err) {
+    CCLDevContainer* devcon,
+    ccl_dev_container_get_cldevices get_devices, cl_uint index,
+    CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Make sure devcon is not NULL. */
-	g_return_val_if_fail(devcon != NULL, NULL);
+    /* Make sure devcon is not NULL. */
+    g_return_val_if_fail(devcon != NULL, NULL);
 
-	/* The return value. */
-	CCLDevice* device_ret;
+    /* The return value. */
+    CCLDevice* device_ret;
 
-	/* Internal error object. */
-	CCLErr* err_internal = NULL;
+    /* Internal error object. */
+    CCLErr* err_internal = NULL;
 
-	/* Check if device list is already initialized. */
-	if (devcon->devices == NULL) {
+    /* Check if device list is already initialized. */
+    if (devcon->devices == NULL) {
 
-		/* Not initialized, initialize it. */
-		ccl_dev_container_init_devices(
-			devcon, get_devices, &err_internal);
+        /* Not initialized, initialize it. */
+        ccl_dev_container_init_devices(
+            devcon, get_devices, &err_internal);
 
-		/* Check for errors. */
-		g_if_err_propagate_goto(err, err_internal, error_handler);
+        /* Check for errors. */
+        g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	}
+    }
 
-	/* Make sure device index is less than the number of devices. */
-	g_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices,
-		CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
-		"%s: device index (%d) out of bounds (%d devices in list).",
-		 CCL_STRD, index, devcon->num_devices);
+    /* Make sure device index is less than the number of devices. */
+    g_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices,
+        CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
+        "%s: device index (%d) out of bounds (%d devices in list).",
+         CCL_STRD, index, devcon->num_devices);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	device_ret = devcon->devices[index];
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    device_ret = devcon->devices[index];
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	device_ret = NULL;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    device_ret = NULL;
 
 finish:
 
-	/* Return list of device wrappers. */
-	return device_ret;
+    /* Return list of device wrappers. */
+    return device_ret;
 
 }
 
@@ -242,24 +242,24 @@ finish:
  * occurs or is otherwise not possible to get any device.
  * */
 cl_uint ccl_dev_container_get_num_devices(
-	CCLDevContainer* devcon,
-	ccl_dev_container_get_cldevices get_devices, CCLErr** err) {
+    CCLDevContainer* devcon,
+    ccl_dev_container_get_cldevices get_devices, CCLErr** err) {
 
-	/* Make sure devcon is not NULL. */
-	g_return_val_if_fail(devcon != NULL, 0);
+    /* Make sure devcon is not NULL. */
+    g_return_val_if_fail(devcon != NULL, 0);
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	/* Check if device list is already initialized. */
-	if (devcon->devices == NULL) {
+    /* Check if device list is already initialized. */
+    if (devcon->devices == NULL) {
 
-		/* Not initialized, initialize it. */
-		ccl_dev_container_init_devices(devcon, get_devices, err);
+        /* Not initialized, initialize it. */
+        ccl_dev_container_init_devices(devcon, get_devices, err);
 
-	}
+    }
 
-	/* Return the number of devices in context. */
-	return devcon->num_devices;
+    /* Return the number of devices in context. */
+    return devcon->num_devices;
 
 }

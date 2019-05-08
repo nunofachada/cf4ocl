@@ -90,7 +90,7 @@
  * @param[in] user_data A pointer to user supplied data.
  * */
 typedef void (CL_CALLBACK *ccl_event_callback)(cl_event event,
-	cl_int event_command_exec_status, void *user_data);
+    cl_int event_command_exec_status, void *user_data);
 
 /* Get the event wrapper for the given OpenCL event. */
 CCL_EXPORT
@@ -115,7 +115,7 @@ const char* ccl_event_get_final_name(CCLEvent* evt);
 /* Get the command type which fired the given event. */
 CCL_EXPORT
 cl_command_type ccl_event_get_command_type(
-	CCLEvent* evt, CCLErr** err);
+    CCLEvent* evt, CCLErr** err);
 
 /* Get the OpenCL version of the platform associated with this event
  * object. */
@@ -125,8 +125,8 @@ cl_uint ccl_event_get_opencl_version(CCLEvent* evt, CCLErr** err);
 /* Wrapper for OpenCL clSetEventCallback() function. */
 CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
-	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
-	void *user_data, CCLErr** err);
+    cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
+    void *user_data, CCLErr** err);
 
 /* Create a new user event. */
 CCL_EXPORT
@@ -135,7 +135,7 @@ CCLEvent* ccl_user_event_new(CCLContext* ctx, CCLErr** err);
 /* Sets the execution status of a user event object. */
 CCL_EXPORT
 cl_bool ccl_user_event_set_status(
-	CCLEvent* evt, cl_int execution_status, CCLErr** err);
+    CCLEvent* evt, cl_int execution_status, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo event information object.
@@ -149,8 +149,8 @@ cl_bool ccl_user_event_set_status(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_event_get_info(evt, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) evt, NULL, param_name, 0, \
-		CCL_INFO_EVENT, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) evt, NULL, param_name, 0, \
+        CCL_INFO_EVENT, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar event information value.
@@ -169,8 +169,8 @@ cl_bool ccl_user_event_set_status(
  * If an error occurs, zero is returned.
  * */
 #define ccl_event_get_info_scalar(evt, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_EVENT, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_EVENT, CL_FALSE, err))
 
 /**
  * Macro which returns an array event information value.
@@ -190,8 +190,8 @@ cl_bool ccl_user_event_set_status(
  * If an error occurs, NULL is returned.
  * */
 #define ccl_event_get_info_array(evt, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) evt, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_EVENT, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) evt, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_EVENT, CL_FALSE, err)
 
 /**
  * Get a ::CCLWrapperInfo event profiling information object.
@@ -205,8 +205,8 @@ cl_bool ccl_user_event_set_status(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_event_get_profiling_info(evt, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) evt, NULL, param_name, 0, \
-		CCL_INFO_EVENT_PROFILING, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) evt, NULL, param_name, 0, \
+        CCL_INFO_EVENT_PROFILING, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar event profiling information value.
@@ -225,9 +225,9 @@ cl_bool ccl_user_event_set_status(
  * If an error occurs, zero is returned.
  * */
 #define ccl_event_get_profiling_info_scalar(evt, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_EVENT_PROFILING, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) evt, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_EVENT_PROFILING, CL_FALSE, err))
 
 /**
  * Macro which returns an array event profiling information value.
@@ -247,9 +247,9 @@ cl_bool ccl_user_event_set_status(
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_event_get_profiling_info_array(evt, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) evt, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_EVENT_PROFILING, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) evt, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_EVENT_PROFILING, CL_FALSE, err)
 
 /**
  * Increase the reference count of the event object.
@@ -257,7 +257,7 @@ cl_bool ccl_user_event_set_status(
  * @param[in] evt The event wrapper object.
  * */
 #define ccl_event_ref(evt) \
-	ccl_wrapper_ref((CCLWrapper*) evt)
+    ccl_wrapper_ref((CCLWrapper*) evt)
 
 /**
  * Alias to ccl_event_destroy().
@@ -274,7 +274,7 @@ cl_bool ccl_user_event_set_status(
  * @return The OpenCL event object.
  * */
 #define ccl_event_unwrap(evt) \
-	((cl_event) ccl_wrapper_unwrap((CCLWrapper*) evt))
+    ((cl_event) ccl_wrapper_unwrap((CCLWrapper*) evt))
 
 /**
  * @defgroup CCL_EVENT_WAIT_LIST Event wait lists
@@ -336,12 +336,12 @@ typedef GPtrArray* CCLEventWaitList;
  * list version). */
 CCL_EXPORT
 CCLEventWaitList* ccl_event_wait_list_add(
-	CCLEventWaitList* evt_wait_lst, ...) G_GNUC_NULL_TERMINATED;
+    CCLEventWaitList* evt_wait_lst, ...) G_GNUC_NULL_TERMINATED;
 
 /* Add event wrapper objects to an event wait list (array version). */
 CCL_EXPORT
 CCLEventWaitList* ccl_event_wait_list_add_v(
-	CCLEventWaitList* evt_wait_lst, CCLEvent** evt);
+    CCLEventWaitList* evt_wait_lst, CCLEvent** evt);
 
 /* Clears an event wait list. */
 CCL_EXPORT
@@ -358,9 +358,9 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
  * @return Number of event in the event wait list.
  * */
 #define ccl_event_wait_list_get_num_events(evt_wait_lst) \
-	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
-	? (*(evt_wait_lst))->len \
-	: 0)
+    ((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
+    ? (*(evt_wait_lst))->len \
+    : 0)
 
 /**
  * @internal
@@ -373,9 +373,9 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst);
  * @return Array of OpenCL cl_event objects in the event wait list.
  * */
 #define ccl_event_wait_list_get_clevents(evt_wait_lst) \
-	((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
-		? (const cl_event*) (*(evt_wait_lst))->pdata \
-		: NULL)
+    ((((evt_wait_lst) != NULL) && (*(evt_wait_lst) != NULL)) \
+        ? (const cl_event*) (*(evt_wait_lst))->pdata \
+        : NULL)
 
 /** @} */
 

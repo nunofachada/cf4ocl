@@ -36,17 +36,17 @@
  */
 struct ccl_platforms {
 
-	/**
-	 * Platforms available in the system.
-	 * @private
-	 * */
-	CCLPlatform** platfs;
+    /**
+     * Platforms available in the system.
+     * @private
+     * */
+    CCLPlatform** platfs;
 
-	/**
-	 * Number of platforms available in the system.
-	 * @private
-	 * */
-	cl_uint num_platfs;
+    /**
+     * Number of platforms available in the system.
+     * @private
+     * */
+    cl_uint num_platfs;
 };
 
 /**
@@ -67,82 +67,82 @@ struct ccl_platforms {
 CCL_EXPORT
 CCLPlatforms* ccl_platforms_new(CCLErr **err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Return status of OpenCL functions. */
-	cl_int ocl_status;
+    /* Return status of OpenCL functions. */
+    cl_int ocl_status;
 
-	/* Object which represents the list of OpenCL platforms available
-	 * in the system. */
-	CCLPlatforms* platforms = NULL;
+    /* Object which represents the list of OpenCL platforms available
+     * in the system. */
+    CCLPlatforms* platforms = NULL;
 
-	/* Size in bytes of array of platform IDs. */
-	gsize platf_ids_size;
+    /* Size in bytes of array of platform IDs. */
+    gsize platf_ids_size;
 
-	/* Array of platform IDs. */
-	cl_platform_id* platf_ids = NULL;
+    /* Array of platform IDs. */
+    cl_platform_id* platf_ids = NULL;
 
-	/* Allocate memory for the CCLPlatforms object. */
-	platforms = g_slice_new0(CCLPlatforms);
+    /* Allocate memory for the CCLPlatforms object. */
+    platforms = g_slice_new0(CCLPlatforms);
 
-	/* Get number of platforms */
-	ocl_status = clGetPlatformIDs(0, NULL, &platforms->num_platfs);
-	g_if_err_create_goto(*err, CCL_ERROR,
-		platforms->num_platfs == 0, CCL_ERROR_DEVICE_NOT_FOUND,
-		error_handler, "%s: no OpenCL platforms found.", CCL_STRD);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: get number of platforms (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Get number of platforms */
+    ocl_status = clGetPlatformIDs(0, NULL, &platforms->num_platfs);
+    g_if_err_create_goto(*err, CCL_ERROR,
+        platforms->num_platfs == 0, CCL_ERROR_DEVICE_NOT_FOUND,
+        error_handler, "%s: no OpenCL platforms found.", CCL_STRD);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: get number of platforms (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Determine size in bytes of array of platform IDs. */
-	platf_ids_size = sizeof(cl_platform_id) * platforms->num_platfs;
+    /* Determine size in bytes of array of platform IDs. */
+    platf_ids_size = sizeof(cl_platform_id) * platforms->num_platfs;
 
-	/* Allocate memory for array of platform IDs. */
-	platf_ids = (cl_platform_id*) g_slice_alloc(platf_ids_size);
+    /* Allocate memory for array of platform IDs. */
+    platf_ids = (cl_platform_id*) g_slice_alloc(platf_ids_size);
 
-	/* Get existing platform IDs. */
-	ocl_status = clGetPlatformIDs(
-		platforms->num_platfs, platf_ids, NULL);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: get platforms IDs (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Get existing platform IDs. */
+    ocl_status = clGetPlatformIDs(
+        platforms->num_platfs, platf_ids, NULL);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: get platforms IDs (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Allocate memory for array of platform wrapper objects. */
-	platforms->platfs =
-		g_slice_alloc(sizeof(CCLPlatform*) * platforms->num_platfs);
+    /* Allocate memory for array of platform wrapper objects. */
+    platforms->platfs =
+        g_slice_alloc(sizeof(CCLPlatform*) * platforms->num_platfs);
 
-	/* Wrap platform IDs in platform wrapper objects. */
-	for (guint i = 0; i < platforms->num_platfs; i++) {
-		/* Add platform wrapper object to array of wrapper objects. */
-		platforms->platfs[i] = ccl_platform_new_wrap(platf_ids[i]);
-	}
+    /* Wrap platform IDs in platform wrapper objects. */
+    for (guint i = 0; i < platforms->num_platfs; i++) {
+        /* Add platform wrapper object to array of wrapper objects. */
+        platforms->platfs[i] = ccl_platform_new_wrap(platf_ids[i]);
+    }
 
-	/* Free array of platform ids. */
-	g_slice_free1(platf_ids_size, platf_ids);
+    /* Free array of platform ids. */
+    g_slice_free1(platf_ids_size, platf_ids);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* Destroy the CCLPlatforms object (no need to check for NULL since to get
-	 * here, the object must have been created). */
-	ccl_platforms_destroy(platforms);
+    /* Destroy the CCLPlatforms object (no need to check for NULL since to get
+     * here, the object must have been created). */
+    ccl_platforms_destroy(platforms);
 
-	/* Set platforms to NULL, indicating an error occurred.*/
-	platforms = NULL;
+    /* Set platforms to NULL, indicating an error occurred.*/
+    platforms = NULL;
 
 finish:
 
-	/* Return the CCLPlatforms object. */
-	return platforms;
+    /* Return the CCLPlatforms object. */
+    return platforms;
 
 }
 
@@ -157,20 +157,20 @@ finish:
 CCL_EXPORT
 void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
-	/* Platforms object can't be NULL. */
-	g_return_if_fail(platforms != NULL);
+    /* Platforms object can't be NULL. */
+    g_return_if_fail(platforms != NULL);
 
-	/* Destroy underlying platforms. */
-	for (guint i = 0; i < platforms->num_platfs; i++) {
-		ccl_platform_unref(platforms->platfs[i]);
-	}
+    /* Destroy underlying platforms. */
+    for (guint i = 0; i < platforms->num_platfs; i++) {
+        ccl_platform_unref(platforms->platfs[i]);
+    }
 
-	/* Free underlying platforms array. */
-	g_slice_free1(
-		sizeof(CCLPlatform*) * platforms->num_platfs, platforms->platfs);
+    /* Free underlying platforms array. */
+    g_slice_free1(
+        sizeof(CCLPlatform*) * platforms->num_platfs, platforms->platfs);
 
-	/* Free CCLPlatforms object. */
-	g_slice_free(CCLPlatforms, platforms);
+    /* Free CCLPlatforms object. */
+    g_slice_free(CCLPlatforms, platforms);
 }
 
 
@@ -186,11 +186,11 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
 CCL_EXPORT
 cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
 
-	/* Platforms object can't be NULL. */
-	g_return_val_if_fail(platforms != NULL, 0);
+    /* Platforms object can't be NULL. */
+    g_return_val_if_fail(platforms != NULL, 0);
 
-	/* Return number of OpenCL platforms. */
-	return platforms->num_platfs;
+    /* Return number of OpenCL platforms. */
+    return platforms->num_platfs;
 }
 
 /**
@@ -204,17 +204,17 @@ cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
  * */
 CCL_EXPORT
 CCLPlatform* ccl_platforms_get(
-	CCLPlatforms* platforms, cl_uint index) {
+    CCLPlatforms* platforms, cl_uint index) {
 
-	/* Platforms object can't be NULL. */
-	g_return_val_if_fail(platforms != NULL, NULL);
+    /* Platforms object can't be NULL. */
+    g_return_val_if_fail(platforms != NULL, NULL);
 
-	/* Index of platform to return must be smaller than the number of
-	 * available platforms. */
-	g_return_val_if_fail(index < platforms->num_platfs, NULL);
+    /* Index of platform to return must be smaller than the number of
+     * available platforms. */
+    g_return_val_if_fail(index < platforms->num_platfs, NULL);
 
-	/* Return platform at given index. */
-	return platforms->platfs[index];
+    /* Return platform at given index. */
+    return platforms->platfs[index];
 }
 
 /** @} */

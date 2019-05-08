@@ -31,98 +31,98 @@
 
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueue(cl_context context, cl_device_id device,
-	cl_command_queue_properties properties, cl_int* errcode_ret) {
+    cl_command_queue_properties properties, cl_int* errcode_ret) {
 
-	seterrcode(errcode_ret, CL_SUCCESS);
+    seterrcode(errcode_ret, CL_SUCCESS);
 
-	cl_command_queue queue = g_slice_new(struct _cl_command_queue);
+    cl_command_queue queue = g_slice_new(struct _cl_command_queue);
 
-	queue->context = context;
-	queue->device = device;
-	queue->properties = properties;
-	queue->ref_count = 1;
+    queue->context = context;
+    queue->device = device;
+    queue->properties = properties;
+    queue->ref_count = 1;
 
-	return queue;
+    return queue;
 }
 
 #ifdef CL_VERSION_2_0
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueueWithProperties(cl_context context,
-	cl_device_id device, const cl_queue_properties* properties,
-	cl_int* errcode_ret) {
+    cl_device_id device, const cl_queue_properties* properties,
+    cl_int* errcode_ret) {
 
-	cl_queue_properties final_properties = 0;
+    cl_queue_properties final_properties = 0;
 
-	/* Use only CL_QUEUE_PROPERTIES properties if they are available in the
-	 * first slot of the properties array. */
-	if (properties && properties[0] == CL_QUEUE_PROPERTIES)
-		final_properties = properties[1];
+    /* Use only CL_QUEUE_PROPERTIES properties if they are available in the
+     * first slot of the properties array. */
+    if (properties && properties[0] == CL_QUEUE_PROPERTIES)
+        final_properties = properties[1];
 
-	CCL_BEGIN_IGNORE_DEPRECATIONS
-	return clCreateCommandQueue(
-		context, device, final_properties, errcode_ret);
-	CCL_END_IGNORE_DEPRECATIONS
+    CCL_BEGIN_IGNORE_DEPRECATIONS
+    return clCreateCommandQueue(
+        context, device, final_properties, errcode_ret);
+    CCL_END_IGNORE_DEPRECATIONS
 }
 #endif
 
 CL_API_ENTRY cl_int CL_API_CALL
 clRetainCommandQueue(cl_command_queue command_queue) {
 
-	g_atomic_int_inc(&command_queue->ref_count);
-	return CL_SUCCESS;
+    g_atomic_int_inc(&command_queue->ref_count);
+    return CL_SUCCESS;
 
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clReleaseCommandQueue(cl_command_queue command_queue) {
 
-	/* Decrement reference count and check if it reaches 0. */
-	if (g_atomic_int_dec_and_test(&command_queue->ref_count)) {
+    /* Decrement reference count and check if it reaches 0. */
+    if (g_atomic_int_dec_and_test(&command_queue->ref_count)) {
 
-		g_slice_free(struct _cl_command_queue, command_queue);
+        g_slice_free(struct _cl_command_queue, command_queue);
 
-	}
+    }
 
-	return CL_SUCCESS;
+    return CL_SUCCESS;
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetCommandQueueInfo(cl_command_queue command_queue,
-	cl_command_queue_info param_name, size_t param_value_size,
-	void* param_value, size_t* param_value_size_ret) {
+    cl_command_queue_info param_name, size_t param_value_size,
+    void* param_value, size_t* param_value_size_ret) {
 
-	cl_int status = CL_SUCCESS;
+    cl_int status = CL_SUCCESS;
 
-	if (command_queue == NULL) {
-		status = CL_INVALID_COMMAND_QUEUE;
-	} else {
-		switch (param_name) {
+    if (command_queue == NULL) {
+        status = CL_INVALID_COMMAND_QUEUE;
+    } else {
+        switch (param_name) {
 
-			case CL_QUEUE_CONTEXT:
-				ccl_test_basic_info(cl_context, command_queue, context);
-			case CL_QUEUE_DEVICE:
-				ccl_test_basic_info(cl_device_id, command_queue, device);
-			case CL_QUEUE_REFERENCE_COUNT:
-				ccl_test_basic_info(cl_uint, command_queue, ref_count);
-			case CL_QUEUE_PROPERTIES:
-				ccl_test_basic_info(cl_command_queue_properties, command_queue, properties);
-			default:
-				status = CL_INVALID_VALUE;
-		}
-	}
+            case CL_QUEUE_CONTEXT:
+                ccl_test_basic_info(cl_context, command_queue, context);
+            case CL_QUEUE_DEVICE:
+                ccl_test_basic_info(cl_device_id, command_queue, device);
+            case CL_QUEUE_REFERENCE_COUNT:
+                ccl_test_basic_info(cl_uint, command_queue, ref_count);
+            case CL_QUEUE_PROPERTIES:
+                ccl_test_basic_info(cl_command_queue_properties, command_queue, properties);
+            default:
+                status = CL_INVALID_VALUE;
+        }
+    }
 
-	return status;
+    return status;
 
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clFlush(cl_command_queue command_queue) {
-	(void)(command_queue);
-	return CL_SUCCESS;
+    (void)(command_queue);
+    return CL_SUCCESS;
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clFinish(cl_command_queue command_queue) {
-	(void)(command_queue);
-	return CL_SUCCESS;
+    (void)(command_queue);
+    return CL_SUCCESS;
 }

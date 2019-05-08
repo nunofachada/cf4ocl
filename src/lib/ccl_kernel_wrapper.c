@@ -39,17 +39,17 @@
  */
 struct ccl_kernel {
 
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
+    /**
+     * Parent wrapper object.
+     * @private
+     * */
+    CCLWrapper base;
 
-	/**
-	 * Kernel arguments.
-	 * @private
-	 * */
-	GHashTable* args;
+    /**
+     * Kernel arguments.
+     * @private
+     * */
+    GHashTable* args;
 
 };
 
@@ -64,12 +64,12 @@ struct ccl_kernel {
  * */
 static void ccl_kernel_release_fields(CCLKernel* krnl) {
 
-	/* Make sure krnl wrapper object is not NULL. */
-	g_return_if_fail(krnl != NULL);
+    /* Make sure krnl wrapper object is not NULL. */
+    g_return_if_fail(krnl != NULL);
 
-	/* Free kernel arguments. */
-	if (krnl->args != NULL)
-		g_hash_table_destroy(krnl->args);
+    /* Free kernel arguments. */
+    if (krnl->args != NULL)
+        g_hash_table_destroy(krnl->args);
 
 }
 
@@ -98,8 +98,8 @@ static void ccl_kernel_release_fields(CCLKernel* krnl) {
 CCL_EXPORT
 CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
 
-	return (CCLKernel*) ccl_wrapper_new(
-		CCL_KERNEL, (void*) kernel, sizeof(CCLKernel));
+    return (CCLKernel*) ccl_wrapper_new(
+        CCL_KERNEL, (void*) kernel, sizeof(CCLKernel));
 
 }
 
@@ -116,52 +116,52 @@ CCLKernel* ccl_kernel_new_wrap(cl_kernel kernel) {
  * */
 CCL_EXPORT
 CCLKernel* ccl_kernel_new(
-	CCLProgram* prg, const char* kernel_name, CCLErr** err) {
+    CCLProgram* prg, const char* kernel_name, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
 
-	/* Make sure prg is not NULL. */
-	g_return_val_if_fail(prg != NULL, NULL);
+    /* Make sure prg is not NULL. */
+    g_return_val_if_fail(prg != NULL, NULL);
 
-	/* Make sure kernel_name is not NULL. */
-	g_return_val_if_fail(kernel_name != NULL, NULL);
+    /* Make sure kernel_name is not NULL. */
+    g_return_val_if_fail(kernel_name != NULL, NULL);
 
-	/* Kernel wrapper object. */
-	CCLKernel* krnl = NULL;
+    /* Kernel wrapper object. */
+    CCLKernel* krnl = NULL;
 
-	/* OpenCL return status. */
-	cl_int ocl_status;
+    /* OpenCL return status. */
+    cl_int ocl_status;
 
-	/* The OpenCL kernel object. */
-	cl_kernel kernel = NULL;
+    /* The OpenCL kernel object. */
+    cl_kernel kernel = NULL;
 
-	/* Create kernel. */
-	kernel = clCreateKernel(ccl_program_unwrap(prg),
-		kernel_name, &ocl_status);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to create kernel (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Create kernel. */
+    kernel = clCreateKernel(ccl_program_unwrap(prg),
+        kernel_name, &ocl_status);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to create kernel (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Create kernel wrapper. */
-	krnl = ccl_kernel_new_wrap(kernel);
+    /* Create kernel wrapper. */
+    krnl = ccl_kernel_new_wrap(kernel);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	krnl = NULL;
+    krnl = NULL;
 
 finish:
 
-	/* Return kernel wrapper. */
-	return krnl;
+    /* Return kernel wrapper. */
+    return krnl;
 
 }
 
@@ -176,9 +176,9 @@ finish:
 CCL_EXPORT
 void ccl_kernel_destroy(CCLKernel* krnl) {
 
-	ccl_wrapper_unref((CCLWrapper*) krnl, sizeof(CCLKernel),
-		(ccl_wrapper_release_fields) ccl_kernel_release_fields,
-		(ccl_wrapper_release_cl_object) clReleaseKernel, NULL);
+    ccl_wrapper_unref((CCLWrapper*) krnl, sizeof(CCLKernel),
+        (ccl_wrapper_release_fields) ccl_kernel_release_fields,
+        (ccl_wrapper_release_cl_object) clReleaseKernel, NULL);
 
 }
 
@@ -204,18 +204,18 @@ void ccl_kernel_destroy(CCLKernel* krnl) {
 CCL_EXPORT
 void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_if_fail(krnl != NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_if_fail(krnl != NULL);
 
-	/* Initialize table of kernel arguments if necessary. */
-	if (krnl->args == NULL) {
-		krnl->args = g_hash_table_new_full(g_direct_hash,
-			g_direct_equal, NULL, (GDestroyNotify) ccl_arg_destroy);
-	}
+    /* Initialize table of kernel arguments if necessary. */
+    if (krnl->args == NULL) {
+        krnl->args = g_hash_table_new_full(g_direct_hash,
+            g_direct_equal, NULL, (GDestroyNotify) ccl_arg_destroy);
+    }
 
-	/* Keep argument in table. */
-	g_hash_table_replace(krnl->args, GUINT_TO_POINTER(arg_index),
-		(gpointer) arg);
+    /* Keep argument in table. */
+    g_hash_table_replace(krnl->args, GUINT_TO_POINTER(arg_index),
+        (gpointer) arg);
 
 }
 
@@ -249,64 +249,64 @@ void ccl_kernel_set_arg(CCLKernel* krnl, cl_uint arg_index, void* arg) {
 CCL_EXPORT
 void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_if_fail(krnl != NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_if_fail(krnl != NULL);
 
-	/* The va_list, which represents the variable argument list. */
-	va_list args_va;
-	/* Array of arguments, created from the va_list. */
-	void** args_array = NULL;
-	/* Number of arguments. */
-	guint num_args = 0;
-	/* Aux. arg. when cycling through the va_list. */
-	void* aux_arg;
+    /* The va_list, which represents the variable argument list. */
+    va_list args_va;
+    /* Array of arguments, created from the va_list. */
+    void** args_array = NULL;
+    /* Number of arguments. */
+    guint num_args = 0;
+    /* Aux. arg. when cycling through the va_list. */
+    void* aux_arg;
 
-	/* Initialize the va_list. */
-	va_start(args_va, krnl);
+    /* Initialize the va_list. */
+    va_start(args_va, krnl);
 
-	/* Get first argument. */
-	aux_arg = va_arg(args_va, void*);
+    /* Get first argument. */
+    aux_arg = va_arg(args_va, void*);
 
-	/* Check if any arguments are given, and if so, populate array
-	 * of arguments. */
-	if (aux_arg != NULL) {
+    /* Check if any arguments are given, and if so, populate array
+     * of arguments. */
+    if (aux_arg != NULL) {
 
-		/* 1. Determine number of arguments. */
+        /* 1. Determine number of arguments. */
 
-		while (aux_arg != NULL) {
-			num_args++;
-			aux_arg = va_arg(args_va, void*);
-		}
-		va_end(args_va);
+        while (aux_arg != NULL) {
+            num_args++;
+            aux_arg = va_arg(args_va, void*);
+        }
+        va_end(args_va);
 
-		/* 2. Populate array of arguments. */
+        /* 2. Populate array of arguments. */
 
-		args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
-		va_start(args_va, krnl);
+        args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
+        va_start(args_va, krnl);
 
-		for (guint i = 0; i < num_args; ++i) {
-			aux_arg = va_arg(args_va, void*);
-			args_array[i] = aux_arg;
-		}
-		va_end(args_va);
-		args_array[num_args] = NULL;
+        for (guint i = 0; i < num_args; ++i) {
+            aux_arg = va_arg(args_va, void*);
+            args_array[i] = aux_arg;
+        }
+        va_end(args_va);
+        args_array[num_args] = NULL;
 
-	} else {
+    } else {
 
-		/* Close the variable argument list if no arguments are given. */
-		va_end(args_va);
-	}
+        /* Close the variable argument list if no arguments are given. */
+        va_end(args_va);
+    }
 
-	/* If any arguments are given... */
-	if (num_args > 0) {
+    /* If any arguments are given... */
+    if (num_args > 0) {
 
-		/* Call the array version of this function.*/
-		ccl_kernel_set_args_v(krnl, args_array);
+        /* Call the array version of this function.*/
+        ccl_kernel_set_args_v(krnl, args_array);
 
-		/* Free the array of arguments. */
-		g_slice_free1((num_args + 1) * sizeof(void*), args_array);
+        /* Free the array of arguments. */
+        g_slice_free1((num_args + 1) * sizeof(void*), args_array);
 
-	}
+    }
 
 }
 
@@ -337,24 +337,24 @@ void ccl_kernel_set_args(CCLKernel* krnl, ...) {
 CCL_EXPORT
 void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_if_fail(krnl != NULL);
-	/* Make sure args is not NULL. */
-	g_return_if_fail(args != NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_if_fail(krnl != NULL);
+    /* Make sure args is not NULL. */
+    g_return_if_fail(args != NULL);
 
-	/* Cycle through the arguments. */
-	for (guint i = 0; args[i] != NULL; ++i) {
+    /* Cycle through the arguments. */
+    for (guint i = 0; args[i] != NULL; ++i) {
 
-		/* Get next argument. */
-		CCLArg* arg = args[i];
+        /* Get next argument. */
+        CCLArg* arg = args[i];
 
-		/* Ignore "skip" arguments. */
-		if (arg == ccl_arg_skip) continue;
+        /* Ignore "skip" arguments. */
+        if (arg == ccl_arg_skip) continue;
 
-		/* Set the i^th kernel argument. */
-		ccl_kernel_set_arg(krnl, i, arg);
+        /* Set the i^th kernel argument. */
+        ccl_kernel_set_arg(krnl, i, arg);
 
-	}
+    }
 
 }
 
@@ -395,80 +395,80 @@ void ccl_kernel_set_args_v(CCLKernel* krnl, void** args) {
  * */
 CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
-	cl_uint work_dim, const size_t* global_work_offset,
-	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+    cl_uint work_dim, const size_t* global_work_offset,
+    const size_t* global_work_size, const size_t* local_work_size,
+    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_val_if_fail(krnl != NULL, NULL);
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_val_if_fail(krnl != NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* OpenCL status flag. */
-	cl_int ocl_status;
+    /* OpenCL status flag. */
+    cl_int ocl_status;
 
-	/* OpenCL event. */
-	cl_event event;
-	/* Event wrapper. */
-	CCLEvent* evt;
+    /* OpenCL event. */
+    cl_event event;
+    /* Event wrapper. */
+    CCLEvent* evt;
 
-	/* Iterator for table of kernel arguments. */
-	GHashTableIter iter;
-	gpointer arg_index_ptr, arg_ptr;
+    /* Iterator for table of kernel arguments. */
+    GHashTableIter iter;
+    gpointer arg_index_ptr, arg_ptr;
 
-	/* Set pending kernel arguments. */
-	if (krnl->args != NULL) {
-		g_hash_table_iter_init(&iter, krnl->args);
-		while (g_hash_table_iter_next(&iter, &arg_index_ptr, &arg_ptr)) {
-			cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
-			CCLArg* arg = (CCLArg*) arg_ptr;
-			ocl_status = clSetKernelArg(ccl_kernel_unwrap(krnl), arg_index,
-				ccl_arg_size(arg), ccl_arg_value(arg));
-			g_if_err_create_goto(*err, CCL_OCL_ERROR,
-				CL_SUCCESS != ocl_status, ocl_status, error_handler,
-				"%s: unable to set kernel arg %d (OpenCL error %d: %s).",
-				CCL_STRD, arg_index, ocl_status, ccl_err(ocl_status));
-			g_hash_table_iter_remove(&iter);
-		}
-	}
+    /* Set pending kernel arguments. */
+    if (krnl->args != NULL) {
+        g_hash_table_iter_init(&iter, krnl->args);
+        while (g_hash_table_iter_next(&iter, &arg_index_ptr, &arg_ptr)) {
+            cl_uint arg_index = GPOINTER_TO_UINT(arg_index_ptr);
+            CCLArg* arg = (CCLArg*) arg_ptr;
+            ocl_status = clSetKernelArg(ccl_kernel_unwrap(krnl), arg_index,
+                ccl_arg_size(arg), ccl_arg_value(arg));
+            g_if_err_create_goto(*err, CCL_OCL_ERROR,
+                CL_SUCCESS != ocl_status, ocl_status, error_handler,
+                "%s: unable to set kernel arg %d (OpenCL error %d: %s).",
+                CCL_STRD, arg_index, ocl_status, ccl_err(ocl_status));
+            g_hash_table_iter_remove(&iter);
+        }
+    }
 
-	/* Run kernel. */
-	ocl_status = clEnqueueNDRangeKernel(ccl_queue_unwrap(cq),
-		ccl_kernel_unwrap(krnl), work_dim, global_work_offset,
-		global_work_size, local_work_size,
-		ccl_event_wait_list_get_num_events(evt_wait_lst),
-		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to enqueue kernel (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Run kernel. */
+    ocl_status = clEnqueueNDRangeKernel(ccl_queue_unwrap(cq),
+        ccl_kernel_unwrap(krnl), work_dim, global_work_offset,
+        global_work_size, local_work_size,
+        ccl_event_wait_list_get_num_events(evt_wait_lst),
+        ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to enqueue kernel (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap event and associate it with the respective command queue.
-	 * The event object will be released automatically when the command
-	 * queue is released. */
-	evt = ccl_queue_produce_event(cq, event);
+    /* Wrap event and associate it with the respective command queue.
+     * The event object will be released automatically when the command
+     * queue is released. */
+    evt = ccl_queue_produce_event(cq, event);
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* An error occurred, return NULL to signal it. */
-	evt = NULL;
+    /* An error occurred, return NULL to signal it. */
+    evt = NULL;
 
 finish:
 
-	/* Return evt. */
-	return evt;
+    /* Return evt. */
+    return evt;
 
 }
 
@@ -518,79 +518,79 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
-	cl_uint work_dim, const size_t* global_work_offset,
-	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err, ...) {
+    cl_uint work_dim, const size_t* global_work_offset,
+    const size_t* global_work_size, const size_t* local_work_size,
+    CCLEventWaitList* evt_wait_lst, CCLErr** err, ...) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_val_if_fail(krnl != NULL, NULL);
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_val_if_fail(krnl != NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Event wrapper. */
-	CCLEvent* evt;
-	/* The va_list, which represents the variable argument list. */
-	va_list args_va;
-	/* Array of arguments, to be created from the va_list. */
-	void** args_array = NULL;
-	/* Number of arguments. */
-	guint num_args = 0;
-	/* Aux. arg. when cycling through the va_list. */
-	void* aux_arg;
+    /* Event wrapper. */
+    CCLEvent* evt;
+    /* The va_list, which represents the variable argument list. */
+    va_list args_va;
+    /* Array of arguments, to be created from the va_list. */
+    void** args_array = NULL;
+    /* Number of arguments. */
+    guint num_args = 0;
+    /* Aux. arg. when cycling through the va_list. */
+    void* aux_arg;
 
-	/* Initialize the va_list. */
-	va_start(args_va, err);
+    /* Initialize the va_list. */
+    va_start(args_va, err);
 
-	/* Get first argument. */
-	aux_arg = va_arg(args_va, void*);
+    /* Get first argument. */
+    aux_arg = va_arg(args_va, void*);
 
-	/* Check if any arguments are given, and if so, populate array
-	 * of arguments. */
-	if (aux_arg != NULL) {
+    /* Check if any arguments are given, and if so, populate array
+     * of arguments. */
+    if (aux_arg != NULL) {
 
-		/* 1. Determine number of arguments. */
+        /* 1. Determine number of arguments. */
 
-		while (aux_arg != NULL) {
-			num_args++;
-			aux_arg = va_arg(args_va, void*);
-		}
-		va_end(args_va);
+        while (aux_arg != NULL) {
+            num_args++;
+            aux_arg = va_arg(args_va, void*);
+        }
+        va_end(args_va);
 
-		/* 2. Populate array of arguments. */
+        /* 2. Populate array of arguments. */
 
-		args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
-		va_start(args_va, err);
+        args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
+        va_start(args_va, err);
 
-		for (guint i = 0; i < num_args; ++i) {
-			aux_arg = va_arg(args_va, void*);
-			args_array[i] = aux_arg;
-		}
-		va_end(args_va);
-		args_array[num_args] = NULL;
+        for (guint i = 0; i < num_args; ++i) {
+            aux_arg = va_arg(args_va, void*);
+            args_array[i] = aux_arg;
+        }
+        va_end(args_va);
+        args_array[num_args] = NULL;
 
-	} else {
+    } else {
 
-		/* Close the variable argument list if no arguments are given. */
-		va_end(args_va);
-	}
+        /* Close the variable argument list if no arguments are given. */
+        va_end(args_va);
+    }
 
-	/* Set kernel arguments and run it. */
-	evt = ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, work_dim,
-		global_work_offset, global_work_size, local_work_size,
-		evt_wait_lst, args_array, err);
+    /* Set kernel arguments and run it. */
+    evt = ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, work_dim,
+        global_work_offset, global_work_size, local_work_size,
+        evt_wait_lst, args_array, err);
 
-	/* If any arguments are given... */
-	if (num_args > 0) {
+    /* If any arguments are given... */
+    if (num_args > 0) {
 
-		/* Free the array of arguments. */
-		g_slice_free1((num_args + 1) * sizeof(void*), args_array);
+        /* Free the array of arguments. */
+        g_slice_free1((num_args + 1) * sizeof(void*), args_array);
 
-	}
+    }
 
-	/* Return event wrapper. */
-	return evt;
+    /* Return event wrapper. */
+    return evt;
 
 }
 
@@ -641,42 +641,42 @@ CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange(CCLKernel* krnl, CCLQueue* cq,
  * */
 CCL_EXPORT
 CCLEvent* ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel* krnl,
-	CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
-	const size_t* global_work_size, const size_t* local_work_size,
-	CCLEventWaitList* evt_wait_lst, void** args, CCLErr** err) {
+    CCLQueue* cq, cl_uint work_dim, const size_t* global_work_offset,
+    const size_t* global_work_size, const size_t* local_work_size,
+    CCLEventWaitList* evt_wait_lst, void** args, CCLErr** err) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_val_if_fail(krnl != NULL, NULL);
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_val_if_fail(krnl != NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	CCLErr* err_internal = NULL;
+    CCLErr* err_internal = NULL;
 
-	CCLEvent* evt = NULL;
+    CCLEvent* evt = NULL;
 
-	/* Set kernel arguments. */
-	ccl_kernel_set_args_v(krnl, args);
+    /* Set kernel arguments. */
+    ccl_kernel_set_args_v(krnl, args);
 
-	/* Enqueue kernel. */
-	evt = ccl_kernel_enqueue_ndrange(krnl, cq, work_dim, global_work_offset,
-		global_work_size, local_work_size, evt_wait_lst, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Enqueue kernel. */
+    evt = ccl_kernel_enqueue_ndrange(krnl, cq, work_dim, global_work_offset,
+        global_work_size, local_work_size, evt_wait_lst, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Return event wrapper. */
-	return evt;
+    /* Return event wrapper. */
+    return evt;
 
 }
 
@@ -712,76 +712,76 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_kernel_enqueue_native(CCLQueue* cq,
-	void (CL_CALLBACK * user_func)(void*), void* args, size_t cb_args,
-	cl_uint num_mos, CCLMemObj* const* mo_list,
-	const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
-	CCLErr** err) {
+    void (CL_CALLBACK * user_func)(void*), void* args, size_t cb_args,
+    cl_uint num_mos, CCLMemObj* const* mo_list,
+    const void** args_mem_loc, CCLEventWaitList* evt_wait_lst,
+    CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure user_func is not NULL. */
-	g_return_val_if_fail(user_func != NULL, NULL);
-	/* Make sure that num_mos == 0 AND mo_list != NULL, OR, that
-	 * num_mos > 0  AND mo_list != NULL */
-	g_return_val_if_fail(((num_mos == 0) && (mo_list == NULL))
-		|| ((num_mos > 0) && (mo_list != NULL)), NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure user_func is not NULL. */
+    g_return_val_if_fail(user_func != NULL, NULL);
+    /* Make sure that num_mos == 0 AND mo_list != NULL, OR, that
+     * num_mos > 0  AND mo_list != NULL */
+    g_return_val_if_fail(((num_mos == 0) && (mo_list == NULL))
+        || ((num_mos > 0) && (mo_list != NULL)), NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* OpenCL status flag. */
-	cl_int ocl_status;
-	/* OpenCL event. */
-	cl_event event = NULL;
-	/* Event wrapper. */
-	CCLEvent* evt = NULL;
-	/* List of cl_mem objects. */
-	cl_mem* mem_list = NULL;
+    /* OpenCL status flag. */
+    cl_int ocl_status;
+    /* OpenCL event. */
+    cl_event event = NULL;
+    /* Event wrapper. */
+    CCLEvent* evt = NULL;
+    /* List of cl_mem objects. */
+    cl_mem* mem_list = NULL;
 
-	/* Unwrap memory objects. */
-	if (num_mos > 0) {
-		mem_list = g_slice_alloc(sizeof(cl_mem) * num_mos);
-		for (cl_uint i = 0; i < num_mos; ++i) {
-			mem_list[i] = mo_list[i] != NULL
-				? ccl_memobj_unwrap(mo_list[i])
-				: NULL;
-		}
-	}
+    /* Unwrap memory objects. */
+    if (num_mos > 0) {
+        mem_list = g_slice_alloc(sizeof(cl_mem) * num_mos);
+        for (cl_uint i = 0; i < num_mos; ++i) {
+            mem_list[i] = mo_list[i] != NULL
+                ? ccl_memobj_unwrap(mo_list[i])
+                : NULL;
+        }
+    }
 
-	/* Enqueue kernel. */
-	ocl_status = clEnqueueNativeKernel(ccl_queue_unwrap(cq), user_func,
-		args, cb_args, num_mos, (const cl_mem*) mem_list, args_mem_loc,
-		ccl_event_wait_list_get_num_events(evt_wait_lst),
-		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to enqueue native kernel (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Enqueue kernel. */
+    ocl_status = clEnqueueNativeKernel(ccl_queue_unwrap(cq), user_func,
+        args, cb_args, num_mos, (const cl_mem*) mem_list, args_mem_loc,
+        ccl_event_wait_list_get_num_events(evt_wait_lst),
+        ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to enqueue native kernel (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap event and associate it with the respective command queue.
-	 * The event object will be released automatically when the command
-	 * queue is released. */
-	evt = ccl_queue_produce_event(cq, event);
+    /* Wrap event and associate it with the respective command queue.
+     * The event object will be released automatically when the command
+     * queue is released. */
+    evt = ccl_queue_produce_event(cq, event);
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Release temporary cl_mem list. */
-	if (num_mos > 0)
-		g_slice_free1(sizeof(cl_mem) * num_mos, mem_list);
+    /* Release temporary cl_mem list. */
+    if (num_mos > 0)
+        g_slice_free1(sizeof(cl_mem) * num_mos, mem_list);
 
-	/* Return event wrapper. */
-	return evt;
+    /* Return event wrapper. */
+    return evt;
 
 }
 
@@ -806,45 +806,45 @@ finish:
 CCL_EXPORT
 cl_uint ccl_kernel_get_opencl_version(CCLKernel* krnl, CCLErr** err) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_val_if_fail(krnl != NULL, 0);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure krnl is not NULL. */
+    g_return_val_if_fail(krnl != NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	cl_context context;
-	CCLContext* ctx;
-	CCLErr* err_internal = NULL;
-	cl_uint ocl_ver;
+    cl_context context;
+    CCLContext* ctx;
+    CCLErr* err_internal = NULL;
+    cl_uint ocl_ver;
 
-	/* Get cl_context object for this kernel. */
-	context = ccl_kernel_get_info_scalar(
-		krnl, CL_KERNEL_CONTEXT, cl_context, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get cl_context object for this kernel. */
+    context = ccl_kernel_get_info_scalar(
+        krnl, CL_KERNEL_CONTEXT, cl_context, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Get context wrapper. */
-	ctx = ccl_context_new_wrap(context);
+    /* Get context wrapper. */
+    ctx = ccl_context_new_wrap(context);
 
-	/* Get OpenCL version. */
-	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get OpenCL version. */
+    ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Unref. the context wrapper. */
-	ccl_context_unref(ctx);
+    /* Unref. the context wrapper. */
+    ccl_context_unref(ctx);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	ocl_ver = 0;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    ocl_ver = 0;
 
 finish:
 
-	/* Return event wrapper. */
-	return ocl_ver;
+    /* Return event wrapper. */
+    return ocl_ver;
 
 }
 
@@ -860,14 +860,14 @@ finish:
  * CCL_ERROR_INFO_UNAVAILABLE_OCL is detected.
  * */
 #define g_if_err_not_info_unavailable_propagate_goto( \
-			err, err_internal, error_handler) \
-	if (((err_internal) != NULL) && ((err_internal)->domain == CCL_ERROR) && \
-			((err_internal)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) { \
-		g_warning("In %s: %s", CCL_STRD, (err_internal)->message); \
-		g_clear_error(&(err_internal)); \
-	} else { \
-		g_if_err_propagate_goto(err, err_internal, error_handler); \
-	}
+            err, err_internal, error_handler) \
+    if (((err_internal) != NULL) && ((err_internal)->domain == CCL_ERROR) && \
+            ((err_internal)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) { \
+        g_warning("In %s: %s", CCL_STRD, (err_internal)->message); \
+        g_clear_error(&(err_internal)); \
+    } else { \
+        g_if_err_propagate_goto(err, err_internal, error_handler); \
+    }
 
 /**
  * Suggest appropriate local (and optionally global) work sizes for the
@@ -909,229 +909,229 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_kernel_suggest_worksizes(CCLKernel* krnl, CCLDevice* dev,
-	cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
-	CCLErr** err) {
+    cl_uint dims, const size_t* real_worksize, size_t* gws, size_t* lws,
+    CCLErr** err) {
 
-	/* Make sure dev is not NULL. */
-	g_return_val_if_fail(dev != NULL, CL_FALSE);
-	/* Make sure dims not zero. */
-	g_return_val_if_fail(dims > 0, CL_FALSE);
-	/* Make sure real_worksize is not NULL. */
-	g_return_val_if_fail(real_worksize != NULL, CL_FALSE);
-	/* Make sure lws is not NULL. */
-	g_return_val_if_fail(lws != NULL, CL_FALSE);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+    /* Make sure dev is not NULL. */
+    g_return_val_if_fail(dev != NULL, CL_FALSE);
+    /* Make sure dims not zero. */
+    g_return_val_if_fail(dims > 0, CL_FALSE);
+    /* Make sure real_worksize is not NULL. */
+    g_return_val_if_fail(real_worksize != NULL, CL_FALSE);
+    /* Make sure lws is not NULL. */
+    g_return_val_if_fail(lws != NULL, CL_FALSE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
-	/* The preferred workgroup size. */
-	size_t wg_size_mult = 0;
-	size_t wg_size_max = 0;
-	size_t wg_size = 1, wg_size_aux;
-	size_t* max_wi_sizes;
-	cl_uint dev_dims;
-	cl_bool ret_status;
-	size_t real_ws = 1;
+    /* The preferred workgroup size. */
+    size_t wg_size_mult = 0;
+    size_t wg_size_max = 0;
+    size_t wg_size = 1, wg_size_aux;
+    size_t* max_wi_sizes;
+    cl_uint dev_dims;
+    cl_bool ret_status;
+    size_t real_ws = 1;
 
-	/* Error handling object. */
-	CCLErr* err_internal = NULL;
+    /* Error handling object. */
+    CCLErr* err_internal = NULL;
 
-	/* Check if device supports the requested dims. */
-	dev_dims = ccl_device_get_info_scalar(
-		dev, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, cl_uint, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
-	g_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: device only supports a maximum of %d dimension(s), "
-		"but %d were requested.",
-		CCL_STRD, dev_dims, dims);
+    /* Check if device supports the requested dims. */
+    dev_dims = ccl_device_get_info_scalar(
+        dev, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, cl_uint, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
+    g_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: device only supports a maximum of %d dimension(s), "
+        "but %d were requested.",
+        CCL_STRD, dev_dims, dims);
 
-	/* Get max. work item sizes for device. */
-	max_wi_sizes = ccl_device_get_info_array(
-		dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get max. work item sizes for device. */
+    max_wi_sizes = ccl_device_get_info_array(
+        dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* For each dimension, if the user specified a maximum local work
-	 * size, the effective maximum local work size will be the minimum
-	 * between the user value and the device value. */
-	for (cl_uint i = 0; i < dims; ++i) {
-		if (lws[i] != 0)
-			max_wi_sizes[i] = MIN(max_wi_sizes[i], lws[i]);
-	}
+    /* For each dimension, if the user specified a maximum local work
+     * size, the effective maximum local work size will be the minimum
+     * between the user value and the device value. */
+    for (cl_uint i = 0; i < dims; ++i) {
+        if (lws[i] != 0)
+            max_wi_sizes[i] = MIN(max_wi_sizes[i], lws[i]);
+    }
 
-	/* If kernel is not NULL, query it about workgroup size preferences
-	 * and capabilities. */
-	if (krnl != NULL) {
+    /* If kernel is not NULL, query it about workgroup size preferences
+     * and capabilities. */
+    if (krnl != NULL) {
 
-		/* Determine maximum workgroup size. */
-		wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
-			CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
-		g_if_err_not_info_unavailable_propagate_goto(
-			err, err_internal, error_handler);
+        /* Determine maximum workgroup size. */
+        wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
+            CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
+        g_if_err_not_info_unavailable_propagate_goto(
+            err, err_internal, error_handler);
 
 #ifdef CL_VERSION_1_1
 
-		/* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
+        /* Determine preferred workgroup size multiple (OpenCL >= 1.1). */
 
-		/* Get OpenCL version of the underlying platform. */
-		cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
+        /* Get OpenCL version of the underlying platform. */
+        cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
 
-		/* If OpenCL version of the underlying platform is >= 1.1 ... */
-		if (ocl_ver >= 110) {
+        /* If OpenCL version of the underlying platform is >= 1.1 ... */
+        if (ocl_ver >= 110) {
 
-			/* ...use CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE... */
-			wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
-				krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
-				size_t, &err_internal);
-			g_if_err_not_info_unavailable_propagate_goto(
-				err, err_internal, error_handler);
+            /* ...use CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE... */
+            wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
+                krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+                size_t, &err_internal);
+            g_if_err_not_info_unavailable_propagate_goto(
+                err, err_internal, error_handler);
 
-		} else {
+        } else {
 
-			/* ...otherwise just use CL_KERNEL_WORK_GROUP_SIZE. */
-			wg_size_mult = wg_size_max;
+            /* ...otherwise just use CL_KERNEL_WORK_GROUP_SIZE. */
+            wg_size_mult = wg_size_max;
 
-		}
+        }
 
 #else
 
-		wg_size_mult = wg_size_max;
+        wg_size_mult = wg_size_max;
 
 #endif
 
-	}
+    }
 
-	/* If it was not possible to obtain wg_size_mult and wg_size_max, either
-	 * because kernel is NULL or the information was unavailable, use values
-	 * obtained from device. */
-	if ((wg_size_max == 0) && (wg_size_mult == 0)) {
-		wg_size_max = ccl_device_get_info_scalar(
-			dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
-		wg_size_mult = wg_size_max;
-	}
+    /* If it was not possible to obtain wg_size_mult and wg_size_max, either
+     * because kernel is NULL or the information was unavailable, use values
+     * obtained from device. */
+    if ((wg_size_max == 0) && (wg_size_mult == 0)) {
+        wg_size_max = ccl_device_get_info_scalar(
+            dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
+        wg_size_mult = wg_size_max;
+    }
 
-	/* Try to find an appropriate local worksize. */
-	for (cl_uint i = 0; i < dims; ++i) {
+    /* Try to find an appropriate local worksize. */
+    for (cl_uint i = 0; i < dims; ++i) {
 
-		/* Each lws component is at most the preferred workgroup
-		 * multiple or the maximum size of that component in device. */
-		lws[i] = MIN(wg_size_mult, max_wi_sizes[i]);
+        /* Each lws component is at most the preferred workgroup
+         * multiple or the maximum size of that component in device. */
+        lws[i] = MIN(wg_size_mult, max_wi_sizes[i]);
 
-		/* Update total workgroup size. */
-		wg_size *= lws[i];
+        /* Update total workgroup size. */
+        wg_size *= lws[i];
 
-		/* Update total real worksize. */
-		real_ws *= real_worksize[i];
+        /* Update total real worksize. */
+        real_ws *= real_worksize[i];
 
-	}
+    }
 
-	/* Don't let each component of the local worksize to be
-	 * higher than the respective component of the real
-	 * worksize. */
-	for (cl_uint i = 0; i < dims; ++i) {
-		while (lws[i] > real_worksize[i]) {
-			lws[i] /= 2;
-			wg_size /= 2;
-		}
-	}
+    /* Don't let each component of the local worksize to be
+     * higher than the respective component of the real
+     * worksize. */
+    for (cl_uint i = 0; i < dims; ++i) {
+        while (lws[i] > real_worksize[i]) {
+            lws[i] /= 2;
+            wg_size /= 2;
+        }
+    }
 
-	/* The total workgroup size can't be higher than the maximum
-	 * supported by the device. */
-	while (wg_size > wg_size_max) {
-		wg_size_aux = wg_size;
-		for (int i = dims - 1; i >= 0; --i) {
-			if (lws[i] > 1) {
-				/* Local work size can't be smaller than 1. */
-				lws[i] /= 2;
-				wg_size /= 2;
-			}
-			if (wg_size <= wg_size_max) break;
-		}
-		/* Avoid infinite loops and throw error if wg_size didn't
-		 * change. */
-		g_if_err_create_goto(*err, CCL_ERROR, wg_size == wg_size_aux,
-			CCL_ERROR_OTHER, error_handler,
-			"%s: Unable to determine a work size within the device limit (%d).",
-			CCL_STRD, (int) wg_size_max);
-	}
+    /* The total workgroup size can't be higher than the maximum
+     * supported by the device. */
+    while (wg_size > wg_size_max) {
+        wg_size_aux = wg_size;
+        for (int i = dims - 1; i >= 0; --i) {
+            if (lws[i] > 1) {
+                /* Local work size can't be smaller than 1. */
+                lws[i] /= 2;
+                wg_size /= 2;
+            }
+            if (wg_size <= wg_size_max) break;
+        }
+        /* Avoid infinite loops and throw error if wg_size didn't
+         * change. */
+        g_if_err_create_goto(*err, CCL_ERROR, wg_size == wg_size_aux,
+            CCL_ERROR_OTHER, error_handler,
+            "%s: Unable to determine a work size within the device limit (%d).",
+            CCL_STRD, (int) wg_size_max);
+    }
 
-	/* If output variable gws is not NULL... */
-	if (gws != NULL) {
-		/* ...find a global worksize which is a multiple of the local
-		 * worksize and is big enough to handle the real worksize. */
-		for (cl_uint i = 0; i < dims; ++i) {
-			gws[i] = ((real_worksize[i] / lws[i])
-				+ (((real_worksize[i] % lws[i]) > 0) ? 1 : 0))
-				* lws[i];
-		}
-	} else {
-		/* ...otherwise check if found local worksizes are divisors of
-		 * the respective real_worksize. If so keep them, otherwise find
-		 * local worksizes which respect the maximum sizes allowed by
-		 * the kernel and the device, and is a dimension-wise divisor of
-		 * the real_worksize. */
-		cl_bool lws_are_divisors = CL_TRUE;
-		for (cl_uint i = 0; i < dims; ++i) {
-			/* Check if lws[i] is divisor of real_worksize[i]. */
-			if (real_worksize[i] % lws[i] != 0) {
-				/* Ops... lws[i] is not divisor of real_worksize[i], so
-				 * we'll have to try and find new lws ahead. */
-				lws_are_divisors = CL_FALSE;
-				break;
-			}
-		}
-		/* Is lws divisor of real_worksize, dimension-wise? */
-		if (!lws_are_divisors) {
-			/* No, so we'll have to find new lws. */
-			wg_size = 1;
-			for (cl_uint i = 0; i < dims; ++i) {
+    /* If output variable gws is not NULL... */
+    if (gws != NULL) {
+        /* ...find a global worksize which is a multiple of the local
+         * worksize and is big enough to handle the real worksize. */
+        for (cl_uint i = 0; i < dims; ++i) {
+            gws[i] = ((real_worksize[i] / lws[i])
+                + (((real_worksize[i] % lws[i]) > 0) ? 1 : 0))
+                * lws[i];
+        }
+    } else {
+        /* ...otherwise check if found local worksizes are divisors of
+         * the respective real_worksize. If so keep them, otherwise find
+         * local worksizes which respect the maximum sizes allowed by
+         * the kernel and the device, and is a dimension-wise divisor of
+         * the real_worksize. */
+        cl_bool lws_are_divisors = CL_TRUE;
+        for (cl_uint i = 0; i < dims; ++i) {
+            /* Check if lws[i] is divisor of real_worksize[i]. */
+            if (real_worksize[i] % lws[i] != 0) {
+                /* Ops... lws[i] is not divisor of real_worksize[i], so
+                 * we'll have to try and find new lws ahead. */
+                lws_are_divisors = CL_FALSE;
+                break;
+            }
+        }
+        /* Is lws divisor of real_worksize, dimension-wise? */
+        if (!lws_are_divisors) {
+            /* No, so we'll have to find new lws. */
+            wg_size = 1;
+            for (cl_uint i = 0; i < dims; ++i) {
 
-				/* For each dimension, try to use the previously
-				 * found lws[i]. */
-				if ((real_worksize[i] % lws[i] != 0)
-					|| (lws[i] * wg_size > wg_size_max))
-				{
-					/* Previoulsy found lws[i] not usable, find
-					 * new one. Must be a divisor of real_worksize[i]
-					 * and respect the kernel and device maximum lws.*/
-					cl_uint best_lws_i = 1;
-					for (cl_uint j = 2; j <= real_worksize[i] / 2; ++j) {
-						/* If current value is higher than the kernel
-						 * and device limits, stop searching and use
-						 * the best one so far. */
-						if ((wg_size * j > wg_size_max)
-							|| (j > max_wi_sizes[i])) break;
-						/* Otherwise check if current value is divisor
-						 * of lws[i]. If so, keep it as the best so
-						 * far. */
-						if (real_worksize[i] % j == 0)
-							best_lws_i = j;
-					}
-					/* Keep the best divisor for current dimension. */
-					lws[i] = best_lws_i;
-				}
-				/* Update absolute workgroup size (all dimensions). */
-				wg_size *= lws[i];
-			}
-		}
-	}
+                /* For each dimension, try to use the previously
+                 * found lws[i]. */
+                if ((real_worksize[i] % lws[i] != 0)
+                    || (lws[i] * wg_size > wg_size_max))
+                {
+                    /* Previoulsy found lws[i] not usable, find
+                     * new one. Must be a divisor of real_worksize[i]
+                     * and respect the kernel and device maximum lws.*/
+                    cl_uint best_lws_i = 1;
+                    for (cl_uint j = 2; j <= real_worksize[i] / 2; ++j) {
+                        /* If current value is higher than the kernel
+                         * and device limits, stop searching and use
+                         * the best one so far. */
+                        if ((wg_size * j > wg_size_max)
+                            || (j > max_wi_sizes[i])) break;
+                        /* Otherwise check if current value is divisor
+                         * of lws[i]. If so, keep it as the best so
+                         * far. */
+                        if (real_worksize[i] % j == 0)
+                            best_lws_i = j;
+                    }
+                    /* Keep the best divisor for current dimension. */
+                    lws[i] = best_lws_i;
+                }
+                /* Update absolute workgroup size (all dimensions). */
+                wg_size *= lws[i];
+            }
+        }
+    }
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	ret_status = CL_TRUE;
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    ret_status = CL_TRUE;
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	ret_status = CL_FALSE;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    ret_status = CL_FALSE;
 
 finish:
 
-	/* Return status. */
-	return ret_status;
+    /* Return status. */
+    return ret_status;
 
 }
 
@@ -1157,11 +1157,11 @@ finish:
  * error code otherwise.
  * */
 cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
-	cl_kernel_arg_info param_name, size_t param_value_size, void *param_value,
-	size_t* param_value_size_ret) {
+    cl_kernel_arg_info param_name, size_t param_value_size, void *param_value,
+    size_t* param_value_size_ret) {
 
-	return clGetKernelArgInfo(kernel, GPOINTER_TO_UINT(ptr_arg_indx),
-		param_name, param_value_size, param_value, param_value_size_ret);
+    return clGetKernelArgInfo(kernel, GPOINTER_TO_UINT(ptr_arg_indx),
+        param_name, param_value_size, param_value, param_value_size_ret);
 }
 
 #endif
@@ -1184,78 +1184,78 @@ cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void* ptr_arg_indx,
  * */
 CCL_EXPORT
 CCLWrapperInfo* ccl_kernel_get_arg_info(CCLKernel* krnl, cl_uint idx,
-	cl_kernel_arg_info param_name, CCLErr** err) {
+    cl_kernel_arg_info param_name, CCLErr** err) {
 
-	/* Make sure krnl is not NULL. */
-	g_return_val_if_fail(krnl != NULL, NULL);
+    /* Make sure krnl is not NULL. */
+    g_return_val_if_fail(krnl != NULL, NULL);
 
-	/* Helper wrapper. */
-	CCLWrapper fake_wrapper;
+    /* Helper wrapper. */
+    CCLWrapper fake_wrapper;
 
-	/* Kernel information to return. */
-	CCLWrapperInfo* info;
+    /* Kernel information to return. */
+    CCLWrapperInfo* info;
 
-	/* Error handling object. */
-	CCLErr* err_internal = NULL;
+    /* Error handling object. */
+    CCLErr* err_internal = NULL;
 
-	/* OpenCL version of the underlying platform. */
-	double ocl_ver;
+    /* OpenCL version of the underlying platform. */
+    double ocl_ver;
 
 #ifndef CL_VERSION_1_2
 
-	CCL_UNUSED(idx);
-	CCL_UNUSED(param_name);
-	CCL_UNUSED(fake_wrapper);
-	CCL_UNUSED(err_internal);
-	CCL_UNUSED(ocl_ver);
+    CCL_UNUSED(idx);
+    CCL_UNUSED(param_name);
+    CCL_UNUSED(fake_wrapper);
+    CCL_UNUSED(err_internal);
+    CCL_UNUSED(ocl_ver);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: Obtaining kernel argument information requires cf4ocl to be "
-		"deployed with support for OpenCL version 1.2 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: Obtaining kernel argument information requires cf4ocl to be "
+        "deployed with support for OpenCL version 1.2 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* Check that context platform is >= OpenCL 1.2 */
-	ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Check that context platform is >= OpenCL 1.2 */
+    ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If OpenCL version is not >= 1.2, throw error. */
-	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: information about kernel arguments requires OpenCL" \
-		" version 1.2 or newer.", CCL_STRD);
+    /* If OpenCL version is not >= 1.2, throw error. */
+    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: information about kernel arguments requires OpenCL" \
+        " version 1.2 or newer.", CCL_STRD);
 
-	/* Wrap argument index in a fake cl_object. */
-	fake_wrapper.cl_object = GUINT_TO_POINTER(idx);
+    /* Wrap argument index in a fake cl_object. */
+    fake_wrapper.cl_object = GUINT_TO_POINTER(idx);
 
-	/* Get kernel argument info. */
-	info = ccl_wrapper_get_info(
-		(CCLWrapper*) krnl, &fake_wrapper, param_name, 0,
-		CCL_INFO_KERNEL_ARG, CL_FALSE, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get kernel argument info. */
+    info = ccl_wrapper_get_info(
+        (CCLWrapper*) krnl, &fake_wrapper, param_name, 0,
+        CCL_INFO_KERNEL_ARG, CL_FALSE, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* An error occurred, return NULL to signal it. */
-	info = NULL;
+    /* An error occurred, return NULL to signal it. */
+    info = NULL;
 
 finish:
 
-	/* Return argument info. */
-	return info;
+    /* Return argument info. */
+    return info;
 
 }
 

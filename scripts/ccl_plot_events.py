@@ -77,14 +77,14 @@ import matplotlib.patches as patches
 
 # Check command-line arguments
 if len(sys.argv) < 2:
-	print 'Usage: ' + sys.argv[0] + ' <file.tsv>\n'
-	exit(-1)
+    print 'Usage: ' + sys.argv[0] + ' <file.tsv>\n'
+    exit(-1)
 elif sys.argv[1] == '--version':
-	print 'ccl_plot_events.py v2.0.0\n'
-	exit(0)
+    print 'ccl_plot_events.py v2.0.0\n'
+    exit(0)
 elif not os.path.isfile(sys.argv[1]):
-	print "File not found: '" + sys.argv[1] + "'\n"
-	exit(-2)
+    print "File not found: '" + sys.argv[1] + "'\n"
+    exit(-2)
 
 
 # Load profiling info in file given as first cli argument
@@ -150,8 +150,3 @@ plt.xlabel('Time')
 
 # Show figure
 plt.show()
-
-
-
-
-

@@ -56,42 +56,42 @@
  * @return Formatted output (same address as parameter out).
  * */
 typedef char* (*ccl_devquery_format)(CCLWrapperInfo* info, char* out,
-	size_t size, const char* units);
+    size_t size, const char* units);
 
 /**
  * Maps a string to a cl_device_info bitfield.
  * */
 typedef struct ccl_devquery_map {
 
-	/**
-	 * Parameter name string.
-	 * @public
-	 * */
-	const char* const param_name;
+    /**
+     * Parameter name string.
+     * @public
+     * */
+    const char* const param_name;
 
-	/**
-	 * CL device information bitfield.
-	 * @public
-	 * */
-	const cl_device_info device_info;
+    /**
+     * CL device information bitfield.
+     * @public
+     * */
+    const cl_device_info device_info;
 
-	/**
-	 * Long description of parameter.
-	 * @public
-	 * */
-	const char* const description;
+    /**
+     * Long description of parameter.
+     * @public
+     * */
+    const char* const description;
 
-	/**
-	 * Output formatting function.
-	 * @public
-	 * */
-	const ccl_devquery_format format;
+    /**
+     * Output formatting function.
+     * @public
+     * */
+    const ccl_devquery_format format;
 
-	/**
-	 * Parameter units suffix.
-	 * @public
-	 * */
-	const char* const units;
+    /**
+     * Parameter units suffix.
+     * @public
+     * */
+    const char* const units;
 
 } CCLDevQueryMap;
 
@@ -132,11 +132,11 @@ const CCLDevQueryMap* ccl_devquery_match(const char* substr, int* idx);
  * @return String identifying device type.
  * */
 #define ccl_devquery_type2str(type) \
-	(((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \
-		(((type) & CL_DEVICE_TYPE_GPU) ? "GPU" : \
-			(((type) & CL_DEVICE_TYPE_ACCELERATOR) ? "Accelerator" : \
-				(((type) & CL_DEVICE_TYPE_CUSTOM) ? "Custom" : \
-					"Unknown"))))
+    (((type) & CL_DEVICE_TYPE_CPU) ? "CPU" : \
+        (((type) & CL_DEVICE_TYPE_GPU) ? "GPU" : \
+            (((type) & CL_DEVICE_TYPE_ACCELERATOR) ? "Accelerator" : \
+                (((type) & CL_DEVICE_TYPE_CUSTOM) ? "Custom" : \
+                    "Unknown"))))
 
 /** @} */
 

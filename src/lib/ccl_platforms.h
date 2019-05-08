@@ -88,7 +88,7 @@ cl_uint ccl_platforms_count(CCLPlatforms* platforms);
 /* Get CCL platform wrapper object at given index. */
 CCL_EXPORT
 CCLPlatform* ccl_platforms_get(
-	CCLPlatforms* platforms, cl_uint index);
+    CCLPlatforms* platforms, cl_uint index);
 
 /** @} */
 

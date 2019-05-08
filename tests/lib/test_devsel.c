@@ -33,28 +33,28 @@
  * */
 static void devices_new_destroy_test() {
 
-	/* Error reporting object. */
-	CCLErr* err = NULL;
+    /* Error reporting object. */
+    CCLErr* err = NULL;
 
-	/* Object containing device wrappers. */
-	CCLDevSelDevices devs = NULL;
+    /* Object containing device wrappers. */
+    CCLDevSelDevices devs = NULL;
 
-	/* Create object containing device wrappers for all OpenCL devices in the
-	 * system. */
-	devs = ccl_devsel_devices_new(&err);
+    /* Create object containing device wrappers for all OpenCL devices in the
+     * system. */
+    devs = ccl_devsel_devices_new(&err);
 
-	/* Check that no error occurred. */
-	g_assert_no_error(err);
+    /* Check that no error occurred. */
+    g_assert_no_error(err);
 
-	/* Check that devs is not null. */
-	g_assert_cmphex(GPOINTER_TO_UINT(devs), !=, GPOINTER_TO_UINT(NULL));
+    /* Check that devs is not null. */
+    g_assert_cmphex(GPOINTER_TO_UINT(devs), !=, GPOINTER_TO_UINT(NULL));
 
-	/* Destroy object containing device wrappers for all OpenCL devices in the
-	 * system. */
-	ccl_devsel_devices_destroy(devs);
+    /* Destroy object containing device wrappers for all OpenCL devices in the
+     * system. */
+    ccl_devsel_devices_destroy(devs);
 
-	/* Confirm that memory allocated by wrappers has been properly freed. */
-	g_assert(ccl_wrapper_memcheck());
+    /* Confirm that memory allocated by wrappers has been properly freed. */
+    g_assert(ccl_wrapper_memcheck());
 
 }
 
@@ -66,12 +66,12 @@ static void devices_new_destroy_test() {
  * */
 int main(int argc, char** argv) {
 
-	g_test_init(&argc, &argv, NULL);
+    g_test_init(&argc, &argv, NULL);
 
-	g_test_add_func("/devsel/devices_new_destroy_test",
-		devices_new_destroy_test);
+    g_test_add_func("/devsel/devices_new_destroy_test",
+        devices_new_destroy_test);
 
-	return g_test_run();
+    return g_test_run();
 
 }
 

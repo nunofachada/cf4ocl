@@ -88,12 +88,12 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
 /* Create a new command queue wrapper object. */
 CCL_EXPORT
 CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
-	const cl_queue_properties* prop_full, CCLErr** err);
+    const cl_queue_properties* prop_full, CCLErr** err);
 
 /* Create a new command queue wrapper object. */
 CCL_EXPORT
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-	cl_command_queue_properties properties, CCLErr** err);
+    cl_command_queue_properties properties, CCLErr** err);
 
 /* Decrements the reference count of the command queue wrapper
  * object. If it reaches 0, the command queue wrapper object is
@@ -142,12 +142,12 @@ void ccl_queue_gc(CCLQueue* cq);
 /* Enqueues a barrier command on the given command queue. */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Enqueues a marker command on the given command queue. */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo command queue information object.
@@ -161,8 +161,8 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_queue_get_info(cq, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, 0, \
-		CCL_INFO_QUEUE, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, 0, \
+        CCL_INFO_QUEUE, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar command queue information value.
@@ -181,8 +181,8 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * destroyed. If an error occurs, zero is returned.
  * */
 #define ccl_queue_get_info_scalar(cq, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_QUEUE, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_QUEUE, CL_FALSE, err))
 
 /**
  * Macro which returns an array command queue information value.
@@ -202,8 +202,8 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_queue_get_info_array(cq, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) cq, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_QUEUE, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) cq, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_QUEUE, CL_FALSE, err)
 
 /**
  * Increase the reference count of the command queue object.
@@ -211,7 +211,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @param[in] cq The command queue wrapper object.
  * */
 #define ccl_queue_ref(cq) \
-	ccl_wrapper_ref((CCLWrapper*) cq)
+    ccl_wrapper_ref((CCLWrapper*) cq)
 
 /**
  * Alias to ccl_queue_destroy().
@@ -228,7 +228,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @return The OpenCL command queue object.
  * */
 #define ccl_queue_unwrap(cq) \
-	((cl_command_queue) ccl_wrapper_unwrap((CCLWrapper*) cq))
+    ((cl_command_queue) ccl_wrapper_unwrap((CCLWrapper*) cq))
 
 /** @} */
 

@@ -11,13 +11,13 @@ file(GLOB CODE2TEST "${CMAKE_SOURCE_DIR}/src/lib/*.c")
 
 # Put test kernel in a string to insert into test.h
 file(READ ${PROJECT_SOURCE_DIR}/tests/test_kernels/sum_full.cl
-	TEST_KERNEL_SUM_RAW HEX)
+    TEST_KERNEL_SUM_RAW HEX)
 string(REGEX REPLACE "(..)" "\\\\x\\1"
-	TEST_KERNEL_SUM_SRC ${TEST_KERNEL_SUM_RAW})
+    TEST_KERNEL_SUM_SRC ${TEST_KERNEL_SUM_RAW})
 
 # Configure include file for tests
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.in.h
-	${CMAKE_BINARY_DIR}/generated/test.h @ONLY)
+    ${CMAKE_BINARY_DIR}/generated/test.h @ONLY)
 
 # Specify location of configured include file for tests
 include_directories(${CMAKE_BINARY_DIR}/generated)
@@ -28,8 +28,8 @@ set(TESTS_STUBONLY test_profiler_op)
 # Set of tests which work with either the OpenCL stub or a real OpenCL
 # implementation
 set(TESTS_OPT test_profiler test_platforms test_buffer test_devquery
-	test_context test_event test_program test_image test_sampler
-	test_kernel test_queue test_device test_devsel)
+    test_context test_event test_program test_image test_sampler
+    test_kernel test_queue test_device test_devsel)
 
 # Complete set of tests
 set(TESTS ${TESTS_STUBONLY} ${TESTS_OPT})
@@ -41,7 +41,7 @@ add_subdirectory(ocl_stub)
 add_library(${PROJECT_NAME}_TESTING STATIC ${CODE2TEST})
 
 set_target_properties(${PROJECT_NAME}_TESTING PROPERTIES
-	COMPILE_FLAGS "-DCCL_STATIC_DEFINE")
+    COMPILE_FLAGS "-DCCL_STATIC_DEFINE")
 
 # Dependencies for the static cf4ocl library for tests
 target_link_libraries(${PROJECT_NAME}_TESTING ${GLIB_LDFLAGS} OpenCL_STUB_LIB)
@@ -52,35 +52,35 @@ option(TESTS_USE_OPENCL_STUB "Use OpenCL stub in tests when possible?" ON)
 # Determine general properties for tests which can either use the OpenCL
 # stub or a real OpenCL implementation
 if (TESTS_USE_OPENCL_STUB)
-	set(LIB_OPT ${PROJECT_NAME}_TESTING)
-	add_definitions("-DOPENCL_STUB")
-	set(FLAGS_OPT "-DCCL_STATIC_DEFINE")
+    set(LIB_OPT ${PROJECT_NAME}_TESTING)
+    add_definitions("-DOPENCL_STUB")
+    set(FLAGS_OPT "-DCCL_STATIC_DEFINE")
 else()
-	set(LIB_OPT ${PROJECT_NAME})
-	set(FLAGS_OPT "")
+    set(LIB_OPT ${PROJECT_NAME})
+    set(FLAGS_OPT "")
 endif()
 
 # Set properties for tests which can either use the OpenCL stub
 # or a real OpenCL implementation
 foreach(TEST_OPT ${TESTS_OPT})
-	set(${TEST_OPT}_LIBS ${LIB_OPT})
-	set(${TEST_OPT}_FLAGS "${FLAGS_OPT}")
+    set(${TEST_OPT}_LIBS ${LIB_OPT})
+    set(${TEST_OPT}_FLAGS "${FLAGS_OPT}")
 endforeach()
 
 # Set properties for tests which can only use the OpenCL stub
 foreach(TEST_STUBONLY ${TESTS_STUBONLY})
-	set(${TEST_STUBONLY}_LIBS ${PROJECT_NAME}_TESTING)
-	set(${TEST_STUBONLY}_FLAGS "-DCCL_STATIC_DEFINE")
+    set(${TEST_STUBONLY}_LIBS ${PROJECT_NAME}_TESTING)
+    set(${TEST_STUBONLY}_FLAGS "-DCCL_STATIC_DEFINE")
 endforeach()
 
 # Add a target for each test
 foreach(TEST ${TESTS})
-	add_executable(${TEST} ${TEST}.c test.c)
-	target_link_libraries(${TEST} ${${TEST}_LIBS})
-	set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
-		COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR} ${${TEST}_FLAGS}")
-	# Add test to ctest
-	add_test(NAME ${TEST} COMMAND ${TEST})
+    add_executable(${TEST} ${TEST}.c test.c)
+    target_link_libraries(${TEST} ${${TEST}_LIBS})
+    set_target_properties(${TEST} PROPERTIES OUTPUT_NAME ${TEST}
+        COMPILE_FLAGS "-I${CMAKE_CURRENT_LIST_DIR} ${${TEST}_FLAGS}")
+    # Add test to ctest
+    add_test(NAME ${TEST} COMMAND ${TEST})
 endforeach()
 
 # Add a target which builds all tests
@@ -88,9 +88,9 @@ add_custom_target(tests DEPENDS ${TESTS})
 
 # Code coverage configuration (only for coverage builds)
 if ((DEFINED CMAKE_BUILD_TYPE) AND (CMAKE_BUILD_TYPE STREQUAL "Coverage"))
-	setup_target_for_coverage(
-		codecov  # Name for custom target.
-		ctest    # Name of the test driver executable that runs the tests.
-		coverage # Name of output directory.
-	)
+    setup_target_for_coverage(
+        codecov  # Name for custom target.
+        ctest    # Name of the test driver executable that runs the tests.
+        coverage # Name of output directory.
+    )
 endif()

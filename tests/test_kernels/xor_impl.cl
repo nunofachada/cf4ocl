@@ -33,7 +33,7 @@
  * */
 uint do_xor(uint a, uint b, uint c) {
 
-	/* Perform XOR. */
-	return a ^ b ^ c;
+    /* Perform XOR. */
+    return a ^ b ^ c;
 
 }

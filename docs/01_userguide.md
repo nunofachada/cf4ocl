@@ -399,17 +399,17 @@ the definitions of the abstract ::CCLWrapper* class and of the concrete
 /* Base class for all OpenCL wrappers. */
 struct ccl_wrapper {
 
-	/* The class or type of wrapped OpenCL object. */
-	CCLClass class;
+    /* The class or type of wrapped OpenCL object. */
+    CCLClass class;
 
-	/* The wrapped OpenCL object. */
-	void* cl_object;
+    /* The wrapped OpenCL object. */
+    void* cl_object;
 
-	/* Information about the wrapped OpenCL object. */
-	CCLWrapperInfoTable* info;
+    /* Information about the wrapped OpenCL object. */
+    CCLWrapperInfoTable* info;
 
-	/* Reference count. */
-	int ref_count;
+    /* Reference count. */
+    int ref_count;
 
 };
 @endcode
@@ -427,11 +427,11 @@ _In ccl_event_wrapper.c:_
 /* Event wrapper class, extends CCLWrapper */
 struct ccl_event {
 
-	/* Parent wrapper object. */
-	CCLWrapper base;
+    /* Parent wrapper object. */
+    CCLWrapper base;
 
-	/* Event name, for profiling purposes only. */
-	const char* name;
+    /* Event name, for profiling purposes only. */
+    const char* name;
 
 };
 @endcode
@@ -452,33 +452,33 @@ diagram:
 
 @dot
 digraph cf4ocl {
-	rankdir=RL;
-	node [shape=record, fontname=Helvetica, fontsize=10];
-	wrapper [ label="CCLWrapper*" URL="@ref ccl_wrapper"];
-	devcon [ label="CCLDevContainer*" URL="@ref ccl_dev_container"];
-	ctx [ label="CCLContext*" URL="@ref ccl_context"];
-	prg [ label="CCLProgram*" URL="@ref ccl_program"];
-	platf [ label="CCLPlatform*" URL="@ref ccl_platform"];
-	memobj [ label="CCLMemObj*" URL="@ref ccl_memobj"];
-	buf [ label="CCLBuffer*" URL="@ref ccl_buffer"];
-	img [ label="CCLImage*" URL="@ref ccl_image"];
-	dev [ label="CCLDevice*" URL="@ref ccl_device"];
-	evt [ label="CCLEvent*" URL="@ref ccl_event"];
-	krnl [ label="CCLKernel*" URL="@ref ccl_kernel"];
-	queue [ label="CCLQueue*" URL="@ref ccl_queue"];
-	smplr [ label="CCLSampler*" URL="@ref ccl_sampler"];
-	devcon -> wrapper;
-	ctx -> devcon;
-	prg -> devcon;
-	platf -> devcon;
-	memobj->wrapper;
-	buf -> memobj;
-	img -> memobj;
-	dev -> wrapper;
-	evt -> wrapper;
-	krnl -> wrapper;
-	queue -> wrapper;
-	smplr -> wrapper;
+    rankdir=RL;
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    wrapper [ label="CCLWrapper*" URL="@ref ccl_wrapper"];
+    devcon [ label="CCLDevContainer*" URL="@ref ccl_dev_container"];
+    ctx [ label="CCLContext*" URL="@ref ccl_context"];
+    prg [ label="CCLProgram*" URL="@ref ccl_program"];
+    platf [ label="CCLPlatform*" URL="@ref ccl_platform"];
+    memobj [ label="CCLMemObj*" URL="@ref ccl_memobj"];
+    buf [ label="CCLBuffer*" URL="@ref ccl_buffer"];
+    img [ label="CCLImage*" URL="@ref ccl_image"];
+    dev [ label="CCLDevice*" URL="@ref ccl_device"];
+    evt [ label="CCLEvent*" URL="@ref ccl_event"];
+    krnl [ label="CCLKernel*" URL="@ref ccl_kernel"];
+    queue [ label="CCLQueue*" URL="@ref ccl_queue"];
+    smplr [ label="CCLSampler*" URL="@ref ccl_sampler"];
+    devcon -> wrapper;
+    ctx -> devcon;
+    prg -> devcon;
+    platf -> devcon;
+    memobj->wrapper;
+    buf -> memobj;
+    img -> memobj;
+    dev -> wrapper;
+    evt -> wrapper;
+    krnl -> wrapper;
+    queue -> wrapper;
+    smplr -> wrapper;
 }
 @enddot
 
@@ -679,10 +679,10 @@ For example:
 @code{.c}
 /* Log function which outputs messages to a stream specified in user_data. */
 void my_log_function(const gchar *log_domain, GLogLevelFlags log_level,
-	const gchar *message, gpointer user_data) {
+    const gchar *message, gpointer user_data) {
 
-	g_fprintf((FILE*) user_data, "[%s](%d)>%s\n",
-		log_domain, log_level, message);
+    g_fprintf((FILE*) user_data, "[%s](%d)>%s\n",
+        log_domain, log_level, message);
 
 }
 @endcode
@@ -692,7 +692,7 @@ FILE* my_file;
 @code{.c}
 /* Add log handler for all messages from cf4ocl. */
 g_log_set_handler("cf4ocl2", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
-	my_log_function, my_file);
+    my_log_function, my_file);
 @endcode
 
 This requires the client application to be linked against GLib..
@@ -706,4 +706,3 @@ This requires the client application to be linked against GLib..
 @example image_fill.c
 @example image_filter.c
 @example image_filter.cl
-

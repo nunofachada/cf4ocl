@@ -12,9 +12,9 @@
 
 # The script expects an input file
 if [ "$#" -eq "0" ]; then
-	exit 1
+    exit 1
 elif [ ! -f "$1" ]; then
-	exit 2
+    exit 2
 fi
 
 # Read from input file
@@ -25,7 +25,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Check if file containing function-URL relations exist
 if [ ! -f "${SCRIPT_DIR}/oclfunurls.txt" ]; then
-	exit 3
+    exit 3
 fi
 
 # Load function-URL relations
@@ -41,9 +41,9 @@ ocl_urls=(`echo "$ocl_funs_urls" | cut -f2 -d " "`)
 num_ocl_funs=${#ocl_funs[@]}
 for ((i=0; i < $num_ocl_funs; i += 1))
 do
-	keyword=`echo "${ocl_funs[$i]}"`
-	replacement=`echo "[${ocl_funs[$i]}](${ocl_urls[$i]})"`
-	docfile=`echo "$docfile" | sed -e "s,${keyword},${replacement},g"`
+    keyword=`echo "${ocl_funs[$i]}"`
+    replacement=`echo "[${ocl_funs[$i]}](${ocl_urls[$i]})"`
+    docfile=`echo "$docfile" | sed -e "s,${keyword},${replacement},g"`
 done
 echo "$docfile"
 

@@ -30,9 +30,9 @@
 
 /* Filter to apply (a convolution matrix). */
 __constant float filter[9] = {
-	1.0f/9, 1.0f/9, 1.0f/9,
-	1.0f/9, 1.0f/9, 1.0f/9,
-	1.0f/9, 1.0f/9, 1.0f/9 };
+    1.0f/9, 1.0f/9, 1.0f/9,
+    1.0f/9, 1.0f/9, 1.0f/9,
+    1.0f/9, 1.0f/9, 1.0f/9 };
 
 /* Filter size (one dimension). */
 __constant int filter_size = 3;
@@ -45,36 +45,36 @@ __constant int filter_size = 3;
  * @param[in] sampler Sampler for reading image values.
  * */
 __kernel void do_filter(__read_only image2d_t input_img,
-	__write_only image2d_t output_img, sampler_t sampler) {
+    __write_only image2d_t output_img, sampler_t sampler) {
 
-	int2 imdim = get_image_dim(input_img);
-	int x = get_global_id(0);
-	int y = get_global_id(1);
+    int2 imdim = get_image_dim(input_img);
+    int x = get_global_id(0);
+    int y = get_global_id(1);
 
-	if ((x < imdim.x) && (y < imdim.y)) {
+    if ((x < imdim.x) && (y < imdim.y)) {
 
-		int half_filter = filter_size / 2;
-		uint4 px_val;
-		float4 px_filt = { 0.0f, 0.0f, 0.0f, 0.0f };
-		uint4 px_filt_int;
-		int i, j, filter_i, filter_j;
+        int half_filter = filter_size / 2;
+        uint4 px_val;
+        float4 px_filt = { 0.0f, 0.0f, 0.0f, 0.0f };
+        uint4 px_filt_int;
+        int i, j, filter_i, filter_j;
 
-		for(i = -half_filter, filter_i = 0; i <= half_filter; i++, filter_i++) {
-			for(j = -half_filter, filter_j = 0;
-				j <= half_filter;
-				j++, filter_j++) {
+        for(i = -half_filter, filter_i = 0; i <= half_filter; i++, filter_i++) {
+            for(j = -half_filter, filter_j = 0;
+                j <= half_filter;
+                j++, filter_j++) {
 
-				px_val =
-					read_imageui(input_img, sampler, (int2) (x + i, y + j));
-				px_filt +=
-					filter[filter_i * filter_size + filter_j]
-					* convert_float4(px_val);
+                px_val =
+                    read_imageui(input_img, sampler, (int2) (x + i, y + j));
+                px_filt +=
+                    filter[filter_i * filter_size + filter_j]
+                    * convert_float4(px_val);
 
-			}
-		}
+            }
+        }
 
-		px_filt_int = convert_uint4(px_filt);
-		write_imageui(output_img, (int2)(x, y), px_filt_int);
+        px_filt_int = convert_uint4(px_filt);
+        write_imageui(output_img, (int2)(x, y), px_filt_int);
 
-	}
+    }
 }

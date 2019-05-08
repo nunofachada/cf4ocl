@@ -40,18 +40,18 @@
  */
 struct ccl_device {
 
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
+    /**
+     * Parent wrapper object.
+     * @private
+     * */
+    CCLWrapper base;
 
 #ifdef CL_VERSION_1_2
-	/**
-	 * List of sub-device arrays.
-	 * @private
-	 * */
-	GSList* subdev_arrays;
+    /**
+     * List of sub-device arrays.
+     * @private
+     * */
+    GSList* subdev_arrays;
 #endif
 
 };
@@ -68,18 +68,18 @@ struct ccl_device {
  * */
 static void ccl_device_release_subdev_arrays(gpointer data) {
 
-	/* Make sure data is not NULL. */
-	g_return_if_fail(data != NULL);
+    /* Make sure data is not NULL. */
+    g_return_if_fail(data != NULL);
 
-	/* Convert data to array of sub-devices. */
-	CCLDevice** subdevs = (CCLDevice**) data;
+    /* Convert data to array of sub-devices. */
+    CCLDevice** subdevs = (CCLDevice**) data;
 
-	/* Destroy sub-devices. */
-	for (cl_uint i = 0; subdevs[i] != NULL; ++i)
-		ccl_device_destroy(subdevs[i]);
+    /* Destroy sub-devices. */
+    for (cl_uint i = 0; subdevs[i] != NULL; ++i)
+        ccl_device_destroy(subdevs[i]);
 
-	/* Destroy array holding sub-devices. */
-	g_free(subdevs);
+    /* Destroy array holding sub-devices. */
+    g_free(subdevs);
 }
 
 /**
@@ -93,12 +93,12 @@ static void ccl_device_release_subdev_arrays(gpointer data) {
  * */
 static void ccl_device_release_fields(CCLDevice* dev) {
 
-	/* Make sure device wrapper object is not NULL. */
-	g_return_if_fail(dev != NULL);
+    /* Make sure device wrapper object is not NULL. */
+    g_return_if_fail(dev != NULL);
 
-	/* Release list of arrays of sub-devices. */
-	g_slist_free_full(dev->subdev_arrays,
-		ccl_device_release_subdev_arrays);
+    /* Release list of arrays of sub-devices. */
+    g_slist_free_full(dev->subdev_arrays,
+        ccl_device_release_subdev_arrays);
 }
 
 #endif
@@ -128,8 +128,8 @@ static void ccl_device_release_fields(CCLDevice* dev) {
 CCL_EXPORT
 CCLDevice* ccl_device_new_wrap(cl_device_id device) {
 
-	return (CCLDevice*) ccl_wrapper_new(
-		CCL_DEVICE, (void*) device, sizeof(CCLDevice));
+    return (CCLDevice*) ccl_wrapper_new(
+        CCL_DEVICE, (void*) device, sizeof(CCLDevice));
 
 }
 
@@ -146,28 +146,28 @@ void ccl_device_destroy(CCLDevice* dev) {
 
 #ifdef CL_VERSION_1_2
 
-	cl_uint ver = ccl_device_get_opencl_version(dev, NULL);
+    cl_uint ver = ccl_device_get_opencl_version(dev, NULL);
 
-	/* Device destruction depends on device OpenCL version. */
-	if (ver >= 120) {
+    /* Device destruction depends on device OpenCL version. */
+    if (ver >= 120) {
 
-		/* If OpenCL >= 1.2, then pass clReleaseDevice to release
-		 * device (will only matter for sub-devices). */
-		ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
-			(ccl_wrapper_release_fields) ccl_device_release_fields,
-			(ccl_wrapper_release_cl_object) clReleaseDevice, NULL);
+        /* If OpenCL >= 1.2, then pass clReleaseDevice to release
+         * device (will only matter for sub-devices). */
+        ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
+            (ccl_wrapper_release_fields) ccl_device_release_fields,
+            (ccl_wrapper_release_cl_object) clReleaseDevice, NULL);
 
-	} else {
+    } else {
 
-		/* If OpenCL < 1.2, don't pass OpenCL specific destructors. */
-		ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
-			NULL, NULL, NULL);
-	}
+        /* If OpenCL < 1.2, don't pass OpenCL specific destructors. */
+        ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
+            NULL, NULL, NULL);
+    }
 
 #else
 
-	ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
-		NULL, NULL, NULL);
+    ccl_wrapper_unref((CCLWrapper*) dev, sizeof(CCLDevice),
+        NULL, NULL, NULL);
 
 #endif
 }
@@ -193,23 +193,23 @@ void ccl_device_destroy(CCLDevice* dev) {
 CCL_EXPORT
 cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
 
-	/* Make sure dev is not NULL. */
-	g_return_val_if_fail(dev != NULL, 0);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure dev is not NULL. */
+    g_return_val_if_fail(dev != NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	char* ver_str;
-	cl_uint ver = 0;
+    char* ver_str;
+    cl_uint ver = 0;
 
-	/* Get version string which has the format "OpenCL x.x ..." */
-	ver_str = ccl_device_get_info_array(dev, CL_DEVICE_VERSION, char, err);
+    /* Get version string which has the format "OpenCL x.x ..." */
+    ver_str = ccl_device_get_info_array(dev, CL_DEVICE_VERSION, char, err);
 
-	if (ver_str != NULL) {
-		ver = /* strlen("OpenCL ") == 7 */
-			atoi(ver_str + 7) * 100 + /* Major version. */
-			atoi(ver_str + 9) * 10; /* Minor version. */
-	}
-	return ver;
+    if (ver_str != NULL) {
+        ver = /* strlen("OpenCL ") == 7 */
+            atoi(ver_str + 7) * 100 + /* Major version. */
+            atoi(ver_str + 9) * 10; /* Minor version. */
+    }
+    return ver;
 
 }
 
@@ -233,24 +233,24 @@ cl_uint ccl_device_get_opencl_version(CCLDevice* dev, CCLErr** err) {
 CCL_EXPORT
 cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
 
-	/* Make sure dev is not NULL. */
-	g_return_val_if_fail(dev != NULL, 0);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure dev is not NULL. */
+    g_return_val_if_fail(dev != NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	char* ver_str;
-	cl_uint ver = 0;
+    char* ver_str;
+    cl_uint ver = 0;
 
-	/* Get version string which has the format "OpenCL C x.x ..." */
-	ver_str = ccl_device_get_info_array(
-		dev, CL_DEVICE_OPENCL_C_VERSION, char, err);
+    /* Get version string which has the format "OpenCL C x.x ..." */
+    ver_str = ccl_device_get_info_array(
+        dev, CL_DEVICE_OPENCL_C_VERSION, char, err);
 
-	if (ver_str != NULL) {
-		ver = /* strlen("OpenCL C ") == 9 */
-			atoi(ver_str + 9) * 100 + /* Major version. */
-			atoi(ver_str + 11) * 10; /* Minor version. */
-	}
-	return ver;
+    if (ver_str != NULL) {
+        ver = /* strlen("OpenCL C ") == 9 */
+            atoi(ver_str + 9) * 100 + /* Major version. */
+            atoi(ver_str + 11) * 10; /* Minor version. */
+    }
+    return ver;
 
 }
 
@@ -276,86 +276,86 @@ cl_uint ccl_device_get_opencl_c_version(CCLDevice* dev, CCLErr** err) {
  * */
 CCL_EXPORT
 CCLDevice* const* ccl_device_create_subdevices(CCLDevice* dev,
-	const cl_device_partition_property *properties,
-	cl_uint *num_devs_ret, CCLErr** err) {
+    const cl_device_partition_property *properties,
+    cl_uint *num_devs_ret, CCLErr** err) {
 
-	/* Make sure device wrapper object is not NULL. */
-	g_return_val_if_fail(dev != NULL, NULL);
+    /* Make sure device wrapper object is not NULL. */
+    g_return_val_if_fail(dev != NULL, NULL);
 
-	/* OpenCL function return status. */
-	cl_int ocl_status;
-	/* Number of sub-devices the partition may yield. */
-	cl_uint num_devs;
-	/* Array for holding sub-devices. */
-	void** subdevs = NULL;
+    /* OpenCL function return status. */
+    cl_int ocl_status;
+    /* Number of sub-devices the partition may yield. */
+    cl_uint num_devs;
+    /* Array for holding sub-devices. */
+    void** subdevs = NULL;
 
 #ifndef CL_VERSION_1_2
 
-	CCL_UNUSED(properties);
-	CCL_UNUSED(ocl_status);
-	CCL_UNUSED(num_devs);
+    CCL_UNUSED(properties);
+    CCL_UNUSED(ocl_status);
+    CCL_UNUSED(num_devs);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: Sub-device creation requires cf4ocl to be deployed with "
-		"support for OpenCL version 1.2 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: Sub-device creation requires cf4ocl to be deployed with "
+        "support for OpenCL version 1.2 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* How many sub-devices will this partition yield? */
-	ocl_status = clCreateSubDevices(
-		ccl_device_unwrap(dev), properties, 0, NULL, &num_devs);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to determine how many sub-devices can be created " \
-		"(OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* How many sub-devices will this partition yield? */
+    ocl_status = clCreateSubDevices(
+        ccl_device_unwrap(dev), properties, 0, NULL, &num_devs);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to determine how many sub-devices can be created " \
+        "(OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Create array for holding sub-devices. The last element should
-	 * be NULL. */
-	subdevs = g_new0(void*, num_devs + 1);
+    /* Create array for holding sub-devices. The last element should
+     * be NULL. */
+    subdevs = g_new0(void*, num_devs + 1);
 
-	/* Create sub-devices. */
-	ocl_status = clCreateSubDevices(
-		ccl_device_unwrap(dev), properties, num_devs,
-		(cl_device_id*) subdevs, NULL);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to create sub-devices (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Create sub-devices. */
+    ocl_status = clCreateSubDevices(
+        ccl_device_unwrap(dev), properties, num_devs,
+        (cl_device_id*) subdevs, NULL);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to create sub-devices (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap sub-devices. */
-	for (cl_uint i = 0; subdevs[i] != NULL; ++i)
-		subdevs[i] = ccl_device_new_wrap(subdevs[i]);
+    /* Wrap sub-devices. */
+    for (cl_uint i = 0; subdevs[i] != NULL; ++i)
+        subdevs[i] = ccl_device_new_wrap(subdevs[i]);
 
-	/* Return number of sub-devices? */
-	if (num_devs_ret != NULL) *num_devs_ret = num_devs;
+    /* Return number of sub-devices? */
+    if (num_devs_ret != NULL) *num_devs_ret = num_devs;
 
-	/* Add new sub-devices to list of sub-devices. */
-	dev->subdev_arrays = g_slist_prepend(dev->subdev_arrays, subdevs);
+    /* Add new sub-devices to list of sub-devices. */
+    dev->subdev_arrays = g_slist_prepend(dev->subdev_arrays, subdevs);
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* An error occurred, return NULL to signal it. */
-	if (num_devs_ret != NULL) *num_devs_ret = 0;
-	if (subdevs != NULL) g_free(subdevs);
-	subdevs = NULL;
+    /* An error occurred, return NULL to signal it. */
+    if (num_devs_ret != NULL) *num_devs_ret = 0;
+    if (subdevs != NULL) g_free(subdevs);
+    subdevs = NULL;
 
 finish:
 
-	/* Return event. */
-	return (CCLDevice* const*) subdevs;
+    /* Return event. */
+    return (CCLDevice* const*) subdevs;
 }
 
 /** @} */

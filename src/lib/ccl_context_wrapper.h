@@ -123,8 +123,8 @@
  * is called. user_data can be NULL.
  * */
 typedef void (CL_CALLBACK* ccl_context_callback)(
-	const char* errinfo, const void* private_info, size_t cb,
-	void* user_data);
+    const char* errinfo, const void* private_info, size_t cb,
+    void* user_data);
 
 /* Get the context wrapper for the given OpenCL context. */
 CCL_EXPORT
@@ -140,8 +140,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object.
  * */
 #define ccl_context_new_from_filters(filters, err) \
-	ccl_context_new_from_filters_full( \
-		NULL, (filters), NULL, NULL, (err))
+    ccl_context_new_from_filters_full( \
+        NULL, (filters), NULL, NULL, (err))
 
 /**
  * Creates a context wrapper given an array of ::CCLDevice wrappers.
@@ -156,8 +156,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object.
  * */
 #define ccl_context_new_from_devices(num_devices, devices, err) \
-	ccl_context_new_from_devices_full( \
-		NULL, (num_devices), (devices), NULL, NULL, (err))
+    ccl_context_new_from_devices_full( \
+        NULL, (num_devices), (devices), NULL, NULL, (err))
 
 /**
  * Creates a context wrapper for a CPU device.
@@ -170,8 +170,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_cpu(err) \
-	ccl_context_new_from_indep_filter( \
-		ccl_devsel_indep_type_cpu, NULL, (err))
+    ccl_context_new_from_indep_filter( \
+        ccl_devsel_indep_type_cpu, NULL, (err))
 
 /**
  * Creates a context wrapper for a GPU device.
@@ -184,8 +184,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_gpu(err) \
-	ccl_context_new_from_indep_filter( \
-		ccl_devsel_indep_type_gpu, NULL, (err))
+    ccl_context_new_from_indep_filter( \
+        ccl_devsel_indep_type_gpu, NULL, (err))
 
 /**
  * Creates a context wrapper for an Accelerator device.
@@ -198,8 +198,8 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_accel(err) \
-	ccl_context_new_from_indep_filter( \
-		ccl_devsel_indep_type_accel, NULL, (err))
+    ccl_context_new_from_indep_filter( \
+        ccl_devsel_indep_type_accel, NULL, (err))
 
 /**
  * Creates a context wrapper for the first found device(s).
@@ -212,7 +212,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_any(err) \
-	ccl_context_new_from_indep_filter(NULL, NULL, (err))
+    ccl_context_new_from_indep_filter(NULL, NULL, (err))
 
 /**
  * Creates a context wrapper using one independent device filter specified in
@@ -230,7 +230,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_indep_filter(filter, data, err) \
-	ccl_context_new_from_filter(CCL_DEVSEL_INDEP, (filter), (data), (err))
+    ccl_context_new_from_filter(CCL_DEVSEL_INDEP, (filter), (data), (err))
 
 /**
  * Creates a context wrapper using one dependent device filter specified in the
@@ -249,7 +249,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_dep_filter(filter, data, err) \
-	ccl_context_new_from_filter(CCL_DEVSEL_DEP, (filter), (data), (err))
+    ccl_context_new_from_filter(CCL_DEVSEL_DEP, (filter), (data), (err))
 
 /**
  * Creates a context wrapper using a device selected by its index.
@@ -263,7 +263,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_device_index(data, err) \
-	ccl_context_new_from_dep_filter(ccl_devsel_dep_index, (data), (err))
+    ccl_context_new_from_dep_filter(ccl_devsel_dep_index, (data), (err))
 
 /**
  * Creates a context wrapper using a device which the user selects from a menu.
@@ -275,7 +275,7 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu_full(data, err) \
-	ccl_context_new_from_dep_filter(ccl_devsel_dep_menu, (data), (err))
+    ccl_context_new_from_dep_filter(ccl_devsel_dep_menu, (data), (err))
 
 /**
  * Creates a context wrapper from a device selected by the user from a menu.
@@ -285,28 +285,28 @@ CCLContext* ccl_context_new_wrap(cl_context context);
  * @return A new context wrapper object or `NULL` if an error occurs.
  * */
 #define ccl_context_new_from_menu(err) \
-	ccl_context_new_from_dep_filter(ccl_devsel_dep_menu, NULL, (err))
+    ccl_context_new_from_dep_filter(ccl_devsel_dep_menu, NULL, (err))
 
 /* Create a new context wrapper object selecting devices using the given set of
  * filters. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filters_full(
-	const cl_context_properties* properties, CCLDevSelFilters* filters,
-	ccl_context_callback pfn_notify, void* user_data, CCLErr **err);
+    const cl_context_properties* properties, CCLDevSelFilters* filters,
+    ccl_context_callback pfn_notify, void* user_data, CCLErr **err);
 
 /* Creates a context wrapper given an array of ::CCLDevice wrappers and the
  * remaining parameters required by the clCreateContext() function. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_devices_full(
-	const cl_context_properties* properties, cl_uint num_devices,
-	CCLDevice* const* devices, ccl_context_callback pfn_notify,
-	void* user_data, CCLErr** err);
+    const cl_context_properties* properties, cl_uint num_devices,
+    CCLDevice* const* devices, ccl_context_callback pfn_notify,
+    void* user_data, CCLErr** err);
 
 /* Creates a context wrapper using one device filter specified in the function
  * parameters. */
 CCL_EXPORT
 CCLContext* ccl_context_new_from_filter(CCLDevSelFilterType ftype,
-	void* filter, void* data, CCLErr** err);
+    void* filter, void* data, CCLErr** err);
 
 /* Decrements the reference count of the context wrapper object.
  * If it reaches 0, the context wrapper object is destroyed. */
@@ -324,13 +324,13 @@ CCLPlatform* ccl_context_get_platform(CCLContext* ctx, CCLErr** err);
 /* Get the list of image formats supported by a given context. */
 CCL_EXPORT
 const cl_image_format* ccl_context_get_supported_image_formats(
-	CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
-	cl_uint* num_image_formats, CCLErr** err);
+    CCLContext* ctx, cl_mem_flags flags, cl_mem_object_type image_type,
+    cl_uint* num_image_formats, CCLErr** err);
 
 /* Get ::CCLDevice wrapper at given index. */
 CCL_EXPORT
 CCLDevice* ccl_context_get_device(
-	CCLContext* ctx, cl_uint index, CCLErr** err);
+    CCLContext* ctx, cl_uint index, CCLErr** err);
 
 /* Return number of devices in context. */
 CCL_EXPORT
@@ -339,7 +339,7 @@ cl_uint ccl_context_get_num_devices(CCLContext* ctx, CCLErr** err);
 /* Get all device wrappers in context. */
 CCL_EXPORT
 CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
-	CCLErr** err);
+    CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo context information object.
@@ -353,8 +353,8 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_context_get_info(ctx, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) ctx, NULL, param_name, 0, \
-		CCL_INFO_CONTEXT, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) ctx, NULL, param_name, 0, \
+        CCL_INFO_CONTEXT, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar context information value.
@@ -373,9 +373,9 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * If an error occurs, zero is returned.
  * */
 #define ccl_context_get_info_scalar(ctx, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_CONTEXT, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) ctx, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_CONTEXT, CL_FALSE, err))
 
 /**
  * Macro which returns an array context information value.
@@ -395,16 +395,16 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_context_get_info_array(ctx, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) ctx, \
-		NULL, param_name, sizeof(param_type), \
-		CCL_INFO_CONTEXT, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) ctx, \
+        NULL, param_name, sizeof(param_type), \
+        CCL_INFO_CONTEXT, CL_FALSE, err)
 /**
  * Increase the reference count of the context wrapper object.
  *
  * @param[in] ctx The context wrapper object.
  * */
 #define ccl_context_ref(ctx) \
-	ccl_wrapper_ref((CCLWrapper*) ctx)
+    ccl_wrapper_ref((CCLWrapper*) ctx)
 
 /**
  * Alias to ccl_context_destroy().
@@ -413,7 +413,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * is 1, otherwise just decrement the reference count.
  * */
 #define ccl_context_unref(ctx) \
-	ccl_context_destroy(ctx)
+    ccl_context_destroy(ctx)
 
 /**
  * Get the OpenCL context object.
@@ -422,7 +422,7 @@ CCLDevice* const* ccl_context_get_all_devices(CCLContext* ctx,
  * @return The OpenCL context object.
  * */
 #define ccl_context_unwrap(ctx) \
-	((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
+    ((cl_context) ccl_wrapper_unwrap((CCLWrapper*) ctx))
 
 /** @} */
 

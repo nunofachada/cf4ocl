@@ -30,82 +30,82 @@
 
 CL_API_ENTRY cl_mem CL_API_CALL
 clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
-	void* host_ptr, cl_int* errcode_ret) {
+    void* host_ptr, cl_int* errcode_ret) {
 
-	cl_mem memobj = NULL;
+    cl_mem memobj = NULL;
 
-	cl_mem_flags valid_flags = CL_MEM_READ_WRITE | CL_MEM_WRITE_ONLY
-		| CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR | CL_MEM_ALLOC_HOST_PTR
-		| CL_MEM_COPY_HOST_PTR
+    cl_mem_flags valid_flags = CL_MEM_READ_WRITE | CL_MEM_WRITE_ONLY
+        | CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR | CL_MEM_ALLOC_HOST_PTR
+        | CL_MEM_COPY_HOST_PTR
 #ifdef CL_VERSION_1_2
-		| CL_MEM_HOST_WRITE_ONLY | CL_MEM_HOST_READ_ONLY | CL_MEM_HOST_NO_ACCESS
+        | CL_MEM_HOST_WRITE_ONLY | CL_MEM_HOST_READ_ONLY | CL_MEM_HOST_NO_ACCESS
 #endif
-		;
+        ;
 
-	if (context == NULL) {
-		seterrcode(errcode_ret, CL_INVALID_CONTEXT);
-	} else if (flags & !valid_flags) {
-		seterrcode(errcode_ret, CL_INVALID_VALUE);
-	} else if (((host_ptr == NULL) && (flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))
-		|| ((host_ptr != NULL) && !(flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))) {
-		seterrcode(errcode_ret, CL_INVALID_HOST_PTR);
-	} /* Not checking for CL_INVALID_BUFFER_SIZE */
-	else {
-		seterrcode(errcode_ret, CL_SUCCESS);
+    if (context == NULL) {
+        seterrcode(errcode_ret, CL_INVALID_CONTEXT);
+    } else if (flags & !valid_flags) {
+        seterrcode(errcode_ret, CL_INVALID_VALUE);
+    } else if (((host_ptr == NULL) && (flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))
+        || ((host_ptr != NULL) && !(flags & (CL_MEM_COPY_HOST_PTR | CL_MEM_USE_HOST_PTR)))) {
+        seterrcode(errcode_ret, CL_INVALID_HOST_PTR);
+    } /* Not checking for CL_INVALID_BUFFER_SIZE */
+    else {
+        seterrcode(errcode_ret, CL_SUCCESS);
 
-		memobj = g_slice_new(struct _cl_mem);
+        memobj = g_slice_new(struct _cl_mem);
 
-		memobj->ref_count = 1;
-		memobj->type = CL_MEM_OBJECT_BUFFER;
-		memobj->flags = flags;
-		memobj->size = size;
-		memobj->host_ptr = host_ptr;
-		memobj->map_count = 0;
-		memobj->context = context;
-		memobj->associated_object = NULL;
-		memobj->offset = 0;
-		memobj->callbacks = NULL;
-		if (flags & CL_MEM_COPY_HOST_PTR) {
-			memobj->mem = g_memdup(host_ptr, (guint) size);
-		} else if (flags & CL_MEM_USE_HOST_PTR) {
-			memobj->mem = host_ptr;
-		} else {
-			memobj->mem = g_malloc(size);
-		}
-	}
-	return memobj;
+        memobj->ref_count = 1;
+        memobj->type = CL_MEM_OBJECT_BUFFER;
+        memobj->flags = flags;
+        memobj->size = size;
+        memobj->host_ptr = host_ptr;
+        memobj->map_count = 0;
+        memobj->context = context;
+        memobj->associated_object = NULL;
+        memobj->offset = 0;
+        memobj->callbacks = NULL;
+        if (flags & CL_MEM_COPY_HOST_PTR) {
+            memobj->mem = g_memdup(host_ptr, (guint) size);
+        } else if (flags & CL_MEM_USE_HOST_PTR) {
+            memobj->mem = host_ptr;
+        } else {
+            memobj->mem = g_malloc(size);
+        }
+    }
+    return memobj;
 }
 
 #ifdef CL_VERSION_1_1
 
 CL_API_ENTRY cl_mem CL_API_CALL
 clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
-	cl_buffer_create_type buffer_create_type,
-	const void* buffer_create_info, cl_int* errcode_ret) {
+    cl_buffer_create_type buffer_create_type,
+    const void* buffer_create_info, cl_int* errcode_ret) {
 
-	seterrcode(errcode_ret, CL_SUCCESS);
-	cl_mem memobj = g_slice_new(struct _cl_mem);
+    seterrcode(errcode_ret, CL_SUCCESS);
+    cl_mem memobj = g_slice_new(struct _cl_mem);
 
-	buffer->ref_count++;
+    buffer->ref_count++;
 
-	memobj->ref_count = 1;
-	memobj->type = CL_MEM_OBJECT_BUFFER;
-	memobj->flags = flags;
-	memobj->size = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
-		? ((struct _cl_buffer_region*) buffer_create_info)->size
-		: 0;
-	memobj->host_ptr = buffer->host_ptr;
-	memobj->map_count = 0;
-	memobj->context = buffer->context;
-	memobj->associated_object = buffer;
-	memobj->offset = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
-		? ((struct _cl_buffer_region*) buffer_create_info)->origin
-		: 0;
+    memobj->ref_count = 1;
+    memobj->type = CL_MEM_OBJECT_BUFFER;
+    memobj->flags = flags;
+    memobj->size = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
+        ? ((struct _cl_buffer_region*) buffer_create_info)->size
+        : 0;
+    memobj->host_ptr = buffer->host_ptr;
+    memobj->map_count = 0;
+    memobj->context = buffer->context;
+    memobj->associated_object = buffer;
+    memobj->offset = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
+        ? ((struct _cl_buffer_region*) buffer_create_info)->origin
+        : 0;
 
-	memobj->mem = ((cl_uchar*) buffer->mem) + memobj->offset;
-	memobj->callbacks = NULL;
+    memobj->mem = ((cl_uchar*) buffer->mem) + memobj->offset;
+    memobj->callbacks = NULL;
 
-	return memobj;
+    return memobj;
 }
 
 #endif

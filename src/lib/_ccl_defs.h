@@ -34,22 +34,22 @@
  * order to support Clang. */
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
 #define CCL_BEGIN_IGNORE_DEPRECATIONS \
-	_Pragma ("GCC diagnostic push") \
-	_Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+    _Pragma ("GCC diagnostic push") \
+    _Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #define CCL_END_IGNORE_DEPRECATIONS \
-	_Pragma ("GCC diagnostic pop")
+    _Pragma ("GCC diagnostic pop")
 #elif defined (_MSC_VER) && (_MSC_VER >= 1500)
 #define CCL_BEGIN_IGNORE_DEPRECATIONS \
-	__pragma (warning (push)) \
-	__pragma (warning (disable : 4996))
+    __pragma (warning (push)) \
+    __pragma (warning (disable : 4996))
 #define CCL_END_IGNORE_DEPRECATIONS \
-	__pragma (warning (pop))
+    __pragma (warning (pop))
 #elif defined (__clang__)
 #define CCL_BEGIN_IGNORE_DEPRECATIONS \
-	_Pragma("clang diagnostic push") \
-	_Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+    _Pragma("clang diagnostic push") \
+    _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
 #define CCL_END_IGNORE_DEPRECATIONS \
-	_Pragma("clang diagnostic pop")
+    _Pragma("clang diagnostic pop")
 #else
 #define CCL_BEGIN_IGNORE_DEPRECATIONS
 #define CCL_END_IGNORE_DEPRECATIONS
@@ -68,15 +68,15 @@
 /* The CCL_STRD macro determines which debug information appear in error
  * messages. */
 #ifndef CCL_STRD
-	#ifdef NDEBUG
-		/* If the NDEBUG macro is set, CCL_STRD will expand to a string
-		 * identifying the current code position. */
-		#define CCL_STRD G_STRFUNC
-	#else
-		/* Otherwise it will expand to a string identifying the current
-		 * function. */
-		#define CCL_STRD G_STRLOC
-	#endif
+    #ifdef NDEBUG
+        /* If the NDEBUG macro is set, CCL_STRD will expand to a string
+         * identifying the current code position. */
+        #define CCL_STRD G_STRFUNC
+    #else
+        /* Otherwise it will expand to a string identifying the current
+         * function. */
+        #define CCL_STRD G_STRLOC
+    #endif
 #endif
 
 /* The error-handling macros output to the debug log the stack trace when an

@@ -42,12 +42,12 @@
  * */
 void ccl_memobj_release_fields(CCLMemObj* mo) {
 
-	/* Make sure mo wrapper object is not NULL. */
-	g_return_if_fail(mo != NULL);
+    /* Make sure mo wrapper object is not NULL. */
+    g_return_if_fail(mo != NULL);
 
-	/* Reduce reference count of memory object context wrapper. */
-	if (mo->ctx != NULL)
-		ccl_context_unref(mo->ctx);
+    /* Reduce reference count of memory object context wrapper. */
+    if (mo->ctx != NULL)
+        ccl_context_unref(mo->ctx);
 
 }
 
@@ -78,45 +78,45 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
 CCL_EXPORT
 cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, CCLErr** err) {
 
-	/* Make sure number mo is not NULL. */
-	g_return_val_if_fail(mo != NULL, 0);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure number mo is not NULL. */
+    g_return_val_if_fail(mo != NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	cl_context context;
-	CCLContext* ctx;
-	CCLErr* err_internal = NULL;
-	cl_uint ocl_ver;
+    cl_context context;
+    CCLContext* ctx;
+    CCLErr* err_internal = NULL;
+    cl_uint ocl_ver;
 
-	/* Get cl_context object for this memory object. */
-	context = ccl_memobj_get_info_scalar(
-		mo, CL_MEM_CONTEXT, cl_context, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get cl_context object for this memory object. */
+    context = ccl_memobj_get_info_scalar(
+        mo, CL_MEM_CONTEXT, cl_context, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Get context wrapper. */
-	ctx = ccl_context_new_wrap(context);
+    /* Get context wrapper. */
+    ctx = ccl_context_new_wrap(context);
 
-	/* Get OpenCL version. */
-	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get OpenCL version. */
+    ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Unref. the context wrapper. */
-	ccl_context_unref(ctx);
+    /* Unref. the context wrapper. */
+    ccl_context_unref(ctx);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	ocl_ver = 0;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    ocl_ver = 0;
 
 finish:
 
-	/* Return event wrapper. */
-	return ocl_ver;
+    /* Return event wrapper. */
+    return ocl_ver;
 
 }
 
@@ -140,56 +140,56 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
-	void* mapped_ptr, CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+    void* mapped_ptr, CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure mo is not NULL. */
-	g_return_val_if_fail(mo != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure mo is not NULL. */
+    g_return_val_if_fail(mo != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* OpenCL function status. */
-	cl_int ocl_status;
-	/* OpenCL event. */
-	cl_event event;
-	/* Event wrapper. */
-	CCLEvent* evt;
+    /* OpenCL function status. */
+    cl_int ocl_status;
+    /* OpenCL event. */
+    cl_event event;
+    /* Event wrapper. */
+    CCLEvent* evt;
 
-	/* Enqueue unmap command. */
-	ocl_status = clEnqueueUnmapMemObject (ccl_queue_unwrap(cq),
-		ccl_memobj_unwrap(mo), mapped_ptr,
-		ccl_event_wait_list_get_num_events(evt_wait_lst),
-		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to unmap memory object (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Enqueue unmap command. */
+    ocl_status = clEnqueueUnmapMemObject (ccl_queue_unwrap(cq),
+        ccl_memobj_unwrap(mo), mapped_ptr,
+        ccl_event_wait_list_get_num_events(evt_wait_lst),
+        ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to unmap memory object (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap event and associate it with the respective command queue.
-	 * The event object will be released automatically when the command
-	 * queue is released. */
-	evt = ccl_queue_produce_event(cq, event);
+    /* Wrap event and associate it with the respective command queue.
+     * The event object will be released automatically when the command
+     * queue is released. */
+    evt = ccl_queue_produce_event(cq, event);
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* An error occurred, return NULL to signal it. */
-	evt = NULL;
+    /* An error occurred, return NULL to signal it. */
+    evt = NULL;
 
 finish:
 
-	/* Return evt. */
-	return evt;
+    /* Return evt. */
+    return evt;
 
 
 }
@@ -211,79 +211,79 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
-	ccl_memobj_destructor_callback pfn_notify,
-	void *user_data, CCLErr** err) {
+    ccl_memobj_destructor_callback pfn_notify,
+    void *user_data, CCLErr** err) {
 
-	/* Make sure mo is not NULL. */
-	g_return_val_if_fail(mo != NULL, CL_FALSE);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+    /* Make sure mo is not NULL. */
+    g_return_val_if_fail(mo != NULL, CL_FALSE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
-	/* OpenCL function status. */
-	cl_int ocl_status;
-	/* This function return status. */
-	cl_bool ret_status;
-	/* OpenCL version. */
-	double ocl_ver;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* OpenCL function status. */
+    cl_int ocl_status;
+    /* This function return status. */
+    cl_bool ret_status;
+    /* OpenCL version. */
+    double ocl_ver;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
-	CCL_UNUSED(pfn_notify);
-	CCL_UNUSED(user_data);
-	CCL_UNUSED(ocl_status);
-	CCL_UNUSED(ocl_ver);
-	CCL_UNUSED(err_internal);
+    CCL_UNUSED(pfn_notify);
+    CCL_UNUSED(user_data);
+    CCL_UNUSED(ocl_status);
+    CCL_UNUSED(ocl_ver);
+    CCL_UNUSED(err_internal);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: Setting destructor callbacks requires cf4ocl to be "
-		"deployed with support for OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: Setting destructor callbacks requires cf4ocl to be "
+        "deployed with support for OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* Check that context platform is >= OpenCL 1.1 */
-	ocl_ver = ccl_memobj_get_opencl_version(mo, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Check that context platform is >= OpenCL 1.1 */
+    ocl_ver = ccl_memobj_get_opencl_version(mo, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If OpenCL version is not >= 1.1, throw error. */
-	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: memory object destructor callbacks require OpenCL " \
-		"version 1.1 or newer.",
-		CCL_STRD);
+    /* If OpenCL version is not >= 1.1, throw error. */
+    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: memory object destructor callbacks require OpenCL " \
+        "version 1.1 or newer.",
+        CCL_STRD);
 
-	/* Set destructor callback. */
-	ocl_status = clSetMemObjectDestructorCallback(ccl_memobj_unwrap(mo),
-		pfn_notify, user_data);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to set memory object destructor callback "
-		"(OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Set destructor callback. */
+    ocl_status = clSetMemObjectDestructorCallback(ccl_memobj_unwrap(mo),
+        pfn_notify, user_data);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to set memory object destructor callback "
+        "(OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	ret_status = CL_TRUE;
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    ret_status = CL_TRUE;
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	ret_status = CL_FALSE;
+    ret_status = CL_FALSE;
 
 finish:
 
-	/* Return status. */
-	return ret_status;
+    /* Return status. */
+    return ret_status;
 
 }
 
@@ -308,108 +308,108 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
- 	CCLQueue* cq, cl_mem_migration_flags flags,
- 	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+     CCLQueue* cq, cl_mem_migration_flags flags,
+     CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure mos is not NULL. */
-	g_return_val_if_fail(mos != NULL, NULL);
-	/* Make sure num_mos > 0 is not NULL. */
-	g_return_val_if_fail(num_mos > 0, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure mos is not NULL. */
+    g_return_val_if_fail(mos != NULL, NULL);
+    /* Make sure num_mos > 0 is not NULL. */
+    g_return_val_if_fail(num_mos > 0, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* OpenCL function status. */
-	cl_int ocl_status;
-	/* OpenCL event. */
-	cl_event event;
-	/* Event wrapper. */
-	CCLEvent* evt;
-	/* OpenCL version. */
-	double ocl_ver;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
-	/* Array of OpenCL memory objects. */
-	cl_mem* mem_objects = NULL;
+    /* OpenCL function status. */
+    cl_int ocl_status;
+    /* OpenCL event. */
+    cl_event event;
+    /* Event wrapper. */
+    CCLEvent* evt;
+    /* OpenCL version. */
+    double ocl_ver;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
+    /* Array of OpenCL memory objects. */
+    cl_mem* mem_objects = NULL;
 
 #ifndef CL_VERSION_1_2
 
-	CCL_UNUSED(flags);
-	CCL_UNUSED(evt_wait_lst);
-	CCL_UNUSED(ocl_status);
-	CCL_UNUSED(event);
-	CCL_UNUSED(ocl_ver);
-	CCL_UNUSED(err_internal);
+    CCL_UNUSED(flags);
+    CCL_UNUSED(evt_wait_lst);
+    CCL_UNUSED(ocl_status);
+    CCL_UNUSED(event);
+    CCL_UNUSED(ocl_ver);
+    CCL_UNUSED(err_internal);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: Memory object migration requires cf4ocl to be "
-		"deployed with support for OpenCL version 1.2 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: Memory object migration requires cf4ocl to be "
+        "deployed with support for OpenCL version 1.2 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* Check that context platform is >= OpenCL 1.2 */
-	ocl_ver = ccl_memobj_get_opencl_version(mos[0], &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Check that context platform is >= OpenCL 1.2 */
+    ocl_ver = ccl_memobj_get_opencl_version(mos[0], &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If OpenCL version is not >= 1.2, throw error. */
-	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: memory object migration requires OpenCL version 1.2 or " \
-		"newer.",
-		CCL_STRD);
+    /* If OpenCL version is not >= 1.2, throw error. */
+    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: memory object migration requires OpenCL version 1.2 or " \
+        "newer.",
+        CCL_STRD);
 
-	/* Allocate memory for memory objects. */
-	mem_objects = (cl_mem*) g_slice_alloc(sizeof(cl_mem) * num_mos);
+    /* Allocate memory for memory objects. */
+    mem_objects = (cl_mem*) g_slice_alloc(sizeof(cl_mem) * num_mos);
 
-	/* Gather OpenCL memory objects in a array. */
-	for (cl_uint i = 0; i < num_mos; ++i) {
-		mem_objects[i] = ccl_memobj_unwrap(mos[i]);
-	}
+    /* Gather OpenCL memory objects in a array. */
+    for (cl_uint i = 0; i < num_mos; ++i) {
+        mem_objects[i] = ccl_memobj_unwrap(mos[i]);
+    }
 
-	/* Migrate memory objects. */
-	ocl_status = clEnqueueMigrateMemObjects(ccl_queue_unwrap(cq),
-		num_mos, (const cl_mem*) mem_objects, flags,
-		ccl_event_wait_list_get_num_events(evt_wait_lst),
-		ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to migrate memory objects (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Migrate memory objects. */
+    ocl_status = clEnqueueMigrateMemObjects(ccl_queue_unwrap(cq),
+        num_mos, (const cl_mem*) mem_objects, flags,
+        ccl_event_wait_list_get_num_events(evt_wait_lst),
+        ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to migrate memory objects (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap event and associate it with the respective command queue.
-	 * The event object will be released automatically when the command
-	 * queue is released. */
-	evt = ccl_queue_produce_event(cq, event);
+    /* Wrap event and associate it with the respective command queue.
+     * The event object will be released automatically when the command
+     * queue is released. */
+    evt = ccl_queue_produce_event(cq, event);
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* An error occurred, return NULL to signal it. */
-	evt = NULL;
+    /* An error occurred, return NULL to signal it. */
+    evt = NULL;
 
 finish:
 
-	/* Release stuff. */
-	if (mem_objects) g_slice_free1(sizeof(cl_mem) * num_mos, mem_objects);
+    /* Release stuff. */
+    if (mem_objects) g_slice_free1(sizeof(cl_mem) * num_mos, mem_objects);
 
-	/* Return evt. */
-	return evt;
+    /* Return evt. */
+    return evt;
 
 }
 

@@ -213,10 +213,10 @@ typedef struct ccl_prof CCLProf;
  * Sort order for the profile module iterators.
  * */
 typedef enum {
-	/** Sort ascending (default). */
-	CCL_PROF_SORT_ASC  = 0x0,
-	/** Sort descending. */
-	CCL_PROF_SORT_DESC = 0x1
+    /** Sort ascending (default). */
+    CCL_PROF_SORT_ASC  = 0x0,
+    /** Sort descending. */
+    CCL_PROF_SORT_DESC = 0x1
 } CCLProfSortOrder;
 
 
@@ -225,25 +225,25 @@ typedef enum {
  */
 typedef struct ccl_prof_agg {
 
-	/**
-	 * Name of event which the instant refers to.
-	 * @public
-	 * */
-	const char* event_name;
+    /**
+     * Name of event which the instant refers to.
+     * @public
+     * */
+    const char* event_name;
 
-	/**
-	 * Total (absolute) time of events with name equal to
-	 * ::CCLProfAgg::event_name.
-	 * @public
-	 * */
-	cl_ulong absolute_time;
+    /**
+     * Total (absolute) time of events with name equal to
+     * ::CCLProfAgg::event_name.
+     * @public
+     * */
+    cl_ulong absolute_time;
 
-	/**
-	 * Relative time of events with name equal to
-	 * ::CCLProfAgg::event_name.
-	 * @public
-	 * */
-	double relative_time;
+    /**
+     * Relative time of events with name equal to
+     * ::CCLProfAgg::event_name.
+     * @public
+     * */
+    double relative_time;
 
 } CCLProfAgg;
 
@@ -253,11 +253,11 @@ typedef struct ccl_prof_agg {
  */
 typedef enum {
 
-	 /** Sort aggregate event data instances by name. */
-	CCL_PROF_AGG_SORT_NAME = 0x00,
+     /** Sort aggregate event data instances by name. */
+    CCL_PROF_AGG_SORT_NAME = 0x00,
 
-	/** Sort aggregate event data instances by time. */
-	CCL_PROF_AGG_SORT_TIME = 0x10
+    /** Sort aggregate event data instances by time. */
+    CCL_PROF_AGG_SORT_TIME = 0x10
 
 } CCLProfAggSort;
 
@@ -266,52 +266,52 @@ typedef enum {
  * */
 typedef struct ccl_prof_info {
 
-	/**
-	 * Name of event.
-	 * @public
-	 * */
-	const char* event_name;
+    /**
+     * Name of event.
+     * @public
+     * */
+    const char* event_name;
 
-	/**
-	 * Type of command which produced the event.
-	 * @public
-	 * */
-	cl_command_type command_type;
+    /**
+     * Type of command which produced the event.
+     * @public
+     * */
+    cl_command_type command_type;
 
-	/**
-	 * Name of command queue which generated this event.
-	 * @public
-	 * */
-	const char* queue_name;
+    /**
+     * Name of command queue which generated this event.
+     * @public
+     * */
+    const char* queue_name;
 
-	/**
-	 * Device time in nanoseconds when the command identified by event
-	 * is enqueued in a command-queue by the host.
-	 * @public
-	 * */
-	cl_ulong t_queued;
+    /**
+     * Device time in nanoseconds when the command identified by event
+     * is enqueued in a command-queue by the host.
+     * @public
+     * */
+    cl_ulong t_queued;
 
-	/**
-	 * Device time counter in nanoseconds when the command identified
-	 * by event that has been enqueued is submitted by the host to the
-	 * device associated with the command-queue.
-	 * @public
-	 * */
-	cl_ulong t_submit;
+    /**
+     * Device time counter in nanoseconds when the command identified
+     * by event that has been enqueued is submitted by the host to the
+     * device associated with the command-queue.
+     * @public
+     * */
+    cl_ulong t_submit;
 
-	/**
-	 * Device time in nanoseconds when the command identified by event
-	 * starts execution on the device.
-	 * @public
-	 * */
-	cl_ulong t_start;
+    /**
+     * Device time in nanoseconds when the command identified by event
+     * starts execution on the device.
+     * @public
+     * */
+    cl_ulong t_start;
 
-	/**
-	 * Device time in nanoseconds when the command identified by event
-	 * has finished execution on the device.
-	 * @public
-	 * */
-	cl_ulong t_end;
+    /**
+     * Device time in nanoseconds when the command identified by event
+     * has finished execution on the device.
+     * @public
+     * */
+    cl_ulong t_end;
 
 } CCLProfInfo;
 
@@ -320,23 +320,23 @@ typedef struct ccl_prof_info {
  */
 typedef enum {
 
-	 /** Sort event profiling info instances by event name. */
-	CCL_PROF_INFO_SORT_NAME_EVENT = 0x20,
+     /** Sort event profiling info instances by event name. */
+    CCL_PROF_INFO_SORT_NAME_EVENT = 0x20,
 
-	 /** Sort event profiling info instances by queue name. */
-	CCL_PROF_INFO_SORT_NAME_QUEUE = 0x30,
+     /** Sort event profiling info instances by queue name. */
+    CCL_PROF_INFO_SORT_NAME_QUEUE = 0x30,
 
-	 /** Sort event profiling info instances by queued time. */
-	CCL_PROF_INFO_SORT_T_QUEUED   = 0x40,
+     /** Sort event profiling info instances by queued time. */
+    CCL_PROF_INFO_SORT_T_QUEUED   = 0x40,
 
-	 /** Sort event profiling info instances by submit time. */
-	CCL_PROF_INFO_SORT_T_SUBMIT   = 0x50,
+     /** Sort event profiling info instances by submit time. */
+    CCL_PROF_INFO_SORT_T_SUBMIT   = 0x50,
 
-	 /** Sort event profiling info instances by start time. */
-	CCL_PROF_INFO_SORT_T_START    = 0x60,
+     /** Sort event profiling info instances by start time. */
+    CCL_PROF_INFO_SORT_T_START    = 0x60,
 
-	 /** Sort event profiling info instances by end time. */
-	CCL_PROF_INFO_SORT_T_END      = 0x70
+     /** Sort event profiling info instances by end time. */
+    CCL_PROF_INFO_SORT_T_END      = 0x70
 
 } CCLProfInfoSort;
 
@@ -346,11 +346,11 @@ typedef enum {
  */
 typedef enum {
 
-	/** Start event instant. */
-	CCL_PROF_INST_TYPE_START,
+    /** Start event instant. */
+    CCL_PROF_INST_TYPE_START,
 
-	/** End event instant. */
-	CCL_PROF_INST_TYPE_END
+    /** End event instant. */
+    CCL_PROF_INST_TYPE_END
 
 } CCLProfInstType;
 
@@ -359,36 +359,36 @@ typedef enum {
  */
 typedef struct ccl_prof_inst {
 
-	 /**
-	  * Name of event which the instant refers to.
-	 * @public
-	  * */
-	const char* event_name;
+     /**
+      * Name of event which the instant refers to.
+     * @public
+      * */
+    const char* event_name;
 
-	/**
-	 * Name of command queue associated with event.
-	 * @public
-	 * */
-	const char* queue_name;
+    /**
+     * Name of command queue associated with event.
+     * @public
+     * */
+    const char* queue_name;
 
-	/**
-	 * Event instant ID.
-	 * @public
-	 * */
-	cl_uint id;
+    /**
+     * Event instant ID.
+     * @public
+     * */
+    cl_uint id;
 
-	/**
-	 * Event instant in nanoseconds from current device time counter.
-	 * @public
-	 * */
-	cl_ulong instant;
+    /**
+     * Event instant in nanoseconds from current device time counter.
+     * @public
+     * */
+    cl_ulong instant;
 
-	/**
-	 * Type of event instant (::CCL_PROF_INST_TYPE_START or
-	 * ::CCL_PROF_INST_TYPE_END).
-	 * @public
-	 * */
-	CCLProfInstType type;
+    /**
+     * Type of event instant (::CCL_PROF_INST_TYPE_START or
+     * ::CCL_PROF_INST_TYPE_END).
+     * @public
+     * */
+    CCLProfInstType type;
 
 } CCLProfInst;
 
@@ -397,11 +397,11 @@ typedef struct ccl_prof_inst {
  */
 typedef enum {
 
-	/** Sort event instants by instant. */
-	CCL_PROF_INST_SORT_INSTANT = 0x80,
+    /** Sort event instants by instant. */
+    CCL_PROF_INST_SORT_INSTANT = 0x80,
 
-	/** Sort event instants by event id. */
-	CCL_PROF_INST_SORT_ID      = 0x90
+    /** Sort event instants by event id. */
+    CCL_PROF_INST_SORT_ID      = 0x90
 
 } CCLProfInstSort;
 
@@ -410,23 +410,23 @@ typedef enum {
  */
 typedef struct ccl_prof_overlap {
 
-	/**
-	 * Name of first overlapping event.
-	 * @public
-	 * */
-	const char* event1_name;
+    /**
+     * Name of first overlapping event.
+     * @public
+     * */
+    const char* event1_name;
 
-	/**
-	 * Name of second overlapping event.
-	 * @public
-	 * */
-	const char* event2_name;
+    /**
+     * Name of second overlapping event.
+     * @public
+     * */
+    const char* event2_name;
 
-	/**
-	 * Overlap duration in nanoseconds.
-	 * @public
-	 * */
-	cl_ulong duration;
+    /**
+     * Overlap duration in nanoseconds.
+     * @public
+     * */
+    cl_ulong duration;
 
 } CCLProfOverlap;
 
@@ -435,11 +435,11 @@ typedef struct ccl_prof_overlap {
  */
 typedef enum {
 
-	/** Sort overlaps by event name. */
-	CCL_PROF_OVERLAP_SORT_NAME     = 0xa0,
+    /** Sort overlaps by event name. */
+    CCL_PROF_OVERLAP_SORT_NAME     = 0xa0,
 
-	/** Sort overlaps by overlap duration. */
-	CCL_PROF_OVERLAP_SORT_DURATION = 0xb0
+    /** Sort overlaps by overlap duration. */
+    CCL_PROF_OVERLAP_SORT_DURATION = 0xb0
 
 } CCLProfOverlapSort;
 
@@ -448,35 +448,35 @@ typedef enum {
  * */
 typedef struct ccl_prof_export_options {
 
-	/**
-	 * Field separator, defaults to tab (\\t).
-	 * @public
-	 * */
-	const char* separator;
+    /**
+     * Field separator, defaults to tab (\\t).
+     * @public
+     * */
+    const char* separator;
 
-	/**
-	 * Newline character, Defaults to Unix newline (\\n).
-	 * @public
-	 * */
-	const char* newline;
+    /**
+     * Newline character, Defaults to Unix newline (\\n).
+     * @public
+     * */
+    const char* newline;
 
-	/**
-	 * Queue name delimiter, defaults to empty string.
-	 * @public
-	 * */
-	const char* queue_delim;
+    /**
+     * Queue name delimiter, defaults to empty string.
+     * @public
+     * */
+    const char* queue_delim;
 
-	/**
-	 * Event name delimiter, defaults to empty string.
-	 * @public
-	 * */
-	const char* evname_delim;
+    /**
+     * Event name delimiter, defaults to empty string.
+     * @public
+     * */
+    const char* evname_delim;
 
-	/** Start at instant 0 (TRUE, default), or start at oldest instant
-	 * returned by OpenCL (FALSE).
-	 * @public
-	 * */
-	cl_bool zero_start;
+    /** Start at instant 0 (TRUE, default), or start at oldest instant
+     * returned by OpenCL (FALSE).
+     * @public
+     * */
+    cl_bool zero_start;
 
 }  CCLProfExportOptions;
 
@@ -508,7 +508,7 @@ double ccl_prof_time_elapsed(CCLProf* prof);
 /* Add a command queue wrapper for profiling. */
 CCL_EXPORT
 void ccl_prof_add_queue(
-	CCLProf* prof, const char* cq_name, CCLQueue* cq);
+    CCLProf* prof, const char* cq_name, CCLQueue* cq);
 
 /* Determine aggregate statistics for the given profile object. */
 CCL_EXPORT
@@ -517,7 +517,7 @@ cl_bool ccl_prof_calc(CCLProf* prof, CCLErr** err);
 /* Return aggregate statistics for events with the given name. */
 CCL_EXPORT
 const CCLProfAgg* ccl_prof_get_agg(
-	CCLProf* prof, const char* event_name);
+    CCLProf* prof, const char* event_name);
 
 /* Initialize an iterator for profiled aggregate event
  * instances. */
@@ -574,7 +574,7 @@ void ccl_prof_print_summary(CCLProf* prof);
  * information can be specified in the function arguments. */
 CCL_EXPORT
 const char* ccl_prof_get_summary(
-	CCLProf* prof, int agg_sort, int ovlp_sort);
+    CCLProf* prof, int agg_sort, int ovlp_sort);
 
 /* Export profiling info to a given stream. */
 CCL_EXPORT
@@ -585,7 +585,7 @@ cl_bool ccl_prof_export_info(CCLProf* profile, FILE* stream, CCLErr** err);
  * ccl_prof_export_info() for more information. */
 CCL_EXPORT
 cl_bool ccl_prof_export_info_file(
-	CCLProf* profile, const char* filename, CCLErr** err);
+    CCLProf* profile, const char* filename, CCLErr** err);
 
 /* Set export options using a ::CCLProfExportOptions struct. */
 CCL_EXPORT

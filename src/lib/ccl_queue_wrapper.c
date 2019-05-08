@@ -37,35 +37,35 @@
  */
 struct ccl_queue {
 
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
+    /**
+     * Parent wrapper object.
+     * @private
+     * */
+    CCLWrapper base;
 
-	/**
-	 * Context wrapper to which the queue is associated with.
-	 * @private
-	 * */
-	CCLContext* ctx;
+    /**
+     * Context wrapper to which the queue is associated with.
+     * @private
+     * */
+    CCLContext* ctx;
 
-	/**
-	 * Device wrapper to which the queue is associated with.
-	 * @private
-	 * */
-	CCLDevice* dev;
+    /**
+     * Device wrapper to which the queue is associated with.
+     * @private
+     * */
+    CCLDevice* dev;
 
-	/**
-	 * Events associated with the command queue.
-	 * @private
-	 * */
-	GHashTable* evts;
+    /**
+     * Events associated with the command queue.
+     * @private
+     * */
+    GHashTable* evts;
 
-	/**
-	 * Event iterator.
-	 * @private
-	 * */
-	GHashTableIter evt_iter;
+    /**
+     * Event iterator.
+     * @private
+     * */
+    GHashTableIter evt_iter;
 
 };
 
@@ -80,20 +80,20 @@ struct ccl_queue {
  * */
 static void ccl_queue_release_fields(CCLQueue* cq) {
 
-	/* Make sure cq wrapper object is not NULL. */
-	g_return_if_fail(cq != NULL);
+    /* Make sure cq wrapper object is not NULL. */
+    g_return_if_fail(cq != NULL);
 
-	/* Decrease reference count of context and device wrappers, if
-	 * they're set. */
-	 if (cq->ctx != NULL)
-		ccl_context_unref(cq->ctx);
-	 if (cq->dev != NULL)
-		ccl_device_unref(cq->dev);
+    /* Decrease reference count of context and device wrappers, if
+     * they're set. */
+     if (cq->ctx != NULL)
+        ccl_context_unref(cq->ctx);
+     if (cq->dev != NULL)
+        ccl_device_unref(cq->dev);
 
-	/* Destroy the events table. */
-	if (cq->evts != NULL) {
-		g_hash_table_destroy(cq->evts);
-	}
+    /* Destroy the events table. */
+    if (cq->evts != NULL) {
+        g_hash_table_destroy(cq->evts);
+    }
 }
 
 /**
@@ -122,8 +122,8 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
 CCL_EXPORT
 CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
 
-	return (CCLQueue*) ccl_wrapper_new(
-		CCL_QUEUE, (void*) command_queue, sizeof(CCLQueue));
+    return (CCLQueue*) ccl_wrapper_new(
+        CCL_QUEUE, (void*) command_queue, sizeof(CCLQueue));
 
 }
 
@@ -153,156 +153,156 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * */
 CCL_EXPORT
 CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
-	const cl_queue_properties* prop_full, CCLErr** err) {
+    const cl_queue_properties* prop_full, CCLErr** err) {
 
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure ctx is not NULL. */
+    g_return_val_if_fail(ctx != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* The OpenCL status flag. */
-	cl_int ocl_status;
-	/* The OpenCL command queue object. */
-	cl_command_queue queue = NULL;
-	/* The command queue wrapper object. */
-	CCLQueue* cq = NULL;
-	/* Internal error object. */
-	CCLErr* err_internal = NULL;
-	/* OpenCL <= 1.2 properties. */
-	cl_command_queue_properties properties = 0;
-	/* Are there any OpenCL >= 2.0 properties? */
-	cl_bool prop_other = CL_FALSE;
+    /* The OpenCL status flag. */
+    cl_int ocl_status;
+    /* The OpenCL command queue object. */
+    cl_command_queue queue = NULL;
+    /* The command queue wrapper object. */
+    CCLQueue* cq = NULL;
+    /* Internal error object. */
+    CCLErr* err_internal = NULL;
+    /* OpenCL <= 1.2 properties. */
+    cl_command_queue_properties properties = 0;
+    /* Are there any OpenCL >= 2.0 properties? */
+    cl_bool prop_other = CL_FALSE;
 
-	/* Extract <= 1.2 properties and initialize flag indicating if any >= 2.0
-	 * properties are passed. */
-	if (prop_full != NULL) {
+    /* Extract <= 1.2 properties and initialize flag indicating if any >= 2.0
+     * properties are passed. */
+    if (prop_full != NULL) {
 
-		/* Cycle through the prop_full array. */
-		for (cl_uint i = 0; prop_full[i] != 0; i = i + 2) {
+        /* Cycle through the prop_full array. */
+        for (cl_uint i = 0; prop_full[i] != 0; i = i + 2) {
 
-			/* Check if current property name is known in OpenCL <= 1.2. */
-			if (prop_full[i] == CL_QUEUE_PROPERTIES) {
+            /* Check if current property name is known in OpenCL <= 1.2. */
+            if (prop_full[i] == CL_QUEUE_PROPERTIES) {
 
-				/* Yes, current property name (CL_QUEUE_PROPERTIES) is known in
-				 * OpenCL <= 1.2. */
-				properties = prop_full[i + 1];
+                /* Yes, current property name (CL_QUEUE_PROPERTIES) is known in
+                 * OpenCL <= 1.2. */
+                properties = prop_full[i + 1];
 
-			} else {
+            } else {
 
-				/* No, current property name is valid only for OpenCL >= 2.0. */
-				prop_other = CL_TRUE;
+                /* No, current property name is valid only for OpenCL >= 2.0. */
+                prop_other = CL_TRUE;
 
-			}
-		}
+            }
+        }
 
-		/* Check if all values in the CL_QUEUE_PROPERTIES bitfield are known
-		 * in OpenCL <= 1.2. */
-		if ((properties &
-			~(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
-			CL_QUEUE_PROFILING_ENABLE)) != 0) {
+        /* Check if all values in the CL_QUEUE_PROPERTIES bitfield are known
+         * in OpenCL <= 1.2. */
+        if ((properties &
+            ~(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+            CL_QUEUE_PROFILING_ENABLE)) != 0) {
 
-			/* There are values in the CL_QUEUE_PROPERTIES bitfield which
-			 * require OpenCL >= 2.0. */
-			prop_other = CL_TRUE;
+            /* There are values in the CL_QUEUE_PROPERTIES bitfield which
+             * require OpenCL >= 2.0. */
+            prop_other = CL_TRUE;
 
-		}
+        }
 
-	}
+    }
 
-	/* If dev is NULL, get first device in context. */
-	if (dev == NULL) {
-		dev = ccl_context_get_device(ctx, 0, &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
-	}
+    /* If dev is NULL, get first device in context. */
+    if (dev == NULL) {
+        dev = ccl_context_get_device(ctx, 0, &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
+    }
 
 #ifdef CL_VERSION_2_0
 
-	/* OpenCL platform version of the given context. */
-	double platf_ver;
+    /* OpenCL platform version of the given context. */
+    double platf_ver;
 
-	/* Get context platform version. */
-	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get context platform version. */
+    platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Create and keep the OpenCL command queue object. */
-	if (platf_ver >= 200) {
+    /* Create and keep the OpenCL command queue object. */
+    if (platf_ver >= 200) {
 
-		/* Platform is OpenCL >= 2.0 and supports
-		 * clCreateCommandQueueWithProperties(). */
-		queue = clCreateCommandQueueWithProperties(
-			ccl_context_unwrap(ctx), ccl_device_unwrap(dev),
-			prop_full, &ocl_status);
+        /* Platform is OpenCL >= 2.0 and supports
+         * clCreateCommandQueueWithProperties(). */
+        queue = clCreateCommandQueueWithProperties(
+            ccl_context_unwrap(ctx), ccl_device_unwrap(dev),
+            prop_full, &ocl_status);
 
-	} else {
+    } else {
 
-		/* Platform is OpenCL <= 1.2 and we should use
-		 * clCreateCommandQueue(). */
+        /* Platform is OpenCL <= 1.2 and we should use
+         * clCreateCommandQueue(). */
 
-		/* Where any OpenCL >= 2.0 property names or values specified? */
-		if (prop_other) {
+        /* Where any OpenCL >= 2.0 property names or values specified? */
+        if (prop_other) {
 
-			/* If so, log warning and ignore them. */
-			g_warning("OpenCL >= 2.0 queue properties are not supported by "
-				"the selected OpenCL platform and will be ignored.");
-			properties = properties &
-				(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
-				CL_QUEUE_PROFILING_ENABLE);
-		}
+            /* If so, log warning and ignore them. */
+            g_warning("OpenCL >= 2.0 queue properties are not supported by "
+                "the selected OpenCL platform and will be ignored.");
+            properties = properties &
+                (CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+                CL_QUEUE_PROFILING_ENABLE);
+        }
 
-		/* Create queue with clCreateCommandQueue(). */
-		CCL_BEGIN_IGNORE_DEPRECATIONS
-		queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
-			ccl_device_unwrap(dev), properties, &ocl_status);
-		CCL_END_IGNORE_DEPRECATIONS
-	}
+        /* Create queue with clCreateCommandQueue(). */
+        CCL_BEGIN_IGNORE_DEPRECATIONS
+        queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
+            ccl_device_unwrap(dev), properties, &ocl_status);
+        CCL_END_IGNORE_DEPRECATIONS
+    }
 
 #else
 
-	/* Where any OpenCL >= 2.0 property names or values specified? */
-	if (prop_other) {
+    /* Where any OpenCL >= 2.0 property names or values specified? */
+    if (prop_other) {
 
-		/* If so, log warning and ignore them. */
-		g_warning("OpenCL >= 2.0 queue properties are not supported by "
-			"the selected OpenCL platform and will be ignored.");
-		properties = properties &
-			(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
-			CL_QUEUE_PROFILING_ENABLE);
-	}
+        /* If so, log warning and ignore them. */
+        g_warning("OpenCL >= 2.0 queue properties are not supported by "
+            "the selected OpenCL platform and will be ignored.");
+        properties = properties &
+            (CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+            CL_QUEUE_PROFILING_ENABLE);
+    }
 
-	/* Create queue with clCreateCommandQueue(). */
-	queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
-		ccl_device_unwrap(dev), properties, &ocl_status);
+    /* Create queue with clCreateCommandQueue(). */
+    queue = clCreateCommandQueue(ccl_context_unwrap(ctx),
+        ccl_device_unwrap(dev), properties, &ocl_status);
 
 #endif
 
-	/* Check for errors in queue creation. */
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to create queue (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Check for errors in queue creation. */
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to create queue (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap the queue. */
-	cq = ccl_queue_new_wrap(queue);
+    /* Wrap the queue. */
+    cq = ccl_queue_new_wrap(queue);
 
-	/* Keep the context and device wrappers, update their reference
-	 * count. */
-	cq->ctx = ctx;
-	ccl_context_ref(ctx);
-	cq->dev = dev;
-	ccl_device_ref(dev);
+    /* Keep the context and device wrappers, update their reference
+     * count. */
+    cq->ctx = ctx;
+    ccl_context_ref(ctx);
+    cq->dev = dev;
+    ccl_device_ref(dev);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Return the new command queue wrapper object. */
-	return cq;
+    /* Return the new command queue wrapper object. */
+    return cq;
 
 }
 
@@ -331,12 +331,12 @@ finish:
  * */
 CCL_EXPORT
 CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-	cl_command_queue_properties properties, CCLErr** err) {
+    cl_command_queue_properties properties, CCLErr** err) {
 
-	const cl_queue_properties prop_full[] =
-		{ CL_QUEUE_PROPERTIES, properties, 0 };
+    const cl_queue_properties prop_full[] =
+        { CL_QUEUE_PROPERTIES, properties, 0 };
 
-	return ccl_queue_new_full(ctx, dev, prop_full, err);
+    return ccl_queue_new_full(ctx, dev, prop_full, err);
 
 }
 
@@ -352,9 +352,9 @@ CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
 CCL_EXPORT
 void ccl_queue_destroy(CCLQueue* cq) {
 
-	ccl_wrapper_unref((CCLWrapper*) cq, sizeof(CCLQueue),
-		(ccl_wrapper_release_fields) ccl_queue_release_fields,
-		(ccl_wrapper_release_cl_object) clReleaseCommandQueue, NULL);
+    ccl_wrapper_unref((CCLWrapper*) cq, sizeof(CCLQueue),
+        (ccl_wrapper_release_fields) ccl_queue_release_fields,
+        (ccl_wrapper_release_cl_object) clReleaseCommandQueue, NULL);
 
 }
 
@@ -373,41 +373,41 @@ void ccl_queue_destroy(CCLQueue* cq) {
 CCL_EXPORT
 CCLContext* ccl_queue_get_context(CCLQueue* cq, CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	CCLContext* ctx = NULL;
+    CCLContext* ctx = NULL;
 
-	/* Internal error object. */
-	CCLErr* err_internal = NULL;
+    /* Internal error object. */
+    CCLErr* err_internal = NULL;
 
-	/* Check if context wrapper is already kept by the queue wrapper. */
-	if (cq->ctx != NULL) {
-		/* If so, return it. */
-		ctx = cq->ctx;
-	} else {
-		/* Otherwise, get it using a query. */
-		CCLWrapperInfo* info = NULL;
-		info = ccl_queue_get_info(cq, CL_QUEUE_CONTEXT, &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
-		ctx = ccl_context_new_wrap(*((cl_context*) info->value));
-		cq->ctx = ctx;
-	}
+    /* Check if context wrapper is already kept by the queue wrapper. */
+    if (cq->ctx != NULL) {
+        /* If so, return it. */
+        ctx = cq->ctx;
+    } else {
+        /* Otherwise, get it using a query. */
+        CCLWrapperInfo* info = NULL;
+        info = ccl_queue_get_info(cq, CL_QUEUE_CONTEXT, &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ctx = ccl_context_new_wrap(*((cl_context*) info->value));
+        cq->ctx = ctx;
+    }
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Return the command queue context wrapper. */
-	return ctx;
+    /* Return the command queue context wrapper. */
+    return ctx;
 
 }
 
@@ -426,42 +426,42 @@ finish:
 CCL_EXPORT
 CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* The device wrapper object to return. */
-	CCLDevice* dev = NULL;
+    /* The device wrapper object to return. */
+    CCLDevice* dev = NULL;
 
-	/* Internal error object. */
-	CCLErr* err_internal = NULL;
+    /* Internal error object. */
+    CCLErr* err_internal = NULL;
 
-	/* Check if device wrapper is already kept by the queue wrapper. */
-	if (cq->dev != NULL) {
-		/* If so, return it. */
-		dev = cq->dev;
-	} else {
-		/* Otherwise, get it using a query. */
-		CCLWrapperInfo* info = NULL;
-		info = ccl_queue_get_info(cq, CL_QUEUE_DEVICE, &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
-		dev = ccl_device_new_wrap(*((cl_device_id*) info->value));
-		cq->dev = dev;
-	}
+    /* Check if device wrapper is already kept by the queue wrapper. */
+    if (cq->dev != NULL) {
+        /* If so, return it. */
+        dev = cq->dev;
+    } else {
+        /* Otherwise, get it using a query. */
+        CCLWrapperInfo* info = NULL;
+        info = ccl_queue_get_info(cq, CL_QUEUE_DEVICE, &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
+        dev = ccl_device_new_wrap(*((cl_device_id*) info->value));
+        cq->dev = dev;
+    }
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Return the command queue device wrapper object. */
-	return dev;
+    /* Return the command queue device wrapper object. */
+    return dev;
 
 }
 
@@ -483,26 +483,26 @@ finish:
 CCL_EXPORT
 CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure event is not NULL. */
-	g_return_val_if_fail(event != NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure event is not NULL. */
+    g_return_val_if_fail(event != NULL, NULL);
 
-	/* Wrap the OpenCL event. */
-	CCLEvent* evt = ccl_event_new_wrap(event);
+    /* Wrap the OpenCL event. */
+    CCLEvent* evt = ccl_event_new_wrap(event);
 
-	/* Initialize the list of events of this command queue. */
-	if (cq->evts == NULL) {
-		cq->evts = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-			(GDestroyNotify) ccl_event_destroy, NULL);
-	}
+    /* Initialize the list of events of this command queue. */
+    if (cq->evts == NULL) {
+        cq->evts = g_hash_table_new_full(g_direct_hash, g_direct_equal,
+            (GDestroyNotify) ccl_event_destroy, NULL);
+    }
 
-	/* Add the wrapped event to the list of events of this command
-	 * queue. */
-	g_hash_table_add(cq->evts, (gpointer) evt);
+    /* Add the wrapped event to the list of events of this command
+     * queue. */
+    g_hash_table_add(cq->evts, (gpointer) evt);
 
-	/* Return the wrapped event. */
-	return evt;
+    /* Return the wrapped event. */
+    return evt;
 
 }
 
@@ -522,11 +522,11 @@ CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
 CCL_EXPORT
 void ccl_queue_iter_event_init(CCLQueue* cq) {
 
-	/* Make sure cq is not NULL. */
-	g_return_if_fail(cq != NULL);
+    /* Make sure cq is not NULL. */
+    g_return_if_fail(cq != NULL);
 
-	/* Initialize iterator. */
-	g_hash_table_iter_init(&cq->evt_iter, cq->evts);
+    /* Initialize iterator. */
+    g_hash_table_iter_init(&cq->evt_iter, cq->evts);
 
 }
 
@@ -552,12 +552,12 @@ void ccl_queue_iter_event_init(CCLQueue* cq) {
 CCL_EXPORT
 CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
 
-	gpointer evt;
-	gboolean exists = g_hash_table_iter_next(&cq->evt_iter, &evt, NULL);
-	return exists ? (CCLEvent*) evt : NULL;
+    gpointer evt;
+    gboolean exists = g_hash_table_iter_next(&cq->evt_iter, &evt, NULL);
+    return exists ? (CCLEvent*) evt : NULL;
 }
 
 /**
@@ -576,23 +576,23 @@ CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
 CCL_EXPORT
 cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
 
-	/* OpenCL status flag. */
-	cl_int ocl_status;
+    /* OpenCL status flag. */
+    cl_int ocl_status;
 
-	/* Flush queue. */
-	ocl_status = clFlush(ccl_queue_unwrap(cq));
-	if (ocl_status != CL_SUCCESS)
-		g_set_error(err, CCL_OCL_ERROR, ocl_status,
-			"%s: unable to flush queue (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Flush queue. */
+    ocl_status = clFlush(ccl_queue_unwrap(cq));
+    if (ocl_status != CL_SUCCESS)
+        g_set_error(err, CCL_OCL_ERROR, ocl_status,
+            "%s: unable to flush queue (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Return status. */
-	return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
+    /* Return status. */
+    return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
 }
 
 /**
@@ -611,23 +611,23 @@ cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err) {
 CCL_EXPORT
 cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, CL_INVALID_COMMAND_QUEUE);
 
-	/* OpenCL status flag. */
-	cl_int ocl_status;
+    /* OpenCL status flag. */
+    cl_int ocl_status;
 
-	/* Finish queue. */
-	ocl_status = clFinish(ccl_queue_unwrap(cq));
-	if (ocl_status != CL_SUCCESS)
-		g_set_error(err, CCL_OCL_ERROR, ocl_status,
-			"%s: unable to finish queue (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Finish queue. */
+    ocl_status = clFinish(ccl_queue_unwrap(cq));
+    if (ocl_status != CL_SUCCESS)
+        g_set_error(err, CCL_OCL_ERROR, ocl_status,
+            "%s: unable to finish queue (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Return status. */
-	return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
+    /* Return status. */
+    return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
 
 }
 
@@ -651,13 +651,13 @@ cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err) {
 CCL_EXPORT
 void ccl_queue_gc(CCLQueue* cq) {
 
-	/* Make sure cq is not NULL. */
-	g_return_if_fail(cq != NULL);
+    /* Make sure cq is not NULL. */
+    g_return_if_fail(cq != NULL);
 
-	/* Release events. */
-	if (cq->evts != NULL) {
-		g_hash_table_remove_all(cq->evts);
-	}
+    /* Release events. */
+    if (cq->evts != NULL) {
+        g_hash_table_remove_all(cq->evts);
+    }
 
 }
 
@@ -686,64 +686,64 @@ void ccl_queue_gc(CCLQueue* cq) {
  * function).
  * */
 static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* OpenCL status. */
-	cl_int ocl_status;
-	/* OpenCL event object. */
-	cl_event event = NULL;
+    /* OpenCL status. */
+    cl_int ocl_status;
+    /* OpenCL event object. */
+    cl_event event = NULL;
 
-	CCL_BEGIN_IGNORE_DEPRECATIONS
+    CCL_BEGIN_IGNORE_DEPRECATIONS
 
-	/* Exact OpenCL function to use depends on whether evt_wait_lst
-	 * is NULL or empty. */
-	if ((evt_wait_lst == NULL) ||
-		(ccl_event_wait_list_get_num_events(evt_wait_lst) == 0)) {
+    /* Exact OpenCL function to use depends on whether evt_wait_lst
+     * is NULL or empty. */
+    if ((evt_wait_lst == NULL) ||
+        (ccl_event_wait_list_get_num_events(evt_wait_lst) == 0)) {
 
-		/* If so, use clEnqueueBarrier() */
-		ocl_status = clEnqueueBarrier(ccl_queue_unwrap(cq));
-		g_if_err_create_goto(*err, CCL_OCL_ERROR,
-			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: error in clEnqueueBarrier() (OpenCL error %d: %s).",
-			CCL_STRD, ocl_status, ccl_err(ocl_status));
+        /* If so, use clEnqueueBarrier() */
+        ocl_status = clEnqueueBarrier(ccl_queue_unwrap(cq));
+        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+            CL_SUCCESS != ocl_status, ocl_status, error_handler,
+            "%s: error in clEnqueueBarrier() (OpenCL error %d: %s).",
+            CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	} else {
+    } else {
 
-		/* Otherwise use clEnqueueWaitForEvents(). */
-		ocl_status = clEnqueueWaitForEvents(ccl_queue_unwrap(cq),
-			ccl_event_wait_list_get_num_events(evt_wait_lst),
-			ccl_event_wait_list_get_clevents(evt_wait_lst));
-		g_if_err_create_goto(*err, CCL_OCL_ERROR,
-			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
-			CCL_STRD, ocl_status, ccl_err(ocl_status));
+        /* Otherwise use clEnqueueWaitForEvents(). */
+        ocl_status = clEnqueueWaitForEvents(ccl_queue_unwrap(cq),
+            ccl_event_wait_list_get_num_events(evt_wait_lst),
+            ccl_event_wait_list_get_clevents(evt_wait_lst));
+        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+            CL_SUCCESS != ocl_status, ocl_status, error_handler,
+            "%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
+            CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	}
+    }
 
-	/* Enqueue a marker so we get an OpenCL event object. */
-	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Enqueue a marker so we get an OpenCL event object. */
+    ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	CCL_END_IGNORE_DEPRECATIONS
+    CCL_END_IGNORE_DEPRECATIONS
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* In case of error, return a NULL event. */
-	event = NULL;
+    /* In case of error, return a NULL event. */
+    event = NULL;
 
 finish:
 
-	/* Return OpenCL event. */
-	return event;
+    /* Return OpenCL event. */
+    return event;
 
 }
 
@@ -769,94 +769,94 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Event wrapper to return. */
-	CCLEvent* evt;
-	/* OpenCL event object. */
-	cl_event event;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* Event wrapper to return. */
+    CCLEvent* evt;
+    /* OpenCL event object. */
+    cl_event event;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
-	/* If library is compiled with support for OpenCL >= 1.2, then use
-	 * the platform's OpenCL version for selecting the desired
-	 * functionality. */
+    /* If library is compiled with support for OpenCL >= 1.2, then use
+     * the platform's OpenCL version for selecting the desired
+     * functionality. */
 
-	/* Context associated with event. */
-	CCLContext* ctx;
-	/* OpenCL version. */
-	double platf_ver;
-	/* OpenCL status. */
-	cl_int ocl_status;
+    /* Context associated with event. */
+    CCLContext* ctx;
+    /* OpenCL version. */
+    double platf_ver;
+    /* OpenCL status. */
+    cl_int ocl_status;
 
-	/* Get platform version. */
-	ctx = ccl_queue_get_context(cq, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
-	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get platform version. */
+    ctx = ccl_queue_get_context(cq, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
+    platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Proceed depending on platform version. */
-	if (platf_ver >= 120) {
+    /* Proceed depending on platform version. */
+    if (platf_ver >= 120) {
 
-		/* Use "new" functions. */
-		ocl_status = clEnqueueBarrierWithWaitList(ccl_queue_unwrap(cq),
-			ccl_event_wait_list_get_num_events(evt_wait_lst),
-			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-		g_if_err_create_goto(*err, CCL_OCL_ERROR,
-			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: error in clEnqueueBarrierWithWaitList() "
-			"(OpenCL error %d: %s).",
-			CCL_STRD, ocl_status, ccl_err(ocl_status));
+        /* Use "new" functions. */
+        ocl_status = clEnqueueBarrierWithWaitList(ccl_queue_unwrap(cq),
+            ccl_event_wait_list_get_num_events(evt_wait_lst),
+            ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+            CL_SUCCESS != ocl_status, ocl_status, error_handler,
+            "%s: error in clEnqueueBarrierWithWaitList() "
+            "(OpenCL error %d: %s).",
+            CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	} else {
+    } else {
 
-		/* Use "old" functions. */
-		event = ccl_enqueue_barrier_deprecated(
-			cq, evt_wait_lst,  &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
-	}
+        /* Use "old" functions. */
+        event = ccl_enqueue_barrier_deprecated(
+            cq, evt_wait_lst,  &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
+    }
 
 #else
 
-	/* If library is compiled with support for OpenCL 1.0 and 1.1,
-	 * then use those functions by default. */
-	event = ccl_enqueue_barrier_deprecated(
-		cq, evt_wait_lst,  &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* If library is compiled with support for OpenCL 1.0 and 1.1,
+     * then use those functions by default. */
+    event = ccl_enqueue_barrier_deprecated(
+        cq, evt_wait_lst,  &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 
-	/* Wrap event and associate it with the respective command queue.
-	 * The event object will be released automatically when the command
-	 * queue is released. */
-	evt = ccl_queue_produce_event(cq, event);
+    /* Wrap event and associate it with the respective command queue.
+     * The event object will be released automatically when the command
+     * queue is released. */
+    evt = ccl_queue_produce_event(cq, event);
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* In case of error, return NULL. */
-	evt = NULL;
+    /* In case of error, return NULL. */
+    evt = NULL;
 
 finish:
 
-	/* Return event. */
-	return evt;
+    /* Return event. */
+    return evt;
 
 }
 
@@ -881,48 +881,48 @@ finish:
  * function).
  * */
 static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* OpenCL status. */
-	cl_int ocl_status;
-	/* OpenCL event object. */
-	cl_event event = NULL;
+    /* OpenCL status. */
+    cl_int ocl_status;
+    /* OpenCL event object. */
+    cl_event event = NULL;
 
-	/* evt_wait_lst must be NULL or empty, because getting a marker to
-	 * wait on some events is only supported in OpenCL >= 1.2. */
-	if (evt_wait_lst != NULL) {
-		g_warning("The OpenCL version of the selected platform " \
-			"doesn't support markers on specific events. The marker " \
-			"will only fire an event when all previous events have " \
-			"been completed");
-	}
+    /* evt_wait_lst must be NULL or empty, because getting a marker to
+     * wait on some events is only supported in OpenCL >= 1.2. */
+    if (evt_wait_lst != NULL) {
+        g_warning("The OpenCL version of the selected platform " \
+            "doesn't support markers on specific events. The marker " \
+            "will only fire an event when all previous events have " \
+            "been completed");
+    }
 
-	CCL_BEGIN_IGNORE_DEPRECATIONS
+    CCL_BEGIN_IGNORE_DEPRECATIONS
 
-	/* Call clEnqueueMarker() once. */
-	ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Call clEnqueueMarker() once. */
+    ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	CCL_END_IGNORE_DEPRECATIONS
+    CCL_END_IGNORE_DEPRECATIONS
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* In case of error, return a NULL event. */
-	event = NULL;
+    /* In case of error, return a NULL event. */
+    event = NULL;
 
 finish:
 
-	/* Return OpenCL event. */
-	return event;
+    /* Return OpenCL event. */
+    return event;
 
 }
 
@@ -949,93 +949,93 @@ finish:
  * */
 CCL_EXPORT
 CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* Make sure cq is not NULL. */
-	g_return_val_if_fail(cq != NULL, NULL);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure cq is not NULL. */
+    g_return_val_if_fail(cq != NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Event wrapper to return. */
-	CCLEvent* evt;
-	/* OpenCL event object. */
-	cl_event event;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* Event wrapper to return. */
+    CCLEvent* evt;
+    /* OpenCL event object. */
+    cl_event event;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
-	/* If library is compiled with support for OpenCL >= 1.2, then use
-	 * the platform's OpenCL version for selecting the desired
-	 * functionality. */
+    /* If library is compiled with support for OpenCL >= 1.2, then use
+     * the platform's OpenCL version for selecting the desired
+     * functionality. */
 
-	/* Context associated with event. */
-	CCLContext* ctx;
-	/* OpenCL version. */
-	double platf_ver;
-	/* OpenCL status. */
-	cl_int ocl_status;
+    /* Context associated with event. */
+    CCLContext* ctx;
+    /* OpenCL version. */
+    double platf_ver;
+    /* OpenCL status. */
+    cl_int ocl_status;
 
-	/* Get platform version. */
-	ctx = ccl_queue_get_context(cq, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
-	platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get platform version. */
+    ctx = ccl_queue_get_context(cq, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
+    platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Proceed depending on platform version. */
-	if (platf_ver >= 120) {
+    /* Proceed depending on platform version. */
+    if (platf_ver >= 120) {
 
-		/* Use "new" functions. */
-		ocl_status = clEnqueueMarkerWithWaitList(ccl_queue_unwrap(cq),
-			ccl_event_wait_list_get_num_events(evt_wait_lst),
-			ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-		g_if_err_create_goto(*err, CCL_OCL_ERROR,
-			CL_SUCCESS != ocl_status, ocl_status, error_handler,
-			"%s: error in clEnqueueMarkerWithWaitList() (OpenCL error %d: %s).",
-			CCL_STRD, ocl_status, ccl_err(ocl_status));
+        /* Use "new" functions. */
+        ocl_status = clEnqueueMarkerWithWaitList(ccl_queue_unwrap(cq),
+            ccl_event_wait_list_get_num_events(evt_wait_lst),
+            ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
+        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+            CL_SUCCESS != ocl_status, ocl_status, error_handler,
+            "%s: error in clEnqueueMarkerWithWaitList() (OpenCL error %d: %s).",
+            CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	} else {
+    } else {
 
-		/* Use "old" functions. */
-		event = ccl_enqueue_marker_deprecated(
-			cq, evt_wait_lst, &err_internal);
-		g_if_err_propagate_goto(err, err_internal, error_handler);
-	}
+        /* Use "old" functions. */
+        event = ccl_enqueue_marker_deprecated(
+            cq, evt_wait_lst, &err_internal);
+        g_if_err_propagate_goto(err, err_internal, error_handler);
+    }
 
 #else
 
-	/* If library is compiled with support for OpenCL 1.0 and 1.1,
-	 * then use those functions by default. */
-	event = ccl_enqueue_marker_deprecated(
-		cq, evt_wait_lst, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* If library is compiled with support for OpenCL 1.0 and 1.1,
+     * then use those functions by default. */
+    event = ccl_enqueue_marker_deprecated(
+        cq, evt_wait_lst, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 
-	/* Wrap event and associate it with the respective command queue.
-	 * The event object will be released automatically when the command
-	 * queue is released. */
-	evt = ccl_queue_produce_event(cq, event);
+    /* Wrap event and associate it with the respective command queue.
+     * The event object will be released automatically when the command
+     * queue is released. */
+    evt = ccl_queue_produce_event(cq, event);
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	/* In case of error, return NULL. */
-	evt = NULL;
+    /* In case of error, return NULL. */
+    evt = NULL;
 
 finish:
 
-	/* Return event. */
-	return evt;
+    /* Return event. */
+    return evt;
 
 }
 

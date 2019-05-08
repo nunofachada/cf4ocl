@@ -30,7 +30,7 @@
  * Print handler which redirects output to debug stream.
  * */
 void ccl_print_to_debug(const gchar* string) {
-	g_debug("%s", string);
+    g_debug("%s", string);
 }
 
 /**
@@ -38,31 +38,31 @@ void ccl_print_to_debug(const gchar* string) {
  * */
 CCLContext* ccl_test_context_new(CCLErr** err) {
 
-	/* Context wrapper. */
-	CCLContext* ctx = NULL;
+    /* Context wrapper. */
+    CCLContext* ctx = NULL;
 
-	/* Device index string taken from the environment. */
-	const char* devidx_str;
+    /* Device index string taken from the environment. */
+    const char* devidx_str;
 
-	/* Final device index integer. */
-	cl_uint ccl_tests_devidx;
+    /* Final device index integer. */
+    cl_uint ccl_tests_devidx;
 
-	/* Is a device index defined as an environment variable? */
-	devidx_str = g_getenv("CCL_TEST_DEVICE_INDEX");
-	if (devidx_str) {
+    /* Is a device index defined as an environment variable? */
+    devidx_str = g_getenv("CCL_TEST_DEVICE_INDEX");
+    if (devidx_str) {
 
-		/* If so, use it. */
-		ccl_tests_devidx = atoi(devidx_str);
+        /* If so, use it. */
+        ccl_tests_devidx = atoi(devidx_str);
 
-	} else {
+    } else {
 
-		/* Otherwise use default device index specified at compile time. */
-		ccl_tests_devidx = CCL_TEST_DEFAULT_DEVICE_IDX;
+        /* Otherwise use default device index specified at compile time. */
+        ccl_tests_devidx = CCL_TEST_DEFAULT_DEVICE_IDX;
 
-	}
+    }
 
-	/* Create context, error handling is performed by the caller. */
-	ctx = ccl_context_new_from_device_index(&ccl_tests_devidx, err);
+    /* Create context, error handling is performed by the caller. */
+    ctx = ccl_context_new_from_device_index(&ccl_tests_devidx, err);
 
-	return ctx;
+    return ctx;
 }

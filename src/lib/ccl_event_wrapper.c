@@ -39,17 +39,17 @@
  * */
 struct ccl_event {
 
-	/**
-	 * Parent wrapper object.
-	 * @private
-	 * */
-	CCLWrapper base;
+    /**
+     * Parent wrapper object.
+     * @private
+     * */
+    CCLWrapper base;
 
-	/**
-	 * Event name, for profiling purposes only.
-	 * @private
-	 * */
-	const char* name;
+    /**
+     * Event name, for profiling purposes only.
+     * @private
+     * */
+    const char* name;
 
 };
 
@@ -76,10 +76,10 @@ struct ccl_event {
 CCL_EXPORT
 CCLEvent* ccl_event_new_wrap(cl_event event) {
 
-	CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
-		CCL_EVENT, (void*) event, sizeof(CCLEvent));
+    CCLEvent* evt = (CCLEvent*) ccl_wrapper_new(
+        CCL_EVENT, (void*) event, sizeof(CCLEvent));
 
-	return evt;
+    return evt;
 
 }
 
@@ -94,8 +94,8 @@ CCLEvent* ccl_event_new_wrap(cl_event event) {
 CCL_EXPORT
 void ccl_event_destroy(CCLEvent* evt) {
 
-	ccl_wrapper_unref((CCLWrapper*) evt, sizeof(CCLEvent),
-		NULL, (ccl_wrapper_release_cl_object) clReleaseEvent, NULL);
+    ccl_wrapper_unref((CCLWrapper*) evt, sizeof(CCLEvent),
+        NULL, (ccl_wrapper_release_cl_object) clReleaseEvent, NULL);
 
 }
 
@@ -113,11 +113,11 @@ void ccl_event_destroy(CCLEvent* evt) {
 CCL_EXPORT
 void ccl_event_set_name(CCLEvent* evt, const char* name) {
 
-	/* Make sure evt wrapper object is not NULL. */
-	g_return_if_fail(evt != NULL);
+    /* Make sure evt wrapper object is not NULL. */
+    g_return_if_fail(evt != NULL);
 
-	/* Set event name. */
-	evt->name = name;
+    /* Set event name. */
+    evt->name = name;
 
 }
 
@@ -136,11 +136,11 @@ void ccl_event_set_name(CCLEvent* evt, const char* name) {
 CCL_EXPORT
 const char* ccl_event_get_name(CCLEvent* evt) {
 
-	/* Make sure evt wrapper object is not NULL. */
-	g_return_val_if_fail(evt != NULL, NULL);
+    /* Make sure evt wrapper object is not NULL. */
+    g_return_val_if_fail(evt != NULL, NULL);
 
-	/* Return event name. */
-	return evt->name;
+    /* Return event name. */
+    return evt->name;
 
 }
 
@@ -160,165 +160,165 @@ const char* ccl_event_get_name(CCLEvent* evt) {
 CCL_EXPORT
 const char* ccl_event_get_final_name(CCLEvent* evt) {
 
-	/* Make sure evt wrapper object is not NULL. */
-	g_return_val_if_fail(evt != NULL, NULL);
+    /* Make sure evt wrapper object is not NULL. */
+    g_return_val_if_fail(evt != NULL, NULL);
 
-	/* Final name to return. */
-	const char* final_name;
+    /* Final name to return. */
+    const char* final_name;
 
-	/* Check if name is not NULL. */
-	if (evt->name != NULL) {
+    /* Check if name is not NULL. */
+    if (evt->name != NULL) {
 
-		/* Name is not NULL, use it as final name. */
-		final_name = evt->name;
+        /* Name is not NULL, use it as final name. */
+        final_name = evt->name;
 
-	} else {
+    } else {
 
-		/* Name is NULL, determine a final name based on type of
-		 * command which produced the event. */
+        /* Name is NULL, determine a final name based on type of
+         * command which produced the event. */
 
-		CCLErr* err_internal = NULL;
+        CCLErr* err_internal = NULL;
 
-		cl_command_type ct =
-			ccl_event_get_command_type(evt, &err_internal);
+        cl_command_type ct =
+            ccl_event_get_command_type(evt, &err_internal);
 
-		if (err_internal != NULL) {
-			g_warning("Unable to determine final event name due to" \
-				"the following error: %s", err_internal->message);
-			g_error_free(err_internal);
-			return NULL;
-		}
+        if (err_internal != NULL) {
+            g_warning("Unable to determine final event name due to" \
+                "the following error: %s", err_internal->message);
+            g_error_free(err_internal);
+            return NULL;
+        }
 
-		switch (ct) {
-			case CL_COMMAND_NDRANGE_KERNEL:
-				final_name = "NDRANGE_KERNEL";
-				break;
-			case CL_COMMAND_NATIVE_KERNEL:
-				final_name = "NATIVE_KERNEL";
-				break;
-			case CL_COMMAND_READ_BUFFER:
-				final_name = "READ_BUFFER";
-				break;
-			case CL_COMMAND_WRITE_BUFFER:
-				final_name = "WRITE_BUFFER";
-				break;
-			case CL_COMMAND_COPY_BUFFER:
-				final_name = "COPY_BUFFER";
-				break;
-			case CL_COMMAND_READ_IMAGE:
-				final_name = "READ_IMAGE";
-				break;
-			case CL_COMMAND_WRITE_IMAGE:
-				final_name = "WRITE_IMAGE";
-				break;
-			case CL_COMMAND_COPY_IMAGE:
-				final_name = "COPY_IMAGE";
-				break;
-			case CL_COMMAND_COPY_BUFFER_TO_IMAGE:
-				final_name = "COPY_BUFFER_TO_IMAGE";
-				break;
-			case CL_COMMAND_COPY_IMAGE_TO_BUFFER:
-				final_name = "COPY_IMAGE_TO_BUFFER";
-				break;
-			case CL_COMMAND_MAP_BUFFER:
-				final_name = "MAP_BUFFER";
-				break;
-			case CL_COMMAND_MAP_IMAGE:
-				final_name = "MAP_IMAGE";
-				break;
-			case CL_COMMAND_UNMAP_MEM_OBJECT:
-				final_name = "UNMAP_MEM_OBJECT";
-				break;
-			case CL_COMMAND_MARKER:
-				final_name = "MARKER";
-				break;
-			case CL_COMMAND_ACQUIRE_GL_OBJECTS:
-				final_name = "ACQUIRE_GL_OBJECTS";
-				break;
-			case CL_COMMAND_RELEASE_GL_OBJECTS:
-				final_name = "RELEASE_GL_OBJECTS";
-				break;
-			case CL_COMMAND_READ_BUFFER_RECT:
-				final_name = "READ_BUFFER_RECT";
-				break;
-			case CL_COMMAND_WRITE_BUFFER_RECT:
-				final_name = "WRITE_BUFFER_RECT";
-				break;
-			case CL_COMMAND_COPY_BUFFER_RECT:
-				final_name = "COPY_BUFFER_RECT";
-				break;
-			case CL_COMMAND_USER:
-				/* This is here just for completeness, as a user
-				 * event can't be profiled. */
-				final_name = "USER";
-				break;
-			case CL_COMMAND_BARRIER:
-				final_name = "BARRIER";
-				break;
-			case CL_COMMAND_MIGRATE_MEM_OBJECTS:
-				final_name = "MIGRATE_MEM_OBJECTS";
-				break;
-			case CL_COMMAND_FILL_BUFFER:
-				final_name = "FILL_BUFFER";
-				break;
-			case CL_COMMAND_FILL_IMAGE:
-				final_name = "FILL_IMAGE";
-				break;
-			case CL_COMMAND_SVM_FREE:
-				final_name = "SVM_FREE";
-				break;
-			case CL_COMMAND_SVM_MEMCPY:
-				final_name = "SVM_MEMCPY";
-				break;
-			case CL_COMMAND_SVM_MEMFILL:
-				final_name = "SVM_MEMFILL";
-				break;
-			case CL_COMMAND_SVM_MAP:
-				final_name = "SVM_MAP";
-				break;
-			case CL_COMMAND_SVM_UNMAP:
-				final_name = "SVM_UNMAP";
-				break;
-			case CL_COMMAND_GL_FENCE_SYNC_OBJECT_KHR:
-				final_name = "GL_FENCE_SYNC_OBJECT_KHR";
-				break;
-			case CL_COMMAND_ACQUIRE_D3D10_OBJECTS_KHR:
-				final_name = "ACQUIRE_D3D10_OBJECTS_KHR";
-				break;
-			case CL_COMMAND_RELEASE_D3D10_OBJECTS_KHR:
-				final_name = "RELEASE_D3D10_OBJECTS_KHR";
-				break;
-			case CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR:
-				final_name = "ACQUIRE_DX9_MEDIA_SURFACES_KHR";
-				break;
-			case CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR:
-				final_name = "RELEASE_DX9_MEDIA_SURFACES_KHR";
-				break;
-			case CL_COMMAND_ACQUIRE_D3D11_OBJECTS_KHR:
-				final_name = "ACQUIRE_D3D11_OBJECTS_KHR";
-				break;
-			case CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR:
-				final_name = "RELEASE_D3D11_OBJECTS_KHR";
-				break;
-			case CL_COMMAND_ACQUIRE_EGL_OBJECTS_KHR:
-				final_name = "ACQUIRE_EGL_OBJECTS_KHR";
-				break;
-			case CL_COMMAND_RELEASE_EGL_OBJECTS_KHR:
-				final_name = "RELEASE_EGL_OBJECTS_KHR";
-				break;
-			case CL_COMMAND_EGL_FENCE_SYNC_OBJECT_KHR:
-				final_name = "EGL_FENCE_SYNC_OBJECT_KHR";
-				break;
-			default:
-				final_name = "UNKNOWN";
-				g_warning("Unknown event command type: 0x%x", ct);
-				break;
-		}
+        switch (ct) {
+            case CL_COMMAND_NDRANGE_KERNEL:
+                final_name = "NDRANGE_KERNEL";
+                break;
+            case CL_COMMAND_NATIVE_KERNEL:
+                final_name = "NATIVE_KERNEL";
+                break;
+            case CL_COMMAND_READ_BUFFER:
+                final_name = "READ_BUFFER";
+                break;
+            case CL_COMMAND_WRITE_BUFFER:
+                final_name = "WRITE_BUFFER";
+                break;
+            case CL_COMMAND_COPY_BUFFER:
+                final_name = "COPY_BUFFER";
+                break;
+            case CL_COMMAND_READ_IMAGE:
+                final_name = "READ_IMAGE";
+                break;
+            case CL_COMMAND_WRITE_IMAGE:
+                final_name = "WRITE_IMAGE";
+                break;
+            case CL_COMMAND_COPY_IMAGE:
+                final_name = "COPY_IMAGE";
+                break;
+            case CL_COMMAND_COPY_BUFFER_TO_IMAGE:
+                final_name = "COPY_BUFFER_TO_IMAGE";
+                break;
+            case CL_COMMAND_COPY_IMAGE_TO_BUFFER:
+                final_name = "COPY_IMAGE_TO_BUFFER";
+                break;
+            case CL_COMMAND_MAP_BUFFER:
+                final_name = "MAP_BUFFER";
+                break;
+            case CL_COMMAND_MAP_IMAGE:
+                final_name = "MAP_IMAGE";
+                break;
+            case CL_COMMAND_UNMAP_MEM_OBJECT:
+                final_name = "UNMAP_MEM_OBJECT";
+                break;
+            case CL_COMMAND_MARKER:
+                final_name = "MARKER";
+                break;
+            case CL_COMMAND_ACQUIRE_GL_OBJECTS:
+                final_name = "ACQUIRE_GL_OBJECTS";
+                break;
+            case CL_COMMAND_RELEASE_GL_OBJECTS:
+                final_name = "RELEASE_GL_OBJECTS";
+                break;
+            case CL_COMMAND_READ_BUFFER_RECT:
+                final_name = "READ_BUFFER_RECT";
+                break;
+            case CL_COMMAND_WRITE_BUFFER_RECT:
+                final_name = "WRITE_BUFFER_RECT";
+                break;
+            case CL_COMMAND_COPY_BUFFER_RECT:
+                final_name = "COPY_BUFFER_RECT";
+                break;
+            case CL_COMMAND_USER:
+                /* This is here just for completeness, as a user
+                 * event can't be profiled. */
+                final_name = "USER";
+                break;
+            case CL_COMMAND_BARRIER:
+                final_name = "BARRIER";
+                break;
+            case CL_COMMAND_MIGRATE_MEM_OBJECTS:
+                final_name = "MIGRATE_MEM_OBJECTS";
+                break;
+            case CL_COMMAND_FILL_BUFFER:
+                final_name = "FILL_BUFFER";
+                break;
+            case CL_COMMAND_FILL_IMAGE:
+                final_name = "FILL_IMAGE";
+                break;
+            case CL_COMMAND_SVM_FREE:
+                final_name = "SVM_FREE";
+                break;
+            case CL_COMMAND_SVM_MEMCPY:
+                final_name = "SVM_MEMCPY";
+                break;
+            case CL_COMMAND_SVM_MEMFILL:
+                final_name = "SVM_MEMFILL";
+                break;
+            case CL_COMMAND_SVM_MAP:
+                final_name = "SVM_MAP";
+                break;
+            case CL_COMMAND_SVM_UNMAP:
+                final_name = "SVM_UNMAP";
+                break;
+            case CL_COMMAND_GL_FENCE_SYNC_OBJECT_KHR:
+                final_name = "GL_FENCE_SYNC_OBJECT_KHR";
+                break;
+            case CL_COMMAND_ACQUIRE_D3D10_OBJECTS_KHR:
+                final_name = "ACQUIRE_D3D10_OBJECTS_KHR";
+                break;
+            case CL_COMMAND_RELEASE_D3D10_OBJECTS_KHR:
+                final_name = "RELEASE_D3D10_OBJECTS_KHR";
+                break;
+            case CL_COMMAND_ACQUIRE_DX9_MEDIA_SURFACES_KHR:
+                final_name = "ACQUIRE_DX9_MEDIA_SURFACES_KHR";
+                break;
+            case CL_COMMAND_RELEASE_DX9_MEDIA_SURFACES_KHR:
+                final_name = "RELEASE_DX9_MEDIA_SURFACES_KHR";
+                break;
+            case CL_COMMAND_ACQUIRE_D3D11_OBJECTS_KHR:
+                final_name = "ACQUIRE_D3D11_OBJECTS_KHR";
+                break;
+            case CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR:
+                final_name = "RELEASE_D3D11_OBJECTS_KHR";
+                break;
+            case CL_COMMAND_ACQUIRE_EGL_OBJECTS_KHR:
+                final_name = "ACQUIRE_EGL_OBJECTS_KHR";
+                break;
+            case CL_COMMAND_RELEASE_EGL_OBJECTS_KHR:
+                final_name = "RELEASE_EGL_OBJECTS_KHR";
+                break;
+            case CL_COMMAND_EGL_FENCE_SYNC_OBJECT_KHR:
+                final_name = "EGL_FENCE_SYNC_OBJECT_KHR";
+                break;
+            default:
+                final_name = "UNKNOWN";
+                g_warning("Unknown event command type: 0x%x", ct);
+                break;
+        }
 
-	}
+    }
 
-	/* Return final name. */
-	return final_name;
+    /* Return final name. */
+    return final_name;
 }
 
 /**
@@ -334,31 +334,31 @@ const char* ccl_event_get_final_name(CCLEvent* evt) {
  * */
 CCL_EXPORT
 cl_command_type ccl_event_get_command_type(
-	CCLEvent* evt, CCLErr** err) {
+    CCLEvent* evt, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	/* Make sure evt wrapper object is not NULL. */
-	g_return_val_if_fail(evt != NULL, 0);
+    /* Make sure evt wrapper object is not NULL. */
+    g_return_val_if_fail(evt != NULL, 0);
 
-	/* The command type to return. */
-	cl_command_type ct;
+    /* The command type to return. */
+    cl_command_type ct;
 
-	/* Determine the command type. */
-	CCLWrapperInfo* info =
-		ccl_event_get_info(evt, CL_EVENT_COMMAND_TYPE, err);
+    /* Determine the command type. */
+    CCLWrapperInfo* info =
+        ccl_event_get_info(evt, CL_EVENT_COMMAND_TYPE, err);
 
-	if (info == NULL) {
-		/* Some error ocurred, return 0. */
-		ct = 0;
-	} else {
-		/* Get the command type. */
-		ct = *((cl_command_type*) info->value);
-	}
+    if (info == NULL) {
+        /* Some error ocurred, return 0. */
+        ct = 0;
+    } else {
+        /* Get the command type. */
+        ct = *((cl_command_type*) info->value);
+    }
 
-	/* Return the command type. */
-	return ct;
+    /* Return the command type. */
+    return ct;
 }
 
 /**
@@ -383,57 +383,57 @@ cl_command_type ccl_event_get_command_type(
 CCL_EXPORT
 cl_uint ccl_event_get_opencl_version(CCLEvent* evt, CCLErr** err) {
 
-	/* Make sure number evt is not NULL. */
-	g_return_val_if_fail(evt != NULL, 0);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, 0);
+    /* Make sure number evt is not NULL. */
+    g_return_val_if_fail(evt != NULL, 0);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-	/* OpenCL version. */
-	cl_uint ocl_ver;
+    /* OpenCL version. */
+    cl_uint ocl_ver;
 
 #ifdef CL_VERSION_1_1
-	/* Get version from event if OpenCL >= 1.1 because CL_EVENT_CONTEXT
-	 * isn't defined for version 1.0. */
+    /* Get version from event if OpenCL >= 1.1 because CL_EVENT_CONTEXT
+     * isn't defined for version 1.0. */
 
-	cl_context context;
-	CCLContext* ctx;
-	CCLErr* err_internal = NULL;
+    cl_context context;
+    CCLContext* ctx;
+    CCLErr* err_internal = NULL;
 
-	context = ccl_event_get_info_scalar(
-		evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    context = ccl_event_get_info_scalar(
+        evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Get context wrapper. */
-	ctx = ccl_context_new_wrap(context);
+    /* Get context wrapper. */
+    ctx = ccl_context_new_wrap(context);
 
-	/* Get OpenCL version. */
-	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Get OpenCL version. */
+    ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* Unref. the context wrapper. */
-	ccl_context_unref(ctx);
+    /* Unref. the context wrapper. */
+    ccl_context_unref(ctx);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	ocl_ver = 0;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    ocl_ver = 0;
 
 finish:
 
 #else
 
-	/* It's version 1.0. */
-	ocl_ver = 100;
+    /* It's version 1.0. */
+    ocl_ver = 100;
 
 #endif
 
-	/* Return event wrapper. */
-	return ocl_ver;
+    /* Return event wrapper. */
+    return ocl_ver;
 
 }
 
@@ -458,78 +458,78 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_event_set_callback(CCLEvent* evt,
-	cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
-	void *user_data, CCLErr** err) {
+    cl_int command_exec_callback_type, ccl_event_callback pfn_notify,
+    void *user_data, CCLErr** err) {
 
-	/* Make sure evt is not NULL. */
-	g_return_val_if_fail(evt != NULL, CL_FALSE);
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+    /* Make sure evt is not NULL. */
+    g_return_val_if_fail(evt != NULL, CL_FALSE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
-	/* OpenCL function return status. */
-	cl_int ocl_status;
-	/* This function return status. */
-	cl_bool ret_status;
-	/* OpenCL version of the underlying platform. */
-	double ocl_ver;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* OpenCL function return status. */
+    cl_int ocl_status;
+    /* This function return status. */
+    cl_bool ret_status;
+    /* OpenCL version of the underlying platform. */
+    double ocl_ver;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
-	CCL_UNUSED(command_exec_callback_type);
-	CCL_UNUSED(pfn_notify);
-	CCL_UNUSED(user_data);
-	CCL_UNUSED(ocl_status);
-	CCL_UNUSED(ocl_ver);
-	CCL_UNUSED(err_internal);
+    CCL_UNUSED(command_exec_callback_type);
+    CCL_UNUSED(pfn_notify);
+    CCL_UNUSED(user_data);
+    CCL_UNUSED(ocl_status);
+    CCL_UNUSED(ocl_ver);
+    CCL_UNUSED(err_internal);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: Event callbacks require cf4ocl to be deployed with "
-		"support for OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: Event callbacks require cf4ocl to be deployed with "
+        "support for OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* Check that context platform is >= OpenCL 1.1 */
-	ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Check that context platform is >= OpenCL 1.1 */
+    ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If OpenCL version is not >= 1.1, throw error. */
-	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: set event callback requires OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If OpenCL version is not >= 1.1, throw error. */
+    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: set event callback requires OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
-	/* Set event callback.*/
-	ocl_status = clSetEventCallback(ccl_event_unwrap(evt),
-		command_exec_callback_type, pfn_notify, user_data);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: unable to set event callback (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Set event callback.*/
+    ocl_status = clSetEventCallback(ccl_event_unwrap(evt),
+        command_exec_callback_type, pfn_notify, user_data);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: unable to set event callback (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	ret_status = CL_TRUE;
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    ret_status = CL_TRUE;
+    goto finish;
 
 error_handler:
 
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
-	ret_status = CL_FALSE;
+    ret_status = CL_FALSE;
 
 finish:
 
-	/* Return status. */
-	return ret_status;
+    /* Return status. */
+    return ret_status;
 
 }
 
@@ -551,74 +551,74 @@ finish:
 CCL_EXPORT
 CCLEvent* ccl_user_event_new(CCLContext* ctx, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, NULL);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-	/* Make sure ctx is not NULL. */
-	g_return_val_if_fail(ctx != NULL, NULL);
+    /* Make sure ctx is not NULL. */
+    g_return_val_if_fail(ctx != NULL, NULL);
 
-	/* OpenCL status. */
-	cl_int ocl_status;
-	/* Event wrapper object. */
-	CCLEvent* evt = NULL;
-	/* OpenCL event object. */
-	cl_event event;
-	/* OpenCL version of the underlying platform. */
-	double ocl_ver;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* OpenCL status. */
+    cl_int ocl_status;
+    /* Event wrapper object. */
+    CCLEvent* evt = NULL;
+    /* OpenCL event object. */
+    cl_event event;
+    /* OpenCL version of the underlying platform. */
+    double ocl_ver;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
-	CCL_UNUSED(ocl_status);
-	CCL_UNUSED(event);
-	CCL_UNUSED(ocl_ver);
-	CCL_UNUSED(err_internal);
+    CCL_UNUSED(ocl_status);
+    CCL_UNUSED(event);
+    CCL_UNUSED(ocl_ver);
+    CCL_UNUSED(err_internal);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: User events require cf4ocl to be deployed with "
-		"support for OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: User events require cf4ocl to be deployed with "
+        "support for OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* Check that context platform is >= OpenCL 1.1 */
-	ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Check that context platform is >= OpenCL 1.1 */
+    ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If OpenCL version is not >= 1.1, throw error. */
-	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: User events require OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If OpenCL version is not >= 1.1, throw error. */
+    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: User events require OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
-	/* Create user event. */
-	event = clCreateUserEvent(ccl_context_unwrap(ctx), &ocl_status);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: error creating user event (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Create user event. */
+    event = clCreateUserEvent(ccl_context_unwrap(ctx), &ocl_status);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: error creating user event (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Wrap event. */
-	evt = ccl_event_new_wrap(event);
+    /* Wrap event. */
+    evt = ccl_event_new_wrap(event);
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
 
 finish:
 
-	/* Return event wrapper. */
-	return evt;
+    /* Return event wrapper. */
+    return evt;
 
 }
 
@@ -639,74 +639,74 @@ finish:
  * */
 CCL_EXPORT
 cl_bool ccl_user_event_set_status(
-	CCLEvent* evt, cl_int execution_status, CCLErr** err) {
+    CCLEvent* evt, cl_int execution_status, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
-	/* Make sure evt is not NULL. */
-	g_return_val_if_fail(evt != NULL, CL_FALSE);
+    /* Make sure evt is not NULL. */
+    g_return_val_if_fail(evt != NULL, CL_FALSE);
 
-	/* OpenCL status. */
-	cl_int ocl_status;
-	/* Function return status. */
-	cl_bool ret_status;
-	/* OpenCL version of the underlying platform. */
-	double ocl_ver;
-	/* Internal error handling object. */
-	CCLErr* err_internal = NULL;
+    /* OpenCL status. */
+    cl_int ocl_status;
+    /* Function return status. */
+    cl_bool ret_status;
+    /* OpenCL version of the underlying platform. */
+    double ocl_ver;
+    /* Internal error handling object. */
+    CCLErr* err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
-	CCL_UNUSED(execution_status);
-	CCL_UNUSED(ocl_status);
-	CCL_UNUSED(ocl_ver);
-	CCL_UNUSED(err_internal);
+    CCL_UNUSED(execution_status);
+    CCL_UNUSED(ocl_status);
+    CCL_UNUSED(ocl_ver);
+    CCL_UNUSED(err_internal);
 
-	/* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
-	 * error. */
-	g_if_err_create_goto(*err, CCL_ERROR, TRUE,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: User events require cf4ocl to be deployed with "
-		"support for OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
+     * error. */
+    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: User events require cf4ocl to be deployed with "
+        "support for OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
 #else
 
-	/* Check that context platform is >= OpenCL 1.1 */
-	ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
-	g_if_err_propagate_goto(err, err_internal, error_handler);
+    /* Check that context platform is >= OpenCL 1.1 */
+    ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
 
-	/* If OpenCL version is not >= 1.1, throw error. */
-	g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
-		CCL_ERROR_UNSUPPORTED_OCL, error_handler,
-		"%s: User events require OpenCL version 1.1 or newer.",
-		CCL_STRD);
+    /* If OpenCL version is not >= 1.1, throw error. */
+    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+        CCL_ERROR_UNSUPPORTED_OCL, error_handler,
+        "%s: User events require OpenCL version 1.1 or newer.",
+        CCL_STRD);
 
-	/* Set status. */
-	ocl_status = clSetUserEventStatus(
-		ccl_event_unwrap(evt), execution_status);
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: error setting user event status (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* Set status. */
+    ocl_status = clSetUserEventStatus(
+        ccl_event_unwrap(evt), execution_status);
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: error setting user event status (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
 #endif
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	ret_status = CL_TRUE;
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    ret_status = CL_TRUE;
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	ret_status = CL_FALSE;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    ret_status = CL_FALSE;
 
 finish:
 
-	/* Return status. */
-	return ret_status;
+    /* Return status. */
+    return ret_status;
 
 }
 
@@ -720,40 +720,40 @@ finish:
  * */
 CCL_EXPORT
 CCLEventWaitList* ccl_event_wait_list_add(
-	CCLEventWaitList* evt_wait_lst, ...) {
+    CCLEventWaitList* evt_wait_lst, ...) {
 
-	/* Check that evt_wait_lst is not NULL. */
-	g_return_val_if_fail(evt_wait_lst != NULL, NULL);
+    /* Check that evt_wait_lst is not NULL. */
+    g_return_val_if_fail(evt_wait_lst != NULL, NULL);
 
-	/* Variable argument list. */
-	va_list al;
+    /* Variable argument list. */
+    va_list al;
 
-	/* Current event wrapper object. */
-	CCLEvent* evt;
+    /* Current event wrapper object. */
+    CCLEvent* evt;
 
-	/* Initialize list if required. */
-	if (*evt_wait_lst == NULL)
-		*evt_wait_lst = g_ptr_array_new();
+    /* Initialize list if required. */
+    if (*evt_wait_lst == NULL)
+        *evt_wait_lst = g_ptr_array_new();
 
-	/* Initialize variable argument list. */
-	va_start(al, evt_wait_lst);
+    /* Initialize variable argument list. */
+    va_start(al, evt_wait_lst);
 
-	/* Get arguments (i.e. event wrapper objects). */
-	while ((evt = va_arg(al, CCLEvent*)) != NULL) {
+    /* Get arguments (i.e. event wrapper objects). */
+    while ((evt = va_arg(al, CCLEvent*)) != NULL) {
 
-		/* Add event wrapper to array. */
-		g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evt));
+        /* Add event wrapper to array. */
+        g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evt));
 
-	}
+    }
 
-	/* Finalize variable argument list. */
-	va_end(al);
+    /* Finalize variable argument list. */
+    va_end(al);
 
-	/* Signal bug if no events have been given. */
-	g_return_val_if_fail((*evt_wait_lst)->len > 0, NULL);
+    /* Signal bug if no events have been given. */
+    g_return_val_if_fail((*evt_wait_lst)->len > 0, NULL);
 
-	/* Return event wait list. */
-	return evt_wait_lst;
+    /* Return event wait list. */
+    return evt_wait_lst;
 
 }
 
@@ -766,31 +766,31 @@ CCLEventWaitList* ccl_event_wait_list_add(
  * */
 CCL_EXPORT
 CCLEventWaitList* ccl_event_wait_list_add_v(
-	CCLEventWaitList* evt_wait_lst, CCLEvent** evts) {
+    CCLEventWaitList* evt_wait_lst, CCLEvent** evts) {
 
-	/* Check that evt_wait_lst is not NULL. */
-	g_return_val_if_fail(evt_wait_lst != NULL, NULL);
+    /* Check that evt_wait_lst is not NULL. */
+    g_return_val_if_fail(evt_wait_lst != NULL, NULL);
 
-	/* Check that events array is not NULL. */
-	g_return_val_if_fail(evts != NULL, NULL);
+    /* Check that events array is not NULL. */
+    g_return_val_if_fail(evts != NULL, NULL);
 
-	/* Check that events array contains events. */
-	g_return_val_if_fail(evts[0] != NULL, NULL);
+    /* Check that events array contains events. */
+    g_return_val_if_fail(evts[0] != NULL, NULL);
 
-	/* Initialize list if required. */
-	if (*evt_wait_lst == NULL)
-		*evt_wait_lst = g_ptr_array_new();
+    /* Initialize list if required. */
+    if (*evt_wait_lst == NULL)
+        *evt_wait_lst = g_ptr_array_new();
 
-	/* Cycle through array of event wrapper objects. */
-	for (guint i = 0; evts[i] != NULL; ++i) {
+    /* Cycle through array of event wrapper objects. */
+    for (guint i = 0; evts[i] != NULL; ++i) {
 
-		/* Add wrapped cl_event to array. */
-		g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evts[i]));
+        /* Add wrapped cl_event to array. */
+        g_ptr_array_add(*evt_wait_lst, ccl_event_unwrap(evts[i]));
 
-	}
+    }
 
-	/* Return event wait list. */
-	return evt_wait_lst;
+    /* Return event wait list. */
+    return evt_wait_lst;
 
 }
 
@@ -806,10 +806,10 @@ CCLEventWaitList* ccl_event_wait_list_add_v(
 CCL_EXPORT
 void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
 
-	if ((evt_wait_lst != NULL) && (*evt_wait_lst != NULL)) {
-		g_ptr_array_free(*evt_wait_lst, TRUE);
-		*evt_wait_lst = NULL;
-	}
+    if ((evt_wait_lst != NULL) && (*evt_wait_lst != NULL)) {
+        g_ptr_array_free(*evt_wait_lst, TRUE);
+        *evt_wait_lst = NULL;
+    }
 }
 
 /**
@@ -828,40 +828,40 @@ void ccl_event_wait_list_clear(CCLEventWaitList* evt_wait_lst) {
 CCL_EXPORT
 cl_bool ccl_event_wait(CCLEventWaitList* evt_wait_lst, CCLErr** err) {
 
-	/* Make sure err is NULL or it is not set. */
-	g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
+    /* Make sure err is NULL or it is not set. */
+    g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
-	/* OpenCL status. */
-	cl_int ocl_status;
-	/* Function return status. */
-	cl_bool ret_status;
+    /* OpenCL status. */
+    cl_int ocl_status;
+    /* Function return status. */
+    cl_bool ret_status;
 
-	/* OpenCL wait for events. */
-	ocl_status = clWaitForEvents(
-		ccl_event_wait_list_get_num_events(evt_wait_lst),
-		ccl_event_wait_list_get_clevents(evt_wait_lst));
-	g_if_err_create_goto(*err, CCL_OCL_ERROR,
-		CL_SUCCESS != ocl_status, ocl_status, error_handler,
-		"%s: error while waiting for events (OpenCL error %d: %s).",
-		CCL_STRD, ocl_status, ccl_err(ocl_status));
+    /* OpenCL wait for events. */
+    ocl_status = clWaitForEvents(
+        ccl_event_wait_list_get_num_events(evt_wait_lst),
+        ccl_event_wait_list_get_clevents(evt_wait_lst));
+    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        CL_SUCCESS != ocl_status, ocl_status, error_handler,
+        "%s: error while waiting for events (OpenCL error %d: %s).",
+        CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-	/* Clear event wait list. */
-	ccl_event_wait_list_clear(evt_wait_lst);
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
-	/* If we got here, everything is OK. */
-	g_assert(err == NULL || *err == NULL);
-	ret_status = CL_TRUE;
-	goto finish;
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    ret_status = CL_TRUE;
+    goto finish;
 
 error_handler:
-	/* If we got here there was an error, verify that it is so. */
-	g_assert(err == NULL || *err != NULL);
-	ret_status = CL_FALSE;
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+    ret_status = CL_FALSE;
 
 finish:
 
-	/* Return status. */
-	return ret_status;
+    /* Return status. */
+    return ret_status;
 
 }
 

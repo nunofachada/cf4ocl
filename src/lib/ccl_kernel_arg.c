@@ -39,7 +39,7 @@
  * a real ::CCLWrapper object.
  * */
 #define ccl_arg_is_local(arg) \
-	 (arg->info == (void*) &arg_local_marker)
+     (arg->info == (void*) &arg_local_marker)
 
 /**
  * @internal
@@ -75,16 +75,16 @@ const CCLArg* ccl_arg_skip = &arg_skip;
 CCL_EXPORT
 CCLArg* ccl_arg_new(void* value, size_t size) {
 
-	/* Make sure size is > 0. */
-	g_return_val_if_fail(size > 0, NULL);
+    /* Make sure size is > 0. */
+    g_return_val_if_fail(size > 0, NULL);
 
-	CCLArg* arg = g_slice_new(CCLArg);
+    CCLArg* arg = g_slice_new(CCLArg);
 
-	arg->cl_object = g_memdup((const void*) value, (guint) size);
-	arg->info = (void*) &arg_local_marker;
-	arg->ref_count = (gint) size;
+    arg->cl_object = g_memdup((const void*) value, (guint) size);
+    arg->info = (void*) &arg_local_marker;
+    arg->ref_count = (gint) size;
 
-	return arg;
+    return arg;
 
 }
 
@@ -99,13 +99,13 @@ CCLArg* ccl_arg_new(void* value, size_t size) {
 CCL_EXPORT
 void ccl_arg_destroy(CCLArg* arg) {
 
-	/* Make sure arg is not NULL. */
-	g_return_if_fail(arg != NULL);
+    /* Make sure arg is not NULL. */
+    g_return_if_fail(arg != NULL);
 
-	if ccl_arg_is_local(arg) {
-		g_free(arg->cl_object);
-		g_slice_free(CCLArg, arg);
-	}
+    if ccl_arg_is_local(arg) {
+        g_free(arg->cl_object);
+        g_slice_free(CCLArg, arg);
+    }
 }
 
 /**
@@ -120,12 +120,12 @@ void ccl_arg_destroy(CCLArg* arg) {
 CCL_EXPORT
 size_t ccl_arg_size(CCLArg* arg) {
 
-	/* Make sure arg is not NULL. */
-	g_return_val_if_fail(arg != NULL, 0);
+    /* Make sure arg is not NULL. */
+    g_return_val_if_fail(arg != NULL, 0);
 
-	return ccl_arg_is_local(arg)
-		? (size_t) arg->ref_count
-		: sizeof(void*);
+    return ccl_arg_is_local(arg)
+        ? (size_t) arg->ref_count
+        : sizeof(void*);
 }
 
 /**
@@ -140,10 +140,10 @@ size_t ccl_arg_size(CCLArg* arg) {
 CCL_EXPORT
 void* ccl_arg_value(CCLArg* arg) {
 
-	/* Make sure arg is not NULL. */
-	g_return_val_if_fail(arg != NULL, NULL);
+    /* Make sure arg is not NULL. */
+    g_return_val_if_fail(arg != NULL, NULL);
 
-	return ccl_arg_is_local(arg)
-		? arg->cl_object
-		: &arg->cl_object;
+    return ccl_arg_is_local(arg)
+        ? arg->cl_object
+        : &arg->cl_object;
 }

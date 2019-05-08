@@ -126,75 +126,75 @@
  * */
 typedef struct ccl_image_desc {
 
-	/**
-	 * The type of image, must be supported by the underlying OpenCL
-	 * version. Only `CL_MEM_OBJECT_IMAGE2D` and `CL_MEM_OBJECT_IMAGE3D`
-	 * are supported in all OpenCL versions.
-	 * @public
-	 * */
-	cl_mem_object_type image_type;
+    /**
+     * The type of image, must be supported by the underlying OpenCL
+     * version. Only `CL_MEM_OBJECT_IMAGE2D` and `CL_MEM_OBJECT_IMAGE3D`
+     * are supported in all OpenCL versions.
+     * @public
+     * */
+    cl_mem_object_type image_type;
 
-	/**
-	 * Width of the image in pixels. Used for all image types.
-	 * @public
-	 * */
-	size_t image_width;
+    /**
+     * Width of the image in pixels. Used for all image types.
+     * @public
+     * */
+    size_t image_width;
 
-	/**
-	 * Height of the image in pixels. Used for 2D and 3D images and
-	 * 2D image arrays.
-	 * @public
-	 * */
-	size_t image_height;
+    /**
+     * Height of the image in pixels. Used for 2D and 3D images and
+     * 2D image arrays.
+     * @public
+     * */
+    size_t image_height;
 
-	/**
-	 * Depth of the image in pixels. Used only for 3D images.
-	 * @public
-	 * */
-	size_t image_depth;
+    /**
+     * Depth of the image in pixels. Used only for 3D images.
+     * @public
+     * */
+    size_t image_depth;
 
-	/**
-	 * Number of images in the image array. Used for 1D and 2D image
-	 * arrays.
-	 * @public
-	 * */
-	size_t image_array_size;
+    /**
+     * Number of images in the image array. Used for 1D and 2D image
+     * arrays.
+     * @public
+     * */
+    size_t image_array_size;
 
-	/**
-	 * Scan-line pitch in bytes. Must be 0 if `host_ptr` is `NULL`.
-	 * @public
-	 * */
-	size_t image_row_pitch;
+    /**
+     * Scan-line pitch in bytes. Must be 0 if `host_ptr` is `NULL`.
+     * @public
+     * */
+    size_t image_row_pitch;
 
-	/**
-	 * Size in bytes of each 2D slice in the 3D image or the size in
-	 * bytes of each image in a 1D or 2D image array. Must be 0 if
-	 * `host_ptr` is `NULL`.
-	 * @public
-	 * */
-	size_t image_slice_pitch;
+    /**
+     * Size in bytes of each 2D slice in the 3D image or the size in
+     * bytes of each image in a 1D or 2D image array. Must be 0 if
+     * `host_ptr` is `NULL`.
+     * @public
+     * */
+    size_t image_slice_pitch;
 
-	/**
-	 * Unused up to OpenCL 2.0.
-	 * @public
-	 * */
-	cl_uint num_mip_levels;
+    /**
+     * Unused up to OpenCL 2.0.
+     * @public
+     * */
+    cl_uint num_mip_levels;
 
-	/**
-	 * Unused up to OpenCL 2.0.
-	 * @public
-	 * */
-	cl_uint num_samples;
+    /**
+     * Unused up to OpenCL 2.0.
+     * @public
+     * */
+    cl_uint num_samples;
 
-	/**
-	 * A memory object wrapper. In OpenCL 1.2, it refers to a buffer
-	 * wrapper and is used for 1D image buffers. In OpenCL 2.0 it can
-	 * also be used with 2D images to create a new 2D image from data
-	 * shared with the specified memory object (either a buffer or a
-	 * 2D image).
-	 * @public
-	 * */
-	CCLMemObj* memobj;
+    /**
+     * A memory object wrapper. In OpenCL 1.2, it refers to a buffer
+     * wrapper and is used for 1D image buffers. In OpenCL 2.0 it can
+     * also be used with 2D images to create a new 2D image from data
+     * shared with the specified memory object (either a buffer or a
+     * 2D image).
+     * @public
+     * */
+    CCLMemObj* memobj;
 
 } CCLImageDesc;
 
@@ -210,59 +210,59 @@ void ccl_image_destroy(CCLImage* img);
 /* Creates a new image wrapper object. */
 CCL_EXPORT
 CCLImage* ccl_image_new_v(CCLContext* ctx, cl_mem_flags flags,
-	const cl_image_format* image_format, const CCLImageDesc* img_dsc,
-	void* host_ptr, CCLErr** err);
+    const cl_image_format* image_format, const CCLImageDesc* img_dsc,
+    void* host_ptr, CCLErr** err);
 
 /* Creates a new image wrapper object using a variable list of key-value
  * pairs which describe the image.  */
 CCL_EXPORT
 CCLImage* ccl_image_new(CCLContext* ctx, cl_mem_flags flags,
-	const cl_image_format* image_format, void* host_ptr, CCLErr** err,
-	...);
+    const cl_image_format* image_format, void* host_ptr, CCLErr** err,
+    ...);
 
 /* Read from an image or image array object to host memory. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_read(CCLImage* img, CCLQueue* cq,
-	cl_bool blocking_read, const size_t* origin, const size_t* region,
-	size_t row_pitch, size_t slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    cl_bool blocking_read, const size_t* origin, const size_t* region,
+    size_t row_pitch, size_t slice_pitch, void *ptr,
+    CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Write to an image or image array object from host memory. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_write(CCLImage* img, CCLQueue* cq,
-	cl_bool blocking_read, const size_t* origin, const size_t* region,
-	size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    cl_bool blocking_read, const size_t* origin, const size_t* region,
+    size_t input_row_pitch, size_t input_slice_pitch, void *ptr,
+    CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Copy image objects. This function wraps the clEnqueueCopyImage()
  * OpenCL function. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_copy(CCLImage* src_img, CCLImage* dst_img,
-	CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
-	const size_t* region, CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    CCLQueue* cq, const size_t* src_origin, const size_t* dst_origin,
+    const size_t* region, CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Copy an image object to a buffer object. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_copy_to_buffer(CCLImage* src_img,
-	CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
-	const size_t *region, size_t dst_offset,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    CCLBuffer* dst_buf, CCLQueue* cq, const size_t *src_origin,
+    const size_t *region, size_t dst_offset,
+    CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /* Map a region of the image into the host address space and return a
  * pointer to this mapped region. */
 CCL_EXPORT
 void* ccl_image_enqueue_map(CCLImage* img, CCLQueue* cq,
-	cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
-	const size_t* region, size_t *image_row_pitch,
-	size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
-	CCLEvent** evt, CCLErr** err);
+    cl_bool blocking_map, cl_map_flags map_flags, const size_t* origin,
+    const size_t* region, size_t *image_row_pitch,
+    size_t *image_slice_pitch, CCLEventWaitList* evt_wait_lst,
+    CCLEvent** evt, CCLErr** err);
 
 /* Fill an image object with a specified color. This function wraps the
  * clEnqueueFillImage() OpenCL function. */
 CCL_EXPORT
 CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
-	const void *fill_color, const size_t *origin, const size_t *region,
-	CCLEventWaitList* evt_wait_lst, CCLErr** err);
+    const void *fill_color, const size_t *origin, const size_t *region,
+    CCLEventWaitList* evt_wait_lst, CCLErr** err);
 
 /**
  * Enqueues a command to unmap a previously mapped image object. This
@@ -281,7 +281,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @return Event wrapper object that identifies this command.
  * */
 #define ccl_image_enqueue_unmap(img, cq, ptr, ewl, err) \
-	ccl_memobj_enqueue_unmap((CCLMemObj*) img, cq, ptr, ewl, err)
+    ccl_memobj_enqueue_unmap((CCLMemObj*) img, cq, ptr, ewl, err)
 
 /**
  * Get a ::CCLWrapperInfo image information object.
@@ -295,8 +295,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_image_get_info(img, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) img, NULL, param_name, 0, \
-		CCL_INFO_IMAGE, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) img, NULL, param_name, 0, \
+        CCL_INFO_IMAGE, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar image information value.
@@ -315,8 +315,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * If an error occurs, zero is returned.
  * */
 #define ccl_image_get_info_scalar(img, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) img, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_IMAGE, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) img, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_IMAGE, CL_FALSE, err))
 
 /**
  * Macro which returns an array image information value.
@@ -336,8 +336,8 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_image_get_info_array(img, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) img, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_IMAGE, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) img, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_IMAGE, CL_FALSE, err)
 
 /**
  * Increase the reference count of the image wrapper object.
@@ -345,7 +345,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @param[in] img The image wrapper object.
  * */
 #define ccl_image_ref(img) \
-	ccl_wrapper_ref((CCLWrapper*) img)
+    ccl_wrapper_ref((CCLWrapper*) img)
 
 /**
  * Alias to ccl_image_destroy().
@@ -362,7 +362,7 @@ CCLEvent* ccl_image_enqueue_fill(CCLImage* img, CCLQueue* cq,
  * @return The OpenCL image memory object.
  * */
 #define ccl_image_unwrap(img) \
-	((cl_mem) ccl_wrapper_unwrap((CCLWrapper*) img))
+    ((cl_mem) ccl_wrapper_unwrap((CCLWrapper*) img))
 
 /** @} */
 

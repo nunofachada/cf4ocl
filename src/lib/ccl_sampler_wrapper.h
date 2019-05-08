@@ -96,13 +96,13 @@ void ccl_sampler_destroy(CCLSampler* smplr);
  * sampler properties. */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
-	cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
-	CCLErr** err);
+    cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
+    CCLErr** err);
 
 /* Create a new sampler wrapper object using a list of properties. */
 CCL_EXPORT
 CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
-	const cl_sampler_properties *sampler_properties, CCLErr** err);
+    const cl_sampler_properties *sampler_properties, CCLErr** err);
 
 /**
  * Get a ::CCLWrapperInfo sampler information object.
@@ -116,8 +116,8 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * destroyed. If an error occurs, NULL is returned.
  * */
 #define ccl_sampler_get_info(smplr, param_name, err) \
-	ccl_wrapper_get_info((CCLWrapper*) smplr, NULL, param_name, 0, \
-		CCL_INFO_SAMPLER, CL_FALSE, err)
+    ccl_wrapper_get_info((CCLWrapper*) smplr, NULL, param_name, 0, \
+        CCL_INFO_SAMPLER, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar sampler information value.
@@ -136,8 +136,8 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * If an error occurs, zero is returned.
  * */
 #define ccl_sampler_get_info_scalar(smplr, param_name, param_type, err) \
-	*((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) smplr, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_SAMPLER, CL_FALSE, err))
+    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) smplr, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_SAMPLER, CL_FALSE, err))
 
 /**
  * Macro which returns an array sampler information value.
@@ -160,8 +160,8 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * If an error occurs, NULL is returned.
  * */
 #define ccl_sampler_get_info_array(smplr, param_name, param_type, err) \
-	(param_type *) ccl_wrapper_get_info_value((CCLWrapper *) smplr, \
-		NULL, param_name, sizeof(param_type), CCL_INFO_SAMPLER, CL_FALSE, err)
+    (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) smplr, \
+        NULL, param_name, sizeof(param_type), CCL_INFO_SAMPLER, CL_FALSE, err)
 
 /**
  * Increase the reference count of the sampler wrapper object.
@@ -169,7 +169,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * @param[in] smplr The sampler wrapper object.
  * */
 #define ccl_sampler_ref(smplr) \
-	ccl_wrapper_ref((CCLWrapper*) smplr)
+    ccl_wrapper_ref((CCLWrapper*) smplr)
 
 /**
  * Alias to ccl_sampler_destroy().
@@ -186,7 +186,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
  * @return The OpenCL sampler object.
  * */
 #define ccl_sampler_unwrap(smplr) \
-	((cl_sampler) ccl_wrapper_unwrap((CCLWrapper*) smplr))
+    ((cl_sampler) ccl_wrapper_unwrap((CCLWrapper*) smplr))
 
 /** @} */
 
