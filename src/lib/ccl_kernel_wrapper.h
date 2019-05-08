@@ -349,7 +349,7 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. char*, size_t*, etc.).
+ * @param[in] param_type Type of parameter (e.g. `char`, `size_t`, etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The requested kernel argument information value. This value
@@ -359,7 +359,7 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
 #define ccl_kernel_get_arg_info_array(krnl, idx, param_name, \
     param_type, err) \
     (ccl_kernel_get_arg_info((krnl), (idx), (param_name), (err)) != NULL) \
-    ? *((param_type *) ccl_kernel_get_arg_info( \
+    ? *((param_type **) ccl_kernel_get_arg_info( \
         (krnl), (idx), (param_name), (err))) \
     : NULL
 

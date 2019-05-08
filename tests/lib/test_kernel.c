@@ -178,8 +178,8 @@ static void create_info_destroy_test() {
 #ifdef CL_VERSION_1_2
 
         cl_kernel_arg_address_qualifier kaaq;
-        char* kernel_arg_type_name;
-        char* kernel_arg_name;
+        char * kernel_arg_type_name;
+        char * kernel_arg_name;
 
         /* If platform supports kernel argument queries, get kernel argument
          * information and compare it with expected info. */
@@ -199,8 +199,8 @@ static void create_info_destroy_test() {
                 g_clear_error(&err);
             }
 
-            kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-                CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+            kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+                krnl, 0, CL_KERNEL_ARG_TYPE_NAME, char, &err);
             g_assert((err == NULL)
                 || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                     && (err->domain == CCL_ERROR))
@@ -212,8 +212,8 @@ static void create_info_destroy_test() {
                 g_clear_error(&err);
             }
 
-            kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
-                CL_KERNEL_ARG_NAME, char*, &err);
+            kernel_arg_name = ccl_kernel_get_arg_info_array(
+                krnl, 0, CL_KERNEL_ARG_NAME, char, &err);
             g_assert((err == NULL)
                 || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                     && (err->domain == CCL_ERROR))
@@ -789,8 +789,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-            CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+        kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+            krnl, 0, CL_KERNEL_ARG_TYPE_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -802,8 +802,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 0,
-            CL_KERNEL_ARG_NAME, char*, &err);
+        kernel_arg_name = ccl_kernel_get_arg_info_array(
+            krnl, 0, CL_KERNEL_ARG_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -830,8 +830,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 1,
-            CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+        kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+            krnl, 1, CL_KERNEL_ARG_TYPE_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -843,8 +843,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 1,
-            CL_KERNEL_ARG_NAME, char*, &err);
+        kernel_arg_name = ccl_kernel_get_arg_info_array(
+            krnl, 1, CL_KERNEL_ARG_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -871,8 +871,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 2,
-            CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+        kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+            krnl, 2, CL_KERNEL_ARG_TYPE_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -884,8 +884,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 2,
-            CL_KERNEL_ARG_NAME, char*, &err);
+        kernel_arg_name = ccl_kernel_get_arg_info_array(
+            krnl, 2, CL_KERNEL_ARG_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -912,8 +912,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 3,
-            CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+        kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+            krnl, 3, CL_KERNEL_ARG_TYPE_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -925,8 +925,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 3,
-            CL_KERNEL_ARG_NAME, char*, &err);
+        kernel_arg_name = ccl_kernel_get_arg_info_array(
+            krnl, 3, CL_KERNEL_ARG_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -953,8 +953,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 4,
-            CL_KERNEL_ARG_TYPE_NAME, char*, &err);
+        kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+            krnl, 4, CL_KERNEL_ARG_TYPE_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -966,8 +966,8 @@ static void args_test() {
             g_clear_error(&err);
         }
 
-        kernel_arg_name = ccl_kernel_get_arg_info_array(krnl, 4,
-            CL_KERNEL_ARG_NAME, char*, &err);
+        kernel_arg_name = ccl_kernel_get_arg_info_array(
+            krnl, 4, CL_KERNEL_ARG_NAME, char, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -980,8 +980,8 @@ static void args_test() {
         }
 
         /* Bogus request, should return NULL and should raise an error. */
-        kernel_arg_type_name = ccl_kernel_get_arg_info_array(krnl, 0,
-            0 /* invalid value */, char*, &err);
+        kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+            krnl, 0, 0 /* invalid value */, char, &err);
         g_assert(kernel_arg_type_name == NULL);
         g_assert (err != NULL);
         g_clear_error(&err);
