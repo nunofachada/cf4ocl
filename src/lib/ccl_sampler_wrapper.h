@@ -69,9 +69,9 @@
  * _Example:_
  *
  * @dontinclude image_filter.c
- * @skipline CCLContext*
- * @skipline CCLSampler*
- * @skipline CCLErr*
+ * @skipline CCLContext
+ * @skipline CCLSampler
+ * @skipline CCLErr
  *
  * @skipline smplr =
  * @until CL_FILTER_NEAREST,

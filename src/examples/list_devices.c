@@ -59,10 +59,10 @@ int main() {
     /* Other variables. */
     cl_uint num_platfs;
     cl_uint num_devs;
-    char* info;
+    char * info;
 
     /* Error handling object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Get all platforms in system. */
     platf_list = ccl_platforms_new(&err);
@@ -117,4 +117,3 @@ int main() {
     /* Bye. */
     return EXIT_SUCCESS;
 }
-

@@ -40,16 +40,17 @@
  *
  * _Example:_
  *
- * @code{.c}
+ * ```c
  * cl_int status;
  * cl_event event;
- * @endcode
- * @code{.c}
+ * ```
+ *
+ * ```c
  * status = clWaitForEvents(1, &event);
  * if (status != CL_SUCCESS) {
  *     fprintf(stderr, "OpenCL error %d: %s", status, ccl_err(status));
  * }
- * @endcode
+ * ```
  *
  * @{
  */

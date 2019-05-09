@@ -48,11 +48,11 @@
  *
  * @dontinclude list_devices.c
  * @skipline cf4ocl objects
- * @until CCLPlatform* platf;
+ * @until CCLPlatform * platf;
  *
  * @skipline Other variables
  * @until cl_uint num_platfs;
- * @skipline CCLErr* err = NULL;
+ * @skipline CCLErr * err = NULL;
  *
  * @skipline Get all platforms in system
  * @until platf_list = ccl_platforms_new(&err);

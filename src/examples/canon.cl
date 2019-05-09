@@ -37,8 +37,8 @@
  * @param[in] d Constant to sum.
  * @param[in] buf_size Size of vector.
  * */
-__kernel void sum(__global const uint *a, __global const uint *b,
-    __global uint *c, uint d, uint buf_size) {
+__kernel void sum(__global const uint * a, __global const uint * b,
+    __global uint * c, uint d, uint buf_size) {
 
     /* Get global ID. */
     uint gid = get_global_id(0);

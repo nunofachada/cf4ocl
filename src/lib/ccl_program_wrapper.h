@@ -157,7 +157,7 @@
  *
  * @skipline Wrappers.
  * @until c_dev
- * @skipline CCLEvent* evt_exec
+ * @skipline CCLEvent * evt_exec
  *
  * @skipline Global and local
  * @until lws

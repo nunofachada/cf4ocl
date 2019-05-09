@@ -110,7 +110,7 @@
  * @until queue_comm
  * @skipline CCLProf
  * @skipline Error handling
- * @until CCLErr*
+ * @until CCLErr *
  *
  * @skipline Create command queues
  * @skipline queue_exec
@@ -181,7 +181,7 @@
  * The @ref ccl_plot_events script can be used to plot a Gantt-like chart of
  * the events which took place in the queues. Running the following command...
  *
- *     $ python ccl_plot_events.py prof.tsv
+ * `$ python ccl_plot_events.py prof.tsv`
  *
  * ...will produce the following image:
  *

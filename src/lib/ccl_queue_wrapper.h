@@ -66,9 +66,9 @@
  *
  * @dontinclude image_filter.c
  * @skipline Wrappers for
- * @skipline CCLQueue*
+ * @skipline CCLQueue
  * @skipline Error handling
- * @skipline CCLErr*
+ * @skipline CCLErr
  *
  * @skipline Create a command queue
  * @skipline queue =
