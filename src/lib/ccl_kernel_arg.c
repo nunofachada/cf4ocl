@@ -18,12 +18,11 @@
 
  /**
  * @file
- *
  * Implementation of a wrapper type and related functions for a OpenCL kernel
  * arguments.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -31,8 +30,9 @@
 #include "_ccl_abstract_wrapper.h"
 
 /**
- * @internal
  * Determine if argument is local/private.
+ *
+ * @internal
  *
  * @param[in] arg Kernel argument.
  * @return True if argument is local or private, false if argument is
@@ -42,17 +42,19 @@
      (arg->info == (void *) &arg_local_marker)
 
 /**
- * @internal
  * Marker which determines if argument is local/private or a
  * real ::CCLWrapper object.
+ *
+ * @internal
  * */
 static char arg_local_marker;
 
 /**
- * @internal
  * This variables defines a kernel argument to be skiped in
  * ::ccl_kernel_set_args() and ::ccl_kernel_set_args_v() functions.
  * Client code should use the ::ccl_arg_skip global variable.
+ *
+ * @internal
  * */
 static const CCLArg arg_skip = { CCL_NONE, NULL, NULL, 0 };
 
@@ -88,10 +90,11 @@ CCLArg * ccl_arg_new(void * value, size_t size) {
 }
 
 /**
- * @internal
  * Destroy a kernel argument.
  *
  * Client code shouldn't directly use this function.
+ *
+ * @internal
  *
  * @param[in] arg Argument to destroy.
  * */
@@ -108,10 +111,11 @@ void ccl_arg_destroy(CCLArg * arg) {
 }
 
 /**
- * @internal
  * Get size in bytes of kernel argument.
  *
  * Client code shouldn't directly use this function.
+ *
+ * @internal
  *
  * @param[in] arg Argument to get size of.
  * @return Argument size in bytes.
@@ -128,10 +132,11 @@ size_t ccl_arg_size(CCLArg * arg) {
 }
 
 /**
- * @internal
  * Get value of kernel argument.
  *
  * Client code shouldn't directly use this function.
+ *
+ * @internal
  *
  * @param[in] arg Argument to get value of.
  * @return Argument value.

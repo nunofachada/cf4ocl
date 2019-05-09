@@ -18,12 +18,10 @@
 
 /**
  * @file
- *
- * Implementation of a wrapper class and its methods for OpenCL buffer
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL buffer objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 

@@ -18,11 +18,11 @@
 
  /**
  * @file
- *
- * Implementation of a wrapper class and its methods for OpenCL sampler objects.
+ * Implementation of a wrapper class and its methods for OpenCL sampler
+ * objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -42,7 +42,6 @@ struct ccl_sampler {
      * @private
      * */
     CCLWrapper base;
-
 };
 
 /**
@@ -51,9 +50,10 @@ struct ccl_sampler {
  */
 
 /**
- * @internal
  * Basic sampler properties accepted by the "old" clCreateSampler()
  * constructor.
+ *
+ * @internal
  * */
 struct ccl_sampler_basic_properties {
 
@@ -65,30 +65,26 @@ struct ccl_sampler_basic_properties {
 
     /** Filter to apply when reading an image. */
     cl_filter_mode filter_mode;
-
 };
 
 /**
- * @internal
- * Gets a ::ccl_sampler_basic_properties containing the properties
- * accepted by the "old" clCreateSampler() constructor from a given
- * list of properties. The following default values are assumed for
- * non-specified properties:
+ * Gets a ::ccl_sampler_basic_properties containing the properties accepted by
+ * the "old" clCreateSampler() constructor from a given list of properties. The
+ * following default values are assumed for non-specified properties:
  *
  * * `CL_SAMPLER_NORMALIZED_COORDS`: `CL_TRUE`
  * * `CL_SAMPLER_ADDRESSING_MODE` : `CL_ADDRESS_CLAMP`
  * * `CL_SAMPLER_FILTER_MODE` : `CL_FILTER_NEAREST`
  *
- * @private @memberof ccl_sampler
+ * @internal @private @memberof ccl_sampler
  *
- * @param[in] sampler_properties Zero-terminated list of sampler
- * properties.
+ * @param[in] sampler_properties Zero-terminated list of sampler properties.
  * @return A ::ccl_sampler_basic_properties object containing sampler
  * properties.
  * */
 static struct ccl_sampler_basic_properties
     ccl_sampler_get_basic_properties(
-        const cl_sampler_properties *sampler_properties) {
+        const cl_sampler_properties * sampler_properties) {
 
     /* Set defaults. */
     struct ccl_sampler_basic_properties sbp =
@@ -100,7 +96,8 @@ static struct ccl_sampler_basic_properties
             /* Check if property is a basic known property. */
             switch (sampler_properties[i]) {
                 case CL_SAMPLER_NORMALIZED_COORDS:
-                    sbp.normalized_coords = (cl_bool) sampler_properties[i + 1];
+                    sbp.normalized_coords =
+                        (cl_bool) sampler_properties[i + 1];
                     break;
                 case CL_SAMPLER_ADDRESSING_MODE:
                     sbp.addressing_mode =
@@ -116,19 +113,17 @@ static struct ccl_sampler_basic_properties
 
     /* Return properties. */
     return sbp;
-
 }
 
 /**
  * Get the sampler wrapper for the given OpenCL sampler.
  *
- * If the wrapper doesn't exist, its created with a reference count
- * of 1. Otherwise, the existing wrapper is returned and its reference
- * count is incremented by 1.
+ * If the wrapper doesn't exist, its created with a reference count of 1.
+ * Otherwise, the existing wrapper is returned and its reference count is
+ * incremented by 1.
  *
- * This function will rarely be called from client code, except when
- * clients wish to directly wrap an OpenCL sampler in a
- * ::CCLSampler wrapper object.
+ * This function will rarely be called from client code, except when clients
+ * wish to directly wrap an OpenCL sampler in a ::CCLSampler wrapper object.
  *
  * @protected @memberof ccl_sampler
  *
@@ -136,39 +131,36 @@ static struct ccl_sampler_basic_properties
  * @return The ::CCLSampler wrapper for the given OpenCL sampler.
  * */
 CCL_EXPORT
-CCLSampler* ccl_sampler_new_wrap(cl_sampler sampler) {
+CCLSampler * ccl_sampler_new_wrap(cl_sampler sampler) {
 
-    return (CCLSampler*) ccl_wrapper_new(
-        CCL_SAMPLER, (void*) sampler, sizeof(CCLSampler));
-
+    return (CCLSampler *) ccl_wrapper_new(
+        CCL_SAMPLER, (void *) sampler, sizeof(CCLSampler));
 }
 
 /**
- * Decrements the reference count of the wrapper object. If it
- * reaches 0, the wrapper object is destroyed.
+ * Decrements the reference count of the wrapper object. If it reaches 0, the
+ * wrapper object is destroyed.
  *
  * @public @memberof ccl_sampler
  *
  * @param[in] smplr The sampler wrapper object.
  * */
 CCL_EXPORT
-void ccl_sampler_destroy(CCLSampler* smplr) {
+void ccl_sampler_destroy(CCLSampler * smplr) {
 
-    ccl_wrapper_unref((CCLWrapper*) smplr, sizeof(CCLSampler),
+    ccl_wrapper_unref((CCLWrapper *) smplr, sizeof(CCLSampler),
         NULL, (ccl_wrapper_release_cl_object) clReleaseSampler, NULL);
-
 }
 
 /**
- * Create a new sampler wrapper object by specifying a basic set of
- * sampler properties.
+ * Create a new sampler wrapper object by specifying a basic set of sampler
+ * properties.
  *
  * @public @memberof ccl_sampler
  *
- * This function mimicks the style of the classic sampler constructor,
- * clCreateSampler(), but can be used with any version of OpenCL. This
- * function calls the ccl_sampler_new_full() function for actual
- * sampler creation.
+ * This function mimics the style of the classic sampler constructor,
+ * clCreateSampler(), but can be used with any version of OpenCL. This function
+ * calls the ccl_sampler_new_full() function for actual sampler creation.
  *
  * @param[in] ctx A context wrapper object.
  * @param[in] normalized_coords Are the image coordinates normalized?
@@ -179,9 +171,9 @@ void ccl_sampler_destroy(CCLSampler* smplr) {
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
+CCLSampler * ccl_sampler_new(CCLContext * ctx, cl_bool normalized_coords,
     cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
-    CCLErr** err) {
+    CCLErr ** err) {
 
     const cl_sampler_properties sp[] = {
         CL_SAMPLER_NORMALIZED_COORDS, normalized_coords,
@@ -197,37 +189,35 @@ CCLSampler* ccl_sampler_new(CCLContext* ctx, cl_bool normalized_coords,
 /**
  * Create a new sampler wrapper object using a list of properties.
  *
- * If a supported property is not specified, a default value is used.
- * Some valid properties are `CL_SAMPLER_NORMALIZED_COORDS` (default
- * value is `CL_TRUE`), `CL_SAMPLER_ADDRESSING_MODE` (default value is
+ * If a supported property is not specified, a default value is used. Some
+ * valid properties are `CL_SAMPLER_NORMALIZED_COORDS` (default value is
+ * `CL_TRUE`), `CL_SAMPLER_ADDRESSING_MODE` (default value is
  * `CL_ADDRESS_CLAMP`) and `CL_SAMPLER_FILTER_MODE` (default value is
  * `CL_FILTER_NEAREST`).
  *
- * This function mimicks the style of the OpenCL 2.0 sampler
- * constructor, clCreateSamplerWithProperties(), but can be used with
- * any version of OpenCL. Thus, The underlying OpenCL sampler object is
- * created using:
+ * This function mimics the style of the OpenCL 2.0 sampler constructor,
+ * clCreateSamplerWithProperties(), but can be used with any version of OpenCL.
+ * Thus, The underlying OpenCL sampler object is created using:
  *
  * * clCreateSampler() - for platforms with OpenCL version <= 1.2
  * * clCreateSamplerWithProperties() - for platforms with OpenCL version
- * >= 2.0.
+ *   >= 2.0.
  *
  * @public @memberof ccl_sampler
  *
  * @param[in] ctx A context wrapper object.
- * @param[in] sampler_properties A list of sampler property names and
- * their corresponding values. Each sampler property name is immediately
- * followed by the corresponding desired value. The list is terminated
- * with 0. If a supported property is not specified, its default value
- * will be used. If `NULL`, default values for supported sampler
- * properties will be used.
+ * @param[in] sampler_properties A list of sampler property names and their
+ * corresponding values. Each sampler property name is immediately followed by
+ * the corresponding desired value. The list is terminated with 0. If a
+ * supported property is not specified, its default value will be used. If
+ * `NULL`, default values for supported sampler properties will be used.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new sampler wrapper object or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
-    const cl_sampler_properties *sampler_properties, CCLErr** err) {
+CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
+    const cl_sampler_properties * sampler_properties, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -235,7 +225,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
     g_return_val_if_fail(ctx != NULL, NULL);
 
     /* New sampler wrapper object to create. */
-    CCLSampler* smplr = NULL;
+    CCLSampler * smplr = NULL;
     /* OpenCL sampler object to create and wrap. */
     cl_sampler sampler;
     /* OpenCL function status. */
@@ -246,7 +236,7 @@ CCLSampler* ccl_sampler_new_full(CCLContext* ctx,
     /* OpenCL platform version. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Get context platform version. */
     ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
@@ -301,8 +291,6 @@ finish:
 
     /* Return sampler wrapper. */
     return smplr;
-
-
 }
 
 

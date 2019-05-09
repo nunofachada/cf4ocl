@@ -18,9 +18,7 @@
 
  /**
  * @file
- *
- * Definition of a wrapper class and its methods for OpenCL kernel
- * objects.
+ * Definition of a wrapper class and its methods for OpenCL kernel objects.
  *
  * @author Nuno Fachada
  * @date 2019

@@ -18,9 +18,7 @@
 
  /**
  * @file
- *
- * Definition of a wrapper class and its methods for OpenCL event
- * objects.
+ * Definition of a wrapper class and its methods for OpenCL event objects.
  *
  * @author Nuno Fachada
  * @date 2019
@@ -350,11 +348,12 @@ CCL_EXPORT
 void ccl_event_wait_list_clear(CCLEventWaitList * evt_wait_lst);
 
 /**
- * @internal
  * Get number of events in the event wait list.
  *
  * This macro is used by the `ccl_*_enqueue_*()` functions and will
  * rarely be called from client code.
+ *
+ * @internal
  *
  * @param[in] evt_wait_lst Event wait list.
  * @return Number of event in the event wait list.
@@ -365,11 +364,12 @@ void ccl_event_wait_list_clear(CCLEventWaitList * evt_wait_lst);
     : 0)
 
 /**
- * @internal
  * Get an array of OpenCL cl_event objects in the event wait list.
  *
  * This macro is used by the `ccl_*_enqueue_*()` functions and will
  * rarely be called from client code.
+ *
+ * @internal
  *
  * @param[in] evt_wait_lst Event wait list.
  * @return Array of OpenCL cl_event objects in the event wait list.

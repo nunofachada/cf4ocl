@@ -18,12 +18,11 @@
 
 /**
  * @file
- *
  * Classes and functions for filtering and selecting OpenCL contexts and
  * associated devices.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 

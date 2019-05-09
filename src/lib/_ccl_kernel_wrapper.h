@@ -18,12 +18,13 @@
 
 /**
  * @file
- *
  * This header provides the prototype of the ccl_kernel_get_arg_info_adapter()
  * function. This header is not part of the _cf4ocl_ public API.
  *
+ * @internal
+ *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 

@@ -18,7 +18,6 @@
 
 /**
  * @file
- *
  * Functions for querying OpenCL devices.
  *
  * @author Nuno Fachada

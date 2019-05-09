@@ -18,7 +18,6 @@
 
 /**
  * @file
- *
  * Implementation of a wrapper class and its methods for OpenCL device objects.
  *
  * @author Nuno Fachada
@@ -58,10 +57,9 @@ struct ccl_device {
 #ifdef CL_VERSION_1_2
 
 /**
- * @internal
  * Release an array of sub-devices and the respective sub-devices.
  *
- * @private @memberof ccl_device
+ * @internal @private @memberof ccl_device
  *
  * @param[in] data An array of sub-devices to be released.
  * */
@@ -82,11 +80,10 @@ static void ccl_device_release_subdev_arrays(gpointer data) {
 }
 
 /**
- * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLDevice wrapper objects.
  *
- * @private @memberof ccl_device
+ * @internal @private @memberof ccl_device
  *
  * @param[in] dev A ::CCLDevice wrapper object.
  * */

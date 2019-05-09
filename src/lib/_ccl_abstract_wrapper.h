@@ -17,14 +17,14 @@
  * */
 
 /**
- * @internal
  * @file
- *
  * Definition of an abstract wrapper class and some of its methods. This
  * file is only for building _cf4ocl_. Is is not part of its public API.
  *
+ * @internal
+ *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -36,8 +36,8 @@
 #include "ccl_errors.h"
 
 /**
- * @internal
  * Information about wrapped OpenCL objects.
+ * @internal
  * */
 typedef struct ccl_wrapper_info_table CCLWrapperInfoTable;
 
@@ -73,24 +73,22 @@ struct ccl_wrapper {
 };
 
 /**
- * @internal
  * Release the fields of the concrete wrapper implementation.
  *
- * @protected @memberof ccl_wrapper
+ * @internal @protected @memberof ccl_wrapper
  *
  * @param[in] wrapper A concrete wrapper implementation.
  * */
 typedef void (*ccl_wrapper_release_fields)(CCLWrapper * wrapper);
 
 /**
- * @internal
  * Release the OpenCL object wrapped by the concrete wrapper
  * implementation.
  *
- * @protected @memberof ccl_wrapper
- *
  * Concrete implementations of this function are provided by the OpenCL
  * implementation.
+ *
+ * @internal @protected @memberof ccl_wrapper
  *
  * @param[in] cl_object The OpenCL object to release.
  * @return Returns `CL_SUCCESS` if the function is executed successfully
@@ -100,10 +98,9 @@ typedef CL_API_ENTRY cl_int
     (CL_API_CALL * ccl_wrapper_release_cl_object)(void * cl_object);
 
 /**
- * @internal
  * Generic type for OpenCL `clGet*Info()` functions.
  *
- * @protected @memberof ccl_wrapper
+ * @internal @protected @memberof ccl_wrapper
  *
  * Concrete implementations of this function are provided by the OpenCL
  * implementation.
@@ -125,11 +122,10 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL * ccl_wrapper_info_fp1)(
     void * param_value, size_t * param_value_size_ret);
 
 /**
- * @internal
  * Generic type for OpenCL `clGet**Info()` functions, in which two
  * OpenCL objects are involved.
  *
- * @protected @memberof ccl_wrapper
+ * @internal @protected @memberof ccl_wrapper
  *
  * Concrete implementations of this function are provided by the OpenCL
  * implementation.
@@ -174,4 +170,3 @@ CCLWrapperInfo * ccl_wrapper_info_new(size_t size);
 void ccl_wrapper_info_destroy(CCLWrapperInfo * info);
 
 #endif
-

@@ -18,12 +18,13 @@
 
 /**
  * @file
- *
  * Useful definitions used internally by _cf4ocl_. This header is not part of
  * the public API.
  *
+ * @internal
+ *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -56,9 +57,9 @@
 #endif
 
 /**
- * @internal
  * A `g_info()` macro for older GLib versions which do not provide it.
  *
+ * @internal
  * @def g_info()
  * */
 #ifndef g_info

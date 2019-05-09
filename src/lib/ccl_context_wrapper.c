@@ -18,11 +18,10 @@
 
 /**
  * @file
- *
  * Implementation of a wrapper class and its methods for OpenCL context objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -52,11 +51,10 @@ struct ccl_context {
 };
 
 /**
- * @internal
  * Implementation of ccl_wrapper_release_fields() function for ::CCLContext
  * wrapper objects.
  *
- * @private @memberof ccl_context
+ * @internal @private @memberof ccl_context
  *
  * @param[in] ctx A ::CCLContext wrapper object.
  * */
@@ -75,10 +73,9 @@ static void ccl_context_release_fields(CCLContext * ctx) {
 }
 
 /**
- * @internal
  * Free the default context properties if required.
  *
- * @private @memberof ccl_context
+ * @internal @private
  *
  * @param[in] properties The original const properties, may be `NULL`, in
  * which case the `ctx_props` parameter will be freed.
@@ -90,12 +87,11 @@ static void ccl_context_release_fields(CCLContext * ctx) {
         g_slice_free1(3 * sizeof(cl_context_properties), ctx_props)
 
 /**
- * @internal
  * Create a default context properties object, if required. The
  * only property set in the default properties object is the OpenCL
  * `cl_platform_id` object.
  *
- * @private @memberof ccl_context
+ * @internal @private @memberof ccl_context
  *
  * @param[in] properties Original const properties, which if `NULL` imply
  * that a new default properties object should be created.
@@ -165,11 +161,9 @@ finish:
 }
 
 /**
- * @internal
- * Implementation of ccl_dev_container_get_cldevices() for the
- * context wrapper.
+ * Implementation of ccl_dev_container_get_cldevices() for the context wrapper.
  *
- * @private @memberof ccl_context
+ * @internal @private @memberof ccl_context
  *
  * @param[in] devcon A ::CCLContext wrapper, passed as a ::CCLDevContainer.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error

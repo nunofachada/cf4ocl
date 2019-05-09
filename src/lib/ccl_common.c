@@ -18,7 +18,6 @@
 
 /**
  * @file
- *
  * Common _cf4ocl_ implementations.
  *
  * @author Nuno Fachada

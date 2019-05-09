@@ -22,25 +22,22 @@
 
  /**
  * @file
- *
- * Implementation of a wrapper class and its methods for OpenCL memory
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL memory objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
 /**
- * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects.
  *
- * @protected @memberof ccl_memobj
+ * @internal @protected @memberof ccl_memobj
  *
  * @param[in] mo A ::CCLMemObj wrapper object.
  * */
-void ccl_memobj_release_fields(CCLMemObj* mo) {
+void ccl_memobj_release_fields(CCLMemObj * mo) {
 
     /* Make sure mo wrapper object is not NULL. */
     g_return_if_fail(mo != NULL);
@@ -48,7 +45,6 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
     /* Reduce reference count of memory object context wrapper. */
     if (mo->ctx != NULL)
         ccl_context_unref(mo->ctx);
-
 }
 
 /**
@@ -65,6 +61,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @public @memberof ccl_memobj
@@ -76,7 +73,7 @@ void ccl_memobj_release_fields(CCLMemObj* mo) {
  * memory object as an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, CCLErr** err) {
+cl_uint ccl_memobj_get_opencl_version(CCLMemObj * mo, CCLErr ** err) {
 
     /* Make sure number mo is not NULL. */
     g_return_val_if_fail(mo != NULL, 0);
@@ -84,8 +81,8 @@ cl_uint ccl_memobj_get_opencl_version(CCLMemObj* mo, CCLErr** err) {
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
     cl_context context;
-    CCLContext* ctx;
-    CCLErr* err_internal = NULL;
+    CCLContext * ctx;
+    CCLErr * err_internal = NULL;
     cl_uint ocl_ver;
 
     /* Get cl_context object for this memory object. */
@@ -117,7 +114,6 @@ finish:
 
     /* Return event wrapper. */
     return ocl_ver;
-
 }
 
 /**
@@ -139,8 +135,8 @@ finish:
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
-    void* mapped_ptr, CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_memobj_enqueue_unmap(CCLMemObj * mo, CCLQueue * cq,
+    void * mapped_ptr, CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -154,7 +150,7 @@ CCLEvent* ccl_memobj_enqueue_unmap(CCLMemObj* mo, CCLQueue* cq,
     /* OpenCL event. */
     cl_event event;
     /* Event wrapper. */
-    CCLEvent* evt;
+    CCLEvent * evt;
 
     /* Enqueue unmap command. */
     ocl_status = clEnqueueUnmapMemObject (ccl_queue_unwrap(cq),
@@ -190,8 +186,6 @@ finish:
 
     /* Return evt. */
     return evt;
-
-
 }
 
 /**
@@ -210,9 +204,9 @@ finish:
  * `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
+cl_bool ccl_memobj_set_destructor_callback(CCLMemObj * mo,
     ccl_memobj_destructor_callback pfn_notify,
-    void *user_data, CCLErr** err) {
+    void * user_data, CCLErr ** err) {
 
     /* Make sure mo is not NULL. */
     g_return_val_if_fail(mo != NULL, CL_FALSE);
@@ -226,7 +220,7 @@ cl_bool ccl_memobj_set_destructor_callback(CCLMemObj* mo,
     /* OpenCL version. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -284,7 +278,6 @@ finish:
 
     /* Return status. */
     return ret_status;
-
 }
 
 /**
@@ -307,9 +300,9 @@ finish:
  * @return
  * */
 CCL_EXPORT
-CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
-     CCLQueue* cq, cl_mem_migration_flags flags,
-     CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
+     CCLQueue * cq, cl_mem_migration_flags flags,
+     CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -325,13 +318,13 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
     /* OpenCL event. */
     cl_event event;
     /* Event wrapper. */
-    CCLEvent* evt;
+    CCLEvent * evt;
     /* OpenCL version. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* Array of OpenCL memory objects. */
-    cl_mem* mem_objects = NULL;
+    cl_mem * mem_objects = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -364,7 +357,7 @@ CCLEvent* ccl_memobj_enqueue_migrate(CCLMemObj** mos, cl_uint num_mos,
         CCL_STRD);
 
     /* Allocate memory for memory objects. */
-    mem_objects = (cl_mem*) g_slice_alloc(sizeof(cl_mem) * num_mos);
+    mem_objects = (cl_mem *) g_slice_alloc(sizeof(cl_mem) * num_mos);
 
     /* Gather OpenCL memory objects in a array. */
     for (cl_uint i = 0; i < num_mos; ++i) {
@@ -410,7 +403,6 @@ finish:
 
     /* Return evt. */
     return evt;
-
 }
 
 /** @} */

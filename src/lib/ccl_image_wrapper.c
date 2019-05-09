@@ -18,12 +18,10 @@
 
  /**
  * @file
- *
- * Implementation of a wrapper class and its methods for OpenCL image
- * objects.
+ * Implementation of a wrapper class and its methods for OpenCL image objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -52,11 +50,9 @@ struct ccl_image {
  */
 
 /**
- * @internal
- * Creates a new OpenCL image object using the deprecated OpenCL 1.0/1.1
- * API.
+ * Creates a new OpenCL image object using the deprecated OpenCL 1.0/1.1 API.
  *
- * @private @memberof ccl_image
+ * @internal @private @memberof ccl_image
  *
  * @param[in] ctx A context wrapper object on which the image wrapper
  * object is to be created.

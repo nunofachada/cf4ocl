@@ -18,7 +18,6 @@
 
  /**
  * @file
- *
  * Definition of a wrapper class and its methods for OpenCL queue objects.
  *
  * @author Nuno Fachada
@@ -39,12 +38,12 @@
 /**
  * @defgroup CCL_QUEUE_WRAPPER Command queue wrapper
  *
- * The command queue wrapper module provides functionality for simple
- * handling of OpenCL command queue objects.
+ * The command queue wrapper module provides functionality for simple handling
+ * of OpenCL command queue objects.
  *
  * Queue wrappers can be instantiated with the ::ccl_queue_new() and
- * ::ccl_queue_new_full() constructors. While both constructors can be used with
- * any OpenCL version, the later is targeted for OpenCL >= 2.0, exposing
+ * ::ccl_queue_new_full() constructors. While both constructors can be used
+ * with any OpenCL version, the later is targeted for OpenCL >= 2.0, exposing
  * features such as on-device queues to client code. If OpenCL >= 2.0 features
  * are requested for platforms which do not support them, a warning will be
  * logged and the queue will be created without the unsupported features.
@@ -83,71 +82,67 @@
 /* Get the command queue wrapper for the given OpenCL command
  * queue. */
 CCL_EXPORT
-CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue);
+CCLQueue * ccl_queue_new_wrap(cl_command_queue command_queue);
 
 /* Create a new command queue wrapper object. */
 CCL_EXPORT
-CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
-    const cl_queue_properties* prop_full, CCLErr** err);
+CCLQueue * ccl_queue_new_full(CCLContext * ctx, CCLDevice * dev,
+    const cl_queue_properties * prop_full, CCLErr ** err);
 
 /* Create a new command queue wrapper object. */
 CCL_EXPORT
-CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-    cl_command_queue_properties properties, CCLErr** err);
+CCLQueue * ccl_queue_new(CCLContext * ctx, CCLDevice * dev,
+    cl_command_queue_properties properties, CCLErr ** err);
 
-/* Decrements the reference count of the command queue wrapper
- * object. If it reaches 0, the command queue wrapper object is
- * destroyed. */
+/* Decrements the reference count of the command queue wrapper object. If it
+ * reaches 0, the command queue wrapper object is destroyed. */
 CCL_EXPORT
-void ccl_queue_destroy(CCLQueue* cq);
+void ccl_queue_destroy(CCLQueue * cq);
 
-/* Get the context associated with the given command queue wrapper
- * object. */
+/* Get the context associated with the given command queue wrapper object. */
 CCL_EXPORT
-CCLContext* ccl_queue_get_context(CCLQueue* cq, CCLErr** err);
+CCLContext * ccl_queue_get_context(CCLQueue * cq, CCLErr ** err);
 
-/* Get the device associated with the given command queue wrapper
- * object. */
+/* Get the device associated with the given command queue wrapper object. */
 CCL_EXPORT
-CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err);
+CCLDevice * ccl_queue_get_device(CCLQueue * cq, CCLErr ** err);
 
-/* Create an event wrapper from a given OpenCL event object and
- * associate it with the command queue. */
+/* Create an event wrapper from a given OpenCL event object and associate it
+ * with the command queue. */
 CCL_EXPORT
-CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event);
+CCLEvent * ccl_queue_produce_event(CCLQueue * cq, cl_event event);
 
-/* Initialize an iterator for this command queue's list of event
- * wrappers. */
+/* Initialize an iterator for this command queue's list of event wrappers. */
 CCL_EXPORT
-void ccl_queue_iter_event_init(CCLQueue* cq);
+void ccl_queue_iter_event_init(CCLQueue * cq);
 
 /* Get the next event wrapper associated with this queue. */
 CCL_EXPORT
-CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq);
+CCLEvent * ccl_queue_iter_event_next(CCLQueue * cq);
 
 /* Issues all previously queued commands in a command queue to the
  * associated device. */
 CCL_EXPORT
-cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err);
+cl_bool ccl_queue_flush(CCLQueue * cq, CCLErr ** err);
 
 /* Blocks until all previously queued OpenCL commands in a command-queue
  * are issued to the associated device and have completed. */
 CCL_EXPORT
-cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err);
+cl_bool ccl_queue_finish(CCLQueue * cq, CCLErr ** err);
 
 /* Release all events associated with the command queue. */
 CCL_EXPORT
-void ccl_queue_gc(CCLQueue* cq);
+void ccl_queue_gc(CCLQueue * cq);
 
 /* Enqueues a barrier command on the given command queue. */
 CCL_EXPORT
-CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err);
+CCLEvent * ccl_enqueue_barrier(
+    CCLQueue * cq, CCLEventWaitList * evt_wait_lst, CCLErr ** err);
 
 /* Enqueues a marker command on the given command queue. */
 CCL_EXPORT
-CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err);
+CCLEvent * ccl_enqueue_marker(
+    CCLQueue * cq, CCLEventWaitList * evt_wait_lst, CCLErr ** err);
 
 /**
  * Get a ::CCLWrapperInfo command queue information object.
@@ -156,40 +151,40 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The requested command queue information object. This object
- * will be automatically freed when the command queue wrapper object is
- * destroyed. If an error occurs, NULL is returned.
+ * @return The requested command queue information object. This object will be
+ * automatically freed when the command queue wrapper object is destroyed. If
+ * an error occurs, `NULL` is returned.
  * */
 #define ccl_queue_get_info(cq, param_name, err) \
-    ccl_wrapper_get_info((CCLWrapper*) cq, NULL, param_name, 0, \
+    ccl_wrapper_get_info((CCLWrapper *) cq, NULL, param_name, 0, \
         CCL_INFO_QUEUE, CL_FALSE, err)
 
 /**
  * Macro which returns a scalar command queue information value.
  *
- * Use with care. In case an error occurs, zero is returned, which
- * might be ambiguous if zero is a valid return value. In this case, it
- * is necessary to check the error object.
+ * Use with care. In case an error occurs, zero is returned, which might be
+ * ambiguous if zero is a valid return value. In this case, it is necessary to
+ * check the error object.
  *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
- * @param[in] param_type Type of parameter (e.g. cl_uint, size_t, etc.).
+ * @param[in] param_type Type of parameter (e.g. `cl_uint`, `size_t`, etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The requested command queue information value. This value
- * will be automatically freed when the command queue wrapper object is
- * destroyed. If an error occurs, zero is returned.
+ * @return The requested command queue information value. This value will be
+ * automatically freed when the command queue wrapper object is destroyed. If
+ * an error occurs, zero is returned.
  * */
 #define ccl_queue_get_info_scalar(cq, param_name, param_type, err) \
-    *((param_type*) ccl_wrapper_get_info_value((CCLWrapper*) cq, \
+    *((param_type *) ccl_wrapper_get_info_value((CCLWrapper *) cq, \
         NULL, param_name, sizeof(param_type), CCL_INFO_QUEUE, CL_FALSE, err))
 
 /**
  * Macro which returns an array command queue information value.
  *
- * Use with care. In case an error occurs, `NULL` is returned, which
- * might be ambiguous if `NULL` is a valid return value. In this case, it
- * is necessary to check the error object.
+ * Use with care. In case an error occurs, `NULL` is returned, which might be
+ * ambiguous if `NULL` is a valid return value. In this case, it is necessary
+ * to check the error object.
  *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -197,9 +192,9 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * etc.).
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The requested command queue information value. This value
- * will be automatically freed when the command queue wrapper object is
- * destroyed. If an error occurs, NULL is returned.
+ * @return The requested command queue information value. This value will be
+ * automatically freed when the command queue wrapper object is destroyed. If
+ * an error occurs, `NULL` is returned.
  * */
 #define ccl_queue_get_info_array(cq, param_name, param_type, err) \
     (param_type *) ccl_wrapper_get_info_value((CCLWrapper *) cq, \
@@ -211,13 +206,13 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @param[in] cq The command queue wrapper object.
  * */
 #define ccl_queue_ref(cq) \
-    ccl_wrapper_ref((CCLWrapper*) cq)
+    ccl_wrapper_ref((CCLWrapper *) cq)
 
 /**
  * Alias to ccl_queue_destroy().
  *
- * @param[in] cq Command queue wrapper object to destroy if reference
- * count is 1, otherwise just decrement the reference count.
+ * @param[in] cq Command queue wrapper object to destroy if reference count is
+ * 1, otherwise just decrement the reference count.
  * */
 #define ccl_queue_unref(cq) ccl_queue_destroy(cq)
 
@@ -228,7 +223,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
  * @return The OpenCL command queue object.
  * */
 #define ccl_queue_unwrap(cq) \
-    ((cl_command_queue) ccl_wrapper_unwrap((CCLWrapper*) cq))
+    ((cl_command_queue) ccl_wrapper_unwrap((CCLWrapper *) cq))
 
 /** @} */
 

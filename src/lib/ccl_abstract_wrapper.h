@@ -18,12 +18,10 @@
 
  /**
  * @file
- *
- * Definition of an abstract wrapper class and its methods for OpenCL
- * objects.
+ * Definition of an abstract wrapper class and its methods for OpenCL objects.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -95,4 +93,3 @@ CCL_EXPORT
 const char * ccl_wrapper_get_class_name(CCLWrapper * wrapper);
 
 #endif
-

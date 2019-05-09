@@ -18,9 +18,7 @@
 
  /**
  * @file
- *
- * Definition of a wrapper class and its methods for OpenCL image
- * objects.
+ * Definition of a wrapper class and its methods for OpenCL image objects.
  *
  * @author Nuno Fachada
  * @date 2019

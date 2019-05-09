@@ -17,15 +17,15 @@
  * */
 
 /**
- * @internal
  * @file
- *
  * Implementation of an abstract device container wrapper class and
  * specification of its methods. This file is only for building _cf4ocl_. Is is
  * not part of its public API.
  *
+ * @internal
+ *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -68,14 +68,13 @@ struct ccl_dev_container {
 };
 
 /**
- * @internal
  * Returns the list of cl_device_id OpenCL objects in the
  * wrapped OpenCL device container object (i.e. `cl_platform_id`,
  * `cl_program` and `cl_context`). This is an abstract function prototype
  * which must be implemented by device container wrappers, i.e.,
  * ::CCLPlatform, ::CCLProgram and ::CCLContext.
  *
- * @protected @memberof ccl_dev_container
+ * @internal @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container wrapper.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -105,5 +104,3 @@ cl_uint ccl_dev_container_get_num_devices(CCLDevContainer * devcon,
     ccl_dev_container_get_cldevices get_devices, CCLErr ** err);
 
 #endif
-
-

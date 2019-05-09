@@ -18,7 +18,6 @@
 
 /**
  * @file
- *
  * Implementation of a class which represents the list of OpenCL platforms
  * available in the system and respective methods.
  *
@@ -40,7 +39,7 @@ struct ccl_platforms {
      * Platforms available in the system.
      * @private
      * */
-    CCLPlatform** platfs;
+    CCLPlatform ** platfs;
 
     /**
      * Number of platforms available in the system.
@@ -55,17 +54,17 @@ struct ccl_platforms {
  */
 
 /**
- * Creates a new CCLPlatforms* object, which contains the list
+ * Creates a new ::CCLPlatforms* object, which contains the list
  * of OpenCL platforms available in the system.
  *
  * @public @memberof ccl_platforms
  *
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A new ::CCLPlatforms object, or NULL in case an error occurs.
+ * @return A new ::CCLPlatforms object, or `NULL` in case an error occurs.
  * */
 CCL_EXPORT
-CCLPlatforms* ccl_platforms_new(CCLErr **err) {
+CCLPlatforms * ccl_platforms_new(CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -75,13 +74,13 @@ CCLPlatforms* ccl_platforms_new(CCLErr **err) {
 
     /* Object which represents the list of OpenCL platforms available
      * in the system. */
-    CCLPlatforms* platforms = NULL;
+    CCLPlatforms * platforms = NULL;
 
     /* Size in bytes of array of platform IDs. */
     gsize platf_ids_size;
 
     /* Array of platform IDs. */
-    cl_platform_id* platf_ids = NULL;
+    cl_platform_id * platf_ids = NULL;
 
     /* Allocate memory for the CCLPlatforms object. */
     platforms = g_slice_new0(CCLPlatforms);
@@ -100,11 +99,10 @@ CCLPlatforms* ccl_platforms_new(CCLErr **err) {
     platf_ids_size = sizeof(cl_platform_id) * platforms->num_platfs;
 
     /* Allocate memory for array of platform IDs. */
-    platf_ids = (cl_platform_id*) g_slice_alloc(platf_ids_size);
+    platf_ids = (cl_platform_id *) g_slice_alloc(platf_ids_size);
 
     /* Get existing platform IDs. */
-    ocl_status = clGetPlatformIDs(
-        platforms->num_platfs, platf_ids, NULL);
+    ocl_status = clGetPlatformIDs(platforms->num_platfs, platf_ids, NULL);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: get platforms IDs (OpenCL error %d: %s).",
@@ -112,7 +110,7 @@ CCLPlatforms* ccl_platforms_new(CCLErr **err) {
 
     /* Allocate memory for array of platform wrapper objects. */
     platforms->platfs =
-        g_slice_alloc(sizeof(CCLPlatform*) * platforms->num_platfs);
+        g_slice_alloc(sizeof(CCLPlatform *) * platforms->num_platfs);
 
     /* Wrap platform IDs in platform wrapper objects. */
     for (guint i = 0; i < platforms->num_platfs; i++) {
@@ -143,11 +141,10 @@ finish:
 
     /* Return the CCLPlatforms object. */
     return platforms;
-
 }
 
 /**
- * Destroy a CCLPlatforms* object, including all underlying
+ * Destroy a ::CCLPlatforms* object, including all underlying
  * platforms, devices and data.
  *
  * @public @memberof ccl_platforms
@@ -167,16 +164,14 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
 
     /* Free underlying platforms array. */
     g_slice_free1(
-        sizeof(CCLPlatform*) * platforms->num_platfs, platforms->platfs);
+        sizeof(CCLPlatform *) * platforms->num_platfs, platforms->platfs);
 
     /* Free CCLPlatforms object. */
     g_slice_free(CCLPlatforms, platforms);
 }
 
-
 /**
- * Return number of OpenCL platforms found in ::CCLPlatforms
- * object.
+ * Return number of OpenCL platforms found in ::CCLPlatforms object.
  *
  * @public @memberof ccl_platforms
  *
@@ -184,7 +179,7 @@ void ccl_platforms_destroy(CCLPlatforms* platforms) {
  * @return The number of OpenCL platforms found.
  * */
 CCL_EXPORT
-cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
+cl_uint ccl_platforms_count(CCLPlatforms * platforms) {
 
     /* Platforms object can't be NULL. */
     g_return_val_if_fail(platforms != NULL, 0);
@@ -203,8 +198,7 @@ cl_uint ccl_platforms_count(CCLPlatforms* platforms) {
  * @return Platform wrapper object at given index.
  * */
 CCL_EXPORT
-CCLPlatform* ccl_platforms_get(
-    CCLPlatforms* platforms, cl_uint index) {
+CCLPlatform * ccl_platforms_get(CCLPlatforms * platforms, cl_uint index) {
 
     /* Platforms object can't be NULL. */
     g_return_val_if_fail(platforms != NULL, NULL);

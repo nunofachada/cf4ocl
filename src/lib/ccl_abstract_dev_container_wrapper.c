@@ -18,11 +18,10 @@
 
 /**
  * @file
- *
  * Implementation of the methods of the abstract device container wrapper class.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -30,10 +29,9 @@
 #include "_ccl_defs.h"
 
 /**
- * @internal
  * Initialize device list in device container.
  *
- * @private @memberof ccl_dev_container
+ * @internal @private @memberof ccl_dev_container
  *
  * @param[in] devcon Device container wrapper.
  * @param[in] get_devices Concrete wrapper implementation of
@@ -92,11 +90,10 @@ finish:
 }
 
 /**
- * @internal
  * Release the devices held by the given ::CCLDevContainer object. Implements
  * the ccl_wrapper_release_fields() function.
  *
- * @protected @memberof ccl_dev_container
+ * @internal @protected @memberof ccl_dev_container
  *
  * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
@@ -122,10 +119,9 @@ void ccl_dev_container_release_devices(CCLDevContainer * devcon) {
 }
 
 /**
- * @internal
  * Get all ::CCLDevice wrappers in device container.
  *
- * @protected @memberof ccl_dev_container
+ * @internal @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get `cl_device_id`s from wrapped
@@ -159,10 +155,9 @@ CCLDevice * const * ccl_dev_container_get_all_devices(
 
 
 /**
- * @internal
  * Get ::CCLDevice wrapper at given index.
  *
- * @protected @memberof ccl_dev_container
+ * @internal @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get `cl_device_id`s from wrapped
@@ -226,10 +221,9 @@ finish:
 }
 
 /**
- * @internal
  * Return number of devices in device container.
  *
- * @protected @memberof ccl_dev_container
+ * @internal @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get `cl_device_id`s from wrapped

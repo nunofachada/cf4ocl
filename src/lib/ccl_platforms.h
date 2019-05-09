@@ -18,12 +18,11 @@
 
 /**
  * @file
- *
- * Definition of a class which represents the list of OpenCL platforms available
- * in the system and respective methods.
+ * Definition of a class which represents the list of OpenCL platforms
+ * available in the system and respective methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -73,22 +72,21 @@
 /* Creates a new CCLPlatforms* object, which contains the list
  * of OpenCL platforms available in the system. */
 CCL_EXPORT
-CCLPlatforms* ccl_platforms_new(CCLErr **err);
+CCLPlatforms * ccl_platforms_new(CCLErr ** err);
 
 /* Destroy a CCLPlatforms* object, including all underlying
  * platforms, devices and data. */
 CCL_EXPORT
-void ccl_platforms_destroy(CCLPlatforms* platforms);
+void ccl_platforms_destroy(CCLPlatforms * platforms);
 
 /* Return number of OpenCL platforms found in CCLPlatforms*
  * object. */
 CCL_EXPORT
-cl_uint ccl_platforms_count(CCLPlatforms* platforms);
+cl_uint ccl_platforms_count(CCLPlatforms * platforms);
 
 /* Get CCL platform wrapper object at given index. */
 CCL_EXPORT
-CCLPlatform* ccl_platforms_get(
-    CCLPlatforms* platforms, cl_uint index);
+CCLPlatform * ccl_platforms_get(CCLPlatforms * platforms, cl_uint index);
 
 /** @} */
 

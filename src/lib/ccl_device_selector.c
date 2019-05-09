@@ -18,9 +18,8 @@
 
 /**
  * @file
- *
- * Classes and functions for filtering and selecting OpenCL contexts
- * and associated devices.
+ * Classes and functions for filtering and selecting OpenCL contexts and
+ * associated devices.
  *
  * @author Nuno Fachada
  * @date 2019
@@ -64,11 +63,12 @@ typedef struct ccl_devsel_filter {
 } CCLDevSelFilter;
 
 /**
- * @internal
  * Add any filter to the filter set.
  *
  * This private function is used by the public `ccl_devsel_add_*_filter()`
  * functions.
+ *
+ * @internal
  *
  * @param[in] filters The filter set.
  * @param[in] function Filter function (independent or dependent).
@@ -96,9 +96,10 @@ static void ccl_devsel_add_filter(CCLDevSelFilters * filters,
 }
 
 /**
- * @internal
  * Returns a `NULL`-terminated array of strings, each one containing the name
  * and vendor of each device in the given device array.
+ *
+ * @internal
  *
  * @param[in] devices Array of devices.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -171,9 +172,10 @@ finish:
 }
 
 /**
- * @internal
  * Private helper function, prints a list of the devices
  * specified in the given list.
+ *
+ * @internal
  *
  * @param[in] devices List of devices.
  * @param[in] selected Index of selected device (a message will appear
@@ -236,17 +238,17 @@ finish:
 }
 
 /**
+ * Private helper function, asks the user to select a device from a list.
+ *
  * @internal
- * Private helper function, asks the user to select a device
- * from a list.
  *
  * @param[in] devices Array of devices.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The list index of the selected device or -1 if an error occurs.
  * */
-static cl_int ccl_devsel_dep_menu_query(CCLDevSelDevices devices,
-    CCLErr ** err) {
+static cl_int ccl_devsel_dep_menu_query(
+    CCLDevSelDevices devices, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, -1);

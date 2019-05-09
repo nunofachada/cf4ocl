@@ -18,12 +18,11 @@
 
 /**
  * @file
- *
  * Implementation of a wrapper class and its methods for OpenCL platform
  * objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -44,25 +43,22 @@ struct ccl_platform {
      * @private
      * */
     CCLDevContainer base;
-
 };
 
 /**
- * @internal
- * Implementation of ::ccl_dev_container_get_cldevices() for the
- * platform wrapper.
+ * Implementation of ::ccl_dev_container_get_cldevices() for the platform
+ * wrapper.
  *
- * @private @memberof ccl_platform
+ * @internal @private @memberof ccl_platform
  *
- * @param[in] devcon A ::CCLPlatform wrapper, passed as a
- * ::CCLDevContainer.
+ * @param[in] devcon A ::CCLPlatform wrapper, passed as a ::CCLDevContainer.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
+ * @return A list of `cl_device_id` objects inside a ::CCLWrapperInfo
  * object.
  * */
-static CCLWrapperInfo* ccl_platform_get_cldevices(
-    CCLDevContainer* devcon, CCLErr** err) {
+static CCLWrapperInfo * ccl_platform_get_cldevices(
+    CCLDevContainer * devcon, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -70,7 +66,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
     /* Make sure devcon is not NULL. */
     g_return_val_if_fail(devcon != NULL, NULL);
 
-    CCLWrapperInfo* info = NULL;
+    CCLWrapperInfo * info = NULL;
 
     cl_int ocl_status;
 
@@ -98,8 +94,7 @@ static CCLWrapperInfo* ccl_platform_get_cldevices(
      * automatically released. Because the cl_platform_id object
      * doesn't have a CL_PLATFORM_DEVICES parameter, we keep this info
      * referenced has CL_CONTEXT_DEVICES. */
-    ccl_wrapper_add_info(
-        (CCLWrapper*) devcon, CL_CONTEXT_DEVICES, info);
+    ccl_wrapper_add_info((CCLWrapper *) devcon, CL_CONTEXT_DEVICES, info);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -141,11 +136,10 @@ finish:
  * @return The ::CCLPlatform wrapper for the given OpenCL platform.
  * */
 CCL_EXPORT
-CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
+CCLPlatform * ccl_platform_new_wrap(cl_platform_id platform) {
 
-    return (CCLPlatform*) ccl_wrapper_new(
-        CCL_PLATFORM, (void*) platform, sizeof(CCLPlatform));
-
+    return (CCLPlatform *) ccl_wrapper_new(
+        CCL_PLATFORM, (void *) platform, sizeof(CCLPlatform));
 }
 
 /**
@@ -153,15 +147,14 @@ CCLPlatform* ccl_platform_new_wrap(cl_platform_id platform) {
  *
  * @public @memberof ccl_platform
  *
- * @param[in] dev The device wrapper from where to get a platform
- * wrapper.
+ * @param[in] dev The device wrapper from where to get a platform wrapper.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The platform wrapper for the given device wrapper or NULL in
+ * @return The platform wrapper for the given device wrapper or `NULL` in
  * case an error occurs.
  * */
 CCL_EXPORT
-CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, CCLErr** err) {
+CCLPlatform * ccl_platform_new_from_device(CCLDevice * dev, CCLErr ** err) {
 
     /* Make sure dev is not NULL. */
     g_return_val_if_fail(dev != NULL, NULL);
@@ -171,9 +164,9 @@ CCLPlatform* ccl_platform_new_from_device(CCLDevice* dev, CCLErr** err) {
     /* The OpenCL platform_id object. */
     cl_platform_id platform_id;
     /* The platform wrapper to return. */
-    CCLPlatform* platf = NULL;
+    CCLPlatform * platf = NULL;
     /* Internal error object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Get OpenCL platform_id object from device. */
     platform_id = ccl_device_get_info_scalar(
@@ -195,7 +188,6 @@ finish:
 
     /* Return the device platform wrapper. */
     return platf;
-
 }
 
 /**
@@ -207,12 +199,11 @@ finish:
  * @param[in] platf The platform wrapper object.
  * */
 CCL_EXPORT
-void ccl_platform_destroy(CCLPlatform* platf) {
+void ccl_platform_destroy(CCLPlatform * platf) {
 
-    ccl_wrapper_unref((CCLWrapper*) platf, sizeof(CCLPlatform),
+    ccl_wrapper_unref((CCLWrapper *) platf, sizeof(CCLPlatform),
         (ccl_wrapper_release_fields) ccl_dev_container_release_devices,
         NULL, NULL);
-
 }
 
 /**
@@ -223,6 +214,7 @@ void ccl_platform_destroy(CCLPlatform* platf) {
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @public @memberof ccl_platform
@@ -230,19 +222,18 @@ void ccl_platform_destroy(CCLPlatform* platf) {
  * @param[in] platf The platform wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return OpenCL version of platform as an integer. If an error
- * occurs, 0 is returned.
+ * @return OpenCL version of platform as an integer. If an error occurs,
+ * 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_platform_get_opencl_version(
-    CCLPlatform* platf, CCLErr** err) {
+cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err) {
 
     /* Make sure platf is not NULL. */
     g_return_val_if_fail(platf != NULL, 0);
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-    char* ver_str;
+    char * ver_str;
     cl_uint ver = 0;
 
     /* Get version string which has the format "OpenCL x.x ..." */
@@ -272,11 +263,11 @@ cl_uint ccl_platform_get_opencl_version(
  * @return An array containing the ::CCLDevice wrappers which belong to
  * this platform, or `NULL` if an error occurs.
  */
-CCLDevice* const* ccl_platform_get_all_devices(
-    CCLPlatform* platf, CCLErr** err) {
+CCLDevice * const * ccl_platform_get_all_devices(
+    CCLPlatform * platf, CCLErr ** err) {
 
     return ccl_dev_container_get_all_devices(
-        (CCLDevContainer*) platf, ccl_platform_get_cldevices, err);
+        (CCLDevContainer *) platf, ccl_platform_get_cldevices, err);
 }
 
 /**
@@ -288,16 +279,14 @@ CCLDevice* const* ccl_platform_get_all_devices(
  * @param[in] index Index of device in platform.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The ::CCLDevice wrapper at given index or `NULL` if an error
- * occurs.
+ * @return The ::CCLDevice wrapper at given index or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLDevice* ccl_platform_get_device(
-    CCLPlatform* platf, cl_uint index, CCLErr** err) {
+CCLDevice * ccl_platform_get_device(
+    CCLPlatform* platf, cl_uint index, CCLErr ** err) {
 
     return ccl_dev_container_get_device((CCLDevContainer*) platf,
         ccl_platform_get_cldevices, index, err);
-
 }
 
 /**
@@ -312,11 +301,10 @@ CCLDevice* ccl_platform_get_device(
  * is otherwise not possible to get any device.
  * */
 CCL_EXPORT
-cl_uint ccl_platform_get_num_devices(CCLPlatform* platf, CCLErr** err) {
+cl_uint ccl_platform_get_num_devices(CCLPlatform * platf, CCLErr ** err) {
 
-    return ccl_dev_container_get_num_devices((CCLDevContainer*) platf,
-        ccl_platform_get_cldevices, err);
-
+    return ccl_dev_container_get_num_devices(
+        (CCLDevContainer *) platf, ccl_platform_get_cldevices, err);
 }
 
 /** @}*/

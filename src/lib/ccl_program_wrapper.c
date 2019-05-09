@@ -18,8 +18,8 @@
 
  /**
  * @file
- *
- * Implementation of a wrapper class and its methods for OpenCL program objects.
+ * Implementation of a wrapper class and its methods for OpenCL program
+ * objects.
  *
  * @author Nuno Fachada
  * @date 2019
@@ -51,26 +51,25 @@ struct ccl_program {
      * Program binaries.
      * @private
      * */
-    GHashTable* binaries;
+    GHashTable * binaries;
 
     /**
      * Program kernels.
      * @private
      * */
-    GHashTable* krnls;
+    GHashTable * krnls;
 
     /**
      * Build logs of most recent build for each device.
      * @private
      * */
-    GHashTable* build_logs;
+    GHashTable * build_logs;
 
     /**
      * Concatenated build logs of most recent build for all devices.
      * @private
      * */
-    gchar* build_logs_concat;
-
+    gchar * build_logs_concat;
 };
 
 /**
@@ -83,7 +82,7 @@ struct ccl_program_binary {
      * Binary data.
      * @private
      * */
-    unsigned char* data;
+    unsigned char * data;
 
     /**
      * Size of binary data.
@@ -93,14 +92,13 @@ struct ccl_program_binary {
 };
 
 /**
- * @internal
  * Destroy table of build logs.
  *
- * @private @memberof ccl_program
+ * @internal @private @memberof ccl_program
  *
  * @param[in] prg A ::CCLProgram wrapper object.
  * */
-static void ccl_program_clear_build_logs(CCLProgram* prg) {
+static void ccl_program_clear_build_logs(CCLProgram * prg) {
 
     /* Make sure prg is not NULL. */
     g_return_if_fail(prg != NULL);
@@ -113,26 +111,24 @@ static void ccl_program_clear_build_logs(CCLProgram* prg) {
 
         /* Set to NULL to allow reuse. */
         prg->build_logs = NULL;
-
     }
 }
 
 /**
- * @internal
  * Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
  *
- * @private @memberof ccl_program
+ * @internal @private @memberof ccl_program
  *
  * @param[in] prg A ::CCLProgram wrapper object.
  * */
-static void ccl_program_release_fields(CCLProgram* prg) {
+static void ccl_program_release_fields(CCLProgram * prg) {
 
     /* Make sure prg wrapper object is not NULL. */
     g_return_if_fail(prg != NULL);
 
     /* Release devices. */
-    ccl_dev_container_release_devices((CCLDevContainer*) prg);
+    ccl_dev_container_release_devices((CCLDevContainer *) prg);
 
     /* If the kernels table was created...*/
     if (prg->krnls != NULL) {
@@ -161,61 +157,53 @@ static void ccl_program_release_fields(CCLProgram* prg) {
 
         /*...free it. */
         g_free(prg->build_logs_concat);
-
     }
-
 }
 
 /**
- * @internal
- * Implementation of ccl_dev_container_get_cldevices() for the
- * program wrapper.
+ * Implementation of ccl_dev_container_get_cldevices() for the program wrapper.
  *
- * @private @memberof ccl_program
+ * @internal @private @memberof ccl_program
  *
  * @param[in] devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A list of cl_device_id objects inside a ::CCLWrapperInfo
- * object.
+ * @return A list of `cl_device_id` objects inside a ::CCLWrapperInfo object.
  * */
-static CCLWrapperInfo* ccl_program_get_cldevices(
-    CCLDevContainer* devcon, CCLErr** err) {
+static CCLWrapperInfo * ccl_program_get_cldevices(
+    CCLDevContainer * devcon, CCLErr ** err) {
 
     return ccl_program_get_info(devcon, CL_PROGRAM_DEVICES, err);
 }
 
 /**
- * @internal
  * Create a new binary object.
  *
- * @private @memberof ccl_program
+ * @internal @private @memberof ccl_program
  *
  * @param[in] data Binary data.
  * @param[in] size Size of binary data.
  * @return A new binary object.
  * */
-static CCLProgramBinary* ccl_program_binary_new(
-    unsigned char* data, size_t size) {
+static CCLProgramBinary * ccl_program_binary_new(
+    unsigned char * data, size_t size) {
 
-    CCLProgramBinary* pbin = g_slice_new(CCLProgramBinary);
+    CCLProgramBinary * pbin = g_slice_new(CCLProgramBinary);
 
     pbin->data = data;
     pbin->size = size;
 
     return pbin;
-
 }
 
 /**
- * @internal
  * Destroy a binary object.
  *
- * @private @memberof ccl_program
+ * @internal @private @memberof ccl_program
  *
  * @param[in] pbin The binary object to destroy.
  * */
-static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
+static void ccl_program_binary_destroy(CCLProgramBinary * pbin) {
 
     /* Make sure pbin is not NULL. */
     g_return_if_fail(pbin != NULL);
@@ -223,12 +211,12 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
     if (pbin->size > 0)
         g_free(pbin->data);
     g_slice_free(CCLProgramBinary, pbin);
-
 }
 
 /**
- * @internal
  * Helper macro to create a new empty binary object.
+ *
+ * @internal
  *
  * @return A new empty binary object.
  * */
@@ -242,14 +230,14 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
 /**
  * Get the program wrapper for the given OpenCL program.
  *
- * If the wrapper doesn't exist, its created with a reference count
- * of 1. Otherwise, the existing wrapper is returned and its reference
- * count is incremented by 1.
+ * If the wrapper doesn't exist, its created with a reference count of 1.
+ * Otherwise, the existing wrapper is returned and its reference count is
+ * incremented by 1.
  *
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL program directly (using the
- * clCreateProgramWith*() functions) and then wrap the OpenCL program
- * in a ::CCLProgram wrapper object.
+ * This function will rarely be called from client code, except when clients
+ * wish to create the OpenCL program directly (using the
+ * `clCreateProgramWith*()` functions) and then wrap the OpenCL program in
+ * a ::CCLProgram wrapper object.
  *
  * @public @memberof ccl_program
  *
@@ -257,11 +245,10 @@ static void ccl_program_binary_destroy(CCLProgramBinary* pbin) {
  * @return The ::CCLProgram wrapper for the given OpenCL program.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_wrap(cl_program program) {
+CCLProgram * ccl_program_new_wrap(cl_program program) {
 
-    return (CCLProgram*) ccl_wrapper_new(
-        CCL_PROGRAM, (void*) program, sizeof(CCLProgram));
-
+    return (CCLProgram *) ccl_wrapper_new(
+        CCL_PROGRAM, (void *) program, sizeof(CCLProgram));
 }
 
 /**
@@ -273,18 +260,17 @@ CCLProgram* ccl_program_new_wrap(cl_program program) {
  * @param[in] prg The program wrapper object.
  * */
 CCL_EXPORT
-void ccl_program_destroy(CCLProgram* prg) {
+void ccl_program_destroy(CCLProgram * prg) {
 
-    ccl_wrapper_unref((CCLWrapper*) prg, sizeof(CCLProgram),
+    ccl_wrapper_unref((CCLWrapper *) prg, sizeof(CCLProgram),
         (ccl_wrapper_release_fields) ccl_program_release_fields,
         (ccl_wrapper_release_cl_object) clReleaseProgram, NULL);
-
 }
 
 /**
- * Create a new program wrapper object from a source file. This is a
- * utility function which calls the ccl_program_new_from_source_files()
- * function with `count` equal to 1.
+ * Create a new program wrapper object from a source file. This is a utility
+ * function which calls the ccl_program_new_from_source_files() function with
+ * `count` equal to 1.
  *
  * @public @memberof ccl_program
  *
@@ -295,17 +281,16 @@ void ccl_program_destroy(CCLProgram* prg) {
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
-    const char* filename, CCLErr** err) {
+CCLProgram * ccl_program_new_from_source_file(
+    CCLContext * ctx, const char * filename, CCLErr ** err) {
 
     return ccl_program_new_from_source_files(ctx, 1, &(filename), err);
-
 }
 
 /**
- * Create a new program wrapper object from several source files. This
- * function delegates the actual program creation to the
- * ccl_program_new_from_sources() function.
+ * Create a new program wrapper object from several source files. This function
+ * delegates the actual program creation to the ccl_program_new_from_sources()
+ * function.
  *
  * @public @memberof ccl_program
  *
@@ -317,8 +302,8 @@ CCLProgram* ccl_program_new_from_source_file(CCLContext* ctx,
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
-    cl_uint count, const char** filenames, CCLErr** err) {
+CCLProgram * ccl_program_new_from_source_files(
+    CCLContext * ctx, cl_uint count, const char ** filenames, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
@@ -330,15 +315,15 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
     g_return_val_if_fail(count > 0, NULL);
 
     /* Error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* Program wrapper object to return. */
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     /* Source files contents. */
-    gchar** strings = NULL;
+    gchar ** strings = NULL;
 
     /* Allocate space for the specified number of source file
      * strings. */
-    strings = g_slice_alloc0(count * sizeof(gchar*));
+    strings = g_slice_alloc0(count * sizeof(gchar *));
 
     /* Read source files contents. */
     for (cl_uint i = 0; i < count; ++i) {
@@ -346,12 +331,11 @@ CCLProgram* ccl_program_new_from_source_files(CCLContext* ctx,
         g_file_get_contents(
             filenames[i], &strings[i], NULL, &err_internal);
         g_if_err_propagate_goto(err, err_internal, error_handler);
-
     }
 
     /* Create program from sources. */
     prg = ccl_program_new_from_sources(ctx, count,
-        (const char**) strings, NULL, &err_internal);
+        (const char **) strings, NULL, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we got here, everything is OK. */
@@ -372,19 +356,18 @@ finish:
                 g_free(strings[i]);
             }
         }
-        g_slice_free1(count * sizeof(gchar*), strings);
+        g_slice_free1(count * sizeof(gchar *), strings);
     }
 
     /* Return prg. */
     return prg;
-
 }
 
 /**
- * Create a new program wrapper object from a null-terminated source
- * string. This is a utility function which calls the
- * ccl_program_new_from_sources() function with `count` equal to 1 and
- * assumes the passed source string is null-terminated.
+ * Create a new program wrapper object from a null-terminated source string.
+ * This is a utility function which calls the ccl_program_new_from_sources()
+ * function with `count` equal to 1 and assumes the passed source string is
+ * null-terminated.
  *
  * @public @memberof ccl_program
  *
@@ -395,34 +378,33 @@ finish:
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_source(CCLContext* ctx,
-    const char* string, CCLErr** err) {
+CCLProgram * ccl_program_new_from_source(
+    CCLContext * ctx, const char * string, CCLErr ** err) {
 
     return ccl_program_new_from_sources(ctx, 1, &string, NULL, err);
 }
 
 /**
- * Create a new program wrapper object from several source code strings.
- * This function directly wraps the clCreateProgramWithSource() OpenCL
- * function.
+ * Create a new program wrapper object from several source code strings. This
+ * function directly wraps the clCreateProgramWithSource() OpenCL function.
  *
  * @public @memberof ccl_program
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] count Number of source strings.
  * @param[in] strings Source strings.
- * @param[in] lengths An array with the number of chars in each string
- * (the string length). If an element in lengths is zero, its
- * accompanying string is null-terminated. If lengths is `NULL`, all
- * strings in the strings argument are considered null-terminated.
+ * @param[in] lengths An array with the number of chars in each string (the
+ * string length). If an element in lengths is zero, its accompanying string is
+ * null-terminated. If lengths is `NULL`, all strings in the strings argument
+ * are considered null-terminated.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
-    cl_uint count, const char** strings, const size_t* lengths,
-    CCLErr** err) {
+CCLProgram * ccl_program_new_from_sources(CCLContext * ctx,
+    cl_uint count, const char ** strings, const size_t * lengths,
+    CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
@@ -431,7 +413,7 @@ CCLProgram* ccl_program_new_from_sources(CCLContext* ctx,
 
     cl_int ocl_status;
     cl_program program = NULL;
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
 
     /* Build program from sources. */
     program = clCreateProgramWithSource(
@@ -457,41 +439,39 @@ finish:
 
     /* Return prg. */
     return prg;
-
 }
 
 /**
- * Create a new program wrapper object from a file containing binary
- * code executable on a specific device. This is a utility function
- * which calls the ccl_program_new_from_binary_files() function for the
- * specified device only.
+ * Create a new program wrapper object from a file containing binary code
+ * executable on a specific device. This is a utility function which calls the
+ * ccl_program_new_from_binary_files() function for the specified device only.
  *
  * @public @memberof ccl_program
  *
  * @param[in] ctx The context wrapper object.
- * @param[in] dev Device for which to create the program, and on which
- * the binary code can be executed.
+ * @param[in] dev Device for which to create the program, and on which the
+ * binary code can be executed.
  * @param[in] filename Path to binary file.
- * @param[out] binary_status Returns whether the program binary was
- * loaded successfully or not.
+ * @param[out] binary_status Returns whether the program binary was loaded
+ * successfully or not.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
-    CCLDevice* dev, const char* filename, cl_int *binary_status,
-    CCLErr** err) {
+CCLProgram * ccl_program_new_from_binary_file(CCLContext * ctx,
+    CCLDevice * dev, const char * filename, cl_int * binary_status,
+    CCLErr ** err) {
 
     return ccl_program_new_from_binary_files(
         ctx, 1, &(dev), &(filename), binary_status, err);
 }
 
 /**
- * Create a new program wrapper object from files containing binary
- * code executable on the given device list, one file per device. This
- * function delegates the actual program creation to the
- * ccl_program_new_from_binaries() function.
+ * Create a new program wrapper object from files containing binary code
+ * executable on the given device list, one file per device. This function
+ * delegates the actual program creation to the ccl_program_new_from_binaries()
+ * function.
  *
  * @public @memberof ccl_program
  *
@@ -507,9 +487,9 @@ CCLProgram* ccl_program_new_from_binary_file(CCLContext* ctx,
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
-    cl_uint num_devices, CCLDevice* const* devs, const char** filenames,
-    cl_int *binary_status, CCLErr** err) {
+CCLProgram * ccl_program_new_from_binary_files(CCLContext * ctx,
+    cl_uint num_devices, CCLDevice * const * devs, const char ** filenames,
+    cl_int * binary_status, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -522,15 +502,15 @@ CCLProgram* ccl_program_new_from_binary_files(CCLContext* ctx,
     /* Make sure num_devices > 0. */
     g_return_val_if_fail(num_devices > 0, NULL);
 
-    CCLErr* err_internal = NULL;
-    CCLProgramBinary** bins = NULL;
-    CCLProgram* prg = NULL;
+    CCLErr * err_internal = NULL;
+    CCLProgramBinary ** bins = NULL;
+    CCLProgram * prg = NULL;
 
     /* Open files and create binaries. */
-    bins = g_slice_alloc0(num_devices * sizeof(CCLProgramBinary*));
+    bins = g_slice_alloc0(num_devices * sizeof(CCLProgramBinary *));
     for (cl_uint i = 0; i < num_devices; ++i) {
         bins[i] = ccl_program_binary_new_empty();
-        g_file_get_contents(filenames[i], (char**) &bins[i]->data,
+        g_file_get_contents(filenames[i], (char **) &bins[i]->data,
             &bins[i]->size, &err_internal);
         g_if_err_propagate_goto(err, err_internal, error_handler);
     }
@@ -558,19 +538,17 @@ finish:
                 ccl_program_binary_destroy(bins[i]);
             }
         }
-        g_slice_free1(num_devices * sizeof(CCLProgramBinary*), bins);
+        g_slice_free1(num_devices * sizeof(CCLProgramBinary *), bins);
     }
 
     /* Return prg. */
     return prg;
-
 }
 
 /**
  * Create a new program wrapper object from binary code executable on a
  * specific device. This is a utility function which calls the
- * ccl_program_new_from_binaries() function for the specified device
- * only.
+ * ccl_program_new_from_binaries() function for the specified device only.
  *
  * @public @memberof ccl_program
  *
@@ -578,43 +556,42 @@ finish:
  * @param[in] dev Device for which to create the program, and on which
  * the binary code can be executed.
  * @param[in] binary Binary code.
- * @param[out] binary_status Returns whether the program binary was
- * loaded successfully or not.
+ * @param[out] binary_status Returns whether the program binary was loaded
+ * successfully or not.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_binary(CCLContext* ctx, CCLDevice* dev,
-    CCLProgramBinary* binary, cl_int *binary_status, CCLErr** err) {
+CCLProgram * ccl_program_new_from_binary(CCLContext * ctx, CCLDevice * dev,
+    CCLProgramBinary * binary, cl_int * binary_status, CCLErr ** err) {
 
-    return ccl_program_new_from_binaries(ctx, 1, &dev, &binary,
-        binary_status, err);
+    return ccl_program_new_from_binaries(
+        ctx, 1, &dev, &binary, binary_status, err);
 }
 
 /**
- * Create a new program wrapper object from a list of binary code
- * strings executable on the given device list, one binary string per
- * device. This function is a wrapper for the
- * clCreateProgramWithBinary() OpenCL function.
+ * Create a new program wrapper object from a list of binary code strings
+ * executable on the given device list, one binary string per device. This
+ * function is a wrapper for the clCreateProgramWithBinary() OpenCL function.
  *
  * @public @memberof ccl_program
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] num_devices Number of devices (and of binary strings).
- * @param[in] devs List of devices for which to create the program, and
- * on which the binary code can be executed.
+ * @param[in] devs List of devices for which to create the program, and on
+ * which the binary code can be executed.
  * @param[in] bins List of binary code strings, one per device.
- * @param[out] binary_status Returns whether the program binary for each
- * device specified in `devs` was loaded successfully or not.
+ * @param[out] binary_status Returns whether the program binary for each device
+ * specified in `devs` was loaded successfully or not.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
-    cl_uint num_devices, CCLDevice* const* devs, CCLProgramBinary** bins,
-    cl_int *binary_status, CCLErr** err) {
+CCLProgram * ccl_program_new_from_binaries(CCLContext * ctx,
+    cl_uint num_devices, CCLDevice * const * devs, CCLProgramBinary ** bins,
+    cl_int * binary_status, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
@@ -626,16 +603,16 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
     g_return_val_if_fail(num_devices > 0, NULL);
 
     cl_int ocl_status;
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     cl_program program = NULL;
-    cl_device_id* device_list = NULL;
-    size_t* lengths = NULL;
-    unsigned char** bins_raw = NULL;
+    cl_device_id * device_list = NULL;
+    size_t * lengths = NULL;
+    unsigned char ** bins_raw = NULL;
 
     /* Unwrap devices, binaries and lengths. */
     device_list = g_slice_alloc(num_devices * sizeof(cl_device_id));
     lengths = g_slice_alloc(num_devices * sizeof(size_t));
-    bins_raw = g_slice_alloc(num_devices * sizeof(unsigned char*));
+    bins_raw = g_slice_alloc(num_devices * sizeof(unsigned char *));
     for (guint i = 0; i < num_devices; ++i) {
         device_list[i] = ccl_device_unwrap(devs[i]);
         lengths[i] = bins[i]->size;
@@ -645,7 +622,7 @@ CCLProgram* ccl_program_new_from_binaries(CCLContext* ctx,
     /* Create program. */
     program = clCreateProgramWithBinary(ccl_context_unwrap(ctx),
         num_devices, device_list, lengths,
-        (const unsigned char**) bins_raw,
+        (const unsigned char **) bins_raw,
         binary_status, &ocl_status);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
@@ -672,35 +649,34 @@ finish:
     if (lengths != NULL)
         g_slice_free1(num_devices * sizeof(size_t), lengths);
     if (bins_raw != NULL)
-        g_slice_free1(num_devices * sizeof(unsigned char*), bins_raw);
+        g_slice_free1(num_devices * sizeof(unsigned char *), bins_raw);
 
     /* Return prg. */
     return prg;
-
 }
 
 /**
- * Create a new program wrapper object from device built-in kernels.
- * This function is a wrapper for the
- * clCreateProgramWithBuiltInKernels() OpenCL function.
+ * Create a new program wrapper object from device built-in kernels. This
+ * function is a wrapper for the clCreateProgramWithBuiltInKernels() OpenCL
+ * function.
  *
  * @public @memberof ccl_program
  * @note Requires OpenCL >= 1.2
  *
  * @param[in] ctx The context wrapper object.
  * @param[in] num_devices Number of devices.
- * @param[in] devs List of devices for which to create the program, and
- * on which all the built-in kernels can be executed.
- * @param[in] kernel_names A semi-colon separated list of built-in
- * kernel names.
+ * @param[in] devs List of devices for which to create the program, and on
+ * which all the built-in kernels can be executed.
+ * @param[in] kernel_names A semi-colon separated list of built-in kernel
+ * names.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
-    cl_uint num_devices, CCLDevice* const* devs, const char *kernel_names,
-    CCLErr** err) {
+CCLProgram * ccl_program_new_from_built_in_kernels(CCLContext * ctx,
+    cl_uint num_devices, CCLDevice * const * devs, const char * kernel_names,
+    CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
@@ -714,13 +690,13 @@ CCLProgram* ccl_program_new_from_built_in_kernels(CCLContext* ctx,
     /* OpenCL program object. */
     cl_program program = NULL;
     /* Program wrapper object. */
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     /* List of cl_device_id objects. */
-    cl_device_id* device_list = NULL;
+    cl_device_id * device_list = NULL;
     /* OpenCL version of underlying platform. */
     cl_uint ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -792,64 +768,58 @@ finish:
 
     /* Return prg. */
     return prg;
-
 }
 
 /**
- * Utility function which builds (compiles and links) a program
- * executable from the program source or binary. This function calls the
- * ccl_program_build_full() function, passing `NULL` to the
- * following parameters: `devices`, `pfn_notify` and `user_data`. In
- * other words, the program executable is built for all devices
- * associated with the program and no callback function is registered.
+ * Utility function which builds (compiles and links) a program executable from
+ * the program source or binary. This function calls the
+ * ccl_program_build_full() function, passing `NULL` to the following
+ * parameters: `devices`, `pfn_notify` and `user_data`. In other words, the
+ * program executable is built for all devices associated with the program and
+ * no callback function is registered.
  *
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
- * @param[in] options A null-terminated string of characters that
- * describes the build options to be used for building the program
- * executable.
+ * @param[in] options A null-terminated string of characters that describes the
+ * build options to be used for building the program executable.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
 cl_bool ccl_program_build(
-    CCLProgram* prg, const char* options, CCLErr** err) {
+    CCLProgram * prg, const char * options, CCLErr ** err) {
 
     return ccl_program_build_full(
         prg, 0, NULL, options, NULL, NULL, err);
 }
 
 /**
- * Builds (compiles and links) a program executable from the program
- * source or binary. This function wraps the clBuildProgram() OpenCL
- * function.
+ * Builds (compiles and links) a program executable from the program source or
+ * binary. This function wraps the clBuildProgram() OpenCL function.
  *
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[in] num_devices The number of devices listed in `devs`.
- * @param[in] devs List of device wrappers associated with program.
- * If `NULL`, the program executable is built for all devices
- * associated with program for which a source or binary has been loaded.
- * @param[in] options A null-terminated string of characters that
- * describes the build options to be used for building the program
- * executable.
- * @param[in] pfn_notify A callback function that can be registered and
- * which will be called when the program executable has been built
- * (successfully or unsuccessfully).
+ * @param[in] devs List of device wrappers associated with program. If `NULL`,
+ * the program executable is built for all devices associated with program for
+ * which a source or binary has been loaded.
+ * @param[in] options A null-terminated string of characters that describes the
+ * build options to be used for building the program executable.
+ * @param[in] pfn_notify A callback function that can be registered and which
+ * will be called when the program executable has been built (successfully or
+ * unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_program_build_full(CCLProgram* prg,
-    cl_uint num_devices, CCLDevice* const* devs, const char *options,
-    ccl_program_callback pfn_notify, void *user_data, CCLErr** err) {
+cl_bool ccl_program_build_full(CCLProgram * prg,
+    cl_uint num_devices, CCLDevice * const * devs, const char * options,
+    ccl_program_callback pfn_notify, void * user_data, CCLErr ** err) {
 
     /* Make sure prg is not NULL. */
     g_return_val_if_fail(prg != NULL, CL_FALSE);
@@ -857,7 +827,7 @@ cl_bool ccl_program_build_full(CCLProgram* prg,
     g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
     /* Array of unwrapped devices. */
-    cl_device_id* cl_devices = NULL;
+    cl_device_id * cl_devices = NULL;
     /* Status of OpenCL function call. */
     cl_int ocl_status;
     /* Result of function call. */
@@ -906,7 +876,6 @@ finish:
 
     /* Return result of function call. */
     return result;
-
 }
 
 /**
@@ -921,11 +890,11 @@ finish:
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The build log for most recent build, compile or link. May be `NULL`
- * or an empty string if no build, compile or link was performed, or if no build
- * log is available.
+ * or an empty string if no build, compile or link was performed, or if no
+ * build log is available.
  * */
 CCL_EXPORT
-const char* ccl_program_get_build_log(CCLProgram* prg, CCLErr** err) {
+const char * ccl_program_get_build_log(CCLProgram * prg, CCLErr ** err) {
 
     /* Make sure prg is not NULL. */
     g_return_val_if_fail(prg != NULL, NULL);
@@ -937,16 +906,16 @@ const char* ccl_program_get_build_log(CCLProgram* prg, CCLErr** err) {
     /* Number of devices in program. */
     cl_uint num_devs = 0;
     /* Current device. */
-    CCLDevice* dev = NULL;
+    CCLDevice * dev = NULL;
     /* Name of current device. */
-    char* dev_name;
+    char * dev_name;
     /* Build log for current device.*/
-    const char* build_log;
+    const char * build_log;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Complete build log string object. */
-    GString* build_log_obj = g_string_new("");
+    GString * build_log_obj = g_string_new("");
 
     /* Clear any previously obtained concatenated build log. */
     if (prg->build_logs_concat) {
@@ -1003,7 +972,7 @@ error_handler:
 finish:
 
     /* Return concatenated build log. */
-    return (const char*) prg->build_logs_concat;
+    return (const char *) prg->build_logs_concat;
 }
 
 /**
@@ -1015,12 +984,12 @@ finish:
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The build log for most recent build, compile or link. May be `NULL`
- * or an empty string if no build, compile or link was performed, or if no build
- * log is available.
+ * or an empty string if no build, compile or link was performed, or if no
+ * build log is available.
  * */
 CCL_EXPORT
-const char* ccl_program_get_device_build_log(
-    CCLProgram* prg, CCLDevice* dev, CCLErr** err) {
+const char * ccl_program_get_device_build_log(
+    CCLProgram * prg, CCLDevice * dev, CCLErr ** err) {
 
     /* Make sure prg is not NULL. */
     g_return_val_if_fail(prg != NULL, NULL);
@@ -1030,12 +999,12 @@ const char* ccl_program_get_device_build_log(
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Build log for current device.*/
-    char* build_log_dev = NULL;
+    char * build_log_dev = NULL;
     /* Error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Is build log for this device already in cache? */
-    if ((prg->build_logs == NULL) || ((build_log_dev = (char*)
+    if ((prg->build_logs == NULL) || ((build_log_dev = (char *)
         g_hash_table_lookup(prg->build_logs, (gconstpointer) dev)) == NULL)) {
 
         /* Build log for the specified device is not in cache, get it. */
@@ -1058,7 +1027,6 @@ const char* ccl_program_get_device_build_log(
             g_hash_table_insert(prg->build_logs,
                 (gpointer) dev,
                 (gpointer) build_log_dev);
-
         }
     }
 
@@ -1075,36 +1043,31 @@ finish:
 
     /* Return build log for the specified device, if it exists. */
     return build_log_dev;
-
 }
 
 /**
- * Compile a program's source code. This function wraps the
- * clCompileProgram() OpenCL function.
+ * Compile a program's source code. This function wraps the clCompileProgram()
+ * OpenCL function.
  *
  * @public @memberof ccl_program
  * @note Requires OpenCL >= 1.2
  *
- * @param[in] prg The program wrapper that holds the program to be
- * compiled.
+ * @param[in] prg The program wrapper that holds the program to be compiled.
  * @param[in] num_devices Number of devices in `devs`.
- * @param[in] devs List of device wrappers associated with the program.
- * If `NULL`, the compile is performed for all devices associated with
- * the program.
- * @param[in] options A null-terminated string of characters that
- * describes the compilation options to be used for building the program
- * executable.
- * @param[in] num_input_headers The number of programs wrappers that
- * describe headers in the array referenced by `prg_input_headers`.
- * @param[in] prg_input_headers An array of program wrapper embedded
- * headers created with any of the `ccl_program_new_from_source*()`
- * functions.
+ * @param[in] devs List of device wrappers associated with the program. If
+ * `NULL`, the compile is performed for all devices associated with the
+ * program.
+ * @param[in] options A null-terminated string of characters that describes the
+ * compilation options to be used for building the program executable.
+ * @param[in] num_input_headers The number of programs wrappers that describe
+ * headers in the array referenced by `prg_input_headers`.
+ * @param[in] prg_input_headers An array of program wrapper embedded headers
+ * created with any of the `ccl_program_new_from_source*()` functions.
  * @param[in] header_include_names An array that has a one to one
- * correspondence with `prg_input_headers`. Each entry specifies the
- * include name used by source in program that comes from an embedded
- * header.
- * @param[in] pfn_notify A function pointer to a callback function that
- * an application can register and which will be called when the program
+ * correspondence with `prg_input_headers`. Each entry specifies the include
+ * name used by source in program that comes from an embedded header.
+ * @param[in] pfn_notify A function pointer to a callback function that an
+ * application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -1112,10 +1075,10 @@ finish:
  * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
-    CCLDevice* const* devs, const char* options, cl_uint num_input_headers,
-    CCLProgram** prg_input_headers, const char** header_include_names,
-    ccl_program_callback pfn_notify, void* user_data, CCLErr** err) {
+cl_bool ccl_program_compile(CCLProgram * prg, cl_uint num_devices,
+    CCLDevice * const * devs, const char * options, cl_uint num_input_headers,
+    CCLProgram ** prg_input_headers, const char ** header_include_names,
+    ccl_program_callback pfn_notify, void * user_data, CCLErr ** err) {
 
     /* Make sure prg is not NULL. */
     g_return_val_if_fail(prg != NULL, CL_FALSE);
@@ -1123,9 +1086,9 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
     g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
     /* Array of unwrapped devices. */
-    cl_device_id* cl_devices = NULL;
+    cl_device_id * cl_devices = NULL;
     /* Array of unwrapped programs (input headers). */
-    cl_program* input_headers = NULL;
+    cl_program * input_headers = NULL;
     /* Status of OpenCL function call. */
     cl_int ocl_status;
     /* Result of function call. */
@@ -1133,7 +1096,7 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
     /* OpenCL version of underlying platform. */
     cl_uint ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -1190,8 +1153,8 @@ cl_bool ccl_program_compile(CCLProgram* prg, cl_uint num_devices,
 
     /* Compile program. */
     ocl_status = clCompileProgram(ccl_program_unwrap(prg), num_devices,
-        (const cl_device_id*) cl_devices, options, num_input_headers,
-        (const cl_program*) input_headers, header_include_names,
+        (const cl_device_id *) cl_devices, options, num_input_headers,
+        (const cl_program *) input_headers, header_include_names,
         pfn_notify, user_data);
 
     /* Check for errors. */
@@ -1229,33 +1192,30 @@ finish:
 
     /* Return result of function call. */
     return result;
-
 }
 
 /**
- * Link a set of compiled programs and create an executable program
- * wrapper. The return program wrapper must be freed with
- * ::ccl_program_destroy(). This function wraps the clLinkProgram()
- * OpenCL function.
+ * Link a set of compiled programs and create an executable program wrapper.
+ * The return program wrapper must be freed with ::ccl_program_destroy(). This
+ * function wraps the clLinkProgram() OpenCL function.
  *
  * @public @memberof ccl_program
  * @note Requires OpenCL >= 1.2
  *
  * @param[in] ctx A context wrapper object.
  * @param[in] num_devices Number of devices in `devs`.
- * @param[in] devs List of device wrappers associated with the context.
- * If `NULL`, the link is performed for all devices associated with
- * the context for which a compiled object is available.
- * @param[in] options A null-terminated string of characters that
- * describes the link options to be used for building the program
+ * @param[in] devs List of device wrappers associated with the context. If
+ * `NULL`, the link is performed for all devices associated with the context
+ * for which a compiled object is available.
+ * @param[in] options A null-terminated string of characters that describes the
+ * link options to be used for building the program executable.
+ * @param[in] num_input_programs The number of program wrapper objects in
+ * `input_prgs`.
+ * @param[in] input_prgs An array of program wrapper objects that contain
+ * compiled binaries or libraries that are to be linked to create the program
  * executable.
- * @param[in] num_input_programs The number of program wrapper objects
- * in `input_prgs`.
- * @param[in] input_prgs An array of program wrapper objects that
- * contain compiled binaries or libraries that are to be linked to
- * create the program executable.
- * @param[in] pfn_notify A function pointer to a callback function that
- * an application can register and which will be called when the program
+ * @param[in] pfn_notify A function pointer to a callback function that an
+ * application can register and which will be called when the program
  * executable has been built (successfully or unsuccessfully).
  * @param[in] user_data User supplied data for the callback function.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -1263,10 +1223,10 @@ finish:
  * @return A new program wrapper object, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
-    CCLDevice* const* devs, const char* options, cl_uint num_input_programs,
-    CCLProgram** input_prgs, ccl_program_callback pfn_notify,
-    void* user_data, CCLErr** err) {
+CCLProgram * ccl_program_link(CCLContext * ctx, cl_uint num_devices,
+    CCLDevice * const * devs, const char * options, cl_uint num_input_programs,
+    CCLProgram ** input_prgs, ccl_program_callback pfn_notify,
+    void* user_data, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, CL_FALSE);
@@ -1274,19 +1234,19 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
     g_return_val_if_fail(err == NULL || *err == NULL, CL_FALSE);
 
     /* Array of unwrapped devices. */
-    cl_device_id* cl_devices = NULL;
+    cl_device_id * cl_devices = NULL;
     /* Array of unwrapped input programs. */
-    cl_program* input_programs = NULL;
+    cl_program * input_programs = NULL;
     /* Status of OpenCL function call. */
     cl_int ocl_status;
     /* Program wrapper object to create. */
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     /* OpenCL program object to create and wrap. */
     cl_program program = NULL;
     /* OpenCL version of underlying platform. */
     cl_uint ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 
@@ -1340,8 +1300,8 @@ CCLProgram* ccl_program_link(CCLContext* ctx, cl_uint num_devices,
 
     /* Link program. */
     program = clLinkProgram(ccl_context_unwrap(ctx), num_devices,
-        (const cl_device_id*) cl_devices, options, num_input_programs,
-        (const cl_program*) input_programs, pfn_notify, user_data,
+        (const cl_device_id *) cl_devices, options, num_input_programs,
+        (const cl_program *) input_programs, pfn_notify, user_data,
         &ocl_status);
 
     /* Check for errors. */
@@ -1372,13 +1332,11 @@ finish:
     }
     /* Check if necessary to release array of input programs. */
     if (input_programs != NULL) {
-        g_slice_free1(
-            sizeof(cl_program) * num_input_programs, input_programs);
+        g_slice_free1(sizeof(cl_program) * num_input_programs, input_programs);
     }
 
     /* Return linked program wrapper. */
     return prg;
-
 }
 
 
@@ -1390,6 +1348,7 @@ finish:
  * * 110 for OpenCL 1.1
  * * 120 for OpenCL 1.2
  * * 200 for OpenCL 2.0
+ * * 210 for OpenCL 2.1
  * * etc.
  *
  * @public @memberof ccl_program
@@ -1397,11 +1356,11 @@ finish:
  * @param[in] prg A program wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The OpenCL version of the platform associated with this
- * program as an integer. If an error occurs, 0 is returned.
+ * @return The OpenCL version of the platform associated with this program as
+ * an integer. If an error occurs, 0 is returned.
  * */
 CCL_EXPORT
-cl_uint ccl_program_get_opencl_version(CCLProgram* prg, CCLErr** err) {
+cl_uint ccl_program_get_opencl_version(CCLProgram * prg, CCLErr ** err) {
 
     /* Make sure number prg is not NULL. */
     g_return_val_if_fail(prg != NULL, 0);
@@ -1409,8 +1368,8 @@ cl_uint ccl_program_get_opencl_version(CCLProgram* prg, CCLErr** err) {
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
     cl_context context;
-    CCLContext* ctx;
-    CCLErr* err_internal = NULL;
+    CCLContext * ctx;
+    CCLErr * err_internal = NULL;
     cl_uint ocl_ver;
 
     /* Get cl_context object for this program. */
@@ -1442,19 +1401,17 @@ finish:
 
     /* Return event wrapper. */
     return ocl_ver;
-
 }
 
 /**
- * Get the kernel wrapper object for the given program kernel function.
- * This is a utility function which returns the same kernel wrapper
- * instance for each kernel function name. The returned kernel wrapper
- * object is automatically released when the program wrapper object
- * which contains it is destroyed; as such, it must not be externally
- * destroyed with ccl_kernel_destroy().
+ * Get the kernel wrapper object for the given program kernel function. This is
+ * a utility function which returns the same kernel wrapper instance for each
+ * kernel function name. The returned kernel wrapper object is automatically
+ * released when the program wrapper object which contains it is destroyed; as
+ * such, it must not be externally destroyed with ccl_kernel_destroy().
  *
- * @warning For multi-threaded handling and execution of the same
- * kernel function, create different kernel wrapper instances with the
+ * @warning For multi-threaded handling and execution of the same kernel
+ * function, create different kernel wrapper instances with the
  * ccl_kernel_new() function.
  *
  * @public @memberof ccl_program
@@ -1463,12 +1420,11 @@ finish:
  * @param[in] kernel_name Name of kernel function.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The kernel wrapper object for the given program kernel
- * function.
+ * @return The kernel wrapper object for the given program kernel function.
  * */
 CCL_EXPORT
-CCLKernel* ccl_program_get_kernel(
-    CCLProgram* prg, const char* kernel_name, CCLErr** err) {
+CCLKernel * ccl_program_get_kernel(
+    CCLProgram * prg, const char * kernel_name, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -1478,9 +1434,9 @@ CCLKernel* ccl_program_get_kernel(
     g_return_val_if_fail(kernel_name != NULL, NULL);
 
     /* Internal error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* Kernel wrapper object. */
-    CCLKernel* krnl = NULL;
+    CCLKernel * krnl = NULL;
 
     /* If kernels table is not yet initialized, then
      * initialize it. */
@@ -1522,26 +1478,24 @@ finish:
 
     /* Return kernel wrapper. */
     return krnl;
-
 }
 
 /**
- * Enqueues a program kernel function for execution on a device. This
- * is a utility function which handles one kernel wrapper instance
- * for each kernel function name.
+ * Enqueues a program kernel function for execution on a device. This is a
+ * utility function which handles one kernel wrapper instance for each kernel
+ * function name.
  *
- * The operations performed by this function are equivalent to getting
- * the program's internally kept kernel wrapper instance for the given
- * kernel name using ccl_program_get_kernel(), and then enqueing it for
- * execution with ccl_kernel_set_args_and_enqueue_ndrange().
- * that
+ * The operations performed by this function are equivalent to getting the
+ * program's internally kept kernel wrapper instance for the given kernel name
+ * using ccl_program_get_kernel(), and then enqueing it for execution with
+ * ccl_kernel_set_args_and_enqueue_ndrange().
  *
  * @attention The variable argument list must end with `NULL`.
  *
- * @warning For multi-threaded execution of the same kernel
- * function, create different kernel wrapper instances with the
- * ccl_kernel_new() function and use the @ref CCL_KERNEL_WRAPPER
- * "kernel module" API to enqueue kernel executions.
+ * @warning For multi-threaded execution of the same kernel function, create
+ * different kernel wrapper instances with the ccl_kernel_new() function and
+ * use the @ref CCL_KERNEL_WRAPPER "kernel module" API to enqueue kernel
+ * executions.
  *
  * @public @memberof ccl_program
  *
@@ -1549,42 +1503,42 @@ finish:
  * @param[in] kernel_name Name of kernel function.
  * @param[in] cq Command queue wrapper object where to enqueue kernel
  * execution.
- * @param[in] work_dim The number of dimensions used to specify the
- * global work-items and work-items in the work-group.
- * @param[in] global_work_offset Can be used to specify an array of
- * `work_dim` unsigned values that describe the offset used to calculate
- * the global ID of a work-item.
- * @param[in] global_work_size An array of `work_dim` unsigned values
- * that describe the number of global work-items in `work_dim`
- * dimensions that will execute the kernel function.
- * @param[in] local_work_size An array of `work_dim` unsigned values
- * that describe the number of work-items that make up a work-group that
- * will execute the specified kernel.
- * @param[in,out] evt_wait_lst List of events that need to complete
- * before this command can be executed. The list will be cleared and
- * can be reused by client code.
+ * @param[in] work_dim The number of dimensions used to specify the global
+ * work-items and work-items in the work-group.
+ * @param[in] global_work_offset Can be used to specify an array of `work_dim`
+ * unsigned values that describe the offset used to calculate the global ID of
+ * a work-item.
+ * @param[in] global_work_size An array of `work_dim` unsigned values that
+ * describe the number of global work-items in `work_dim` dimensions that will
+ * execute the kernel function.
+ * @param[in] local_work_size An array of `work_dim` unsigned values that
+ * describe the number of work-items that make up a work-group that will
+ * execute the specified kernel.
+ * @param[in,out] evt_wait_lst List of events that need to complete before this
+ * command can be executed. The list will be cleared and can be reused by
+ * client code.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @param[in] ... A `NULL`-terminated list of arguments to set.
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
-    const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
-    const size_t* global_work_offset, const size_t* global_work_size,
-    const size_t* local_work_size, CCLEventWaitList* evt_wait_lst,
-    CCLErr** err, ...) {
+CCLEvent * ccl_program_enqueue_kernel(CCLProgram * prg,
+    const char * kernel_name, CCLQueue * cq, cl_uint work_dim,
+    const size_t * global_work_offset, const size_t * global_work_size,
+    const size_t * local_work_size, CCLEventWaitList * evt_wait_lst,
+    CCLErr ** err, ...) {
 
     /* Event wrapper. */
-    CCLEvent* evt;
+    CCLEvent * evt;
     /* The va_list, which represents the variable argument list. */
     va_list args_va;
     /* Array of arguments, to be created from the va_list. */
-    void** args_array = NULL;
+    void ** args_array = NULL;
     /* Number of arguments. */
     guint num_args = 0;
     /* Aux. arg. when cycling through the va_list. */
-    void* aux_arg;
+    void * aux_arg;
 
     /* Initialize the va_list. */
     va_start(args_va, err);
@@ -1638,23 +1592,21 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
 
     /* Return the event. */
     return evt;
-
 }
 
 /**
- * Enqueues a program kernel function for execution on a device. This
- * is a utility function which handles one kernel wrapper instance
- * for each kernel function name.
+ * Enqueues a program kernel function for execution on a device. This is a
+ * utility function which handles one kernel wrapper instance for each kernel
+ * function name.
  *
- * This function gets the program's internally kept kernel wrapper
- * instance for the given kernel name using ccl_program_get_kernel(),
- * and then enqueues it for execution with
- * ccl_kernel_set_args_and_enqueue_ndrange_v().
+ * This function gets the program's internally kept kernel wrapper instance for
+ * the given kernel name using ccl_program_get_kernel(), and then enqueues it
+ * for execution with ccl_kernel_set_args_and_enqueue_ndrange_v().
  *
- * @warning For multi-threaded execution of the same kernel
- * function, create different kernel wrapper instances with the
- * ccl_kernel_new() function and use the @ref CCL_KERNEL_WRAPPER
- * "kernel module" API to enqueue kernel executions.
+ * @warning For multi-threaded execution of the same kernel function, create
+ * different kernel wrapper instances with the ccl_kernel_new() function and
+ * use the @ref CCL_KERNEL_WRAPPER "kernel module" API to enqueue kernel
+ * executions.
  *
  * @public @memberof ccl_program
  *
@@ -1662,20 +1614,20 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
  * @param[in] kernel_name Name of kernel function.
  * @param[in] cq Command queue wrapper object where to enqueue kernel
  * execution.
- * @param[in] work_dim The number of dimensions used to specify the
- * global work-items and work-items in the work-group.
- * @param[in] global_work_offset Can be used to specify an array of
- * `work_dim` unsigned values that describe the offset used to calculate
- * the global ID of a work-item.
- * @param[in] global_work_size An array of `work_dim` unsigned values
- * that describe the number of global work-items in `work_dim`
- * dimensions that will execute the kernel function.
- * @param[in] local_work_size An array of `work_dim` unsigned values
- * that describe the number of work-items that make up a work-group that
- * will execute the specified kernel.
- * @param[in,out] evt_wait_lst List of events that need to complete
- * before this command can be executed. The list will be cleared and
- * can be reused by client code.
+ * @param[in] work_dim The number of dimensions used to specify the global
+ * work-items and work-items in the work-group.
+ * @param[in] global_work_offset Can be used to specify an array of `work_dim`
+ * unsigned values that describe the offset used to calculate the global ID of
+ * a work-item.
+ * @param[in] global_work_size An array of `work_dim` unsigned values that
+ * describe the number of global work-items in `work_dim` dimensions that will
+ * execute the kernel function.
+ * @param[in] local_work_size An array of `work_dim` unsigned values that
+ * describe the number of work-items that make up a work-group that will
+ * execute the specified kernel.
+ * @param[in,out] evt_wait_lst List of events that need to complete before this
+ * command can be executed. The list will be cleared and can be reused by
+ * client code.
  * @param[in] args A `NULL`-terminated array of arguments to set.
  * Arguments must be of type ::CCLArg*, ::CCLBuffer*, ::CCLImage* or
  * ::CCLSampler*.
@@ -1684,17 +1636,17 @@ CCLEvent* ccl_program_enqueue_kernel(CCLProgram* prg,
  * @return Event wrapper object that identifies this command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
-    const char* kernel_name, CCLQueue* cq, cl_uint work_dim,
-    const size_t* global_work_offset, const size_t* global_work_size,
-    const size_t* local_work_size, CCLEventWaitList* evt_wait_lst,
-    void** args, CCLErr** err) {
+CCLEvent * ccl_program_enqueue_kernel_v(CCLProgram * prg,
+    const char * kernel_name, CCLQueue * cq, cl_uint work_dim,
+    const size_t * global_work_offset, const size_t * global_work_size,
+    const size_t * local_work_size, CCLEventWaitList * evt_wait_lst,
+    void ** args, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
 
-    CCLEvent* evt;
-    CCLKernel* krnl;
+    CCLEvent * evt;
+    CCLKernel * krnl;
 
     krnl = ccl_program_get_kernel(prg, kernel_name, err);
     if (krnl == NULL) return NULL;
@@ -1706,17 +1658,16 @@ CCLEvent* ccl_program_enqueue_kernel_v(CCLProgram* prg,
 }
 
 /**
- * @internal
- * Load the program binaries into the binaries table of the program
- * wrapper object.
+ * Load the program binaries into the binaries table of the program wrapper
+ * object.
  *
- * @private @memberof ccl_program
+ * @internal @private @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * */
-static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
+static void ccl_program_load_binaries(CCLProgram * prg, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_if_fail((err) == NULL || *(err) == NULL);
@@ -1728,30 +1679,30 @@ static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
     g_return_if_fail(prg->binaries != NULL);
 
     cl_uint num_devices;
-    cl_device_id* devices;
-    size_t* binary_sizes;
-    CCLWrapperInfo* info;
-    unsigned char** bins_raw;
-    CCLErr* err_internal = NULL;
+    cl_device_id * devices;
+    size_t * binary_sizes;
+    CCLWrapperInfo * info;
+    unsigned char ** bins_raw;
+    CCLErr * err_internal = NULL;
     cl_int ocl_status;
 
     /* Get number of program devices. */
     info = ccl_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
-    num_devices = *((cl_uint*) info->value);
+    num_devices = *((cl_uint *) info->value);
 
     /* Get program devices. */
     info = ccl_program_get_info(prg, CL_PROGRAM_DEVICES, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
-    devices = (cl_device_id*) info->value;
+    devices = (cl_device_id *) info->value;
 
     /* Get binary sizes. */
     info = ccl_program_get_info(prg, CL_PROGRAM_BINARY_SIZES, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
-    binary_sizes = (size_t*) info->value;
+    binary_sizes = (size_t *) info->value;
 
     /* Allocate memory for binaries. */
-    bins_raw = g_slice_alloc0(num_devices * sizeof(unsigned char*));
+    bins_raw = g_slice_alloc0(num_devices * sizeof(unsigned char *));
     for (guint i = 0; i < num_devices; i++) {
         if (binary_sizes[i] > 0) {
             bins_raw[i] = g_malloc(binary_sizes[i]);
@@ -1760,7 +1711,7 @@ static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
 
     /* Get binaries. */
     ocl_status = clGetProgramInfo(ccl_program_unwrap(prg),
-        CL_PROGRAM_BINARIES, num_devices * sizeof(unsigned char*),
+        CL_PROGRAM_BINARIES, num_devices * sizeof(unsigned char *),
         bins_raw, NULL);
     g_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
@@ -1771,7 +1722,7 @@ static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
      * CCLProgramBinary* object containing the binary and its size. */
     for (guint i = 0; i < num_devices; ++i) {
 
-        CCLProgramBinary* bin = ccl_program_binary_new_empty();
+        CCLProgramBinary * bin = ccl_program_binary_new_empty();
         bin->size = binary_sizes[i];
         bin->data = bins_raw[i];
 
@@ -1779,7 +1730,7 @@ static void ccl_program_load_binaries(CCLProgram* prg, CCLErr** err) {
     }
 
     /* Free memory allocated for binary array. */
-    g_slice_free1(num_devices * sizeof(unsigned char*), bins_raw);
+    g_slice_free1(num_devices * sizeof(unsigned char *), bins_raw);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -1790,7 +1741,6 @@ error_handler:
     /* If we got here there was an error, verify that it is so. */
     g_assert(err == NULL || *err != NULL);
     return;
-
 }
 
 /**
@@ -1803,12 +1753,11 @@ error_handler:
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
  * @return The program's binary object for the the specified device.
- * The returned object will be freed when the associated program is
- * destroyed.
+ * The returned object will be freed when the associated program is destroyed.
  * */
 CCL_EXPORT
-CCLProgramBinary* ccl_program_get_binary(
-    CCLProgram* prg, CCLDevice* dev, CCLErr** err) {
+CCLProgramBinary * ccl_program_get_binary(
+    CCLProgram * prg, CCLDevice * dev, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, NULL);
@@ -1818,9 +1767,9 @@ CCLProgramBinary* ccl_program_get_binary(
     g_return_val_if_fail(dev != NULL, NULL);
 
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* Binary code object. */
-    CCLProgramBinary* binary = NULL;
+    CCLProgramBinary * binary = NULL;
 
     /* Check if binaries table is initialized. */
     if (prg->binaries == NULL) {
@@ -1883,16 +1832,14 @@ finish:
  *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
- * @param[in] filename Name of file where to save the program's binary
- * code.
+ * @param[in] filename Name of file where to save the program's binary code.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
-    const char* filename, CCLErr** err) {
+cl_bool ccl_program_save_binary(
+    CCLProgram * prg, CCLDevice * dev, const char * filename, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
@@ -1904,9 +1851,9 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
     /* OpenCL function status. */
     cl_bool status;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* The binary code object. */
-    CCLProgramBinary* binary = NULL;
+    CCLProgramBinary * binary = NULL;
 
     /* Get the binary code object for the specified device and check
      * for associated errors. */
@@ -1918,7 +1865,7 @@ cl_bool ccl_program_save_binary(CCLProgram* prg, CCLDevice* dev,
         "%s: binary for given device has size 0.", CCL_STRD);
 
     /* Save binary code to specified file. */
-    g_file_set_contents(filename, (const gchar*) binary->data,
+    g_file_set_contents(filename, (const gchar *) binary->data,
         binary->size, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
 
@@ -1941,17 +1888,16 @@ finish:
 }
 
 /**
- * Save the program binaries for all associated devices to files, one
- * file per device.
+ * Save the program binaries for all associated devices to files, one file per
+ * device.
  *
- * Applications can specify the prefix and suffix of saved files. The
- * variable part of the filename is obtained via the device name and
- * the device index.
+ * Applications can specify the prefix and suffix of saved files. The variable
+ * part of the filename is obtained via the device name and the device index.
  *
- * @attention Depending on the OpenCL implementation, this function
- * might throw an error if program has not been built for all devices
- * associated with the program context. Use ::ccl_program_save_binary()
- * for saving binaries associated with specific devices.
+ * @attention Depending on the OpenCL implementation, this function might throw
+ * an error if program has not been built for all devices associated with the
+ * program context. Use ::ccl_program_save_binary() for saving binaries
+ * associated with specific devices.
  *
  * @public @memberof ccl_program
  *
@@ -1959,23 +1905,21 @@ finish:
  * @param[in] file_prefix Prefix of files to save, can include full or
  * relative paths.
  * @param[in] file_suffix Suffix of files to save.
- * @param[out] filenames Location where to place array of strings
- * containing the saved binaries filenames, or `NULL` if this
- * information is not required. If not `NULL` this variable will point
- * to an array containing *n* strings, where *n* is the number of devices
- * associated with the program, obtained with the
- * ::ccl_program_get_num_devices() function. If not `NULL` the value
+ * @param[out] filenames Location where to place array of strings containing
+ * the saved binaries filenames, or `NULL` if this information is not required.
+ * If not `NULL` this variable will point to an array containing *n* strings,
+ * where *n* is the number of devices associated with the program, obtained
+ * with the ::ccl_program_get_num_devices() function. If not `NULL` the value
  * pointed to by this variable should be freed with the ::ccl_strv_clear()
  * function.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
-    const char* file_prefix, const char* file_suffix, char*** filenames,
-    CCLErr** err) {
+cl_bool ccl_program_save_all_binaries(CCLProgram * prg,
+    const char * file_prefix, const char * file_suffix, char *** filenames,
+    CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail((err) == NULL || *(err) == NULL, CL_FALSE);
@@ -1986,7 +1930,7 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
         (file_prefix != NULL) && (file_suffix != NULL), CL_FALSE);
 
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* Number of devices. */
     guint num_devices;
     /* OpenCL function return status. */
@@ -2007,11 +1951,11 @@ cl_bool ccl_program_save_all_binaries(CCLProgram* prg,
         /* Save binaries, one per device. */
 
         /* Device wrapper object. */
-        CCLDevice* dev = NULL;
+        CCLDevice * dev = NULL;
         /* Variable part of filename. */
-        gchar* file_middle = NULL;
+        gchar * file_middle = NULL;
         /* Complete filename. */
-        gchar* filename;
+        gchar * filename;
 
         /* Get next device associated with program. */
         dev = ccl_program_get_device(prg, i, &err_internal);
@@ -2066,7 +2010,6 @@ finish:
 
     /* Return function status. */
     return status;
-
 }
 
 /**
@@ -2078,15 +2021,14 @@ finish:
  * @param[in] index Index of device in program.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The ::CCLDevice wrapper at given index or `NULL` if an error
- * occurs.
+ * @return The ::CCLDevice wrapper at given index or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLDevice* ccl_program_get_device(
-    CCLProgram* prg, cl_uint index, CCLErr** err) {
+CCLDevice * ccl_program_get_device(
+    CCLProgram * prg, cl_uint index, CCLErr ** err) {
 
     return ccl_dev_container_get_device(
-        (CCLDevContainer*) prg, ccl_program_get_cldevices, index, err);
+        (CCLDevContainer *) prg, ccl_program_get_cldevices, index, err);
 }
 
 /**
@@ -2101,35 +2043,33 @@ CCLDevice* ccl_program_get_device(
  * otherwise not possible to get any device.
  * */
 CCL_EXPORT
-cl_uint ccl_program_get_num_devices(CCLProgram* prg, CCLErr** err) {
+cl_uint ccl_program_get_num_devices(CCLProgram * prg, CCLErr ** err) {
 
     return ccl_dev_container_get_num_devices(
-        (CCLDevContainer*) prg, ccl_program_get_cldevices, err);
-
+        (CCLDevContainer *) prg, ccl_program_get_cldevices, err);
 }
 
 /**
  * Get all device wrappers in program.
  *
- * This function returns the internal array containing the program
- * device wrappers. As such, clients should not modify the returned
- * array (e.g. they should not free it directly).
+ * This function returns the internal array containing the program device
+ * wrappers. As such, clients should not modify the returned array (e.g. they
+ * should not free it directly).
  *
  * @public @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return An array containing the ::CCLDevice wrappers which belong to
- * the given program, or `NULL` if an error occurs.
+ * @return An array containing the ::CCLDevice wrappers which belong to the
+ * given program, or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLDevice* const* ccl_program_get_all_devices(CCLProgram* prg,
-    CCLErr** err) {
+CCLDevice * const * ccl_program_get_all_devices(CCLProgram * prg,
+    CCLErr ** err) {
 
-    return ccl_dev_container_get_all_devices((CCLDevContainer*) prg,
+    return ccl_dev_container_get_all_devices((CCLDevContainer *) prg,
         ccl_program_get_cldevices, err);
-
 }
 
 /** @}*/

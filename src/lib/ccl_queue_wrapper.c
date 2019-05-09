@@ -18,11 +18,10 @@
 
  /**
  * @file
- *
  * Implementation of a wrapper class and its methods for OpenCL queue objects.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU Lesser General Public License version 3 (LGPLv3)](http://www.gnu.org/licenses/lgpl.html)
  * */
 
@@ -47,38 +46,36 @@ struct ccl_queue {
      * Context wrapper to which the queue is associated with.
      * @private
      * */
-    CCLContext* ctx;
+    CCLContext * ctx;
 
     /**
      * Device wrapper to which the queue is associated with.
      * @private
      * */
-    CCLDevice* dev;
+    CCLDevice * dev;
 
     /**
      * Events associated with the command queue.
      * @private
      * */
-    GHashTable* evts;
+    GHashTable * evts;
 
     /**
      * Event iterator.
      * @private
      * */
     GHashTableIter evt_iter;
-
 };
 
 /**
- * @internal
- * Implementation of ccl_wrapper_release_fields() function for
- * ::CCLQueue wrapper objects.
+ * Implementation of ccl_wrapper_release_fields() function for ::CCLQueue
+ * wrapper objects.
  *
- * @private @memberof ccl_queue
+ * @internal @private @memberof ccl_queue
  *
  * @param[in] cq A ::CCLQueue wrapper object.
  * */
-static void ccl_queue_release_fields(CCLQueue* cq) {
+static void ccl_queue_release_fields(CCLQueue * cq) {
 
     /* Make sure cq wrapper object is not NULL. */
     g_return_if_fail(cq != NULL);
@@ -102,17 +99,16 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
  */
 
 /**
- * Get the command queue wrapper for the given OpenCL command
- * queue.
+ * Get the command queue wrapper for the given OpenCL command queue.
  *
- * If the wrapper doesn't exist, its created with a reference count
- * of 1. Otherwise, the existing wrapper is returned and its reference
- * count is incremented by 1.
+ * If the wrapper doesn't exist, its created with a reference count of 1.
+ * Otherwise, the existing wrapper is returned and its reference count is
+ * incremented by 1.
  *
- * This function will rarely be called from client code, except when
- * clients wish to create the OpenCL command queue directly (using the
- * clCreateCommandQueue() function) and then wrap the OpenCL command
- * queue in a ::CCLQueue wrapper object.
+ * This function will rarely be called from client code, except when clients
+ * wish to create the OpenCL command queue directly (using the
+ * clCreateCommandQueue() function) and then wrap the OpenCL command queue in a
+ * ::CCLQueue wrapper object.
  *
  * @public @memberof ccl_queue
  *
@@ -120,11 +116,10 @@ static void ccl_queue_release_fields(CCLQueue* cq) {
  * @return The ::CCLQueue wrapper for the given OpenCL command queue.
  * */
 CCL_EXPORT
-CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
+CCLQueue * ccl_queue_new_wrap(cl_command_queue command_queue) {
 
-    return (CCLQueue*) ccl_wrapper_new(
-        CCL_QUEUE, (void*) command_queue, sizeof(CCLQueue));
-
+    return (CCLQueue *) ccl_wrapper_new(
+        CCL_QUEUE, (void *) command_queue, sizeof(CCLQueue));
 }
 
 /**
@@ -134,12 +129,12 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * (instead of the `cl_command_queue_properties` bitfield used in the
  * ::ccl_queue_new() constructor), following the behavior of the
  * clCreateCommandQueueWithProperties() function (OpenCL >= 2.0). The exact
- * OpenCL constructor used is automatically selected based on the OpenCL version
- * of the underlying platform (i.e. clCreateCommandQueue() if OpenCL <= 1.2, or
- * clCreateCommandQueueWithProperties() for OpenCL >= 2.0). However, if OpenCL
- * >= 2.0 only properties are specified and the underlying platform is OpenCL <=
- * 1.2, a warning will be logged, and the queue will be created with OpenCL <=
- * 1.2 properties only.
+ * OpenCL constructor used is automatically selected based on the OpenCL
+ * version of the underlying platform (i.e. clCreateCommandQueue() if OpenCL <=
+ * 1.2, or clCreateCommandQueueWithProperties() for OpenCL >= 2.0). However, if
+ * OpenCL >= 2.0 only properties are specified and the underlying platform is
+ * OpenCL <= 1.2, a warning will be logged, and the queue will be created with
+ * OpenCL <= 1.2 properties only.
  *
  * @public @memberof ccl_queue
  *
@@ -148,12 +143,12 @@ CCLQueue* ccl_queue_new_wrap(cl_command_queue command_queue) {
  * @param[in] prop_full A zero-terminated list of `cl_queue_properties`.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The ::CCLQueue wrapper for the given device and context, or `NULL` if
- * an error occurs.
+ * @return The ::CCLQueue wrapper for the given device and context, or `NULL`
+ * if an error occurs.
  * */
 CCL_EXPORT
-CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
-    const cl_queue_properties* prop_full, CCLErr** err) {
+CCLQueue * ccl_queue_new_full(CCLContext * ctx, CCLDevice * dev,
+    const cl_queue_properties * prop_full, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, NULL);
@@ -165,9 +160,9 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
     /* The OpenCL command queue object. */
     cl_command_queue queue = NULL;
     /* The command queue wrapper object. */
-    CCLQueue* cq = NULL;
+    CCLQueue * cq = NULL;
     /* Internal error object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
     /* OpenCL <= 1.2 properties. */
     cl_command_queue_properties properties = 0;
     /* Are there any OpenCL >= 2.0 properties? */
@@ -191,7 +186,6 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
 
                 /* No, current property name is valid only for OpenCL >= 2.0. */
                 prop_other = CL_TRUE;
-
             }
         }
 
@@ -204,9 +198,7 @@ CCLQueue* ccl_queue_new_full(CCLContext* ctx, CCLDevice* dev,
             /* There are values in the CL_QUEUE_PROPERTIES bitfield which
              * require OpenCL >= 2.0. */
             prop_other = CL_TRUE;
-
         }
-
     }
 
     /* If dev is NULL, get first device in context. */
@@ -303,21 +295,20 @@ finish:
 
     /* Return the new command queue wrapper object. */
     return cq;
-
 }
 
 /**
  * Create a new command queue wrapper object.
  *
  * This function accepts a `cl_command_queue_properties` bitfield  of command
- * queue properties, mimicking the behavior of the OpenCL clCreateCommandQueue()
- * constructor (deprecated in OpenCL 2.0). The exact OpenCL constructor used is
- * automatically selected based on the OpenCL version of the underlying platform
- * (i.e. clCreateCommandQueue() if OpenCL <= 1.2, or
- * clCreateCommandQueueWithProperties() for OpenCL >= 2.0).
+ * queue properties, mimicking the behavior of the OpenCL
+ * clCreateCommandQueue() constructor (deprecated in OpenCL 2.0). The exact
+ * OpenCL constructor used is automatically selected based on the OpenCL
+ * version of the underlying platform (i.e. clCreateCommandQueue() if OpenCL <=
+ * 1.2, or clCreateCommandQueueWithProperties() for OpenCL >= 2.0).
  *
- * To specify OpenCL >= 2.0 only features, such as on-device queue size,
- * use the ::ccl_queue_new_full() constructor.
+ * To specify OpenCL >= 2.0 only features, such as on-device queue size, use
+ * the ::ccl_queue_new_full() constructor.
  *
  * @public @memberof ccl_queue
  *
@@ -326,62 +317,58 @@ finish:
  * @param[in] properties Bitfield of command queue properties.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The ::CCLQueue wrapper for the given device and context,
- * or `NULL` if an error occurs.
+ * @return The ::CCLQueue wrapper for the given device and context, or `NULL`
+ * if an error occurs.
  * */
 CCL_EXPORT
-CCLQueue* ccl_queue_new(CCLContext* ctx, CCLDevice* dev,
-    cl_command_queue_properties properties, CCLErr** err) {
+CCLQueue * ccl_queue_new(CCLContext * ctx, CCLDevice * dev,
+    cl_command_queue_properties properties, CCLErr ** err) {
 
     const cl_queue_properties prop_full[] =
         { CL_QUEUE_PROPERTIES, properties, 0 };
 
     return ccl_queue_new_full(ctx, dev, prop_full, err);
-
 }
 
 /**
- * Decrements the reference count of the command queue wrapper
- * object. If it reaches 0, the command queue wrapper object is
- * destroyed.
+ * Decrements the reference count of the command queue wrapper object. If it
+ * reaches 0, the command queue wrapper object is destroyed.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * */
 CCL_EXPORT
-void ccl_queue_destroy(CCLQueue* cq) {
+void ccl_queue_destroy(CCLQueue * cq) {
 
-    ccl_wrapper_unref((CCLWrapper*) cq, sizeof(CCLQueue),
+    ccl_wrapper_unref((CCLWrapper *) cq, sizeof(CCLQueue),
         (ccl_wrapper_release_fields) ccl_queue_release_fields,
         (ccl_wrapper_release_cl_object) clReleaseCommandQueue, NULL);
-
 }
 
 /**
- * Get the context associated with the given command queue wrapper
- * object.
+ * Get the context associated with the given command queue wrapper object.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The context associated with the given command queue wrapper
- * object, or `NULL` if an error occurs.
+ * @return The context associated with the given command queue wrapper object,
+ * or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLContext* ccl_queue_get_context(CCLQueue* cq, CCLErr** err) {
+CCLContext * ccl_queue_get_context(CCLQueue * cq, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-    CCLContext* ctx = NULL;
+    CCLContext * ctx = NULL;
 
     /* Internal error object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Check if context wrapper is already kept by the queue wrapper. */
     if (cq->ctx != NULL) {
@@ -389,10 +376,10 @@ CCLContext* ccl_queue_get_context(CCLQueue* cq, CCLErr** err) {
         ctx = cq->ctx;
     } else {
         /* Otherwise, get it using a query. */
-        CCLWrapperInfo* info = NULL;
+        CCLWrapperInfo * info = NULL;
         info = ccl_queue_get_info(cq, CL_QUEUE_CONTEXT, &err_internal);
         g_if_err_propagate_goto(err, err_internal, error_handler);
-        ctx = ccl_context_new_wrap(*((cl_context*) info->value));
+        ctx = ccl_context_new_wrap(*((cl_context *) info->value));
         cq->ctx = ctx;
     }
 
@@ -408,23 +395,21 @@ finish:
 
     /* Return the command queue context wrapper. */
     return ctx;
-
 }
 
 /**
- * Get the device associated with the given command queue wrapper
- * object.
+ * Get the device associated with the given command queue wrapper object.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The device associated with the given command queue wrapper
- * object, or `NULL` if an error occurs.
+ * @return The device associated with the given command queue wrapper object,
+ * or `NULL` if an error occurs.
  * */
 CCL_EXPORT
-CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err) {
+CCLDevice * ccl_queue_get_device(CCLQueue * cq, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -432,10 +417,10 @@ CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err) {
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* The device wrapper object to return. */
-    CCLDevice* dev = NULL;
+    CCLDevice * dev = NULL;
 
     /* Internal error object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Check if device wrapper is already kept by the queue wrapper. */
     if (cq->dev != NULL) {
@@ -443,10 +428,10 @@ CCLDevice* ccl_queue_get_device(CCLQueue* cq, CCLErr** err) {
         dev = cq->dev;
     } else {
         /* Otherwise, get it using a query. */
-        CCLWrapperInfo* info = NULL;
+        CCLWrapperInfo * info = NULL;
         info = ccl_queue_get_info(cq, CL_QUEUE_DEVICE, &err_internal);
         g_if_err_propagate_goto(err, err_internal, error_handler);
-        dev = ccl_device_new_wrap(*((cl_device_id*) info->value));
+        dev = ccl_device_new_wrap(*((cl_device_id *) info->value));
         cq->dev = dev;
     }
 
@@ -462,26 +447,24 @@ finish:
 
     /* Return the command queue device wrapper object. */
     return dev;
-
 }
 
 /**
- * @internal
- * Create an event wrapper from a given OpenCL event object and
- * associate it with the command queue.
+ * Create an event wrapper from a given OpenCL event object and associate it
+ * with the command queue.
  *
- * This function is used by the `ccl_*_enqueue_*()` functions and will
- * rarely be called from client code.
+ * This function is used by the `ccl_*_enqueue_*()` functions and will rarely
+ * be called from client code.
  *
- * @public @memberof ccl_queue
+ * @internal @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @param[in] event The OpenCL event to wrap and associate with the
- * given command queue.
+ * @param[in] event The OpenCL event to wrap and associate with the given
+ * command queue.
  * @return The event wrapper object for the given OpenCL event object.
  * */
 CCL_EXPORT
-CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
+CCLEvent * ccl_queue_produce_event(CCLQueue * cq, cl_event event) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -489,7 +472,7 @@ CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
     g_return_val_if_fail(event != NULL, NULL);
 
     /* Wrap the OpenCL event. */
-    CCLEvent* evt = ccl_event_new_wrap(event);
+    CCLEvent * evt = ccl_event_new_wrap(event);
 
     /* Initialize the list of events of this command queue. */
     if (cq->evts == NULL) {
@@ -503,78 +486,72 @@ CCLEvent* ccl_queue_produce_event(CCLQueue* cq, cl_event event) {
 
     /* Return the wrapped event. */
     return evt;
-
 }
 
 /**
- * @internal
- * Initialize an iterator for this command queue's list of event
- * wrappers. The event wrappers can be iterated in a loop using the
+ * Initialize an iterator for this command queue's list of event wrappers. The
+ * event wrappers can be iterated in a loop using the
  * ccl_queue_iter_event_next() function.
  *
  * This function is used by @ref CCL_PROFILER "profile module" functions and
  * will rarely be called from client code.
  *
- * @public @memberof ccl_queue
+ * @internal @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * */
 CCL_EXPORT
-void ccl_queue_iter_event_init(CCLQueue* cq) {
+void ccl_queue_iter_event_init(CCLQueue * cq) {
 
     /* Make sure cq is not NULL. */
     g_return_if_fail(cq != NULL);
 
     /* Initialize iterator. */
     g_hash_table_iter_init(&cq->evt_iter, cq->evts);
-
 }
 
 /**
- * @internal
  * Get the next event wrapper associated with this queue.
  *
  * This function is used by @ref CCL_PROFILER "profile module" functions and
  * will rarely be called from client code.
  *
- * @attention Calling this before ccl_queue_iter_event_init() is
- * undefined behavior.
+ * @attention Calling this before ccl_queue_iter_event_init() is undefined
+ * behavior.
  * @warning This function is not thread-safe.
- * @warning No events should be enqueued on this queue while the
- * iteration is ongoing.
+ * @warning No events should be enqueued on this queue while the iteration is
+ * ongoing.
  *
- * @public @memberof ccl_queue
+ * @internal @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
- * @return The next event wrapper associated with this queue, or `NULL`
- * if no more event wrappers are available.
+ * @return The next event wrapper associated with this queue, or `NULL` if no
+ * more event wrappers are available.
  * */
 CCL_EXPORT
-CCLEvent* ccl_queue_iter_event_next(CCLQueue* cq) {
+CCLEvent * ccl_queue_iter_event_next(CCLQueue * cq) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
 
     gpointer evt;
     gboolean exists = g_hash_table_iter_next(&cq->evt_iter, &evt, NULL);
-    return exists ? (CCLEvent*) evt : NULL;
+    return exists ? (CCLEvent *) evt : NULL;
 }
 
 /**
- * Issues all previously queued commands in a command queue to the
- * associated device. This function is a wrapper for the clFlush()
- * OpenCL function.
+ * Issues all previously queued commands in a command queue to the associated
+ * device. This function is a wrapper for the clFlush() OpenCL function.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err) {
+cl_bool ccl_queue_flush(CCLQueue * cq, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
@@ -596,20 +573,19 @@ cl_bool ccl_queue_flush(CCLQueue* cq, CCLErr** err) {
 }
 
 /**
- * Blocks until all previously queued OpenCL commands in a command-queue
- * are issued to the associated device and have completed. This function
- * is a wrapper for the clFinish() OpenCL function.
+ * Blocks until all previously queued OpenCL commands in a command-queue are
+ * issued to the associated device and have completed. This function is a
+ * wrapper for the clFinish() OpenCL function.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return `CL_TRUE` if operation is successful, or `CL_FALSE`
- * otherwise.
+ * @return `CL_TRUE` if operation is successful, or `CL_FALSE` otherwise.
  * */
 CCL_EXPORT
-cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err) {
+cl_bool ccl_queue_finish(CCLQueue * cq, CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, CL_INT_MAX);
@@ -628,28 +604,25 @@ cl_bool ccl_queue_finish(CCLQueue* cq, CCLErr** err) {
 
     /* Return status. */
     return ocl_status == CL_SUCCESS ? CL_TRUE : CL_FALSE;
-
 }
 
 /**
  * Release all events associated with the command queue.
  *
  * _cf4ocl_ command queue wrappers internally keep events for profiling
- * purposes and simpler handling of event associated memory. However,
- * a very large number of events can have an impact on utilized memory.
- * In such cases, this function can be used to periodically release
- * these events.
+ * purposes and simpler handling of event associated memory. However, a very
+ * large number of events can have an impact on utilized memory. In such cases,
+ * this function can be used to periodically release these events.
  *
- * This function is also called by the ::ccl_prof_calc() function,
- * i.e., the queue events are released after the profiling analysis is
- * performed.
+ * This function is also called by the ::ccl_prof_calc() function, i.e., the
+ * queue events are released after the profiling analysis is performed.
  *
  * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * */
 CCL_EXPORT
-void ccl_queue_gc(CCLQueue* cq) {
+void ccl_queue_gc(CCLQueue * cq) {
 
     /* Make sure cq is not NULL. */
     g_return_if_fail(cq != NULL);
@@ -658,35 +631,31 @@ void ccl_queue_gc(CCLQueue* cq) {
     if (cq->evts != NULL) {
         g_hash_table_remove_all(cq->evts);
     }
-
 }
 
 /**
  * For platforms which do not support clEnqueueBarrierWithWaitList()
- * (OpenCL <= 1.1), this function implements the same functionality by
- * using the deprecated clEnqueueBarrier(), clEnqueueWaitForEvents() and
+ * (OpenCL <= 1.1), this function implements the same functionality by using
+ * the deprecated clEnqueueBarrier(), clEnqueueWaitForEvents() and
  * clEnqueueMarker() OpenCL functions.
  *
- * If `evt_wait_lst` is `NULL`, clEnqueueBarrier() and clEnqueueMarker()
- * are called in sequence; otherwise (if there are events which must be
- * waited on), clEnqueueWaitForEvents() and clEnqueueMarker() are
- * called in sequence. The calls on clEnqueueMarker() allow to fire
- * a marker event (not produced by either clEnqueueBarrier() or
- * clEnqueueWaitForEvents()). This marker event can then be used to
- * queue a wait on.
+ * If `evt_wait_lst` is `NULL`, clEnqueueBarrier() and clEnqueueMarker() are
+ * called in sequence; otherwise (if there are events which must be waited on),
+ * clEnqueueWaitForEvents() and clEnqueueMarker() are called in sequence. The
+ * calls on clEnqueueMarker() allow to fire a marker event (not produced by
+ * either clEnqueueBarrier() or clEnqueueWaitForEvents()). This marker event
+ * can then be used to queue a wait on.
  *
- * @internal
- * @see ccl_enqueue_barrier()
+ * @internal @see ccl_enqueue_barrier()
  *
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return An OpenCL marker event (will be wrapped by the calling
- * function).
+ * @return An OpenCL marker event (will be wrapped by the calling function).
  * */
-static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+static cl_event ccl_enqueue_barrier_deprecated(
+    CCLQueue * cq, CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* OpenCL status. */
     cl_int ocl_status;
@@ -717,7 +686,6 @@ static cl_event ccl_enqueue_barrier_deprecated(CCLQueue* cq,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
             CCL_STRD, ocl_status, ccl_err(ocl_status));
-
     }
 
     /* Enqueue a marker so we get an OpenCL event object. */
@@ -744,32 +712,30 @@ finish:
 
     /* Return OpenCL event. */
     return event;
-
 }
 
 /**
- * Enqueues a barrier command on the given command queue. The barrier
- * can wait on a given list of events, or wait until all previous
- * enqueued commands have completed if `evt_wait_lst` is `NULL`. A
- * marker event is returned, which can be used to identify this barrier
- * command later on. This function is a wrapper for the
- * clEnqueueBarrierWithWaitList() OpenCL function (OpenCL >= 1.2).
+ * Enqueues a barrier command on the given command queue. The barrier can wait
+ * on a given list of events, or wait until all previous enqueued commands have
+ * completed if `evt_wait_lst` is `NULL`. A marker event is returned, which can
+ * be used to identify this barrier command later on. This function is a
+ * wrapper for the clEnqueueBarrierWithWaitList() OpenCL function (OpenCL >=
+ * 1.2).
  *
+ * @copybrief ccl_enqueue_barrier_deprecated()
  * @public @memberof ccl_queue
- * @copydoc ccl_enqueue_barrier_deprecated()
  *
  * @param[in] cq Command queue wrapper object.
- * @param[in,out] evt_wait_lst List of events that need to complete
- * before this command can be executed. The list will be cleared and
- * can be reused by client code.
+ * @param[in,out] evt_wait_lst List of events that need to complete before this
+ * command can be executed. The list will be cleared and can be reused by
+ * client code.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return An event wrapper object that identifies this particular
- * command.
+ * @return An event wrapper object that identifies this particular command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_enqueue_barrier(
+    CCLQueue * cq, CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -777,11 +743,11 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Event wrapper to return. */
-    CCLEvent* evt;
+    CCLEvent * evt;
     /* OpenCL event object. */
     cl_event event;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
@@ -790,7 +756,7 @@ CCLEvent* ccl_enqueue_barrier(CCLQueue* cq,
      * functionality. */
 
     /* Context associated with event. */
-    CCLContext* ctx;
+    CCLContext * ctx;
     /* OpenCL version. */
     double platf_ver;
     /* OpenCL status. */
@@ -857,31 +823,28 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /**
- * For platforms which do not support clEnqueueMarkerWithWaitList()
- * (OpenCL <= 1.1), this function uses the deprecated clEnqueueMarker()
- * OpenCL function. However, in this case `evt_wait_lst` must be `NULL`,
- * because clEnqueueMarker() does not support markers with wait lists.
- * If `evt_wait_lst` is not `NULL`, it will be ignored (i.e. the marker
- * will only fire an event after all commands queued before the marker
- * command are complete) and a warning will be generated.
+ * For platforms which do not support clEnqueueMarkerWithWaitList() (OpenCL <=
+ * 1.1), this function uses the deprecated clEnqueueMarker() OpenCL function.
+ * However, in this case `evt_wait_lst` must be `NULL`, because
+ * clEnqueueMarker() does not support markers with wait lists. If
+ * `evt_wait_lst` is not `NULL`, it will be ignored (i.e. the marker will only
+ * fire an event after all commands queued before the marker command are
+ * complete) and a warning will be generated.
  *
- * @internal
- * @see ccl_enqueue_marker()
+ * @internal @see ccl_enqueue_marker()
  *
  * @param[in] cq Command queue wrapper object.
- * @param[in,out] evt_wait_lst Event wait list. Must be `NULL` or a
- * warning will be generated.
+ * @param[in,out] evt_wait_lst Event wait list. Must be `NULL` or a warning
+ * will be generated.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return An OpenCL marker event (will be wrapped by the calling
- * function).
+ * @return An OpenCL marker event (will be wrapped by the calling function).
  * */
-static cl_event ccl_enqueue_marker_deprecated(CCLQueue* cq,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+static cl_event ccl_enqueue_marker_deprecated(
+    CCLQueue * cq, CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* OpenCL status. */
     cl_int ocl_status;
@@ -923,33 +886,29 @@ finish:
 
     /* Return OpenCL event. */
     return event;
-
 }
 
 /**
- * Enqueues a marker command on the given command queue. The marker can
- * wait on a given list of events, or wait until all previous enqueued
- * commands have completed if `evt_wait_lst` is `NULL`. This function
- * is a wrapper for the clEnqueueMarkerWithWaitList() OpenCL function
- * (OpenCL >= 1.2).
+ * Enqueues a marker command on the given command queue. The marker can wait on
+ * a given list of events, or wait until all previous enqueued commands have
+ * completed if `evt_wait_lst` is `NULL`. This function is a wrapper for the
+ * clEnqueueMarkerWithWaitList() OpenCL function (OpenCL >= 1.2).
  *
- * @public @memberof ccl_queue
- * @copydoc ccl_enqueue_marker_deprecated()
+ * @copybrief ccl_enqueue_marker_deprecated()
  * @note Requires OpenCL >= 1.2 if `evt_wait_lst` is not `NULL`.
+ * @public @memberof ccl_queue
  *
  * @param[in] cq Command queue wrapper object.
- * @param[in,out] evt_wait_lst List of events that need to complete
- * before this command can be executed. The list will be cleared and
- * can be reused by client code. Must be `NULL` if OpenCL platform
- * version is <= 1.1.
+ * @param[in,out] evt_wait_lst List of events that need to complete before this
+ * command can be executed. The list will be cleared and can be reused by
+ * client code. Must be `NULL` if OpenCL platform version is <= 1.1.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return An event wrapper object that identifies this particular
- * command.
+ * @return An event wrapper object that identifies this particular command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err) {
+CCLEvent * ccl_enqueue_marker(
+    CCLQueue * cq, CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
 
     /* Make sure cq is not NULL. */
     g_return_val_if_fail(cq != NULL, NULL);
@@ -957,11 +916,11 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
     /* Event wrapper to return. */
-    CCLEvent* evt;
+    CCLEvent * evt;
     /* OpenCL event object. */
     cl_event event;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifdef CL_VERSION_1_2
 
@@ -970,7 +929,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
      * functionality. */
 
     /* Context associated with event. */
-    CCLContext* ctx;
+    CCLContext * ctx;
     /* OpenCL version. */
     double platf_ver;
     /* OpenCL status. */
@@ -997,8 +956,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
     } else {
 
         /* Use "old" functions. */
-        event = ccl_enqueue_marker_deprecated(
-            cq, evt_wait_lst, &err_internal);
+        event = ccl_enqueue_marker_deprecated(cq, evt_wait_lst, &err_internal);
         g_if_err_propagate_goto(err, err_internal, error_handler);
     }
 
@@ -1006,8 +964,7 @@ CCLEvent* ccl_enqueue_marker(CCLQueue* cq,
 
     /* If library is compiled with support for OpenCL 1.0 and 1.1,
      * then use those functions by default. */
-    event = ccl_enqueue_marker_deprecated(
-        cq, evt_wait_lst, &err_internal);
+    event = ccl_enqueue_marker_deprecated(cq, evt_wait_lst, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
@@ -1036,7 +993,6 @@ finish:
 
     /* Return event. */
     return evt;
-
 }
 
 /** @} */

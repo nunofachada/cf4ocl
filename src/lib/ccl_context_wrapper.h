@@ -18,7 +18,6 @@
 
 /**
  * @file
- *
  * Definition of a wrapper class and its methods for OpenCL context objects.
  *
  * @author Nuno Fachada
