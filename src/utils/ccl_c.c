@@ -90,7 +90,7 @@
  * COPYRIGHT
  * =========
  *
- * Copyright (C) 2016 Nuno Fachada<br/>
+ * Copyright (C) 2019 Nuno Fachada<br/>
  * License GPLv3+: GNU GPL version 3 or later
  * <http://gnu.org/licenses/gpl.html>.<br/>
  * This is free software: you are free to change and redistribute it.<br/>
@@ -130,14 +130,14 @@ typedef enum ccl_c_tasks {
 static gboolean opt_list = FALSE;
 static guint dev_idx = CCL_UTILS_NODEVICE;
 static guint task = CCL_C_BUILD;
-static gchar* options = NULL;
-static gchar** src_files = NULL;
-static gchar** bin_files = NULL;
-static gchar** src_h_files = NULL;
-static gchar** src_h_names = NULL;
-static gchar** kernel_names = NULL;
-static gchar* output = NULL;
-static gchar* bld_log_out = NULL;
+static gchar * options = NULL;
+static gchar ** src_files = NULL;
+static gchar ** bin_files = NULL;
+static gchar ** src_h_files = NULL;
+static gchar ** src_h_names = NULL;
+static gchar ** kernel_names = NULL;
+static gchar * output = NULL;
+static gchar * bld_log_out = NULL;
 static gboolean version = FALSE;
 
 /* Valid command line options. */
@@ -185,13 +185,13 @@ static GOptionEntry entries[] = {
  * @param[in] argv Command line arguments.
  * @param[out] err Return location for a CCLErr object.
  * */
-void ccl_c_args_parse(int argc, char* argv[], CCLErr** err) {
+void ccl_c_args_parse(int argc, char * argv[], CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_if_fail(err == NULL || *err == NULL);
 
     /* Command line options context. */
-    GOptionContext* context = NULL;
+    GOptionContext * context = NULL;
 
     /* Create parsing context. */
     context = g_option_context_new(" - " CCL_C_DESCRIPTION);
@@ -219,7 +219,6 @@ cleanup:
 
     /* Return. */
     return;
-
 }
 
 /**
@@ -231,28 +230,27 @@ cleanup:
  * @param[out] err Return location for a CCLErr object.
  * */
 void ccl_c_kernel_info_show(
-    CCLProgram* prg, CCLDevice* dev, const char* kernel, CCLErr** err) {
+    CCLProgram * prg, CCLDevice * dev, const char * kernel, CCLErr ** err) {
 
     /* OpenCL version. */
     cl_uint ocl_ver;
 
     /* Kernel wrapper. */
-    CCLKernel* krnl = NULL;
+    CCLKernel * krnl = NULL;
 
     /* Kernel workgroup info variables. */
     size_t k_wg_size;
     size_t k_pref_wg_size_mult;
-    size_t* k_compile_wg_size;
+    size_t * k_compile_wg_size;
     cl_ulong k_loc_mem_size;
     cl_ulong k_priv_mem_size;
 
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Get OpenCL version. */
     ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
-
 
     /* Get kernel. */
     krnl = ccl_program_get_kernel(prg, kernel, &err_internal);
@@ -342,7 +340,6 @@ finish:
 
     /* Return. */
     return;
-
 }
 
 /**
@@ -353,10 +350,10 @@ finish:
  * @return ::CCL_SUCCESS if program returns with no error, or another
  * ::CCLErrorCode value otherwise.
  */
-int main(int argc, char* argv[]) {
+int main(int argc, char * argv[]) {
 
     /* Error object. */
-    CCLErr* err = NULL, *err_build = NULL;
+    CCLErr * err = NULL, *err_build = NULL;
 
     /* Program return status. */
     gint status;
@@ -369,31 +366,31 @@ int main(int argc, char* argv[]) {
         n_src_h_names, n_kernel_names;
 
     /* Context wrapper. */
-    CCLContext* ctx = NULL;
+    CCLContext * ctx = NULL;
 
     /* Device wrapper. */
-    CCLDevice* dev = NULL;
+    CCLDevice * dev = NULL;
 
     /* Device name. */
-    char* dname;
+    char * dname;
 
     /* Main program wrapper. */
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
 
     /* Auxiliary program wrapper. */
-    CCLProgram* prg_aux = NULL;
+    CCLProgram * prg_aux = NULL;
 
     /* Array containing multiple program wrappers. */
-    GPtrArray* prgs = NULL;
+    GPtrArray * prgs = NULL;
 
     /* Build status. */
     cl_build_status build_status;
 
     /* Build status string. */
-    const char* build_status_str;
+    const char * build_status_str;
 
     /* Build log. */
-    const char* build_log;
+    const char * build_log;
 
     /* Parse command line options. */
     ccl_c_args_parse(argc, argv, &err);
@@ -469,14 +466,14 @@ int main(int argc, char* argv[]) {
                 if (n_bin_files == 1) {
 
                     /* Create program from binary file. */
-                    prg = ccl_program_new_from_binary_file(ctx, dev,
-                        *bin_files, NULL, &err);
+                    prg = ccl_program_new_from_binary_file(
+                        ctx, dev, *bin_files, NULL, &err);
 
                 } else {
 
                     /* Create program from source. */
                     prg = ccl_program_new_from_source_files(
-                        ctx, n_src_files, (const char**) src_files, &err);
+                        ctx, n_src_files, (const char **) src_files, &err);
 
                 }
                 g_if_err_goto(err, error_handler);
@@ -517,33 +514,30 @@ int main(int argc, char* argv[]) {
 
                     /* Instantiate array of header programs. */
                     prgs = g_ptr_array_new_full(
-                        n_src_h_files,
-                        (GDestroyNotify) ccl_program_destroy);
+                        n_src_h_files, (GDestroyNotify) ccl_program_destroy);
 
                     /* Create individual header programs. */
                     for (i = 0; i < n_src_h_files; i++) {
 
                         /* Create current header program from source. */
-                        prg_aux = ccl_program_new_from_source_files(ctx,
-                            1, (const char**) &(src_h_files[i]), &err);
+                        prg_aux = ccl_program_new_from_source_files(
+                            ctx, 1, (const char **) &(src_h_files[i]), &err);
                         g_if_err_goto(err, error_handler);
 
                         /* Add header program to array. */
                         g_ptr_array_add(prgs, (gpointer) prg_aux);
-
                     }
                 }
 
                 /* Create main program from source. */
-                prg = ccl_program_new_from_source_files(ctx,
-                    n_src_files, (const char**) src_files, &err);
+                prg = ccl_program_new_from_source_files(
+                    ctx, n_src_files, (const char **) src_files, &err);
                 g_if_err_goto(err, error_handler);
 
                 /* Compile program. */
-                ccl_program_compile(prg, 1, &dev, options,
-                    n_src_h_files,
-                    (CCLProgram**) (prgs ? prgs->pdata : NULL),
-                    (const char**) (src_h_names ? src_h_names : src_h_files),
+                ccl_program_compile(prg, 1, &dev, options, n_src_h_files,
+                    (CCLProgram **) (prgs ? prgs->pdata : NULL),
+                    (const char **) (src_h_names ? src_h_names : src_h_files),
                     NULL, NULL, &err_build);
 
                 /* Only check for errors that are not build/compile/link
@@ -566,8 +560,7 @@ int main(int argc, char* argv[]) {
 
                 /* Instantiate array of programs. */
                 prgs = g_ptr_array_new_full(
-                    n_bin_files,
-                    (GDestroyNotify) ccl_program_destroy);
+                    n_bin_files, (GDestroyNotify) ccl_program_destroy);
 
                 /* Create programs from binaries. */
                 for (i = 0; i < n_bin_files; i++) {
@@ -579,12 +572,11 @@ int main(int argc, char* argv[]) {
 
                     /* Add binary program to array. */
                     g_ptr_array_add(prgs, (gpointer) prg_aux);
-
                 }
 
                 /* Link programs. */
                 prg = ccl_program_link(ctx, 1, &dev, options,
-                    n_bin_files, (CCLProgram**) prgs->pdata, NULL,
+                    n_bin_files, (CCLProgram **) prgs->pdata, NULL,
                     NULL, &err_build);
                 /* Only check for errors that are not build/compile/link
                  * failures. */
@@ -620,7 +612,6 @@ int main(int argc, char* argv[]) {
              * unavailable. */
             build_status = CL_BUILD_NONE;
             build_status_str = "Unavailable";
-
         }
 
         /* Show build status. */
@@ -632,7 +623,6 @@ int main(int argc, char* argv[]) {
             ccl_program_save_binary(prg, dev, output, &err);
             g_if_err_goto(err, error_handler);
             g_printf("* Binary output file     : %s\n", output);
-
         }
 
         /* Show build error message, if any. */
@@ -744,5 +734,4 @@ cleanup:
 
     /* Return status. */
     return status;
-
 }

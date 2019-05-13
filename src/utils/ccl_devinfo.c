@@ -20,7 +20,7 @@
  * Utility to query OpenCL platforms and devices.
  *
  * @author Nuno Fachada
- * @date 2017
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  */
 
@@ -108,7 +108,7 @@
  * COPYRIGHT
  * =========
  *
- * Copyright (C) 2016 Nuno Fachada<br/>
+ * Copyright (C) 2019 Nuno Fachada<br/>
  * License GPLv3+: GNU GPL version 3 or later
  * <http://gnu.org/licenses/gpl.html>.<br/>
  * This is free software: you are free to change and redistribute it.<br/>
@@ -138,7 +138,7 @@
 static gboolean opt_all = FALSE;
 static gboolean opt_basic = TRUE; /* Default. */
 static gboolean no_platf = FALSE;
-static gchar** opt_custom = NULL;
+static gchar ** opt_custom = NULL;
 static guint opt_platf = G_MAXUINT;
 static guint opt_dev = G_MAXUINT;
 static gboolean opt_nfound = FALSE;
@@ -173,7 +173,7 @@ static GOptionEntry entries[] = {
 };
 
 /* Information queried for basic CLI option. */
-static gchar* basic_info[] = {
+static gchar * basic_info[] = {
     "type",
     "vendor",
     "opencl_c_version",
@@ -200,13 +200,13 @@ static gchar* basic_info[] = {
  * @param[out] err Return location for a CCLErr, or `NULL` if error
  * reporting is to be ignored.
  * */
-void ccl_devinfo_args_parse(int argc, char* argv[], CCLErr** err) {
+void ccl_devinfo_args_parse(int argc, char * argv[], CCLErr ** err) {
 
     /* Make sure err is NULL or it is not set. */
     g_return_if_fail(err == NULL || *err == NULL);
 
     /* Command line options context. */
-    GOptionContext* context = NULL;
+    GOptionContext * context = NULL;
 
     /* Create parsing context. */
     context = g_option_context_new(" - " CCL_DEVINFO_DESCRIPTION);
@@ -234,7 +234,6 @@ cleanup:
 
     /* Return. */
     return;
-
 }
 
 /**
@@ -243,13 +242,13 @@ cleanup:
  * @param[in] p Platform wrapper object.
  * @param[in] idx Platform index.
  * */
-void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
+void ccl_devinfo_show_platform_info(CCLPlatform * p, guint idx) {
 
     /* Platform info variables. */
-    gchar *profile, *version, *name, *vendor;
+    gchar * profile, * version, * name, * vendor;
 
     /* Error location. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Get platform profile. */
     profile = ccl_platform_get_info_string(p, CL_PLATFORM_PROFILE, &err);
@@ -306,16 +305,16 @@ void ccl_devinfo_show_platform_info(CCLPlatform* p, guint idx) {
  *
  * @param[in] d Device wrapper object.
  * */
-void ccl_devinfo_show_device_info_all(CCLDevice* d) {
+void ccl_devinfo_show_device_info_all(CCLDevice * d) {
 
     /* Parameter value and size. */
-    CCLWrapperInfo* param_value;
+    CCLWrapperInfo * param_value;
 
     /* Parameter value string. */
     gchar param_value_str[CCL_DEVINFO_MAXINFOLEN];
 
     /* Error reporting object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Cycle through all supported device information names. */
     for (gint k = 0; k < ccl_devquery_info_map_size; k++) {
@@ -350,7 +349,6 @@ void ccl_devinfo_show_device_info_all(CCLDevice* d) {
             }
         }
     }
-
 }
 
 /**
@@ -358,22 +356,22 @@ void ccl_devinfo_show_device_info_all(CCLDevice* d) {
  *
  * @param[in] d Device wrapper object.
  * */
-void ccl_devinfo_show_device_info_custom(CCLDevice* d) {
+void ccl_devinfo_show_device_info_custom(CCLDevice * d) {
 
     /* A row of the device info_map. */
-    const CCLDevQueryMap* info_row;
+    const CCLDevQueryMap * info_row;
 
     /* Parameter value and size. */
-    CCLWrapperInfo* param_value;
+    CCLWrapperInfo * param_value;
 
     /* Parameter value string. */
     gchar param_value_str[CCL_DEVINFO_MAXINFOLEN];
 
     /* Error reporting object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Custom parameter name in proper format. */
-    gchar* custom_param_name;
+    gchar * custom_param_name;
 
     /* Index of next row of the device info_map. */
     gint idx;
@@ -432,7 +430,6 @@ void ccl_devinfo_show_device_info_custom(CCLDevice* d) {
         g_free(custom_param_name);
 
     }
-
 }
 
 /**
@@ -440,19 +437,19 @@ void ccl_devinfo_show_device_info_custom(CCLDevice* d) {
  *
  * @param[in] d Device wrapper object.
  * */
-void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
+void ccl_devinfo_show_device_info_basic(CCLDevice * d) {
 
     /* A row of the device info_map. */
-    const CCLDevQueryMap* info_row;
+    const CCLDevQueryMap * info_row;
 
     /* Parameter value and size. */
-    CCLWrapperInfo* param_value;
+    CCLWrapperInfo * param_value;
 
     /* Parameter value string. */
     gchar param_value_str[CCL_DEVINFO_MAXINFOLEN];
 
     /* Error reporting object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Cycle through the pre-defined basic information array. */
     for (guint i = 0; basic_info[i] != NULL; i++) {
@@ -492,9 +489,7 @@ void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
                     info_row->description);
             }
         }
-
     }
-
 }
 
 /**
@@ -505,29 +500,29 @@ void ccl_devinfo_show_device_info_basic(CCLDevice* d) {
  * @return ::CCL_SUCCESS if program returns with no error, or another
  * ::CCLErrorCode value otherwise.
  */
-int main(int argc, char* argv[]) {
+int main(int argc, char * argv[]) {
 
     /* Error object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* List of platform wrapper objects. */
-    CCLPlatforms* platforms = NULL;
+    CCLPlatforms * platforms = NULL;
 
     /* List of device wrapper objects. */
     CCLDevSelDevices devices = NULL;
 
     /* Current platform and device. */
-    CCLPlatform* p;
-    CCLDevice* d;
+    CCLPlatform * p;
+    CCLDevice * d;
 
     /* Number of devices in platform. */
     guint num_devs;
 
     /* Device information value object. */
-    CCLWrapperInfo* info_value = NULL;
+    CCLWrapperInfo * info_value = NULL;
 
     /* Device name. */
-    gchar* dev_name;
+    gchar * dev_name;
 
     /* Program return status. */
     gint status;
@@ -583,13 +578,13 @@ int main(int argc, char* argv[]) {
                     continue;
 
                 /* Get current device. */
-                d = (CCLDevice*) devices->pdata[j];
+                d = (CCLDevice *) devices->pdata[j];
 
                 /* Get device name. */
                 info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
                 g_if_err_goto(err, error_handler);
 
-                dev_name = (gchar*) info_value->value;
+                dev_name = (gchar *) info_value->value;
 
                 /* Show device information. */
                 g_fprintf(CCL_DEVINFO_OUT,
@@ -655,7 +650,7 @@ int main(int argc, char* argv[]) {
                     info_value = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
                     g_if_err_goto(err, error_handler);
 
-                    dev_name = (gchar*) info_value->value;
+                    dev_name = (gchar *) info_value->value;
 
                     /* Show device information. */
                     g_fprintf(CCL_DEVINFO_OUT,
@@ -689,11 +684,9 @@ cleanup:
     if (devices) ccl_devsel_devices_destroy(devices);
     g_strfreev(opt_custom);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_return_val_if_fail(ccl_wrapper_memcheck(), CCL_ERROR_OTHER);
 
     /* Return status. */
     return status;
-
 }
