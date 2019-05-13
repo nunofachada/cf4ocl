@@ -17,7 +17,7 @@
 
 /**
  * @file
- * File containing incompilable kernel for testing.
+ * File containing uncompilable kernel for testing.
  *
  * @author Nuno Fachada
  * @date 2019

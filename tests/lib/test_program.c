@@ -644,7 +644,7 @@ static void ref_unref_test() {
 
 #ifdef CL_VERSION_1_2
 
-static const char* src_head[] = {
+static const char * src_head[] = {
     "#define SOMETYPE char\n",
     "SOMETYPE some_function(SOMETYPE a, size_t b) {\n" \
     "	return (SOMETYPE) (a + b);\n" \
@@ -657,7 +657,7 @@ static const char src_main[] =
     "	buf[gid] = some_function(buf[gid], gid);\n" \
     "}\n";
 
-static const char* src_head_name = "head.h";
+static const char * src_head_name = "head.h";
 
 /**
  * Test program and kernel wrappers ref counting.
