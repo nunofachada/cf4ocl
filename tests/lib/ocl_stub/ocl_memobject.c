@@ -20,7 +20,7 @@
  * OpenCL memory object stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -28,8 +28,8 @@
 #include "utils.h"
 
 struct cl_memobject_callbacks {
-    void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data);
-    void* user_data;
+    void (CL_CALLBACK * pfn_notify)(cl_mem memobj, void * user_data);
+    void * user_data;
 };
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -37,7 +37,6 @@ clRetainMemObject(cl_mem memobj) {
 
     g_atomic_int_inc(&memobj->ref_count);
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -49,8 +48,8 @@ clReleaseMemObject(cl_mem memobj) {
         /* Call callback functions. */
         GSList* curr = memobj->callbacks;
         while (curr != NULL) {
-            struct cl_memobject_callbacks* cb =
-                (struct cl_memobject_callbacks*) curr->data;
+            struct cl_memobject_callbacks * cb =
+                (struct cl_memobject_callbacks *) curr->data;
             cb->pfn_notify(memobj, cb->user_data);
             curr = g_slist_next(curr);
         }
@@ -81,13 +80,12 @@ clReleaseMemObject(cl_mem memobj) {
     }
 
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -125,8 +123,8 @@ clGetMemObjectInfo(cl_mem memobj, cl_mem_info param_name,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetMemObjectDestructorCallback(cl_mem memobj,
-    void (CL_CALLBACK *pfn_notify)(cl_mem memobj, void* user_data),
-    void* user_data) {
+    void (CL_CALLBACK * pfn_notify)(cl_mem memobj, void * user_data),
+    void * user_data) {
 
     cl_int status;
 
@@ -136,7 +134,7 @@ clSetMemObjectDestructorCallback(cl_mem memobj,
         status = CL_INVALID_VALUE;
     } else {
 
-        struct cl_memobject_callbacks* cb =
+        struct cl_memobject_callbacks * cb =
             g_new0(struct cl_memobject_callbacks, 1);
 
         cb->pfn_notify = pfn_notify;
@@ -148,5 +146,4 @@ clSetMemObjectDestructorCallback(cl_mem memobj,
         status = CL_SUCCESS;
     }
     return status;
-
 }

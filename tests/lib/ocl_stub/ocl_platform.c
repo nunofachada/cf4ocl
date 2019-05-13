@@ -20,7 +20,7 @@
  * OpenCL platform stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -28,8 +28,8 @@
 #include "utils.h"
 
 CL_API_ENTRY cl_int CL_API_CALL
-clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
-    cl_uint* num_platforms) {
+clGetPlatformIDs(cl_uint num_entries, cl_platform_id * platforms,
+    cl_uint * num_platforms) {
 
     cl_int status = CL_SUCCESS;
 
@@ -55,8 +55,8 @@ clGetPlatformIDs(cl_uint num_entries, cl_platform_id* platforms,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetPlatformInfo(cl_platform_id platform, cl_platform_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 

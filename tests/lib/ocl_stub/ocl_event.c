@@ -20,7 +20,7 @@
  * OpenCL event stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -44,8 +44,8 @@ static void checkForCallbacks(cl_event event) {
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -67,13 +67,12 @@ clGetEventProfilingInfo(cl_event event, cl_profiling_info param_name,
     }
 
     return status;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetEventInfo(cl_event event, cl_event_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -99,7 +98,6 @@ clGetEventInfo(cl_event event, cl_event_info param_name,
     }
 
     return status;
-
 }
 
 
@@ -108,7 +106,6 @@ clRetainEvent(cl_event event) {
 
     g_atomic_int_inc(&event->ref_count);
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -127,11 +124,10 @@ clReleaseEvent(cl_event event) {
     }
 
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
-clWaitForEvents(cl_uint num_events, const cl_event* event_list) {
+clWaitForEvents(cl_uint num_events, const cl_event * event_list) {
 
     (void)(num_events);
     (void)(event_list);
@@ -142,7 +138,7 @@ clWaitForEvents(cl_uint num_events, const cl_event* event_list) {
 #ifdef CL_VERSION_1_1
 
 CL_API_ENTRY cl_event CL_API_CALL
-clCreateUserEvent(cl_context context, cl_int* errcode_ret) {
+clCreateUserEvent(cl_context context, cl_int * errcode_ret) {
 
     cl_event event = NULL;
     if (context == NULL) {
@@ -175,8 +171,8 @@ clSetUserEventStatus(cl_event event, cl_int execution_status) {
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetEventCallback(cl_event event, cl_int command_exec_callback_type,
-    void (CL_CALLBACK *pfn_notify)(cl_event, cl_int, void*),
-    void* user_data) {
+    void (CL_CALLBACK * pfn_notify)(cl_event, cl_int, void *),
+    void * user_data) {
 
     /* Register callback. */
     event->pfn_notify[command_exec_callback_type] = pfn_notify;
@@ -187,7 +183,6 @@ clSetEventCallback(cl_event event, cl_int command_exec_callback_type,
 
     /* Return success. */
     return CL_SUCCESS;
-
 }
 
 #endif

@@ -20,7 +20,7 @@
  * OpenCL buffer stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -30,7 +30,7 @@
 
 CL_API_ENTRY cl_mem CL_API_CALL
 clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
-    void* host_ptr, cl_int* errcode_ret) {
+    void * host_ptr, cl_int * errcode_ret) {
 
     cl_mem memobj = NULL;
 
@@ -81,7 +81,7 @@ clCreateBuffer(cl_context context, cl_mem_flags flags, size_t size,
 CL_API_ENTRY cl_mem CL_API_CALL
 clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
     cl_buffer_create_type buffer_create_type,
-    const void* buffer_create_info, cl_int* errcode_ret) {
+    const void * buffer_create_info, cl_int* errcode_ret) {
 
     seterrcode(errcode_ret, CL_SUCCESS);
     cl_mem memobj = g_slice_new(struct _cl_mem);

@@ -28,8 +28,8 @@
 #include "utils.h"
 
 CL_API_ENTRY cl_kernel CL_API_CALL
-clCreateKernel(cl_program program, const char* kernel_name,
-    cl_int* errcode_ret) {
+clCreateKernel(cl_program program, const char * kernel_name,
+    cl_int * errcode_ret) {
 
     /* Allocate memory for kernel. */
     cl_kernel kernel = g_slice_new(struct _cl_kernel);
@@ -42,12 +42,11 @@ clCreateKernel(cl_program program, const char* kernel_name,
     kernel->attributes = ""; /* Also bogus! */
     seterrcode(errcode_ret, CL_SUCCESS);
     return kernel;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetKernelArg(cl_kernel kernel, cl_uint arg_index, size_t arg_size,
-    const void* arg_value) {
+    const void * arg_value) {
 
     (void)(kernel);
     (void)(arg_index);
@@ -63,7 +62,6 @@ clRetainKernel(cl_kernel kernel) {
 
     g_atomic_int_inc(&kernel->ref_count);
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -77,13 +75,12 @@ clReleaseKernel(cl_kernel kernel) {
     }
 
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -111,13 +108,12 @@ clGetKernelInfo(cl_kernel kernel, cl_kernel_info param_name,
     }
 
     return status;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
     cl_kernel_work_group_info param_name, size_t param_value_size,
-    void* param_value, size_t * param_value_size_ret) {
+    void * param_value, size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -127,18 +123,23 @@ clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
         switch (param_name) {
             case CL_KERNEL_WORK_GROUP_SIZE:
                 ccl_test_basic_info(size_t, device, max_work_group_size);
-            case CL_KERNEL_COMPILE_WORK_GROUP_SIZE: /* This is incorrect. */
+            case CL_KERNEL_COMPILE_WORK_GROUP_SIZE:
+                /* This is incorrect. */
                 ccl_test_vector_info(size_t, device, max_work_item_sizes);
-            case CL_KERNEL_LOCAL_MEM_SIZE: /* This is incorrect. */
+            case CL_KERNEL_LOCAL_MEM_SIZE:
+                /* This is incorrect. */
                 ccl_test_basic_info(cl_ulong, device, local_mem_size);
 #ifdef CL_VERSION_1_2
-            case CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE: /* This is incorrect. */
+            case CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE:
+                /* This is incorrect. */
                 ccl_test_basic_info(size_t, device, max_work_item_sizes[0]);
-            case CL_KERNEL_PRIVATE_MEM_SIZE: /* This is incorrect. */
+            case CL_KERNEL_PRIVATE_MEM_SIZE:
+                /* This is incorrect. */
                 ccl_test_basic_info(cl_ulong, device, local_mem_size);
 #endif
 #ifdef CL_VERSION_1_2
-            case CL_KERNEL_GLOBAL_WORK_SIZE: /* This is incorrect. */
+            case CL_KERNEL_GLOBAL_WORK_SIZE:
+                /* This is incorrect. */
                 ccl_test_basic_info(size_t, device, max_work_group_size);
 #endif
             default:
@@ -153,7 +154,7 @@ clGetKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 CL_API_ENTRY cl_int CL_API_CALL
 clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
     cl_kernel_arg_info param_name, size_t param_value_size,
-    void* param_value, size_t* param_value_size_ret) {
+    void * param_value, size_t * param_value_size_ret) {
 
     (void)(kernel);
     (void)(arg_indx);
@@ -163,6 +164,5 @@ clGetKernelArgInfo(cl_kernel kernel, cl_uint arg_indx,
     (void)(param_value_size_ret);
 
     return CL_INVALID_VALUE;
-
 }
 #endif

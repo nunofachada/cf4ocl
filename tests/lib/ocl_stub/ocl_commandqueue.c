@@ -31,7 +31,7 @@
 
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueue(cl_context context, cl_device_id device,
-    cl_command_queue_properties properties, cl_int* errcode_ret) {
+    cl_command_queue_properties properties, cl_int * errcode_ret) {
 
     seterrcode(errcode_ret, CL_SUCCESS);
 
@@ -48,8 +48,8 @@ clCreateCommandQueue(cl_context context, cl_device_id device,
 #ifdef CL_VERSION_2_0
 CL_API_ENTRY cl_command_queue CL_API_CALL
 clCreateCommandQueueWithProperties(cl_context context,
-    cl_device_id device, const cl_queue_properties* properties,
-    cl_int* errcode_ret) {
+    cl_device_id device, const cl_queue_properties * properties,
+    cl_int * errcode_ret) {
 
     cl_queue_properties final_properties = 0;
 
@@ -70,7 +70,6 @@ clRetainCommandQueue(cl_command_queue command_queue) {
 
     g_atomic_int_inc(&command_queue->ref_count);
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -89,7 +88,7 @@ clReleaseCommandQueue(cl_command_queue command_queue) {
 CL_API_ENTRY cl_int CL_API_CALL
 clGetCommandQueueInfo(cl_command_queue command_queue,
     cl_command_queue_info param_name, size_t param_value_size,
-    void* param_value, size_t* param_value_size_ret) {
+    void * param_value, size_t* param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -105,7 +104,8 @@ clGetCommandQueueInfo(cl_command_queue command_queue,
             case CL_QUEUE_REFERENCE_COUNT:
                 ccl_test_basic_info(cl_uint, command_queue, ref_count);
             case CL_QUEUE_PROPERTIES:
-                ccl_test_basic_info(cl_command_queue_properties, command_queue, properties);
+                ccl_test_basic_info(
+                    cl_command_queue_properties, command_queue, properties);
             default:
                 status = CL_INVALID_VALUE;
         }

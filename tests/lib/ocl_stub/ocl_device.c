@@ -20,7 +20,7 @@
  * OpenCL device stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -29,7 +29,7 @@
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type,
-    cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices) {
+    cl_uint num_entries, cl_device_id * devices, cl_uint * num_devices) {
 
     cl_int status = CL_SUCCESS;
 
@@ -61,8 +61,8 @@ clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -228,8 +228,8 @@ clGetDeviceInfo(cl_device_id device, cl_device_info param_name,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clCreateSubDevices(cl_device_id in_device,
-    const cl_device_partition_property* properties, cl_uint num_devices,
-    cl_device_id* out_devices, cl_uint* num_devices_ret) {
+    const cl_device_partition_property * properties, cl_uint num_devices,
+    cl_device_id * out_devices, cl_uint * num_devices_ret) {
 
     cl_uint i;
     cl_uint num_subdevices;
@@ -309,7 +309,10 @@ clCreateSubDevices(cl_device_id in_device,
          * number of necessary subdevices. */
         cl_uint num_cus = 0;
         num_subdevices = 0;
-        for (i = 1; properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END; ++i) {
+        for (i = 1;
+            properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+            ++i) {
+
             if (properties[i] < 0) {
                 return CL_INVALID_DEVICE_PARTITION_COUNT;
             }
@@ -340,7 +343,10 @@ clCreateSubDevices(cl_device_id in_device,
             }
 
             /* Create sub-devices. */
-            for (i = 1; properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END; ++i) {
+            for (i = 1;
+                properties[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+                ++i) {
+
                 cl_device_id subdev =
                     g_memdup(in_device, sizeof(struct _cl_device_id));
                 subdev->global_mem_cache_size =
@@ -348,12 +354,15 @@ clCreateSubDevices(cl_device_id in_device,
                     properties[i] / in_device->max_compute_units;
                 subdev->max_compute_units = properties[i];
                 subdev->parent_device = in_device;
+
+                /* 3 is for CL_DEVICE_PARTITION_BY_COUNTS +
+                 * CL_DEVICE_PARTITION_BY_COUNTS_LIST_END + `0`. */
                 subdev->partition_type = g_memdup(properties,
-                    sizeof(cl_device_partition_property) * (num_subdevices + 3)); /* 3 is for CL_DEVICE_PARTITION_BY_COUNTS + CL_DEVICE_PARTITION_BY_COUNTS_LIST_END + `0`. */
+                    sizeof(cl_device_partition_property) * (num_subdevices + 3));
+
                 subdev->ref_count = 1;
                 out_devices[i - 1] = subdev;
             }
-
         }
 
 
@@ -377,7 +386,6 @@ clRetainDevice(cl_device_id device) {
         g_atomic_int_inc(&device->ref_count);
     }
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL

@@ -20,7 +20,7 @@
  * OpenCL context stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -28,10 +28,10 @@
 #include "utils.h"
 
 CL_API_ENTRY cl_context CL_API_CALL
-clCreateContext(const cl_context_properties* properties,
-    cl_uint num_devices, const cl_device_id* devices,
-    void (CL_CALLBACK* pfn_notify)(const char*, const void*, size_t, void*),
-    void* user_data, cl_int* errcode_ret) {
+clCreateContext(const cl_context_properties * properties,
+    cl_uint num_devices, const cl_device_id * devices,
+    void (CL_CALLBACK * pfn_notify)(const char *, const void *, size_t, void *),
+    void* user_data, cl_int * errcode_ret) {
 
     /* Allocate memory for context. */
     cl_context ctx = g_slice_new(struct _cl_context);
@@ -83,13 +83,12 @@ clRetainContext(cl_context context) {
 
     g_atomic_int_inc(&context->ref_count);
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetContextInfo(cl_context context, cl_context_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -119,13 +118,12 @@ clGetContextInfo(cl_context context, cl_context_info param_name,
     }
 
     return status;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetSupportedImageFormats(cl_context context, cl_mem_flags flags,
     cl_mem_object_type image_type, cl_uint num_entries,
-    cl_image_format* image_formats, cl_uint* num_image_formats) {
+    cl_image_format * image_formats, cl_uint * num_image_formats) {
 
     cl_int status = CL_SUCCESS;
     (void)(flags);
@@ -147,5 +145,4 @@ clGetSupportedImageFormats(cl_context context, cl_mem_flags flags,
         }
     }
     return status;
-
 }

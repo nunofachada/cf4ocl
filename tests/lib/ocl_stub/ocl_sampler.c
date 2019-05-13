@@ -20,7 +20,7 @@
  * OpenCL sampler stub functions.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -29,8 +29,8 @@
 
 CL_API_ENTRY cl_sampler CL_API_CALL
 clCreateSamplerWithProperties(cl_context context,
-    const cl_sampler_properties* sampler_properties,
-    cl_int* errcode_ret) {
+    const cl_sampler_properties * sampler_properties,
+    cl_int * errcode_ret) {
 
     /* Allocate sampler. */
     cl_sampler sampler = g_slice_new(struct _cl_sampler);
@@ -51,11 +51,14 @@ clCreateSamplerWithProperties(cl_context context,
             sp_value = sampler_properties[i];
             switch (sp_key) {
                 case CL_SAMPLER_NORMALIZED_COORDS:
-                    sampler->normalized_coords = (cl_bool) sp_value; break;
+                    sampler->normalized_coords =
+                        (cl_bool) sp_value; break;
                 case CL_SAMPLER_ADDRESSING_MODE:
-                    sampler->addressing_mode = (cl_addressing_mode) sp_value; break;
+                    sampler->addressing_mode =
+                        (cl_addressing_mode) sp_value; break;
                 case CL_SAMPLER_FILTER_MODE:
-                    sampler->filter_mode = (cl_filter_mode) sp_value; break;
+                    sampler->filter_mode =
+                        (cl_filter_mode) sp_value; break;
                 default:
                     seterrcode(errcode_ret, CL_INVALID_VALUE);
                     clReleaseSampler(sampler);
@@ -74,7 +77,7 @@ clCreateSamplerWithProperties(cl_context context,
 CL_API_ENTRY cl_sampler CL_API_CALL
 clCreateSampler(cl_context context, cl_bool normalized_coords,
     cl_addressing_mode addressing_mode, cl_filter_mode filter_mode,
-    cl_int* errcode_ret) {
+    cl_int * errcode_ret) {
 
     const cl_sampler_properties sp[] = {
         CL_SAMPLER_NORMALIZED_COORDS, normalized_coords,
@@ -83,7 +86,6 @@ clCreateSampler(cl_context context, cl_bool normalized_coords,
         0};
 
     return clCreateSamplerWithProperties(context, sp, errcode_ret);
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -91,7 +93,6 @@ clRetainSampler(cl_sampler sampler) {
 
     g_atomic_int_inc(&sampler->ref_count);
     return CL_SUCCESS;
-
 }
 
 CL_API_ENTRY cl_int CL_API_CALL
@@ -109,8 +110,8 @@ clReleaseSampler(cl_sampler sampler) {
 
 CL_API_ENTRY cl_int CL_API_CALL
 clGetSamplerInfo(cl_sampler sampler, cl_sampler_info param_name,
-    size_t param_value_size, void* param_value,
-    size_t* param_value_size_ret) {
+    size_t param_value_size, void * param_value,
+    size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 
@@ -135,6 +136,5 @@ clGetSamplerInfo(cl_sampler sampler, cl_sampler_info param_name,
     }
 
     return status;
-
 }
 

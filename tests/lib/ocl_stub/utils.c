@@ -39,7 +39,7 @@ guint veclen(void * vector, size_t elem_size) {
 
 
 void ocl_stub_create_event(
-    cl_event* event, cl_command_queue queue, cl_command_type ctype) {
+    cl_event * event, cl_command_queue queue, cl_command_type ctype) {
 
     if (event != NULL) { \
         *event = g_slice_new0(struct _cl_event);

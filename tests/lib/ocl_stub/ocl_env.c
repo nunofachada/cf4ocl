@@ -20,7 +20,7 @@
  * OpenCL fake environment.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -57,7 +57,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .endian_little = CL_TRUE,
                 .error_correction_support = CL_FALSE,
                 .execution_capabilities = CL_EXEC_KERNEL,
-                .extensions = "cl_khr_int64_base_atomics cl_khr_fp16 cl_khr_gl_sharing cl_khr_gl_event cl_khr_d3d10_sharing cl_khr_dx9_media_sharing cl_khr_d3d11_sharing",
+                .extensions = "cl_khr_int64_base_atomics cl_khr_fp16 "
+                    "cl_khr_gl_sharing cl_khr_gl_event cl_khr_d3d10_sharing "
+                    "cl_khr_dx9_media_sharing cl_khr_d3d11_sharing",
                 .global_mem_cache_size = 16384,
                 .global_mem_cache_type = CL_READ_ONLY_CACHE,
                 .global_mem_cacheline_size = 32,
@@ -100,7 +102,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .opencl_c_version = "OpenCL C 1.2",
                 .parent_device = NULL,
                 .partition_max_sub_devices = 16,
-                .partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, 0},
+                .partition_properties =
+                    (cl_device_partition_property const[])
+                    {CL_DEVICE_PARTITION_EQUALLY, 0},
                 .partition_affinity_domain = 0,
                 .partition_type = (cl_device_partition_property[]) {0},
                 .platform_id = (const cl_platform_id) &ccl_test_platforms[0],
@@ -129,16 +133,20 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .available = CL_TRUE,
                 .built_in_kernels = "",
                 .compiler_available = CL_TRUE,
-                .double_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_ROUND_TO_INF | CL_FP_FMA,
+                .double_fp_config = CL_FP_DENORM | CL_FP_INF_NAN |
+                    CL_FP_ROUND_TO_INF | CL_FP_FMA,
                 .endian_little = CL_TRUE,
                 .error_correction_support = CL_TRUE,
-                .execution_capabilities = CL_EXEC_KERNEL | CL_EXEC_NATIVE_KERNEL,
-                .extensions = "cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_fp16",
+                .execution_capabilities =
+                    CL_EXEC_KERNEL | CL_EXEC_NATIVE_KERNEL,
+                .extensions = "cl_khr_int64_base_atomics "
+                    "cl_khr_int64_extended_atomics cl_khr_fp16",
                 .global_mem_cache_size = 1048576,
                 .global_mem_cache_type = CL_READ_WRITE_CACHE,
                 .global_mem_cacheline_size = 128,
                 .global_mem_size = 17179869184,
-                .half_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_ROUND_TO_INF | CL_FP_FMA,
+                .half_fp_config = CL_FP_DENORM | CL_FP_INF_NAN |
+                    CL_FP_ROUND_TO_INF | CL_FP_FMA,
                 .host_unified_memory = CL_TRUE,
                 .image_support = CL_FALSE,
                 .image2d_max_height = 0,
@@ -176,8 +184,17 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .opencl_c_version = "OpenCL C 1.2",
                 .parent_device = NULL,
                 .partition_max_sub_devices = 8,
-                .partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_EQUALLY, CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
-                .partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
+                .partition_properties =
+                    (cl_device_partition_property const[]) {
+                        CL_DEVICE_PARTITION_EQUALLY,
+                        CL_DEVICE_PARTITION_BY_COUNTS,
+                        CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN,
+                        0
+                    },
+                .partition_affinity_domain =
+                    CL_DEVICE_AFFINITY_DOMAIN_NUMA |
+                    CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE |
+                    CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
                 .partition_type = (cl_device_partition_property[]) {0},
                 .platform_id = (const cl_platform_id) &ccl_test_platforms[0],
                 .preferred_vector_width_char = 8,
@@ -191,8 +208,11 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .preferred_interop_user_sync = CL_FALSE,
                 .profile = "FULL_PROFILE",
                 .profiling_timer_resolution = 1,
-                .queue_properties = CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
-                .single_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_ROUND_TO_INF | CL_FP_FMA,
+                .queue_properties =
+                    CL_QUEUE_PROFILING_ENABLE |
+                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+                .single_fp_config = CL_FP_DENORM | CL_FP_INF_NAN |
+                    CL_FP_ROUND_TO_INF | CL_FP_FMA,
                 .type = CL_DEVICE_TYPE_CPU,
                 .vendor = "FakenMC",
                 .vendor_id = 0xFFFF,
@@ -261,7 +281,8 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .max_work_item_sizes = (size_t const[]) {1024, 256, 16, 0},
                 .max_write_image_args = 16,
                 .mem_base_addr_align = 2048,
-                .min_data_type_align_size = 8, /* Deprecated in OpenCL 1.2 */
+                /* Deprecated in OpenCL 1.2 */
+                .min_data_type_align_size = 8,
                 .name = "cf4ocl Accelerator device",
                 .native_vector_width_char = 8,
                 .native_vector_width_short = 4,
@@ -271,11 +292,17 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .native_vector_width_double = 0,
                 .native_vector_width_half = 0,
                 .opencl_c_version = "OpenCL C 1.1",
-                .parent_device = NULL, /* Not available in OpenCL 1.1 */
-                .partition_max_sub_devices = 0, /* Not available in OpenCL 1.1 */
-                .partition_properties = (cl_device_partition_property const[]) {0}, /* Not available in OpenCL 1.1 */
-                .partition_affinity_domain = 0, /* Not available in OpenCL 1.1 */
-                .partition_type = (cl_device_partition_property[]) {0}, /* Not available in OpenCL 1.1 */
+                /* Not available in OpenCL 1.1 */
+                .parent_device = NULL,
+                /* Not available in OpenCL 1.1 */
+                .partition_max_sub_devices = 0,
+                /* Not available in OpenCL 1.1 */
+                .partition_properties =
+                    (cl_device_partition_property const[]) {0},
+                /* Not available in OpenCL 1.1 */
+                .partition_affinity_domain = 0,
+                /* Not available in OpenCL 1.1 */
+                .partition_type = (cl_device_partition_property[]) {0},
                 .platform_id = (const cl_platform_id) &ccl_test_platforms[1],
                 .preferred_vector_width_char = 4,
                 .preferred_vector_width_short = 2,
@@ -288,7 +315,9 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .preferred_interop_user_sync = CL_FALSE,
                 .profile = "FULL_PROFILE",
                 .profiling_timer_resolution = 10000,
-                .queue_properties = CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+                .queue_properties =
+                    CL_QUEUE_PROFILING_ENABLE |
+                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
                 .single_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_FMA,
                 .type = CL_DEVICE_TYPE_ACCELERATOR | CL_DEVICE_TYPE_DEFAULT,
                 .vendor = "FakenMC",
@@ -319,16 +348,20 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .available = CL_TRUE,
                 .built_in_kernels = "",
                 .compiler_available = CL_FALSE,
-                .double_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_ROUND_TO_ZERO | CL_FP_ROUND_TO_INF | CL_FP_FMA,
+                .double_fp_config = CL_FP_DENORM | CL_FP_INF_NAN |
+                    CL_FP_ROUND_TO_ZERO | CL_FP_ROUND_TO_INF | CL_FP_FMA,
                 .endian_little = CL_TRUE,
                 .error_correction_support = CL_TRUE,
-                .execution_capabilities = CL_EXEC_KERNEL | CL_EXEC_NATIVE_KERNEL,
-                .extensions = "cl_khr_int64_base_atomics cl_khr_int64_extended_atomics",
+                .execution_capabilities =
+                    CL_EXEC_KERNEL | CL_EXEC_NATIVE_KERNEL,
+                .extensions = "cl_khr_int64_base_atomics "
+                    "cl_khr_int64_extended_atomics",
                 .global_mem_cache_size = 4194304,
                 .global_mem_cache_type = CL_READ_WRITE_CACHE,
                 .global_mem_cacheline_size = 64,
                 .global_mem_size = 2147483648,
-                .half_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_ROUND_TO_ZERO | CL_FP_ROUND_TO_INF | CL_FP_FMA,
+                .half_fp_config = CL_FP_DENORM | CL_FP_INF_NAN |
+                    CL_FP_ROUND_TO_ZERO | CL_FP_ROUND_TO_INF | CL_FP_FMA,
                 .host_unified_memory = CL_TRUE,
                 .image_support = CL_FALSE,
                 .image2d_max_height = 0,
@@ -366,8 +399,14 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .opencl_c_version = "OpenCL C 1.2",
                 .parent_device = NULL,
                 .partition_max_sub_devices = 4,
-                .partition_properties = (cl_device_partition_property const[]) {CL_DEVICE_PARTITION_BY_COUNTS, CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN, 0},
-                .partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
+                .partition_properties =
+                    (cl_device_partition_property const[]) {
+                        CL_DEVICE_PARTITION_BY_COUNTS,
+                        CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN,
+                        0
+                    },
+                .partition_affinity_domain = CL_DEVICE_AFFINITY_DOMAIN_NUMA |
+                    CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
                 .partition_type = (cl_device_partition_property[]) {0},
                 .platform_id = (const cl_platform_id) &ccl_test_platforms[2],
                 .preferred_vector_width_char = 8,
@@ -382,7 +421,8 @@ const struct _cl_platform_id ccl_test_platforms[] = {
                 .profile = "EMBEDDED_PROFILE",
                 .profiling_timer_resolution = 100,
                 .queue_properties = CL_QUEUE_PROFILING_ENABLE,
-                .single_fp_config = CL_FP_DENORM | CL_FP_INF_NAN | CL_FP_ROUND_TO_ZERO | CL_FP_ROUND_TO_INF | CL_FP_FMA,
+                .single_fp_config = CL_FP_DENORM | CL_FP_INF_NAN |
+                    CL_FP_ROUND_TO_ZERO | CL_FP_ROUND_TO_INF | CL_FP_FMA,
                 .type = CL_DEVICE_TYPE_CPU | CL_DEVICE_TYPE_DEFAULT,
                 .vendor = "FakenMC",
                 .vendor_id = 0xFFFF,
@@ -393,7 +433,3 @@ const struct _cl_platform_id ccl_test_platforms[] = {
         }
     }
 };
-
-
-
-

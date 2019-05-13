@@ -20,7 +20,7 @@
  * OpenCL fake environment.
  *
  * @author Nuno Fachada
- * @date 2014
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -34,5 +34,4 @@ extern const cl_uint ccl_test_num_platforms;
 extern const struct _cl_platform_id ccl_test_platforms[];
 
 #endif
-
 

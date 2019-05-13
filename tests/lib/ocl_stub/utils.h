@@ -29,10 +29,10 @@
 
 #include "ocl_impl.h"
 
-guint veclen(void* vector, size_t elem_size);
+guint veclen(void * vector, size_t elem_size);
 
 void ocl_stub_create_event(
-    cl_event* event, cl_command_queue queue, cl_command_type ctype);
+    cl_event * event, cl_command_queue queue, cl_command_type ctype);
 
 #define seterrcode(errcode_ret, errcode) \
     if ((errcode_ret) != NULL) *(errcode_ret) = (errcode)
@@ -57,30 +57,31 @@ void ocl_stub_create_event(
     if (param_value == NULL) { \
         if (param_value_size_ret != NULL) { \
             *param_value_size_ret = \
-                sizeof(type) * veclen((void*) object->info, sizeof(type)); \
+                sizeof(type) * veclen((void *) object->info, sizeof(type)); \
         } \
-    } else if (param_value_size < sizeof(type) * veclen((void*) object->info, sizeof(type))) { \
+    } else if (param_value_size < sizeof(type) * \
+        veclen((void *) object->info, sizeof(type))) { \
         status = CL_INVALID_VALUE; \
     } else if (object->info == NULL) { \
         status = CL_INVALID_VALUE; \
     } else { \
         g_memmove(param_value, object->info, \
-            sizeof(type) * veclen((void*) object->info, sizeof(type))); \
+            sizeof(type) * veclen((void *) object->info, sizeof(type))); \
     } \
     break;
 
 #define ccl_test_predefvector2d_info(type, qty, object, sizes, info) \
     if (param_value == NULL) { \
         if (param_value_size_ret != NULL) { \
-            *param_value_size_ret = sizeof(type*) * qty; \
+            *param_value_size_ret = sizeof(type *) * qty; \
         } \
-    } else if (param_value_size < sizeof(type*) * qty) { \
+    } else if (param_value_size < sizeof(type *) * qty) { \
         status = CL_INVALID_VALUE; \
     } else if (object->info == NULL) { \
         status = CL_INVALID_VALUE; \
     } else { \
         for (cl_uint __i = 0; __i < qty; ++__i) \
-            g_memmove(((type**) param_value)[__i], \
+            g_memmove(((type **) param_value)[__i], \
                 object->info[__i], sizeof(type) * object->sizes[__i]); \
     } \
     break;
@@ -107,7 +108,7 @@ void ocl_stub_create_event(
     } else if (param_value_size < sizeof(type)) { \
         status = CL_INVALID_VALUE; \
     } else { \
-        *((type*) param_value) = object->info; \
+        *((type *) param_value) = object->info; \
     } \
     break;
 
