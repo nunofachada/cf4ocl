@@ -1220,7 +1220,7 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(
 
     /* Get kernel argument info. */
     info = ccl_wrapper_get_info(
-        (CCLWrapper*) krnl, &fake_wrapper, param_name, 0,
+        (CCLWrapper *) krnl, &fake_wrapper, param_name, 0,
         CCL_INFO_KERNEL_ARG, CL_FALSE, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
 

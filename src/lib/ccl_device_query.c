@@ -316,7 +316,7 @@ static char * ccl_devquery_format_partprop(
 
     CCL_UNUSED(units);
     cl_device_partition_property * pp =
-        (cl_device_partition_property*) info->value;
+        (cl_device_partition_property *) info->value;
     GString * str = g_string_new("");
     guint count = (guint) (info->size / sizeof(cl_device_partition_property));
     for (guint i = 0; i < count; i++) {
@@ -390,7 +390,7 @@ static char * ccl_devquery_format_affdom_ext(
 
     CCL_UNUSED(units);
     cl_device_partition_property_ext * ade =
-        (cl_device_partition_property_ext*) info->value;
+        (cl_device_partition_property_ext *) info->value;
     GString * str = g_string_new("");
     guint count =
         (guint) (info->size / sizeof(cl_device_partition_property_ext));

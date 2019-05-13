@@ -82,9 +82,8 @@ struct ccl_sampler_basic_properties {
  * @return A ::ccl_sampler_basic_properties object containing sampler
  * properties.
  * */
-static struct ccl_sampler_basic_properties
-    ccl_sampler_get_basic_properties(
-        const cl_sampler_properties * sampler_properties) {
+static struct ccl_sampler_basic_properties ccl_sampler_get_basic_properties(
+    const cl_sampler_properties * sampler_properties) {
 
     /* Set defaults. */
     struct ccl_sampler_basic_properties sbp =

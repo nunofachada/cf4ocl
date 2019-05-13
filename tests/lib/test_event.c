@@ -133,7 +133,7 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
 
     /* Check that start time occurs before end time. */
-    g_assert_cmpuint(*((cl_ulong*) info->value), <=, time_end);
+    g_assert_cmpuint(*((cl_ulong *) info->value), <=, time_end);
 
     /* Release wrappers. */
     ccl_event_destroy(evt);
@@ -255,7 +255,7 @@ static void callback_test() {
     CCLBuffer * buf = NULL;
     CCLEvent * evt = NULL;
     CCLErr * err = NULL;
-    GTime * timer = NULL;
+    GTimer * timer = NULL;
     cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_bool test_var = CL_FALSE;
 

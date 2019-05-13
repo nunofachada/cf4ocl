@@ -64,7 +64,7 @@ static void ccl_dev_container_init_devices(CCLDevContainer * devcon,
 
     /* Allocate memory for array of device wrapper objects. */
     devcon->devices = g_slice_alloc(
-        devcon->num_devices * sizeof(CCLDevice*));
+        devcon->num_devices * sizeof(CCLDevice *));
 
     /* Wrap device IDs in device wrapper objects. */
     for (guint i = 0; i < devcon->num_devices; ++i) {

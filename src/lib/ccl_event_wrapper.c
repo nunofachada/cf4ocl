@@ -75,7 +75,7 @@ CCL_EXPORT
 CCLEvent * ccl_event_new_wrap(cl_event event) {
 
     CCLEvent * evt = (CCLEvent *) ccl_wrapper_new(
-        CCL_EVENT, (void*) event, sizeof(CCLEvent));
+        CCL_EVENT, (void *) event, sizeof(CCLEvent));
 
     return evt;
 }

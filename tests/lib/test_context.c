@@ -197,7 +197,7 @@ static void create_info_destroy_test() {
 
     /* Create some context properties. */
     ctx_props = g_new0(cl_context_properties, 3);
-    platform = (cl_platform_id) ccl_wrapper_unwrap((CCLWrapper*) p);
+    platform = (cl_platform_id) ccl_wrapper_unwrap((CCLWrapper *) p);
     ctx_props[0] = CL_CONTEXT_PLATFORM;
     ctx_props[1] = (cl_context_properties) platform;
     ctx_props[2] = 0;
@@ -516,7 +516,8 @@ static void ref_unref_test() {
                 ccl_device_ref(d_1);
                 /* Device ref count should be 1 (1 from platform + 1 from
                  * d_1). */
-                g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
+                g_assert_cmpuint(
+                    ccl_wrapper_ref_count((CCLWrapper *) d), ==, 2);
             }
 
             /* If this is the last device in platform, keep a
@@ -529,12 +530,12 @@ static void ref_unref_test() {
                     /* ...then the total ref count of current (last)
                      * device should be 3 (1 from platform + 1 d_1 + 1 d_l). */
                     g_assert_cmpuint(
-                        ccl_wrapper_ref_count((CCLWrapper*) d), ==, 3);
+                        ccl_wrapper_ref_count((CCLWrapper *) d), ==, 3);
                 } else {
                     /* Otherwise it should be 2 (1 from platform + 1 from
                      * d_l). */
                     g_assert_cmpuint(
-                        ccl_wrapper_ref_count((CCLWrapper*) d), ==, 2);
+                        ccl_wrapper_ref_count((CCLWrapper *) d), ==, 2);
                 }
             }
 

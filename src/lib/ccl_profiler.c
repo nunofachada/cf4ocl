@@ -726,7 +726,7 @@ static void ccl_prof_process_queues(CCLProf * prof, CCLErr ** err) {
             (qprop & CL_QUEUE_PROFILING_ENABLE) == 0, CCL_ERROR_OTHER,
             error_handler,
             "%s: the '%s' queue does not have profiling enabled.",
-            CCL_STRD, (char*) cq_name);
+            CCL_STRD, (char *) cq_name);
 
         /* Iterate over the events in current command queue. */
         CCLEvent * evt;
@@ -1464,7 +1464,7 @@ const CCLProfInfo * ccl_prof_iter_info_next(CCLProf * prof) {
     }
 
     /* Return the profiling info instance. */
-    return (const CCLProfInfo*) info;
+    return (const CCLProfInfo *) info;
 }
 
 /**
@@ -1515,7 +1515,7 @@ const CCLProfInst * ccl_prof_iter_inst_next(CCLProf * prof) {
     /* Check if there are any more left. */
     if (prof->inst_iter != NULL) {
         /* Yes, send current one, pass to the next. */
-        inst = (CCLProfInst*) prof->inst_iter->data;
+        inst = (CCLProfInst *) prof->inst_iter->data;
         prof->inst_iter = prof->inst_iter->next;
     } else {
         /* Nothing left. */

@@ -146,7 +146,7 @@ typedef enum ccl_devsel_filter_type {
  * CCLDevSelDevice devices;
  * @endcode
  * @code{.c}
- * dev = (CCLDeviceWrapper*) devices->pdata[0];
+ * dev = (CCLDeviceWrapper *) devices->pdata[0];
  * @endcode
  *
  * Objects of this type will rarely be manipulated directly in client code,

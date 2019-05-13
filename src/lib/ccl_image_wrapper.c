@@ -417,7 +417,7 @@ CCLImage * ccl_image_new(CCLContext * ctx, cl_mem_flags flags,
         } else if (g_strcmp0(key, "num_samples") == 0) {
             image_dsc.num_samples = va_arg(args_va, cl_uint);
         } else if (g_strcmp0(key, "memobj") == 0) {
-            image_dsc.memobj = va_arg(args_va, CCLMemObj*);
+            image_dsc.memobj = va_arg(args_va, CCLMemObj *);
         } else {
             g_set_error(err, CCL_ERROR, CCL_ERROR_ARGS,
                 "%s: unknown key '%s'", CCL_STRD, key);
@@ -958,7 +958,7 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
 
     /* Check that context platform is >= OpenCL 1.2 */
     ocl_ver = ccl_memobj_get_opencl_version(
-        (CCLMemObj*) img, &err_internal);
+        (CCLMemObj *) img, &err_internal);
     g_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If OpenCL version is not >= 1.2, throw error. */

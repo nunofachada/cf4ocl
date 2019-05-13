@@ -232,7 +232,7 @@ static void read_write_test() {
 
     /* Read data back to host. */
     ccl_buffer_enqueue_read(
-        b, q, CL_TRUE, 0, buf_size, (void*) h_out, NULL, &err);
+        b, q, CL_TRUE, 0, buf_size, (void *) h_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK. */
@@ -245,12 +245,12 @@ static void read_write_test() {
 
     /* Write it explicitly to buffer. */
     ccl_buffer_enqueue_write(
-        b, q, CL_TRUE, 0, buf_size, (void*) h_in, NULL, &err);
+        b, q, CL_TRUE, 0, buf_size, (void *) h_in, NULL, &err);
     g_assert_no_error(err);
 
     /* Read new data to host. */
     ccl_buffer_enqueue_read(
-        b, q, CL_TRUE, 0, buf_size, (void*) h_out, NULL, &err);
+        b, q, CL_TRUE, 0, buf_size, (void *) h_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK. */
@@ -432,7 +432,7 @@ static void destructor_callback_test() {
 
     /* Add destructor callback. */
     ccl_memobj_set_destructor_callback(
-        (CCLMemObj*) b, destructor_callback, &test_var, &err);
+        (CCLMemObj *) b, destructor_callback, &test_var, &err);
     g_assert_no_error(err);
 
     /* Destroy buffer. */

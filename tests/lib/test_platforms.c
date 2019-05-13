@@ -176,7 +176,7 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_NAME, &err);
             g_assert_no_error(err);
             ccl_test_platforms_msg("...... Name :", "%s",
-                ccl_info_array(info, char*));
+                ccl_info_array(info, char *));
 
             info = ccl_device_get_info(d, CL_DEVICE_ADDRESS_BITS, &err);
             ccl_test_platforms_check_error(&err);
@@ -191,7 +191,7 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_BUILT_IN_KERNELS, &err);
             ccl_test_platforms_check_error(&err);
             ccl_test_platforms_msg("...... Built-in kernels :", "%s",
-                ccl_info_array(info, char*));
+                ccl_info_array(info, char *));
 
             info = ccl_device_get_info(d, CL_DEVICE_COMPILER_AVAILABLE, &err);
             ccl_test_platforms_check_error(&err);
@@ -233,7 +233,7 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_EXTENSIONS, &err);
             ccl_test_platforms_check_error(&err);
             ccl_test_platforms_msg("...... Extensions :", "%s",
-                ccl_info_array(info, char*));
+                ccl_info_array(info, char *));
 
             info = ccl_device_get_info(
                 d, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, &err);
@@ -442,7 +442,7 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_OPENCL_C_VERSION, &err);
             ccl_test_platforms_check_error(&err);
             ccl_test_platforms_msg("...... OpenCL C version :", "%s",
-                ccl_info_array(info, char*));
+                ccl_info_array(info, char *));
             ccl_test_platforms_check_error(&err);
 
             info = ccl_device_get_info(d, CL_DEVICE_PLATFORM, &err);
@@ -455,7 +455,7 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_PARENT_DEVICE, &err);
             ccl_test_platforms_check_error(&err);
             ccl_test_platforms_msg("...... Parent device :", "%p",
-                *((void**) info->value));
+                *((void **) info->value));
 
             info = ccl_device_get_info(
                 d, CL_DEVICE_PARTITION_MAX_SUB_DEVICES, &err);
@@ -479,7 +479,7 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_PARTITION_TYPE, &err);
             ccl_test_platforms_check_error(&err);
             ccl_test_platforms_msg("...... Partition type (only first):", "%x",
-                info != NULL ? (int) ((intptr_t*) info->value)[0] : 0);
+                info != NULL ? (int) ((intptr_t *) info->value)[0] : 0);
 
             info = ccl_device_get_info(
                 d, CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, &err);

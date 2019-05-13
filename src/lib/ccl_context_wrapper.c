@@ -203,7 +203,7 @@ CCL_EXPORT
 CCLContext * ccl_context_new_wrap(cl_context context) {
 
     return (CCLContext *) ccl_wrapper_new(
-        CCL_CONTEXT, (void*) context, sizeof(CCLContext));
+        CCL_CONTEXT, (void *) context, sizeof(CCLContext));
 }
 
 /**
@@ -631,7 +631,7 @@ const cl_image_format * ccl_context_get_supported_image_formats(
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
-    image_formats = (const cl_image_format*) info->value;
+    image_formats = (const cl_image_format *) info->value;
     goto finish;
 
 error_handler:

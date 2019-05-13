@@ -46,7 +46,7 @@ static void context_with_image_support_setup(
     *ctx_fixt = NULL;
     cl_uint min_ocl_ver = 0;
     if (user_data != NULL)
-        min_ocl_ver = *((cl_uint*) user_data);
+        min_ocl_ver = *((cl_uint *) user_data);
 
     /* Get all OpenCL platforms in system. */
     ps = ccl_platforms_new(&err);

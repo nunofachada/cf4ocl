@@ -79,8 +79,7 @@
  * @{
  */
 
-/* Get the command queue wrapper for the given OpenCL command
- * queue. */
+/* Get the command queue wrapper for the given OpenCL command queue. */
 CCL_EXPORT
 CCLQueue * ccl_queue_new_wrap(cl_command_queue command_queue);
 

@@ -92,17 +92,17 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
     memobj->type = CL_MEM_OBJECT_BUFFER;
     memobj->flags = flags;
     memobj->size = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
-        ? ((struct _cl_buffer_region*) buffer_create_info)->size
+        ? ((struct _cl_buffer_region *) buffer_create_info)->size
         : 0;
     memobj->host_ptr = buffer->host_ptr;
     memobj->map_count = 0;
     memobj->context = buffer->context;
     memobj->associated_object = buffer;
     memobj->offset = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
-        ? ((struct _cl_buffer_region*) buffer_create_info)->origin
+        ? ((struct _cl_buffer_region *) buffer_create_info)->origin
         : 0;
 
-    memobj->mem = ((cl_uchar*) buffer->mem) + memobj->offset;
+    memobj->mem = ((cl_uchar *) buffer->mem) + memobj->offset;
     memobj->callbacks = NULL;
 
     return memobj;

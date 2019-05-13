@@ -616,7 +616,7 @@ CCLProgram * ccl_program_new_from_binaries(CCLContext * ctx,
     for (guint i = 0; i < num_devices; ++i) {
         device_list[i] = ccl_device_unwrap(devs[i]);
         lengths[i] = bins[i]->size;
-        bins_raw[i] = (unsigned char*) bins[i]->data;
+        bins_raw[i] = (unsigned char *) bins[i]->data;
     }
 
     /* Create program. */
@@ -1544,7 +1544,7 @@ CCLEvent * ccl_program_enqueue_kernel(CCLProgram * prg,
     va_start(args_va, err);
 
     /* Get first argument. */
-    aux_arg = va_arg(args_va, void*);
+    aux_arg = va_arg(args_va, void *);
 
     /* Check if any arguments are given, and if so, populate array
      * of arguments. */
@@ -1554,17 +1554,17 @@ CCLEvent * ccl_program_enqueue_kernel(CCLProgram * prg,
 
         while (aux_arg != NULL) {
             num_args++;
-            aux_arg = va_arg(args_va, void*);
+            aux_arg = va_arg(args_va, void *);
         }
         va_end(args_va);
 
         /* 2. Populate array of arguments. */
 
-        args_array = g_slice_alloc((num_args + 1) * sizeof(void*));
+        args_array = g_slice_alloc((num_args + 1) * sizeof(void *));
         va_start(args_va, err);
 
         for (guint i = 0; i < num_args; ++i) {
-            aux_arg = va_arg(args_va, void*);
+            aux_arg = va_arg(args_va, void *);
             args_array[i] = aux_arg;
         }
         va_end(args_va);
@@ -1586,7 +1586,7 @@ CCLEvent * ccl_program_enqueue_kernel(CCLProgram * prg,
     if (num_args > 0) {
 
         /* Free the array of arguments. */
-        g_slice_free1((num_args + 1) * sizeof(void*), args_array);
+        g_slice_free1((num_args + 1) * sizeof(void *), args_array);
 
     }
 

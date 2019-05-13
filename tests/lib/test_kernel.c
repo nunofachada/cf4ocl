@@ -1039,7 +1039,7 @@ static void args_test() {
     arg_test = ccl_arg_new(&pi, sizeof(cl_float));
     g_assert(arg_test != NULL);
     g_assert_cmpuint(ccl_arg_size(arg_test), ==, sizeof(cl_float));
-    g_assert_cmpfloat(pi, ==, *((cl_float*) ccl_arg_value(arg_test)));
+    g_assert_cmpfloat(pi, ==, *((cl_float *) ccl_arg_value(arg_test)));
     ccl_arg_destroy(arg_test);
 
     arg_test = NULL;

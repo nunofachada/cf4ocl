@@ -56,7 +56,7 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
  * https://github.com/pocl/pocl/blob/master/LICENSE */
 CL_API_ENTRY cl_int CL_API_CALL
 clEnqueueNativeKernel(cl_command_queue command_queue,
-    void (CL_CALLBACK * user_func)(void*), void * args, size_t cb_args,
+    void (CL_CALLBACK * user_func)(void *), void * args, size_t cb_args,
     cl_uint num_mem_objects, const cl_mem * mem_list,
     const void ** args_mem_loc, cl_uint num_events_in_wait_list,
     const cl_event * event_wait_list, cl_event * event) {
@@ -150,7 +150,7 @@ clEnqueueReadBuffer(cl_command_queue command_queue, cl_mem buffer,
     ocl_stub_create_event(event, command_queue, CL_COMMAND_READ_BUFFER);
 
     /* Read buffer. */
-    g_memmove(ptr, ((cl_uchar*)buffer->mem) + offset, size);
+    g_memmove(ptr, ((cl_uchar *)buffer->mem) + offset, size);
 
     /* All good. */
     return CL_SUCCESS;
@@ -333,7 +333,7 @@ clEnqueueUnmapMemObject(cl_command_queue command_queue, cl_mem memobj,
     } else if (mapped_ptr == NULL) {
         return CL_INVALID_VALUE;
     } else if ((mapped_ptr < memobj->mem)
-        || ((cl_uchar *)mapped_ptr >= ((cl_uchar*)memobj->mem) + memobj->size)
+        || ((cl_uchar *)mapped_ptr >= ((cl_uchar *)memobj->mem) + memobj->size)
         || (memobj->map_count == 0)) {
         return CL_INVALID_VALUE;
     }

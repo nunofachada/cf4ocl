@@ -47,7 +47,7 @@ static cl_program clCreateProgram(cl_context context,
         ? g_slice_copy(program->num_devices * sizeof(size_t), lengths)
         : g_slice_alloc0(program->num_devices * sizeof(size_t));
     program->binaries = g_slice_alloc0(
-        program->num_devices * sizeof(unsigned char*));
+        program->num_devices * sizeof(unsigned char *));
 #ifdef CL_VERSION_1_2
     program->binary_type = g_slice_alloc0(
         program->num_devices * sizeof(cl_program_binary_type));
@@ -55,7 +55,7 @@ static cl_program clCreateProgram(cl_context context,
     if (binaries != NULL && lengths != NULL) {
         for (cl_uint i = 0; i < program->num_devices; ++i) {
             if (binaries[i] != NULL && lengths[i] > 0) {
-                program->binaries[i] = (unsigned char*)
+                program->binaries[i] = (unsigned char *)
                     g_strndup((const char *) binaries[i], lengths[i]);
 #ifdef CL_VERSION_1_2
                 program->binary_type[i] = CL_PROGRAM_BINARY_TYPE_EXECUTABLE;
@@ -244,7 +244,7 @@ clReleaseProgram(cl_program program) {
                     g_free(program->binaries[i]);
             }
             g_slice_free1(
-                program->num_devices * sizeof(unsigned char*),
+                program->num_devices * sizeof(unsigned char *),
                 program->binaries);
         }
 
@@ -346,7 +346,7 @@ clBuildProgram(cl_program program, cl_uint num_devices,
                 program->devices[j]->name);
             /* Do some bogus compilation of source code. */
             if (program->binaries[j] == NULL) {
-                program->binaries[j] = (unsigned char*)
+                program->binaries[j] = (unsigned char *)
                     g_compute_checksum_for_string(
                         G_CHECKSUM_SHA256, program->source, -1);
                 program->binary_sizes[j] =
