@@ -5,10 +5,12 @@
 # Requires: ctags cut grep sort cut git
 # Author: Nuno Fachada <faken@fakenmc.com>
 # Licence: GNU General Public License version 3 (GPLv3)
-# Date: 2016
+# Date: 2019
 #
 
-defs=`LC_ALL=C ctags -I G_GNUC_NULL_TERMINATED -x --c-kinds=f ../src/lib/*.c | grep -v "static" | sort -n -s | cut -f1 -d " "`
-decls=`LC_ALL=C ctags -I G_GNUC_NULL_TERMINATED -x --c-kinds=p ../src/lib/*.h | grep -v "static" | sort -n -s | cut -f1 -d " "`
+defs=$(LC_ALL=C ctags -I G_GNUC_NULL_TERMINATED -x --c-kinds=f \
+    ../src/lib/*.c grep -v "static" | sort -n -s | cut -f1 -d " ")
+decls=$(LC_ALL=C ctags -I G_GNUC_NULL_TERMINATED -x --c-kinds=p \
+    ../src/lib/*.h | grep -v "static" | sort -n -s | cut -f1 -d " ")
 diff -u  <(echo "$defs") <(echo "$decls")
 

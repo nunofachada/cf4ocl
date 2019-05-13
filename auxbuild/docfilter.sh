@@ -7,7 +7,7 @@
 # Requires: cut cat sed
 # Author: Nuno Fachada <faken@fakenmc.com>
 # Licence: GNU General Public License version 3 (GPLv3)
-# Date: 2016
+# Date: 2019
 #
 
 # The script expects an input file
@@ -18,7 +18,7 @@ elif [ ! -f "$1" ]; then
 fi
 
 # Read from input file
-docfile=`cat $1`
+docfile=$(cat $1)
 
 # Get script dir
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -29,21 +29,21 @@ if [ ! -f "${SCRIPT_DIR}/oclfunurls.txt" ]; then
 fi
 
 # Load function-URL relations
-ocl_funs_urls=`cat ${SCRIPT_DIR}/oclfunurls.txt`
+ocl_funs_urls=$(cat ${SCRIPT_DIR}/oclfunurls.txt)
 
 # Get OpenCL function names
-ocl_funs=(`echo "$ocl_funs_urls" | cut -f1 -d " "`)
+ocl_funs=($(echo "$ocl_funs_urls" | cut -f1 -d " "))
 
 # Get OpenCL function URLs
-ocl_urls=(`echo "$ocl_funs_urls" | cut -f2 -d " "`)
+ocl_urls=($(echo "$ocl_funs_urls" | cut -f2 -d " "))
 
 # Replace function names with function names and URLs
 num_ocl_funs=${#ocl_funs[@]}
 for ((i=0; i < $num_ocl_funs; i += 1))
 do
-    keyword=`echo "${ocl_funs[$i]}"`
-    replacement=`echo "[${ocl_funs[$i]}](${ocl_urls[$i]})"`
-    docfile=`echo "$docfile" | sed -e "s,${keyword},${replacement},g"`
+    keyword=$(echo "${ocl_funs[$i]}")
+    replacement=$(echo "[${ocl_funs[$i]}](${ocl_urls[$i]})")
+    docfile=$(echo "$docfile" | sed -e "s,${keyword},${replacement},g")
 done
 echo "$docfile"
 
