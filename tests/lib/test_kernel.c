@@ -30,7 +30,7 @@
 #define CCL_TEST_KERNEL_NAME "test_krnl"
 
 #define CCL_TEST_KERNEL_CONTENT \
-    "__kernel void " CCL_TEST_KERNEL_NAME "(__global uint *buf)\n" \
+    "__kernel void " CCL_TEST_KERNEL_NAME "(__global uint * buf)\n" \
     "{\n" \
     "	int gid = get_global_id(0);\n" \
     "	buf[gid] = buf[gid] + 1;\n" \
@@ -48,24 +48,24 @@ G_STATIC_ASSERT(CCL_TEST_KERNEL_BUF_SIZE % CCL_TEST_KERNEL_LWS == 0);
 static void create_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
+    CCLContext * ctx = NULL;
     cl_context context = NULL;
-    CCLProgram* prg = NULL;
+    CCLProgram * prg = NULL;
     cl_program program = NULL;
-    CCLKernel* krnl = NULL;
+    CCLKernel * krnl = NULL;
     cl_kernel kernel = NULL;
-    CCLDevice* d = NULL;
-    CCLQueue* cq = NULL;
+    CCLDevice * d = NULL;
+    CCLQueue * cq = NULL;
     size_t gws;
     size_t lws;
     cl_uint host_buf[CCL_TEST_KERNEL_BUF_SIZE];
     cl_uint host_buf_aux[CCL_TEST_KERNEL_BUF_SIZE];
-    CCLBuffer* buf;
-    CCLErr* err = NULL;
-    CCLEvent* evt = NULL;
+    CCLBuffer * buf;
+    CCLErr * err = NULL;
+    CCLEvent * evt = NULL;
     CCLEventWaitList ewl = NULL;
-    const char* krnl_name;
-    void* args[] = { NULL, NULL };
+    const char * krnl_name;
+    void * args[] = { NULL, NULL };
     cl_bool release_krnl;
     cl_int ocl_status;
 
@@ -74,8 +74,7 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
 
     /* Create a new program from source and build it. */
-    prg = ccl_program_new_from_source(
-        ctx, CCL_TEST_KERNEL_CONTENT, &err);
+    prg = ccl_program_new_from_source(ctx, CCL_TEST_KERNEL_CONTENT, &err);
     g_assert_no_error(err);
 
     ccl_program_build(prg, NULL, &err);
@@ -151,7 +150,7 @@ static void create_info_destroy_test() {
 #ifdef CL_VERSION_1_1
 
         size_t kwgz;
-        size_t* kcwgs;
+        size_t * kcwgs;
         CCLDevice* dev = NULL;
 
         /* If platform supports kernel work group queries, get kernel
@@ -166,11 +165,10 @@ static void create_info_destroy_test() {
             g_assert_no_error(err);
             (void)kwgz;
 
-            kcwgs = ccl_kernel_get_workgroup_info_array(krnl, dev,
-                CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t, &err);
+            kcwgs = ccl_kernel_get_workgroup_info_array(
+                krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t, &err);
             g_assert_no_error(err);
             (void)kcwgs;
-
         }
 
 #endif /* ifdef CL_VERSION_1_1 */
@@ -185,9 +183,9 @@ static void create_info_destroy_test() {
          * information and compare it with expected info. */
         if (ocl_ver >= 120) {
 
-            kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
-                    CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                    cl_kernel_arg_address_qualifier, &err);
+            kaaq = ccl_kernel_get_arg_info_scalar(
+                krnl, 0, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+                cl_kernel_arg_address_qualifier, &err);
             g_assert((err == NULL)
                 || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                     && (err->domain == CCL_ERROR))
@@ -224,7 +222,6 @@ static void create_info_destroy_test() {
             } else {
                 g_clear_error(&err);
             }
-
         }
 
 #endif /* ifdef CL_VERSION_1_2 */
@@ -240,7 +237,8 @@ static void create_info_destroy_test() {
         }
 
         /* Create device buffer. */
-        buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+        buf = ccl_buffer_new(
+            ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
             CCL_TEST_KERNEL_BUF_SIZE * sizeof(cl_uint), host_buf, &err);
         g_assert_no_error(err);
 
@@ -293,11 +291,11 @@ static void create_info_destroy_test() {
  * */
 static void ref_unref_test() {
 
-    CCLContext* ctx = NULL;
-    CCLErr* err = NULL;
-    CCLProgram* prg = NULL;
-    CCLKernel* krnl1 = NULL;
-    CCLKernel* krnl2 = NULL;
+    CCLContext * ctx = NULL;
+    CCLErr * err = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl1 = NULL;
+    CCLKernel * krnl2 = NULL;
 
     /* Get some context. */
     ctx = ccl_test_context_new(&err);
@@ -328,13 +326,13 @@ static void ref_unref_test() {
         GPOINTER_TO_UINT(krnl1), !=, GPOINTER_TO_UINT(krnl2));
 
     /* Check that each has a ref count of 1. */
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl1), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl2), ==, 1);
 
     /* Increment the ref count of the directly created kernel. */
     ccl_kernel_ref(krnl2);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 2);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl1), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl2), ==, 2);
 
     /* Get rid of the directly created kernel. */
     ccl_kernel_unref(krnl2);
@@ -356,7 +354,6 @@ static void ref_unref_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 #define WS_INIT(ws, a, b, c) \
@@ -370,10 +367,10 @@ static void ref_unref_test() {
  * Helper function for ::suggest_worksizes_test() which checks if
  * suggested work sizes are within device limits.
  * */
-static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
+static void check_dev_limits(CCLDevice * dev, cl_uint dims, size_t * lws) {
 
     /* Error handling object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Max device workgroup size. */
     size_t max_wgsize = ccl_device_get_info_scalar(
@@ -381,7 +378,7 @@ static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
     g_assert_no_error(err);
 
     /* Max device workitem sizes. */
-    size_t* max_wisizes = ccl_device_get_info_array(
+    size_t * max_wisizes = ccl_device_get_info_array(
         dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err);
     g_assert_no_error(err);
 
@@ -400,7 +397,6 @@ static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
 
     /* Check work group size. */
     g_assert_cmpuint(wgsize, <=, max_wgsize);
-
 }
 
 /**
@@ -408,10 +404,10 @@ static void check_dev_limits(CCLDevice* dev, cl_uint dims, size_t* lws) {
  *
  * Aux. function for suggest_worksizes_test()-
  * */
-static void suggest_worksizes_aux(CCLDevice* dev, CCLKernel* krnl) {
+static void suggest_worksizes_aux(CCLDevice * dev, CCLKernel * krnl) {
 
     /* Test variables. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     size_t rws[3], gws[3], lws[3], lws_max[3];
 
     /* Perform test 20 times with different values. */
@@ -581,9 +577,7 @@ static void suggest_worksizes_aux(CCLDevice* dev, CCLKernel* krnl) {
         g_assert_cmpuint(lws[1], <=, lws_max[1]);
         g_assert_cmpuint(lws[2], <=, lws_max[2]);
         check_dev_limits(dev, 3, lws);
-
     }
-
 }
 
 /**
@@ -593,9 +587,9 @@ static void suggest_worksizes_aux(CCLDevice* dev, CCLKernel* krnl) {
 static void suggest_worksizes_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(&err);
@@ -613,12 +607,11 @@ static void suggest_worksizes_test() {
     /* Kernel info is not functional with the OCL stub, so this
      * test will only take place with a real OCL implementation. */
 
-    CCLProgram* prg = NULL;
-    CCLKernel* krnl = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl = NULL;
 
     /* Create and build program. */
-    prg = ccl_program_new_from_source(
-        ctx, CCL_TEST_KERNEL_CONTENT, &err);
+    prg = ccl_program_new_from_source(ctx, CCL_TEST_KERNEL_CONTENT, &err);
     g_assert_no_error(err);
 
     ccl_program_build(prg, NULL, &err);
@@ -653,10 +646,10 @@ static void suggest_worksizes_test() {
 
 #define CCL_TEST_KERNEL_ARGS_CONTENT \
     "__kernel void " CCL_TEST_KERNEL_ARGS_NAME "(" \
-    "	__global uint *buf,\n" \
+    "	__global uint * buf,\n" \
     "	__read_only image2d_t img,\n" \
     "	sampler_t sampler,\n" \
-    "	__local uint* loc,\n" \
+    "	__local uint * loc,\n" \
     "	uint x)\n" \
     "{\n" \
     "	uint gid = get_global_id(0);\n" \
@@ -678,25 +671,25 @@ G_STATIC_ASSERT(CCL_TEST_KERNEL_ARGS_BUF_SIZE % CCL_TEST_KERNEL_ARGS_LWS == 0);
 static void args_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLProgram* prg = NULL;
-    CCLKernel* krnl = NULL;
-    CCLImage* img = NULL;
-    CCLBuffer* buf = NULL;
-    CCLQueue* cq = NULL;
-    CCLEvent* evt = NULL;
-    CCLSampler* smplr = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl = NULL;
+    CCLImage * img = NULL;
+    CCLBuffer * buf = NULL;
+    CCLQueue * cq = NULL;
+    CCLEvent * evt = NULL;
+    CCLSampler * smplr = NULL;
     CCLEventWaitList ewl = NULL;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     union {cl_uint u; cl_uchar c[4];} himg[CCL_TEST_KERNEL_ARGS_BUF_SIZE];
     cl_uint hbuf[CCL_TEST_KERNEL_ARGS_BUF_SIZE];
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     size_t gws = CCL_TEST_KERNEL_ARGS_BUF_SIZE;
     size_t lws = CCL_TEST_KERNEL_ARGS_LWS;
-    void* args[6];
+    void * args[6];
     cl_uint to_sum = 3;
-    char* krnl_name;
+    char * krnl_name;
 
     /* **************************************************** */
     /* 1 - Test different types of arguments with a kernel. */
@@ -714,13 +707,14 @@ static void args_test() {
     cq = ccl_queue_new(ctx, dev, 0, &err);
     g_assert_no_error(err);
 
-    /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
-     * bits). */
+    /* Create a random 4-channel 8-bit image (i.e. each pixel has 32 bits). */
     for (cl_uint i = 0; i < CCL_TEST_KERNEL_ARGS_BUF_SIZE; ++i)
         himg[i].u = (cl_uint) g_test_rand_int();
 
     /* Create 2D image, copy data from host. */
-    img = ccl_image_new(ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+    img = ccl_image_new(
+        ctx,
+        CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
         &image_format, himg, &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_KERNEL_ARGS_BUF_SIZE,
@@ -729,17 +723,17 @@ static void args_test() {
     g_assert_no_error(err);
 
     /* Create buffer. */
-    buf = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+    buf = ccl_buffer_new(
+        ctx, CL_MEM_WRITE_ONLY,
         sizeof(cl_uint) * CCL_TEST_KERNEL_ARGS_BUF_SIZE, NULL, &err);
     g_assert_no_error(err);
 
     /* Create sampler (this could also be created in-kernel). */
-    smplr = ccl_sampler_new(ctx, CL_FALSE, CL_ADDRESS_CLAMP_TO_EDGE,
-        CL_FILTER_NEAREST, &err);
+    smplr = ccl_sampler_new(
+        ctx, CL_FALSE, CL_ADDRESS_CLAMP_TO_EDGE, CL_FILTER_NEAREST, &err);
 
     /* Create and build program. */
-    prg = ccl_program_new_from_source(
-        ctx, CCL_TEST_KERNEL_ARGS_CONTENT, &err);
+    prg = ccl_program_new_from_source(ctx, CCL_TEST_KERNEL_ARGS_CONTENT, &err);
     g_assert_no_error(err);
 
     ccl_program_build(prg, NULL, &err);
@@ -763,8 +757,8 @@ static void args_test() {
 
     cl_uint ocl_ver;
     cl_kernel_arg_address_qualifier kaaq;
-    char* kernel_arg_type_name;
-    char* kernel_arg_name;
+    char * kernel_arg_type_name;
+    char * kernel_arg_name;
 
     /* Get OpenCL version of kernel's underlying platform. */
     ocl_ver = ccl_kernel_get_opencl_version(krnl, &err);
@@ -857,9 +851,9 @@ static void args_test() {
         }
 
         /* Third kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 2, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -898,9 +892,9 @@ static void args_test() {
         }
 
         /* Fourth kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 3, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -939,9 +933,9 @@ static void args_test() {
         }
 
         /* Fifth kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 4,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 4, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -985,7 +979,6 @@ static void args_test() {
         g_assert(kernel_arg_type_name == NULL);
         g_assert (err != NULL);
         g_clear_error(&err);
-
     }
 
 #endif
@@ -1000,13 +993,13 @@ static void args_test() {
     args[5] = NULL;
 
     /* Set args and execute kernel. */
-    ccl_kernel_set_args_and_enqueue_ndrange_v(krnl, cq, 1, NULL,
-        &gws, &lws, NULL, args, &err);
+    ccl_kernel_set_args_and_enqueue_ndrange_v(
+        krnl, cq, 1, NULL, &gws, &lws, NULL, args, &err);
     g_assert_no_error(err);
 
     /* Get results. */
-    evt = ccl_buffer_enqueue_read(buf, cq, CL_FALSE, 0,
-        sizeof(cl_uint) * CCL_TEST_KERNEL_ARGS_BUF_SIZE,
+    evt = ccl_buffer_enqueue_read(
+        buf, cq, CL_FALSE, 0, sizeof(cl_uint) * CCL_TEST_KERNEL_ARGS_BUF_SIZE,
         hbuf, NULL, &err);
     g_assert_no_error(err);
 
@@ -1041,7 +1034,7 @@ static void args_test() {
 
     cl_float pi = 3.1415f;
     cl_char c = 12;
-    CCLArg* arg_test = NULL;
+    CCLArg * arg_test = NULL;
 
     arg_test = ccl_arg_new(&pi, sizeof(cl_float));
     g_assert(arg_test != NULL);
@@ -1053,7 +1046,7 @@ static void args_test() {
     arg_test = ccl_arg_full(&c, sizeof(cl_char));
     g_assert(arg_test != NULL);
     g_assert_cmpuint(ccl_arg_size(arg_test), ==, sizeof(cl_char));
-    g_assert_cmpfloat(c, ==, *((cl_char*) ccl_arg_value(arg_test)));
+    g_assert_cmpfloat(c, ==, *((cl_char *) ccl_arg_value(arg_test)));
     ccl_arg_destroy(arg_test);
 
     /* Confirm that memory allocated by wrappers has been properly
@@ -1069,19 +1062,18 @@ static void args_test() {
 
 /* Data structure used for for the native_test. */
 struct nk_args {
-    cl_int* buf;
+    cl_int * buf;
     cl_uint numel;
 };
 
 /* Native function used for the native_test. */
-static void CL_CALLBACK native_kernel(void* args) {
+static void CL_CALLBACK native_kernel(void * args) {
 
-    struct nk_args* nka = (struct nk_args*) args;
+    struct nk_args * nka = (struct nk_args *) args;
 
     /* Perform some simple operation. */
     for (cl_uint i = 0; i < nka->numel; ++i)
         nka->buf[i] = nka->buf[i] + 1;
-
 }
 
 /**
@@ -1090,17 +1082,17 @@ static void CL_CALLBACK native_kernel(void* args) {
 static void native_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLBuffer* buf = NULL;
-    CCLQueue* cq = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLBuffer * buf = NULL;
+    CCLQueue * cq = NULL;
+    CCLErr * err = NULL;
     cl_int hbuf[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
     cl_int hbuf_out[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
     size_t bs = CCL_TEST_KERNEL_NATIVE_BUF_SIZE * sizeof(cl_int);
     cl_device_exec_capabilities exec_cap;
     struct nk_args args;
-    const void* args_mem_loc;
+    const void * args_mem_loc;
     cl_uint i;
 
     /* Get the test context with the pre-defined device. */
@@ -1133,8 +1125,8 @@ static void native_test() {
         hbuf[i] = g_test_rand_int();
 
     /* Create device buffer, copy contents from host buffer. */
-    buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        bs, hbuf, &err);
+    buf = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, bs, hbuf, &err);
     g_assert_no_error(err);
 
     /* Initialize arguments for native kernel. We only initialize
@@ -1145,11 +1137,12 @@ static void native_test() {
     /* Here we specify the location of 'args.buf', which the OpenCL
      * implementation will setup using data in the device buffer
      * 'buf'. */
-    args_mem_loc = (const void*) &args.buf;
+    args_mem_loc = (const void *) &args.buf;
 
     /* Test the ccl_kernel_enqueue_native() function. */
-    ccl_kernel_enqueue_native(cq, native_kernel, &args,
-        sizeof(struct nk_args), 1, (CCLMemObj* const*) &buf,
+    ccl_kernel_enqueue_native(
+        cq, native_kernel, &args,
+        sizeof(struct nk_args), 1, (CCLMemObj * const *) &buf,
         &args_mem_loc, NULL, &err);
     g_assert_no_error(err);
 
@@ -1182,7 +1175,7 @@ static void native_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -1208,6 +1201,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-

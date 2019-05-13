@@ -20,7 +20,7 @@
  * Test the buffer wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -37,9 +37,9 @@
 static void create_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLBuffer* b = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLBuffer * b = NULL;
+    CCLErr * err = NULL;
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
     /* Get the test context with the pre-defined device. */
@@ -90,7 +90,6 @@ static void create_info_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -99,9 +98,9 @@ static void create_info_destroy_test() {
 static void ref_unref_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLBuffer* b = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLBuffer * b = NULL;
+    CCLErr * err = NULL;
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
     /* Get the test context with the pre-defined device. */
@@ -116,21 +115,21 @@ static void ref_unref_test() {
     ccl_memobj_ref(b);
 
     /* Check that buffer ref count is 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Increase buffer reference count again, this time using helper
      * macro. */
     ccl_buffer_ref(b);
 
     /* Check that buffer ref count is 3. */
-    g_assert_cmpuint(3, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+    g_assert_cmpuint(3, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Unref buffer, twice. */
     ccl_buffer_unref(b);
     ccl_buffer_unref(b);
 
     /* Check that buffer ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Destroy stuff. */
     ccl_buffer_unref(b);
@@ -147,11 +146,11 @@ static void ref_unref_test() {
 static void wrap_unwrap_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLBuffer* b = NULL;
-    CCLBuffer* b_aux = NULL;
+    CCLContext * ctx = NULL;
+    CCLBuffer * b = NULL;
+    CCLBuffer * b_aux = NULL;
     cl_mem buffer = NULL;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
     cl_int status;
 
@@ -160,8 +159,8 @@ static void wrap_unwrap_test() {
     g_assert_no_error(err);
 
     /* Create a buffer using OpenCL functions directly. */
-    buffer = clCreateBuffer(ccl_context_unwrap(ctx), CL_MEM_READ_ONLY,
-        buf_size, NULL, &status);
+    buffer = clCreateBuffer(
+        ccl_context_unwrap(ctx), CL_MEM_READ_ONLY, buf_size, NULL, &status);
     g_assert_cmpint(status, ==, CL_SUCCESS);
 
     /* Wrap buffer. */
@@ -178,13 +177,13 @@ static void wrap_unwrap_test() {
     g_assert(b == b_aux);
 
     /* ... and the buffer wrapper ref count must be 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Unref buffer, twice. */
     ccl_buffer_unref(b);
 
     /* Check that buffer ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) b));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Destroy stuff. */
     ccl_buffer_destroy(b);
@@ -201,14 +200,14 @@ static void wrap_unwrap_test() {
 static void read_write_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLBuffer* b = NULL;
-    CCLQueue* q;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLBuffer * b = NULL;
+    CCLQueue * q;
     cl_uint h_in[CCL_TEST_BUFFER_SIZE];
     cl_uint h_out[CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Create a host array, put some stuff in it. */
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -227,13 +226,13 @@ static void read_write_test() {
     g_assert_no_error(err);
 
     /* Create regular buffer and write data from the host buffer. */
-    b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        buf_size, h_in, &err);
+    b = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, buf_size, h_in, &err);
     g_assert_no_error(err);
 
     /* Read data back to host. */
-    ccl_buffer_enqueue_read(b, q, CL_TRUE, 0, buf_size, (void*) h_out,
-        NULL, &err);
+    ccl_buffer_enqueue_read(
+        b, q, CL_TRUE, 0, buf_size, (void*) h_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK. */
@@ -245,13 +244,13 @@ static void read_write_test() {
         h_in[i] = g_test_rand_int();
 
     /* Write it explicitly to buffer. */
-    ccl_buffer_enqueue_write(b, q, CL_TRUE, 0, buf_size, (void*) h_in,
-        NULL, &err);
+    ccl_buffer_enqueue_write(
+        b, q, CL_TRUE, 0, buf_size, (void*) h_in, NULL, &err);
     g_assert_no_error(err);
 
     /* Read new data to host. */
-    ccl_buffer_enqueue_read(b, q, CL_TRUE, 0, buf_size, (void*) h_out,
-        NULL, &err);
+    ccl_buffer_enqueue_read(
+        b, q, CL_TRUE, 0, buf_size, (void*) h_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK. */
@@ -266,7 +265,6 @@ static void read_write_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -275,15 +273,15 @@ static void read_write_test() {
 static void copy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLBuffer* b1 = NULL;
-    CCLBuffer* b2 = NULL;
-    CCLQueue* q;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLBuffer * b1 = NULL;
+    CCLBuffer * b2 = NULL;
+    CCLQueue * q;
     cl_long h1[CCL_TEST_BUFFER_SIZE];
     cl_long h2[CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_long) * CCL_TEST_BUFFER_SIZE;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Create a host array, put some stuff in it. */
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -302,8 +300,8 @@ static void copy_test() {
     g_assert_no_error(err);
 
     /* Create regular buffer and write data from the host buffer. */
-    b1 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        buf_size, h1, &err);
+    b1 = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, buf_size, h1, &err);
     g_assert_no_error(err);
 
     /* Create another buffer, double the size. */
@@ -317,14 +315,13 @@ static void copy_test() {
     g_assert_no_error(err);
 
     /* Read data back to host from the second buffer. */
-    ccl_buffer_enqueue_read(b2, q, CL_TRUE, buf_size / 2, buf_size, h2,
-        NULL, &err);
+    ccl_buffer_enqueue_read(
+        b2, q, CL_TRUE, buf_size / 2, buf_size, h2, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK. */
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
         g_assert_cmpuint(h1[i], ==, h2[i]);
-
 
     /* Free stuff. */
     ccl_buffer_destroy(b1);
@@ -335,7 +332,6 @@ static void copy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -344,14 +340,14 @@ static void copy_test() {
 static void map_unmap_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLBuffer* b = NULL;
-    CCLQueue* q;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLBuffer * b = NULL;
+    CCLQueue * q;
     cl_uint h_in[CCL_TEST_BUFFER_SIZE];
-    cl_uint* h_out;
+    cl_uint * h_out;
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Create a host array, put some stuff in it. */
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -370,13 +366,13 @@ static void map_unmap_test() {
     g_assert_no_error(err);
 
     /* Create regular buffer and write data from the host buffer. */
-    b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        buf_size, h_in, &err);
+    b = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, buf_size, h_in, &err);
     g_assert_no_error(err);
 
     /* Map buffer onto host memory. */
-    h_out = ccl_buffer_enqueue_map(b, q, CL_TRUE, CL_MAP_READ, 0,
-        buf_size, NULL, NULL, &err);
+    h_out = ccl_buffer_enqueue_map(
+        b, q, CL_TRUE, CL_MAP_READ, 0, buf_size, NULL, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK. */
@@ -384,7 +380,8 @@ static void map_unmap_test() {
         g_assert_cmpuint(h_in[i], ==, h_out[i]);
 
     /* Unmap buffer. */
-    ccl_memobj_enqueue_unmap((CCLMemObj*) b, q, h_out, NULL, &err);
+    ccl_memobj_enqueue_unmap(
+        (CCLMemObj *) b, q, h_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Free stuff. */
@@ -395,7 +392,6 @@ static void map_unmap_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 #ifdef CL_VERSION_1_1
@@ -404,14 +400,14 @@ static void map_unmap_test() {
  * Test callback function.
  * */
 static void CL_CALLBACK destructor_callback(
-    cl_mem memobj, void *user_data) {
+    cl_mem memobj, void * user_data) {
 
     /* The memory object cannot be NULL. */
     g_assert(memobj != NULL);
 
     /* Set userdata to CL_TRUE, thus providing evidence that the
      * callback was indeed called. */
-    *((cl_bool*) user_data) = CL_TRUE;
+    *((cl_bool *) user_data) = CL_TRUE;
 }
 
 /**
@@ -420,10 +416,10 @@ static void CL_CALLBACK destructor_callback(
 static void destructor_callback_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLBuffer* b = NULL;
-    CCLErr* err = NULL;
-    GTimer* timer = NULL;
+    CCLContext * ctx = NULL;
+    CCLBuffer * b = NULL;
+    CCLErr * err = NULL;
+    GTimer * timer = NULL;
     cl_bool test_var = CL_FALSE;
 
     /* Get the test context with the pre-defined device. */
@@ -431,12 +427,12 @@ static void destructor_callback_test() {
     g_assert_no_error(err);
 
     /* Create a buffer. */
-    b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, 128 * sizeof(cl_uint),
-        NULL, &err);
+    b = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE, 128 * sizeof(cl_uint), NULL, &err);
 
     /* Add destructor callback. */
-    ccl_memobj_set_destructor_callback((CCLMemObj*) b,
-        destructor_callback, &test_var, &err);
+    ccl_memobj_set_destructor_callback(
+        (CCLMemObj*) b, destructor_callback, &test_var, &err);
     g_assert_no_error(err);
 
     /* Destroy buffer. */
@@ -457,8 +453,6 @@ static void destructor_callback_test() {
 
     /* Confirm that test_var is CL_TRUE. */
     g_assert_cmpuint(test_var, ==, CL_TRUE);
-
-
 }
 
 /**
@@ -467,11 +461,11 @@ static void destructor_callback_test() {
 static void rect_read_write_copy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLBuffer* b1 = NULL;
-    CCLBuffer* b2 = NULL;
-    CCLQueue* cq;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLBuffer * b1 = NULL;
+    CCLBuffer * b2 = NULL;
+    CCLQueue * cq;
     cl_uchar h1[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
     cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_uchar) * sizeof(cl_uchar)
@@ -506,18 +500,18 @@ static void rect_read_write_copy_test() {
     g_assert_no_error(err);
 
     /* Write "rect" data to first buffer in device. */
-    ccl_buffer_enqueue_write_rect(b1, cq, CL_TRUE, origin, origin,
-        region, 0, 0, 0, 0, h1, NULL, &err);
+    ccl_buffer_enqueue_write_rect(
+        b1, cq, CL_TRUE, origin, origin, region, 0, 0, 0, 0, h1, NULL, &err);
     g_assert_no_error(err);
 
     /* Copy "rect" data from first buffer to second buffer. */
-    ccl_buffer_enqueue_copy_rect(b1, b2, cq, origin, origin, region,
-        0, 0, 0, 0, NULL, &err);
+    ccl_buffer_enqueue_copy_rect(
+        b1, b2, cq, origin, origin, region, 0, 0, 0, 0, NULL, &err);
     g_assert_no_error(err);
 
     /* Read data "rect" back to host from the second buffer. */
-    ccl_buffer_enqueue_read_rect(b2, cq, CL_TRUE, origin, origin,
-        region, 0, 0, 0, 0, h2, NULL, &err);
+    ccl_buffer_enqueue_read_rect(
+        b2, cq, CL_TRUE, origin, origin, region, 0, 0, 0, 0, h2, NULL, &err);
     g_assert_no_error(err);
 
     /* Check data is OK doing a flat comparison. */
@@ -533,7 +527,6 @@ static void rect_read_write_copy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -542,16 +535,16 @@ static void rect_read_write_copy_test() {
 static void create_from_region_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq = NULL;
-    CCLBuffer* buf = NULL;
-    CCLBuffer* subbuf = NULL;
-    CCLEvent* evt = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLBuffer * buf = NULL;
+    CCLBuffer * subbuf = NULL;
+    CCLEvent * evt = NULL;
     CCLEventWaitList ewl = NULL;
-    CCLErr* err = NULL;
-    cl_ulong* hbuf;
-    cl_ulong* hsubbuf;
+    CCLErr * err = NULL;
+    cl_ulong * hbuf;
+    cl_ulong * hsubbuf;
     cl_uint min_align;
     size_t siz_buf;
     size_t siz_subbuf;
@@ -587,8 +580,8 @@ static void create_from_region_test() {
     g_assert_no_error(err);
 
     /* Create a regular buffer, put some data in it. */
-    buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        siz_buf, hbuf, &err);
+    buf = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, siz_buf, hbuf, &err);
     g_assert_no_error(err);
 
     /* Create sub-buffer from indexes 16 to 31 (16 positions) of
@@ -598,8 +591,8 @@ static void create_from_region_test() {
     g_assert_no_error(err);
 
     /* Get data in sub-buffer to a new host buffer. */
-    evt = ccl_buffer_enqueue_read(subbuf, cq, CL_FALSE, 0,
-        siz_subbuf, hsubbuf, NULL, &err);
+    evt = ccl_buffer_enqueue_read(
+        subbuf, cq, CL_FALSE, 0, siz_subbuf, hsubbuf, NULL, &err);
     g_assert_no_error(err);
 
     /* Wait for read to be complete. */
@@ -608,7 +601,8 @@ static void create_from_region_test() {
 
     /* Check that expected values were successfully read. */
     for (cl_uint i = 0; i < siz_subbuf / sizeof(cl_ulong); ++i)
-        g_assert_cmpuint(hsubbuf[i], ==, hbuf[i + siz_subbuf / sizeof(cl_ulong)]);
+        g_assert_cmpuint(
+            hsubbuf[i], ==, hbuf[i + siz_subbuf / sizeof(cl_ulong)]);
 
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);
@@ -621,7 +615,6 @@ static void create_from_region_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 #endif
@@ -635,16 +628,16 @@ static void create_from_region_test() {
 static void fill_test() {
 
     /* Test variables. */
-    CCLPlatforms* ps;
-    CCLPlatform* p;
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLBuffer* b = NULL;
-    CCLQueue* q;
+    CCLPlatforms * ps;
+    CCLPlatform * p;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLBuffer * b = NULL;
+    CCLQueue * q;
     cl_char8 h[CCL_TEST_BUFFER_SIZE];
     cl_char8 pattern = {{ 1, -1, 5, 4, -12, 3, 7, -20 }};
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Get a context which supports OpenCL 1.2, if possible. */
     ps = ccl_platforms_new(&err);
@@ -706,7 +699,6 @@ static void fill_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -715,14 +707,14 @@ static void fill_test() {
 static void migrate_test() {
 
     /* Test variables. */
-    CCLPlatforms* ps;
-    CCLPlatform* p;
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLBuffer* b = NULL;
-    CCLQueue* q;
+    CCLPlatforms * ps;
+    CCLPlatform * p;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLBuffer * b = NULL;
+    CCLQueue * q;
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Get a context which supports OpenCL 1.2 if possible. */
     ps = ccl_platforms_new(&err);
@@ -764,12 +756,12 @@ static void migrate_test() {
 
     /* Assign buffer to first device in context (via the command
      * queue). */
-    ccl_memobj_enqueue_migrate((CCLMemObj**) &b, 1, q, 0, NULL, &err);
+    ccl_memobj_enqueue_migrate((CCLMemObj **) &b, 1, q, 0, NULL, &err);
     g_assert_no_error(err);
 
     /* Migrate buffer to host. */
-    ccl_memobj_enqueue_migrate((CCLMemObj**) &b, 1, q,
-        CL_MIGRATE_MEM_OBJECT_HOST, NULL, &err);
+    ccl_memobj_enqueue_migrate(
+        (CCLMemObj **) &b, 1, q, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &err);
     g_assert_no_error(err);
 
     /* Wait for queue to finish... */
@@ -785,7 +777,6 @@ static void migrate_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 
@@ -797,7 +788,7 @@ static void migrate_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -851,6 +842,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-

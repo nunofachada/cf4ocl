@@ -20,7 +20,7 @@
  * File containing xor kernel for testing.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -33,9 +33,9 @@
  * @param[in] d Constant to xor.
  * */
 __kernel void test_xor_full(
-    __global const uint *a,
-    __global const uint *b,
-    __global uint *c, uint d) {
+    __global const uint * a,
+    __global const uint * b,
+    __global uint * c, uint d) {
 
         /* Get global ID. */
         int gid = get_global_id(0);

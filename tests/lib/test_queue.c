@@ -35,15 +35,15 @@
 static void create_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLContext* ctx_aux = NULL;
+    CCLContext * ctx = NULL;
+    CCLContext * ctx_aux = NULL;
     cl_context context = NULL;
-    CCLDevice* dev = NULL;
-    CCLDevice* dev_aux = NULL;
+    CCLDevice * dev = NULL;
+    CCLDevice * dev_aux = NULL;
     cl_device_id device = NULL;
-    CCLQueue* cq = NULL;
+    CCLQueue * cq = NULL;
     cl_command_queue command_queue = NULL;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     cl_command_queue_properties prop_probed, prop_used;
     cl_command_queue_properties prop_base = CL_QUEUE_PROFILING_ENABLE;
     const cl_queue_properties prop_full[] =
@@ -139,7 +139,6 @@ static void create_info_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -148,10 +147,10 @@ static void create_info_destroy_test() {
 static void ref_unref_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLQueue* cq = NULL;
-    CCLDevice* dev = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLQueue * cq = NULL;
+    CCLDevice * dev = NULL;
+    CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(&err);
@@ -169,13 +168,13 @@ static void ref_unref_test() {
     ccl_queue_ref(cq);
 
     /* Check that queue ref count is 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) cq));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) cq));
 
     /* Unref queue. */
     ccl_queue_unref(cq);
 
     /* Check that queue ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) cq));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) cq));
 
     /* Destroy stuff. */
     ccl_queue_unref(cq);
@@ -193,16 +192,16 @@ static void ref_unref_test() {
 static void barrier_marker_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq = NULL;
-    CCLBuffer* buf = NULL;
-    CCLEvent* evt_cq = NULL;
-    CCLEvent* evt_map = NULL;
-    CCLEvent* evt_unmap = NULL;
-    CCLEvent* evt_barrier = NULL;
-    CCLEvent* evt_marker = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLBuffer * buf = NULL;
+    CCLEvent * evt_cq = NULL;
+    CCLEvent * evt_map = NULL;
+    CCLEvent * evt_unmap = NULL;
+    CCLEvent * evt_barrier = NULL;
+    CCLEvent * evt_marker = NULL;
+    CCLErr * err = NULL;
     cl_ulong* host_buf;
     CCLEventWaitList ewl = NULL;
     cl_int exec_status = -1;
@@ -232,13 +231,13 @@ static void barrier_marker_test() {
     g_assert_no_error(err);
 
     /* Map device buffer, get an event and analise it. */
-    host_buf = ccl_buffer_enqueue_map(buf, cq, CL_FALSE, CL_MAP_WRITE,
+    host_buf = ccl_buffer_enqueue_map(
+        buf, cq, CL_FALSE, CL_MAP_WRITE,
         0, 8 * sizeof(cl_ulong), NULL, &evt_map, &err);
     g_assert_no_error(err);
 
     /* Enqueue a barrier for waiting on the map event. */
-    evt_barrier =
-        ccl_enqueue_barrier(cq, ccl_ewl(&ewl, evt_map, NULL), &err);
+    evt_barrier = ccl_enqueue_barrier(cq, ccl_ewl(&ewl, evt_map, NULL), &err);
     g_assert_no_error(err);
 
     /* Check that the barrier event is CL_COMMAND_BARRIER or
@@ -319,7 +318,6 @@ static void barrier_marker_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -328,7 +326,7 @@ static void barrier_marker_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -346,6 +344,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-

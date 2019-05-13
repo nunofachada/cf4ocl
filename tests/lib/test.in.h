@@ -20,7 +20,7 @@
  * Header for cf4ocl2 tests.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -33,7 +33,7 @@
 #define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
 
 /* Print handler which redirects output to debug stream. */
-void ccl_print_to_debug(const gchar* string);
+void ccl_print_to_debug(const gchar * string);
 
 /* Create a context with a device specified at compile time. */
-CCLContext* ccl_test_context_new(CCLErr** err);
+CCLContext* ccl_test_context_new(CCLErr ** err);

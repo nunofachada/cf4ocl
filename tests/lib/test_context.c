@@ -29,7 +29,7 @@
 #include <glib/gstdio.h>
 #include "test.h"
 
-static const char* ccl_test_channel_order_string(cl_uint co) {
+static const char * ccl_test_channel_order_string(cl_uint co) {
     switch(co) {
         case 0x10B0: return "CL_R";
         case 0x10B1: return "CL_A";
@@ -53,10 +53,9 @@ static const char* ccl_test_channel_order_string(cl_uint co) {
         case 0x10C3: return "CL_ABGR";
     }
     return "Unknown";
-
 }
 
-static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
+static const char * ccl_test_channel_data_type_string(cl_uint cdt) {
 
     switch (cdt) {
         case 0x10D0: return "CL_SNORM_INT8";
@@ -84,13 +83,12 @@ static const char* ccl_test_channel_data_type_string(cl_uint cdt) {
  * Independent pass-all filter for testing.
  * */
 static cl_bool ccl_devsel_indep_test_true(
-    CCLDevice* device, void *data, CCLErr **err) {
+    CCLDevice * device, void * data, CCLErr ** err) {
 
     CCL_UNUSED(device);
     CCL_UNUSED(data);
     CCL_UNUSED(err);
     return CL_TRUE;
-
 }
 
 /**
@@ -99,16 +97,16 @@ static cl_bool ccl_devsel_indep_test_true(
  * */
 static void create_info_destroy_test() {
 
-    CCLContext* ctx = NULL;
-    CCLErr* err = NULL;
-    CCLPlatforms* ps = NULL;
-    CCLPlatform* p = NULL;
-    CCLDevice* d = NULL;
+    CCLContext * ctx = NULL;
+    CCLErr * err = NULL;
+    CCLPlatforms * ps = NULL;
+    CCLPlatform * p = NULL;
+    CCLDevice * d = NULL;
     cl_device_id d_id = NULL;
-    cl_device_id* d_ids = NULL;
+    cl_device_id * d_ids = NULL;
     CCLDevSelFilters filters = NULL;
-    CCLWrapperInfo* info = NULL;
-    cl_context_properties* ctx_props = NULL;
+    CCLWrapperInfo * info = NULL;
+    cl_context_properties * ctx_props = NULL;
     cl_platform_id platform, platf_ref;
     cl_context context;
     cl_device_type device_type;
@@ -146,7 +144,7 @@ static void create_info_destroy_test() {
 #ifdef CL_VERSION_1_1
     info = ccl_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
     g_assert_no_error(err);
-    g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
+    g_assert_cmpuint(*((cl_uint *) info->value), ==, 1);
 #endif
 
     /* Get the cl_device_id from context via context info and check
@@ -154,7 +152,7 @@ static void create_info_destroy_test() {
      * was created. */
     info = ccl_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
     g_assert_no_error(err);
-    g_assert(((cl_device_id*) info->value)[0] == d_id);
+    g_assert(((cl_device_id *) info->value)[0] == d_id);
 
     /* Check again that the number of devices is 1, this time not using
      * CL_CONTEXT_NUM_DEVICES, which is not available in OpenCL 1.0. */
@@ -206,7 +204,7 @@ static void create_info_destroy_test() {
 
     /* Create a CL context. */
     context = clCreateContext(
-        (const cl_context_properties*) ctx_props,
+        (const cl_context_properties *) ctx_props,
         1, &d_id, NULL, NULL, &ocl_status);
     g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
 
@@ -227,7 +225,7 @@ static void create_info_destroy_test() {
      * info is 1. */
 #ifdef CL_VERSION_1_1
     info = ccl_context_get_info(ctx, CL_CONTEXT_NUM_DEVICES, &err);
-    g_assert_cmpuint(*((cl_uint*) info->value), ==, 1);
+    g_assert_cmpuint(*((cl_uint *) info->value), ==, 1);
 #else
     info = ccl_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
     g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
@@ -305,7 +303,7 @@ static void create_info_destroy_test() {
 
     /* Check that a context wrapper was created. */
     ctx = ccl_context_new_from_indep_filter(
-        ccl_devsel_indep_platform, (void*) platform, &err);
+        ccl_devsel_indep_platform, (void *) platform, &err);
     g_assert_no_error(err);
 
     /* Check that context wrapper contains a device. */
@@ -314,8 +312,8 @@ static void create_info_destroy_test() {
 
     /* Check that the device platform corresponds to the expected
      * platform (the one used in the filter). */
-    platf_ref = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
-        cl_platform_id, &err);
+    platf_ref = ccl_device_get_info_scalar(
+        d, CL_DEVICE_PLATFORM, cl_platform_id, &err);
     g_assert_no_error(err);
     g_assert(platf_ref == platform);
 
@@ -342,8 +340,8 @@ static void create_info_destroy_test() {
 
     /* Check that the device platform corresponds to the expected
      * platform (the one which the first device belongs to). */
-    platf_ref = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
-        cl_platform_id, &err);
+    platf_ref = ccl_device_get_info_scalar(
+        d, CL_DEVICE_PLATFORM, cl_platform_id, &err);
     g_assert_no_error(err);
 
     /* Get number of devices. */
@@ -356,8 +354,8 @@ static void create_info_destroy_test() {
         d = ccl_context_get_device(ctx, i, &err);
         g_assert_no_error(err);
 
-        platform = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
-            cl_platform_id, &err);
+        platform = ccl_device_get_info_scalar(
+            d, CL_DEVICE_PLATFORM, cl_platform_id, &err);
         g_assert_no_error(err);
 
         g_assert(platf_ref == platform);
@@ -382,8 +380,8 @@ static void create_info_destroy_test() {
 
     /* Check that the device platform corresponds to the expected
      * platform (the one which the first device belongs to). */
-    platf_ref = ccl_device_get_info_scalar(d, CL_DEVICE_PLATFORM,
-        cl_platform_id, &err);
+    platf_ref = ccl_device_get_info_scalar(
+        d, CL_DEVICE_PLATFORM, cl_platform_id, &err);
     g_assert_no_error(err);
 
     /* Get number of devices. */
@@ -435,8 +433,7 @@ static void create_info_destroy_test() {
     /* Free context and set filters to NULL. */
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 
 }
@@ -450,19 +447,19 @@ static void create_info_destroy_test() {
  * */
 static void ref_unref_test() {
 
-    CCLContext* ctx = NULL;
-    CCLContext* ctx_cmp = NULL;
-    CCLErr* err = NULL;
-    CCLPlatforms* ps = NULL;
-    CCLPlatform* p = NULL;
-    CCLPlatform* p_1 = NULL;
-    CCLPlatform* p_l = NULL;
+    CCLContext * ctx = NULL;
+    CCLContext * ctx_cmp = NULL;
+    CCLErr * err = NULL;
+    CCLPlatforms * ps = NULL;
+    CCLPlatform * p = NULL;
+    CCLPlatform * p_1 = NULL;
+    CCLPlatform * p_l = NULL;
     cl_platform_id cl_p_1 = NULL;
     cl_platform_id cl_p_l = NULL;
-    CCLDevice* d = NULL;
-    CCLDevice* d_1 = NULL;
-    CCLDevice* d_l = NULL;
-    CCLDevice* const* ds;
+    CCLDevice * d = NULL;
+    CCLDevice * d_1 = NULL;
+    CCLDevice * d_l = NULL;
+    CCLDevice * const* ds;
     CCLDevSelFilters filters = NULL;
     cl_uint num_devs;
     cl_device_type dev_type;
@@ -500,17 +497,17 @@ static void ref_unref_test() {
             g_assert_no_error(err);
 
             /* Check the reference count of platform, device and context*/
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 1);
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) p), ==, 1);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
 
             /* Increase ref. count of context, check that ref count is now 2. */
             ccl_context_ref(ctx);
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 2);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 2);
 
             /* Decrease ref. count of context, check that ref count is now 1. */
             ccl_context_unref(ctx);
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
 
             /* If this is the first device in platform, keep a
              * reference to it. */
@@ -551,14 +548,14 @@ static void ref_unref_test() {
         if (num_devs == 1) {
             /* ...then the ref count of this device should be 3 (from first,
              * last and platform). */
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 3);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 3);
             /* ...and d_1 and d_l should be the same. */
             g_assert_cmphex(GPOINTER_TO_UINT(d_1), ==, GPOINTER_TO_UINT(d_l));
         } else {
             /* Otherwise it should be 2 for each device (from itself and from
              * platform). */
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 2);
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 2);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 2);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 2);
             /* ...and d_1 and d_l should be the different. */
             g_assert_cmphex(GPOINTER_TO_UINT(d_1), !=, GPOINTER_TO_UINT(d_l));
         }
@@ -575,21 +572,21 @@ static void ref_unref_test() {
         g_assert_no_error(err);
         p_l = ccl_platform_new_wrap(cl_p_l);
         g_assert_cmphex(GPOINTER_TO_UINT(p_1), ==, GPOINTER_TO_UINT(p_l));
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) p_1), ==, 3);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) p_1), ==, 3);
         ccl_platform_unref(p_1); /* Could use p_l, its the same object. */
         ccl_platform_unref(p_1); /* Could use p_l, its the same object. */
 
         /* Destroy first and last device in platform (which may be the same). */
         if (d_1 == d_l) {
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 3);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 3);
         } else {
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 2);
-            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 2);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 2);
+            g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 2);
         }
         ccl_device_destroy(d_1);
         ccl_device_destroy(d_l);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 1);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 1);
 
         /* At this time there is still a reference to each device held in the
          * platform wrapper. */
@@ -599,20 +596,20 @@ static void ref_unref_test() {
          * (thus lazy initialized) from this platform. */
         ds = ccl_platform_get_all_devices(p, &err);
         g_assert_no_error(err);
-        ctx = ccl_context_new_from_devices(num_devs, (CCLDevice**) ds, &err);
+        ctx = ccl_context_new_from_devices(num_devs, (CCLDevice **) ds, &err);
         g_assert_no_error(err);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 1);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 1);
 
         /* Check that the context ref count is 1. */
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
 
         /* The next instruction lazy initializes device wrappers array in
          * context, increasing the device wrappers ref count.*/
         d = ccl_context_get_device(ctx, 0, &err);
         g_assert_no_error(err);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 2);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 2);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 2);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 2);
 
         /* The number of devices in context should be the same as the number of
          * devices in platform. */
@@ -626,7 +623,7 @@ static void ref_unref_test() {
          * which should now be 2. */
         p_1 = ccl_platform_new_from_device(d, &err);
         g_assert_no_error(err);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 2);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) p), ==, 2);
 
         /* Check that the platform wrapper of the first device is the same
          * object as the current platform wrapper. */
@@ -635,15 +632,15 @@ static void ref_unref_test() {
         /* Destroy the context. This will decrease the ref count of the
          * associated device wrappers. */
         ccl_context_destroy(ctx);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_1), ==, 1);
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d_l), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 1);
 
         /* Destroy the platform wrapper */
         ccl_platform_destroy(p_1);
 
         /* There should be a reference to the platform object, due to it
          * still being reference in the first device. */
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) p), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) p), ==, 1);
 
     }
 
@@ -672,7 +669,7 @@ static void ref_unref_test() {
         g_clear_error(&err);
     } else {
         /* No error, so check that the context ref. count is 1. */
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
         /* Get first device. */
         d = ccl_context_get_device(ctx, 0, &err);
         g_assert_no_error(err);
@@ -686,7 +683,7 @@ static void ref_unref_test() {
         ccl_context_destroy(ctx);
         /* Check that device ref count is 1 (because we ref'ed it before
          * context destruction). */
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
         /* Destroy device. */
         ccl_device_destroy(d);
     }
@@ -706,7 +703,7 @@ static void ref_unref_test() {
         g_clear_error(&err);
     } else {
         /* No error, so check that the context ref. count is 1. */
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
         /* Get first device. */
         d = ccl_context_get_device(ctx, 0, &err);
         g_assert_no_error(err);
@@ -720,7 +717,7 @@ static void ref_unref_test() {
         ccl_context_destroy(ctx);
         /* Check that device ref count is 1 (because we ref'ed it before
          * context destruction). */
-        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+        g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
         /* Destroy device. */
         ccl_device_destroy(d);
     }
@@ -736,7 +733,7 @@ static void ref_unref_test() {
     int data = CCL_TEST_DEFAULT_DEVICE_IDX;
     ctx = ccl_context_new_from_menu_full(&data, &err);
     g_assert_no_error(err);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
 
     /* Reset print handler to default. */
     g_set_print_handler(NULL);
@@ -750,7 +747,7 @@ static void ref_unref_test() {
     ctx_cmp = ccl_context_new_wrap(ccl_context_unwrap(ctx));
 
     g_assert_cmphex(GPOINTER_TO_UINT(ctx_cmp), ==, GPOINTER_TO_UINT(ctx));
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) ctx), ==, 2);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 2);
 
     /* Unref context. We must do it twice, so as to maintain the logic that for
      * each _new function, a _destroy (or _unref) function must be called. */
@@ -761,14 +758,13 @@ static void ref_unref_test() {
 
     /* We ref'ed device, so it ref count should be 1, though we destroyed the
      * enclosing context. */
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) d), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
 
     /* Unref device. */
     ccl_device_unref(d);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -776,15 +772,15 @@ static void ref_unref_test() {
  * */
 static void get_supported_image_formats_test() {
 
-    CCLPlatforms* ps;
-    CCLPlatform* p;
-    CCLContext* c;
-    CCLDevice* const* ds;
+    CCLPlatforms * ps;
+    CCLPlatform * p;
+    CCLContext * c;
+    CCLDevice * const * ds;
     cl_uint num_devs;
-    const cl_image_format* image_formats;
+    const cl_image_format * image_formats;
     cl_uint num_image_formats;
-    char* p_name;
-    CCLErr* err = NULL;
+    char * p_name;
+    CCLErr * err = NULL;
 
     /* Get all platforms. */
     ps = ccl_platforms_new(&err);
@@ -809,8 +805,8 @@ static void get_supported_image_formats_test() {
         g_assert_no_error(err);
 
         /* Test the ccl_context_get_supported_image_formats() function. */
-        image_formats = ccl_context_get_supported_image_formats(c,
-            CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D,
+        image_formats = ccl_context_get_supported_image_formats(
+            c, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D,
             &num_image_formats, &err);
         g_assert_no_error(err);
 
@@ -840,7 +836,6 @@ static void get_supported_image_formats_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -849,8 +844,8 @@ static void get_supported_image_formats_test() {
 static void device_container_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLErr * err = NULL;
 
     /* Create some context. */
     ctx = ccl_test_context_new(&err);
@@ -886,7 +881,7 @@ static void device_container_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 

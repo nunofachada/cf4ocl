@@ -20,7 +20,7 @@
  * Test the event wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -34,18 +34,18 @@
 static void create_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq = NULL;
-    CCLEvent* evt = NULL;
-    CCLBuffer* buf = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLEvent * evt = NULL;
+    CCLBuffer * buf = NULL;
     cl_float hbuf[] = {1.2, 2.4, 0.021, -44.23};
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     cl_int ocl_status;
     cl_uint ocl_ver;
     cl_event event = NULL;
     cl_command_queue command_queue = NULL;
-    CCLWrapperInfo* info = NULL;
+    CCLWrapperInfo * info = NULL;
     cl_command_type evt_type;
     cl_int exec_status;
     cl_ulong time_end;
@@ -81,7 +81,7 @@ static void create_info_destroy_test() {
     ccl_queue_produce_event(cq, event);
 
     /* Ref. count of event wrapper should be 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) evt));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) evt));
 
     /* Wait on host thread for all events to complete. */
     ccl_queue_finish(cq, &err);
@@ -144,7 +144,6 @@ static void create_info_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 #ifdef CL_VERSION_1_1
@@ -155,9 +154,9 @@ static void create_info_destroy_test() {
 static void user_event_test() {
 
     /* Test variables. */
-    CCLEvent* uevt = NULL;
-    CCLContext* ctx = NULL;
-    CCLErr* err = NULL;
+    CCLEvent * uevt = NULL;
+    CCLContext * ctx = NULL;
+    CCLErr * err = NULL;
     cl_command_queue clcq = NULL;
     cl_context clctx = NULL;
     cl_command_type clct = 0;
@@ -172,37 +171,40 @@ static void user_event_test() {
     g_assert_no_error(err);
 
     /* Check that event ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) uevt));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
 
     /* Increase ref count, check it is 2. */
     ccl_event_ref(uevt);
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) uevt));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
 
     /* Decrease ref count, check it is 1. */
     ccl_event_unref(uevt);
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) uevt));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
 
     /* Confirm that event command queue is NULL. */
-    clcq = ccl_event_get_info_scalar(uevt, CL_EVENT_COMMAND_QUEUE,
-        cl_command_queue, &err);
+    clcq = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_QUEUE, cl_command_queue, &err);
     g_assert_no_error(err);
     g_assert_cmphex(GPOINTER_TO_UINT(clcq), ==, GPOINTER_TO_UINT(NULL));
 
     /* Confirm that event returns the correct context. */
-    clctx = ccl_event_get_info_scalar(uevt, CL_EVENT_CONTEXT,
-        cl_context, &err);
+    clctx = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_CONTEXT, cl_context, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(clctx), ==, GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+    g_assert_cmphex(
+        GPOINTER_TO_UINT(clctx),
+        ==,
+        GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
 
     /* Confirm command type is user event. */
-    clct = ccl_event_get_info_scalar(uevt, CL_EVENT_COMMAND_TYPE,
-        cl_command_type, &err);
+    clct = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_TYPE, cl_command_type, &err);
     g_assert_no_error(err);
     g_assert_cmpuint(clct, ==, CL_COMMAND_USER);
 
     /* Confirm execution status is "submitted". */
-    exec_status = ccl_event_get_info_scalar(uevt,
-        CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+    exec_status = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
     g_assert_no_error(err);
     g_assert_cmpint(exec_status, ==, CL_SUBMITTED);
 
@@ -211,8 +213,8 @@ static void user_event_test() {
     g_assert_no_error(err);
 
     /* Confirm execution status is "complete". */
-    exec_status = ccl_event_get_info_scalar(uevt,
-        CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+    exec_status = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
     g_assert_no_error(err);
     g_assert_cmpint(exec_status, ==, CL_COMPLETE);
 
@@ -229,7 +231,7 @@ static void user_event_test() {
  * Test callback function.
  * */
 static void CL_CALLBACK callback_fun(
-    cl_event event, cl_int event_command_exec_status, void *user_data) {
+    cl_event event, cl_int event_command_exec_status, void * user_data) {
 
     (void)event;
 
@@ -238,7 +240,7 @@ static void CL_CALLBACK callback_fun(
 
     /* Set userdata to CL_TRUE, thus providing evidence that the
      * callback was indeed called. */
-    *((cl_bool*) user_data) = CL_TRUE;
+    *((cl_bool *) user_data) = CL_TRUE;
 }
 
 /**
@@ -247,13 +249,13 @@ static void CL_CALLBACK callback_fun(
 static void callback_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq = NULL;
-    CCLBuffer* buf = NULL;
-    CCLEvent* evt = NULL;
-    CCLErr* err = NULL;
-    GTimer* timer = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLBuffer * buf = NULL;
+    CCLEvent * evt = NULL;
+    CCLErr * err = NULL;
+    GTime * timer = NULL;
     cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
     cl_bool test_var = CL_FALSE;
 
@@ -275,8 +277,8 @@ static void callback_test() {
     g_assert_no_error(err);
 
     /* Write something to buffer and get an event. */
-    evt = ccl_buffer_enqueue_write(buf, cq, CL_FALSE, 0,
-        8 * sizeof(cl_uint), vector, NULL, &err);
+    evt = ccl_buffer_enqueue_write(
+        buf, cq, CL_FALSE, 0, 8 * sizeof(cl_uint), vector, NULL, &err);
     g_assert_no_error(err);
 
     /* Add a callback. */
@@ -305,7 +307,6 @@ static void callback_test() {
 
     /* Confirm that test_var is CL_TRUE. */
     g_assert_cmpuint(test_var, ==, CL_TRUE);
-
 }
 
 #endif
@@ -316,17 +317,17 @@ static void callback_test() {
 static void name_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq = NULL;
-    CCLBuffer* buf = NULL;
-    CCLEvent* evt = NULL;
-    CCLErr* err = NULL;
-    cl_ulong* host_buf;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLBuffer * buf = NULL;
+    CCLEvent * evt = NULL;
+    CCLErr * err = NULL;
+    cl_ulong * host_buf;
     CCLEventWaitList ewl = NULL;
     cl_int exec_status = -1;
     cl_command_type ct = 0;
-    const char* evt_name = NULL;
+    const char * evt_name = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(&err);
@@ -346,8 +347,9 @@ static void name_test() {
     g_assert_no_error(err);
 
     /* Map device buffer, get an event and analise it. */
-    host_buf = ccl_buffer_enqueue_map(buf, cq, CL_FALSE, CL_MAP_WRITE,
-        0, 8 * sizeof(cl_ulong), NULL, &evt, &err);
+    host_buf = ccl_buffer_enqueue_map(
+        buf, cq, CL_FALSE, CL_MAP_WRITE, 0,
+        8 * sizeof(cl_ulong), NULL, &evt, &err);
     g_assert_no_error(err);
 
     /* Wait that buffer gets mapped. */
@@ -414,8 +416,8 @@ static void name_test() {
 /**
  * Bogus function to avoid GCC errors in ::event_wait_lists_test().
  * */
-CCLEventWaitList* ewl_test_aux(void* ptr) {
-    return (CCLEventWaitList*) ptr;
+CCLEventWaitList * ewl_test_aux(void * ptr) {
+    return (CCLEventWaitList *) ptr;
 }
 
 /**
@@ -424,18 +426,18 @@ CCLEventWaitList* ewl_test_aux(void* ptr) {
 static void event_wait_lists_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq1 = NULL;
-    CCLQueue* cq2 = NULL;
-    CCLBuffer* buf = NULL;
-    CCLEvent* evt = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq1 = NULL;
+    CCLQueue * cq2 = NULL;
+    CCLBuffer * buf = NULL;
+    CCLEvent * evt = NULL;
+    CCLErr * err = NULL;
     cl_float host_buf1[8] = { 2.0, 3.5, 4.2, 5.0, 2.2, 199.0, -12.9, -0.01 };
     cl_float host_buf2[8];
     CCLEvent* evt_array[2] = { NULL, NULL };
     CCLEventWaitList ewl = NULL;
-    const cl_event* clevent_ptr;
+    const cl_event * clevent_ptr;
     cl_uint num_evts;
 
     /* Get the test context with the pre-defined device. */
@@ -459,14 +461,15 @@ static void event_wait_lists_test() {
     g_assert_no_error(err);
 
     /* Write something to buffer using command queue 1, get an event. */
-    evt = ccl_buffer_enqueue_write(buf, cq1, CL_FALSE, 0,
-        8 * sizeof(cl_float), host_buf1, NULL, &err);
+    evt = ccl_buffer_enqueue_write(
+        buf, cq1, CL_FALSE, 0, 8 * sizeof(cl_float), host_buf1, NULL, &err);
     g_assert_no_error(err);
 
     /* Read something from buffer using command queue 2, depending on
      * previous event. */
-    evt = ccl_buffer_enqueue_read(buf, cq2, CL_FALSE, 0,
-        8 * sizeof(cl_float), host_buf2, ccl_ewl(&ewl, evt, NULL), &err);
+    evt = ccl_buffer_enqueue_read(
+        buf, cq2, CL_FALSE, 0, 8 * sizeof(cl_float),
+        host_buf2, ccl_ewl(&ewl, evt, NULL), &err);
     g_assert_no_error(err);
 
     /* Wait for read event using ccl_event_wait_list_add_v(). */
@@ -512,7 +515,6 @@ static void event_wait_lists_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -521,7 +523,7 @@ static void event_wait_lists_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -550,7 +552,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-
-

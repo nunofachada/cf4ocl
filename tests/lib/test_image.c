@@ -20,7 +20,7 @@
  * Test the image wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -36,12 +36,12 @@
  * device. A minimum OpenCL version can be set in `user_data`.
  * */
 static void context_with_image_support_setup(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
-    CCLPlatforms* ps;
-    CCLPlatform* p;
-    CCLDevice* d;
-    CCLErr* err = NULL;
+    CCLPlatforms * ps;
+    CCLPlatform * p;
+    CCLDevice * d;
+    CCLErr * err = NULL;
     cl_uint num_devs;
     *ctx_fixt = NULL;
     cl_uint min_ocl_ver = 0;
@@ -85,10 +85,9 @@ static void context_with_image_support_setup(
                 d, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
             g_assert_no_error(err);
             if (image_support) {
-                /* If so, create a context with current device and
-                 * return. */
+                /* If so, create a context with current device and return. */
                 *ctx_fixt = ccl_context_new_from_devices(
-                    1, (CCLDevice* const*) &d, &err);
+                    1, (CCLDevice * const *) &d, &err);
                 g_assert_no_error(err);
                 ccl_platforms_destroy(ps);
                 return;
@@ -102,7 +101,7 @@ static void context_with_image_support_setup(
  * Teardown image tests by releasing the created context.
  * */
 static void context_with_image_support_teardown(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     CCL_UNUSED(user_data);
 
@@ -120,12 +119,12 @@ static void context_with_image_support_teardown(
  * image wrapper objects.
  * */
 static void create_info_destroy_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLImage* img = NULL;
+    CCLImage * img = NULL;
     cl_mem image = NULL;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     cl_int ocl_status;
     CCL_UNUSED(user_data);
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
@@ -193,9 +192,9 @@ static void create_info_destroy_test(
         g_assert_no_error(err);
         g_assert_cmphex(flags, ==, CL_MEM_READ_WRITE);
 
-        void* host_ptr;
+        void * host_ptr;
         host_ptr = ccl_memobj_get_info_scalar(
-            img, CL_MEM_HOST_PTR, void*, &err);
+            img, CL_MEM_HOST_PTR, void *, &err);
         g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
         g_assert_cmphex(GPOINTER_TO_UINT(host_ptr), ==,
             GPOINTER_TO_UINT(NULL));
@@ -245,11 +244,11 @@ static void create_info_destroy_test(
  * Tests image wrapper class reference counting.
  * */
 static void ref_unref_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLImage* img = NULL;
-    CCLErr* err = NULL;
+    CCLImage * img = NULL;
+    CCLErr * err = NULL;
     CCL_UNUSED(user_data);
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 
@@ -274,47 +273,46 @@ static void ref_unref_test(
     ccl_memobj_ref(img);
 
     /* Check that image ref count is 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) img));
 
     /* Increase again, this time using the helper macro. */
     ccl_image_ref(img);
 
     /* Check that image ref count is 3. */
-    g_assert_cmpuint(3, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
+    g_assert_cmpuint(3, ==, ccl_wrapper_ref_count((CCLWrapper *) img));
 
     /* Unref image. */
     ccl_image_unref(img);
 
     /* Check that image ref count is 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) img));
 
     /* Unref image. */
     ccl_image_unref(img);
 
     /* Check that image ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) img));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) img));
 
     /* Destroy stuff. */
     ccl_image_unref(img);
-
 }
 
 /**
  * Tests basic read/write operations from/to image objects.
  * */
 static void read_write_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLDevice* d = NULL;
-    CCLImage* img = NULL;
-    CCLQueue* q;
+    CCLDevice * d = NULL;
+    CCLImage * img = NULL;
+    CCLQueue * q;
     gint32 himg_in[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     size_t origin[3] = {0, 0, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     CCL_UNUSED(user_data);
 
     /* Check that a context is set. */
@@ -339,8 +337,12 @@ static void read_write_test(
     g_assert_no_error(err);
 
     /* Create 2D image and copy data from the host memory. */
-    img = ccl_image_new(*ctx_fixt, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        &image_format, himg_in, &err,
+    img = ccl_image_new(
+        *ctx_fixt,
+        CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+        &image_format,
+        himg_in,
+        &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -348,8 +350,8 @@ static void read_write_test(
     g_assert_no_error(err);
 
     /* Read image data back to host. */
-    ccl_image_enqueue_read(img, q, CL_TRUE, origin, region, 0, 0,
-        himg_out, NULL, &err);
+    ccl_image_enqueue_read(
+        img, q, CL_TRUE, origin, region, 0, 0, himg_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check image data is OK. */
@@ -361,13 +363,13 @@ static void read_write_test(
         himg_in[i] = g_test_rand_int();
 
     /* Write it explicitly to device image. */
-    ccl_image_enqueue_write(img, q, CL_TRUE, origin, region, 0, 0,
-        himg_in, NULL, &err);
+    ccl_image_enqueue_write(
+        img, q, CL_TRUE, origin, region, 0, 0, himg_in, NULL, &err);
     g_assert_no_error(err);
 
     /* Read new image data to host. */
-    ccl_image_enqueue_read(img, q, CL_TRUE, origin, region, 0, 0,
-        himg_out, NULL, &err);
+    ccl_image_enqueue_read(
+        img, q, CL_TRUE, origin, region, 0, 0, himg_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check image data is OK. */
@@ -377,20 +379,19 @@ static void read_write_test(
     /* Free stuff. */
     ccl_image_destroy(img);
     ccl_queue_destroy(q);
-
 }
 
 /**
  * Tests copy operations from one image to another.
  * */
 static void copy_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLDevice* d = NULL;
-    CCLImage* img1 = NULL;
-    CCLImage* img2 = NULL;
-    CCLQueue* q;
+    CCLDevice * d = NULL;
+    CCLImage * img1 = NULL;
+    CCLImage * img2 = NULL;
+    CCLQueue * q;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     gint32 himg_in[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
@@ -398,7 +399,7 @@ static void copy_test(
     size_t dst_origin[3] =
         {CCL_TEST_IMAGE_WIDTH / 2, CCL_TEST_IMAGE_WIDTH / 2, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     CCL_UNUSED(user_data);
 
     /* Check that a context is set. */
@@ -423,8 +424,12 @@ static void copy_test(
     g_assert_no_error(err);
 
     /* Create 2D image and copy data from the host memory. */
-    img1 = ccl_image_new(*ctx_fixt, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        &image_format, himg_in, &err,
+    img1 = ccl_image_new(
+        *ctx_fixt,
+        CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+        &image_format,
+        himg_in,
+        &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -433,7 +438,11 @@ static void copy_test(
 
     /* Create another image, double the dimensions of the previous one. */
     img2 = ccl_image_new(
-        *ctx_fixt, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+        *ctx_fixt,
+        CL_MEM_READ_WRITE,
+        &image_format,
+        NULL,
+        &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) (CCL_TEST_IMAGE_WIDTH * 2),
         "image_height", (size_t) (CCL_TEST_IMAGE_HEIGHT * 2),
@@ -447,8 +456,8 @@ static void copy_test(
     g_assert_no_error(err);
 
     /* Read image data back to host. */
-    ccl_image_enqueue_read(img2, q, CL_TRUE, dst_origin, region, 0, 0,
-        himg_out, NULL, &err);
+    ccl_image_enqueue_read(
+        img2, q, CL_TRUE, dst_origin, region, 0, 0, himg_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check image data is OK. */
@@ -459,20 +468,19 @@ static void copy_test(
     ccl_image_destroy(img1);
     ccl_image_destroy(img2);
     ccl_queue_destroy(q);
-
 }
 
 /**
  * Tests map/unmap operations in image objects.
  * */
 static void map_unmap_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLDevice* d = NULL;
-    CCLEvent* evt = NULL;
-    CCLImage* img = NULL;
-    CCLQueue* q = NULL;
+    CCLDevice * d = NULL;
+    CCLEvent * evt = NULL;
+    CCLImage * img = NULL;
+    CCLQueue * q = NULL;
     CCLEventWaitList ewl = NULL;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     gint32 himg[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
@@ -480,7 +488,7 @@ static void map_unmap_test(
     size_t origin[3] = {0, 0, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     size_t image_row_pitch;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     CCL_UNUSED(user_data);
 
     /* Check that a context is set. */
@@ -505,8 +513,12 @@ static void map_unmap_test(
     g_assert_no_error(err);
 
     /* Create 2D image, copy data from host. */
-    img = ccl_image_new(*ctx_fixt, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        &image_format, himg, &err,
+    img = ccl_image_new(
+        *ctx_fixt,
+        CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+        &image_format,
+        himg,
+        &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -514,8 +526,9 @@ static void map_unmap_test(
     g_assert_no_error(err);
 
     /* Map image onto host memory. */
-    himg_map = ccl_image_enqueue_map(img, q, CL_FALSE, CL_MAP_READ,
-        origin, region, &image_row_pitch, NULL, NULL, &evt, &err);
+    himg_map = ccl_image_enqueue_map(
+        img, q, CL_FALSE, CL_MAP_READ, origin, region,
+        &image_row_pitch, NULL, NULL, &evt, &err);
     g_assert_no_error(err);
 
     /* Wait before mapping is complete. */
@@ -541,7 +554,6 @@ static void map_unmap_test(
     /* Free stuff. */
     ccl_image_destroy(img);
     ccl_queue_destroy(q);
-
 }
 
 
@@ -549,22 +561,22 @@ static void map_unmap_test(
  * Tests copy image to buffer and buffer to image functions.
  * */
 static void copy_buffer_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+    CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLDevice* dev = NULL;
-    CCLEvent* evt = NULL;
-    CCLImage* img1 = NULL;
-    CCLImage* img2 = NULL;
-    CCLBuffer* buf = NULL;
-    CCLQueue* cq = NULL;
+    CCLDevice * dev = NULL;
+    CCLEvent * evt = NULL;
+    CCLImage * img1 = NULL;
+    CCLImage * img2 = NULL;
+    CCLBuffer * buf = NULL;
+    CCLQueue * cq = NULL;
     CCLEventWaitList ewl = NULL;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     cl_uint himg_in[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     cl_uint himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     size_t origin[3] = {0, 0, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     CCL_UNUSED(user_data);
 
     /* Check that a context is set. */
@@ -577,8 +589,7 @@ static void copy_buffer_test(
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
-    for (cl_uint i = 0;
-            i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
+    for (cl_uint i = 0; i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
         himg_in[i] = (cl_uint) g_test_rand_int();
 
     /* Get first device in context. */
@@ -590,8 +601,12 @@ static void copy_buffer_test(
     g_assert_no_error(err);
 
     /* Create 2D image, copy data from host. */
-    img1 = ccl_image_new(*ctx_fixt, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-        &image_format, himg_in, &err,
+    img1 = ccl_image_new(
+        *ctx_fixt,
+        CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+        &image_format,
+        himg_in,
+        &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -599,8 +614,12 @@ static void copy_buffer_test(
     g_assert_no_error(err);
 
     /* Create destination 2D image. */
-    img2 = ccl_image_new(*ctx_fixt, CL_MEM_WRITE_ONLY, &image_format,
-        NULL, &err,
+    img2 = ccl_image_new(
+        *ctx_fixt,
+        CL_MEM_WRITE_ONLY,
+        &image_format,
+        NULL,
+        &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -608,24 +627,25 @@ static void copy_buffer_test(
     g_assert_no_error(err);
 
     /* Create buffer with enough size to hold image. */
-    buf = ccl_buffer_new(*ctx_fixt, CL_MEM_READ_WRITE,
+    buf = ccl_buffer_new(
+        *ctx_fixt, CL_MEM_READ_WRITE,
         CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT * sizeof(cl_uint),
         NULL, &err);
     g_assert_no_error(err);
 
     /* Copy image to buffer. */
-    ccl_image_enqueue_copy_to_buffer(img1, buf, cq, origin,
-        region, 0, NULL, &err);
+    ccl_image_enqueue_copy_to_buffer(
+        img1, buf, cq, origin, region, 0, NULL, &err);
     g_assert_no_error(err);
 
     /* Copy buffer to new image. */
-    ccl_buffer_enqueue_copy_to_image(buf, img2, cq, 0, origin, region,
-        NULL, &err);
+    ccl_buffer_enqueue_copy_to_image(
+        buf, img2, cq, 0, origin, region, NULL, &err);
     g_assert_no_error(err);
 
     /* Read image to host. */
-    evt = ccl_image_enqueue_read(img2, cq, CL_FALSE, origin, region,
-        0, 0, himg_out, NULL, &err);
+    evt = ccl_image_enqueue_read(
+        img2, cq, CL_FALSE, origin, region, 0, 0, himg_out, NULL, &err);
     g_assert_no_error(err);
 
     /* For for transfer. */
@@ -633,8 +653,8 @@ static void copy_buffer_test(
     g_assert_no_error(err);
 
     /* Check that the contents are the same as in the origin buffer. */
-    for (cl_uint i = 0;
-            i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i) {
+    for (cl_uint i = 0; i < CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT; ++i)
+    {
         g_assert_cmpuint(himg_in[i], ==, himg_out[i]);
     }
 
@@ -650,26 +670,26 @@ static void copy_buffer_test(
 /**
  * Tests image fill.
  * */
-static void fill_test(
-    CCLContext** ctx_fixt, gconstpointer user_data) {
+static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
 
     /* Test variables. */
-    CCLDevice* d = NULL;
-    CCLImage* img = NULL;
-    CCLQueue* q;
+    CCLDevice * d = NULL;
+    CCLImage * img = NULL;
+    CCLQueue * q;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     const size_t origin[3] = {0, 0, 0};
     const size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     CCL_UNUSED(user_data);
-    /* Create a random color 4-channel 8-bit color (i.e. color has 32
-     * bits). */
+    /* Create a random color 4-channel 8-bit color (i.e. color has 32 bits). */
     gint32 rc = g_test_rand_int();
-    cl_uint4 color = {{ rc & 0xFF,
-            (rc >> 8) & 0xFF,
-            (rc >> 16) & 0xFF,
-            (rc >> 24) & 0xFF }};
+    cl_uint4 color = {{
+        rc & 0xFF,
+        (rc >> 8) & 0xFF,
+        (rc >> 16) & 0xFF,
+        (rc >> 24) & 0xFF
+    }};
 
     /* Check that a context is set. */
     if (*ctx_fixt == NULL) {
@@ -701,8 +721,8 @@ static void fill_test(
     g_assert_no_error(err);
 
     /* Read image data back to host. */
-    ccl_image_enqueue_read(img, q, CL_TRUE, origin, region, 0, 0,
-        himg_out, NULL, &err);
+    ccl_image_enqueue_read(
+        img, q, CL_TRUE, origin, region, 0, 0, himg_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Check if data is Ok. */
@@ -712,7 +732,6 @@ static void fill_test(
     /* Free stuff. */
     ccl_image_destroy(img);
     ccl_queue_destroy(q);
-
 }
 
 #endif
@@ -723,43 +742,43 @@ static void fill_test(
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
     g_test_add(
         "/wrappers/image/create-info-destroy",
-        CCLContext*, NULL, context_with_image_support_setup,
+        CCLContext *, NULL, context_with_image_support_setup,
         create_info_destroy_test,
         context_with_image_support_teardown);
 
     g_test_add(
         "/wrappers/image/ref-unref",
-        CCLContext*, NULL, context_with_image_support_setup,
+        CCLContext *, NULL, context_with_image_support_setup,
         ref_unref_test,
         context_with_image_support_teardown);
 
     g_test_add(
         "/wrappers/image/read-write",
-        CCLContext*, NULL, context_with_image_support_setup,
+        CCLContext *, NULL, context_with_image_support_setup,
         read_write_test,
         context_with_image_support_teardown);
 
     g_test_add(
         "/wrappers/image/copy",
-        CCLContext*, NULL, context_with_image_support_setup,
+        CCLContext *, NULL, context_with_image_support_setup,
         copy_test,
         context_with_image_support_teardown);
 
     g_test_add(
         "/wrappers/image/map-unmap",
-        CCLContext*, NULL, context_with_image_support_setup,
+        CCLContext *, NULL, context_with_image_support_setup,
         map_unmap_test,
         context_with_image_support_teardown);
 
     g_test_add(
         "/wrappers/image/copy-buffer",
-        CCLContext*, NULL, context_with_image_support_setup,
+        CCLContext *, NULL, context_with_image_support_setup,
         copy_buffer_test,
         context_with_image_support_teardown);
 
@@ -774,7 +793,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-
-

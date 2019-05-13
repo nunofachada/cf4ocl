@@ -20,7 +20,7 @@
  * Test the sampler wrapper class and its methods.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -35,8 +35,8 @@
 static void create_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLSampler* s = NULL;
+    CCLContext * ctx = NULL;
+    CCLSampler * s = NULL;
     cl_sampler sampler = NULL;
     CCLErr* err = NULL;
     cl_int ocl_status;
@@ -116,7 +116,6 @@ static void create_info_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -177,7 +176,6 @@ static void create_full_info_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -186,30 +184,30 @@ static void create_full_info_destroy_test() {
 static void ref_unref_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLSampler* s = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLSampler * s = NULL;
+    CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(&err);
     g_assert_no_error(err);
 
     /* Create sampler. */
-    s = ccl_sampler_new(ctx, CL_TRUE, CL_ADDRESS_CLAMP,
-        CL_FILTER_NEAREST, &err);
+    s = ccl_sampler_new(
+        ctx, CL_TRUE, CL_ADDRESS_CLAMP, CL_FILTER_NEAREST, &err);
     g_assert_no_error(err);
 
     /* Increase sampler reference count. */
     ccl_sampler_ref(s);
 
     /* Check that sampler ref count is 2. */
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper*) s));
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) s));
 
     /* Unref sampler. */
     ccl_sampler_unref(s);
 
     /* Check that sampler ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper*) s));
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) s));
 
     /* Destroy stuff. */
     ccl_sampler_unref(s);
@@ -226,7 +224,7 @@ static void ref_unref_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -244,6 +242,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-

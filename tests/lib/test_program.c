@@ -44,31 +44,31 @@ G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
 static void create_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLProgram* prg = NULL;
-    CCLProgram* prg2 = NULL;
-    CCLKernel* krnl = NULL;
-    CCLWrapperInfo* info = NULL;
-    CCLDevice* d = NULL;
-    CCLQueue* cq = NULL;
+    CCLContext * ctx = NULL;
+    CCLProgram * prg = NULL;
+    CCLProgram * prg2 = NULL;
+    CCLKernel * krnl = NULL;
+    CCLWrapperInfo * info = NULL;
+    CCLDevice * d = NULL;
+    CCLQueue * cq = NULL;
     size_t gws;
     size_t lws;
     cl_uint a_h[CCL_TEST_PROGRAM_BUF_SIZE];
     cl_uint b_h[CCL_TEST_PROGRAM_BUF_SIZE];
     cl_uint c_h[CCL_TEST_PROGRAM_BUF_SIZE];
     cl_uint d_h ;
-    CCLBuffer* a_w;
-    CCLBuffer* b_w;
-    CCLBuffer* c_w;
-    CCLEvent* evt_w1;
-    CCLEvent* evt_w2;
-    CCLEvent* evt_kr;
-    CCLEvent* evt_r1;
+    CCLBuffer * a_w;
+    CCLBuffer * b_w;
+    CCLBuffer * c_w;
+    CCLEvent * evt_w1;
+    CCLEvent * evt_w2;
+    CCLEvent * evt_kr;
+    CCLEvent * evt_r1;
     CCLEventWaitList ewl = NULL;
-    CCLErr* err = NULL;
-    gchar* tmp_dir_name;
-    gchar* tmp_file_prefix;
-    const char* build_log;
+    CCLErr * err = NULL;
+    gchar * tmp_dir_name;
+    gchar * tmp_file_prefix;
+    const char * build_log;
 
     /* Get a temp. dir. */
     tmp_dir_name = g_dir_make_tmp("test_program_XXXXXX", &err);
@@ -94,7 +94,7 @@ static void create_info_destroy_test() {
 
     ccl_program_destroy(prg);
 
-    const char* file_pref = (const char*) tmp_file_prefix;
+    const char * file_pref = (const char *) tmp_file_prefix;
     prg = ccl_program_new_from_source_files(ctx, 1, &file_pref, &err);
     g_assert_no_error(err);
 
@@ -103,51 +103,47 @@ static void create_info_destroy_test() {
     /* Get some program info, compare it with expected info. */
     info = ccl_program_get_info(prg, CL_PROGRAM_CONTEXT, &err);
     g_assert_no_error(err);
-    g_assert(*((cl_context*) info->value) == ccl_context_unwrap(ctx));
+    g_assert(*((cl_context *) info->value) == ccl_context_unwrap(ctx));
 
     /* Get number of devices from program info, check that this is the
      * same value as the number of devices in context. */
     info = ccl_program_get_info(prg, CL_PROGRAM_NUM_DEVICES, &err);
     g_assert_no_error(err);
-    g_assert_cmpuint(*((cl_uint*) info->value),
-        ==, ccl_context_get_num_devices(ctx, &err));
+    g_assert_cmpuint(
+        *((cl_uint *) info->value), ==, ccl_context_get_num_devices(ctx, &err));
     g_assert_no_error(err);
 
     /* Get program source from program info, check that it is the
      * same as the passed source. */
     info = ccl_program_get_info(prg, CL_PROGRAM_SOURCE, &err);
     g_assert_no_error(err);
-    g_assert_cmpstr((char*) info->value,
-        ==, CCL_TEST_PROGRAM_SUM_CONTENT);
+    g_assert_cmpstr((char *) info->value, ==, CCL_TEST_PROGRAM_SUM_CONTENT);
 
     /* Get first device in context (and in program). */
     d = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
     /* Check that no build was performed yet. */
-    info = ccl_program_get_build_info(
-        prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+    info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
     g_assert_no_error(err);
-    g_assert_cmpint(*((cl_build_status*) info->value), ==, CL_BUILD_NONE);
+    g_assert_cmpint(*((cl_build_status *) info->value), ==, CL_BUILD_NONE);
 
     /* **** BUILD PROGRAM **** */
     ccl_program_build(prg, NULL, &err);
     g_assert_no_error(err);
 
     /* Get some program build info, compare it with expected values. */
-    info = ccl_program_get_build_info(
-        prg, d, CL_PROGRAM_BUILD_STATUS, &err);
+    info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
     g_assert_no_error(err);
-    g_assert((*((cl_build_status*) info->value) == CL_BUILD_SUCCESS)
-        || (*((cl_build_status*) info->value) == CL_BUILD_IN_PROGRESS));
+    g_assert((*((cl_build_status *) info->value) == CL_BUILD_SUCCESS)
+        || (*((cl_build_status *) info->value) == CL_BUILD_IN_PROGRESS));
 
     /* Get the build log, check that no error occurs. */
     info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
     g_assert_no_error(err);
 
     /* Get kernel wrapper object. */
-    krnl = ccl_program_get_kernel(
-        prg, CCL_TEST_PROGRAM_SUM, &err);
+    krnl = ccl_program_get_kernel(prg, CCL_TEST_PROGRAM_SUM, &err);
     g_assert_no_error(err);
 
     /* Get some kernel info, compare it with expected info. */
@@ -156,25 +152,24 @@ static void create_info_destroy_test() {
      * expected value. */
     info = ccl_kernel_get_info(krnl, CL_KERNEL_FUNCTION_NAME, &err);
     g_assert_no_error(err);
-    g_assert_cmpstr(
-        (gchar*) info->value, ==, CCL_TEST_PROGRAM_SUM);
+    g_assert_cmpstr((gchar *) info->value, ==, CCL_TEST_PROGRAM_SUM);
 
     /* Check if the kernel context is the same as the initial context
      * and the program context. */
     info = ccl_kernel_get_info(krnl, CL_KERNEL_CONTEXT, &err);
     g_assert_no_error(err);
-    g_assert(*((cl_context*) info->value) == ccl_context_unwrap(ctx));
+    g_assert(*((cl_context *) info->value) == ccl_context_unwrap(ctx));
 
     info = ccl_kernel_get_info(krnl, CL_KERNEL_PROGRAM, &err);
     g_assert_no_error(err);
-    g_assert(*((cl_program*) info->value) == ccl_program_unwrap(prg));
+    g_assert(*((cl_program *) info->value) == ccl_program_unwrap(prg));
 
 #ifndef OPENCL_STUB
 #ifdef CL_VERSION_1_2
 
     cl_kernel_arg_address_qualifier kaaq;
-    char* kernel_arg_type_name;
-    char* kernel_arg_name;
+    char * kernel_arg_type_name;
+    char * kernel_arg_name;
     cl_uint ocl_ver;
 
     /* Get OpenCL version of program's underlying platform. */
@@ -186,9 +181,9 @@ static void create_info_destroy_test() {
     if (ocl_ver >= 120) {
 
         /* First kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 0, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -227,9 +222,9 @@ static void create_info_destroy_test() {
         }
 
         /* Second kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 1, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -268,9 +263,9 @@ static void create_info_destroy_test() {
         }
 
         /* Third kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 2,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 2, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -309,9 +304,9 @@ static void create_info_destroy_test() {
         }
 
         /* Fourth kernel argument. */
-        kaaq = ccl_kernel_get_arg_info_scalar(krnl, 3,
-                CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
+        kaaq = ccl_kernel_get_arg_info_scalar(
+            krnl, 3, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+            cl_kernel_arg_address_qualifier, &err);
         g_assert((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
@@ -362,7 +357,7 @@ static void create_info_destroy_test() {
 
     /* Save binaries for all available devices (which we will load into
      * a new program later). */
-    char** filenames;
+    char ** filenames;
 
     tmp_file_prefix = g_strdup_printf(
         "%s%ctest_", tmp_dir_name, G_DIR_SEPARATOR);
@@ -375,7 +370,7 @@ static void create_info_destroy_test() {
 
     cl_uint num_devs = ccl_program_get_num_devices(prg, &err);
     g_assert_no_error(err);
-    CCLDevice* const* devs = ccl_program_get_all_devices(prg, &err);
+    CCLDevice * const * devs = ccl_program_get_all_devices(prg, &err);
     g_assert_no_error(err);
 
     g_debug(" ==== NUMDEVS=%d =====\n", num_devs);
@@ -392,7 +387,7 @@ static void create_info_destroy_test() {
 
     /* Create a new program using the saved binaries. */
     prg2 = ccl_program_new_from_binary_files(
-        ctx, num_devs, devs, (const char**) filenames, NULL, &err);
+        ctx, num_devs, devs, (const char **) filenames, NULL, &err);
     g_assert_no_error(err);
 
     /* Destroy the filenames string array. */
@@ -402,20 +397,19 @@ static void create_info_destroy_test() {
     ccl_program_destroy(prg2);
 
     /* Get binary in variable. */
-    CCLProgramBinary* prg_bin = ccl_program_get_binary(prg, d, &err);
+    CCLProgramBinary * prg_bin = ccl_program_get_binary(prg, d, &err);
     g_assert_no_error(err);
 
     /* Create program using that binary. */
-    prg2 = ccl_program_new_from_binaries(
-        ctx, 1, &d, &prg_bin, NULL, &err);
+    prg2 = ccl_program_new_from_binaries(ctx, 1, &d, &prg_bin, NULL, &err);
     g_assert_no_error(err);
 
     /* Check that device is the correct one. */
-    CCLDevice* d2 = ccl_program_get_device(prg2, 0, &err);
+    CCLDevice * d2 = ccl_program_get_device(prg2, 0, &err);
     g_assert_no_error(err);
     g_assert_cmphex(GPOINTER_TO_UINT(d), ==, GPOINTER_TO_UINT(d2));
 
-    cl_device_id* devices = ccl_program_get_info_array(
+    cl_device_id * devices = ccl_program_get_info_array(
         prg2, CL_PROGRAM_DEVICES, cl_device_id, &err);
     g_assert_no_error(err);
     g_assert_cmphex(GPOINTER_TO_UINT(devices[0]),
@@ -460,7 +454,7 @@ static void create_info_destroy_test() {
     info = ccl_program_get_build_info(
         prg, d, CL_PROGRAM_BUILD_STATUS, &err);
     g_assert_no_error(err);
-    g_assert(*((cl_build_status*) info->value) == CL_BUILD_SUCCESS);
+    g_assert(*((cl_build_status *) info->value) == CL_BUILD_SUCCESS);
 
     info = ccl_program_get_build_info(
         prg, d, CL_PROGRAM_BUILD_LOG, &err);
@@ -472,7 +466,7 @@ static void create_info_destroy_test() {
     g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
         (err->domain == CCL_ERROR)));
     if (info) {
-        g_assert(g_strrstr(build_log, (char*) info->value));
+        g_assert(g_strrstr(build_log, (char *) info->value));
     }
     g_clear_error(&err);
 
@@ -481,7 +475,7 @@ static void create_info_destroy_test() {
     g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
         (err->domain == CCL_ERROR)));
     if (info) {
-        g_assert_cmpstr(build_log, ==, (char*) info->value);
+        g_assert_cmpstr(build_log, ==, (char *) info->value);
     }
     g_clear_error(&err);
 
@@ -512,10 +506,12 @@ static void create_info_destroy_test() {
 
     /* Copy host data to device buffers without waiting for transfer
      * to terminate before continuing host program. */
-    evt_w1 = ccl_buffer_enqueue_write(a_w, cq, CL_FALSE, 0,
+    evt_w1 = ccl_buffer_enqueue_write(
+        a_w, cq, CL_FALSE, 0,
         CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
     g_assert_no_error(err);
-    evt_w2 = ccl_buffer_enqueue_write(b_w, cq, CL_FALSE, 0,
+    evt_w2 = ccl_buffer_enqueue_write(
+        b_w, cq, CL_FALSE, 0,
         CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
     g_assert_no_error(err);
 
@@ -525,8 +521,8 @@ static void create_info_destroy_test() {
     /* Set args and execute kernel, waiting for the two transfer events
      * to terminate (this will empty the event wait list). */
     void* args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
-    evt_kr =  ccl_program_enqueue_kernel_v(prg, CCL_TEST_PROGRAM_SUM,
-        cq, 1, NULL, &gws, &lws, &ewl, args, &err);
+    evt_kr =  ccl_program_enqueue_kernel_v(
+        prg, CCL_TEST_PROGRAM_SUM, cq, 1, NULL, &gws, &lws, &ewl, args, &err);
     g_assert_no_error(err);
 
     /* Add the kernel termination event to the wait list. */
@@ -539,7 +535,8 @@ static void create_info_destroy_test() {
 
     /* Read back results from host without waiting for
      * transfer to terminate before continuing host program.. */
-    evt_r1 = ccl_buffer_enqueue_read(c_w, cq, CL_FALSE, 0,
+    evt_r1 = ccl_buffer_enqueue_read(
+        c_w, cq, CL_FALSE, 0,
         CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, NULL, &err);
     g_assert_no_error(err);
 
@@ -577,7 +574,6 @@ static void create_info_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -585,13 +581,13 @@ static void create_info_destroy_test() {
  * */
 static void ref_unref_test() {
 
-    CCLContext* ctx = NULL;
-    CCLErr* err = NULL;
-    CCLProgram* prg = NULL;
-    CCLKernel* krnl1 = NULL;
-    CCLKernel* krnl2 = NULL;
+    CCLContext * ctx = NULL;
+    CCLErr * err = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl1 = NULL;
+    CCLKernel * krnl2 = NULL;
 
-    const char* src = CCL_TEST_PROGRAM_SUM_CONTENT;
+    const char * src = CCL_TEST_PROGRAM_SUM_CONTENT;
 
     /* Get some context. */
     ctx = ccl_test_context_new(&err);
@@ -620,13 +616,13 @@ static void ref_unref_test() {
     g_assert_cmphex(GPOINTER_TO_UINT(krnl1), !=, GPOINTER_TO_UINT(krnl2));
 
     /* Check that each has a ref count of 1. */
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl1), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl2), ==, 1);
 
     /* Increment the ref count of the directly created kernel. */
     ccl_kernel_ref(krnl2);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl1), ==, 1);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) krnl2), ==, 2);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl1), ==, 1);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl2), ==, 2);
 
     /* Get rid of the directly created kernel. */
     ccl_kernel_unref(krnl2);
@@ -634,7 +630,7 @@ static void ref_unref_test() {
 
     /* Reference the program object, check its ref count. */
     ccl_program_ref(prg);
-    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper*) prg), ==, 2);
+    g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) prg), ==, 2);
     ccl_program_unref(prg);
 
     /* Destroy remaining stuff. */
@@ -644,7 +640,6 @@ static void ref_unref_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 #ifdef CL_VERSION_1_2
@@ -657,7 +652,7 @@ static const char* src_head[] = {
 
 static const char src_main[] =
     "#include \"head.h\"\n" \
-    "__kernel void complinktest(__global SOMETYPE *buf) {\n" \
+    "__kernel void complinktest(__global SOMETYPE * buf) {\n" \
     "	size_t gid = get_global_id(0);\n" \
     "	buf[gid] = some_function(buf[gid], gid);\n" \
     "}\n";
@@ -670,13 +665,13 @@ static const char* src_head_name = "head.h";
 static void compile_link_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* dev = NULL;
-    CCLQueue* cq = NULL;
-    CCLProgram* prg_head = NULL;
-    CCLProgram* prg_main = NULL;
-    CCLProgram* prg_exec = NULL;
-    CCLBuffer* buf = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLProgram * prg_head = NULL;
+    CCLProgram * prg_main = NULL;
+    CCLProgram * prg_exec = NULL;
+    CCLBuffer * buf = NULL;
     cl_char hbuf_in[8] = {-3, -2, -1, 0, 1, 2, 3, 4};
     cl_char hbuf_out[8];
     size_t ws = 8;
@@ -707,8 +702,8 @@ static void compile_link_test() {
 
     /* Create device buffer and initialize it with values from host
      * buffer in. */
-    buf = ccl_buffer_new(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-        8, hbuf_in, &err);
+    buf = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 8, hbuf_in, &err);
     g_assert_no_error(err);
 
     /* Create header program. */
@@ -721,7 +716,8 @@ static void compile_link_test() {
     g_assert_no_error(err);
 
     /* Compile main program. */
-    ccl_program_compile(prg_main, 1, &dev, NULL, 1, &prg_head,
+    ccl_program_compile(
+        prg_main, 1, &dev, NULL, 1, &prg_head,
         &src_head_name, NULL, NULL, &err);
     g_assert_no_error(err);
 
@@ -731,13 +727,13 @@ static void compile_link_test() {
     g_assert_no_error(err);
 
     /* Run program. */
-    ccl_program_enqueue_kernel(prg_exec, "complinktest", cq, 1, NULL,
+    ccl_program_enqueue_kernel(
+        prg_exec, "complinktest", cq, 1, NULL,
         &ws, &ws, NULL, &err, buf, NULL);
     g_assert_no_error(err);
 
     /* Read results back to host. */
-    ccl_buffer_enqueue_read(
-        buf, cq, CL_TRUE, 0, 8, hbuf_out, NULL, &err);
+    ccl_buffer_enqueue_read(buf, cq, CL_TRUE, 0, 8, hbuf_out, NULL, &err);
     g_assert_no_error(err);
 
     /* Terminate queue. */
@@ -773,7 +769,7 @@ static void compile_link_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -792,6 +788,3 @@ int main(int argc, char** argv) {
 #endif
     return g_test_run();
 }
-
-
-

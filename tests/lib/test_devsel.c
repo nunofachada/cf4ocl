@@ -20,7 +20,7 @@
  * Tests for device selection module.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -34,7 +34,7 @@
 static void devices_new_destroy_test() {
 
     /* Error reporting object. */
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Object containing device wrappers. */
     CCLDevSelDevices devs = NULL;
@@ -55,7 +55,6 @@ static void devices_new_destroy_test() {
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -64,7 +63,7 @@ static void devices_new_destroy_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -72,6 +71,5 @@ int main(int argc, char** argv) {
         devices_new_destroy_test);
 
     return g_test_run();
-
 }
 

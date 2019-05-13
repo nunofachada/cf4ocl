@@ -36,9 +36,9 @@
  * @param[in] d Constant to xor.
  * */
 __kernel void test_xor(
-    __global const uint *a,
-    __global const uint *b,
-    __global uint *c, uint d) {
+    __global const uint * a,
+    __global const uint * b,
+    __global uint * c, uint d) {
 
     /* Get global ID. */
     int gid = get_global_id(0);

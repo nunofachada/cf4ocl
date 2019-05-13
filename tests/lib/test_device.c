@@ -35,14 +35,14 @@ static void sub_devices_test() {
 #ifdef CL_VERSION_1_2
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLDevice* pdev = NULL;
-    CCLErr* err = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * pdev = NULL;
+    CCLErr * err = NULL;
     cl_uint ocl_ver;
-    cl_device_partition_property* dpp;
+    cl_device_partition_property * dpp;
     cl_uint i;
     cl_bool supported;
-    CCLDevice* const* subdevs;
+    CCLDevice * const * subdevs;
     cl_uint num_subdevs;
     cl_uint max_subdevs;
     cl_uint cu;
@@ -76,7 +76,8 @@ static void sub_devices_test() {
     g_assert_no_error(err);
 
     /* Get device partition properties. */
-    dpp = ccl_device_get_info_array(pdev, CL_DEVICE_PARTITION_PROPERTIES,
+    dpp = ccl_device_get_info_array(
+        pdev, CL_DEVICE_PARTITION_PROPERTIES,
         cl_device_partition_property, &err);
 
     /* Make sure device is partitionable. */
@@ -137,7 +138,6 @@ static void sub_devices_test() {
         /* Check that the last position is NULL. */
         g_assert_cmphex(
             GPOINTER_TO_UINT(subdevs[i]), ==, GPOINTER_TO_UINT(NULL));
-
     }
 
     /* Test partition by counts, if supported by device. */
@@ -190,7 +190,9 @@ static void sub_devices_test() {
             parent_device = ccl_device_get_info_scalar(
                 subdevs[i], CL_DEVICE_PARENT_DEVICE, cl_device_id, &err);
             g_assert_no_error(err);
-            g_assert_cmphex(GPOINTER_TO_UINT(parent_device), ==,
+            g_assert_cmphex(
+                GPOINTER_TO_UINT(parent_device),
+                ==,
                 GPOINTER_TO_UINT(ccl_device_unwrap(pdev)));
         }
 
@@ -228,7 +230,7 @@ static void sub_devices_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -238,6 +240,3 @@ int main(int argc, char** argv) {
 
     return g_test_run();
 }
-
-
-

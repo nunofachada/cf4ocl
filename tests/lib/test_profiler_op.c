@@ -21,7 +21,7 @@
  * module. Can only be performed using the OpenCL stub.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -53,19 +53,19 @@
 static void operation_test() {
 
     /* Aux vars. */
-    CCLContext* ctx;
-    CCLDevice* dev;
-    CCLQueue *q1, *q2, *q3;
-    CCLEvent *ev1, *ev2, *ev3, *ev4, *ev5, *ev6, *ev7, *ev8;
-    CCLBuffer* buf;
-    CCLProgram* prg;
-    CCLKernel* krnl;
-    CCLProf* prof;
-    CCLErr* err = NULL;
+    CCLContext * ctx;
+    CCLDevice * dev;
+    CCLQueue * q1, * q2, * q3;
+    CCLEvent * ev1, * ev2, *ev3, * ev4, * ev5, * ev6, * ev7, * ev8;
+    CCLBuffer * buf;
+    CCLProgram * prg;
+    CCLKernel * krnl;
+    CCLProf * prof;
+    CCLErr * err = NULL;
     cl_event ev_unwrapped;
     cl_int host_ptr[CCL_TEST_MAXBUF];
-    const char* src = "__kernel void k1(_global int* a){}";
-    void* mapped_ptr;
+    const char * src = "__kernel void k1(_global int* a){}";
+    void * mapped_ptr;
     cl_uint devidx = 0;
 
     /* Create OpenCL wrappers for testing. */
@@ -96,7 +96,8 @@ static void operation_test() {
     prof = ccl_prof_new();
 
     /* Test with 5 different event names. */
-    ev1 = ccl_buffer_enqueue_write(buf, q1, CL_TRUE, 0,
+    ev1 = ccl_buffer_enqueue_write(
+        buf, q1, CL_TRUE, 0,
         sizeof(cl_int) * CCL_TEST_MAXBUF, host_ptr, NULL, &err);
     g_assert_no_error(err);
     ccl_event_set_name(ev1, "Event1");
@@ -113,7 +114,7 @@ static void operation_test() {
     ev_unwrapped->t_end = 20;
 
     ev3 = ccl_memobj_enqueue_unmap(
-        (CCLMemObj*) buf, q1, mapped_ptr, NULL, &err);
+        (CCLMemObj *) buf, q1, mapped_ptr, NULL, &err);
     g_assert_no_error(err);
     ccl_event_set_name(ev3, "Event3");
     ev_unwrapped = ccl_event_unwrap(ev3);
@@ -178,7 +179,7 @@ static void operation_test() {
     /* ************************* */
 
     /* 1) Directly. */
-    const CCLProfAgg* agg;
+    const CCLProfAgg * agg;
 
     agg = ccl_prof_get_agg(prof, "Event1");
     g_assert(agg != NULL);
@@ -241,7 +242,7 @@ static void operation_test() {
     /* Test event instants */
     /* ******************* */
 
-    const CCLProfInst* pi;
+    const CCLProfInst * pi;
     cl_ulong prev_inst = 0;
     ccl_prof_iter_inst_init(
         prof, CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC);
@@ -257,7 +258,7 @@ static void operation_test() {
     /* Test overlaps */
     /* ************* */
 
-    const CCLProfOverlap* o;
+    const CCLProfOverlap * o;
     ccl_prof_iter_overlap_init(prof, CCL_PROF_OVERLAP_SORT_DURATION |
         CCL_PROF_SORT_DESC);
     while ((o = ccl_prof_iter_overlap_next(prof)) != NULL) {
@@ -291,7 +292,7 @@ static void operation_test() {
     ccl_prof_set_export_opts(export_options);
 
     /* Export options. */
-    gchar *tmp_dir_name, *tmp_file_name;
+    gchar * tmp_dir_name, * tmp_file_name;
     tmp_dir_name = g_dir_make_tmp("test_op_profiler_XXXXXX", &err);
     g_assert_no_error(err);
     tmp_file_name = g_strconcat(
@@ -303,8 +304,8 @@ static void operation_test() {
     g_assert(export_status);
 
     /* Test if output file was correctly written. */
-    gchar* file_contents;
-    gchar* expected_contents =
+    gchar * file_contents;
+    gchar * expected_contents =
         "Q1\t10\t15\tEvent1" CCL_TEST_NEWLINE \
         "Q1\t16\t20\tEvent2" CCL_TEST_NEWLINE \
         "Q1\t17\t30\tEvent3" CCL_TEST_NEWLINE \
@@ -322,7 +323,7 @@ static void operation_test() {
     g_free(tmp_file_name);
 
     /* Print summary to debug output. */
-    const char* summary = ccl_prof_get_summary(prof,
+    const char * summary = ccl_prof_get_summary(prof,
         CCL_PROF_AGG_SORT_TIME | CCL_PROF_SORT_DESC,
         CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC);
 
@@ -348,7 +349,6 @@ static void operation_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -357,13 +357,12 @@ static void operation_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
     g_test_add_func("/profiler/operation", operation_test);
 
     return g_test_run();
-
 }
 

@@ -20,7 +20,7 @@
  * Test the profiling module.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -35,15 +35,15 @@
 static void create_add_destroy_test() {
 
     /* Test variables. */
-    CCLErr* err = NULL;
-    CCLBuffer* buf1 = NULL;
-    CCLBuffer* buf2 = NULL;
-    CCLProf* prof = NULL;
-    CCLContext* ctx = NULL;
-    CCLDevice* d = NULL;
-    CCLQueue* cq1 = NULL;
-    CCLQueue* cq2 = NULL;
-    CCLEvent* evt = NULL;
+    CCLErr * err = NULL;
+    CCLBuffer * buf1 = NULL;
+    CCLBuffer * buf2 = NULL;
+    CCLProf * prof = NULL;
+    CCLContext * ctx = NULL;
+    CCLDevice * d = NULL;
+    CCLQueue * cq1 = NULL;
+    CCLQueue * cq2 = NULL;
+    CCLEvent * evt = NULL;
     CCLEventWaitList ewl = NULL;
     size_t buf_size = 8 * sizeof(cl_short);
     cl_short hbuf[8] = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -82,8 +82,8 @@ static void create_add_destroy_test() {
     g_assert_no_error(err);
 
     /* Transfer data from one buffer to another. */
-    evt = ccl_buffer_enqueue_copy(buf1, buf2, cq2, 0, 0, buf_size,
-        ccl_ewl(&ewl, evt, NULL), &err);
+    evt = ccl_buffer_enqueue_copy(
+        buf1, buf2, cq2, 0, 0, buf_size, ccl_ewl(&ewl, evt, NULL), &err);
     g_assert_no_error(err);
 
     /* Wait for copy. */
@@ -131,7 +131,6 @@ static void create_add_destroy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -140,7 +139,7 @@ static void create_add_destroy_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 

@@ -20,12 +20,12 @@
  * File containing incompilable kernel for testing.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include <wrong.h>
 
-int fun(void* x) {
+int fun(void * x) {
     return 0;
 }

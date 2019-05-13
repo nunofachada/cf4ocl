@@ -20,7 +20,7 @@
  * Tests for device query module.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
@@ -34,13 +34,13 @@
  * */
 static void helpers_test() {
 
-    CCLPlatforms* platfs = NULL;
-    CCLPlatform* p = NULL;
-    CCLDevice* d = NULL;
-    CCLErr* err = NULL;
+    CCLPlatforms * platfs = NULL;
+    CCLPlatform * p = NULL;
+    CCLDevice * d = NULL;
+    CCLErr * err = NULL;
     guint num_devs;
     guint num_platfs;
-    CCLWrapperInfo* info;
+    CCLWrapperInfo * info;
     gchar param_value_str[CCL_TEST_DEVQUERY_MAXINFOLEN];
 
     /* Get platforms. */
@@ -80,7 +80,8 @@ static void helpers_test() {
                     g_debug("====== Device #%d", j);
 
                     for (gint k = 0; k < ccl_devquery_info_map_size; k++) {
-                        info = ccl_device_get_info(d, ccl_devquery_info_map[k].device_info, &err);
+                        info = ccl_device_get_info(
+                            d, ccl_devquery_info_map[k].device_info, &err);
                         if (err == NULL) {
                             g_debug("\t%s : %s",
                                 ccl_devquery_info_map[k].param_name,
@@ -92,10 +93,8 @@ static void helpers_test() {
                             g_clear_error(&err);
                             g_debug("\t%s : %s",
                                 ccl_devquery_info_map[k].param_name, "N/A");
-
                         }
                     }
-
                 }
             }
         }
@@ -114,7 +113,6 @@ static void helpers_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
@@ -156,7 +154,6 @@ static void name_test() {
     g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
     info = ccl_devquery_name("DRIVER_VERSION");
     g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
-
 }
 
 /**
@@ -189,8 +186,6 @@ static void infomap_test() {
 
     /* Test if size corresponds. */
     g_assert_cmpint(imsize, ==, ccl_devquery_info_map_size);
-
-
 }
 
 /**
@@ -199,7 +194,7 @@ static void infomap_test() {
  * @param[in] argv Command line arguments.
  * @return Result of test run.
  * */
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
@@ -210,6 +205,5 @@ int main(int argc, char** argv) {
     g_test_add_func("/devquery/infomap", infomap_test);
 
     return g_test_run();
-
 }
 
