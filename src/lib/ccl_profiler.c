@@ -712,7 +712,7 @@ static void ccl_prof_process_queues(CCLProf * prof, CCLErr ** err) {
     /* Queue properties. */
     cl_command_queue_properties qprop;
     /* Internal error reporting object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
     /* Iterate over the command queues. */
     g_hash_table_iter_init(&iter, prof->queues);
@@ -1335,7 +1335,7 @@ const CCLProfAgg * ccl_prof_get_agg(CCLProf * prof, const char * event_name) {
 
     /* Find the aggregate statistic for the given event. */
     CCLProfAgg * agg = NULL;
-    GList* agg_container = prof->aggs;
+    GList * agg_container = prof->aggs;
     while (agg_container != NULL) {
         const char * curr_event_name =
             ((CCLProfAgg *) agg_container->data)->event_name;
@@ -1911,7 +1911,7 @@ cl_bool ccl_prof_export_info_file(
     CCLErr * err_internal = NULL;
 
     /* Open file. */
-    FILE* fp = fopen(filename, "w");
+    FILE * fp = fopen(filename, "w");
     g_if_err_create_goto(*err, CCL_ERROR, fp == NULL,
         CCL_ERROR_OPENFILE, error_handler,
         "Unable to open file '%s' for exporting.", filename);

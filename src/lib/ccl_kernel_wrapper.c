@@ -1143,7 +1143,7 @@ finish:
  * */
 cl_int ccl_kernel_get_arg_info_adapter(cl_kernel kernel, void * ptr_arg_indx,
     cl_kernel_arg_info param_name, size_t param_value_size, void * param_value,
-    size_t* param_value_size_ret) {
+    size_t * param_value_size_ret) {
 
     return clGetKernelArgInfo(kernel, GPOINTER_TO_UINT(ptr_arg_indx),
         param_name, param_value_size, param_value, param_value_size_ret);

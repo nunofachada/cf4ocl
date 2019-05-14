@@ -67,7 +67,7 @@ int main(int argc, char * argv[]) {
 
     /* Other variables. */
     cl_uint num_devs;
-    char* dev_name;
+    char * dev_name;
     int op;
 
     /* Error handling object. */
@@ -144,7 +144,6 @@ int main(int argc, char * argv[]) {
 
     /* Bye. */
     return EXIT_SUCCESS;
-
 }
 
 

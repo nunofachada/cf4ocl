@@ -90,7 +90,7 @@ static cl_program clCreateProgram(cl_context context,
 CL_API_ENTRY cl_program CL_API_CALL
 clCreateProgramWithSource(cl_context context, cl_uint count,
     const char ** strings, const size_t * lengths,
-    cl_int* errcode_ret) {
+    cl_int * errcode_ret) {
 
     seterrcode(errcode_ret, CL_SUCCESS);
 
@@ -98,7 +98,7 @@ clCreateProgramWithSource(cl_context context, cl_uint count,
     cl_program program = NULL;
 
     /* Complete source code string. */
-    GString* src = NULL;
+    GString * src = NULL;
 
     /* Parameter check. */
     if (context == NULL) {
@@ -287,7 +287,7 @@ CL_API_ENTRY cl_int CL_API_CALL
 clBuildProgram(cl_program program, cl_uint num_devices,
     const cl_device_id * device_list, const char * options,
     void (CL_CALLBACK * pfn_notify)(cl_program, void *),
-    void* user_data) {
+    void * user_data) {
 
     cl_int status = CL_SUCCESS;
 
@@ -513,7 +513,7 @@ clLinkProgram(cl_context context, cl_uint num_devices,
     const cl_device_id * device_list, const char * options,
     cl_uint num_input_programs, const cl_program * input_programs,
     void (CL_CALLBACK * pfn_notify)(cl_program program, void * user_data),
-    void* user_data, cl_int * errcode_ret) {
+    void * user_data, cl_int * errcode_ret) {
 
     /* Unused vars. */
     (void)(options);

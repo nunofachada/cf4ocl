@@ -459,7 +459,7 @@ static void ref_unref_test() {
     CCLDevice * d = NULL;
     CCLDevice * d_1 = NULL;
     CCLDevice * d_l = NULL;
-    CCLDevice * const* ds;
+    CCLDevice * const * ds;
     CCLDevSelFilters filters = NULL;
     cl_uint num_devs;
     cl_device_type dev_type;

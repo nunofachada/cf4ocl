@@ -40,7 +40,7 @@ static GHashTable * wrappers = NULL;
 G_LOCK_DEFINE(wrappers);
 
 /* Wrapper names ordered by their enum type. */
-static const char* ccl_class_names[] = {"Buffer", "Context", "Device", "Event",
+static const char * ccl_class_names[] = {"Buffer", "Context", "Device", "Event",
     "Image", "Kernel", "Platform", "Program", "Sampler", "Queue", "None", NULL};
 
 /* Information functions. They must be in the same order as defined in the
@@ -416,7 +416,7 @@ int ccl_wrapper_ref_count(CCLWrapper * wrapper) {
  * @return The wrapped OpenCL object.
  * */
 CCL_EXPORT
-void* ccl_wrapper_unwrap(CCLWrapper * wrapper) {
+void * ccl_wrapper_unwrap(CCLWrapper * wrapper) {
 
     /* Make sure wrapper is not NULL. */
     g_return_val_if_fail(wrapper != NULL, NULL);

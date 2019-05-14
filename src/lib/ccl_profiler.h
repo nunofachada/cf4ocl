@@ -261,7 +261,7 @@ typedef struct ccl_prof_info {
      * Name of event.
      * @public
      * */
-    const char* event_name;
+    const char * event_name;
 
     /**
      * Type of command which produced the event.
@@ -273,7 +273,7 @@ typedef struct ccl_prof_info {
      * Name of command queue which generated this event.
      * @public
      * */
-    const char* queue_name;
+    const char * queue_name;
 
     /**
      * Device time in nanoseconds when the command identified by event

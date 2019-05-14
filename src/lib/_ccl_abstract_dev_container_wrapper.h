@@ -95,9 +95,9 @@ CCLDevice * const * ccl_dev_container_get_all_devices(
     ccl_dev_container_get_cldevices get_devices, CCLErr ** err);
 
 /* Get ::CCLDevice wrapper at given index. */
-CCLDevice* ccl_dev_container_get_device(CCLDevContainer * devcon,
+CCLDevice * ccl_dev_container_get_device(CCLDevContainer * devcon,
     ccl_dev_container_get_cldevices get_devices,
-    cl_uint index, CCLErr** err);
+    cl_uint index, CCLErr ** err);
 
 /* Return number of devices in device container. */
 cl_uint ccl_dev_container_get_num_devices(CCLDevContainer * devcon,

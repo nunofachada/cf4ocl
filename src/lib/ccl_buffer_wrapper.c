@@ -332,8 +332,8 @@ void * ccl_buffer_enqueue_map(CCLBuffer * buf, CCLQueue * cq,
 
     cl_int ocl_status;
     cl_event event = NULL;
-    CCLEvent* evt_inner = NULL;
-    void* ptr = NULL;
+    CCLEvent * evt_inner = NULL;
+    void * ptr = NULL;
 
     /* Perform buffer map. */
     ptr = clEnqueueMapBuffer(ccl_queue_unwrap(cq),
@@ -573,7 +573,7 @@ CCLBuffer * ccl_buffer_new_from_region(CCLBuffer * buf,
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -675,7 +675,7 @@ finish:
  * @return Event wrapper object that identifies this read command.
  * */
 CCL_EXPORT
-CCLEvent* ccl_buffer_enqueue_read_rect(CCLBuffer * buf, CCLQueue * cq,
+CCLEvent * ccl_buffer_enqueue_read_rect(CCLBuffer * buf, CCLQueue * cq,
     cl_bool blocking_read, const size_t * buffer_origin,
     const size_t * host_origin, const size_t * region,
     size_t buffer_row_pitch, size_t buffer_slice_pitch,

@@ -142,7 +142,7 @@ size_t ccl_arg_size(CCLArg * arg) {
  * @return Argument value.
  * */
 CCL_EXPORT
-void* ccl_arg_value(CCLArg * arg) {
+void * ccl_arg_value(CCLArg * arg) {
 
     /* Make sure arg is not NULL. */
     g_return_val_if_fail(arg != NULL, NULL);

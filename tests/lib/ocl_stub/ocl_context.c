@@ -31,7 +31,7 @@ CL_API_ENTRY cl_context CL_API_CALL
 clCreateContext(const cl_context_properties * properties,
     cl_uint num_devices, const cl_device_id * devices,
     void (CL_CALLBACK * pfn_notify)(const char *, const void *, size_t, void *),
-    void* user_data, cl_int * errcode_ret) {
+    void * user_data, cl_int * errcode_ret) {
 
     /* Allocate memory for context. */
     cl_context ctx = g_slice_new(struct _cl_context);

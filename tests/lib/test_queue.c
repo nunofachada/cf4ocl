@@ -202,7 +202,7 @@ static void barrier_marker_test() {
     CCLEvent * evt_barrier = NULL;
     CCLEvent * evt_marker = NULL;
     CCLErr * err = NULL;
-    cl_ulong* host_buf;
+    cl_ulong * host_buf;
     CCLEventWaitList ewl = NULL;
     cl_int exec_status = -1;
     cl_command_type ct = 0;
@@ -291,8 +291,7 @@ static void barrier_marker_test() {
     g_assert_cmpuint(ct, ==, CL_COMMAND_MARKER);
 
     /* Check that generated events are in queue. */
-    CCLEvent* evts[] =
-        {evt_map, evt_barrier, evt_unmap, evt_marker, NULL};
+    CCLEvent * evts[] = {evt_map, evt_barrier, evt_unmap, evt_marker, NULL};
     for (cl_uint i = 0; evts[i] != NULL; ++i) {
         ccl_queue_iter_event_init(cq);
         evt_in_cq = CL_FALSE;

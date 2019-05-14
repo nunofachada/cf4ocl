@@ -27,7 +27,7 @@
 
 #include "ccl_errors.h"
 
-static const char* ccl_errors[] = {
+static const char * ccl_errors[] = {
     "Successful operation", /* CL_SUCCESS - 0 */
     "Device not found", /* CL_DEVICE_NOT_FOUND - 1 */
     "Device not available", /* CL_DEVICE_NOT_AVAILABLE - 2 */
@@ -115,7 +115,7 @@ static const int ccl_errors_count = 71;
  * @return A readable string.
  * */
 CCL_EXPORT
-const char* ccl_err(int code) {
+const char * ccl_err(int code) {
     int index = -1 * code;
     return (index >= 0) && (index < ccl_errors_count)
         ? ccl_errors[index]

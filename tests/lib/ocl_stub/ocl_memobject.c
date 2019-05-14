@@ -46,7 +46,7 @@ clReleaseMemObject(cl_mem memobj) {
     if (g_atomic_int_dec_and_test(&memobj->ref_count)) {
 
         /* Call callback functions. */
-        GSList* curr = memobj->callbacks;
+        GSList * curr = memobj->callbacks;
         while (curr != NULL) {
             struct cl_memobject_callbacks * cb =
                 (struct cl_memobject_callbacks *) curr->data;

@@ -278,11 +278,11 @@ typedef struct ccl_platforms CCLPlatforms;
  * structure from [GLib](https://developer.gnome.org/glib/stable/), and has the
  * following fields:
  *
- * ~~~~~~~~~~~~~~~{.c}
+ * ```c
  * GQuark domain;
  * int    code;
- * char*  message;
- * ~~~~~~~~~~~~~~~
+ * char *  message;
+ * ```
  *
  * @see @ref ug_errorhandle "Error handling" in _cf4ocl_.
  * @see @ref ug_deps "The GLib and OpenCL dependencies".

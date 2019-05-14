@@ -70,7 +70,7 @@ struct _cl_device_id {
     const cl_bool endian_little;
     const cl_bool error_correction_support;
     const cl_device_exec_capabilities execution_capabilities;
-    const char* extensions;
+    const char * extensions;
     /* Not const because it can change in sub-devices. */
     cl_ulong global_mem_cache_size;
     const cl_device_mem_cache_type global_mem_cache_type;
@@ -112,7 +112,7 @@ struct _cl_device_id {
     const cl_uint native_vector_width_float;
     const cl_uint native_vector_width_double;
     const cl_uint native_vector_width_half;
-    const char* opencl_c_version;
+    const char * opencl_c_version;
     /* Not const because it can change in sub-devices. */
     cl_device_id parent_device;
     /* Not const because it can change in sub-devices. */

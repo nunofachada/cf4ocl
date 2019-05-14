@@ -336,7 +336,7 @@ typedef GPtrArray * CCLEventWaitList;
  * list version). */
 CCL_EXPORT
 CCLEventWaitList * ccl_event_wait_list_add(
-    CCLEventWaitList* evt_wait_lst, ...) G_GNUC_NULL_TERMINATED;
+    CCLEventWaitList * evt_wait_lst, ...) G_GNUC_NULL_TERMINATED;
 
 /* Add event wrapper objects to an event wait list (array version). */
 CCL_EXPORT

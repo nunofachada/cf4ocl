@@ -56,7 +56,7 @@ struct ccl_wrapper {
      * The wrapped OpenCL object.
      * @private
      * */
-    void* cl_object;
+    void * cl_object;
 
     /**
      * Information about the wrapped OpenCL object.

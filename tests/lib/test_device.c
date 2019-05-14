@@ -151,7 +151,7 @@ static void sub_devices_test() {
     if (supported) {
 
         /* Allocate partition properties array and initialize it. */
-        cl_device_partition_property* ctprop = g_slice_alloc0(
+        cl_device_partition_property * ctprop = g_slice_alloc0(
             (max_subdevs + 3) * sizeof(cl_device_partition_property));
         ctprop[0] = CL_DEVICE_PARTITION_BY_COUNTS;
 

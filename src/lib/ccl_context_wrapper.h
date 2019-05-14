@@ -80,7 +80,7 @@
  * ```c
  * CCLPlatform * platf;
  * CCLContext * ctx;
- * const* CCLDevice * devs;
+ * const * CCLDevice * devs;
  * cl_uint num_devs;
  * ```
  *
@@ -304,7 +304,7 @@ CCL_EXPORT
 CCLContext * ccl_context_new_from_devices_full(
     const cl_context_properties * properties, cl_uint num_devices,
     CCLDevice * const * devices, ccl_context_callback pfn_notify,
-    void* user_data, CCLErr ** err);
+    void * user_data, CCLErr ** err);
 
 /* Creates a context wrapper using one device filter specified in the function
  * parameters. */

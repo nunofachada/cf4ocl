@@ -844,7 +844,7 @@ void * ccl_image_enqueue_map(CCLImage * img, CCLQueue * cq,
     cl_int ocl_status;
     cl_event event = NULL;
     CCLEvent * evt_inner = NULL;
-    void* ptr = NULL;
+    void * ptr = NULL;
 
     /* Perform image map. */
     ptr = clEnqueueMapImage(ccl_queue_unwrap(cq),
@@ -933,7 +933,7 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_2
 

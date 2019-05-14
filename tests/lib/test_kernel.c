@@ -151,7 +151,7 @@ static void create_info_destroy_test() {
 
         size_t kwgz;
         size_t * kcwgs;
-        CCLDevice* dev = NULL;
+        CCLDevice * dev = NULL;
 
         /* If platform supports kernel work group queries, get kernel
          * work group information and compare it with expected info. */

@@ -988,7 +988,7 @@ clEnqueueFillImage(cl_command_queue command_queue, cl_mem image,
 
     /* Convert fill color to RGBA format, the only one supported in this
      * stub. This will only work in little-endian. */
-    void* final_color = g_malloc0(image->image_elem_size);
+    void * final_color = g_malloc0(image->image_elem_size);
     if (image->image_elem_size == 16) {
         /* 16 bytes, 4 bytes (32 bits) per component. */
         g_memmove(final_color, fill_color, 16);

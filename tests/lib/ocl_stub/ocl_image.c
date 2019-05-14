@@ -142,7 +142,7 @@ clCreateImage(cl_context context, cl_mem_flags flags,
 CL_API_ENTRY cl_mem CL_API_CALL clCreateImage2D(cl_context context,
     cl_mem_flags flags, const cl_image_format * image_format,
     size_t image_width, size_t image_height, size_t image_row_pitch,
-    void* host_ptr, cl_int * errcode_ret) {
+    void * host_ptr, cl_int * errcode_ret) {
 
 #ifdef CL_VERSION_2_0
     cl_image_desc img_dsc = {0, 0, 0, 0, 0, 0, 0, 0, 0, {.buffer = NULL}};

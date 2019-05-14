@@ -56,7 +56,7 @@ static void operation_test() {
     CCLContext * ctx;
     CCLDevice * dev;
     CCLQueue * q1, * q2, * q3;
-    CCLEvent * ev1, * ev2, *ev3, * ev4, * ev5, * ev6, * ev7, * ev8;
+    CCLEvent * ev1, * ev2, * ev3, * ev4, * ev5, * ev6, * ev7, * ev8;
     CCLBuffer * buf;
     CCLProgram * prg;
     CCLKernel * krnl;
@@ -64,7 +64,7 @@ static void operation_test() {
     CCLErr * err = NULL;
     cl_event ev_unwrapped;
     cl_int host_ptr[CCL_TEST_MAXBUF];
-    const char * src = "__kernel void k1(_global int* a){}";
+    const char * src = "__kernel void k1(_global int * a){}";
     void * mapped_ptr;
     cl_uint devidx = 0;
 
@@ -207,7 +207,7 @@ static void operation_test() {
     g_assert_cmpfloat(agg->relative_time - 0.15714, <, 0.0001);
 
     /* 2) By cycling all agg. stats. */
-    const char* prev_name = "zzzz";
+    const char * prev_name = "zzzz";
 
     ccl_prof_iter_agg_init(
         prof, CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC);
@@ -224,7 +224,7 @@ static void operation_test() {
     /* **************** */
 
     prev_name = "0000";
-    const CCLProfInfo* info;
+    const CCLProfInfo * info;
 
     /* Test ordering by event name. */
     ccl_prof_iter_info_init(

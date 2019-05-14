@@ -114,7 +114,7 @@ static char * ccl_devquery_format_sizet(
  * @internal
  */
 static char * ccl_devquery_format_ulongbytes(
-    CCLWrapperInfo * info, char * out, size_t size, const char* units) {
+    CCLWrapperInfo * info, char * out, size_t size, const char * units) {
 
     CCL_UNUSED(units);
     unsigned long bytes = (unsigned long) *((cl_ulong *) info->value);
@@ -494,8 +494,8 @@ static char * ccl_devquery_format_svmc(
  //~ * purposes.
  //~ * @internal
  //~ * */
-//~ static char* ccl_devquery_format_testsize(CCLWrapperInfo* info,
-    //~ gchar* out, guint size, const gchar const* units) {
+//~ static char * ccl_devquery_format_testsize(CCLWrapperInfo * info,
+    //~ gchar * out, guint size, const gchar const * units) {
     //~
     //~ g_snprintf(out, size, "%ld %s", (gulong) info->size, units);
     //~ return out;
@@ -1110,7 +1110,7 @@ const CCLDevQueryMap * ccl_devquery_prefix(
     g_return_val_if_fail(prefix != NULL, NULL);
 
     /* Final prefix to search for. */
-    gchar* prefix_final;
+    gchar * prefix_final;
 
     /* Size of final prefix. */
     gint len_prefix_final;

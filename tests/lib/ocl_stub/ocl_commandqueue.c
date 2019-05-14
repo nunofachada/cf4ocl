@@ -88,7 +88,7 @@ clReleaseCommandQueue(cl_command_queue command_queue) {
 CL_API_ENTRY cl_int CL_API_CALL
 clGetCommandQueueInfo(cl_command_queue command_queue,
     cl_command_queue_info param_name, size_t param_value_size,
-    void * param_value, size_t* param_value_size_ret) {
+    void * param_value, size_t * param_value_size_ret) {
 
     cl_int status = CL_SUCCESS;
 

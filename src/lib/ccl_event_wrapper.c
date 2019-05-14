@@ -129,14 +129,13 @@ void ccl_event_set_name(CCLEvent * evt, const char * name) {
  * @return Name associated with event.
  * */
 CCL_EXPORT
-const char* ccl_event_get_name(CCLEvent * evt) {
+const char * ccl_event_get_name(CCLEvent * evt) {
 
     /* Make sure evt wrapper object is not NULL. */
     g_return_val_if_fail(evt != NULL, NULL);
 
     /* Return event name. */
     return evt->name;
-
 }
 
 /**
@@ -555,7 +554,7 @@ CCLEvent * ccl_user_event_new(CCLContext * ctx, CCLErr ** err) {
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 
@@ -642,7 +641,7 @@ cl_bool ccl_user_event_set_status(
     /* OpenCL version of the underlying platform. */
     double ocl_ver;
     /* Internal error handling object. */
-    CCLErr* err_internal = NULL;
+    CCLErr * err_internal = NULL;
 
 #ifndef CL_VERSION_1_1
 

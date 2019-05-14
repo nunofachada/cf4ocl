@@ -152,7 +152,7 @@ finish:
  * @param[in] platforms ::CCLPlatforms object to destroy.
  * */
 CCL_EXPORT
-void ccl_platforms_destroy(CCLPlatforms* platforms) {
+void ccl_platforms_destroy(CCLPlatforms * platforms) {
 
     /* Platforms object can't be NULL. */
     g_return_if_fail(platforms != NULL);

@@ -38,7 +38,7 @@ static void create_info_destroy_test() {
     CCLContext * ctx = NULL;
     CCLSampler * s = NULL;
     cl_sampler sampler = NULL;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     cl_int ocl_status;
     const cl_sampler_properties sampler_properties[] = {
         CL_SAMPLER_NORMALIZED_COORDS, CL_TRUE,
@@ -125,15 +125,15 @@ static void create_info_destroy_test() {
 static void create_full_info_destroy_test() {
 
     /* Test variables. */
-    CCLContext* ctx = NULL;
-    CCLSampler* s = NULL;
+    CCLContext * ctx = NULL;
+    CCLSampler * s = NULL;
     const cl_sampler_properties sampler_properties[] = {
         CL_SAMPLER_NORMALIZED_COORDS, CL_FALSE,
         CL_SAMPLER_ADDRESSING_MODE, CL_ADDRESS_CLAMP_TO_EDGE,
         CL_SAMPLER_FILTER_MODE, CL_FILTER_NEAREST,
         0};
 
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(&err);

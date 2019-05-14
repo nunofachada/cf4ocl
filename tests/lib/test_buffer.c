@@ -68,7 +68,7 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
     g_assert_cmpuint(mem_size, ==, buf_size);
 
-    void* host_ptr = NULL;
+    void * host_ptr = NULL;
     host_ptr = ccl_memobj_get_info_scalar(
         b, CL_MEM_HOST_PTR, void*, &err);
     g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
@@ -470,7 +470,7 @@ static void rect_read_write_copy_test() {
     cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_uchar) * sizeof(cl_uchar)
         * CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     const size_t origin[] = {0, 0, 0};
     const size_t region[] = {CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
         CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar), 1};

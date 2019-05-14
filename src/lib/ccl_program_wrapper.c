@@ -1226,7 +1226,7 @@ CCL_EXPORT
 CCLProgram * ccl_program_link(CCLContext * ctx, cl_uint num_devices,
     CCLDevice * const * devs, const char * options, cl_uint num_input_programs,
     CCLProgram ** input_prgs, ccl_program_callback pfn_notify,
-    void* user_data, CCLErr ** err) {
+    void * user_data, CCLErr ** err) {
 
     /* Make sure ctx is not NULL. */
     g_return_val_if_fail(ctx != NULL, CL_FALSE);

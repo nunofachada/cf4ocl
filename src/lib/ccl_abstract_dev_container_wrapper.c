@@ -168,7 +168,7 @@ CCLDevice * const * ccl_dev_container_get_all_devices(
  * @return The ::CCLDevice wrapper at given index or `NULL` if an error
  * occurs.
  * */
-CCLDevice* ccl_dev_container_get_device(
+CCLDevice * ccl_dev_container_get_device(
     CCLDevContainer * devcon,
     ccl_dev_container_get_cldevices get_devices, cl_uint index,
     CCLErr ** err) {

@@ -283,7 +283,7 @@ CCLDevice * const * ccl_platform_get_all_devices(
  * */
 CCL_EXPORT
 CCLDevice * ccl_platform_get_device(
-    CCLPlatform* platf, cl_uint index, CCLErr ** err) {
+    CCLPlatform * platf, cl_uint index, CCLErr ** err) {
 
     return ccl_dev_container_get_device((CCLDevContainer *) platf,
         ccl_platform_get_cldevices, index, err);

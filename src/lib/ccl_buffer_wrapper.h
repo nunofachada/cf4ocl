@@ -131,10 +131,10 @@ CCLEvent * ccl_buffer_enqueue_copy(CCLBuffer * src_buf,
 /* Copy a buffer object to an image object. This function wraps the
  * clEnqueueCopyBufferToImage() OpenCL function. */
 CCL_EXPORT
-CCLEvent* ccl_buffer_enqueue_copy_to_image(CCLBuffer * src_buf,
-    CCLImage* dst_img, CCLQueue* cq, size_t src_offset,
-    const size_t *dst_origin, const size_t *region,
-    CCLEventWaitList* evt_wait_lst, CCLErr** err);
+CCLEvent * ccl_buffer_enqueue_copy_to_image(CCLBuffer * src_buf,
+    CCLImage * dst_img, CCLQueue * cq, size_t src_offset,
+    const size_t * dst_origin, const size_t * region,
+    CCLEventWaitList * evt_wait_lst, CCLErr ** err);
 
 /* Creates a sub-buffer that represents a specific region in the given
  * buffer. */

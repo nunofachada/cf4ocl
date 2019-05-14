@@ -435,7 +435,7 @@ static void event_wait_lists_test() {
     CCLErr * err = NULL;
     cl_float host_buf1[8] = { 2.0, 3.5, 4.2, 5.0, 2.2, 199.0, -12.9, -0.01 };
     cl_float host_buf2[8];
-    CCLEvent* evt_array[2] = { NULL, NULL };
+    CCLEvent * evt_array[2] = { NULL, NULL };
     CCLEventWaitList ewl = NULL;
     const cl_event * clevent_ptr;
     cl_uint num_evts;

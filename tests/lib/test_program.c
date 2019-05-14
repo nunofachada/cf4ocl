@@ -520,7 +520,7 @@ static void create_info_destroy_test() {
 
     /* Set args and execute kernel, waiting for the two transfer events
      * to terminate (this will empty the event wait list). */
-    void* args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
+    void * args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
     evt_kr =  ccl_program_enqueue_kernel_v(
         prg, CCL_TEST_PROGRAM_SUM, cq, 1, NULL, &gws, &lws, &ewl, args, &err);
     g_assert_no_error(err);
@@ -675,7 +675,7 @@ static void compile_link_test() {
     cl_char hbuf_in[8] = {-3, -2, -1, 0, 1, 2, 3, 4};
     cl_char hbuf_out[8];
     size_t ws = 8;
-    CCLErr* err = NULL;
+    CCLErr * err = NULL;
     cl_uint ocl_ver;
 
     /* Get the test context with the pre-defined device. */

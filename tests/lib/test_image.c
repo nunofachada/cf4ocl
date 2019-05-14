@@ -484,7 +484,7 @@ static void map_unmap_test(
     CCLEventWaitList ewl = NULL;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     gint32 himg[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
-    gint32* himg_map;
+    gint32 * himg_map;
     size_t origin[3] = {0, 0, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     size_t image_row_pitch;
