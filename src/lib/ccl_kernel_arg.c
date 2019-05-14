@@ -66,9 +66,10 @@ const CCLArg * ccl_arg_skip = &arg_skip;
 /**
  * Create a new kernel argument.
  *
- * Arguments created with this function can local, private or NULL.
- * Client code shouldn't directly use this function, but use instead
- * ccl_arg_priv(), ccl_arg_local() or ccl_arg_full().
+ * Arguments created with this function can be local, private or `NULL`.
+ *
+ * @attention Client code shouldn't directly use this function, but use
+ * ccl_arg_priv(), ccl_arg_local() or ccl_arg_full()  instead.
  *
  * @param[in] value Argument value.
  * @param[in] size Argument size.
@@ -90,11 +91,9 @@ CCLArg * ccl_arg_new(void * value, size_t size) {
 }
 
 /**
- * @internal
+ * Destroy a kernel argument.
  *
- * @brief Destroy a kernel argument.
- *
- * Client code shouldn't directly use this function.
+ * @warning Client code shouldn't directly use this function.
  *
  * @param[in] arg Argument to destroy.
  * */
@@ -111,11 +110,9 @@ void ccl_arg_destroy(CCLArg * arg) {
 }
 
 /**
- * @internal
+ * Get size in bytes of kernel argument.
  *
- * @brief Get size in bytes of kernel argument.
- *
- * Client code shouldn't directly use this function.
+ * @warning Client code shouldn't directly use this function.
  *
  * @param[in] arg Argument to get size of.
  * @return Argument size in bytes.
@@ -132,11 +129,9 @@ size_t ccl_arg_size(CCLArg * arg) {
 }
 
 /**
- * @internal
+ * Get value of kernel argument.
  *
- * @brief Get value of kernel argument.
- *
- * Client code shouldn't directly use this function.
+ * @warning Client code shouldn't directly use this function.
  *
  * @param[in] arg Argument to get value of.
  * @return Argument value.
