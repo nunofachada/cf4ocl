@@ -177,10 +177,14 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
     if (DOC_DEVELOPER)
         # ...do not exclude test documentation
         set(DOX_EXCLUDE_PATHS "" CACHE INTERNAL "")
+        # ...and include all headers
+        set(DOX_EXCLUDE_PATTERNS "" CACHE INTERNAL "")
     else()
         # ...otherwise exclude test documentation
         set(DOX_EXCLUDE_PATHS
             "${CMAKE_CURRENT_SOURCE_DIR}/tests" CACHE INTERNAL "")
+        # ...and exclude non-public headers
+        set(DOX_EXCLUDE_PATTERNS "*err_macros.h" CACHE INTERNAL "")
     endif()
 
     # Set doxygen document generation options
