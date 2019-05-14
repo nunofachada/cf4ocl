@@ -659,8 +659,8 @@ size_t ccl_wrapper_get_info_size(CCLWrapper * wrapper1,
 }
 
 /**
- * Debug function which checks if memory allocated by wrappers has been properly
- * freed.
+ * Debug function which checks if memory allocated by wrappers has been
+ * properly freed.
  *
  * @public @memberof ccl_wrapper
  *
@@ -747,9 +747,11 @@ cl_bool ccl_wrapper_memcheck() {
 /**
  * Get wrapper class or type name.
  *
+ * @public @memberof ccl_wrapper
+ *
  * @param[in] wrapper Wrapper object.
  *
- * @return
+ * @return Wrapper class or type name.
  * */
 CCL_EXPORT
 const char * ccl_wrapper_get_class_name(CCLWrapper * wrapper) {

@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * File containing "sum and xor" kernel for testing. This kernel delegates the
  * sum and xor operations to functions declared in the header file.
@@ -29,7 +31,9 @@
 #include "xor_impl.cl.h"
 
 /**
- * Performs sum and xor of values from two vectors and a constant.
+ * @internal
+ *
+ * @brief Performs sum and xor of values from two vectors and a constant.
  *
  * @param[in] a First vector to sum.
  * @param[in] b Second vector to sum.

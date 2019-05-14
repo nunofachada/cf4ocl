@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the profiling module.
  *
@@ -28,7 +30,9 @@
 #include "test.h"
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * profiler objects, and their relationship with context, device and
  * queue wrapper objects.
  * */
@@ -134,7 +138,9 @@ static void create_add_destroy_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

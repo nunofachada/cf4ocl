@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * The do_xor function implementation.
  *
@@ -25,7 +27,9 @@
  * */
 
 /**
- * Performs XOR of three unsigned integers.
+ * @internal
+ *
+ * @brief Performs XOR of three unsigned integers.
  *
  * @param[in] a First integer to XOR.
  * @param[in] b Second integer to XOR.

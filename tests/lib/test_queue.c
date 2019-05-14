@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the command queue wrapper class and its methods.
  *
@@ -29,7 +31,9 @@
 #include "_ccl_defs.h"
 
 /**
- * Tests creation (using "simple" constructor), getting info from and
+ * @internal
+ *
+ * @brief Tests creation (using "simple" constructor), getting info from and
  * destruction of command queue wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -142,7 +146,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Tests the command queue wrapper class reference counting.
+ * @internal
+ *
+ * @brief Tests the command queue wrapper class reference counting.
  * */
 static void ref_unref_test() {
 
@@ -186,7 +192,9 @@ static void ref_unref_test() {
 }
 
 /**
- * Tests the ::ccl_enqueue_barrier() and ::ccl_enqueue_marker()
+ * @internal
+ *
+ * @brief Tests the ::ccl_enqueue_barrier() and ::ccl_enqueue_marker()
  * functions.
  * */
 static void barrier_marker_test() {
@@ -320,7 +328,9 @@ static void barrier_marker_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

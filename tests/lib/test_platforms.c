@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the platforms class and its methods. Also tests the platform and
  * device wrapper classes.
@@ -65,7 +67,9 @@ static void ccl_test_platforms_check_error(CCLErr ** err) {
 }
 
 /**
- * Helper macro which returns a scalar information value casted
+ * @internal
+ *
+ * @brief Helper macro which returns a scalar information value casted
  * to specified scalar type.
  *
  * @param[in] info ::CCLWrapperInfo* information object.
@@ -75,7 +79,9 @@ static void ccl_test_platforms_check_error(CCLErr ** err) {
 #define ccl_info_scalar(info, type) *((type *) (info)->value)
 
 /**
- * Helper macro which returns an array information value casted
+ * @internal
+ *
+ * @brief Helper macro which returns an array information value casted
  * to specified array type.
  *
  * @param[in] info ::CCLWrapperInfo* information object.
@@ -86,7 +92,9 @@ static void ccl_test_platforms_check_error(CCLErr ** err) {
 #define ccl_info_array(info, type) ((type) (info)->value)
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * platforms, platform and device wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -620,7 +628,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Test increasing reference count of objects which compose
+ * @internal
+ *
+ * @brief Test increasing reference count of objects which compose
  * larger objects, then destroy the larger object and verify that
  * composing object still exists and must be freed by the function
  * which increase its reference count. This function tests the following
@@ -669,7 +679,9 @@ static void ref_unref_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

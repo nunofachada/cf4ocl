@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * File containing sum kernel for testing.
  *
@@ -25,7 +27,9 @@
  * */
 
 /**
- * Performs sum of two vectors plus a constant.
+ * @internal
+ *
+ * @brief Performs sum of two vectors plus a constant.
  *
  * @param[in] a First vector to sum.
  * @param[in] b Second vector to sum.

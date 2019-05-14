@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the buffer wrapper class and its methods.
  *
@@ -31,7 +33,9 @@
 #define CCL_TEST_BUFFER_SIZE 512
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * buffer wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -93,7 +97,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Tests buffer wrapper class reference counting.
+ * @internal
+ *
+ * @brief Tests buffer wrapper class reference counting.
  * */
 static void ref_unref_test() {
 
@@ -141,7 +147,9 @@ static void ref_unref_test() {
 }
 
 /**
- * Tests buffer wrapping and unwrapping.
+ * @internal
+ *
+ * @brief Tests buffer wrapping and unwrapping.
  * */
 static void wrap_unwrap_test() {
 
@@ -195,7 +203,9 @@ static void wrap_unwrap_test() {
 }
 
 /**
- * Tests basic read/write operations from/to buffer objects.
+ * @internal
+ *
+ * @brief Tests basic read/write operations from/to buffer objects.
  * */
 static void read_write_test() {
 
@@ -268,7 +278,9 @@ static void read_write_test() {
 }
 
 /**
- * Tests copy operations from one buffer to another.
+ * @internal
+ *
+ * @brief Tests copy operations from one buffer to another.
  * */
 static void copy_test() {
 
@@ -335,7 +347,9 @@ static void copy_test() {
 }
 
 /**
- * Tests map/unmap operations in buffer objects.
+ * @internal
+ *
+ * @brief Tests map/unmap operations in buffer objects.
  * */
 static void map_unmap_test() {
 
@@ -397,7 +411,12 @@ static void map_unmap_test() {
 #ifdef CL_VERSION_1_1
 
 /**
- * Test callback function.
+ * @internal
+ *
+ * @brief Test callback function.
+ *
+ * @param memobj Memory object.
+ * @param user_data User data.
  * */
 static void CL_CALLBACK destructor_callback(
     cl_mem memobj, void * user_data) {
@@ -411,7 +430,9 @@ static void CL_CALLBACK destructor_callback(
 }
 
 /**
- * Test memory object destructor callbacks.
+ * @internal
+ *
+ * @brief Test memory object destructor callbacks.
  * */
 static void destructor_callback_test() {
 
@@ -456,7 +477,9 @@ static void destructor_callback_test() {
 }
 
 /**
- * Tests rect buffer operations.
+ * @internal
+ *
+ * @brief Tests rect buffer operations.
  * */
 static void rect_read_write_copy_test() {
 
@@ -530,7 +553,9 @@ static void rect_read_write_copy_test() {
 }
 
 /**
- * Tests the ccl_buffer_new_from_region() function.
+ * @internal
+ *
+ * @brief Tests the ccl_buffer_new_from_region() function.
  * */
 static void create_from_region_test() {
 
@@ -623,7 +648,9 @@ static void create_from_region_test() {
 #ifdef CL_VERSION_1_2
 
 /**
- * Tests buffer fill.
+ * @internal
+ *
+ * @brief Tests buffer fill.
  * */
 static void fill_test() {
 
@@ -702,7 +729,9 @@ static void fill_test() {
 }
 
 /**
- * Tests memory object migration.
+ * @internal
+ *
+ * @brief Tests memory object migration.
  * */
 static void migrate_test() {
 
@@ -783,7 +812,9 @@ static void migrate_test() {
 #endif
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

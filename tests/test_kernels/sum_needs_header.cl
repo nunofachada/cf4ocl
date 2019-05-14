@@ -16,19 +16,23 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * File containing sum kernel for testing. This kernel delegates the sum to
  * another function which is declared in the header file.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include "sum_impl.cl.h"
 
 /**
- * Performs sum of two vectors plus a constant.
+ * @internal
+ *
+ * @brief Performs sum of two vectors plus a constant.
  *
  * @param[in] a First vector to sum.
  * @param[in] b Second vector to sum.

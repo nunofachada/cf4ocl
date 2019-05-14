@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the kernel wrapper class and its methods.
  *
@@ -42,7 +44,9 @@
 G_STATIC_ASSERT(CCL_TEST_KERNEL_BUF_SIZE % CCL_TEST_KERNEL_LWS == 0);
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * kernel wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -287,7 +291,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Test increasing reference count of kernel wrappers.
+ * @internal
+ *
+ * @brief Test increasing reference count of kernel wrappers.
  * */
 static void ref_unref_test() {
 
@@ -364,8 +370,13 @@ static void ref_unref_test() {
 
 /**
  * @internal
- * Helper function for ::suggest_worksizes_test() which checks if
+ *
+ * @brief Helper function for ::suggest_worksizes_test() which checks if
  * suggested work sizes are within device limits.
+ *
+ * @param[in] dev Device where to get information from.
+ * @param[in] dims Dimensions to check.
+ * @param[in] lws Local work-size.
  * */
 static void check_dev_limits(CCLDevice * dev, cl_uint dims, size_t * lws) {
 
@@ -402,7 +413,10 @@ static void check_dev_limits(CCLDevice * dev, cl_uint dims, size_t * lws) {
 /**
  * @internal
  *
- * Aux. function for suggest_worksizes_test()-
+ * @brief Aux. function for suggest_worksizes_test().
+ *
+ * @param[in] dev Device.
+ * @param[in] krnl Kernel.
  * */
 static void suggest_worksizes_aux(CCLDevice * dev, CCLKernel * krnl) {
 
@@ -581,8 +595,9 @@ static void suggest_worksizes_aux(CCLDevice * dev, CCLKernel * krnl) {
 }
 
 /**
- * Tests the ::ccl_kernel_suggest_worksizes() function.
+ * @internal
  *
+ * @brief Tests the ::ccl_kernel_suggest_worksizes() function.
  * */
 static void suggest_worksizes_test() {
 
@@ -666,7 +681,9 @@ static void suggest_worksizes_test() {
 G_STATIC_ASSERT(CCL_TEST_KERNEL_ARGS_BUF_SIZE % CCL_TEST_KERNEL_ARGS_LWS == 0);
 
 /**
- * Tests functions and macros related with kernel arguments.
+ * @internal
+ *
+ * @brief Tests functions and macros related with kernel arguments.
  * */
 static void args_test() {
 
@@ -1077,7 +1094,9 @@ static void CL_CALLBACK native_kernel(void * args) {
 }
 
 /**
- * Tests the ccl_kernel_enqueue_native() function.
+ * @internal
+ *
+ * @brief Tests the ccl_kernel_enqueue_native() function.
  * */
 static void native_test() {
 
@@ -1170,7 +1189,9 @@ static void native_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

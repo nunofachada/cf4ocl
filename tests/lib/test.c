@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Common stuff for cf4ocl2 tests.
  *
@@ -27,14 +29,23 @@
 #include "test.h"
 
 /**
- * Print handler which redirects output to debug stream.
+ * @internal
+ *
+ * @brief Print handler which redirects output to debug stream.
+ *
+ * @param string Output to redirect to debug stream.
  * */
 void ccl_print_to_debug(const gchar * string) {
     g_debug("%s", string);
 }
 
 /**
- * Create a context with a device specified at compile time.
+ * @internal
+ *
+ * @brief Create a context with a device specified at compile time.
+ *
+ * @param err Error handling object.
+ * @return A context with a device specified at compile time.
  * */
 CCLContext * ccl_test_context_new(CCLErr ** err) {
 

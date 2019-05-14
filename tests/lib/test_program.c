@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the program class. Also tests the kernel class.
  *
@@ -38,7 +40,9 @@
 G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * program wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -577,7 +581,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Test program and kernel wrappers ref counting.
+ * @internal
+ *
+ * @brief Test program and kernel wrappers ref counting.
  * */
 static void ref_unref_test() {
 
@@ -660,7 +666,9 @@ static const char src_main[] =
 static const char * src_head_name = "head.h";
 
 /**
- * Test program and kernel wrappers ref counting.
+ * @internal
+ *
+ * @brief Test program and kernel wrappers ref counting.
  * */
 static void compile_link_test() {
 
@@ -764,7 +772,9 @@ static void compile_link_test() {
 #endif
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

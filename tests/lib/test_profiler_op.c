@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Operation (timming and correctness) tests for the profiling
  * module. Can only be performed using the OpenCL stub.
@@ -47,8 +49,11 @@
 #endif
 
 #define CCL_TEST_MAXBUF 512
+
 /**
- * Tests the profiling module.
+ * @internal
+ *
+ * @brief Tests the profiling module.
  * */
 static void operation_test() {
 
@@ -352,7 +357,9 @@ static void operation_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

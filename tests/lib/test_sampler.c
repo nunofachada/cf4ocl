@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the sampler wrapper class and its methods.
  *
@@ -29,7 +31,9 @@
 #include "_ccl_defs.h"
 
 /**
- * Tests creation (using "simple" constructor), getting info from and
+ * @internal
+ *
+ * @brief Tests creation (using "simple" constructor), getting info from and
  * destruction of sampler wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -119,7 +123,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Tests creation (using "full" constructor), getting info from and
+ * @internal
+ *
+ * @brief Tests creation (using "full" constructor), getting info from and
  * destruction of sampler wrapper objects.
  * */
 static void create_full_info_destroy_test() {
@@ -179,7 +185,9 @@ static void create_full_info_destroy_test() {
 }
 
 /**
- * Tests sampler wrapper class reference counting.
+ * @internal
+ *
+ * @brief Tests sampler wrapper class reference counting.
  * */
 static void ref_unref_test() {
 
@@ -219,7 +227,9 @@ static void ref_unref_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

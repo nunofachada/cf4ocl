@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the event wrapper class and its methods.
  *
@@ -28,7 +30,9 @@
 #include "test.h"
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * event wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -149,7 +153,9 @@ static void create_info_destroy_test() {
 #ifdef CL_VERSION_1_1
 
 /**
- * Tests user events.
+ * @internal
+ *
+ * @brief Tests user events.
  * */
 static void user_event_test() {
 
@@ -228,12 +234,19 @@ static void user_event_test() {
 }
 
 /**
- * Test callback function.
+ * @internal
+ *
+ * @brief Test callback function.
+ *
+ * @param[in] event Unused.
+ * @param[in] event_command_exec_status Command completion status.
+ * @param[out] user_data Location to place evidence that this function was
+ * invoked.
  * */
 static void CL_CALLBACK callback_fun(
     cl_event event, cl_int event_command_exec_status, void * user_data) {
 
-    (void)event;
+    CCL_UNUSED(event);
 
     /* Confirm event is CL_COMPLETE. */
     g_assert_cmpint(event_command_exec_status, ==, CL_COMPLETE);
@@ -244,7 +257,9 @@ static void CL_CALLBACK callback_fun(
 }
 
 /**
- * Tests event callbacks.
+ * @internal
+ *
+ * @brief Tests event callbacks.
  * */
 static void callback_test() {
 
@@ -312,7 +327,9 @@ static void callback_test() {
 #endif
 
 /**
- * Event name and type test.
+ * @internal
+ *
+ * @brief Event name and type test.
  * */
 static void name_test() {
 
@@ -414,14 +431,21 @@ static void name_test() {
 }
 
 /**
- * Bogus function to avoid GCC errors in ::event_wait_lists_test().
+ * @internal
+ *
+ * @brief Bogus function to avoid GCC errors in ::event_wait_lists_test().
+ *
+ * @param ptr Memory location to return.
+ * @return A memory location given as a parameter
  * */
 CCLEventWaitList * ewl_test_aux(void * ptr) {
     return (CCLEventWaitList *) ptr;
 }
 
 /**
- * Event wait lists test.
+ * @internal
+ *
+ * @brief Event wait lists test.
  * */
 static void event_wait_lists_test() {
 
@@ -518,7 +542,9 @@ static void event_wait_lists_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

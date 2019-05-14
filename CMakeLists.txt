@@ -160,7 +160,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
 
     # Document generation options
     option(DOC_GENERATE_HTML "Generate HTML documentation?" ON)
-    option(DOC_INTERNAL
+    option(DOC_DEVELOPER
         "Generate internal documentation (for cf4ocl development only)?" OFF)
     option(DOC_GENERATE_LATEX "Generate Latex documentation?" OFF)
     if (DOC_GENERATE_LATEX AND CMAKE_MAKE_PROGRAM
@@ -173,14 +173,14 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
         option(DOC_GENERATE_MAN "Generate man pages?" OFF)
     endif()
 
-    # Exclude tests from documentation?
-    if (DOC_BUILD)
-        option(DOC_EXCLUDE_TESTS "Exclude tests from API docs?" ON)
-        if (DOC_EXCLUDE_TESTS)
-            # Add tests path to doc exclude path
-            set(DOX_EXCLUDE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tests"
-                CACHE INTERNAL "")
-        endif()
+    # If development docs are to be generated...
+    if (DOC_DEVELOPER)
+        # ...do not exclude test documentation
+        set(DOX_EXCLUDE_PATHS "" CACHE INTERNAL "")
+    else()
+        # ...otherwise exclude test documentation
+        set(DOX_EXCLUDE_PATHS
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests" CACHE INTERNAL "")
     endif()
 
     # Set doxygen document generation options
@@ -199,7 +199,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
     else()
         set(DOX_GENERATE_MAN "NO")
     endif()
-    if (DOC_INTERNAL)
+    if (DOC_DEVELOPER)
         set(DOX_INTERNAL "YES")
     else()
         set(DOX_INTERNAL "NO")
@@ -233,7 +233,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND LATEX_COMPILER)
     if (UNIX)
 
         # Create links to OpenCL API when OpenCL functions are mentioned?
-        # This is slow and requires Bash and other command-line utilties
+        # This is slow and requires Bash and other command-line utilities
         option(DOC_OPENCL_FUNCTION_URLS
             "Create links to OpenCL API (much slower)?" OFF)
         if (DOC_OPENCL_FUNCTION_URLS)

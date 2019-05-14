@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * File containing xor kernel for testing.
  *
@@ -25,7 +27,9 @@
  * */
 
 /**
- * Performs xor of two vectors plus a constant.
+ * @internal
+ *
+ * @brief Performs xor of two vectors plus a constant.
  *
  * @param[in] a First vector to xor.
  * @param[in] b Second vector to xor.

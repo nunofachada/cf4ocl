@@ -690,7 +690,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @DOX_EXCLUDE_PATHS@ \
+EXCLUDE                = @DOX_EXCLUDE_PATHS@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -705,7 +705,8 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = @PROJECT_SOURCE_DIR@/src/lib/*.h \
-                         *.in.*
+                         *export.h \
+                         *.in.* \
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

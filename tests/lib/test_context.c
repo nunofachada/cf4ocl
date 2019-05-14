@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the context wrapper class and its methods. Also tests
  * device selection filters, device wrappers and platform wrappers.
@@ -92,7 +94,9 @@ static cl_bool ccl_devsel_indep_test_true(
 }
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * context wrapper objects.
  * */
 static void create_info_destroy_test() {
@@ -439,7 +443,9 @@ static void create_info_destroy_test() {
 }
 
 /**
- * Test increasing reference count of objects which compose
+ * @internal
+ *
+ * @brief Test increasing reference count of objects which compose
  * larger objects, then destroy the larger object and verify that
  * composing object still exists and must be freed by the function
  * which increase its reference count. This function tests the following
@@ -769,7 +775,9 @@ static void ref_unref_test() {
 }
 
 /**
- * Tests the ccl_context_get_supported_image_formats() function.
+ * @internal
+ *
+ * @brief Tests the ccl_context_get_supported_image_formats() function.
  * */
 static void get_supported_image_formats_test() {
 
@@ -840,7 +848,9 @@ static void get_supported_image_formats_test() {
 }
 
 /**
- * Tests the device container aspects of a context.
+ * @internal
+ *
+ * @brief Tests the device container aspects of a context.
  * */
 static void device_container_test() {
 
@@ -877,7 +887,9 @@ static void device_container_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

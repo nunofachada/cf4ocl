@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Tests for device selection module.
  *
@@ -28,7 +30,9 @@
 #include "test.h"
 
 /**
- * Tests devsel creation and destruction of object containing device wrappers
+ * @internal
+ *
+ * @brief Tests devsel creation and destruction of object containing device wrappers
  * for all OpenCL devices in the system.
  * */
 static void devices_new_destroy_test() {
@@ -58,7 +62,9 @@ static void devices_new_destroy_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

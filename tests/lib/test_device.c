@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the device wrapper class and its methods.
  *
@@ -28,7 +30,9 @@
 #include "test.h"
 
 /**
- * Tests the creation of sub-devices.
+ * @internal
+ *
+ * @brief Tests the creation of sub-devices.
  * */
 static void sub_devices_test() {
 
@@ -225,7 +229,9 @@ static void sub_devices_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

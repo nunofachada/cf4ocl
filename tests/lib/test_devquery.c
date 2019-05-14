@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Tests for device query module.
  *
@@ -30,7 +32,9 @@
 #define CCL_TEST_DEVQUERY_MAXINFOLEN 500
 
 /**
- * Tests devquery module helper functions.
+ * @internal
+ *
+ * @brief Tests devquery module helper functions.
  * */
 static void helpers_test() {
 
@@ -116,7 +120,9 @@ static void helpers_test() {
 }
 
 /**
- * Test the ccl_devquery_name function of the device module.
+ * @internal
+ *
+ * @brief Test the ccl_devquery_name function of the device module.
  * */
 static void name_test() {
 
@@ -157,7 +163,9 @@ static void name_test() {
 }
 
 /**
- * Tests if the ccl_devquery_info_map array is well built,
+ * @internal
+ *
+ * @brief Tests if the ccl_devquery_info_map array is well built,
  * namely (i) if the param_name fields are alphabetically ordered, and
  * (ii) if the size of the array corresponds to the
  * ccl_devquery_info_map_size variable.
@@ -189,7 +197,9 @@ static void infomap_test() {
 }
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.

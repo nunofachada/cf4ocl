@@ -16,19 +16,23 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * File containing xor kernel for testing. This kernel delegates the xor to
  * another function which is declared in the header file.
  *
  * @author Nuno Fachada
- * @date 2016
+ * @date 2019
  * @copyright [GNU General Public License version 3 (GPLv3)](http://www.gnu.org/licenses/gpl.html)
  * */
 
 #include "xor_impl.cl.h"
 
 /**
- * Performs xor of two vectors and a constant.
+ * @internal
+ *
+ * @brief Performs xor of two vectors and a constant.
  *
  * @param[in] a First vector to xor.
  * @param[in] b Second vector to xor.

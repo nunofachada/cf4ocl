@@ -16,6 +16,8 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Test the image wrapper class and its methods.
  *
@@ -32,8 +34,13 @@
 #define CCL_TEST_IMAGE_HEIGHT 64
 
 /**
- * Setup image tests by creating a context with an image-supporting
+ * @internal
+ *
+ * @brief Setup image tests by creating a context with an image-supporting
  * device. A minimum OpenCL version can be set in `user_data`.
+ *
+ * @param[out] ctx_fixt Location where to place context to create.
+ * @param[in] user_data Minimum OpenCL version to be supported by context.
  * */
 static void context_with_image_support_setup(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -98,7 +105,12 @@ static void context_with_image_support_setup(
 }
 
 /**
- * Teardown image tests by releasing the created context.
+ * @internal
+ *
+ * @brief Teardown image tests by releasing the created context.
+ *
+ * @param[in] ctx_fixt Location of the context to teardown.
+ * @param[in] user_data Not used.
  * */
 static void context_with_image_support_teardown(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -115,8 +127,13 @@ static void context_with_image_support_teardown(
 }
 
 /**
- * Tests creation, getting info from and destruction of
+ * @internal
+ *
+ * @brief Tests creation, getting info from and destruction of
  * image wrapper objects.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void create_info_destroy_test(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -241,7 +258,12 @@ static void create_info_destroy_test(
 }
 
 /**
- * Tests image wrapper class reference counting.
+ * @internal
+ *
+ * @brief Tests image wrapper class reference counting.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void ref_unref_test(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -298,7 +320,12 @@ static void ref_unref_test(
 }
 
 /**
- * Tests basic read/write operations from/to image objects.
+ * @internal
+ *
+ * @brief Tests basic read/write operations from/to image objects.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void read_write_test(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -382,7 +409,12 @@ static void read_write_test(
 }
 
 /**
- * Tests copy operations from one image to another.
+ * @internal
+ *
+ * @brief Tests copy operations from one image to another.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void copy_test(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -471,7 +503,12 @@ static void copy_test(
 }
 
 /**
- * Tests map/unmap operations in image objects.
+ * @internal
+ *
+ * @brief Tests map/unmap operations in image objects.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void map_unmap_test(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -558,7 +595,12 @@ static void map_unmap_test(
 
 
 /**
- * Tests copy image to buffer and buffer to image functions.
+ * @internal
+ *
+ * @brief Tests copy image to buffer and buffer to image functions.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void copy_buffer_test(
     CCLContext ** ctx_fixt, gconstpointer user_data) {
@@ -668,7 +710,12 @@ static void copy_buffer_test(
 #ifdef CL_VERSION_1_2
 
 /**
- * Tests image fill.
+ * @internal
+ *
+ * @brief Tests image fill.
+ *
+ * @param[in] ctx_fixt Context to use.
+ * @param[in] user_data Not used.
  * */
 static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
 
@@ -737,7 +784,9 @@ static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
 #endif
 
 /**
- * Main function.
+ * @internal
+ *
+ * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  * @return Result of test run.
