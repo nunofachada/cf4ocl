@@ -57,9 +57,11 @@ struct ccl_device {
 #ifdef CL_VERSION_1_2
 
 /**
- * Release an array of sub-devices and the respective sub-devices.
+ * @internal
  *
- * @internal @private @memberof ccl_device
+ * @brief Release an array of sub-devices and the respective sub-devices.
+ *
+ * @private @memberof ccl_device
  *
  * @param[in] data An array of sub-devices to be released.
  * */
@@ -80,10 +82,12 @@ static void ccl_device_release_subdev_arrays(gpointer data) {
 }
 
 /**
- * Implementation of ccl_wrapper_release_fields() function for
+ * @internal
+ *
+ * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLDevice wrapper objects.
  *
- * @internal @private @memberof ccl_device
+ * @private @memberof ccl_device
  *
  * @param[in] dev A ::CCLDevice wrapper object.
  * */

@@ -17,11 +17,11 @@
  * */
 
 /**
+ * @internal
+ *
  * @file
  * Useful definitions used internally by _cf4ocl_. This header is not part of
  * the public API.
- *
- * @internal
  *
  * @author Nuno Fachada
  * @date 2019
@@ -57,9 +57,10 @@
 #endif
 
 /**
- * A `g_info()` macro for older GLib versions which do not provide it.
- *
  * @internal
+ *
+ * @brief A `g_info()` macro for older GLib versions which do not provide it.
+ *
  * @def g_info()
  * */
 #ifndef g_info

@@ -30,10 +30,12 @@
  * */
 
 /**
- * Implementation of ccl_wrapper_release_fields() function for
+ * @internal
+ *
+ * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLMemObj wrapper objects.
  *
- * @internal @protected @memberof ccl_memobj
+ * @protected @memberof ccl_memobj
  *
  * @param[in] mo A ::CCLMemObj wrapper object.
  * */

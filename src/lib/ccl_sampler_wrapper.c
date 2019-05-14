@@ -50,10 +50,11 @@ struct ccl_sampler {
  */
 
 /**
- * Basic sampler properties accepted by the "old" clCreateSampler()
+ * @internal
+ *
+ * @brief Basic sampler properties accepted by the "old" clCreateSampler()
  * constructor.
  *
- * @internal
  * */
 struct ccl_sampler_basic_properties {
 
@@ -68,15 +69,18 @@ struct ccl_sampler_basic_properties {
 };
 
 /**
- * Gets a ::ccl_sampler_basic_properties containing the properties accepted by
- * the "old" clCreateSampler() constructor from a given list of properties. The
- * following default values are assumed for non-specified properties:
+ * @internal
+ *
+ * @brief Gets a ::ccl_sampler_basic_properties containing the properties
+ * accepted by the "old" clCreateSampler() constructor from a given list of
+ * properties. The following default values are assumed for non-specified
+ * properties:
  *
  * * `CL_SAMPLER_NORMALIZED_COORDS`: `CL_TRUE`
  * * `CL_SAMPLER_ADDRESSING_MODE` : `CL_ADDRESS_CLAMP`
  * * `CL_SAMPLER_FILTER_MODE` : `CL_FILTER_NEAREST`
  *
- * @internal @private @memberof ccl_sampler
+ * @private @memberof ccl_sampler
  *
  * @param[in] sampler_properties Zero-terminated list of sampler properties.
  * @return A ::ccl_sampler_basic_properties object containing sampler

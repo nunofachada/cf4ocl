@@ -29,9 +29,11 @@
 #include "_ccl_defs.h"
 
 /**
- * Initialize device list in device container.
+ * @internal
  *
- * @internal @private @memberof ccl_dev_container
+ * @brief Initialize device list in device container.
+ *
+ * @private @memberof ccl_dev_container
  *
  * @param[in] devcon Device container wrapper.
  * @param[in] get_devices Concrete wrapper implementation of
@@ -90,10 +92,12 @@ finish:
 }
 
 /**
- * Release the devices held by the given ::CCLDevContainer object. Implements
- * the ccl_wrapper_release_fields() function.
+ * @internal
  *
- * @internal @protected @memberof ccl_dev_container
+ * @brief Release the devices held by the given ::CCLDevContainer object.
+ * Implements the ccl_wrapper_release_fields() function.
+ *
+ * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon A ::CCLDevContainer wrapper object.
  * */
@@ -119,9 +123,11 @@ void ccl_dev_container_release_devices(CCLDevContainer * devcon) {
 }
 
 /**
- * Get all ::CCLDevice wrappers in device container.
+ * @internal
  *
- * @internal @protected @memberof ccl_dev_container
+ * @brief Get all ::CCLDevice wrappers in device container.
+ *
+ * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get `cl_device_id`s from wrapped
@@ -153,20 +159,19 @@ CCLDevice * const * ccl_dev_container_get_all_devices(
     return (CCLDevice * const *) devcon->devices;
 }
 
-
 /**
- * Get ::CCLDevice wrapper at given index.
+ * @internal
  *
- * @internal @protected @memberof ccl_dev_container
+ * @brief Get ::CCLDevice wrapper at given index.
+ *
+ * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
- * @param[in] get_devices Function to get `cl_device_id`s from wrapped
- * object.
+ * @param[in] get_devices Function to get `cl_device_id`s from wrapped object.
  * @param[in] index Index of device in device container.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return The ::CCLDevice wrapper at given index or `NULL` if an error
- * occurs.
+ * @return The ::CCLDevice wrapper at given index or `NULL` if an error occurs.
  * */
 CCLDevice * ccl_dev_container_get_device(
     CCLDevContainer * devcon,
@@ -221,9 +226,11 @@ finish:
 }
 
 /**
- * Return number of devices in device container.
+ * @internal
  *
- * @internal @protected @memberof ccl_dev_container
+ * @brief Return number of devices in device container.
+ *
+ * @protected @memberof ccl_dev_container
  *
  * @param[in] devcon The device container object.
  * @param[in] get_devices Function to get `cl_device_id`s from wrapped

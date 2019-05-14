@@ -46,16 +46,17 @@ struct ccl_platform {
 };
 
 /**
- * Implementation of ::ccl_dev_container_get_cldevices() for the platform
- * wrapper.
+ * @internal
  *
- * @internal @private @memberof ccl_platform
+ * @brief Implementation of ::ccl_dev_container_get_cldevices() for the
+ * platform wrapper.
+ *
+ * @private @memberof ccl_platform
  *
  * @param[in] devcon A ::CCLPlatform wrapper, passed as a ::CCLDevContainer.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
  * reporting is to be ignored.
- * @return A list of `cl_device_id` objects inside a ::CCLWrapperInfo
- * object.
+ * @return A list of `cl_device_id` objects inside a ::CCLWrapperInfo object.
  * */
 static CCLWrapperInfo * ccl_platform_get_cldevices(
     CCLDevContainer * devcon, CCLErr ** err) {

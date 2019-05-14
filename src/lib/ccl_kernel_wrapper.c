@@ -52,10 +52,12 @@ struct ccl_kernel {
 };
 
 /**
- * Implementation of ::ccl_wrapper_release_fields() function for ::CCLKernel
- * wrapper objects.
+ * @internal
  *
- * @internal @private @memberof ccl_kernel
+ * @brief Implementation of ::ccl_wrapper_release_fields() function for
+ * ::CCLKernel wrapper objects.
+ *
+ * @private @memberof ccl_kernel
  *
  * @param[in] krnl A ::CCLKernel wrapper object.
  * */
@@ -836,11 +838,12 @@ finish:
 }
 
 /**
- * Helper macro which tests if the error is a `CCL_ERROR_INFO_UNAVAILABLE_OCL`
- * error, and if so, generates a warning and clears the error. Otherwise it
- * tests the error in the same way as g_if_err_propagate_goto().
- *
  * @internal
+ *
+ * @brief Helper macro which tests if the error is a
+ * `CCL_ERROR_INFO_UNAVAILABLE_OCL` error, and if so, generates a warning and
+ * clears the error. Otherwise it tests the error in the same way as
+ * g_if_err_propagate_goto().
  *
  * @param[out] err Destination CCLErr** object.
  * @param[in] err_internal Source CCLErr* object.

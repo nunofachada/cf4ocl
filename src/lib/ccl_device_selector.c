@@ -63,12 +63,12 @@ typedef struct ccl_devsel_filter {
 } CCLDevSelFilter;
 
 /**
- * Add any filter to the filter set.
+ * @internal
+ *
+ * @brief Add any filter to the filter set.
  *
  * This private function is used by the public `ccl_devsel_add_*_filter()`
  * functions.
- *
- * @internal
  *
  * @param[in] filters The filter set.
  * @param[in] function Filter function (independent or dependent).
@@ -96,10 +96,10 @@ static void ccl_devsel_add_filter(CCLDevSelFilters * filters,
 }
 
 /**
- * Returns a `NULL`-terminated array of strings, each one containing the name
- * and vendor of each device in the given device array.
- *
  * @internal
+ *
+ * @brief Returns a `NULL`-terminated array of strings, each one containing the
+ * name and vendor of each device in the given device array.
  *
  * @param[in] devices Array of devices.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -172,10 +172,10 @@ finish:
 }
 
 /**
- * Private helper function, prints a list of the devices
- * specified in the given list.
- *
  * @internal
+ *
+ * @brief Private helper function, prints a list of the devices specified in
+ * the given list.
  *
  * @param[in] devices List of devices.
  * @param[in] selected Index of selected device (a message will appear
@@ -238,9 +238,10 @@ finish:
 }
 
 /**
- * Private helper function, asks the user to select a device from a list.
- *
  * @internal
+ *
+ * @brief Private helper function, asks the user to select a device from a
+ * list.
  *
  * @param[in] devices Array of devices.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error

@@ -74,7 +74,7 @@ struct ccl_program {
 
 /**
  * Class which represents a binary object associated with a program
- * and a device
+ * and a device.
  * */
 struct ccl_program_binary {
 
@@ -92,9 +92,11 @@ struct ccl_program_binary {
 };
 
 /**
- * Destroy table of build logs.
+ * @internal
  *
- * @internal @private @memberof ccl_program
+ * @brief Destroy table of build logs.
+ *
+ * @private @memberof ccl_program
  *
  * @param[in] prg A ::CCLProgram wrapper object.
  * */
@@ -115,10 +117,12 @@ static void ccl_program_clear_build_logs(CCLProgram * prg) {
 }
 
 /**
- * Implementation of ccl_wrapper_release_fields() function for
+ * @internal
+ *
+ * @brief Implementation of ccl_wrapper_release_fields() function for
  * ::CCLProgram wrapper objects.
  *
- * @internal @private @memberof ccl_program
+ * @private @memberof ccl_program
  *
  * @param[in] prg A ::CCLProgram wrapper object.
  * */
@@ -161,9 +165,12 @@ static void ccl_program_release_fields(CCLProgram * prg) {
 }
 
 /**
- * Implementation of ccl_dev_container_get_cldevices() for the program wrapper.
+ * @internal
  *
- * @internal @private @memberof ccl_program
+ * @brief Implementation of ccl_dev_container_get_cldevices() for the program
+ * wrapper.
+ *
+ * @private @memberof ccl_program
  *
  * @param[in] devcon A ::CCLProgram wrapper, passed as a ::CCLDevContainer .
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -177,9 +184,11 @@ static CCLWrapperInfo * ccl_program_get_cldevices(
 }
 
 /**
- * Create a new binary object.
+ * @internal
  *
- * @internal @private @memberof ccl_program
+ * @brief Create a new binary object.
+ *
+ * @private @memberof ccl_program
  *
  * @param[in] data Binary data.
  * @param[in] size Size of binary data.
@@ -197,9 +206,11 @@ static CCLProgramBinary * ccl_program_binary_new(
 }
 
 /**
- * Destroy a binary object.
+ * @internal
  *
- * @internal @private @memberof ccl_program
+ * @brief Destroy a binary object.
+ *
+ * @private @memberof ccl_program
  *
  * @param[in] pbin The binary object to destroy.
  * */
@@ -214,9 +225,9 @@ static void ccl_program_binary_destroy(CCLProgramBinary * pbin) {
 }
 
 /**
- * Helper macro to create a new empty binary object.
- *
  * @internal
+ *
+ * @brief Helper macro to create a new empty binary object.
  *
  * @return A new empty binary object.
  * */
@@ -1658,10 +1669,12 @@ CCLEvent * ccl_program_enqueue_kernel_v(CCLProgram * prg,
 }
 
 /**
- * Load the program binaries into the binaries table of the program wrapper
- * object.
+ * @internal
  *
- * @internal @private @memberof ccl_program
+ * @brief Load the program binaries into the binaries table of the program
+ * wrapper object.
+ *
+ * @private @memberof ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error

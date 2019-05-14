@@ -353,8 +353,6 @@ void ccl_event_wait_list_clear(CCLEventWaitList * evt_wait_lst);
  * This macro is used by the `ccl_*_enqueue_*()` functions and will
  * rarely be called from client code.
  *
- * @internal
- *
  * @param[in] evt_wait_lst Event wait list.
  * @return Number of event in the event wait list.
  * */
@@ -368,8 +366,6 @@ void ccl_event_wait_list_clear(CCLEventWaitList * evt_wait_lst);
  *
  * This macro is used by the `ccl_*_enqueue_*()` functions and will
  * rarely be called from client code.
- *
- * @internal
  *
  * @param[in] evt_wait_lst Event wait list.
  * @return Array of OpenCL cl_event objects in the event wait list.

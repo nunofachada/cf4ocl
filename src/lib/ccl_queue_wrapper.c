@@ -68,10 +68,12 @@ struct ccl_queue {
 };
 
 /**
- * Implementation of ccl_wrapper_release_fields() function for ::CCLQueue
- * wrapper objects.
+ * @internal
  *
- * @internal @private @memberof ccl_queue
+ * @brief Implementation of ccl_wrapper_release_fields() function for
+ * ::CCLQueue wrapper objects.
+ *
+ * @private @memberof ccl_queue
  *
  * @param[in] cq A ::CCLQueue wrapper object.
  * */
@@ -450,13 +452,13 @@ finish:
 }
 
 /**
- * Create an event wrapper from a given OpenCL event object and associate it
- * with the command queue.
+ * @brief Create an event wrapper from a given OpenCL event object and
+ * associate it with the command queue.
  *
  * This function is used by the `ccl_*_enqueue_*()` functions and will rarely
  * be called from client code.
  *
- * @internal @public @memberof ccl_queue
+ * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @param[in] event The OpenCL event to wrap and associate with the given
@@ -496,9 +498,10 @@ CCLEvent * ccl_queue_produce_event(CCLQueue * cq, cl_event event) {
  * This function is used by @ref CCL_PROFILER "profile module" functions and
  * will rarely be called from client code.
  *
- * @internal @public @memberof ccl_queue
+ * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
+ *
  * */
 CCL_EXPORT
 void ccl_queue_iter_event_init(CCLQueue * cq) {
@@ -522,7 +525,7 @@ void ccl_queue_iter_event_init(CCLQueue * cq) {
  * @warning No events should be enqueued on this queue while the iteration is
  * ongoing.
  *
- * @internal @public @memberof ccl_queue
+ * @public @memberof ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @return The next event wrapper associated with this queue, or `NULL` if no
@@ -634,7 +637,9 @@ void ccl_queue_gc(CCLQueue * cq) {
 }
 
 /**
- * For platforms which do not support clEnqueueBarrierWithWaitList()
+ * @internal
+ *
+ * @brief For platforms which do not support clEnqueueBarrierWithWaitList()
  * (OpenCL <= 1.1), this function implements the same functionality by using
  * the deprecated clEnqueueBarrier(), clEnqueueWaitForEvents() and
  * clEnqueueMarker() OpenCL functions.
@@ -646,7 +651,7 @@ void ccl_queue_gc(CCLQueue * cq) {
  * either clEnqueueBarrier() or clEnqueueWaitForEvents()). This marker event
  * can then be used to queue a wait on.
  *
- * @internal @see ccl_enqueue_barrier()
+ * @see ccl_enqueue_barrier()
  *
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list.
@@ -826,15 +831,17 @@ finish:
 }
 
 /**
- * For platforms which do not support clEnqueueMarkerWithWaitList() (OpenCL <=
- * 1.1), this function uses the deprecated clEnqueueMarker() OpenCL function.
- * However, in this case `evt_wait_lst` must be `NULL`, because
+ * @internal
+ *
+ * @brief For platforms which do not support clEnqueueMarkerWithWaitList()
+ * (OpenCL <= 1.1), this function uses the deprecated clEnqueueMarker() OpenCL
+ * function. However, in this case `evt_wait_lst` must be `NULL`, because
  * clEnqueueMarker() does not support markers with wait lists. If
  * `evt_wait_lst` is not `NULL`, it will be ignored (i.e. the marker will only
  * fire an event after all commands queued before the marker command are
  * complete) and a warning will be generated.
  *
- * @internal @see ccl_enqueue_marker()
+ * @see ccl_enqueue_marker()
  *
  * @param[in] cq Command queue wrapper object.
  * @param[in,out] evt_wait_lst Event wait list. Must be `NULL` or a warning

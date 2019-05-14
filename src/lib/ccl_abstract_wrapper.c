@@ -107,10 +107,10 @@ struct ccl_wrapper_info_table {
 /* ********************************* */
 
 /**
- * Create a new ::CCLWrapper object. This function is called by
- * the concrete wrapper constructors.
+ * Create a new ::CCLWrapper object. This function is called by the concrete
+ * wrapper constructors.
  *
- * @internal @protected @memberof ccl_wrapper
+ * @protected @memberof ccl_wrapper
  *
  * @param[in] class Class or type of OpenCL object to wrap.
  * @param[in] cl_object OpenCL object to wrap.
@@ -166,10 +166,12 @@ CCLWrapper * ccl_wrapper_new(CCLClass class, void * cl_object, size_t size) {
 }
 
 /**
- * Decrements the reference count of the wrapper object.
+ * @internal
+ *
+ * @brief Decrements the reference count of the wrapper object.
  * If it reaches 0, the wrapper object is destroyed.
  *
- * @internal @protected @memberof ccl_wrapper
+ * @protected @memberof ccl_wrapper
  *
  * @param[in] wrapper The wrapper object.
  * @param[in] size Size in bytes of wrapper object.
@@ -259,9 +261,11 @@ cl_bool ccl_wrapper_unref(CCLWrapper * wrapper, size_t size,
 }
 
 /**
- * Add a ::CCLWrapperInfo object to the info table of the given wrapper.
+ * @internal
  *
- * @internal @protected @memberof ccl_wrapper
+ * @brief Add a ::CCLWrapperInfo object to the info table of the given wrapper.
+ *
+ * @protected @memberof ccl_wrapper
  *
  * @param[in] wrapper Wrapper to add info to.
  * @param[in] param_name Name of parameter which will refer to this
@@ -319,9 +323,11 @@ void ccl_wrapper_add_info(CCLWrapper * wrapper, cl_uint param_name,
 }
 
 /**
- * Create a new ::CCLWrapperInfo object with a given value size.
+ * @internal
  *
- * @internal @protected @memberof ccl_wrapper_info
+ * @brief Create a new ::CCLWrapperInfo object with a given value size.
+ *
+ * @protected @memberof ccl_wrapper_info
  *
  * @param[in] size Parameter size in bytes.
  * @return A new CCLWrapperInfo * object.
@@ -341,9 +347,11 @@ CCLWrapperInfo * ccl_wrapper_info_new(size_t size) {
 }
 
 /**
- * Destroy a ::CCLWrapperInfo object.
+ * @internal
  *
- * @internal @protected @memberof ccl_wrapper_info
+ * @brief Destroy a ::CCLWrapperInfo object.
+ *
+ * @protected @memberof ccl_wrapper_info
  *
  * @param[in] info Object to destroy.
  * */

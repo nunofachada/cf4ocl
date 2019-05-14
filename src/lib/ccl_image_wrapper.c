@@ -50,9 +50,12 @@ struct ccl_image {
  */
 
 /**
- * Creates a new OpenCL image object using the deprecated OpenCL 1.0/1.1 API.
+ * @internal
  *
- * @internal @private @memberof ccl_image
+ * @brief Creates a new OpenCL image object using the deprecated OpenCL
+ * 1.0/1.1 API.
+ *
+ * @private @memberof ccl_image
  *
  * @param[in] ctx A context wrapper object on which the image wrapper
  * object is to be created.

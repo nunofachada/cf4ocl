@@ -97,8 +97,8 @@ int main() {
 
 We can compile the program with `gcc` (or `clang`), and run it:
 
-```c
-$ gcc `pkg-config --cflags cf4ocl2` mysum.c -o mysum `pkg-config --libs cf4ocl2`
+```
+$ gcc $(pkg-config --cflags cf4ocl2) mysum.c -o mysum $(pkg-config --libs cf4ocl2)
 $ ./mysum
 ```
 
