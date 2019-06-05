@@ -186,6 +186,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
 /**
  * Get a ::CCLWrapperInfo kernel information object.
  *
+ * @relates ccl_kernel
+ *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -204,6 +206,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_kernel
  *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -226,6 +230,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_kernel
+ *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in the array (e.g. `char`, `size_t`,
@@ -243,6 +249,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
 
 /**
  * Get a ::CCLWrapperInfo kernel workgroup information object.
+ *
+ * @relates ccl_kernel
  *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -264,6 +272,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_kernel
  *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -288,6 +298,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
  * Use with care. In case an error occurs, `NULL` is returned, which
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_kernel
  *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] dev The device wrapper object.
@@ -319,6 +331,8 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_kernel
+ *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -344,6 +358,8 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_kernel
+ *
  * @param[in] krnl The kernel wrapper object.
  * @param[in] idx Argument index.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -364,6 +380,8 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
 /**
  * Increase the reference count of the kernel object.
  *
+ * @relates ccl_kernel
+ *
  * @param[in] krnl The kernel wrapper object.
  * */
 #define ccl_kernel_ref(krnl) \
@@ -372,6 +390,8 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
 /**
  * Alias to ccl_kernel_destroy().
  *
+ * @relates ccl_kernel
+ *
  * @param[in] krnl Kernel wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
@@ -379,6 +399,8 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(CCLKernel * krnl, cl_uint idx,
 
 /**
  * Get the OpenCL kernel object.
+ *
+ * @relates ccl_kernel
  *
  * @param[in] krnl The kernel wrapper object.
  * @return The OpenCL kernel object.

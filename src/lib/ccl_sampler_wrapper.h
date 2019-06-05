@@ -105,6 +105,8 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
 /**
  * Get a ::CCLWrapperInfo sampler information object.
  *
+ * @relates ccl_sampler
+ *
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -123,6 +125,8 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
  * Use with care. In case an error occurs, zero is returned, which might be
  * ambiguous if zero is a valid return value. In this case, it is necessary to
  * check the error object.
+ *
+ * @relates ccl_sampler
  *
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -147,6 +151,8 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
  * ambiguous if `NULL` is a valid return value. In this case, it is necessary
  * to check the error object.
  *
+ * @relates ccl_sampler
+ *
  * @param[in] smplr The sampler wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
@@ -164,6 +170,8 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
 /**
  * Increase the reference count of the sampler wrapper object.
  *
+ * @relates ccl_sampler
+ *
  * @param[in] smplr The sampler wrapper object.
  * */
 #define ccl_sampler_ref(smplr) \
@@ -172,6 +180,8 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
 /**
  * Alias to ccl_sampler_destroy().
  *
+ * @relates ccl_sampler
+ *
  * @param[in] smplr sampler wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
@@ -179,6 +189,8 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
 
 /**
  * Get the OpenCL sampler object.
+ *
+ * @relates ccl_sampler
  *
  * @param[in] smplr The sampler wrapper object.
  * @return The OpenCL sampler object.

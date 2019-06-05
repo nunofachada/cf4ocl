@@ -183,6 +183,8 @@ CCLEvent * ccl_buffer_enqueue_fill(CCLBuffer * buf, CCLQueue * cq,
  * is a utility macro that expands to ::ccl_memobj_enqueue_unmap(),
  * casting `buf` into a ::CCLMemObj object.
  *
+ * @relates ccl_buffer
+ *
  * @param[in] buf A buffer wrapper object.
  * @param[in] cq A command queue wrapper object.
  * @param[in] ptr The host address returned by a previous call to
@@ -200,6 +202,8 @@ CCLEvent * ccl_buffer_enqueue_fill(CCLBuffer * buf, CCLQueue * cq,
 /**
  * Increase the reference count of the buffer wrapper object.
  *
+ * @relates ccl_buffer
+ *
  * @param[in] buf The buffer wrapper object.
  * */
 #define ccl_buffer_ref(buf) \
@@ -208,12 +212,16 @@ CCLEvent * ccl_buffer_enqueue_fill(CCLBuffer * buf, CCLQueue * cq,
 /**
  * Alias to ccl_buffer_destroy().
  *
+ * @relates ccl_buffer
+ *
  * @param[in] buf Buffer wrapper object to unreference.
  * */
 #define ccl_buffer_unref(buf) ccl_buffer_destroy(buf)
 
 /**
  * Get the OpenCL buffer object.
+ *
+ * @relates ccl_buffer
  *
  * @param[in] buf The buffer wrapper object.
  * @return The OpenCL buffer object.

@@ -272,6 +272,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
  * is a utility macro that expands to ::ccl_memobj_enqueue_unmap(),
  * casting `img` into a ::CCLMemObj object.
  *
+ * @relates ccl_image
+ *
  * @param[in] img An image wrapper object.
  * @param[in] cq A command queue wrapper object.
  * @param[in] ptr The host address returned by a previous call to
@@ -288,6 +290,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
 
 /**
  * Get a ::CCLWrapperInfo image information object.
+ *
+ * @relates ccl_image
  *
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get.
@@ -307,6 +311,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_image
  *
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -328,6 +334,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_image
+ *
  * @param[in] img The image wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in the array (e.g. `char`, `size_t`,
@@ -345,6 +353,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
 /**
  * Increase the reference count of the image wrapper object.
  *
+ * @relates ccl_image
+ *
  * @param[in] img The image wrapper object.
  * */
 #define ccl_image_ref(img) \
@@ -353,6 +363,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
 /**
  * Alias to ccl_image_destroy().
  *
+ * @relates ccl_image
+ *
  * @param[in] img image wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
@@ -360,6 +372,8 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
 
 /**
  * Get the OpenCL image memory object.
+ *
+ * @relates ccl_image
  *
  * @param[in] img The image wrapper object.
  * @return The OpenCL image memory object.

@@ -136,6 +136,8 @@ cl_bool ccl_user_event_set_status(
 /**
  * Get a ::CCLWrapperInfo event information object.
  *
+ * @relates ccl_event
+ *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -154,6 +156,8 @@ cl_bool ccl_user_event_set_status(
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_event
  *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -175,6 +179,8 @@ cl_bool ccl_user_event_set_status(
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_event
+ *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in the array (e.g. `char`, `size_t`,
@@ -191,6 +197,8 @@ cl_bool ccl_user_event_set_status(
 
 /**
  * Get a ::CCLWrapperInfo event profiling information object.
+ *
+ * @relates ccl_event
  *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get.
@@ -210,6 +218,8 @@ cl_bool ccl_user_event_set_status(
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_event
  *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -232,6 +242,8 @@ cl_bool ccl_user_event_set_status(
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_event
+ *
  * @param[in] evt The event wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in the array (e.g. `char`, `size_t`,
@@ -250,6 +262,8 @@ cl_bool ccl_user_event_set_status(
 /**
  * Increase the reference count of the event object.
  *
+ * @relates ccl_event
+ *
  * @param[in] evt The event wrapper object.
  * */
 #define ccl_event_ref(evt) \
@@ -258,6 +272,8 @@ cl_bool ccl_user_event_set_status(
 /**
  * Alias to ccl_event_destroy().
  *
+ * @relates ccl_event
+ *
  * @param[in] evt Event wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
@@ -265,6 +281,8 @@ cl_bool ccl_user_event_set_status(
 
 /**
  * Get the OpenCL event object.
+ *
+ * @relates ccl_event
  *
  * @param[in] evt The event wrapper object.
  * @return The OpenCL event object.

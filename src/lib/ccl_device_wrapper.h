@@ -98,6 +98,8 @@ CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
 /**
  * Get a ::CCLWrapperInfo device information object.
  *
+ * @relates ccl_device
+ *
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -116,6 +118,8 @@ CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_device
  *
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -138,6 +142,8 @@ CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_device
+ *
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
@@ -156,6 +162,8 @@ CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
 /**
  * Increase the reference count of the device wrapper object.
  *
+ * @relates ccl_device
+ *
  * @param[in] dev The device wrapper object.
  * */
 #define ccl_device_ref(dev) \
@@ -164,6 +172,8 @@ CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
 /**
  * Alias to ccl_device_destroy().
  *
+ * @relates ccl_device
+ *
  * @param[in] dev Device wrapper object to destroy if reference count
  * is 1, otherwise just decrement the reference count.
  * */
@@ -171,6 +181,8 @@ CCLDevice * const * ccl_device_create_subdevices(CCLDevice * dev,
 
 /**
  * Get the OpenCL device_id object.
+ *
+ * @relates ccl_device
  *
  * @param[in] dev The device wrapper object.
  * @return The OpenCL device_id object.

@@ -403,6 +403,8 @@ CCLDevice * const * ccl_program_get_all_devices(
  * binaries use the ::ccl_program_get_binary() function instead, as this macro
  * will return `NULL` when the `CL_PROGRAM_BINARIES` parameter is requested.
  *
+ * @relates ccl_program
+ *
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -424,6 +426,8 @@ CCLDevice * const * ccl_program_get_all_devices(
  * Use with care. In case an error occurs, zero is returned, which might be
  * ambiguous if zero is a valid return value. In this case, it is necessary to
  * check the error object.
+ *
+ * @relates ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -451,6 +455,8 @@ CCLDevice * const * ccl_program_get_all_devices(
  * ambiguous if `NULL` is a valid return value. In this case, it is necessary
  * to check the error object.
  *
+ * @relates ccl_program
+ *
  * @param[in] prg The program wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
@@ -472,6 +478,8 @@ CCLDevice * const * ccl_program_get_all_devices(
 /**
  * Get a ::CCLWrapperInfo program build information object.
  *
+ * @relates ccl_program
+ *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get.
@@ -491,6 +499,8 @@ CCLDevice * const * ccl_program_get_all_devices(
  * Use with care. In case an error occurs, zero is returned, which might be
  * ambiguous if zero is a valid return value. In this case, it is necessary to
  * check the error object.
+ *
+ * @relates ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
@@ -515,6 +525,8 @@ CCLDevice * const * ccl_program_get_all_devices(
  * ambiguous if `NULL` is a valid return value. In this case, it is necessary
  * to check the error object.
  *
+ * @relates ccl_program
+ *
  * @param[in] prg The program wrapper object.
  * @param[in] dev The device wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -535,6 +547,8 @@ CCLDevice * const * ccl_program_get_all_devices(
 /**
  * Increase the reference count of the program object.
  *
+ * @relates ccl_program
+ *
  * @param[in] prg The program wrapper object.
  * */
 #define ccl_program_ref(prg) \
@@ -543,6 +557,8 @@ CCLDevice * const * ccl_program_get_all_devices(
 /**
  * Alias to ccl_program_destroy().
  *
+ * @relates ccl_program
+ *
  * @param[in] prg Program wrapper object to destroy if reference count is 1,
  * otherwise just decrement the reference count.
  * */
@@ -550,6 +566,8 @@ CCLDevice * const * ccl_program_get_all_devices(
 
 /**
  * Get the OpenCL program object.
+ *
+ * @relates ccl_program
  *
  * @param[in] prg The program wrapper object.
  * @return The OpenCL program object.

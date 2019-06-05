@@ -146,6 +146,8 @@ CCLEvent * ccl_enqueue_marker(
 /**
  * Get a ::CCLWrapperInfo command queue information object.
  *
+ * @relates ccl_queue
+ *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -164,6 +166,8 @@ CCLEvent * ccl_enqueue_marker(
  * Use with care. In case an error occurs, zero is returned, which might be
  * ambiguous if zero is a valid return value. In this case, it is necessary to
  * check the error object.
+ *
+ * @relates ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -185,6 +189,8 @@ CCLEvent * ccl_enqueue_marker(
  * ambiguous if `NULL` is a valid return value. In this case, it is necessary
  * to check the error object.
  *
+ * @relates ccl_queue
+ *
  * @param[in] cq The command queue wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
@@ -202,6 +208,8 @@ CCLEvent * ccl_enqueue_marker(
 /**
  * Increase the reference count of the command queue object.
  *
+ * @relates ccl_queue
+ *
  * @param[in] cq The command queue wrapper object.
  * */
 #define ccl_queue_ref(cq) \
@@ -210,6 +218,8 @@ CCLEvent * ccl_enqueue_marker(
 /**
  * Alias to ccl_queue_destroy().
  *
+ * @relates ccl_queue
+ *
  * @param[in] cq Command queue wrapper object to destroy if reference count is
  * 1, otherwise just decrement the reference count.
  * */
@@ -217,6 +227,8 @@ CCLEvent * ccl_enqueue_marker(
 
 /**
  * Get the OpenCL command queue object.
+ *
+ * @relates ccl_queue
  *
  * @param[in] cq The command queue wrapper object.
  * @return The OpenCL command queue object.

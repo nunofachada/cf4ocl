@@ -127,6 +127,8 @@ cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err);
 /**
  * Get a ::CCLWrapperInfo platform information object.
  *
+ * @relates ccl_platform
+ *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -145,6 +147,8 @@ cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err);
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_platform
  *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -167,6 +171,8 @@ cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err);
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_platform
+ *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
@@ -187,6 +193,8 @@ cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err);
  * macro simply wraps the ccl_platform_get_info_array() macro, because
  * (as of OpenCL 2.0) all platform information return types are `char *`.
  *
+ * @relates ccl_platform
+ *
  * @param[in] platf The platform wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -201,12 +209,16 @@ cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err);
 /**
  * Increase the reference count of the platform wrapper object.
  *
+ * @relates ccl_platform
+ *
  * @param[in] platform The platform wrapper object.
  * */
 #define ccl_platform_ref(platform) ccl_wrapper_ref((CCLWrapper *) platform)
 
 /**
  * Alias to ccl_platform_destroy().
+ *
+ * @relates ccl_platform
  *
  * @param[in] platform Platform wrapper object to destroy if reference
  * count is 1, otherwise just decrement the reference count.
@@ -215,6 +227,8 @@ cl_uint ccl_platform_get_opencl_version(CCLPlatform * platf, CCLErr ** err);
 
 /**
  * Get the OpenCL platform object.
+ *
+ * @relates ccl_platform
  *
  * @param[in] platform The platform wrapper object.
  * @return The OpenCL platform object.

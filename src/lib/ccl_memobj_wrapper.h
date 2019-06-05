@@ -97,6 +97,8 @@ CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
 /**
  * Get a ::CCLWrapperInfo memory object information object.
  *
+ * @relates ccl_memobj
+ *
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get.
  * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
@@ -115,6 +117,8 @@ CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
  * Use with care. In case an error occurs, zero is returned, which
  * might be ambiguous if zero is a valid return value. In this case, it
  * is necessary to check the error object.
+ *
+ * @relates ccl_memobj
  *
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
@@ -136,6 +140,8 @@ CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
  * might be ambiguous if `NULL` is a valid return value. In this case, it
  * is necessary to check the error object.
  *
+ * @relates ccl_memobj
+ *
  * @param[in] mo The memory object wrapper object.
  * @param[in] param_name Name of information/parameter to get value of.
  * @param[in] param_type Type of parameter in array (e.g. `char`, `size_t`,
@@ -153,6 +159,8 @@ CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
 /**
  * Increase the reference count of the `cl_mem` wrapper object.
  *
+ * @relates ccl_memobj
+ *
  * @param[in] mo The `cl_mem` wrapper object.
  * */
 #define ccl_memobj_ref(mo) \
@@ -160,6 +168,8 @@ CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
 
 /**
  * Get the OpenCL `cl_mem` object.
+ *
+ * @relates ccl_memobj
  *
  * @param[in] mo The `cl_mem` wrapper object.
  * @return The OpenCL `cl_mem` object.
