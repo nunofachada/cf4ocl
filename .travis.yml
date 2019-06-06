@@ -15,7 +15,7 @@ matrix:
       env:
         - CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0
           -D OpenCL_USE_LOCAL_HEADERS=1
-          -D CMAKE_BUILD_TYPE=Coverage"
+          -D CMAKE_BUILD_TYPE=Debug"
         - CMAKE_TEST_TARGET=codecov
       before_install:
         - echo -n | openssl s_client -connect scan.coverity.com:443 |
