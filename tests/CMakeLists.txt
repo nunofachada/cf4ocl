@@ -51,7 +51,7 @@ if ((DEFINED CMAKE_BUILD_TYPE) AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
         setup_target_for_coverage_lcov(
             NAME codecov                       # Name for custom target
             EXECUTABLE ${CMAKE_CTEST_COMMAND}  # Name of the test driver executable that runs the tests
-            DEPENDENCIES test                  # Dependencies to build first
+            DEPENDENCIES tests                 # Dependencies to build first
         )
 
     endif()
