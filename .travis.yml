@@ -15,8 +15,8 @@ matrix:
       env:
         - CMAKEOPTIONS="-D OpenCL_LOCAL_HEADERS=2.0
           -D OpenCL_USE_LOCAL_HEADERS=1
-          -D CMAKE_BUILD_TYPE=Debug"
-          -D TESTS_GENERATE_COVERAGE=1
+          -D CMAKE_BUILD_TYPE=Debug
+          -D TESTS_GENERATE_COVERAGE=1"
         - CMAKE_TEST_TARGET=codecov
       before_install:
         - echo -n | openssl s_client -connect scan.coverity.com:443 |
@@ -80,5 +80,5 @@ script:
   - make clean
   - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=1 ..
   - make tests
-  - gtester ./tests/lib/test_*
+  - gtester -k ./tests/lib/test_*
   - popd
