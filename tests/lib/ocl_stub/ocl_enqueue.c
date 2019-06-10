@@ -51,7 +51,7 @@ clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_kernel kernel,
     return CL_SUCCESS;
 }
 
-/* Parts of this function are based on the POCL implementation.
+/* This function is based on the POCL implementation.
  * https://github.com/pocl/pocl/blob/master/lib/CL/clEnqueueNativeKernel.c
  * https://github.com/pocl/pocl/blob/master/LICENSE */
 CL_API_ENTRY cl_int CL_API_CALL
@@ -62,21 +62,29 @@ clEnqueueNativeKernel(cl_command_queue command_queue,
     const cl_event * event_wait_list, cl_event * event) {
 
     /* Error check. */
-    if (command_queue == NULL) {
+    if (command_queue == NULL)
         return CL_INVALID_COMMAND_QUEUE;
-    } else if ((user_func == NULL)
-        || (((args == NULL) && (cb_args > 0))
-        || ((args == NULL) && (num_mem_objects > 0)))
-        || ((args != NULL) && (cb_args == 0))
-        || ((num_mem_objects > 0) && ((mem_list == NULL) || (args_mem_loc == NULL)))
-        || ((num_mem_objects == 0) && ((mem_list != NULL) || (args_mem_loc != NULL))))
-    {
-        return CL_INVALID_MEM_OBJECT;
-    }
+    if (user_func == NULL)
+        return CL_INVALID_VALUE;
+    if ((args == NULL) && (cb_args > 0))
+        return CL_INVALID_VALUE;
+    if ((args == NULL) && (num_mem_objects > 0))
+        return CL_INVALID_VALUE;
+    if ((args != NULL) && (cb_args == 0))
+        return CL_INVALID_VALUE;
+    if ((num_mem_objects > 0) && (mem_list == NULL))
+        return CL_INVALID_VALUE;
+    if ((num_mem_objects > 0) && (args_mem_loc == NULL))
+        return CL_INVALID_VALUE;
+    if ((num_mem_objects == 0) && (mem_list != NULL))
+        return CL_INVALID_VALUE;
+    if ((num_mem_objects == 0) && (args_mem_loc != NULL))
+        return  CL_INVALID_VALUE;
+    if (!(command_queue->device->execution_capabilities & CL_EXEC_NATIVE_KERNEL))
+        return CL_INVALID_OPERATION;
 
     /* Variables. */
     void * args_copy;
-    cl_mem * mem_list_copy;
 
     /* These are ignored. */
     (void)(num_events_in_wait_list);
@@ -85,36 +93,41 @@ clEnqueueNativeKernel(cl_command_queue command_queue,
     /* Set event. */
     ocl_stub_create_event(event, command_queue, CL_COMMAND_NATIVE_KERNEL);
 
-    /* Copy native kernel arguments. */
-    args_copy = g_memdup(args, cb_args);
-    mem_list_copy = g_memdup(mem_list, num_mem_objects * sizeof(cl_mem));
+    /* Copy native kernel arguments, if there are any. */
+    if (cb_args) {
+        args_copy = g_memdup(args, cb_args);
+    }
 
     /* Put global memory locations in args_copy. */
     for (cl_uint i = 0; i < num_mem_objects; ++i) {
 
         const char * loc = (const char *) args_mem_loc[i];
-        void ** arg_loc;
+        void * arg_loc;
+        cl_mem m = mem_list[i];
 
         /* If a cl_mem object is NULL throw error. */
-        if (mem_list[i] == NULL) {
-            g_free(mem_list_copy);
+        if (m == NULL) {
             g_free(args_copy);
             return CL_INVALID_MEM_OBJECT;
         }
 
         /* args_mem_loc is a pointer relative to the original args,
          * since we recopy them, we must do some relocation */
-        gulong offset = GPOINTER_TO_UINT(loc) - GPOINTER_TO_UINT(args);
-        arg_loc = GUINT_TO_POINTER(
-            GPOINTER_TO_UINT(args_copy) + GPOINTER_TO_UINT(offset));
+        gssize offset = (guintptr) loc - (guintptr) args;
+        arg_loc = (void *) ((guintptr) args_copy + (guintptr) offset);
 
-        *arg_loc = mem_list[i]->mem;
+        if (command_queue->device->address_bits == 32)
+            *((guint32 *) arg_loc) =
+                (guint32) (((guintptr) mem_list[i]->mem) & 0xFFFFFFFF);
+        else /* 64 bits */
+            *((guint64 *) arg_loc) =
+                (guint64) (guintptr) mem_list[i]->mem;
     }
 
     /* Call the native kernel. */
     user_func(args_copy);
 
-    g_free(mem_list_copy);
+    /* Release allocated memory. */
     g_free(args_copy);
 
     /* All good. */
