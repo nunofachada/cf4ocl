@@ -137,11 +137,13 @@ static void create_info_destroy_test() {
         cq = NULL;
     }
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy context. */
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -182,12 +184,14 @@ static void ref_unref_test() {
     /* Check that queue ref count is 1. */
     g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) cq));
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy stuff. */
     ccl_queue_unref(cq);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -317,13 +321,15 @@ static void barrier_marker_test() {
     ccl_queue_iter_event_init(cq);
     g_assert(ccl_queue_iter_event_next(cq) == NULL);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
     ccl_queue_destroy(cq);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 

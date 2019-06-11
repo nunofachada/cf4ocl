@@ -277,6 +277,9 @@ static void create_info_destroy_test() {
         ccl_buffer_destroy(buf);
     }
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
 
@@ -353,12 +356,14 @@ static void ref_unref_test() {
     g_assert_cmphex(
         GPOINTER_TO_UINT(krnl1), ==, GPOINTER_TO_UINT(krnl2));
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy remaining stuff. */
     ccl_program_destroy(prg);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -644,11 +649,13 @@ static void suggest_worksizes_test() {
 
 #endif
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy stuff. */
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -1066,8 +1073,7 @@ static void args_test() {
     g_assert_cmpfloat(c, ==, *((cl_char *) ccl_arg_value(arg_test)));
     ccl_arg_destroy(arg_test);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -1178,13 +1184,15 @@ static void native_test() {
     for (i = 0; i < CCL_TEST_KERNEL_NATIVE_BUF_SIZE; ++i)
         g_assert_cmpint(hbuf[i] + 1, ==, hbuf_out[i]);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);
     ccl_queue_destroy(cq);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 

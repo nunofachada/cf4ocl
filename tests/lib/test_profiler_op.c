@@ -348,11 +348,13 @@ static void operation_test() {
     ccl_queue_destroy(q2);
     ccl_queue_destroy(q1);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Free context. */
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -372,4 +374,3 @@ int main(int argc, char ** argv) {
 
     return g_test_run();
 }
-

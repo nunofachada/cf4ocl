@@ -118,8 +118,14 @@ static void context_with_image_support_teardown(
     CCL_UNUSED(user_data);
 
     /* If context was created, release it. */
-    if (*ctx_fixt != NULL)
+    if (*ctx_fixt != NULL) {
+
+        /* Confirm that memory allocated by wrappers has not yet been freed. */
+        g_assert(!ccl_wrapper_memcheck());
+
+        /* Release context. */
         ccl_context_destroy(*ctx_fixt);
+    }
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */

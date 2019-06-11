@@ -53,6 +53,9 @@ static void devices_new_destroy_test() {
     /* Check that devs is not null. */
     g_assert_cmphex(GPOINTER_TO_UINT(devs), !=, GPOINTER_TO_UINT(NULL));
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy object containing device wrappers for all OpenCL devices in the
      * system. */
     ccl_devsel_devices_destroy(devs);
@@ -78,4 +81,3 @@ int main(int argc, char ** argv) {
 
     return g_test_run();
 }
-

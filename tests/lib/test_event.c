@@ -139,6 +139,9 @@ static void create_info_destroy_test() {
     /* Check that start time occurs before end time. */
     g_assert_cmpuint(*((cl_ulong *) info->value), <=, time_end);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Release wrappers. */
     ccl_event_destroy(evt);
     ccl_buffer_destroy(buf);
@@ -224,6 +227,9 @@ static void user_event_test() {
     g_assert_no_error(err);
     g_assert_cmpint(exec_status, ==, CL_COMPLETE);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy stuff. */
     ccl_event_destroy(uevt);
     ccl_context_destroy(ctx);
@@ -304,6 +310,9 @@ static void callback_test() {
     /* Wait on host thread for all events to complete. */
     ccl_queue_finish(cq, &err);
     g_assert_no_error(err);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -420,6 +429,9 @@ static void name_test() {
     evt_name = ccl_event_get_final_name(evt);
     g_assert_cmpstr("UNMAP_MEM_OBJECT", ==, evt_name);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
     ccl_queue_destroy(cq);
@@ -529,6 +541,9 @@ static void event_wait_lists_test() {
     /* Clear it again, should throw no error. */
     ccl_event_wait_list_clear(&ewl);
     g_assert(ewl == NULL);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);

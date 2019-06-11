@@ -105,7 +105,7 @@ static void create_info_destroy_test() {
     CCLDevice * const * ds = NULL;
     CCLErr * err = NULL;
     CCLWrapperInfo * info;
-    gchar * platf_info;
+    gchar * platf_info, * aux_info;
     guint num_devs;
     guint num_platfs;
     gchar info_str[CCL_TEST_PLATFORMS_MAXINFOSTR];
@@ -113,6 +113,7 @@ static void create_info_destroy_test() {
     char * info_check_array;
     cl_uint info_check_scalar;
     cl_uint dev_ocl_ver;
+    size_t info_size;
 
     /* Get platforms. */
     platfs = ccl_platforms_new(&err);
@@ -146,6 +147,29 @@ static void create_info_destroy_test() {
             p, CL_PLATFORM_NAME, &err);
         g_assert_no_error(err);
         ccl_test_platforms_msg("==== Name    :", "%s", platf_info);
+
+        /* Get platform name directly with ccl_wrapper_info using the cache and
+         * check that it's the pointer that was previously returned. */
+        aux_info = (char *) ccl_wrapper_get_info_value(
+            (CCLWrapper *) p, NULL, CL_PLATFORM_NAME, sizeof(char *),
+            CCL_INFO_PLATFORM, CL_TRUE, &err);
+        g_assert_no_error(err);
+        g_assert_cmphex(
+            GPOINTER_TO_SIZE(platf_info), ==, GPOINTER_TO_SIZE(aux_info));
+
+        /* Get platform name information size and compare it with the real
+         * thing. */
+        info_size =  ccl_wrapper_get_info_size(
+            (CCLWrapper *) p, NULL, CL_PLATFORM_NAME, 0,
+            CCL_INFO_PLATFORM, CL_FALSE, &err);
+        g_assert_no_error(err);
+        g_assert_cmpuint(info_size / sizeof(char), ==, strlen(platf_info) + 1);
+
+        /* Make an invalid info request. */
+        platf_info = ccl_platform_get_info_string(
+            p, 0x0 /* Invalid */, &err);
+        g_assert(err != NULL);
+        g_clear_error(&err);
 
         /* Get platform vendor. */
         platf_info = ccl_platform_get_info_string(
@@ -456,9 +480,9 @@ static void create_info_destroy_test() {
             info = ccl_device_get_info(d, CL_DEVICE_PLATFORM, &err);
             ccl_test_platforms_check_error(&err);
             g_assert_cmphex(
-                GPOINTER_TO_UINT(*((cl_platform_id *) info->value)),
+                GPOINTER_TO_SIZE(*((cl_platform_id *) info->value)),
                 ==,
-                GPOINTER_TO_UINT(ccl_platform_unwrap(p)));
+                GPOINTER_TO_SIZE(ccl_platform_unwrap(p)));
 
             info = ccl_device_get_info(d, CL_DEVICE_PARENT_DEVICE, &err);
             ccl_test_platforms_check_error(&err);
@@ -619,6 +643,9 @@ static void create_info_destroy_test() {
         g_assert_no_error(err);
     }
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy list of platforms. */
     ccl_platforms_destroy(platfs);
 
@@ -667,14 +694,16 @@ static void ref_unref_test() {
     g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper *) p), ==, 1);
     g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 2);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     ccl_platform_destroy(p);
 
     g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
 
     ccl_device_destroy(d);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -700,4 +729,3 @@ int main(int argc, char ** argv) {
 
     return g_test_run();
 }
-

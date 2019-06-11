@@ -434,6 +434,9 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
     g_assert_cmpuint(num_devices, >, 0);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Free context and set filters to NULL. */
     ccl_context_destroy(ctx);
 
@@ -767,6 +770,9 @@ static void ref_unref_test() {
      * enclosing context. */
     g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Unref device. */
     ccl_device_unref(d);
 
@@ -835,6 +841,9 @@ static void get_supported_image_formats_test() {
             image_formats++;
         }
 
+        /* Confirm that memory allocated by wrappers has not yet been freed. */
+        g_assert(!ccl_wrapper_memcheck());
+
         /* Destroy context. */
         ccl_context_destroy(c);
     }
@@ -877,6 +886,9 @@ static void device_container_test() {
     /* Test get number of devices from context. */
     ccl_context_get_num_devices(ctx, &err);
     g_assert_no_error(err);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
 
     /* Destroy context. */
     ccl_context_destroy(ctx);

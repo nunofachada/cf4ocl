@@ -114,6 +114,9 @@ static void create_add_destroy_test() {
     g_debug("Profiling duration: %d", (cl_int) duration);
     g_debug("Profiling eff. duration: %d", (cl_int) eff_duration);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy buffers. */
     ccl_buffer_destroy(buf1);
     ccl_buffer_destroy(buf2);
@@ -132,8 +135,7 @@ static void create_add_destroy_test() {
     /* Destroy the context. */
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -155,4 +157,3 @@ int main(int argc, char ** argv) {
     return g_test_run();
 
 }
-

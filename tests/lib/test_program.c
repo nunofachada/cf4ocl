@@ -560,6 +560,9 @@ static void create_info_destroy_test() {
     }
 #endif
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy the memory objects. */
     ccl_buffer_destroy(a_w);
     ccl_buffer_destroy(b_w);
@@ -639,12 +642,14 @@ static void ref_unref_test() {
     g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) prg), ==, 2);
     ccl_program_unref(prg);
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy remaining stuff. */
     ccl_program_destroy(prg);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -756,6 +761,9 @@ static void compile_link_test() {
 
 #endif
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Free stuff. */
     ccl_buffer_destroy(buf);
     ccl_program_destroy(prg_exec);
@@ -764,8 +772,7 @@ static void compile_link_test() {
     ccl_queue_destroy(cq);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 

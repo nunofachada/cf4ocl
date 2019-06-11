@@ -114,11 +114,13 @@ static void create_info_destroy_test() {
         ccl_sampler_destroy(s);
     }
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy context. */
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -175,12 +177,14 @@ static void create_full_info_destroy_test() {
     g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
         GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy sampler. */
     ccl_sampler_destroy(s);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
@@ -217,12 +221,14 @@ static void ref_unref_test() {
     /* Check that sampler ref count is 1. */
     g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) s));
 
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
     /* Destroy stuff. */
     ccl_sampler_unref(s);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 }
 
