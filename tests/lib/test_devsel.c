@@ -51,7 +51,7 @@ static void devices_new_destroy_test() {
     g_assert_no_error(err);
 
     /* Check that devs is not null. */
-    g_assert_cmphex(GPOINTER_TO_UINT(devs), !=, GPOINTER_TO_UINT(NULL));
+    g_assert_cmphex(GPOINTER_TO_SIZE(devs), !=, GPOINTER_TO_SIZE(NULL));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());

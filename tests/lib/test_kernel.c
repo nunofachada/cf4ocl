@@ -114,8 +114,8 @@ static void create_info_destroy_test() {
                     CCL_TEST_KERNEL_NAME, &ocl_status);
                 g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
                 krnl = ccl_kernel_new_wrap(kernel);
-                g_assert_cmphex(GPOINTER_TO_UINT(kernel), ==,
-                    GPOINTER_TO_UINT(ccl_kernel_unwrap(krnl)));
+                g_assert_cmphex(GPOINTER_TO_SIZE(kernel), ==,
+                    GPOINTER_TO_SIZE(ccl_kernel_unwrap(krnl)));
                 release_krnl = CL_TRUE;
                 break;
         }
@@ -332,7 +332,7 @@ static void ref_unref_test() {
 
     /* Check that they're different. */
     g_assert_cmphex(
-        GPOINTER_TO_UINT(krnl1), !=, GPOINTER_TO_UINT(krnl2));
+        GPOINTER_TO_SIZE(krnl1), !=, GPOINTER_TO_SIZE(krnl2));
 
     /* Check that each has a ref count of 1. */
     g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl1), ==, 1);
@@ -354,7 +354,7 @@ static void ref_unref_test() {
 
     /* Check that it's the same as krnl1. */
     g_assert_cmphex(
-        GPOINTER_TO_UINT(krnl1), ==, GPOINTER_TO_UINT(krnl2));
+        GPOINTER_TO_SIZE(krnl1), ==, GPOINTER_TO_SIZE(krnl2));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());

@@ -76,16 +76,15 @@ static void create_info_destroy_test() {
     host_ptr = ccl_memobj_get_info_scalar(
         b, CL_MEM_HOST_PTR, void*, &err);
     g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
-    g_assert_cmphex(GPOINTER_TO_UINT(host_ptr), ==,
-        GPOINTER_TO_UINT(NULL));
+    g_assert_cmphex(GPOINTER_TO_SIZE(host_ptr), ==, GPOINTER_TO_SIZE(NULL));
     g_clear_error(&err);
 
     cl_context context;
     context = ccl_memobj_get_info_scalar(
         b, CL_MEM_CONTEXT, cl_context, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
-        GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+    g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
+        GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());

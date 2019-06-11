@@ -560,14 +560,14 @@ static void ref_unref_test() {
              * last and platform). */
             g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 3);
             /* ...and d_1 and d_l should be the same. */
-            g_assert_cmphex(GPOINTER_TO_UINT(d_1), ==, GPOINTER_TO_UINT(d_l));
+            g_assert_cmphex(GPOINTER_TO_SIZE(d_1), ==, GPOINTER_TO_SIZE(d_l));
         } else {
             /* Otherwise it should be 2 for each device (from itself and from
              * platform). */
             g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_1), ==, 2);
             g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d_l), ==, 2);
             /* ...and d_1 and d_l should be the different. */
-            g_assert_cmphex(GPOINTER_TO_UINT(d_1), !=, GPOINTER_TO_UINT(d_l));
+            g_assert_cmphex(GPOINTER_TO_SIZE(d_1), !=, GPOINTER_TO_SIZE(d_l));
         }
 
         /* Check that the platform wrappers associated with the first and last
@@ -581,7 +581,7 @@ static void ref_unref_test() {
             d_l, CL_DEVICE_PLATFORM, cl_platform_id, &err);
         g_assert_no_error(err);
         p_l = ccl_platform_new_wrap(cl_p_l);
-        g_assert_cmphex(GPOINTER_TO_UINT(p_1), ==, GPOINTER_TO_UINT(p_l));
+        g_assert_cmphex(GPOINTER_TO_SIZE(p_1), ==, GPOINTER_TO_SIZE(p_l));
         g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) p_1), ==, 3);
         ccl_platform_unref(p_1); /* Could use p_l, its the same object. */
         ccl_platform_unref(p_1); /* Could use p_l, its the same object. */
@@ -637,7 +637,7 @@ static void ref_unref_test() {
 
         /* Check that the platform wrapper of the first device is the same
          * object as the current platform wrapper. */
-        g_assert_cmphex(GPOINTER_TO_UINT(p_1), ==, GPOINTER_TO_UINT(p));
+        g_assert_cmphex(GPOINTER_TO_SIZE(p_1), ==, GPOINTER_TO_SIZE(p));
 
         /* Destroy the context. This will decrease the ref count of the
          * associated device wrappers. */
@@ -756,7 +756,7 @@ static void ref_unref_test() {
      * now 2. */
     ctx_cmp = ccl_context_new_wrap(ccl_context_unwrap(ctx));
 
-    g_assert_cmphex(GPOINTER_TO_UINT(ctx_cmp), ==, GPOINTER_TO_UINT(ctx));
+    g_assert_cmphex(GPOINTER_TO_SIZE(ctx_cmp), ==, GPOINTER_TO_SIZE(ctx));
     g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 2);
 
     /* Unref context. We must do it twice, so as to maintain the logic that for

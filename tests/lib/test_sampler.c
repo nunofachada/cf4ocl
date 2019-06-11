@@ -79,8 +79,8 @@ static void create_info_destroy_test() {
                 g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
                 CCL_END_IGNORE_DEPRECATIONS
                 s = ccl_sampler_new_wrap(sampler);
-                g_assert_cmphex(GPOINTER_TO_UINT(sampler), ==,
-                    GPOINTER_TO_UINT(ccl_sampler_unwrap(s)));
+                g_assert_cmphex(GPOINTER_TO_SIZE(sampler), ==,
+                    GPOINTER_TO_SIZE(ccl_sampler_unwrap(s)));
                 break;
         }
 
@@ -107,8 +107,8 @@ static void create_info_destroy_test() {
         context = ccl_sampler_get_info_scalar(
             s, CL_SAMPLER_CONTEXT, cl_context, &err);
         g_assert_no_error(err);
-        g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
-            GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+        g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
+            GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
         /* Destroy sampler. */
         ccl_sampler_destroy(s);
@@ -174,8 +174,8 @@ static void create_full_info_destroy_test() {
     context = ccl_sampler_get_info_scalar(
         s, CL_SAMPLER_CONTEXT, cl_context, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
-        GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+    g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
+        GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());

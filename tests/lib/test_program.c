@@ -411,19 +411,19 @@ static void create_info_destroy_test() {
     /* Check that device is the correct one. */
     CCLDevice * d2 = ccl_program_get_device(prg2, 0, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(d), ==, GPOINTER_TO_UINT(d2));
+    g_assert_cmphex(GPOINTER_TO_SIZE(d), ==, GPOINTER_TO_SIZE(d2));
 
     cl_device_id * devices = ccl_program_get_info_array(
         prg2, CL_PROGRAM_DEVICES, cl_device_id, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(devices[0]),
-        ==, GPOINTER_TO_UINT(ccl_device_unwrap(d)));
+    g_assert_cmphex(GPOINTER_TO_SIZE(devices[0]),
+        ==, GPOINTER_TO_SIZE(ccl_device_unwrap(d)));
 
     cl_context context = ccl_program_get_info_scalar(
         prg2, CL_PROGRAM_CONTEXT, cl_context, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(context),
-        ==, GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+    g_assert_cmphex(GPOINTER_TO_SIZE(context),
+        ==, GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
     /* Destroy program created with binary. */
     ccl_program_destroy(prg2);
@@ -432,7 +432,7 @@ static void create_info_destroy_test() {
     prg2 = ccl_program_new_wrap(ccl_program_unwrap(prg));
 
     /* It must be the same program as the original one. */
-    g_assert_cmphex(GPOINTER_TO_UINT(prg), ==, GPOINTER_TO_UINT(prg2));
+    g_assert_cmphex(GPOINTER_TO_SIZE(prg), ==, GPOINTER_TO_SIZE(prg2));
 
     /* Destroy it. */
     ccl_program_destroy(prg2);
@@ -622,7 +622,7 @@ static void ref_unref_test() {
     g_assert_no_error(err);
 
     /* Check that they're different. */
-    g_assert_cmphex(GPOINTER_TO_UINT(krnl1), !=, GPOINTER_TO_UINT(krnl2));
+    g_assert_cmphex(GPOINTER_TO_SIZE(krnl1), !=, GPOINTER_TO_SIZE(krnl2));
 
     /* Check that each has a ref count of 1. */
     g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) krnl1), ==, 1);

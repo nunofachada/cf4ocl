@@ -95,8 +95,8 @@ static void create_info_destroy_test() {
                 g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
                 CCL_END_IGNORE_DEPRECATIONS
                 cq = ccl_queue_new_wrap(command_queue);
-                g_assert_cmphex(GPOINTER_TO_UINT(command_queue), ==,
-                    GPOINTER_TO_UINT(ccl_queue_unwrap(cq)));
+                g_assert_cmphex(GPOINTER_TO_SIZE(command_queue), ==,
+                    GPOINTER_TO_SIZE(ccl_queue_unwrap(cq)));
                 break;
         }
 
@@ -105,27 +105,27 @@ static void create_info_destroy_test() {
             cq, CL_QUEUE_CONTEXT, cl_context, &err);
         g_assert_no_error(err);
         g_assert_cmphex(
-            GPOINTER_TO_UINT(context),
+            GPOINTER_TO_SIZE(context),
             ==,
-            GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+            GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
         ctx_aux = ccl_queue_get_context(cq, &err);
         g_assert_no_error(err);
         g_assert_cmphex(
-            GPOINTER_TO_UINT(ctx), ==, GPOINTER_TO_UINT(ctx_aux));
+            GPOINTER_TO_SIZE(ctx), ==, GPOINTER_TO_SIZE(ctx_aux));
 
         device = ccl_queue_get_info_scalar(
             cq, CL_QUEUE_DEVICE, cl_device_id, &err);
         g_assert_no_error(err);
         g_assert_cmphex(
-            GPOINTER_TO_UINT(device),
+            GPOINTER_TO_SIZE(device),
             ==,
-            GPOINTER_TO_UINT(ccl_device_unwrap(dev)));
+            GPOINTER_TO_SIZE(ccl_device_unwrap(dev)));
 
         dev_aux = ccl_queue_get_device(cq, &err);
         g_assert_no_error(err);
         g_assert_cmphex(
-            GPOINTER_TO_UINT(dev), ==, GPOINTER_TO_UINT(dev_aux));
+            GPOINTER_TO_SIZE(dev), ==, GPOINTER_TO_SIZE(dev_aux));
 
         prop_probed = ccl_queue_get_info_scalar(
             cq, CL_QUEUE_PROPERTIES, cl_command_queue_properties, &err);

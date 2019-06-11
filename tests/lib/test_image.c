@@ -195,8 +195,8 @@ static void create_info_destroy_test(
                 CCL_END_IGNORE_DEPRECATIONS
                 g_assert_cmpint(ocl_status, ==, CL_SUCCESS);
                 img = ccl_image_new_wrap(image);
-                g_assert_cmphex(GPOINTER_TO_UINT(image), ==,
-                    GPOINTER_TO_UINT(ccl_image_unwrap(img)));
+                g_assert_cmphex(GPOINTER_TO_SIZE(image), ==,
+                    GPOINTER_TO_SIZE(ccl_image_unwrap(img)));
                 break;
         }
 
@@ -218,17 +218,18 @@ static void create_info_destroy_test(
         void * host_ptr;
         host_ptr = ccl_memobj_get_info_scalar(
             img, CL_MEM_HOST_PTR, void *, &err);
-        g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
-        g_assert_cmphex(GPOINTER_TO_UINT(host_ptr), ==,
-            GPOINTER_TO_UINT(NULL));
+        g_assert(
+            (err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
+        g_assert_cmphex(GPOINTER_TO_SIZE(host_ptr), ==,
+            GPOINTER_TO_SIZE(NULL));
         g_clear_error(&err);
 
         cl_context context;
         context = ccl_memobj_get_info_scalar(
             img, CL_MEM_CONTEXT, cl_context, &err);
         g_assert_no_error(err);
-        g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
-            GPOINTER_TO_UINT(ccl_context_unwrap(*ctx_fixt)));
+        g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
+            GPOINTER_TO_SIZE(ccl_context_unwrap(*ctx_fixt)));
 
         /* Specific image queries. */
         cl_image_format img_fmt;

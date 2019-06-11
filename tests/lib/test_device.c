@@ -135,13 +135,13 @@ static void sub_devices_test() {
             parent_device = ccl_device_get_info_scalar(
                 subdevs[i], CL_DEVICE_PARENT_DEVICE, cl_device_id, &err);
             g_assert_no_error(err);
-            g_assert_cmphex(GPOINTER_TO_UINT(parent_device), ==,
-                GPOINTER_TO_UINT(ccl_device_unwrap(pdev)));
+            g_assert_cmphex(GPOINTER_TO_SIZE(parent_device), ==,
+                GPOINTER_TO_SIZE(ccl_device_unwrap(pdev)));
         }
 
         /* Check that the last position is NULL. */
         g_assert_cmphex(
-            GPOINTER_TO_UINT(subdevs[i]), ==, GPOINTER_TO_UINT(NULL));
+            GPOINTER_TO_SIZE(subdevs[i]), ==, GPOINTER_TO_SIZE(NULL));
     }
 
     /* Test partition by counts, if supported by device. */
@@ -195,9 +195,9 @@ static void sub_devices_test() {
                 subdevs[i], CL_DEVICE_PARENT_DEVICE, cl_device_id, &err);
             g_assert_no_error(err);
             g_assert_cmphex(
-                GPOINTER_TO_UINT(parent_device),
+                GPOINTER_TO_SIZE(parent_device),
                 ==,
-                GPOINTER_TO_UINT(ccl_device_unwrap(pdev)));
+                GPOINTER_TO_SIZE(ccl_device_unwrap(pdev)));
         }
 
         /* Check that the total number of compute units is as
@@ -206,7 +206,7 @@ static void sub_devices_test() {
 
         /* Check that the last position is NULL. */
         g_assert_cmphex(
-            GPOINTER_TO_UINT(subdevs[i]), ==, GPOINTER_TO_UINT(NULL));
+            GPOINTER_TO_SIZE(subdevs[i]), ==, GPOINTER_TO_SIZE(NULL));
 
         /* Release memory associated with partition properties array. */
         g_slice_free1(

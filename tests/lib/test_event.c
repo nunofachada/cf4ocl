@@ -103,16 +103,16 @@ static void create_info_destroy_test() {
     cl_context context = ccl_event_get_info_scalar(
         evt, CL_EVENT_CONTEXT, cl_context, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(context), ==,
-        GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+    g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
+        GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 #endif
 
     /* Check command queue. */
     command_queue = ccl_event_get_info_scalar(
         evt, CL_EVENT_COMMAND_QUEUE, cl_command_queue, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(command_queue), ==,
-        GPOINTER_TO_UINT(ccl_queue_unwrap(cq)));
+    g_assert_cmphex(GPOINTER_TO_SIZE(command_queue), ==,
+        GPOINTER_TO_SIZE(ccl_queue_unwrap(cq)));
 
     /* Check event type. */
     evt_type = ccl_event_get_info_scalar(evt, CL_EVENT_COMMAND_TYPE,
@@ -194,16 +194,16 @@ static void user_event_test() {
     clcq = ccl_event_get_info_scalar(
         uevt, CL_EVENT_COMMAND_QUEUE, cl_command_queue, &err);
     g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_UINT(clcq), ==, GPOINTER_TO_UINT(NULL));
+    g_assert_cmphex(GPOINTER_TO_SIZE(clcq), ==, GPOINTER_TO_SIZE(NULL));
 
     /* Confirm that event returns the correct context. */
     clctx = ccl_event_get_info_scalar(
         uevt, CL_EVENT_CONTEXT, cl_context, &err);
     g_assert_no_error(err);
     g_assert_cmphex(
-        GPOINTER_TO_UINT(clctx),
+        GPOINTER_TO_SIZE(clctx),
         ==,
-        GPOINTER_TO_UINT(ccl_context_unwrap(ctx)));
+        GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
     /* Confirm command type is user event. */
     clct = ccl_event_get_info_scalar(
