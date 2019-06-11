@@ -29,7 +29,7 @@ set(TESTS_STUBONLY test_profiler_op)
 # implementation
 set(TESTS_OPT test_profiler test_platforms test_buffer test_devquery
     test_context test_event test_program test_image test_sampler
-    test_kernel test_queue test_device test_devsel)
+    test_kernel test_queue test_device test_devsel test_errors)
 
 # Complete set of tests
 set(TESTS ${TESTS_STUBONLY} ${TESTS_OPT})
