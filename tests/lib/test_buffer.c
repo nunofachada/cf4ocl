@@ -86,11 +86,19 @@ static void create_info_destroy_test() {
     g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
         GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
+    /* Destroy buffer. */
+    ccl_buffer_destroy(b);
+
+    /* Try creating a buffer with invalid flags. */
+    b = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, buf_size, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_HOST_PTR);
+    g_clear_error(&err);
+
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
 
-    /* Destroy stuff. */
-    ccl_buffer_destroy(b);
+    /* Destroy context. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly
