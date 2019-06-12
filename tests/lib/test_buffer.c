@@ -366,6 +366,12 @@ static void copy_test() {
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
         g_assert_cmpuint(h1[i], ==, h2[i]);
 
+    /* Do an invalid copy, check if error is thrown. */
+    ccl_buffer_enqueue_copy(
+        b1, b1, q, 0, 0, buf_size, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_MEM_COPY_OVERLAP);
+    g_clear_error(&err);
+
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
 
@@ -431,6 +437,12 @@ static void map_unmap_test() {
     ccl_memobj_enqueue_unmap(
         (CCLMemObj *) b, q, h_out, NULL, &err);
     g_assert_no_error(err);
+
+    /* Do an invalid map, check if error is thrown. */
+    ccl_buffer_enqueue_map(
+        b, q, CL_TRUE, CL_MAP_READ, buf_size, buf_size, NULL, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
