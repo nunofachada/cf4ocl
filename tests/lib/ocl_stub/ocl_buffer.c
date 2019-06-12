@@ -83,6 +83,19 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
     cl_buffer_create_type buffer_create_type,
     const void * buffer_create_info, cl_int * errcode_ret) {
 
+    /* This will help, avoiding casts up ahead. */
+    struct _cl_buffer_region * cbr =
+        (struct _cl_buffer_region *) buffer_create_info;
+
+    /* Check for some errors. */
+    if ((buffer_create_type != CL_BUFFER_CREATE_TYPE_REGION)
+        || (cbr == NULL)
+        || (cbr->origin + cbr->size > buffer->size)) {
+        seterrcode(errcode_ret, CL_INVALID_VALUE);
+        return NULL;
+    }
+
+    /* No errors detected, create sub-buffer. */
     seterrcode(errcode_ret, CL_SUCCESS);
     cl_mem memobj = g_slice_new(struct _cl_mem);
 
@@ -91,16 +104,12 @@ clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags,
     memobj->ref_count = 1;
     memobj->type = CL_MEM_OBJECT_BUFFER;
     memobj->flags = flags;
-    memobj->size = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
-        ? ((struct _cl_buffer_region *) buffer_create_info)->size
-        : 0;
+    memobj->size = cbr->size;
     memobj->host_ptr = buffer->host_ptr;
     memobj->map_count = 0;
     memobj->context = buffer->context;
     memobj->associated_object = buffer;
-    memobj->offset = (buffer_create_type == CL_BUFFER_CREATE_TYPE_REGION)
-        ? ((struct _cl_buffer_region *) buffer_create_info)->origin
-        : 0;
+    memobj->offset = cbr->origin;
 
     memobj->mem = ((cl_uchar *) buffer->mem) + memobj->offset;
     memobj->callbacks = NULL;

@@ -684,12 +684,21 @@ static void create_from_region_test() {
         g_assert_cmpuint(
             hsubbuf[i], ==, hbuf[i + siz_subbuf / sizeof(cl_ulong)]);
 
+    /* Destroy sub-buffer. */
+    ccl_buffer_destroy(subbuf);
+
+    /* Try to create an invalid sub-buffer and check for the appropriate
+     * error. */
+    subbuf = ccl_buffer_new_from_region(
+        buf, 0, siz_buf * 2, siz_buf, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
+
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);
-    ccl_buffer_destroy(subbuf);
     ccl_queue_destroy(cq);
     ccl_context_destroy(ctx);
     g_slice_free1(siz_buf, hbuf);
