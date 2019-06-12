@@ -212,17 +212,14 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
     cl_event * event) {
 
     /* Error check. */
-    if (command_queue == NULL) {
+    /* Not testing if events in wait list belong to this context. */
+    if (command_queue == NULL)
         return CL_INVALID_COMMAND_QUEUE;
-    } else if ((dst_image == NULL) || (src_buffer == NULL)) {
+    if ((dst_image == NULL) || (src_buffer == NULL))
         return CL_INVALID_MEM_OBJECT;
-    } else if ((dst_image->context != command_queue->context)
-        || (src_buffer->context != command_queue->context)) {
+    if ((dst_image->context != command_queue->context)
+            || (src_buffer->context != command_queue->context))
         return CL_INVALID_CONTEXT;
-        /* Not testing if events in wait list belong to this context. */
-    }
-    /* Also not testing if dest buffer has enough space for the image
-     * data. */
 
     /* These are ignored. */
     (void)(num_events_in_wait_list);
@@ -237,6 +234,12 @@ clEnqueueCopyBufferToImage(cl_command_queue command_queue,
 
     size_t size = dst_image->image_elem_size * size_coord[0]
         * size_coord[1] * size_coord[2];
+
+    /* Basic check if the copy size is valid for both the source image and
+     * the destination buffer. */
+    if ((size > src_buffer->size - src_offset)
+            || (size > dst_image->size - dst_offset))
+        return CL_INVALID_VALUE;
 
     /* Perform copy. */
     g_memmove(((cl_uchar *) dst_image->mem) + dst_offset,
@@ -552,17 +555,14 @@ clEnqueueCopyImageToBuffer(cl_command_queue command_queue,
     cl_event * event) {
 
     /* Error check. */
-    if (command_queue == NULL) {
+    /* Not testing if events in wait list belong to this context. */
+    if (command_queue == NULL)
         return CL_INVALID_COMMAND_QUEUE;
-    } else if ((src_image == NULL) || (dst_buffer == NULL)) {
+    if ((src_image == NULL) || (dst_buffer == NULL))
         return CL_INVALID_MEM_OBJECT;
-    } else if ((dst_buffer->context != command_queue->context)
-        || (src_image->context != command_queue->context)) {
+    if ((dst_buffer->context != command_queue->context)
+        || (src_image->context != command_queue->context))
         return CL_INVALID_CONTEXT;
-        /* Not testing if events in wait list belong to this context. */
-    }
-    /* Also not testing if dest buffer has enough space for the image
-     * data. */
 
     /* These are ignored. */
     (void)(num_events_in_wait_list);
@@ -577,6 +577,12 @@ clEnqueueCopyImageToBuffer(cl_command_queue command_queue,
 
     size_t size = src_image->image_elem_size * size_coord[0]
         * size_coord[1] * size_coord[2];
+
+    /* Basic check if the copy size is valid for both the source image and
+     * the destination buffer. */
+    if ((size > src_image->size - src_offset)
+            || (size > dst_buffer->size - dst_offset))
+        return CL_INVALID_VALUE;
 
     /* Perform copy. */
     g_memmove(
