@@ -283,6 +283,18 @@ static void read_write_test() {
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
         g_assert_cmpuint(h_in[i], ==, h_out[i]);
 
+    /* Do an invalid read, check if error is thrown. */
+    ccl_buffer_enqueue_read(
+        b, q, CL_TRUE, 0, buf_size, NULL, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
+
+    /* Do an invalid write, check if error is thrown. */
+    ccl_buffer_enqueue_write(
+        b, q, CL_TRUE, 0, buf_size, NULL, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
+
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
 
