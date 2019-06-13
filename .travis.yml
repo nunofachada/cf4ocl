@@ -60,22 +60,22 @@ matrix:
           branch_pattern: coverity_scan
       after_success:
         - bash <(curl -s https://codecov.io/bash)
-    - os: osx
-      osx_image: xcode9.4
-      env:
-        - CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D CMAKE_BUILD_TYPE=Debug"
-        - CMAKE_TEST_TARGET=test
-      before_install:
-        - brew update
-        - brew install glib bats
-    - os: osx
-      osx_image: xcode10.2
-      env:
-        - CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D CMAKE_BUILD_TYPE=Debug"
-        - CMAKE_TEST_TARGET=test
-      before_install:
-        - brew update
-        - brew install bats
+    # - os: osx
+    #   osx_image: xcode9.4
+    #   env:
+    #     - CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D CMAKE_BUILD_TYPE=Debug"
+    #     - CMAKE_TEST_TARGET=test
+    #   before_install:
+    #     - brew update
+    #     - brew install glib bats
+    # - os: osx
+    #   osx_image: xcode10.2
+    #   env:
+    #     - CMAKEOPTIONS="-D OpenCL_USE_LOCAL_HEADERS=0 -D CMAKE_BUILD_TYPE=Debug"
+    #     - CMAKE_TEST_TARGET=test
+    #   before_install:
+    #     - brew update
+    #     - brew install bats
 
 script:
   - mkdir build
