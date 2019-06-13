@@ -133,6 +133,11 @@ if (NOT APPLE) # Not for Apple, which handles these headers differently
 
     add_definitions(-DCL_TARGET_OPENCL_VERSION=${OpenCL_VERSION_MAJOR}${OpenCL_VERSION_MINOR}0)
 
+else()
+
+    # Avoid deprecation messages in macOS
+    add_definitions("-DCL_SILENCE_DEPRECATION")
+
 endif()
 
 # ########################### #
