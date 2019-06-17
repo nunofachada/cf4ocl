@@ -547,8 +547,14 @@ static void rect_read_write_copy_test() {
         * CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE;
     CCLErr * err = NULL;
     const size_t origin[] = {0, 0, 0};
-    const size_t region[] = {CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
-        CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar), 1};
+    const size_t region[] = {
+        CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
+        CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
+        1 };
+    const size_t invalid_region[] = {
+        10 * CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
+        10 * CCL_TEST_BUFFER_SIZE * sizeof(cl_uchar),
+        1 };
 
     /* Create a "2D" host array, put some stuff in it. */
     for (cl_uint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -592,6 +598,12 @@ static void rect_read_write_copy_test() {
     /* Check data is OK doing a flat comparison. */
     for (cl_uint i = 0; i < CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE; ++i)
         g_assert_cmpuint(h1[i], ==, h2[i]);
+
+    /* Invoke "rect" read with erroneous parameters. */
+    ccl_buffer_enqueue_read_rect(
+        b2, cq, CL_TRUE, origin, origin, invalid_region,
+        0, 0, 0, 0, h2, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
