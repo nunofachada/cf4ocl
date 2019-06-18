@@ -86,8 +86,8 @@ script:
   - ./src/utils/ccl_devinfo
   - make ${CMAKE_TEST_TARGET}
   - bats ./tests/examples ./tests/utils
-  - make clean
-  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=1 ..
-  - make tests
-  - gtester -k ./tests/lib/test_*
+#  - make clean
+#  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=1 ..
+#  - make tests
+#  - gtester -k ./tests/lib/test_*
   - popd
