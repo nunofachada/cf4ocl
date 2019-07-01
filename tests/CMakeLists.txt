@@ -3,7 +3,6 @@ option(BUILD_TESTS "Build tests?" ON)
 
 # Stop processing if tests are not to be built
 if (NOT ${BUILD_TESTS})
-    unset(TESTS_USE_OPENCL_STUB CACHE)
     unset(TESTS_DEVICE_INDEX CACHE)
     unset(TESTS_GENERATE_COVERAGE CACHE)
     return()

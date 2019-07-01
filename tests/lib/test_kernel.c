@@ -141,8 +141,6 @@ static void create_info_destroy_test() {
         g_assert_no_error(err);
         g_assert(program == ccl_program_unwrap(prg));
 
-#ifndef OPENCL_STUB
-
         cl_uint ocl_ver;
 
         /* Get OpenCL version of kernel's underlying platform. */
@@ -230,8 +228,6 @@ static void create_info_destroy_test() {
 
 #endif /* ifdef CL_VERSION_1_2 */
 
-#endif /* ifndef OCL_STUB */
-
         /* Set kernel enqueue properties and initialize host data. */
         gws = CCL_TEST_KERNEL_BUF_SIZE;
         lws = CCL_TEST_KERNEL_LWS;
@@ -263,12 +259,10 @@ static void create_info_destroy_test() {
         ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
         g_assert_no_error(err);
 
-#ifndef OPENCL_STUB
-        /* Check results are as expected (not available with OpenCL stub). */
+        /* Check results are as expected. */
         for (cl_uint i = 0; i < CCL_TEST_KERNEL_BUF_SIZE; ++i) {
             g_assert_cmpuint(host_buf[i] + 1, ==, host_buf_aux[i]);
         }
-#endif
 
         /* Destroy kernel, if required. */
         if (release_krnl) ccl_kernel_destroy(krnl);
@@ -610,6 +604,8 @@ static void suggest_worksizes_test() {
     CCLContext * ctx = NULL;
     CCLDevice * dev = NULL;
     CCLErr * err = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(&err);
@@ -621,14 +617,6 @@ static void suggest_worksizes_test() {
 
     /* Test with NULL kernel. */
     suggest_worksizes_aux(dev, NULL);
-
-#ifndef OPENCL_STUB
-
-    /* Kernel info is not functional with the OCL stub, so this
-     * test will only take place with a real OCL implementation. */
-
-    CCLProgram * prg = NULL;
-    CCLKernel * krnl = NULL;
 
     /* Create and build program. */
     prg = ccl_program_new_from_source(ctx, CCL_TEST_KERNEL_CONTENT, &err);
@@ -646,8 +634,6 @@ static void suggest_worksizes_test() {
 
     /* Destroy program. */
     ccl_program_destroy(prg);
-
-#endif
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -776,7 +762,6 @@ static void args_test() {
     g_assert_no_error(err);
     g_assert_cmpstr(krnl_name, ==, CCL_TEST_KERNEL_ARGS_NAME);
 
-#ifndef OPENCL_STUB
 #ifdef CL_VERSION_1_2
 
     cl_uint ocl_ver;
@@ -1006,7 +991,6 @@ static void args_test() {
     }
 
 #endif
-#endif
 
     /* Set args array. */
     args[0] = buf;
@@ -1031,8 +1015,6 @@ static void args_test() {
     ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
     g_assert_no_error(err);
 
-#ifndef OPENCL_STUB
-
     /* Check that results are as expected. */
     for (cl_uint i = 0; i < CCL_TEST_KERNEL_ARGS_BUF_SIZE; ++i)
         g_assert_cmpuint(hbuf[i], ==, himg[i].c[0] + himg[i].c[1] +
@@ -1040,8 +1022,6 @@ static void args_test() {
         //~ printf("%5d == %5d (%3d, %3d, %3d, %3d, %3d)\n", hbuf[i],
             //~ himg[i].c[0] + himg[i].c[1] + himg[i].c[2] + himg[i].c[3] + to_sum,
             //~ himg[i].c[0], himg[i].c[1], himg[i].c[2], himg[i].c[3], to_sum);
-
-#endif
 
     /* Destroy stuff. */
     ccl_sampler_destroy(smplr);

@@ -168,7 +168,6 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
     g_assert(*((cl_program *) info->value) == ccl_program_unwrap(prg));
 
-#ifndef OPENCL_STUB
 #ifdef CL_VERSION_1_2
 
     cl_kernel_arg_address_qualifier kaaq;
@@ -356,7 +355,6 @@ static void create_info_destroy_test() {
         g_clear_error(&err);
     }
 
-#endif
 #endif
 
     /* Save binaries for all available devices (which we will load into
@@ -552,13 +550,11 @@ static void create_info_destroy_test() {
     ccl_event_wait(&ewl, &err);
     g_assert_no_error(err);
 
-#ifndef OPENCL_STUB
-    /* Check results are as expected (not available with OpenCL stub). */
+    /* Check results are as expected. */
     for (guint i = 0; i < CCL_TEST_PROGRAM_BUF_SIZE; i++) {
         g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i] + d_h);
         g_debug("c_h[%d] = %d\n", i, c_h[i]);
     }
-#endif
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -753,13 +749,9 @@ static void compile_link_test() {
     ccl_queue_finish(cq, &err);
     g_assert_no_error(err);
 
-#ifndef OPENCL_STUB
-
     /* Check results. */
     for (cl_char i = 0; i < 8; ++i)
         g_assert_cmpint(hbuf_out[i], ==, hbuf_in[i] + i);
-
-#endif
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());

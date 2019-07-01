@@ -210,7 +210,7 @@ int main(int argc, char * argv[]) {
         buf_n * sizeof(cl_uint), c_host, NULL, &err);
     HANDLE_ERROR(err);
 
-    /* Check results are as expected (not available with OpenCL stub). */
+    /* Check results are as expected. */
     check_result = CL_TRUE;
     for (cl_uint i = 0; i < buf_n; ++i) {
         if(c_host[i] != a_host[i] + b_host[i] + d_host) {
