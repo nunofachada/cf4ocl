@@ -29,6 +29,17 @@
 #include <cf4ocl2.h>
 #include "test.h"
 
+#define ccl_test_prof_is_overlap(ev1, ev2) \
+    ( \
+        (g_strcmp0(o->event1_name, ev1) == 0) \
+        && \
+        (g_strcmp0(o->event2_name, ev2) == 0) \
+    ) || ( \
+        (g_strcmp0(o->event1_name, ev2) == 0) \
+        && \
+        (g_strcmp0(o->event2_name, ev1) == 0) \
+    )
+
 #define CCL_TEST_MAXBUF 512
 
 /**
@@ -302,6 +313,95 @@ static void features_test() {
         prev_name = info->event_name;
 
     }
+
+    /* ******************* */
+    /* Test event instants */
+    /* ******************* */
+
+    const CCLProfInst * pi;
+    cl_ulong prev_inst = 0;
+    ccl_prof_iter_inst_init(
+        prof, CCL_PROF_INST_SORT_INSTANT | CCL_PROF_SORT_ASC);
+
+    while ((pi = ccl_prof_iter_inst_next(prof)) != NULL) {
+
+        /* Check that previous instant occurred before current one. */
+        g_assert_cmpuint(prev_inst, <=, pi->instant);
+        prev_inst = pi->instant;
+    }
+
+     /* ************* */
+    /* Test overlaps */
+    /* ************* */
+
+    const CCLProfOverlap * o;
+    ccl_prof_iter_overlap_init(prof, CCL_PROF_OVERLAP_SORT_DURATION |
+        CCL_PROF_SORT_DESC);
+    while ((o = ccl_prof_iter_overlap_next(prof)) != NULL) {
+
+        /* Check for impossible overlaps. */
+        g_assert(!ccl_test_prof_is_overlap("Event1", "Event3"));
+        g_assert(!ccl_test_prof_is_overlap("Event1", "Event4"));
+        g_assert(!ccl_test_prof_is_overlap("Event2", "Event3"));
+        g_assert(!ccl_test_prof_is_overlap("Event2", "Event4"));
+
+        /* Check for possible overlaps. */
+        if (ccl_test_prof_is_overlap("Event1", "Event2")) {
+            g_assert_cmpuint(o->duration, >=, 0);
+        } else if (ccl_test_prof_is_overlap("Event3", "Event4")) {
+            g_assert_cmpuint(o->duration, >=, 0);
+        } else {
+            g_assert_not_reached();
+        }
+    }
+
+    /* ******************* */
+    /* Test export options */
+    /* ******************* */
+
+    /* Set some export options. */
+    CCLProfExportOptions export_options = ccl_prof_get_export_opts();
+    export_options.separator = "\t"; /* Default */
+    export_options.queue_delim = ""; /* Default */
+    export_options.evname_delim = ""; /* Default */
+    export_options.zero_start = FALSE; /* Not default */
+    ccl_prof_set_export_opts(export_options);
+
+    /* Export options. */
+    gchar * tmp_dir_name, * tmp_file_name;
+    tmp_dir_name = g_dir_make_tmp("test_profiler_XXXXXX", &err);
+    g_assert_no_error(err);
+    tmp_file_name = g_strconcat(
+        tmp_dir_name, G_DIR_SEPARATOR_S, "export.tsv", NULL);
+
+    cl_bool export_status = ccl_prof_export_info_file(
+        prof, tmp_file_name, &err);
+    g_assert_no_error(err);
+    g_assert(export_status);
+
+    /* Test if output file was correctly written. */
+    gchar * file_contents;
+    gboolean read_flag = g_file_get_contents(
+        tmp_file_name, &file_contents, NULL, NULL);
+    g_assert(read_flag);
+    g_assert(g_strrstr(file_contents, "Event1"));
+    g_assert(g_strrstr(file_contents, "Event2"));
+    g_assert(g_strrstr(file_contents, "Event3"));
+    g_assert(g_strrstr(file_contents, "Event4"));
+    g_free(file_contents);
+    g_free(tmp_dir_name);
+    g_free(tmp_file_name);
+
+    /* Print summary to debug output. */
+    const char * summary = ccl_prof_get_summary(prof,
+        CCL_PROF_AGG_SORT_TIME | CCL_PROF_SORT_DESC,
+        CCL_PROF_OVERLAP_SORT_DURATION | CCL_PROF_SORT_DESC);
+
+    g_debug("\n%s", summary);
+
+    /* ******************* */
+    /* Clean and terminate */
+    /* ******************* */
 
     /* Free profiler object. */
     ccl_prof_destroy(prof);
