@@ -25,7 +25,7 @@ include_directories(${CMAKE_BINARY_DIR}/generated)
 # Set of tests to build
 set(TESTS test_profiler test_platforms test_buffer test_devquery test_context
     test_event test_program test_image test_sampler test_kernel test_queue
-    test_device test_devsel test_errors)
+    test_device test_devsel test_abstract)
 
 # Add a target for each test
 foreach(TEST ${TESTS})

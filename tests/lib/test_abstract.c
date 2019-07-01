@@ -19,7 +19,7 @@
  * @internal
  *
  * @file
- * Tests if errors occur when they should when using cf4ocl.
+ * Tests functionality offered by the abstract wrappers.
  *
  * @author Nuno Fachada
  * @date 2019
@@ -49,7 +49,7 @@ static CCLWrapperInfo * mock_get_devices(
  *
  * @brief Tests errors in device container functions.
  * */
-static void device_container_test() {
+static void device_container_errors_test() {
 
     /* Test variables. */
     CCLDevContainer mock_devcon = { { 0, NULL, NULL, 0 }, 0, NULL };
@@ -84,8 +84,8 @@ int main(int argc, char ** argv) {
     g_test_init(&argc, &argv, NULL);
 
     g_test_add_func(
-        "/wrappers/errors/device-container",
-        device_container_test);
+        "/wrappers/abstract/device-container-errors",
+        device_container_errors_test);
 
     return g_test_run();
 }
