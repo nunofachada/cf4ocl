@@ -29,6 +29,8 @@
 #include <cf4ocl2.h>
 #include "test.h"
 
+#define CCL_TEST_MAXBUF 512
+
 /**
  * @internal
  *
@@ -142,6 +144,189 @@ static void create_add_destroy_test() {
 /**
  * @internal
  *
+ * @brief Tests profiler features.
+ * */
+static void features_test() {
+
+    /* Aux vars. */
+    CCLContext * ctx;
+    CCLDevice * dev;
+    CCLQueue * q1, * q2;
+    CCLBuffer * buf1, * buf2;
+    CCLEvent * ev1, * ev2, * ev3, * ev4;
+    CCLEventWaitList ewl = NULL;
+    CCLProf * prof;
+    CCLErr * err = NULL;
+    cl_int h_buf1[CCL_TEST_MAXBUF], h_buf2[CCL_TEST_MAXBUF];
+    cl_uint devidx = 0;
+
+    /* Put random stuff in host buffers. */
+    for (guint i = 0; i < CCL_TEST_MAXBUF; ++i)
+    {
+        h_buf1[i] = g_test_rand_int();
+        h_buf2[i] = g_test_rand_int();
+    }
+
+    /* Create OpenCL wrappers for testing. */
+    ctx = ccl_context_new_from_device_index(&devidx, &err);
+    g_assert_no_error(err);
+
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    q1 = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+    g_assert_no_error(err);
+    q2 = ccl_queue_new(ctx, dev, CL_QUEUE_PROFILING_ENABLE, &err);
+    g_assert_no_error(err);
+
+    buf1 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE,
+        sizeof(cl_int) * CCL_TEST_MAXBUF, NULL, &err);
+    g_assert_no_error(err);
+
+    buf2 = ccl_buffer_new(ctx, CL_MEM_READ_WRITE,
+        sizeof(cl_int) * CCL_TEST_MAXBUF, NULL, &err);
+    g_assert_no_error(err);
+
+    /* Profiling object. */
+    prof = ccl_prof_new();
+
+    /* Write stuff from host buffers to device buffers using different
+     * queues. These are non-blocking writes, so they may overlap in time. */
+    ev1 = ccl_buffer_enqueue_write(
+        buf1, q1, CL_FALSE, 0,
+        sizeof(cl_int) * CCL_TEST_MAXBUF, h_buf1, NULL, &err);
+    g_assert_no_error(err);
+    ccl_event_set_name(ev1, "Event1");
+
+    ev2 = ccl_buffer_enqueue_write(
+        buf2, q2, CL_FALSE, 0,
+        sizeof(cl_int) * CCL_TEST_MAXBUF, h_buf2, NULL, &err);
+    g_assert_no_error(err);
+    ccl_event_set_name(ev2, "Event2");
+
+    /* Add write events to the event wait list and wait for writes to finish. */
+    ccl_event_wait_list_add(&ewl, ev1, ev2, NULL);
+    ccl_event_wait(&ewl, &err);
+    g_assert_no_error(err);
+
+    /* Now do some reads, swaping data in the host buffers. The reads
+     * will only start when the writes are finished. */
+    ev3 = ccl_buffer_enqueue_read(
+        buf1, q1, CL_FALSE, 0,
+        sizeof(cl_int) * CCL_TEST_MAXBUF, h_buf2, NULL, &err);
+    g_assert_no_error(err);
+    ccl_event_set_name(ev3, "Event3");
+
+    ev4 = ccl_buffer_enqueue_read(
+        buf2, q2, CL_FALSE, 0,
+        sizeof(cl_int) * CCL_TEST_MAXBUF, h_buf1, NULL, &err);
+    g_assert_no_error(err);
+    ccl_event_set_name(ev4, "Event4");
+
+    /* Add read events to the event wait list and wait for reads to finish. */
+    ccl_event_wait_list_add(&ewl, ev3, ev4, NULL);
+    ccl_event_wait(&ewl, &err);
+    g_assert_no_error(err);
+
+    /* Add queues for profiling. */
+    ccl_prof_add_queue(prof, "Q1", q1);
+    ccl_prof_add_queue(prof, "Q2", q2);
+
+    /* Perform profiling calculations. */
+    ccl_prof_calc(prof, &err);
+    g_assert_no_error(err);
+
+    /* **************** */
+    /* Test event names */
+    /* **************** */
+
+    g_assert_cmpstr(ccl_event_get_name(ev1), ==, "Event1");
+    g_assert_cmpstr(ccl_event_get_name(ev2), ==, "Event2");
+    g_assert_cmpstr(ccl_event_get_name(ev3), ==, "Event3");
+    g_assert_cmpstr(ccl_event_get_name(ev4), ==, "Event4");
+
+    /* ************************* */
+    /* Test aggregate statistics */
+    /* ************************* */
+
+    /* 1) Directly. */
+    const CCLProfAgg * agg;
+
+    agg = ccl_prof_get_agg(prof, "Event1");
+    g_assert(agg != NULL);
+    g_assert_cmpuint(agg->absolute_time, >=, 0);
+    g_assert_cmpfloat(agg->relative_time, >=, 0);
+
+    agg = ccl_prof_get_agg(prof, "Event2");
+    g_assert(agg != NULL);
+    g_assert_cmpuint(agg->absolute_time, >=, 0);
+    g_assert_cmpfloat(agg->relative_time, >=, 0);
+
+    agg = ccl_prof_get_agg(prof, "Event3");
+    g_assert(agg != NULL);
+    g_assert_cmpuint(agg->absolute_time, >=, 0);
+    g_assert_cmpfloat(agg->relative_time, >=, 0);
+
+    agg = ccl_prof_get_agg(prof, "Event4");
+    g_assert(agg != NULL);
+    g_assert_cmpuint(agg->absolute_time, >=, 0);
+    g_assert_cmpfloat(agg->relative_time, >=, 0);
+
+    /* 2) By cycling all aggregate stats. */
+    const char * prev_name = "zzzz";
+
+    ccl_prof_iter_agg_init(prof, CCL_PROF_AGG_SORT_NAME | CCL_PROF_SORT_DESC);
+
+    while ((agg = ccl_prof_iter_agg_next(prof)) != NULL) {
+
+        /* Just check that the event names are ordered properly. */
+        g_assert_cmpstr(agg->event_name, <=, prev_name);
+        prev_name = agg->event_name;
+    }
+
+    /* **************** */
+    /* Test event infos */
+    /* **************** */
+
+    prev_name = "0000";
+    const CCLProfInfo * info;
+
+    /* Test ordering by event name. */
+    ccl_prof_iter_info_init(
+        prof, CCL_PROF_INFO_SORT_NAME_EVENT | CCL_PROF_SORT_ASC);
+
+    while ((info = ccl_prof_iter_info_next(prof)) != NULL) {
+
+        /* Check that the event names are ordered properly. */
+        g_assert_cmpstr(info->event_name, >=, prev_name);
+        prev_name = info->event_name;
+
+    }
+
+    /* Free profiler object. */
+    ccl_prof_destroy(prof);
+
+    /* Free buffer wrappers. */
+    ccl_buffer_destroy(buf2);
+    ccl_buffer_destroy(buf1);
+
+    /* Free queue wrappers. */
+    ccl_queue_destroy(q2);
+    ccl_queue_destroy(q1);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
+    /* Free context. */
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly freed. */
+    g_assert(ccl_wrapper_memcheck());
+}
+
+/**
+ * @internal
+ *
  * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -151,8 +336,8 @@ int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
-    g_test_add_func(
-        "/profiler/create-add-destroy", create_add_destroy_test);
+    g_test_add_func("/profiler/create-add-destroy", create_add_destroy_test);
+    g_test_add_func("/profiler/features", features_test);
 
     return g_test_run();
 
