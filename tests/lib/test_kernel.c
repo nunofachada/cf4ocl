@@ -72,9 +72,10 @@ static void create_info_destroy_test() {
     void * args[] = { NULL, NULL };
     cl_bool release_krnl;
     cl_int ocl_status;
+    cl_uint ocl_ver;
 
-    /* Create a context with devices from first available platform. */
-    ctx = ccl_test_context_new(&err);
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create a new program from source and build it. */
@@ -141,92 +142,10 @@ static void create_info_destroy_test() {
         g_assert_no_error(err);
         g_assert(program == ccl_program_unwrap(prg));
 
-        cl_uint ocl_ver;
-
         /* Get OpenCL version of kernel's underlying platform. */
         ocl_ver = ccl_kernel_get_opencl_version(krnl, &err);
         g_assert_no_error(err);
-
-        (void)ocl_ver;
-
-#ifdef CL_VERSION_1_1
-
-        size_t kwgz;
-        size_t * kcwgs;
-        CCLDevice * dev = NULL;
-
-        /* If platform supports kernel work group queries, get kernel
-         * work group information and compare it with expected info. */
-        if (ocl_ver >= 110) {
-
-            dev = ccl_context_get_device(ctx, 0, &err);
-            g_assert_no_error(err);
-
-            kwgz = ccl_kernel_get_workgroup_info_scalar(
-                krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
-            g_assert_no_error(err);
-            (void)kwgz;
-
-            kcwgs = ccl_kernel_get_workgroup_info_array(
-                krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t, &err);
-            g_assert_no_error(err);
-            (void)kcwgs;
-        }
-
-#endif /* ifdef CL_VERSION_1_1 */
-
-#ifdef CL_VERSION_1_2
-
-        cl_kernel_arg_address_qualifier kaaq;
-        char * kernel_arg_type_name;
-        char * kernel_arg_name;
-
-        /* If platform supports kernel argument queries, get kernel argument
-         * information and compare it with expected info. */
-        if (ocl_ver >= 120) {
-
-            kaaq = ccl_kernel_get_arg_info_scalar(
-                krnl, 0, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-                cl_kernel_arg_address_qualifier, &err);
-            g_assert((err == NULL)
-                || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
-                    && (err->domain == CCL_ERROR))
-                || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
-                    && (err->domain == CCL_OCL_ERROR)));
-            if (err == NULL) {
-                g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
-            } else {
-                g_clear_error(&err);
-            }
-
-            kernel_arg_type_name = ccl_kernel_get_arg_info_array(
-                krnl, 0, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-            g_assert((err == NULL)
-                || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
-                    && (err->domain == CCL_ERROR))
-                || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
-                    && (err->domain == CCL_OCL_ERROR)));
-            if (err == NULL) {
-                g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
-            } else {
-                g_clear_error(&err);
-            }
-
-            kernel_arg_name = ccl_kernel_get_arg_info_array(
-                krnl, 0, CL_KERNEL_ARG_NAME, char, &err);
-            g_assert((err == NULL)
-                || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
-                    && (err->domain == CCL_ERROR))
-                || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
-                    && (err->domain == CCL_OCL_ERROR)));
-            if (err == NULL) {
-                g_assert_cmpstr(kernel_arg_name, ==, "buf");
-            } else {
-                g_clear_error(&err);
-            }
-        }
-
-#endif /* ifdef CL_VERSION_1_2 */
+        CCL_UNUSED(ocl_ver);
 
         /* Set kernel enqueue properties and initialize host data. */
         gws = CCL_TEST_KERNEL_BUF_SIZE;
@@ -290,6 +209,186 @@ static void create_info_destroy_test() {
 /**
  * @internal
  *
+ * @brief Tests kernel work group queries.
+ * */
+static void info_workgroup_test() {
+
+#ifndef CL_VERSION_1_1
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.1 support.");
+
+#else
+
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl = NULL;
+    CCLDevice * d = NULL;
+    CCLQueue * cq = NULL;
+    CCLDevice * dev = NULL;
+    size_t kwgz;
+    size_t * kcwgs;
+    CCLErr * err = NULL;
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(110, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
+
+    /* Create a new program from source and build it. */
+    prg = ccl_program_new_from_source(ctx, CCL_TEST_KERNEL_CONTENT, &err);
+    g_assert_no_error(err);
+
+    ccl_program_build(prg, NULL, &err);
+    g_assert_no_error(err);
+
+    /* Create a command queue. */
+    cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
+    g_assert_no_error(err);
+
+    /* Create kernel wrapper. */
+    krnl = ccl_program_get_kernel(prg, CCL_TEST_KERNEL_NAME, &err);
+    g_assert_no_error(err);
+
+    /* Get device in context. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    kwgz = ccl_kernel_get_workgroup_info_scalar(
+        krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err);
+    g_assert_no_error(err);
+    CCL_UNUSED(kwgz);
+
+    kcwgs = ccl_kernel_get_workgroup_info_array(
+        krnl, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t, &err);
+    g_assert_no_error(err);
+    CCL_UNUSED(kcwgs);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
+    /* Destroy the command queue. */
+    ccl_queue_destroy(cq);
+
+    /* Destroy stuff. */
+    ccl_program_destroy(prg);
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly freed. */
+    g_assert(ccl_wrapper_memcheck());
+
+#endif
+
+}
+
+/**
+ * @internal
+ *
+ * @brief Tests kernel argument queries.
+ * */
+static void info_args_test() {
+
+#ifndef CL_VERSION_1_2
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.2 support.");
+
+#else
+
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl = NULL;
+    CCLDevice * d = NULL;
+    CCLQueue * cq = NULL;
+    CCLErr * err = NULL;
+    cl_kernel_arg_address_qualifier kaaq;
+    char * kernel_arg_type_name;
+    char * kernel_arg_name;
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(120, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
+
+    /* Create a new program from source and build it. */
+    prg = ccl_program_new_from_source(ctx, CCL_TEST_KERNEL_CONTENT, &err);
+    g_assert_no_error(err);
+
+    ccl_program_build(prg, NULL, &err);
+    g_assert_no_error(err);
+
+    /* Create a command queue. */
+    cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
+    g_assert_no_error(err);
+
+    /* Create kernel wrapper. */
+    krnl = ccl_program_get_kernel(prg, CCL_TEST_KERNEL_NAME, &err);
+    g_assert_no_error(err);
+
+    /* Get kernel argument information and compare it with expected info. */
+    kaaq = ccl_kernel_get_arg_info_scalar(
+        krnl, 0, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+        cl_kernel_arg_address_qualifier, &err);
+    g_assert((err == NULL)
+        || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+            && (err->domain == CCL_ERROR))
+        || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+            && (err->domain == CCL_OCL_ERROR)));
+    if (err == NULL) {
+        g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
+    } else {
+        g_clear_error(&err);
+    }
+
+    kernel_arg_type_name = ccl_kernel_get_arg_info_array(
+        krnl, 0, CL_KERNEL_ARG_TYPE_NAME, char, &err);
+    g_assert((err == NULL)
+        || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+            && (err->domain == CCL_ERROR))
+        || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+            && (err->domain == CCL_OCL_ERROR)));
+    if (err == NULL) {
+        g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
+    } else {
+        g_clear_error(&err);
+    }
+
+    kernel_arg_name = ccl_kernel_get_arg_info_array(
+        krnl, 0, CL_KERNEL_ARG_NAME, char, &err);
+    g_assert((err == NULL)
+        || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
+            && (err->domain == CCL_ERROR))
+        || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
+            && (err->domain == CCL_OCL_ERROR)));
+    if (err == NULL) {
+        g_assert_cmpstr(kernel_arg_name, ==, "buf");
+    } else {
+        g_clear_error(&err);
+    }
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
+    /* Destroy the command queue. */
+    ccl_queue_destroy(cq);
+
+    /* Destroy stuff. */
+    ccl_program_destroy(prg);
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly
+     * freed. */
+    g_assert(ccl_wrapper_memcheck());
+
+#endif
+
+}
+
+/**
+ * @internal
+ *
  * @brief Test increasing reference count of kernel wrappers.
  * */
 static void ref_unref_test() {
@@ -301,7 +400,7 @@ static void ref_unref_test() {
     CCLKernel * krnl2 = NULL;
 
     /* Get some context. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create a program from source. */
@@ -608,7 +707,7 @@ static void suggest_worksizes_test() {
     CCLKernel * krnl = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -706,8 +805,9 @@ static void args_test() {
     /* **************************************************** */
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new_with_image_support(0, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Get first device in context. */
     dev = ccl_context_get_device(ctx, 0, &err);
@@ -1101,7 +1201,7 @@ static void native_test() {
     cl_uint i;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -1114,11 +1214,11 @@ static void native_test() {
         cl_device_exec_capabilities, &err);
     g_assert_no_error(err);
 
-    /* If not, return. */
+    /* If not, skip test. */
     if (!(exec_cap & CL_EXEC_NATIVE_KERNEL)) {
-        g_test_message("Test device doesn't support native kernels." \
+        g_test_skip("Test device doesn't support native kernels." \
             "Native kernels test will not be performed.");
-        return;
+        goto skip;
     }
 
     /* Create a command queue. */
@@ -1170,6 +1270,9 @@ static void native_test() {
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);
     ccl_queue_destroy(cq);
+
+skip:
+
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
@@ -1191,6 +1294,14 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/kernel/create-info-destroy",
         create_info_destroy_test);
+
+    g_test_add_func(
+        "/wrappers/kernel/info-workgroup",
+        info_workgroup_test);
+
+    g_test_add_func(
+        "/wrappers/kernel/info-args",
+        info_args_test);
 
     g_test_add_func(
         "/wrappers/kernel/ref-unref",

@@ -47,7 +47,7 @@ static void create_info_destroy_test() {
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create regular buffer. */
@@ -120,7 +120,7 @@ static void ref_unref_test() {
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create regular buffer. */
@@ -176,7 +176,7 @@ static void wrap_unwrap_test() {
     cl_int status;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create a buffer using OpenCL functions directly. */
@@ -240,7 +240,7 @@ static void read_write_test() {
         h_in[i] = g_test_rand_int();
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -331,7 +331,7 @@ static void copy_test() {
         h1[i] = g_test_rand_int();
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -408,7 +408,7 @@ static void map_unmap_test() {
         h_in[i] = g_test_rand_int();
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -478,12 +478,21 @@ static void CL_CALLBACK destructor_callback(
     *((cl_bool *) user_data) = CL_TRUE;
 }
 
+#endif
+
 /**
  * @internal
  *
  * @brief Test memory object destructor callbacks.
  * */
 static void destructor_callback_test() {
+
+#ifndef CL_VERSION_1_1
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.1 support.");
+
+#else
 
     /* Test variables. */
     CCLContext * ctx = NULL;
@@ -493,8 +502,9 @@ static void destructor_callback_test() {
     cl_bool test_var = CL_FALSE;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(110, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create a buffer. */
     b = ccl_buffer_new(
@@ -526,6 +536,9 @@ static void destructor_callback_test() {
 
     /* Confirm that test_var is CL_TRUE. */
     g_assert_cmpuint(test_var, ==, CL_TRUE);
+
+#endif
+
 }
 
 /**
@@ -534,6 +547,13 @@ static void destructor_callback_test() {
  * @brief Tests rect buffer operations.
  * */
 static void rect_read_write_copy_test() {
+
+#ifndef CL_VERSION_1_1
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.1 support.");
+
+#else
 
     /* Test variables. */
     CCLContext * ctx = NULL;
@@ -563,8 +583,9 @@ static void rect_read_write_copy_test() {
                 (cl_uchar) (g_test_rand_int() % 0xFF);
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(110, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Get first device in context. */
     d = ccl_context_get_device(ctx, 0, &err);
@@ -617,6 +638,9 @@ static void rect_read_write_copy_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
+
+#endif
+
 }
 
 /**
@@ -625,6 +649,13 @@ static void rect_read_write_copy_test() {
  * @brief Tests the ccl_buffer_new_from_region() function.
  * */
 static void create_from_region_test() {
+
+#ifndef CL_VERSION_1_1
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.1 support.");
+
+#else
 
     /* Test variables. */
     CCLContext * ctx = NULL;
@@ -642,8 +673,9 @@ static void create_from_region_test() {
     size_t siz_subbuf;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(110, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Get first device in context. */
     dev = ccl_context_get_device(ctx, 0, &err);
@@ -719,12 +751,10 @@ static void create_from_region_test() {
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-}
 
 #endif
+}
 
-
-#ifdef CL_VERSION_1_2
 
 /**
  * @internal
@@ -733,9 +763,14 @@ static void create_from_region_test() {
  * */
 static void fill_test() {
 
+#ifndef CL_VERSION_1_2
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.2 support.");
+
+#else
+
     /* Test variables. */
-    CCLPlatforms * ps;
-    CCLPlatform * p;
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
@@ -745,30 +780,10 @@ static void fill_test() {
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
     CCLErr * err = NULL;
 
-    /* Get a context which supports OpenCL 1.2, if possible. */
-    ps = ccl_platforms_new(&err);
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(120, &err);
     g_assert_no_error(err);
-    for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
-        p = ccl_platforms_get(ps, i);
-        cl_uint ocl_ver = ccl_platform_get_opencl_version(p, &err);
-        if (ocl_ver >= 120) {
-            ctx = ccl_context_new_from_devices(
-                ccl_platform_get_num_devices(p, NULL),
-                ccl_platform_get_all_devices(p, NULL),
-                &err);
-            g_assert_no_error(err);
-            break;
-        }
-    }
-
-    /* If not possible to find a 1.2 or better context, finish this
-     * test. */
-    if (ctx == NULL) {
-        g_test_message("'%s' test not performed because no platform " \
-            "with OpenCL 1.2 support was found", CCL_STRD);
-        ccl_platforms_destroy(ps);
-        return;
-    }
+    if (!ctx) return;
 
     /* Get first device in context. */
     d = ccl_context_get_device(ctx, 0, &err);
@@ -803,11 +818,13 @@ static void fill_test() {
     ccl_buffer_destroy(b);
     ccl_queue_destroy(q);
     ccl_context_destroy(ctx);
-    ccl_platforms_destroy(ps);
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
+
+#endif
+
 }
 
 /**
@@ -817,9 +834,14 @@ static void fill_test() {
  * */
 static void migrate_test() {
 
+#ifndef CL_VERSION_1_2
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.2 support.");
+
+#else
+
     /* Test variables. */
-    CCLPlatforms * ps;
-    CCLPlatform * p;
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
@@ -827,30 +849,10 @@ static void migrate_test() {
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
     CCLErr * err = NULL;
 
-    /* Get a context which supports OpenCL 1.2 if possible. */
-    ps = ccl_platforms_new(&err);
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(120, &err);
     g_assert_no_error(err);
-    for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
-        p = ccl_platforms_get(ps, i);
-        cl_uint ocl_ver = ccl_platform_get_opencl_version(p, &err);
-        if (ocl_ver >= 120) {
-            ctx = ccl_context_new_from_devices(
-                ccl_platform_get_num_devices(p, NULL),
-                ccl_platform_get_all_devices(p, NULL),
-                &err);
-            g_assert_no_error(err);
-            break;
-        }
-    }
-
-    /* If not possible to find a 1.2 or better context, finish this
-     * test. */
-    if (ctx == NULL) {
-        g_test_message("'%s' test not performed because no platform " \
-            "with OpenCL 1.2 support was found", CCL_STRD);
-        ccl_platforms_destroy(ps);
-        return;
-    }
+    if (!ctx) return;
 
     /* Get first device in context. */
     d = ccl_context_get_device(ctx, 0, &err);
@@ -886,15 +888,14 @@ static void migrate_test() {
     ccl_buffer_destroy(b);
     ccl_queue_destroy(q);
     ccl_context_destroy(ctx);
-    ccl_platforms_destroy(ps);
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
     g_assert(ccl_wrapper_memcheck());
-}
-
 
 #endif
+
+}
 
 /**
  * @internal
@@ -932,7 +933,6 @@ int main(int argc, char ** argv) {
         "/wrappers/buffer/map-unmap",
         map_unmap_test);
 
-#ifdef CL_VERSION_1_1
     g_test_add_func(
         "/wrappers/buffer/destruct_callback",
         destructor_callback_test);
@@ -944,9 +944,7 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/buffer/create-from-region",
         create_from_region_test);
-#endif
 
-#ifdef CL_VERSION_1_2
     g_test_add_func(
         "/wrappers/buffer/fill",
         fill_test);
@@ -954,7 +952,6 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/buffer/migrate",
         migrate_test);
-#endif
 
     return g_test_run();
 }

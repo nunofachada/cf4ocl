@@ -36,60 +36,6 @@
 /**
  * @internal
  *
- * @brief Creating a context with an image-supporting device and specific
- * support for a minimum OpenCL version.
- *
- * @param[in] min_ocl_ver Minimum OpenCL version to be supported by device.
- * @return A context for the image tests.
- * */
-static CCLContext * ccl_test_context_new_with_image_support(
-    cl_uint min_ocl_ver) {
-
-    /* Test variables. */
-    CCLContext * ctx = NULL;
-    CCLDevice * dev = NULL;
-    GError * err = NULL;
-    cl_bool image_support;
-
-    /* Create a context with the devices specified in CCL_TEST_DEVICE_INDEX. */
-    ctx = ccl_test_context_new(&err);
-    g_assert_no_error(err);
-
-    /* Get the first device associated with the context. */
-    dev = ccl_context_get_device(ctx, 0, &err);
-    g_assert_no_error(err);
-
-    /* Does the device support images? */
-    image_support = ccl_device_get_info_scalar(
-        dev, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
-    g_assert_no_error(err);
-
-    if (!image_support) {
-        g_test_skip("Device does not support images");
-        ccl_context_destroy(ctx);
-        ctx = NULL;
-    }
-
-    /* Does the test require a minimum OpenCL version? */
-    else if (min_ocl_ver > 0) {
-
-        /* Does the device support the required minimum OpenCL version? */
-        cl_uint d_ocl_ver = ccl_device_get_opencl_version(dev, &err);
-        g_assert_no_error(err);
-        if (d_ocl_ver < min_ocl_ver) {
-            g_test_skip("Device does have the required OpenCL version");
-            ccl_context_destroy(ctx);
-            ctx = NULL;
-        }
-    }
-
-    /* Return the context. */
-    return ctx;
-}
-
-/**
- * @internal
- *
  * @brief Tests creation, getting info from and destruction of
  * image wrapper objects.
  * */
@@ -105,8 +51,9 @@ static void create_info_destroy_test() {
     CCLImageDesc img_dsc = CCL_IMAGE_DESC_BLANK;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(0);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(0, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Test three ways to create an image. */
     for (cl_uint i = 0; i < 3; ++i) {
@@ -225,8 +172,9 @@ static void ref_unref_test() {
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(0);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(0, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create 2D image. */
     img = ccl_image_new(
@@ -285,8 +233,9 @@ static void read_write_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(0);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(0, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
@@ -369,8 +318,9 @@ static void copy_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(0);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(0, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
@@ -455,8 +405,9 @@ static void map_unmap_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(0);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(0, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Check that a context is set. */
     if (ctx == NULL) {
@@ -523,7 +474,6 @@ static void map_unmap_test() {
     ccl_queue_destroy(q);
 }
 
-
 /**
  * @internal
  *
@@ -548,8 +498,9 @@ static void copy_buffer_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(0);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(0, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
@@ -677,8 +628,9 @@ static void fill_test() {
     }};
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new_with_image_support(120);
-    if (ctx == NULL) return;
+    ctx = ccl_test_context_new_with_image_support(120, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Get first device in context. */
     d = ccl_context_get_device(ctx, 0, &err);

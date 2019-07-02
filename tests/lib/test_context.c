@@ -868,7 +868,7 @@ static void device_container_test() {
     CCLErr * err = NULL;
 
     /* Create some context. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Test get platform. */

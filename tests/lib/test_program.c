@@ -88,7 +88,7 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
 
     /* Create a context with devices from first available platform. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create a new program from kernel file. */
@@ -595,7 +595,7 @@ static void ref_unref_test() {
     const char * src = CCL_TEST_PROGRAM_SUM_CONTENT;
 
     /* Get some context. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Create a program from source. */
@@ -666,12 +666,21 @@ static const char src_main[] =
 
 static const char * src_head_name = "head.h";
 
+#endif
+
 /**
  * @internal
  *
  * @brief Test program and kernel wrappers ref counting.
  * */
 static void compile_link_test() {
+
+#ifndef CL_VERSION_1_2
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.2 support.");
+
+#else
 
     /* Test variables. */
     CCLContext * ctx = NULL;
@@ -685,11 +694,11 @@ static void compile_link_test() {
     cl_char hbuf_out[8];
     size_t ws = 8;
     CCLErr * err = NULL;
-    cl_uint ocl_ver;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(120, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Get first device in context. */
     dev = ccl_context_get_device(ctx, 0, &err);
@@ -698,16 +707,6 @@ static void compile_link_test() {
     /* Create a command queue. */
     cq = ccl_queue_new(ctx, dev, 0, &err);
     g_assert_no_error(err);
-
-    /* Check if platform supports compilation and linking
-     * (OpenCL >= 1.2) */
-    ocl_ver = ccl_context_get_opencl_version(ctx, &err);
-    g_assert_no_error(err);
-    if (ocl_ver < 120) {
-        g_test_message("Device being tested does not support \
-            compilation and linking");
-        return;
-    }
 
     /* Create device buffer and initialize it with values from host
      * buffer in. */
@@ -766,9 +765,10 @@ static void compile_link_test() {
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
-}
 
 #endif
+
+}
 
 /**
  * @internal
@@ -790,10 +790,9 @@ int main(int argc, char ** argv) {
         "/wrappers/program/ref-unref",
         ref_unref_test);
 
-#ifdef CL_VERSION_1_2
     g_test_add_func(
         "/wrappers/program/compile-link",
         compile_link_test);
-#endif
+
     return g_test_run();
 }

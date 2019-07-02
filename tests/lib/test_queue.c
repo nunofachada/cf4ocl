@@ -55,7 +55,7 @@ static void create_info_destroy_test() {
     cl_int ocl_status;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -161,7 +161,7 @@ static void ref_unref_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -222,7 +222,7 @@ static void barrier_marker_test() {
     cl_bool evt_in_cq;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */

@@ -55,7 +55,7 @@ static void create_info_destroy_test() {
     cl_ulong time_end;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -153,188 +153,6 @@ static void create_info_destroy_test() {
     g_assert(ccl_wrapper_memcheck());
 }
 
-#ifdef CL_VERSION_1_1
-
-/**
- * @internal
- *
- * @brief Tests user events.
- * */
-static void user_event_test() {
-
-    /* Test variables. */
-    CCLEvent * uevt = NULL;
-    CCLContext * ctx = NULL;
-    CCLErr * err = NULL;
-    cl_command_queue clcq = NULL;
-    cl_context clctx = NULL;
-    cl_command_type clct = 0;
-    cl_int exec_status;
-
-    /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
-    g_assert_no_error(err);
-
-    /* Create user event. */
-    uevt = ccl_user_event_new(ctx, &err);
-    g_assert_no_error(err);
-
-    /* Check that event ref count is 1. */
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
-
-    /* Increase ref count, check it is 2. */
-    ccl_event_ref(uevt);
-    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
-
-    /* Decrease ref count, check it is 1. */
-    ccl_event_unref(uevt);
-    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
-
-    /* Confirm that event command queue is NULL. */
-    clcq = ccl_event_get_info_scalar(
-        uevt, CL_EVENT_COMMAND_QUEUE, cl_command_queue, &err);
-    g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_SIZE(clcq), ==, GPOINTER_TO_SIZE(NULL));
-
-    /* Confirm that event returns the correct context. */
-    clctx = ccl_event_get_info_scalar(
-        uevt, CL_EVENT_CONTEXT, cl_context, &err);
-    g_assert_no_error(err);
-    g_assert_cmphex(
-        GPOINTER_TO_SIZE(clctx),
-        ==,
-        GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
-
-    /* Confirm command type is user event. */
-    clct = ccl_event_get_info_scalar(
-        uevt, CL_EVENT_COMMAND_TYPE, cl_command_type, &err);
-    g_assert_no_error(err);
-    g_assert_cmpuint(clct, ==, CL_COMMAND_USER);
-
-    /* Confirm execution status is "submitted". */
-    exec_status = ccl_event_get_info_scalar(
-        uevt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
-    g_assert_no_error(err);
-    g_assert_cmpint(exec_status, ==, CL_SUBMITTED);
-
-    /* Change execution status to "complete". */
-    ccl_user_event_set_status(uevt, CL_COMPLETE, &err);
-    g_assert_no_error(err);
-
-    /* Confirm execution status is "complete". */
-    exec_status = ccl_event_get_info_scalar(
-        uevt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
-    g_assert_no_error(err);
-    g_assert_cmpint(exec_status, ==, CL_COMPLETE);
-
-    /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
-
-    /* Destroy stuff. */
-    ccl_event_destroy(uevt);
-    ccl_context_destroy(ctx);
-
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
-    g_assert(ccl_wrapper_memcheck());
-}
-
-/**
- * @internal
- *
- * @brief Test callback function.
- *
- * @param[in] event Unused.
- * @param[in] event_command_exec_status Command completion status.
- * @param[out] user_data Location to place evidence that this function was
- * invoked.
- * */
-static void CL_CALLBACK callback_fun(
-    cl_event event, cl_int event_command_exec_status, void * user_data) {
-
-    CCL_UNUSED(event);
-
-    /* Confirm event is CL_COMPLETE. */
-    g_assert_cmpint(event_command_exec_status, ==, CL_COMPLETE);
-
-    /* Set userdata to CL_TRUE, thus providing evidence that the
-     * callback was indeed called. */
-    *((cl_bool *) user_data) = CL_TRUE;
-}
-
-/**
- * @internal
- *
- * @brief Tests event callbacks.
- * */
-static void callback_test() {
-
-    /* Test variables. */
-    CCLContext * ctx = NULL;
-    CCLDevice * dev = NULL;
-    CCLQueue * cq = NULL;
-    CCLBuffer * buf = NULL;
-    CCLEvent * evt = NULL;
-    CCLErr * err = NULL;
-    GTimer * timer = NULL;
-    cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
-    cl_bool test_var = CL_FALSE;
-
-    /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
-    g_assert_no_error(err);
-
-    /* Get first device in context. */
-    dev = ccl_context_get_device(ctx, 0, &err);
-    g_assert_no_error(err);
-
-    /* Create a command queue. */
-    cq = ccl_queue_new(ctx, dev, 0, &err);
-    g_assert_no_error(err);
-
-    /* Create a device buffer. */
-    buf = ccl_buffer_new(
-        ctx, CL_MEM_READ_WRITE, 8 * sizeof(cl_uint), NULL, &err);
-    g_assert_no_error(err);
-
-    /* Write something to buffer and get an event. */
-    evt = ccl_buffer_enqueue_write(
-        buf, cq, CL_FALSE, 0, 8 * sizeof(cl_uint), vector, NULL, &err);
-    g_assert_no_error(err);
-
-    /* Add a callback. */
-    ccl_event_set_callback(
-        evt, CL_COMPLETE, callback_fun, &test_var, &err);
-    g_assert_no_error(err);
-
-    /* Wait on host thread for all events to complete. */
-    ccl_queue_finish(cq, &err);
-    g_assert_no_error(err);
-
-    /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
-
-    /* Release wrappers. */
-    ccl_buffer_destroy(buf);
-    ccl_queue_destroy(cq);
-    ccl_context_destroy(ctx);
-
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
-    g_assert(ccl_wrapper_memcheck());
-
-    /* Wait some more... */
-    timer = g_timer_new();
-    while (g_timer_elapsed(timer, NULL) < 2.0);
-    g_timer_stop(timer);
-    g_timer_destroy(timer);
-
-    /* Confirm that test_var is CL_TRUE. */
-    g_assert_cmpuint(test_var, ==, CL_TRUE);
-}
-
-#endif
-
 /**
  * @internal
  *
@@ -356,7 +174,7 @@ static void name_test() {
     const char * evt_name = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -477,7 +295,7 @@ static void event_wait_lists_test() {
     cl_uint num_evts;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     /* Get first device in context. */
@@ -559,6 +377,211 @@ static void event_wait_lists_test() {
 /**
  * @internal
  *
+ * @brief Tests user events.
+ * */
+static void user_event_test() {
+
+#ifndef CL_VERSION_1_1
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.1 support.");
+
+#else
+
+    /* Test variables. */
+    CCLEvent * uevt = NULL;
+    CCLContext * ctx = NULL;
+    CCLErr * err = NULL;
+    cl_command_queue clcq = NULL;
+    cl_context clctx = NULL;
+    cl_command_type clct = 0;
+    cl_int exec_status;
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(110, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
+
+    /* Create user event. */
+    uevt = ccl_user_event_new(ctx, &err);
+    g_assert_no_error(err);
+
+    /* Check that event ref count is 1. */
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
+
+    /* Increase ref count, check it is 2. */
+    ccl_event_ref(uevt);
+    g_assert_cmpuint(2, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
+
+    /* Decrease ref count, check it is 1. */
+    ccl_event_unref(uevt);
+    g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
+
+    /* Confirm that event command queue is NULL. */
+    clcq = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_QUEUE, cl_command_queue, &err);
+    g_assert_no_error(err);
+    g_assert_cmphex(GPOINTER_TO_SIZE(clcq), ==, GPOINTER_TO_SIZE(NULL));
+
+    /* Confirm that event returns the correct context. */
+    clctx = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_CONTEXT, cl_context, &err);
+    g_assert_no_error(err);
+    g_assert_cmphex(
+        GPOINTER_TO_SIZE(clctx),
+        ==,
+        GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
+
+    /* Confirm command type is user event. */
+    clct = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_TYPE, cl_command_type, &err);
+    g_assert_no_error(err);
+    g_assert_cmpuint(clct, ==, CL_COMMAND_USER);
+
+    /* Confirm execution status is "submitted". */
+    exec_status = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+    g_assert_no_error(err);
+    g_assert_cmpint(exec_status, ==, CL_SUBMITTED);
+
+    /* Change execution status to "complete". */
+    ccl_user_event_set_status(uevt, CL_COMPLETE, &err);
+    g_assert_no_error(err);
+
+    /* Confirm execution status is "complete". */
+    exec_status = ccl_event_get_info_scalar(
+        uevt, CL_EVENT_COMMAND_EXECUTION_STATUS, cl_int, &err);
+    g_assert_no_error(err);
+    g_assert_cmpint(exec_status, ==, CL_COMPLETE);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
+    /* Destroy stuff. */
+    ccl_event_destroy(uevt);
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly
+     * freed. */
+    g_assert(ccl_wrapper_memcheck());
+
+#endif
+
+}
+
+#ifdef CL_VERSION_1_1
+
+/**
+ * @internal
+ *
+ * @brief Test callback function.
+ *
+ * @param[in] event Unused.
+ * @param[in] event_command_exec_status Command completion status.
+ * @param[out] user_data Location to place evidence that this function was
+ * invoked.
+ * */
+static void CL_CALLBACK callback_fun(
+    cl_event event, cl_int event_command_exec_status, void * user_data) {
+
+    CCL_UNUSED(event);
+
+    /* Confirm event is CL_COMPLETE. */
+    g_assert_cmpint(event_command_exec_status, ==, CL_COMPLETE);
+
+    /* Set userdata to CL_TRUE, thus providing evidence that the
+     * callback was indeed called. */
+    *((cl_bool *) user_data) = CL_TRUE;
+}
+
+#endif
+
+/**
+ * @internal
+ *
+ * @brief Tests event callbacks.
+ * */
+static void callback_test() {
+
+#ifndef CL_VERSION_1_1
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.1 support.");
+
+#else
+
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLQueue * cq = NULL;
+    CCLBuffer * buf = NULL;
+    CCLEvent * evt = NULL;
+    CCLErr * err = NULL;
+    GTimer * timer = NULL;
+    cl_uint vector[] = {0, 1, 2, 3, 4, 5, 6, 7};
+    cl_bool test_var = CL_FALSE;
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(110, &err);
+    g_assert_no_error(err);
+    if (!ctx) return;
+
+    /* Get first device in context. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    /* Create a command queue. */
+    cq = ccl_queue_new(ctx, dev, 0, &err);
+    g_assert_no_error(err);
+
+    /* Create a device buffer. */
+    buf = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE, 8 * sizeof(cl_uint), NULL, &err);
+    g_assert_no_error(err);
+
+    /* Write something to buffer and get an event. */
+    evt = ccl_buffer_enqueue_write(
+        buf, cq, CL_FALSE, 0, 8 * sizeof(cl_uint), vector, NULL, &err);
+    g_assert_no_error(err);
+
+    /* Add a callback. */
+    ccl_event_set_callback(
+        evt, CL_COMPLETE, callback_fun, &test_var, &err);
+    g_assert_no_error(err);
+
+    /* Wait on host thread for all events to complete. */
+    ccl_queue_finish(cq, &err);
+    g_assert_no_error(err);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
+    /* Release wrappers. */
+    ccl_buffer_destroy(buf);
+    ccl_queue_destroy(cq);
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly
+     * freed. */
+    g_assert(ccl_wrapper_memcheck());
+
+    /* Wait some more... */
+    timer = g_timer_new();
+    while (g_timer_elapsed(timer, NULL) < 2.0);
+    g_timer_stop(timer);
+    g_timer_destroy(timer);
+
+    /* Confirm that test_var is CL_TRUE. */
+    g_assert_cmpuint(test_var, ==, CL_TRUE);
+
+#endif
+
+}
+
+
+/**
+ * @internal
+ *
  * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -572,7 +595,13 @@ int main(int argc, char ** argv) {
         "/wrappers/event/create-info-destroy",
         create_info_destroy_test);
 
-#ifdef CL_VERSION_1_1
+    g_test_add_func(
+        "/wrappers/event/name-type",
+        name_test);
+
+    g_test_add_func(
+        "/wrappers/event/wait-lists",
+        event_wait_lists_test);
 
     g_test_add_func(
         "/wrappers/event/user",
@@ -581,15 +610,6 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/event/callback",
         callback_test);
-#endif
-
-    g_test_add_func(
-        "/wrappers/event/name-type",
-        name_test);
-
-    g_test_add_func(
-        "/wrappers/event/wait-lists",
-        event_wait_lists_test);
 
     return g_test_run();
 }

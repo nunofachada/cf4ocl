@@ -68,7 +68,8 @@ static void helpers_test() {
             /* Only test for device information if device count was
              * successfully obtained. */
             if (err != NULL) {
-                g_test_message("Error obtaining number of devices for platform %d (%s).",
+                g_test_message(
+                    "Error obtaining number of devices for platform %d (%s).",
                     i, err->message);
                 g_clear_error(&err);
             } else {
@@ -216,4 +217,3 @@ int main(int argc, char ** argv) {
 
     return g_test_run();
 }
-

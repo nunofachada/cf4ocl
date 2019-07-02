@@ -37,5 +37,11 @@
 /* Print handler which redirects output to debug stream. */
 void ccl_print_to_debug(const gchar * string);
 
-/* Create a context with a device specified at compile time. */
-CCLContext * ccl_test_context_new(CCLErr ** err);
+/* Create a context with a device specified at compile time or using the
+ * `CCL_TEST_DEVICE_INDEX` environment variable. */
+CCLContext * ccl_test_context_new(cl_uint min_ocl_ver, CCLErr ** err);
+
+/* Create a context with an image-supporting device and support for a minimum
+ * OpenCL version. */
+CCLContext * ccl_test_context_new_with_image_support(
+    cl_uint min_ocl_ver, CCLErr ** err);

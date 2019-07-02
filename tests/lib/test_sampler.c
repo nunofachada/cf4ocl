@@ -51,8 +51,9 @@ static void create_info_destroy_test() {
         0};
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new_with_image_support(0, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Test three ways to create a sampler. */
     for (cl_uint i = 0; i < 3; ++i) {
@@ -144,8 +145,9 @@ static void create_full_info_destroy_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new_with_image_support(0, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create sampler using "full" constructor. */
     s = ccl_sampler_new_full(ctx, sampler_properties, &err);
@@ -201,8 +203,9 @@ static void ref_unref_test() {
     CCLErr * err = NULL;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new_with_image_support(0, &err);
     g_assert_no_error(err);
+    if (!ctx) return;
 
     /* Create sampler. */
     s = ccl_sampler_new(

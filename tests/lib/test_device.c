@@ -36,7 +36,11 @@
  * */
 static void sub_devices_test() {
 
-#ifdef CL_VERSION_1_2
+#ifndef CL_VERSION_1_2
+
+    g_test_skip("Test skipped due to lack of OpenCL 1.2 support.");
+
+#else
 
     /* Test variables. */
     CCLContext * ctx = NULL;
@@ -54,21 +58,9 @@ static void sub_devices_test() {
     cl_device_id parent_device;
 
     /* Get the test context with the pre-defined device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(120, &err);
     g_assert_no_error(err);
-
-    /* Check OpenCL version of the platform. */
-    ocl_ver = ccl_context_get_opencl_version(ctx, &err);
-    g_assert_no_error(err);
-
-    /* This test can only be performed with devices supporting OpenCL
-     * 1.2 or higher. */
-    if (ocl_ver < 120) {
-        g_test_message("OpenCL version of parent device does not "\
-            "support sub-devices. Sub-devices test not performed.");
-        ccl_context_destroy(ctx);
-        return;
-    }
+    if (!ctx) return;
 
     /* Get parent device. */
     pdev = ccl_context_get_device(ctx, 0, &err);
@@ -223,9 +215,6 @@ static void sub_devices_test() {
     /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
 
-#else
-    g_test_message("OpenCL version of platform does not support " \
-        "sub-devices. Sub-devices test not performed.");
 #endif
 
 }

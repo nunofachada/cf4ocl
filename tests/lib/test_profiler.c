@@ -71,7 +71,7 @@ static void create_add_destroy_test() {
     prof = ccl_prof_new();
 
     /* Get a context and a device. */
-    ctx = ccl_test_context_new(&err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     d = ccl_context_get_device(ctx, 0, &err);
@@ -169,7 +169,6 @@ static void features_test() {
     CCLProf * prof;
     CCLErr * err = NULL;
     cl_int h_buf1[CCL_TEST_MAXBUF], h_buf2[CCL_TEST_MAXBUF];
-    cl_uint devidx = 0;
 
     /* Put random stuff in host buffers. */
     for (guint i = 0; i < CCL_TEST_MAXBUF; ++i)
@@ -179,7 +178,7 @@ static void features_test() {
     }
 
     /* Create OpenCL wrappers for testing. */
-    ctx = ccl_context_new_from_device_index(&devidx, &err);
+    ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
 
     dev = ccl_context_get_device(ctx, 0, &err);
