@@ -32,6 +32,53 @@
 /**
  * @internal
  *
+ * @brief Tests obtaining device information.
+ * */
+static void info_test() {
+
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLErr * err = NULL;
+    cl_ulong scalar;
+    size_t * array;
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(0, &err);
+    g_assert_no_error(err);
+
+    /* Get device associated with context. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    /* Get a scalar information. */
+    scalar = ccl_device_get_info_scalar(
+        dev, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, cl_ulong, &err);
+    g_assert_no_error(err);
+    g_assert_cmpuint(scalar, >=, 64 * 1024); // Min size is 64KB
+
+    /* Get an array information. */
+    array = ccl_device_get_info_array(
+        dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err);
+    g_assert_no_error(err);
+    g_assert_cmpuint(array[0], >=, 1);
+    g_assert_cmpuint(array[1], >=, 1);
+    g_assert_cmpuint(array[2], >=, 1);
+
+    /* Confirm that memory allocated by wrappers has not yet been freed. */
+    g_assert(!ccl_wrapper_memcheck());
+
+    /* Destroy stuff. */
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly freed. */
+    g_assert(ccl_wrapper_memcheck());
+
+}
+
+/**
+ * @internal
+ *
  * @brief Tests the creation of sub-devices.
  * */
 static void sub_devices_test() {
@@ -46,7 +93,6 @@ static void sub_devices_test() {
     CCLContext * ctx = NULL;
     CCLDevice * pdev = NULL;
     CCLErr * err = NULL;
-    cl_uint ocl_ver;
     cl_device_partition_property * dpp;
     cl_uint i;
     cl_bool supported;
@@ -230,6 +276,10 @@ static void sub_devices_test() {
 int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
+
+    g_test_add_func(
+        "/wrappers/device/info",
+        info_test);
 
     g_test_add_func(
         "/wrappers/device/sub-devices",
