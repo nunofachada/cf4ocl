@@ -36,100 +36,57 @@
 /**
  * @internal
  *
- * @brief Setup image tests by creating a context with an image-supporting
- * device. A minimum OpenCL version can be set in `user_data`.
+ * @brief Creating a context with an image-supporting device and specific
+ * support for a minimum OpenCL version.
  *
- * @param[out] ctx_fixt Location where to place context to create.
- * @param[in] user_data Minimum OpenCL version to be supported by context.
+ * @param[in] min_ocl_ver Minimum OpenCL version to be supported by device.
+ * @return A context for the image tests.
  * */
-static void context_with_image_support_setup(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static CCLContext * ccl_test_context_new_with_image_support(
+    cl_uint min_ocl_ver) {
 
-    CCLPlatforms * ps;
-    CCLPlatform * p;
-    CCLDevice * d;
-    CCLErr * err = NULL;
-    cl_uint num_devs;
-    *ctx_fixt = NULL;
-    cl_uint min_ocl_ver = 0;
-    if (user_data != NULL)
-        min_ocl_ver = *((cl_uint *) user_data);
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    GError * err = NULL;
+    cl_bool image_support;
 
-    /* Get all OpenCL platforms in system. */
-    ps = ccl_platforms_new(&err);
+    /* Create a context with the devices specified in CCL_TEST_DEVICE_INDEX. */
+    ctx = ccl_test_context_new(&err);
     g_assert_no_error(err);
 
-    /* Cycle through platforms. */
-    for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
+    /* Get the first device associated with the context. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
 
-        /* Get next platform. */
-        p = ccl_platforms_get(ps, i);
+    /* Does the device support images? */
+    image_support = ccl_device_get_info_scalar(
+        dev, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
+    g_assert_no_error(err);
 
-        /* Check if a minimum OpenCL version was set. */
-        if (min_ocl_ver > 0) {
-            /* If so make sure current platform has the required
-             * OpenCL version. */
-            cl_uint p_ocl_ver = ccl_platform_get_opencl_version(p, &err);
-            g_assert_no_error(err);
-            if (p_ocl_ver < min_ocl_ver) {
-                /* If not, go to next platform. */
-                continue;
-            }
-        }
+    if (!image_support) {
+        g_test_message("Skipping test, device does not support images");
+        ccl_context_destroy(ctx);
+        ctx = NULL;
+    }
 
-        /* Get number of devices in current platform. */
-        num_devs = ccl_platform_get_num_devices(p, &err);
+    /* Does the test require a minimum OpenCL version? */
+    else if (min_ocl_ver > 0) {
+
+        /* Does the device support the required minimum OpenCL version? */
+        cl_uint d_ocl_ver = ccl_device_get_opencl_version(dev, &err);
         g_assert_no_error(err);
-
-        /* Cycle through devices. */
-        for (guint j = 0; j < num_devs; ++j) {
-
-            /* Get next device. */
-            d = ccl_platform_get_device(p, j, &err);
-            g_assert_no_error(err);
-            /* Check if current device supports images. */
-            cl_bool image_support = ccl_device_get_info_scalar(
-                d, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err);
-            g_assert_no_error(err);
-            if (image_support) {
-                /* If so, create a context with current device and return. */
-                *ctx_fixt = ccl_context_new_from_devices(
-                    1, (CCLDevice * const *) &d, &err);
-                g_assert_no_error(err);
-                ccl_platforms_destroy(ps);
-                return;
-            }
+        if (d_ocl_ver < min_ocl_ver) {
+            g_test_message("Skipping test, "
+                "device does have the required OpenCL version %u",
+                min_ocl_ver);
+            ccl_context_destroy(ctx);
+            ctx = NULL;
         }
     }
-    ccl_platforms_destroy(ps);
-}
 
-/**
- * @internal
- *
- * @brief Teardown image tests by releasing the created context.
- *
- * @param[in] ctx_fixt Location of the context to teardown.
- * @param[in] user_data Not used.
- * */
-static void context_with_image_support_teardown(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
-
-    CCL_UNUSED(user_data);
-
-    /* If context was created, release it. */
-    if (*ctx_fixt != NULL) {
-
-        /* Confirm that memory allocated by wrappers has not yet been freed. */
-        g_assert(!ccl_wrapper_memcheck());
-
-        /* Release context. */
-        ccl_context_destroy(*ctx_fixt);
-    }
-
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    /* Return the context. */
+    return ctx;
 }
 
 /**
@@ -137,29 +94,21 @@ static void context_with_image_support_teardown(
  *
  * @brief Tests creation, getting info from and destruction of
  * image wrapper objects.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void create_info_destroy_test(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void create_info_destroy_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLImage * img = NULL;
     cl_mem image = NULL;
     CCLErr * err = NULL;
     cl_int ocl_status;
-    CCL_UNUSED(user_data);
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     CCLImageDesc img_dsc = CCL_IMAGE_DESC_BLANK;
 
-    /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
-        /* If not, skip test. */
-        g_test_fail();
-        g_test_message("An appropriate device for this test was not found.");
-        return;
-    }
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(0);
+    if (ctx == NULL) return;
 
     /* Test three ways to create an image. */
     for (cl_uint i = 0; i < 3; ++i) {
@@ -169,7 +118,7 @@ static void create_info_destroy_test(
             case 0:
                 /* The regular way. */
                 img = ccl_image_new(
-                    *ctx_fixt, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+                    ctx, CL_MEM_READ_WRITE, &image_format, NULL, &err,
                     "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
                     "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
                     "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -181,14 +130,14 @@ static void create_info_destroy_test(
                 img_dsc.image_type = CL_MEM_OBJECT_IMAGE2D;
                 img_dsc.image_width = CCL_TEST_IMAGE_WIDTH;
                 img_dsc.image_height = CCL_TEST_IMAGE_HEIGHT;
-                img = ccl_image_new_v(*ctx_fixt, CL_MEM_READ_WRITE,
+                img = ccl_image_new_v(ctx, CL_MEM_READ_WRITE,
                     &image_format, &img_dsc, NULL, &err);
                 g_assert_no_error(err);
                 break;
             case 2:
                 /* Using the "wrap" constructor. */
                 CCL_BEGIN_IGNORE_DEPRECATIONS
-                image = clCreateImage2D(ccl_context_unwrap(*ctx_fixt),
+                image = clCreateImage2D(ccl_context_unwrap(ctx),
                     CL_MEM_READ_WRITE, &image_format,
                     CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 0,
                     NULL, &ocl_status);
@@ -229,7 +178,7 @@ static void create_info_destroy_test(
             img, CL_MEM_CONTEXT, cl_context, &err);
         g_assert_no_error(err);
         g_assert_cmphex(GPOINTER_TO_SIZE(context), ==,
-            GPOINTER_TO_SIZE(ccl_context_unwrap(*ctx_fixt)));
+            GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
 
         /* Specific image queries. */
         cl_image_format img_fmt;
@@ -268,30 +217,22 @@ static void create_info_destroy_test(
  * @internal
  *
  * @brief Tests image wrapper class reference counting.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void ref_unref_test(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void ref_unref_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLImage * img = NULL;
     CCLErr * err = NULL;
-    CCL_UNUSED(user_data);
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
 
-    /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
-        /* If not, skip test. */
-        g_test_fail();
-        g_test_message("An appropriate device for this test was not found.");
-        return;
-    }
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(0);
+    if (ctx == NULL) return;
 
     /* Create 2D image. */
     img = ccl_image_new(
-        *ctx_fixt, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+        ctx, CL_MEM_READ_WRITE, &image_format, NULL, &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -330,14 +271,11 @@ static void ref_unref_test(
  * @internal
  *
  * @brief Tests basic read/write operations from/to image objects.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void read_write_test(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void read_write_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLImage * img = NULL;
     CCLQueue * q;
@@ -347,15 +285,10 @@ static void read_write_test(
     size_t origin[3] = {0, 0, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     CCLErr * err = NULL;
-    CCL_UNUSED(user_data);
 
-    /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
-        /* If not, skip test. */
-        g_test_fail();
-        g_test_message("An appropriate device for this test was not found.");
-        return;
-    }
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(0);
+    if (ctx == NULL) return;
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
@@ -363,16 +296,16 @@ static void read_write_test(
         himg_in[i] = g_test_rand_int();
 
     /* Get first device in context. */
-    d = ccl_context_get_device(*ctx_fixt, 0, &err);
+    d = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
     /* Create a command queue. */
-    q = ccl_queue_new(*ctx_fixt, d, 0, &err);
+    q = ccl_queue_new(ctx, d, 0, &err);
     g_assert_no_error(err);
 
     /* Create 2D image and copy data from the host memory. */
     img = ccl_image_new(
-        *ctx_fixt,
+        ctx,
         CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
         &image_format,
         himg_in,
@@ -419,14 +352,11 @@ static void read_write_test(
  * @internal
  *
  * @brief Tests copy operations from one image to another.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void copy_test(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void copy_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLImage * img1 = NULL;
     CCLImage * img2 = NULL;
@@ -439,15 +369,10 @@ static void copy_test(
         {CCL_TEST_IMAGE_WIDTH / 2, CCL_TEST_IMAGE_WIDTH / 2, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     CCLErr * err = NULL;
-    CCL_UNUSED(user_data);
 
-    /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
-        /* If not, skip test. */
-        g_test_fail();
-        g_test_message("An appropriate device for this test was not found.");
-        return;
-    }
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(0);
+    if (ctx == NULL) return;
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
@@ -455,16 +380,16 @@ static void copy_test(
         himg_in[i] = g_test_rand_int();
 
     /* Get first device in context. */
-    d = ccl_context_get_device(*ctx_fixt, 0, &err);
+    d = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
     /* Create a command queue. */
-    q = ccl_queue_new(*ctx_fixt, d, 0, &err);
+    q = ccl_queue_new(ctx, d, 0, &err);
     g_assert_no_error(err);
 
     /* Create 2D image and copy data from the host memory. */
     img1 = ccl_image_new(
-        *ctx_fixt,
+        ctx,
         CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
         &image_format,
         himg_in,
@@ -477,7 +402,7 @@ static void copy_test(
 
     /* Create another image, double the dimensions of the previous one. */
     img2 = ccl_image_new(
-        *ctx_fixt,
+        ctx,
         CL_MEM_READ_WRITE,
         &image_format,
         NULL,
@@ -513,14 +438,11 @@ static void copy_test(
  * @internal
  *
  * @brief Tests map/unmap operations in image objects.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void map_unmap_test(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void map_unmap_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLEvent * evt = NULL;
     CCLImage * img = NULL;
@@ -533,10 +455,13 @@ static void map_unmap_test(
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     size_t image_row_pitch;
     CCLErr * err = NULL;
-    CCL_UNUSED(user_data);
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(0);
+    if (ctx == NULL) return;
 
     /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
+    if (ctx == NULL) {
         /* If not, skip test. */
         g_test_fail();
         g_test_message("An appropriate device for this test was not found.");
@@ -549,16 +474,16 @@ static void map_unmap_test(
         himg[i] = g_test_rand_int();
 
     /* Get first device in context. */
-    d = ccl_context_get_device(*ctx_fixt, 0, &err);
+    d = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
     /* Create a command queue. */
-    q = ccl_queue_new(*ctx_fixt, d, 0, &err);
+    q = ccl_queue_new(ctx, d, 0, &err);
     g_assert_no_error(err);
 
     /* Create 2D image, copy data from host. */
     img = ccl_image_new(
-        *ctx_fixt,
+        ctx,
         CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
         &image_format,
         himg,
@@ -605,14 +530,11 @@ static void map_unmap_test(
  * @internal
  *
  * @brief Tests copy image to buffer and buffer to image functions.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void copy_buffer_test(
-    CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void copy_buffer_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLDevice * dev = NULL;
     CCLEvent * evt = NULL;
     CCLImage * img1 = NULL;
@@ -626,15 +548,10 @@ static void copy_buffer_test(
     size_t origin[3] = {0, 0, 0};
     size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     CCLErr * err = NULL;
-    CCL_UNUSED(user_data);
 
-    /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
-        /* If not, skip test. */
-        g_test_fail();
-        g_test_message("An appropriate device for this test was not found.");
-        return;
-    }
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(0);
+    if (ctx == NULL) return;
 
     /* Create a random 4-channel 8-bit image (i.e. each pixel has 32
      * bits). */
@@ -642,16 +559,16 @@ static void copy_buffer_test(
         himg_in[i] = (cl_uint) g_test_rand_int();
 
     /* Get first device in context. */
-    dev = ccl_context_get_device(*ctx_fixt, 0, &err);
+    dev = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
     /* Create a command queue. */
-    cq = ccl_queue_new(*ctx_fixt, dev, 0, &err);
+    cq = ccl_queue_new(ctx, dev, 0, &err);
     g_assert_no_error(err);
 
     /* Create 2D image, copy data from host. */
     img1 = ccl_image_new(
-        *ctx_fixt,
+        ctx,
         CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
         &image_format,
         himg_in,
@@ -664,7 +581,7 @@ static void copy_buffer_test(
 
     /* Create destination 2D image. */
     img2 = ccl_image_new(
-        *ctx_fixt,
+        ctx,
         CL_MEM_WRITE_ONLY,
         &image_format,
         NULL,
@@ -677,7 +594,7 @@ static void copy_buffer_test(
 
     /* Create buffer with enough size to hold image. */
     buf = ccl_buffer_new(
-        *ctx_fixt, CL_MEM_READ_WRITE,
+        ctx, CL_MEM_READ_WRITE,
         CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT * sizeof(cl_uint),
         NULL, &err);
     g_assert_no_error(err);
@@ -727,19 +644,15 @@ static void copy_buffer_test(
     ccl_queue_destroy(cq);
 }
 
-#ifdef CL_VERSION_1_2
-
 /**
  * @internal
  *
  * @brief Tests image fill.
- *
- * @param[in] ctx_fixt Context to use.
- * @param[in] user_data Not used.
  * */
-static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
+static void fill_test() {
 
     /* Test variables. */
+    CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLImage * img = NULL;
     CCLQueue * q;
@@ -748,7 +661,7 @@ static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
     const size_t origin[3] = {0, 0, 0};
     const size_t region[3] = {CCL_TEST_IMAGE_WIDTH, CCL_TEST_IMAGE_HEIGHT, 1};
     CCLErr * err = NULL;
-    CCL_UNUSED(user_data);
+
     /* Create a random color 4-channel 8-bit color (i.e. color has 32 bits). */
     gint32 rc = g_test_rand_int();
     cl_uint4 color = {{
@@ -758,24 +671,28 @@ static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
         (rc >> 24) & 0xFF
     }};
 
-    /* Check that a context is set. */
-    if (*ctx_fixt == NULL) {
-        /* If not, skip test. */
-        g_test_message("No device found for fill test.");
-        return;
-    }
+#ifndef CL_VERSION_1_2
+
+    g_test_message(
+        "`%s` test skipped due to lack of OpenCL 1.2 support.", CCL_STRD);
+
+#else
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new_with_image_support(120);
+    if (ctx == NULL) return;
 
     /* Get first device in context. */
-    d = ccl_context_get_device(*ctx_fixt, 0, &err);
+    d = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
     /* Create a command queue. */
-    q = ccl_queue_new(*ctx_fixt, d, 0, &err);
+    q = ccl_queue_new(ctx, d, 0, &err);
     g_assert_no_error(err);
 
     /* Create 2D image. */
     img = ccl_image_new(
-        *ctx_fixt, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+        ctx, CL_MEM_READ_WRITE, &image_format, NULL, &err,
         "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
         "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
         "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
@@ -799,9 +716,10 @@ static void fill_test(CCLContext ** ctx_fixt, gconstpointer user_data) {
     /* Free stuff. */
     ccl_image_destroy(img);
     ccl_queue_destroy(q);
-}
 
-#endif
+#endif /* CL_VERSION_1_2 */
+
+}
 
 /**
  * @internal
@@ -815,50 +733,33 @@ int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/create-info-destroy",
-        CCLContext *, NULL, context_with_image_support_setup,
-        create_info_destroy_test,
-        context_with_image_support_teardown);
+        create_info_destroy_test);
 
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/ref-unref",
-        CCLContext *, NULL, context_with_image_support_setup,
-        ref_unref_test,
-        context_with_image_support_teardown);
+        ref_unref_test);
 
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/read-write",
-        CCLContext *, NULL, context_with_image_support_setup,
-        read_write_test,
-        context_with_image_support_teardown);
+        read_write_test);
 
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/copy",
-        CCLContext *, NULL, context_with_image_support_setup,
-        copy_test,
-        context_with_image_support_teardown);
+        copy_test);
 
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/map-unmap",
-        CCLContext *, NULL, context_with_image_support_setup,
-        map_unmap_test,
-        context_with_image_support_teardown);
+        map_unmap_test);
 
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/copy-buffer",
-        CCLContext *, NULL, context_with_image_support_setup,
-        copy_buffer_test,
-        context_with_image_support_teardown);
+        copy_buffer_test);
 
-#ifdef CL_VERSION_1_2
-    cl_uint ocl_min_ver = 120;
-    g_test_add(
+    g_test_add_func(
         "/wrappers/image/fill",
-        CCLContext*, &ocl_min_ver, context_with_image_support_setup,
-        fill_test,
-        context_with_image_support_teardown);
-#endif
+        fill_test);
 
     return g_test_run();
 }
