@@ -65,7 +65,7 @@ static CCLContext * ccl_test_context_new_with_image_support(
     g_assert_no_error(err);
 
     if (!image_support) {
-        g_test_message("Skipping test, device does not support images");
+        g_test_skip("Device does not support images");
         ccl_context_destroy(ctx);
         ctx = NULL;
     }
@@ -77,9 +77,7 @@ static CCLContext * ccl_test_context_new_with_image_support(
         cl_uint d_ocl_ver = ccl_device_get_opencl_version(dev, &err);
         g_assert_no_error(err);
         if (d_ocl_ver < min_ocl_ver) {
-            g_test_message("Skipping test, "
-                "device does have the required OpenCL version %u",
-                min_ocl_ver);
+            g_test_skip("Device does have the required OpenCL version");
             ccl_context_destroy(ctx);
             ctx = NULL;
         }
@@ -651,6 +649,13 @@ static void copy_buffer_test() {
  * */
 static void fill_test() {
 
+#ifndef CL_VERSION_1_2
+
+    g_test_skip(
+        "Test skipped due to lack of OpenCL 1.2 support.");
+
+#else
+
     /* Test variables. */
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
@@ -670,13 +675,6 @@ static void fill_test() {
         (rc >> 16) & 0xFF,
         (rc >> 24) & 0xFF
     }};
-
-#ifndef CL_VERSION_1_2
-
-    g_test_message(
-        "`%s` test skipped due to lack of OpenCL 1.2 support.", CCL_STRD);
-
-#else
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new_with_image_support(120);
