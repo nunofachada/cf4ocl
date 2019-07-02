@@ -55,7 +55,7 @@ matrix:
             description: "Build submitted via Travis CI"
           notification_email: faken@fakenmc.com
           build_command_prepend: mkdir b && cd b && cmake -G\"Unix Makefiles\"
-                                 ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=0 ..
+                                 ${CMAKEOPTIONS} ..
           build_command: "make"
           branch_pattern: coverity_scan
       after_success:
@@ -81,13 +81,11 @@ script:
   - mkdir build
   - pushd build
   - echo ${CMAKEOPTIONS}
-  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=0 ..
+  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} ..
   - make
   - ./src/utils/ccl_devinfo
   - make ${CMAKE_TEST_TARGET}
-  - bats ./tests/examples ./tests/utils
-#  - make clean
-#  - cmake -G"Unix Makefiles" ${CMAKEOPTIONS} -D TESTS_USE_OPENCL_STUB=1 ..
-#  - make tests
+  - gtester -k --verbose ./tests/lib/test_device
+#  - bats ./tests/examples ./tests/utils
 #  - gtester -k ./tests/lib/test_*
   - popd
