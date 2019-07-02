@@ -238,6 +238,13 @@ static void features_test() {
     ccl_event_wait(&ewl, &err);
     g_assert_no_error(err);
 
+    /* Test event names. */
+
+    g_assert_cmpstr(ccl_event_get_name(ev1), ==, "Event1");
+    g_assert_cmpstr(ccl_event_get_name(ev2), ==, "Event2");
+    g_assert_cmpstr(ccl_event_get_name(ev3), ==, "Event3");
+    g_assert_cmpstr(ccl_event_get_name(ev4), ==, "Event4");
+
     /* Add queues for profiling. */
     ccl_prof_add_queue(prof, "Q1", q1);
     ccl_prof_add_queue(prof, "Q2", q2);
@@ -245,15 +252,6 @@ static void features_test() {
     /* Perform profiling calculations. */
     ccl_prof_calc(prof, &err);
     g_assert_no_error(err);
-
-    /* **************** */
-    /* Test event names */
-    /* **************** */
-
-    g_assert_cmpstr(ccl_event_get_name(ev1), ==, "Event1");
-    g_assert_cmpstr(ccl_event_get_name(ev2), ==, "Event2");
-    g_assert_cmpstr(ccl_event_get_name(ev3), ==, "Event3");
-    g_assert_cmpstr(ccl_event_get_name(ev4), ==, "Event4");
 
     /* ************************* */
     /* Test aggregate statistics */
