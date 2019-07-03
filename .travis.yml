@@ -85,7 +85,6 @@ script:
   - make
   - ./src/utils/ccl_devinfo
   - make ${CMAKE_TEST_TARGET}
-  - gtester -k --verbose ./tests/lib/test_device
 #  - bats ./tests/examples ./tests/utils
 #  - gtester -k ./tests/lib/test_*
   - popd
