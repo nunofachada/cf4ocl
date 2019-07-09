@@ -122,7 +122,7 @@ int main(int argc, char * argv[]) {
     size_t real_ws[] = { CA_WIDTH, CA_HEIGHT };
     /* Global and local worksizes. */
     size_t gws[2];
-    size_t lws[2];
+    size_t lws[2] = { 0, 0 };
 
     /* Check arguments. */
     if (argc >= 2) {
@@ -317,4 +317,3 @@ int main(int argc, char * argv[]) {
     return EXIT_SUCCESS;
 
 }
-
