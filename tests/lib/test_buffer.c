@@ -625,6 +625,7 @@ static void rect_read_write_copy_test() {
         b2, cq, CL_TRUE, origin, origin, invalid_region,
         0, 0, 0, 0, h2, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
