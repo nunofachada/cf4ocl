@@ -58,7 +58,7 @@ void ccl_strv_clear(char ** str_array) {
 }
 
 /**
- * Releases a ::CCLErr object and set is to `NULL`.
+ * Releases a ::CCLErr object and set it to `NULL`.
  *
  * If `err` or `*err` is `NULL`, does nothing. Otherwise, releases memory
  * occupied by `*err` and sets `*err` to `NULL`.

@@ -778,7 +778,7 @@ static void ccl_prof_process_queues(CCLProf * prof, CCLErr ** err) {
                  * saying so. */
                 g_info("The '%s' event does not have profiling info",
                     ccl_event_get_final_name(evt));
-                g_clear_error(&err_internal);
+                ccl_err_clear(&err_internal);
                 continue;
             }
             g_if_err_propagate_goto(err, err_internal, error_handler);

@@ -262,7 +262,7 @@ void ccl_c_kernel_info_show(
     k_wg_size = ccl_kernel_get_workgroup_info_scalar(
         krnl, dev, CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
     if (ccl_c_info_unavailable(err_internal)) {
-        g_clear_error(&err_internal);
+        ccl_err_clear(&err_internal);
         g_printf("   - Maximum workgroup size                  : N/A\n");
     } else {
         g_if_err_propagate_goto(err, err_internal, error_handler);
@@ -277,7 +277,7 @@ void ccl_c_kernel_info_show(
             dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
             size_t, &err_internal);
         if (ccl_c_info_unavailable(err_internal)) {
-            g_clear_error(&err_internal);
+            ccl_err_clear(&err_internal);
             g_printf("   - Preferred multiple of workgroup size    : N/A\n");
         } else {
             g_if_err_propagate_goto(err, err_internal, error_handler);
@@ -290,7 +290,7 @@ void ccl_c_kernel_info_show(
     k_compile_wg_size = ccl_kernel_get_workgroup_info_array(krnl, dev,
         CL_KERNEL_COMPILE_WORK_GROUP_SIZE, size_t, &err_internal);
     if (ccl_c_info_unavailable(err_internal)) {
-        g_clear_error(&err_internal);
+        ccl_err_clear(&err_internal);
         g_printf("   - WG size in __attribute__ qualifier      : N/A\n");
     } else {
         g_if_err_propagate_goto(err, err_internal, error_handler);
@@ -305,7 +305,7 @@ void ccl_c_kernel_info_show(
     k_loc_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
         CL_KERNEL_LOCAL_MEM_SIZE, cl_ulong, &err_internal);
     if (ccl_c_info_unavailable(err_internal)) {
-        g_clear_error(&err_internal);
+        ccl_err_clear(&err_internal);
         g_printf("   - Local memory used by kernel             : N/A\n");
     } else {
         g_if_err_propagate_goto(err, err_internal, error_handler);
@@ -317,7 +317,7 @@ void ccl_c_kernel_info_show(
     k_priv_mem_size = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
         CL_KERNEL_PRIVATE_MEM_SIZE, cl_ulong, &err_internal);
     if (ccl_c_info_unavailable(err_internal)) {
-        g_clear_error(&err_internal);
+        ccl_err_clear(&err_internal);
         g_printf("   - Min. private mem. used by each workitem : N/A\n");
     } else {
         g_if_err_propagate_goto(err, err_internal, error_handler);
@@ -659,7 +659,7 @@ int main(int argc, char * argv[]) {
 
                 /* Not possible to retrieve build log due to error. */
                 g_info("Unable to retrieve build log. %s", err->message);
-                g_clear_error(&err);
+                ccl_err_clear(&err);
 
             }
 
@@ -715,7 +715,7 @@ cleanup:
     g_printf("\n");
 
     /* Free stuff! */
-    g_clear_error(&err_build);
+    ccl_err_clear(&err_build);
     if (src_files) g_strfreev(src_files);
     if (src_h_files) g_strfreev(src_h_files);
     if (src_h_names) g_strfreev(src_h_names);

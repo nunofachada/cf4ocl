@@ -195,7 +195,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -208,7 +208,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -221,7 +221,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "a");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Second kernel argument. */
@@ -236,7 +236,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -249,7 +249,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -262,7 +262,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "b");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Third kernel argument. */
@@ -277,7 +277,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -290,7 +290,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -303,7 +303,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "c");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Fourth kernel argument. */
@@ -318,7 +318,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -331,7 +331,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -344,7 +344,7 @@ static void create_info_destroy_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "d");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Bogus request, should return NULL and should raise an error. */
@@ -352,7 +352,7 @@ static void create_info_destroy_test() {
             krnl, 0, 0 /* invalid value */, char, &err);
         g_assert(kernel_arg_type_name == NULL);
         g_assert (err != NULL);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     }
 
 #endif
@@ -462,7 +462,7 @@ static void create_info_destroy_test() {
         prg, d, CL_PROGRAM_BUILD_LOG, &err);
     g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
         (err->domain == CCL_ERROR)));
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     build_log = ccl_program_get_build_log(prg, &err);
     g_assert((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
@@ -470,7 +470,7 @@ static void create_info_destroy_test() {
     if (info) {
         g_assert(g_strrstr(build_log, (char *) info->value));
     }
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     build_log = ccl_program_get_build_info_array(
         prg, d, CL_PROGRAM_BUILD_LOG, char, &err);
@@ -479,7 +479,7 @@ static void create_info_destroy_test() {
     if (info) {
         g_assert_cmpstr(build_log, ==, (char *) info->value);
     }
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Create a command queue. */
     cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);

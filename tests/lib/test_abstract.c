@@ -65,7 +65,7 @@ static void device_container_errors_test() {
 
     /* Check the error domain and code, and clear the error. */
     g_assert_error(err, CCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that no memory was allocated for wrappers. */
     g_assert(ccl_wrapper_memcheck());

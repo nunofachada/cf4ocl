@@ -378,7 +378,7 @@ CCLDevSelDevices ccl_devsel_devices_new(CCLErr ** err) {
                 (err_internal->code == CL_DEVICE_NOT_FOUND)) {
 
             /* Clear "device not found" error. */
-            g_clear_error(&err_internal);
+            ccl_err_clear(&err_internal);
 
             /* Skip this platform. */
             continue;

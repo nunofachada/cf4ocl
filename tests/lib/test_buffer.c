@@ -77,7 +77,7 @@ static void create_info_destroy_test() {
         b, CL_MEM_HOST_PTR, void*, &err);
     g_assert((err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
     g_assert_cmphex(GPOINTER_TO_SIZE(host_ptr), ==, GPOINTER_TO_SIZE(NULL));
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     cl_context context;
     context = ccl_memobj_get_info_scalar(
@@ -93,7 +93,7 @@ static void create_info_destroy_test() {
     b = ccl_buffer_new(
         ctx, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, buf_size, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_HOST_PTR);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -287,13 +287,13 @@ static void read_write_test() {
     ccl_buffer_enqueue_read(
         b, q, CL_TRUE, 0, buf_size, NULL, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Do an invalid write, check if error is thrown. */
     ccl_buffer_enqueue_write(
         b, q, CL_TRUE, 0, buf_size, NULL, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -370,7 +370,7 @@ static void copy_test() {
     ccl_buffer_enqueue_copy(
         b1, b1, q, 0, 0, buf_size, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_MEM_COPY_OVERLAP);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -442,7 +442,7 @@ static void map_unmap_test() {
     ccl_buffer_enqueue_map(
         b, q, CL_TRUE, CL_MAP_READ, buf_size, buf_size, NULL, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -625,7 +625,7 @@ static void rect_read_write_copy_test() {
         b2, cq, CL_TRUE, origin, origin, invalid_region,
         0, 0, 0, 0, h2, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
@@ -737,7 +737,7 @@ static void create_from_region_test() {
     subbuf = ccl_buffer_new_from_region(
         buf, 0, siz_buf * 2, siz_buf, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());

@@ -253,28 +253,28 @@ void ccl_devinfo_show_platform_info(CCLPlatform * p, guint idx) {
     /* Get platform profile. */
     profile = ccl_platform_get_info_string(p, CL_PLATFORM_PROFILE, &err);
     if (err != NULL) {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
         profile = "Unknown profile";
     }
 
     /* Get platform version. */
     version = ccl_platform_get_info_string(p, CL_PLATFORM_VERSION, &err);
     if (err != NULL) {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
         version = "Unknown version";
     }
 
     /* Get platform name. */
     name = ccl_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
     if (err != NULL) {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
         name = "Unknown name";
     }
 
     /* Get platform vendor. */
     vendor = ccl_platform_get_info_string(p, CL_PLATFORM_VENDOR, &err);
     if (err != NULL) {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
         vendor = "Unknown vendor";
     }
 
@@ -338,7 +338,7 @@ void ccl_devinfo_show_device_info_all(CCLDevice * d) {
         } else {
 
             /* ...otherwise clear error... */
-            g_clear_error(&err);
+            ccl_err_clear(&err);
             if (opt_nfound) {
                 /* ...and show that parameter is not available, if user
                  * requested so. */
@@ -410,7 +410,7 @@ void ccl_devinfo_show_device_info_custom(CCLDevice * d) {
             } else {
 
                 /* ...otherwise clear error... */
-                g_clear_error(&err);
+                ccl_err_clear(&err);
                 if (opt_nfound) {
                     /* ...and show that parameter is not available, if user
                     * requested so. */
@@ -479,7 +479,7 @@ void ccl_devinfo_show_device_info_basic(CCLDevice * d) {
         } else {
 
             /* ...otherwise clear error... */
-            g_clear_error(&err);
+            ccl_err_clear(&err);
             if (opt_nfound) {
                 /* ...and show that parameter is not available, if user
                  * requested so. */
@@ -624,7 +624,7 @@ int main(int argc, char * argv[]) {
                         (err->code == CL_DEVICE_NOT_FOUND)) {
 
                     /* Clear "device not found" error. */
-                    g_clear_error(&err);
+                    ccl_err_clear(&err);
 
                     /* Inform about non-existing devices. */
                     g_fprintf(CCL_DEVINFO_OUT,

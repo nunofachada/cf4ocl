@@ -339,7 +339,7 @@ static void info_args_test() {
     if (err == NULL) {
         g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
     } else {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     }
 
     kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -352,7 +352,7 @@ static void info_args_test() {
     if (err == NULL) {
         g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
     } else {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     }
 
     kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -365,7 +365,7 @@ static void info_args_test() {
     if (err == NULL) {
         g_assert_cmpstr(kernel_arg_name, ==, "buf");
     } else {
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
@@ -889,7 +889,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -902,7 +902,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -915,7 +915,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "buf");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Second kernel argument. */
@@ -930,7 +930,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_GLOBAL);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -943,7 +943,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "image2d_t");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -956,7 +956,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "img");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Third kernel argument. */
@@ -971,7 +971,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -984,7 +984,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "sampler_t");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -997,7 +997,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "sampler");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Fourth kernel argument. */
@@ -1012,7 +1012,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_LOCAL);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -1025,7 +1025,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint*");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -1038,7 +1038,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "loc");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Fifth kernel argument. */
@@ -1053,7 +1053,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmphex(kaaq, ==, CL_KERNEL_ARG_ADDRESS_PRIVATE);
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
@@ -1066,7 +1066,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_type_name, ==, "uint");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
@@ -1079,7 +1079,7 @@ static void args_test() {
         if (err == NULL) {
             g_assert_cmpstr(kernel_arg_name, ==, "x");
         } else {
-            g_clear_error(&err);
+            ccl_err_clear(&err);
         }
 
         /* Bogus request, should return NULL and should raise an error. */
@@ -1087,7 +1087,7 @@ static void args_test() {
             krnl, 0, 0 /* invalid value */, char, &err);
         g_assert(kernel_arg_type_name == NULL);
         g_assert (err != NULL);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     }
 
 #endif

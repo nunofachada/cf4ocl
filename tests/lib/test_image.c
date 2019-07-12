@@ -116,7 +116,7 @@ static void create_info_destroy_test() {
             (err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
         g_assert_cmphex(GPOINTER_TO_SIZE(host_ptr), ==,
             GPOINTER_TO_SIZE(NULL));
-        g_clear_error(&err);
+        ccl_err_clear(&err);
 
         cl_context context;
         context = ccl_memobj_get_info_scalar(
@@ -579,12 +579,12 @@ static void copy_buffer_test() {
     ccl_image_enqueue_copy_to_buffer(
         img1, buf, cq, origin, region, 0, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     ccl_buffer_enqueue_copy_to_image(
         buf, img2, cq, 0, origin, region, NULL, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
-    g_clear_error(&err);
+    ccl_err_clear(&err);
 
     /* Free stuff. */
     ccl_image_destroy(img1);

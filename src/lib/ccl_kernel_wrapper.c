@@ -855,7 +855,7 @@ finish:
     if (((err_internal) != NULL) && ((err_internal)->domain == CCL_ERROR) && \
             ((err_internal)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) { \
         g_warning("In %s: %s", CCL_STRD, (err_internal)->message); \
-        g_clear_error(&(err_internal)); \
+        ccl_err_clear(&(err_internal)); \
     } else { \
         g_if_err_propagate_goto(err, err_internal, error_handler); \
     }

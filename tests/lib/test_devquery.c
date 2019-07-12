@@ -71,7 +71,7 @@ static void helpers_test() {
                 g_test_message(
                     "Error obtaining number of devices for platform %d (%s).",
                     i, err->message);
-                g_clear_error(&err);
+                ccl_err_clear(&err);
             } else {
 
                 g_debug("==== # Devs  : %d", num_devs);
@@ -95,7 +95,7 @@ static void helpers_test() {
                                     CCL_TEST_DEVQUERY_MAXINFOLEN,
                                     ccl_devquery_info_map[k].units));
                         } else {
-                            g_clear_error(&err);
+                            ccl_err_clear(&err);
                             g_debug("\t%s : %s",
                                 ccl_devquery_info_map[k].param_name, "N/A");
                         }

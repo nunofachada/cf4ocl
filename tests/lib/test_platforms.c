@@ -44,7 +44,7 @@
     } else { \
         g_snprintf(info_str, CCL_TEST_PLATFORMS_MAXINFOSTR, \
             "%s", err->message); \
-        g_clear_error(&err); \
+        ccl_err_clear(&err); \
     } \
     g_debug("%s %s", base_msg, info_str);
 
@@ -169,7 +169,7 @@ static void create_info_destroy_test() {
         platf_info = ccl_platform_get_info_string(
             p, 0x0 /* Invalid */, &err);
         g_assert(err != NULL);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
 
         /* Get platform vendor. */
         platf_info = ccl_platform_get_info_string(

@@ -264,7 +264,7 @@ static void create_info_destroy_test() {
     /* Free context if no error and set filters to NULL. */
     if (err != NULL) {
         g_test_message("%s", err->message);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     } else {
         ccl_context_destroy(ctx);
     }
@@ -279,7 +279,7 @@ static void create_info_destroy_test() {
     /* Free context if no error and set filters to NULL. */
     if (err != NULL) {
         g_test_message("%s", err->message);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     } else {
         ccl_context_destroy(ctx);
     }
@@ -295,7 +295,7 @@ static void create_info_destroy_test() {
     /* Free context if no error and set filters to NULL. */
     if (err != NULL) {
         g_test_message("%s", err->message);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     } else {
         ccl_context_destroy(ctx);
     }
@@ -676,7 +676,7 @@ static void ref_unref_test() {
     if (err != NULL) {
         /* Take note of error and clear it. */
         g_test_message("%s", err->message);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     } else {
         /* No error, so check that the context ref. count is 1. */
         g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
@@ -710,7 +710,7 @@ static void ref_unref_test() {
     if (err != NULL) {
         /* Take note of error and clear it. */
         g_test_message("%s", err->message);
-        g_clear_error(&err);
+        ccl_err_clear(&err);
     } else {
         /* No error, so check that the context ref. count is 1. */
         g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) ctx), ==, 1);
