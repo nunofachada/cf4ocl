@@ -573,7 +573,9 @@ static void rect_read_write_copy_test() {
     CCLDevice * d = NULL;
     CCLBuffer * b1 = NULL;
     CCLBuffer * b2 = NULL;
-    CCLQueue * cq;
+    CCLQueue * cq = NULL;
+    CCLEvent * ue = NULL;
+    CCLEventWaitList ewl = NULL;
     cl_uchar h1[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
     cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_uchar) * sizeof(cl_uchar)
@@ -618,6 +620,7 @@ static void rect_read_write_copy_test() {
     ccl_buffer_enqueue_write_rect(
         b1, cq, CL_TRUE, origin, origin, region, 0, 0, 0, 0, h1, NULL, &err);
     g_assert_no_error(err);
+    ccl_err_clear(&err);
 
     /* Copy "rect" data from first buffer to second buffer. */
     ccl_buffer_enqueue_copy_rect(
@@ -633,10 +636,34 @@ static void rect_read_write_copy_test() {
     for (cl_uint i = 0; i < CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE; ++i)
         g_assert_cmpuint(h1[i], ==, h2[i]);
 
-    /* Invoke "rect" read with erroneous parameters. */
+    /* *******************************************************************
+     * Test for errors. Use a completed user event to also test the use of
+     * wait lists in these functions.
+     * ******************************************************************* */
+    ue = ccl_user_event_new(ctx, &err);
+    g_assert_no_error(err);
+    ccl_user_event_set_status(ue, CL_COMPLETE, &err);
+    g_assert_no_error(err);
+
+    /* Invoke "rect" read with erroneous parameters (NULL host buffer). */
+    ccl_buffer_enqueue_write_rect(
+        b1, cq, CL_TRUE, origin, origin, region,
+        0, 0, 0, 0, NULL, ccl_ewl(&ewl, ue, NULL), &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    ccl_err_clear(&err);
+
+    /* Invoke "rect" copy with erroneous parameters (region parameter is all
+     * zeros). */
+    ccl_buffer_enqueue_copy_rect(
+        b1, b2, cq, origin, origin, origin,
+        0, 0, 0, 0, ccl_ewl(&ewl, ue, NULL), &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    ccl_err_clear(&err);
+
+    /* Invoke "rect" read with erroneous parameters (invalid region). */
     ccl_buffer_enqueue_read_rect(
         b2, cq, CL_TRUE, origin, origin, invalid_region,
-        0, 0, 0, 0, h2, NULL, &err);
+        0, 0, 0, 0, h2, ccl_ewl(&ewl, ue, NULL), &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
     ccl_err_clear(&err);
 
@@ -644,6 +671,7 @@ static void rect_read_write_copy_test() {
     g_assert(!ccl_wrapper_memcheck());
 
     /* Free stuff. */
+    ccl_event_destroy(ue);
     ccl_buffer_destroy(b1);
     ccl_buffer_destroy(b2);
     ccl_queue_destroy(cq);
