@@ -507,9 +507,6 @@ CCLEvent * ccl_image_enqueue_read(CCLImage * img, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -522,6 +519,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -596,9 +596,6 @@ CCLEvent * ccl_image_enqueue_write(CCLImage * img, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -611,6 +608,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -684,9 +684,6 @@ CCLEvent * ccl_image_enqueue_copy(CCLImage * src_img, CCLImage * dst_img,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -699,6 +696,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -771,9 +771,6 @@ CCLEvent * ccl_image_enqueue_copy_to_buffer(CCLImage * src_img,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -786,6 +783,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -868,9 +868,6 @@ void * ccl_image_enqueue_map(CCLImage * img, CCLQueue * cq,
     if (evt != NULL)
         *evt = evt_inner;
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -883,6 +880,9 @@ error_handler:
     ptr = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return host pointer. */
     return ptr;
@@ -985,9 +985,6 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
 #endif
 
     /* If we got here, everything is OK. */
@@ -1002,6 +999,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;

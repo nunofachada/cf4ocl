@@ -196,9 +196,6 @@ CCLEvent * ccl_buffer_enqueue_read(CCLBuffer * buf, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -211,6 +208,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -270,9 +270,6 @@ CCLEvent * ccl_buffer_enqueue_write(CCLBuffer * buf, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -285,6 +282,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -353,9 +353,6 @@ void * ccl_buffer_enqueue_map(CCLBuffer * buf, CCLQueue * cq,
     if (evt != NULL)
         *evt = evt_inner;
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -368,6 +365,9 @@ error_handler:
     ptr = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return host pointer. */
     return ptr;
@@ -430,9 +430,6 @@ CCLEvent * ccl_buffer_enqueue_copy(CCLBuffer * src_buf,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -445,6 +442,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -517,9 +517,6 @@ CCLEvent * ccl_buffer_enqueue_copy_to_image(CCLBuffer * src_buf,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -532,6 +529,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -756,9 +756,6 @@ CCLEvent * ccl_buffer_enqueue_read_rect(CCLBuffer * buf, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
 #endif
 
     /* If we got here, everything is OK. */
@@ -773,6 +770,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -896,9 +896,6 @@ CCLEvent * ccl_buffer_enqueue_write_rect(CCLBuffer * buf, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
 #endif
 
     /* If we got here, everything is OK. */
@@ -913,6 +910,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -1034,8 +1034,6 @@ CCLEvent * ccl_buffer_enqueue_copy_rect(CCLBuffer * src_buf,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
 #endif
 
     /* If we got here, everything is OK. */
@@ -1050,6 +1048,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -1150,9 +1151,6 @@ CCLEvent * ccl_buffer_enqueue_fill(CCLBuffer * buf, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
 #endif
 
     /* If we got here, everything is OK. */
@@ -1167,6 +1165,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;

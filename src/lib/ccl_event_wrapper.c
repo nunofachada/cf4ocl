@@ -829,9 +829,6 @@ cl_bool ccl_event_wait(CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
         "%s: error while waiting for events (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     ret_status = CL_TRUE;
@@ -843,6 +840,9 @@ error_handler:
     ret_status = CL_FALSE;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return status. */
     return ret_status;

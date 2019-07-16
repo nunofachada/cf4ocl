@@ -809,9 +809,6 @@ CCLEvent * ccl_enqueue_barrier(
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -825,6 +822,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;
@@ -981,9 +981,6 @@ CCLEvent * ccl_enqueue_marker(
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -997,6 +994,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return event. */
     return evt;

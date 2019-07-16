@@ -169,9 +169,6 @@ CCLEvent * ccl_memobj_enqueue_unmap(CCLMemObj * mo, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -185,6 +182,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return evt. */
     return evt;
@@ -381,9 +381,6 @@ CCLEvent * ccl_memobj_enqueue_migrate(CCLMemObj ** mos, cl_uint num_mos,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
 #endif
 
     /* If we got here, everything is OK. */
@@ -399,6 +396,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Release stuff. */
     if (mem_objects) g_slice_free1(sizeof(cl_mem) * num_mos, mem_objects);

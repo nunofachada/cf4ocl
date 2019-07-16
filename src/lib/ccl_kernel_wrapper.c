@@ -444,9 +444,6 @@ CCLEvent * ccl_kernel_enqueue_ndrange(CCLKernel * krnl, CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -460,6 +457,9 @@ error_handler:
     evt = NULL;
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Return evt. */
     return evt;
@@ -752,9 +752,6 @@ CCLEvent * ccl_kernel_enqueue_native(CCLQueue * cq,
      * queue is released. */
     evt = ccl_queue_produce_event(cq, event);
 
-    /* Clear event wait list. */
-    ccl_event_wait_list_clear(evt_wait_lst);
-
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
     goto finish;
@@ -765,6 +762,9 @@ error_handler:
     g_assert(err == NULL || *err != NULL);
 
 finish:
+
+    /* Clear event wait list. */
+    ccl_event_wait_list_clear(evt_wait_lst);
 
     /* Release temporary cl_mem list. */
     if (num_mos > 0)
