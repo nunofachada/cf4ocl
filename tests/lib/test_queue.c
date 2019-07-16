@@ -336,6 +336,206 @@ static void barrier_marker_test() {
 /**
  * @internal
  *
+ * @brief Type of wait for multiple queues / out-of-order queues test.
+ */
+typedef enum { CCL_TEST_WAIT_FOR_EVENTS, CCL_TEST_FINISH } WaitType;
+
+/**
+ * @internal
+ *
+ * @brief Perform the actual tests multiple queues and out-of-order queues.
+ * */
+static void do_mult_ooo(
+    CCLContext * ctx, CCLQueue * cq1, CCLQueue * cq2, WaitType wait_type) {
+
+    /* Variables. */
+    CCLBuffer * buf_dev1 = NULL;
+    CCLBuffer * buf_dev2 = NULL;
+    CCLEvent * ew[2] = { NULL, NULL }, * er[2] = { NULL, NULL };
+    CCLEventWaitList ewl = NULL;
+    CCLErr * err = NULL;
+    cl_uint bufsize = 512;
+    cl_float * buf_host1A = (cl_float*) malloc(bufsize * sizeof(cl_float));
+    cl_float * buf_host1B = (cl_float*) calloc(bufsize, sizeof(cl_float));
+    cl_int * buf_host2A = (cl_int*) malloc(bufsize * sizeof(cl_int));
+    cl_int * buf_host2B = (cl_int*) calloc(bufsize, sizeof(cl_int));
+
+    /* Fill host buffers with random data. */
+    for (cl_uint i = 0; i < bufsize; i++)
+    {
+        buf_host1A[i] = (cl_float) g_test_rand_double();
+        buf_host2A[i] = (cl_int) g_test_rand_int();
+    }
+
+    /* Create device buffers. */
+    buf_dev1 = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE, bufsize * sizeof(cl_float), NULL, &err);
+    g_assert_no_error(err);
+
+    buf_dev2 = ccl_buffer_new(
+        ctx, CL_MEM_READ_WRITE, bufsize * sizeof(cl_int), NULL, &err);
+    g_assert_no_error(err);
+
+    /* Write something to device buffer 1 using command queue 1,
+     * generate event ew[0]. */
+    ew[0] = ccl_buffer_enqueue_write(
+        buf_dev1, cq1, CL_FALSE, 0,
+        bufsize * sizeof(cl_float), buf_host1A, NULL, &err);
+    g_assert_no_error(err);
+
+    /* Write something to device buffer 2 using command queue 2,
+     * generate event ew[1]. */
+    ew[1] = ccl_buffer_enqueue_write(
+        buf_dev2, cq2, CL_FALSE, 0,
+        bufsize * sizeof(cl_int), buf_host2A, NULL, &err);
+    g_assert_no_error(err);
+
+    /* Read from device buffer 1 using command queue 2, make it depend
+     * on event ew[0] and generate event er[0]. */
+    er[0] = ccl_buffer_enqueue_read(
+        buf_dev1, cq2, CL_FALSE, 0, bufsize * sizeof(cl_float),
+        buf_host1B, ccl_ewl(&ewl, ew[0], NULL), &err);
+    g_assert_no_error(err);
+
+    /* Read from device buffer 2 using command queue 1, make it depend
+     * on event ew[1] and generate event er[1]. */
+    er[1] = ccl_buffer_enqueue_read(
+        buf_dev2, cq1, CL_FALSE, 0, bufsize * sizeof(cl_int),
+        buf_host2B, ccl_ewl(&ewl, ew[1], NULL), &err);
+    g_assert_no_error(err);
+
+    /* Wait on host thread for work to finish. */
+    switch(wait_type)
+    {
+        case CCL_TEST_WAIT_FOR_EVENTS:
+            /* Wait on host thread for read events. */
+            ccl_event_wait(ccl_ewl(&ewl, er[0], er[1], NULL), &err);
+            g_assert_no_error(err);
+            break;
+        case CCL_TEST_FINISH:
+            /* Wait on host thread for queues to be processed. */
+            ccl_queue_finish(cq1, &err);
+            g_assert_no_error(err);
+            /* If they're not the same queue, must also wait in the
+             * second queue. */
+            if (cq1 != cq2)
+            {
+                ccl_queue_finish(cq2, &err);
+                g_assert_no_error(err);
+            }
+            break;
+        default:
+            g_assert_not_reached();
+    }
+
+    /* Check results. */
+    for (cl_uint i = 0; i < bufsize; i++)
+    {
+        g_assert_cmpfloat(buf_host1A[i], ==, buf_host1B[i]);
+        g_assert_cmpint(buf_host2A[i], ==, buf_host2B[i]);
+    }
+
+    /* Release stuff. */
+    ccl_buffer_destroy(buf_dev1);
+    ccl_buffer_destroy(buf_dev2);
+    free(buf_host1A);
+    free(buf_host1B);
+    free(buf_host2A);
+    free(buf_host2B);
+}
+
+/* In OpenCL < 2.0 there is no CL_DEVICE_QUEUE_ON_HOST_PROPERTIES. */
+#ifndef CL_VERSION_2_0
+    #define CL_DEVICE_QUEUE_ON_HOST_PROPERTIES CL_DEVICE_QUEUE_PROPERTIES
+#endif
+
+/**
+ * @internal
+ *
+ * @brief Tests multiple queues and out-of-order queues.
+ * */
+static void mult_ooo_test() {
+
+    /* Variables.  */
+    CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
+    CCLErr * err = NULL;
+    CCLQueue * cq1 = NULL, * cq2 = NULL, * oocq = NULL;
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(0, &err);
+    g_assert_no_error(err);
+
+    /* Get first device in context. */
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    /* ************************** */
+    /* Test 1: Two command queues */
+    /* ************************** */
+
+    /* Create first command queue */
+    cq1 = ccl_queue_new(ctx, dev, 0,  &err);
+    g_assert_no_error(err);
+
+    /* Create second command queue */
+    cq2 = ccl_queue_new(ctx, dev, 0,  &err);
+    g_assert_no_error(err);
+
+    /* Test 1.1: Perform test with two different command queues and explicitly
+     * waiting for events. */
+    do_mult_ooo(ctx, cq1, cq2, CCL_TEST_WAIT_FOR_EVENTS);
+
+    /* Test 1.2: Perform test with two different command queues and wait for
+     * the second queue to finish.  */
+    do_mult_ooo(ctx, cq1, cq2, CCL_TEST_FINISH);
+
+    /* Release command queues. */
+    ccl_queue_destroy(cq2);
+    ccl_queue_destroy(cq1);
+
+    /* ************************************** */
+    /* Test 2: One out-of-order command queue */
+    /* ************************************** */
+
+    /* Does device support out-of-order queues? */
+    cl_command_queue_properties qprops =
+        ccl_device_get_info_scalar(
+            dev, CL_DEVICE_QUEUE_ON_HOST_PROPERTIES,
+            cl_command_queue_properties, &err);
+    g_assert_no_error(err);
+
+    /* If so, test out-of-order command queues. */
+    if (qprops & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE)
+    {
+        /* Create an out-of-order command queue. */
+        oocq = ccl_queue_new(
+            ctx, dev, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
+        g_assert_no_error(err);
+
+        /* Test 2.1: Perform test with out-of-order command queue and
+         * explicitly waiting for events. */
+        do_mult_ooo(ctx, oocq, oocq, CCL_TEST_WAIT_FOR_EVENTS);
+
+        /* Test 2.2: Perform test with out-of-order command queue and wait for
+         * queue to finish. */
+        do_mult_ooo(ctx, oocq, oocq, CCL_TEST_FINISH);
+
+        /* Release command queue. */
+        ccl_queue_destroy(oocq);
+    }
+
+    /* ******** */
+    /* Clean-up */
+    /* ******** */
+
+    /* Release context. */
+    ccl_context_destroy(ctx);
+}
+
+/**
+ * @internal
+ *
  * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -356,6 +556,10 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/queue/barrier-marker",
         barrier_marker_test);
+
+    g_test_add_func(
+        "/wrappers/queue/mult-ooo",
+        mult_ooo_test);
 
     return g_test_run();
 }

@@ -229,7 +229,7 @@ static void read_write_test() {
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
-    CCLQueue * q;
+    CCLQueue * q = NULL;
     cl_uint h_in[CCL_TEST_BUFFER_SIZE];
     cl_uint h_out[CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
