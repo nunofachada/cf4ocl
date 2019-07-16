@@ -54,6 +54,7 @@ static void device_container_errors_test() {
     /* Test variables. */
     CCLDevContainer mock_devcon = { { 0, NULL, NULL, 0 }, 0, NULL };
     CCLDevice * dev;
+    CCLDevice * const * dev_lst;
     CCLErr * err = NULL;
 
     /* Try and get device from mock device container. */
@@ -62,6 +63,17 @@ static void device_container_errors_test() {
 
     /* Check that dev is NULL */
     g_assert(dev == NULL);
+
+    /* Check the error domain and code, and clear the error. */
+    g_assert_error(err, CCL_ERROR, CL_INVALID_VALUE);
+    ccl_err_clear(&err);
+
+    /* Try and get device list from mock device container. */
+    dev_lst = ccl_dev_container_get_all_devices(
+        &mock_devcon, mock_get_devices, &err);
+
+    /* Check that dev is NULL */
+    g_assert(dev_lst == NULL);
 
     /* Check the error domain and code, and clear the error. */
     g_assert_error(err, CCL_ERROR, CL_INVALID_VALUE);
