@@ -230,10 +230,12 @@ static void read_write_test() {
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
     CCLQueue * q = NULL;
+    CCLEventWaitList ewl = NULL;
+    CCLEvent * evt = NULL;
+    CCLErr * err = NULL;
     cl_uint h_in[CCL_TEST_BUFFER_SIZE];
     cl_uint h_out[CCL_TEST_BUFFER_SIZE];
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
-    CCLErr * err = NULL;
 
     /* Create a host array, put some stuff in it. */
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
@@ -269,9 +271,18 @@ static void read_write_test() {
     for (guint i = 0; i < CCL_TEST_BUFFER_SIZE; ++i)
         h_in[i] = g_test_rand_int();
 
-    /* Write it explicitly to buffer. */
+    /* Create a user event, of which writing to buffer will depend. */
+    evt = ccl_user_event_new(ctx, &err);
+    g_assert_no_error(err);
+
+    /* Write it explicitly to buffer, make it depend on user event. */
     ccl_buffer_enqueue_write(
-        b, q, CL_TRUE, 0, buf_size, (void *) h_in, NULL, &err);
+        b, q, CL_FALSE, 0, buf_size, (void *) h_in,
+        ccl_ewl(&ewl, evt, NULL), &err);
+    g_assert_no_error(err);
+
+    /* Set user event to complete, allowing test to go on. */
+    ccl_user_event_set_status(evt, CL_COMPLETE, &err);
     g_assert_no_error(err);
 
     /* Read new data to host. */
@@ -297,6 +308,8 @@ static void read_write_test() {
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
+
+    ccl_event_destroy(evt);
 
     /* Free stuff. */
     ccl_buffer_destroy(b);
