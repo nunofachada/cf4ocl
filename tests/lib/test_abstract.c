@@ -40,7 +40,7 @@ static CCLWrapperInfo * mock_get_devices(
         CCLDevContainer * devcon, CCLErr ** err) {
 
     CCL_UNUSED(devcon);
-    g_set_error(err, CCL_ERROR, CL_INVALID_VALUE, "Mock error");
+    g_set_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE, "Mock error");
     return NULL;
 }
 
@@ -65,7 +65,7 @@ static void device_container_errors_test() {
     g_assert(dev == NULL);
 
     /* Check the error domain and code, and clear the error. */
-    g_assert_error(err, CCL_ERROR, CL_INVALID_VALUE);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
     ccl_err_clear(&err);
 
     /* Try and get device list from mock device container. */
@@ -76,8 +76,70 @@ static void device_container_errors_test() {
     g_assert(dev_lst == NULL);
 
     /* Check the error domain and code, and clear the error. */
-    g_assert_error(err, CCL_ERROR, CL_INVALID_VALUE);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
     ccl_err_clear(&err);
+
+    /* Confirm that no memory was allocated for wrappers. */
+    g_assert(ccl_wrapper_memcheck());
+}
+
+/**
+ * @internal
+ *
+ * @brief Used as a mock function releasing an OpenCL object.
+ */
+static cl_int mock_cl_release(void * cl_object) {
+
+    CCL_UNUSED(cl_object);
+    return CL_OUT_OF_RESOURCES;
+}
+
+/**
+ * @internal
+ *
+ * @brief Tests errors in abstract wrapper functions.
+ * */
+static void errors_test() {
+
+    /* Test variables. */
+    void * var;
+    size_t size = sizeof(CCLWrapper);
+    CCLWrapper * mock_wrapper;
+    CCLErr * err = NULL;
+
+    /* Create a mock wrapper. */
+    mock_wrapper = ccl_wrapper_new(CCL_NONE, (void *) &var, size);
+
+    /* Destroy the mock wrapper, provoking an error while doing so. */
+    ccl_wrapper_unref(mock_wrapper, size, NULL, mock_cl_release, &err);
+
+    /* Check the error domain and code, and clear the error. */
+    g_assert_error(err, CCL_OCL_ERROR, CL_OUT_OF_RESOURCES);
+    ccl_err_clear(&err);
+
+    /* Confirm that no memory was allocated for wrappers. */
+    g_assert(ccl_wrapper_memcheck());
+}
+
+/**
+ * @internal
+ *
+ * @brief Tests the creating of wrapper info with zero size.
+ * */
+static void info_zero_size_test() {
+
+    /* Test variables. */
+    CCLWrapperInfo * info;
+
+    /* Create wrapper info object with zero size for the information itself. */
+    info = ccl_wrapper_info_new(0);
+
+    /* Confirm size is zero and info value is NULL. */
+    g_assert_cmpint(info->size, ==, 0);
+    g_assert_null(info->value);
+
+    /* Destroy wrapper info object. */
+    ccl_wrapper_info_destroy(info);
 
     /* Confirm that no memory was allocated for wrappers. */
     g_assert(ccl_wrapper_memcheck());
@@ -98,6 +160,14 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/abstract/device-container-errors",
         device_container_errors_test);
+
+    g_test_add_func(
+        "/wrappers/abstract/errors",
+        errors_test);
+
+    g_test_add_func(
+        "/wrappers/abstract/info_zero_size",
+        info_zero_size_test);
 
     return g_test_run();
 }
