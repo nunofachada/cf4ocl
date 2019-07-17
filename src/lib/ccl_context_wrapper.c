@@ -661,7 +661,6 @@ finish:
     return image_formats;
 }
 
-
 /**
  * Get ::CCLDevice wrapper at given index.
  *

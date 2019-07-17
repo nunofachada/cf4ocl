@@ -289,6 +289,30 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
     ccl_memobj_enqueue_unmap((CCLMemObj *) img, cq, ptr, ewl, err)
 
 /**
+ * Get the list of supported image formats supported by a given context. This
+ * is a utility macro that expands to
+ * ::ccl_context_get_supported_image_formats().
+ *
+ * @relates ccl_image
+ *
+ * @param[in] ctx A context wrapper object.
+ * @param[in] flags Allocation and usage information about the image
+ * memory object being queried.
+ * @param[in] image_type The image type. Acceptable values depend on the
+ * OpenCL version.
+ * @param[out] num_image_formats Return location for number of image
+ * formats in list, which will be zero if an error occurs.
+ * @param[out] err Return location for a ::CCLErr object, or `NULL` if error
+ * reporting is to be ignored.
+ * @return A list of supported image formats, or `NULL` if an error
+ * occurs. Doesn't need to be freed.
+ * */
+#define ccl_image_get_supported_formats( \
+    ctx, flags, image_type, num_image_formats, err) \
+    ccl_context_get_supported_image_formats( \
+        (ctx), (flags), (image_type), (num_image_formats), (err))
+
+/**
  * Get a ::CCLWrapperInfo image information object.
  *
  * @relates ccl_image
