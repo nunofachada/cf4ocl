@@ -410,7 +410,9 @@ static void map_unmap_test() {
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
-    CCLQueue * q;
+    CCLQueue * q = NULL;
+    CCLEvent * ue = NULL;
+    CCLEventWaitList ewl = NULL;
     cl_uint h_in[CCL_TEST_BUFFER_SIZE];
     cl_uint * h_out;
     size_t buf_size = sizeof(cl_uint) * CCL_TEST_BUFFER_SIZE;
@@ -451,9 +453,24 @@ static void map_unmap_test() {
         (CCLMemObj *) b, q, h_out, NULL, &err);
     g_assert_no_error(err);
 
-    /* Do an invalid map, check if error is thrown. */
+    /* *******************************************************************
+     * Test for errors. Use a completed user event to also test the use of
+     * wait lists in these functions.
+     * ******************************************************************* */
+    ue = ccl_user_event_new(ctx, &err);
+    g_assert_no_error(err);
+    ccl_user_event_set_status(ue, CL_COMPLETE, &err);
+    g_assert_no_error(err);
+
+    /* Do an invalid map (offset same as size), check if error is thrown. */
     ccl_buffer_enqueue_map(
-        b, q, CL_TRUE, CL_MAP_READ, buf_size, buf_size, NULL, NULL, &err);
+        b, q, CL_TRUE, CL_MAP_READ, buf_size, buf_size,
+        ccl_ewl(&ewl, ue, NULL), NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    ccl_err_clear(&err);
+
+    /* Do an invalid unmap (NULL host address), check if error is thrown. */
+    ccl_buffer_enqueue_unmap(b, q, NULL, ccl_ewl(&ewl, ue, NULL), &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
     ccl_err_clear(&err);
 
@@ -461,6 +478,7 @@ static void map_unmap_test() {
     g_assert(!ccl_wrapper_memcheck());
 
     /* Free stuff. */
+    ccl_event_destroy(ue);
     ccl_buffer_destroy(b);
     ccl_queue_destroy(q);
     ccl_context_destroy(ctx);
@@ -797,7 +815,6 @@ static void create_from_region_test() {
 #endif
 }
 
-
 /**
  * @internal
  *
@@ -816,7 +833,9 @@ static void fill_test() {
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
-    CCLQueue * q;
+    CCLQueue * q = NULL;
+    CCLEvent * ue = NULL;
+    CCLEventWaitList ewl = NULL;
     cl_char8 h[CCL_TEST_BUFFER_SIZE];
     cl_char8 pattern = {{ 1, -1, 5, 4, -12, 3, 7, -20 }};
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
@@ -839,9 +858,18 @@ static void fill_test() {
     b = ccl_buffer_new(ctx, CL_MEM_READ_WRITE, buf_size, NULL, &err);
     g_assert_no_error(err);
 
+    /* Create user event, of which the fill operation will depend. */
+    ue = ccl_user_event_new(ctx, &err);
+    g_assert_no_error(err);
+
     /* Fill buffer with pattern. */
     ccl_buffer_enqueue_fill(
-        b, q, &pattern, sizeof(cl_char8), 0, buf_size, NULL, &err);
+        b, q, &pattern, sizeof(cl_char8), 0, buf_size,
+        ccl_ewl(&ewl, ue, NULL), &err);
+    g_assert_no_error(err);
+
+    /* Set user event as complete, allowing the buffer fill to take place. */
+    ccl_user_event_set_status(ue, CL_COMPLETE, &err);
     g_assert_no_error(err);
 
     /* Read data back to host. */
@@ -863,6 +891,7 @@ static void fill_test() {
     g_assert(!ccl_wrapper_memcheck());
 
     /* Free stuff. */
+    ccl_event_destroy(ue);
     ccl_buffer_destroy(b);
     ccl_queue_destroy(q);
     ccl_context_destroy(ctx);
