@@ -443,10 +443,17 @@ static void create_info_destroy_test() {
     /* Get platform and device for these tests. */
     d = ccl_platform_get_device(p, 0, &err);
 
-    /* Create from devices with incorrect parameters. */
+    /* 6.1 Create from devices with incorrect parameters. */
     ctx = ccl_context_new_from_devices_full(
         NULL, 1, &d, NULL, (void *) &ocl_ver, &err);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
+
+    /* 6.2 Create from filter with invalid filter type. */
+    ctx = ccl_context_new_from_filter(
+        CCL_DEVSEL_DEP + 10 /* Invalid */,
+        ccl_devsel_indep_platform, platform, &err);
+    g_assert_error(err, CCL_ERROR, CCL_ERROR_ARGS);
     g_clear_error(&err);
 
     /* Free platforms object and context properties. */
