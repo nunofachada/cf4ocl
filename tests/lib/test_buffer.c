@@ -853,6 +853,12 @@ static void fill_test() {
         for (guint j = 0; j < 8; ++j)
             g_assert_cmpuint(h[i].s[j], ==, pattern.s[j]);
 
+    /* Test erroneous call to fill buffer (invalid pattern size). */
+    ccl_buffer_enqueue_fill(
+        b, q, &pattern, 3 /* Invalid */, 0, buf_size, NULL, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    ccl_err_clear(&err);
+
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert(!ccl_wrapper_memcheck());
 

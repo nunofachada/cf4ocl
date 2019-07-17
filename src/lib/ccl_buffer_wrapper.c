@@ -903,6 +903,7 @@ CCLEvent * ccl_buffer_enqueue_write_rect(CCLBuffer * buf, CCLQueue * cq,
     goto finish;
 
 error_handler:
+
     /* If we got here there was an error, verify that it is so. */
     g_assert(err == NULL || *err != NULL);
 
