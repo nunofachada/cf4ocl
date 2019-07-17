@@ -367,12 +367,9 @@ CCLContext * ccl_context_new_from_devices_full(
     goto finish;
 
 error_handler:
+
     /* If we got here there was an error, verify that it is so. */
     g_assert(err == NULL || *err != NULL);
-
-    /* Destroy what was built for the context wrapper. */
-    ccl_context_destroy(ctx);
-    ctx = NULL;
 
 finish:
 
