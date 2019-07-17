@@ -197,7 +197,7 @@ cl_uint ccl_device_get_opencl_version(CCLDevice * dev, CCLErr ** err) {
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-    char * ver_str;
+    char * ver_str = NULL;
     cl_uint ver = 0;
 
     /* Get version string which has the format "OpenCL x.x ..." */
@@ -209,7 +209,6 @@ cl_uint ccl_device_get_opencl_version(CCLDevice * dev, CCLErr ** err) {
             atoi(ver_str + 9) * 10; /* Minor version. */
     }
     return ver;
-
 }
 
 /**

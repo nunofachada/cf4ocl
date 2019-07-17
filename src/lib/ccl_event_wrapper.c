@@ -389,7 +389,7 @@ cl_uint ccl_event_get_opencl_version(CCLEvent * evt, CCLErr ** err) {
      * isn't defined for version 1.0. */
 
     cl_context context;
-    CCLContext * ctx;
+    CCLContext * ctx = NULL;
     CCLErr * err_internal = NULL;
 
     context = ccl_event_get_info_scalar(

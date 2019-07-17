@@ -500,15 +500,27 @@ cl_uint ccl_context_get_opencl_version(CCLContext * ctx, CCLErr ** err) {
     /* Make sure err is NULL or it is not set. */
     g_return_val_if_fail(err == NULL || *err == NULL, 0);
 
-    CCLPlatform * platf;
-    cl_uint ver;
+    CCLPlatform * platf = NULL;
+    CCLErr * err_internal = NULL;
+    cl_uint ver = 0;
 
-    platf = ccl_context_get_platform(ctx, err);
-    if (platf == NULL) {
-        ver = 0;
-    } else {
-        ver = ccl_platform_get_opencl_version(platf, err);
-    }
+    platf = ccl_context_get_platform(ctx, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
+
+    ver = ccl_platform_get_opencl_version(platf, &err_internal);
+    g_if_err_propagate_goto(err, err_internal, error_handler);
+
+    /* If we got here, everything is OK. */
+    g_assert(err == NULL || *err == NULL);
+    goto finish;
+
+error_handler:
+
+    /* If we got here there was an error, verify that it is so. */
+    g_assert(err == NULL || *err != NULL);
+
+finish:
+
     return ver;
 }
 
