@@ -103,7 +103,6 @@ static void create_info_destroy_test() {
 
     CCLContext * ctx = NULL;
     CCLErr * err = NULL;
-    CCLPlatforms * ps = NULL;
     CCLPlatform * p = NULL;
     CCLDevice * d = NULL;
     cl_device_id d_id = NULL;
@@ -119,17 +118,25 @@ static void create_info_destroy_test() {
     gboolean any_device;
     cl_uint ocl_ver;
 
+    /* Get the platform containing the test device. */
+    ctx = ccl_test_context_new(0, &err);
+    g_assert_no_error(err);
+    d = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+    p = ccl_platform_new_from_device(d, &err);
+    g_assert_no_error(err);
+    ccl_context_destroy(ctx);
+
     /*
      * 1. Test context creation from devices.
      * */
 
-    /* Get platforms object. */
-    ps = ccl_platforms_new(&err);
-    g_assert_no_error(err);
-
-    /* Get first platform wrapper from platforms object. */
-    p = ccl_platforms_get(ps, 0);
-    g_assert(p != NULL);
+    /* Create some context properties, will be useful in some tests. */
+    ctx_props = g_new0(cl_context_properties, 3);
+    platform = (cl_platform_id) ccl_wrapper_unwrap((CCLWrapper *) p);
+    ctx_props[0] = CL_CONTEXT_PLATFORM;
+    ctx_props[1] = (cl_context_properties) platform;
+    ctx_props[2] = 0;
 
     /* Get first device wrapper from platform wrapper. */
     d = ccl_platform_get_device(p, 0, &err);
@@ -173,7 +180,7 @@ static void create_info_destroy_test() {
     /* 1.2 Create a context from the device using the "full"
      * ccl_context_new_from_devices_full() function. */
     ctx = ccl_context_new_from_devices_full(
-        NULL, 1, &d, NULL, NULL, &err);
+        (const cl_context_properties *) ctx_props, 1, &d, NULL, NULL, &err);
 
     /* Get number of devices from context wrapper, check that this
      * number is 1. */
@@ -198,13 +205,6 @@ static void create_info_destroy_test() {
     /*
      * 2. Test context creation by cl_context.
      * */
-
-    /* Create some context properties. */
-    ctx_props = g_new0(cl_context_properties, 3);
-    platform = (cl_platform_id) ccl_wrapper_unwrap((CCLWrapper *) p);
-    ctx_props[0] = CL_CONTEXT_PLATFORM;
-    ctx_props[1] = (cl_context_properties) platform;
-    ctx_props[2] = 0;
 
     /* Create a CL context. */
     context = clCreateContext(
@@ -235,10 +235,8 @@ static void create_info_destroy_test() {
     g_assert_cmpuint(info->size / sizeof(cl_device_id), ==, 1);
 #endif
 
-    /* Free context, platforms and context properties. */
+    /* Free context. */
     ccl_context_destroy(ctx);
-    ccl_platforms_destroy(ps);
-    g_free(ctx_props);
 
     /*
      * 3. Test context creation by device filtering
@@ -434,15 +432,29 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
     g_assert_cmpuint(num_devices, >, 0);
 
-    /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
-
     /* Free context and set filters to NULL. */
     ccl_context_destroy(ctx);
 
+    /*
+     * 6. Test erroneous context creation by device filtering
+     * (pfn_notify is NULL but user_data is not NULL).
+     * */
+
+    /* Get platform and device for these tests. */
+    d = ccl_platform_get_device(p, 0, &err);
+
+    /* Create from devices with incorrect parameters. */
+    ctx = ccl_context_new_from_devices_full(
+        NULL, 1, &d, NULL, (void *) &ocl_ver, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
+
+    /* Free platforms object and context properties. */
+    ccl_platform_destroy(p);
+    g_free(ctx_props);
+
     /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert(ccl_wrapper_memcheck());
-
 }
 
 /**
