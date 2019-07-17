@@ -806,37 +806,20 @@ static void ref_unref_test() {
  * */
 static void get_supported_image_formats_test() {
 
-    CCLPlatforms * ps;
-    CCLPlatform * p;
+    /* Variables. */
     CCLContext * c;
-    CCLDevice * const * ds;
-    cl_uint num_devs;
-    const cl_image_format * image_formats;
-    cl_uint num_image_formats;
-    char * p_name;
     CCLErr * err = NULL;
 
-    /* Get all platforms. */
-    ps = ccl_platforms_new(&err);
+    /* Get an image supporting context and device. */
+    c = ccl_test_context_new_with_image_support(0, &err);
     g_assert_no_error(err);
 
-    /* Cycle through platforms. */
-    for (guint i = 0; i < ccl_platforms_count(ps); ++i) {
+    /* If context supports images, perform tests. */
+    if (c) {
 
-        /* Get current platform. */
-        p = ccl_platforms_get(ps, i);
-
-        /* Get number of devices in platform. */
-        num_devs = ccl_platform_get_num_devices(p, &err);
-        g_assert_no_error(err);
-
-        /* Get all devices in platform. */
-        ds = ccl_platform_get_all_devices(p, &err);
-        g_assert_no_error(err);
-
-        /* Create a context with all devices in current platform. */
-        c = ccl_context_new_from_devices(num_devs, ds, &err);
-        g_assert_no_error(err);
+        /* Test variables. */
+        const cl_image_format * image_formats;
+        cl_uint num_image_formats;
 
         /* Test the ccl_context_get_supported_image_formats() function. */
         image_formats = ccl_context_get_supported_image_formats(
@@ -844,13 +827,8 @@ static void get_supported_image_formats_test() {
             &num_image_formats, &err);
         g_assert_no_error(err);
 
-        /* Get platform name and print it to debug output. */
-        p_name = ccl_platform_get_info_string(p, CL_PLATFORM_NAME, &err);
-        g_assert_no_error(err);
-        g_debug("Image formats for platform '%s':", p_name);
-
         /* Cycle through image formats and print them to debug output. */
-        for (guint j = 0; j < num_image_formats; ++j) {
+        for (guint i = 0; i < num_image_formats; ++i) {
 
             g_debug("\t(chan_order, chan_type) = (%s, %s)",
                 ccl_test_channel_order_string(
@@ -866,9 +844,6 @@ static void get_supported_image_formats_test() {
         /* Destroy context. */
         ccl_context_destroy(c);
     }
-
-    /* Destroy platforms. */
-    ccl_platforms_destroy(ps);
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
