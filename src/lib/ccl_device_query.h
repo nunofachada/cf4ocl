@@ -48,17 +48,17 @@
  * Output formatting function.
  *
  * @param[in] info CL device information bitfield.
- * @param[out] out Char buffer (pre-allocated) where to write formatted
+ * @param[out] out Character buffer (pre-allocated) where to write formatted
  * output.
  * @param[in] size Maximum output length.
  * @param[in] units Parameter units suffix.
- * @return Formatted output (same address as parameter out).
+ * @return Formatted output (same address as parameter `out`).
  * */
 typedef char * (*ccl_devquery_format)(CCLWrapperInfo * info, char * out,
     size_t size, const char * units);
 
 /**
- * Maps a string to a cl_device_info bitfield.
+ * Maps a string to a `cl_device_info` bitfield.
  * */
 typedef struct ccl_devquery_map {
 
@@ -98,7 +98,7 @@ typedef struct ccl_devquery_map {
 CCL_EXPORT
 extern const int ccl_devquery_info_map_size;
 
-/** Map of parameter name strings to respective cl_device_info
+/** Map of parameter name strings to respective `cl_device_info`
  * bitfields, long description string, format output function and a
  * units suffix. */
 CCL_EXPORT
@@ -109,12 +109,11 @@ extern const CCLDevQueryMap ccl_devquery_info_map[];
 CCL_EXPORT
 gchar * ccl_devquery_get_prefix_final(const char * prefix);
 
-/* Return a cl_device_info object given its name. */
+/* Return a `cl_device_info` object given its name. */
 CCL_EXPORT
 cl_device_info ccl_devquery_name(const char * name);
 
-/* Get a list of device information parameters which have the
- * given prefix. */
+/* Get a list of device information parameters which have the given prefix. */
 CCL_EXPORT
 const CCLDevQueryMap * ccl_devquery_prefix(const char * prefix, int * size);
 
@@ -124,10 +123,10 @@ CCL_EXPORT
 const CCLDevQueryMap * ccl_devquery_match(const char * substr, int * idx);
 
 /**
- * Map an OpenCL cl_device_type object to a string identifying
+ * Map an OpenCL `cl_device_type` object to a string identifying
  * the device type.
  *
- * @param[in] type The OpenCL cl_device_type.
+ * @param[in] type The OpenCL `cl_device_type`.
  * @return String identifying device type.
  * */
 #define ccl_devquery_type2str(type) \

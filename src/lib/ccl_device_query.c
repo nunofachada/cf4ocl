@@ -531,7 +531,7 @@ static char * ccl_devquery_format_svmc(
  * @brief Size of parameter information map.
  */
 CCL_EXPORT
-const int ccl_devquery_info_map_size = 126;
+const int ccl_devquery_info_map_size = 129;
 
 /**
  * @internal
@@ -569,6 +569,10 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
         "NVidia ext.: Minor revision number that defines the CUDA compute "
         "capability of the device",
         ccl_devquery_format_uint, ""},
+    {"COMPUTE_UNITS_BITFIELD_ARM", CL_DEVICE_COMPUTE_UNITS_BITFIELD_ARM,
+        "Bitfield where each bit set represents the presence of compute unit "
+        "whose ID is the bit position",
+        ccl_devquery_format_hex, ""},
     {"DOUBLE_FP_CONFIG", CL_DEVICE_DOUBLE_FP_CONFIG,
         "Floating-point device configuration (double)",
         ccl_devquery_format_fpconfig, ""},
@@ -714,6 +718,9 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
     {"MAX_MEM_ALLOC_SIZE", CL_DEVICE_MAX_MEM_ALLOC_SIZE,
         "Max. size of memory object allocation in bytes",
         ccl_devquery_format_ulongbytes, ""},
+    {"MAX_NAMED_BARRIER_COUNT_KHR", CL_DEVICE_MAX_NAMED_BARRIER_COUNT_KHR,
+        "Max. number of named barriers for subgroups",
+        ccl_devquery_format_uint, ""},
     {"MAX_NUM_SUB_GROUPS", CL_DEVICE_MAX_NUM_SUB_GROUPS,
         "Max. sub-groups in work-group on a single compute unit for any given "
         "kernel-instance",
@@ -939,6 +946,10 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
         "false otherwise",
         ccl_devquery_format_yesno, ""},
     {"SVM_CAPABILITIES", CL_DEVICE_SVM_CAPABILITIES,
+        "Shared virtual memory (SVM) memory allocation types the device "
+        "supports",
+        ccl_devquery_format_svmc, ""},
+    {"SVM_CAPABILITIES_ARM", CL_DEVICE_SVM_CAPABILITIES_ARM,
         "Shared virtual memory (SVM) memory allocation types the device "
         "supports",
         ccl_devquery_format_svmc, ""},
