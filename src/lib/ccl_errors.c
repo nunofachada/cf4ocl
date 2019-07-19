@@ -98,10 +98,12 @@ static const char * ccl_errors[] = {
     "Invalid linker options", /* CL_INVALID_LINKER_OPTIONS - 67 */
     "Invalid device partition count", /* CL_INVALID_DEVICE_PARTITION_COUNT - 68 */
     "Invalid pipe size", /* CL_INVALID_PIPE_SIZE - 69 */
-    "Invalid device queue" /* CL_INVALID_DEVICE_QUEUE - 70 */
+    "Invalid device queue", /* CL_INVALID_DEVICE_QUEUE - 70 */
+    "Invalid spec ID", /* CL_INVALID_SPEC_ID - 71 */
+    "Maximum size restriction exceeded", /* CL_MAX_SIZE_RESTRICTION_EXCEEDED - 72 */
 };
 
-static const int ccl_errors_count = 71;
+static const int ccl_errors_count = 73;
 
 /**
  * @addtogroup CCL_ERRORS
