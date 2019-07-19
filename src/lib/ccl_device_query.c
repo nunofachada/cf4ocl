@@ -337,6 +337,11 @@ static char * ccl_devquery_format_partprop(
     GString * str = g_string_new("");
     guint count = (guint) (info->size / sizeof(cl_device_partition_property));
     for (guint i = 0; i < count; i++) {
+
+        /* No more info in the list? Stop here. */
+        if (pp[i] == 0) break;
+
+        /* There's info in the list, check what it is. */
         switch (pp[i]) {
             case CL_DEVICE_PARTITION_EQUALLY:
                 g_string_append_printf(str, "EQUALLY ");
@@ -347,6 +352,52 @@ static char * ccl_devquery_format_partprop(
             case CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN:
                 g_string_append_printf(str, "BY_AFFINITY_DOMAIN ");
                 break;
+            case CL_DEVICE_PARTITION_EQUALLY_EXT:
+                g_string_append_printf(str, "EQUALLY_EXT ");
+                break;
+            case CL_DEVICE_PARTITION_BY_COUNTS_EXT:
+                g_string_append_printf(str, "BY_COUNTS_EXT ");
+                break;
+            case CL_DEVICE_PARTITION_BY_NAMES_EXT:
+                g_string_append_printf(str, "BY_NAMES_EXT ");
+                break;
+            case CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT:
+                g_string_append_printf(str, "BY_AFFINITY_DOMAIN_EXT ");
+                break;
+            default:
+                g_string_append_printf(str, "UNKNOWN(0x%lx) ",
+                    (unsigned long) pp[i]);
+        }
+    }
+    g_snprintf(out, (gulong) size, "%s", str->str);
+    g_string_free(str, TRUE);
+    return out;
+}
+
+/**
+ * @internal
+ *
+ * @brief Implementation of ccl_devquery_format() function for outputting the
+ * partition properties of a device using the optional extension.
+ *
+ * @copydetails ccl_devquery_format()
+ */
+static char * ccl_devquery_format_partprop_ext(
+    CCLWrapperInfo * info, char * out, size_t size, const char * units) {
+
+    CCL_UNUSED(units);
+    cl_device_partition_property_ext * pp =
+        (cl_device_partition_property_ext *) info->value;
+    GString * str = g_string_new("");
+    guint count =
+        (guint) (info->size / sizeof(cl_device_partition_property_ext));
+    for (guint i = 0; i < count; i++) {
+
+        /* No more info in the list? Stop here. */
+        if (pp[i] == 0) break;
+
+        /* There's info in the list, check what it is. */
+        switch (pp[i]) {
             case CL_DEVICE_PARTITION_EQUALLY_EXT:
                 g_string_append_printf(str, "EQUALLY_EXT ");
                 break;
@@ -384,14 +435,16 @@ static char * ccl_devquery_format_affdom(
     CCL_UNUSED(units);
     cl_device_affinity_domain ad =
         *((cl_device_affinity_domain *) info->value);
-    g_snprintf(out, (gulong) size, "%s%s%s%s%s%s",
-        ad & CL_DEVICE_AFFINITY_DOMAIN_NUMA ? "NUMA " : "",
-        ad & CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE ? "L4_CACHE " : "",
-        ad & CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE ? "L3_CACHE " : "",
-        ad & CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE ? "L2_CACHE " : "",
-        ad & CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE ? "L1_CACHE " : "",
-        ad & CL_DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE ?
-            "NEXT_PARTITIONABLE " : "");
+    if (ad == 0) {
+        g_snprintf(out, (gulong) size, "None");
+    } else {
+        g_snprintf(out, (gulong) size, "%s%s%s%s%s",
+            ad & CL_DEVICE_AFFINITY_DOMAIN_NUMA ? "NUMA " : "",
+            ad & CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE ? "L4_CACHE " : "",
+            ad & CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE ? "L3_CACHE " : "",
+            ad & CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE ? "L2_CACHE " : "",
+            ad & CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE ? "L1_CACHE " : "");
+    }
     return out;
 }
 
@@ -430,9 +483,6 @@ static char * ccl_devquery_format_affdom_ext(
             case CL_AFFINITY_DOMAIN_NUMA_EXT:
                 g_string_append_printf(str, "NUMA_EXT ");
                 break;
-            case CL_AFFINITY_DOMAIN_NEXT_FISSIONABLE_EXT:
-                g_string_append_printf(str, "NEXT_FISSIONABLE_EXT ");
-                break;
             case CL_PROPERTIES_LIST_END_EXT:
                 break;
             default:
@@ -440,6 +490,170 @@ static char * ccl_devquery_format_affdom_ext(
                     (unsigned long) ade[i]);
         }
     }
+    g_snprintf(out, (gulong) size, "%s", str->str);
+    g_string_free(str, TRUE);
+    return out;
+}
+
+/**
+ * @internal
+ *
+ * @brief Implementation of ccl_devquery_format() function for outputting the
+ * partitioning type performed on a sub-device.
+ *
+ * @copydetails ccl_devquery_format()
+ */
+static char * ccl_devquery_format_parttype(
+    CCLWrapperInfo * info, char * out, size_t size, const char * units) {
+
+    CCL_UNUSED(units);
+    cl_device_partition_property * ptype =
+        (cl_device_partition_property *) info->value;
+    GString * str = g_string_new("");
+    guint count =
+        (guint) (info->size / sizeof(cl_device_partition_property));
+    if (count > 0) {
+        if (ptype[0] == 0) {
+            g_string_append_printf(str, "Device does not appear partitioned");
+        } else if (ptype[0] == CL_DEVICE_PARTITION_EQUALLY) {
+            g_string_append_printf(str, "EQUALLY : ");
+            if (count > 1) {
+                g_string_append_printf(str, "%d CUs per device", (int) ptype[1]);
+            } else {
+                g_string_append_printf(str, "Unknown number of CUs per device");
+            }
+        } else if (ptype[0] == CL_DEVICE_PARTITION_BY_COUNTS) {
+            g_string_append_printf(str, "BY_COUNTS : ");
+            if (count > 1) {
+                for (guint i = 1;
+                     i < count && ptype[i] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+                     i++) {
+                    g_string_append_printf(str, "%d ", (int) ptype[i]);
+                }
+            } else {
+                g_string_append_printf(str, "Unable to get CU count per device");
+            }
+        } else if (ptype[0] == CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN ) {
+            g_string_append_printf(str, "BY_AFFINITY_DOMAIN : ");
+            if (count > 1) {
+                switch (ptype[1]) {
+                    case CL_DEVICE_AFFINITY_DOMAIN_NUMA:
+                        g_string_append_printf(str, "NUMA");
+                        break;
+                    case CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE:
+                        g_string_append_printf(str, "L4 CACHE");
+                        break;
+                    case CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE:
+                        g_string_append_printf(str, "L3 CACHE");
+                        break;
+                    case CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE:
+                        g_string_append_printf(str, "L2 CACHE");
+                        break;
+                    case CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE:
+                        g_string_append_printf(str, "L1 CACHE");
+                        break;
+                    default:
+                        g_string_append_printf(str, "Unknown affinity domain");
+                        break;
+                }
+            } else {
+                g_string_append_printf(str, "Unable to get affinity domain");
+            }
+        } else {
+            g_string_append_printf(str, "Unknown partitioning type");
+        }
+    } else {
+        g_string_append_printf(str, "Device is not partitioned");
+    }
+
+    g_snprintf(out, (gulong) size, "%s", str->str);
+    g_string_free(str, TRUE);
+    return out;
+}
+
+/**
+ * @internal
+ *
+ * @brief Implementation of ccl_devquery_format() function for outputting the
+ * partitioning type performed on a sub-device using the partitioning
+ * extension.
+ *
+ * @copydetails ccl_devquery_format()
+ */
+static char * ccl_devquery_format_parttype_ext(
+    CCLWrapperInfo * info, char * out, size_t size, const char * units) {
+
+    CCL_UNUSED(units);
+    cl_device_partition_property_ext * ptype =
+        (cl_device_partition_property_ext *) info->value;
+    GString * str = g_string_new("");
+    guint count =
+        (guint) (info->size / sizeof(cl_device_partition_property_ext));
+    if (count > 0) {
+        if (ptype[0] == CL_PROPERTIES_LIST_END_EXT) {
+            g_string_append_printf(str, "Device is not partitioned");
+        } else if (ptype[0] == CL_DEVICE_PARTITION_EQUALLY_EXT) {
+            g_string_append_printf(str, "EQUALLY : ");
+            if (count > 1) {
+                g_string_append_printf(str, "%d CUs per device", (int) ptype[1]);
+            } else {
+                g_string_append_printf(str, "Unknown number of CUs per device");
+            }
+        } else if (ptype[0] == CL_DEVICE_PARTITION_BY_COUNTS_EXT) {
+            g_string_append_printf(str, "BY_COUNTS : ");
+            if (count > 1 && ptype[1] != CL_PARTITION_BY_COUNTS_LIST_END_EXT) {
+                for (guint i = 1;
+                     i < count && ptype[i] != CL_PARTITION_BY_COUNTS_LIST_END_EXT;
+                     i++) {
+                    g_string_append_printf(str, "%d ", (int) ptype[i]);
+                }
+            } else {
+                g_string_append_printf(str, "Unable to get CU count per device");
+            }
+        } else if (ptype[0] == CL_DEVICE_PARTITION_BY_NAMES_EXT) {
+            g_string_append_printf(str, "BY_NAMES : ");
+            if (count > 1 && ptype[1] != CL_PARTITION_BY_NAMES_LIST_END_EXT) {
+                for (guint i = 1;
+                     i < count && ptype[i] != CL_PARTITION_BY_NAMES_LIST_END_EXT;
+                     i++) {
+                    g_string_append_printf(str, "%d ", (int) ptype[i]);
+                }
+            } else {
+                g_string_append_printf(str, "Unable to get CU names");
+            }
+        } else if (ptype[0] == CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT ) {
+            g_string_append_printf(str, "BY_AFFINITY_DOMAIN : ");
+            if (count > 1) {
+                switch (ptype[1]) {
+                    case CL_AFFINITY_DOMAIN_NUMA_EXT:
+                        g_string_append_printf(str, "NUMA");
+                        break;
+                    case CL_AFFINITY_DOMAIN_L4_CACHE_EXT:
+                        g_string_append_printf(str, "L4 CACHE");
+                        break;
+                    case CL_AFFINITY_DOMAIN_L3_CACHE_EXT:
+                        g_string_append_printf(str, "L3 CACHE");
+                        break;
+                    case CL_AFFINITY_DOMAIN_L2_CACHE_EXT:
+                        g_string_append_printf(str, "L2 CACHE");
+                        break;
+                    case CL_AFFINITY_DOMAIN_L1_CACHE_EXT:
+                        g_string_append_printf(str, "L1 CACHE");
+                        break;
+                    default:
+                        g_string_append_printf(str, "Unknown affinity domain");
+                        break;
+                }
+            } else {
+                g_string_append_printf(str, "Unable to get affinity domain");
+            }
+        } else {
+            g_string_append_printf(str, "Unknown partitioning type");
+        }
+    } else {
+        g_string_append_printf(str, "Device does not appear partitioned");
+    }
+
     g_snprintf(out, (gulong) size, "%s", str->str);
     g_string_free(str, TRUE);
     return out;
@@ -812,7 +1026,7 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
         ccl_devquery_format_ptr, ""},
     {"PARENT_DEVICE_EXT", CL_DEVICE_PARENT_DEVICE_EXT,
         "Ext.: Get the parent device to which the sub-device belongs",
-        ccl_devquery_format_hex, ""},
+        ccl_devquery_format_ptr, ""},
     {"PARTITION_AFFINITY_DOMAIN", CL_DEVICE_PARTITION_AFFINITY_DOMAIN,
         "Supported affinity domains for partitioning the device using "
         "CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN",
@@ -825,13 +1039,13 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
         ccl_devquery_format_partprop, ""},
     {"PARTITION_STYLE_EXT", CL_DEVICE_PARTITION_STYLE_EXT,
         "Ext.: Partition properties used to create the sub-device",
-        ccl_devquery_format_affdom_ext, ""},
+        ccl_devquery_format_parttype_ext, ""},
     {"PARTITION_TYPE", CL_DEVICE_PARTITION_TYPE,
         "Properties specified in clCreateSubDevices if device is a subdevice",
-        ccl_devquery_format_uint, ""},
+        ccl_devquery_format_parttype, ""},
     {"PARTITION_TYPES_EXT", CL_DEVICE_PARTITION_TYPES_EXT,
         "Ext.: List of supported partition types for partitioning a device",
-        ccl_devquery_format_partprop, ""},
+        ccl_devquery_format_partprop_ext, ""},
     {"PIPE_MAX_ACTIVE_RESERVATIONS", CL_DEVICE_PIPE_MAX_ACTIVE_RESERVATIONS,
         "Max. reservations that can be active for a pipe per work-item in a "
         "kernel",

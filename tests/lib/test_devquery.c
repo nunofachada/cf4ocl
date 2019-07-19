@@ -123,7 +123,7 @@ static void helpers_test() {
 /**
  * @internal
  *
- * @brief Test the ccl_devquery_name function of the device module.
+ * @brief Test the ccl_devquery_name function.
  * */
 static void name_test() {
 
@@ -161,6 +161,11 @@ static void name_test() {
     g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
     info = ccl_devquery_name("DRIVER_VERSION");
     g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+    /* Test not found parameter name. */
+    info = ccl_devquery_name("MOCK_PARAM_THAT_DOES_NOT_EXIST");
+    g_assert_cmphex(info, ==, 0);
+
 }
 
 /**
