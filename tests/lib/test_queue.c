@@ -444,11 +444,6 @@ static void do_mult_ooo(
     free(buf_host2B);
 }
 
-/* In OpenCL < 2.0 there is no CL_DEVICE_QUEUE_ON_HOST_PROPERTIES. */
-#ifndef CL_VERSION_2_0
-    #define CL_DEVICE_QUEUE_ON_HOST_PROPERTIES CL_DEVICE_QUEUE_PROPERTIES
-#endif
-
 /**
  * @internal
  *
