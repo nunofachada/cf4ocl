@@ -205,6 +205,31 @@ static void infomap_test() {
 /**
  * @internal
  *
+ * @brief Tests rarely used formatting functions or formatting functions used
+ * in a rare way.
+ * */
+static void rare_test() {
+
+    /* Variables. */
+    CCLWrapperInfo info;
+    char out[CCL_TEST_DEVQUERY_MAXINFOLEN];
+
+    /* Formatting functions to test. */
+    ccl_devquery_format format_hex =
+        ccl_devquery_info_map[ccl_devquery_get_index("VENDOR_ID")].format;
+
+    /* Test format hex with units. */
+    cl_ushort hexval = 0xAB;
+    info.size = sizeof(cl_ushort);
+    info.value = (void *) &hexval;
+    format_hex(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "mockUnits");
+    g_assert_cmpstr(out, ==, "0xab mockUnits");
+
+}
+
+/**
+ * @internal
+ *
  * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -219,6 +244,8 @@ int main(int argc, char ** argv) {
     g_test_add_func("/devquery/name", name_test);
 
     g_test_add_func("/devquery/infomap", infomap_test);
+
+    g_test_add_func("/devquery/rare", rare_test);
 
     return g_test_run();
 }
