@@ -56,14 +56,11 @@ static char * ccl_devquery_format_hex(
     CCLWrapperInfo * info, char * out, size_t size, const char * units) {
 
     GString * str = g_string_new("0x");
-    gboolean start = FALSE;
     guchar val;
 
     for (gint i = (gint) info->size - 1; i >= 0 ; i--) {
         val = ((cl_char *) info->value)[i];
-        if (val) start = TRUE;
-        if (start)
-            g_string_append_printf(str, "%.2x", val);
+        if (val) g_string_append_printf(str, "%.2x", val);
     }
     if (units && units[0])
         g_string_append_printf(str, " %s", units);
