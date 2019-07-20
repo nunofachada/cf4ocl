@@ -742,14 +742,6 @@ static char * ccl_devquery_format_svmc(
 /**
  * @internal
  *
- * @brief Size of parameter information map.
- */
-CCL_EXPORT
-const int ccl_devquery_info_map_size = 129;
-
-/**
- * @internal
- *
  * @brief Map of parameter name strings to respective cl_device_info
  * bitfields, long description string, format output function and a
  * units suffix.
@@ -1196,8 +1188,16 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
         "AMD ext.: Wavefront width",
         ccl_devquery_format_uint, ""},
     {NULL, 0, NULL, NULL, NULL}
-
 };
+
+/**
+ * @internal
+ *
+ * @brief Size of parameter information map.
+ */
+CCL_EXPORT
+const int ccl_devquery_info_map_size =
+    sizeof(ccl_devquery_info_map) / sizeof(CCLDevQueryMap) - 1;
 
 /**
  * @addtogroup CCL_DEVICE_QUERY

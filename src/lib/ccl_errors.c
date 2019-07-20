@@ -103,7 +103,7 @@ static const char * ccl_errors[] = {
     "Maximum size restriction exceeded", /* CL_MAX_SIZE_RESTRICTION_EXCEEDED - 72 */
 };
 
-static const int ccl_errors_count = 73;
+static const int ccl_errors_count = sizeof(ccl_errors) / sizeof(char *);
 
 /**
  * @addtogroup CCL_ERRORS
