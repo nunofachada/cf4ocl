@@ -296,7 +296,7 @@ static void rare_test() {
     g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
     g_assert(g_strrstr(out, "UNKNOWN") != NULL);
 
-    /* 5. Test format of affinity domains when partitioning device by
+    /* 5. Test format of available affinity domains for partitioning device by
      * affinity. */
 
     /* Get function, used for formatting CL_DEVICE_PARTITION_AFFINITY_DOMAIN
@@ -317,7 +317,7 @@ static void rare_test() {
     g_assert_null(g_strrstr(out, "L3_CACHE"));
     g_assert_null(g_strrstr(out, "L4_CACHE"));
 
-    /* 6. Test format of affinity domains when partitioning device by
+    /* 6. Test format of available affinity domains for partitioning device by
      * affinity using the optional extension form. */
 
     /* Get function, used for formatting CL_DEVICE_AFFINITY_DOMAINS_EXT info. */
@@ -326,7 +326,7 @@ static void rare_test() {
             ccl_devquery_get_index("AFFINITY_DOMAINS_EXT")].format;
 
     /* Perform test. */
-    cl_device_partition_property_ext ppe[] = {
+    cl_device_partition_property_ext appe[] = {
         CL_AFFINITY_DOMAIN_L1_CACHE_EXT,
         CL_AFFINITY_DOMAIN_L2_CACHE_EXT,
         CL_AFFINITY_DOMAIN_L3_CACHE_EXT,
@@ -334,8 +334,8 @@ static void rare_test() {
         CL_AFFINITY_DOMAIN_NUMA_EXT,
         -2, /* Unknown */
         CL_PROPERTIES_LIST_END_EXT };
-    info.size = sizeof(ppe);
-    info.value = ppe;
+    info.size = sizeof(appe);
+    info.value = appe;
     format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
     g_assert(g_strrstr(out, "NUMA_EXT") != NULL);
     g_assert(g_strrstr(out, "L1_CACHE_EXT") != NULL);
@@ -343,6 +343,178 @@ static void rare_test() {
     g_assert(g_strrstr(out, "L3_CACHE_EXT") != NULL);
     g_assert(g_strrstr(out, "L4_CACHE_EXT") != NULL);
     g_assert(g_strrstr(out, "UNKNOWN") != NULL);
+
+    /* 7. Test format of partition properties of a sub-device when it is
+     * partitioned by affinity or with incorrect parameters. */
+
+    /* Get function, used for formatting CL_DEVICE_PARTITION_TYPE info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("PARTITION_TYPE")].format;
+
+    /* Perform tests. */
+    cl_device_partition_property pp[3];
+
+    info.size = 0;
+    info.value = NULL;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "Device is not partitioned");
+
+    pp[0] = -1; /* Invalid partitioning type. */
+    info.size = sizeof(cl_device_partition_property);
+    info.value = &pp;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "Unknown partitioning type");
+
+    pp[0] = CL_DEVICE_PARTITION_EQUALLY;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "EQUALLY : Unknown number of CUs per device");
+
+    pp[0] = CL_DEVICE_PARTITION_BY_COUNTS;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_COUNTS : Unable to get CU count per device");
+
+    pp[0] = CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(
+        out, ==, "BY_AFFINITY_DOMAIN : Unable to get affinity domain");
+
+    pp[1] = -1; /* Invalid type of affinity domain. */
+    info.size = 2 * sizeof(cl_device_partition_property);
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : Unknown affinity domain");
+
+    pp[1] = CL_DEVICE_AFFINITY_DOMAIN_NUMA;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : NUMA");
+
+    pp[1] = CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L1 CACHE");
+
+    pp[1] = CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L2 CACHE");
+
+    pp[1] = CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L3 CACHE");
+
+    pp[1] = CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L4 CACHE");
+
+    /* 8. Test format of partition properties of a sub-device when it is
+     * partitioned using the optional extension form. */
+
+    /* Get function, used for formatting CL_DEVICE_PARTITION_STYLE_EXT info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("PARTITION_STYLE_EXT")].format;
+
+    /* Perform tests. */
+    cl_device_partition_property_ext ppe[5];
+
+    info.size = 0;
+    info.value = NULL;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "Device does not appear partitioned");
+
+    ppe[0] = CL_PROPERTIES_LIST_END_EXT;
+    info.size = sizeof(cl_device_partition_property);
+    info.value = &ppe;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "Device is not partitioned");
+
+    ppe[0] = -2; /* Invalid partitioning type. */
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "Unknown partitioning type");
+
+    ppe[0] = CL_DEVICE_PARTITION_EQUALLY_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "EQUALLY : Unknown number of CUs per device");
+
+    ppe[1] = 4; /* 4 CUs per device */
+    info.size = 2 * sizeof(cl_device_partition_property);
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "EQUALLY : 4 CUs per device");
+
+    ppe[0] = CL_DEVICE_PARTITION_BY_COUNTS_EXT;
+    info.size = sizeof(cl_device_partition_property);
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_COUNTS : Unable to get CU count per device");
+
+    ppe[1] = 4; /* 1st device with 4 CUs */
+    ppe[2] = 2; /* 2nd device with 2 CUs */
+    ppe[3] = 1; /* 3rd device with 1 CU */
+    ppe[4] = CL_PROPERTIES_LIST_END_EXT;
+    info.size = 5 * sizeof(cl_device_partition_property);
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_COUNTS : 4 2 1 ");
+
+    ppe[0] = CL_DEVICE_PARTITION_BY_NAMES_EXT;
+    ppe[1] = 0; /* 1st device associated with CU named 0 */
+    ppe[2] = 2; /* 2nd device associated with CU named 2 */
+    ppe[3] = 4; /* 3rd device associated with CU named 4 */
+    ppe[4] = CL_PARTITION_BY_NAMES_LIST_END_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_NAMES : 0 2 4 ");
+
+    ppe[1] = CL_PARTITION_BY_NAMES_LIST_END_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_NAMES : Unable to get CU names");
+
+    ppe[1] = 0;
+    info.size = sizeof(cl_device_partition_property);
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_NAMES : Unable to get CU names");
+
+    ppe[0] = CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(
+        out, ==, "BY_AFFINITY_DOMAIN : Unable to get affinity domain");
+
+    ppe[1] = -1; /* Invalid type of affinity domain. */
+    info.size = 2 * sizeof(cl_device_partition_property);
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : Unknown affinity domain");
+
+    ppe[1] = CL_AFFINITY_DOMAIN_NUMA_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : NUMA");
+
+    ppe[1] = CL_AFFINITY_DOMAIN_L1_CACHE_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L1 CACHE");
+
+    ppe[1] = CL_AFFINITY_DOMAIN_L2_CACHE_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L2 CACHE");
+
+    ppe[1] = CL_AFFINITY_DOMAIN_L3_CACHE_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L3 CACHE");
+
+    ppe[1] = CL_AFFINITY_DOMAIN_L4_CACHE_EXT;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "BY_AFFINITY_DOMAIN : L4 CACHE");
+
+    /* 9. Test format cache type with option NONE, which will
+     * probably never happen in a real situation.*/
+
+    /* Get function, which is used for formatting
+     * CL_DEVICE_GLOBAL_MEM_CACHE_TYPE info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("GLOBAL_MEM_CACHE_TYPE")].format;
+
+    /* Perform test. */
+    cl_device_mem_cache_type mct = CL_NONE;
+    info.size = sizeof(cl_device_mem_cache_type);
+    info.value = (void *) &mct;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "NONE");
+
 }
 
 /**
