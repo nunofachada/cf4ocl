@@ -29,8 +29,6 @@
 #include <cf4ocl2.h>
 #include "test.h"
 
-#define CCL_TEST_DEVQUERY_MAXINFOLEN 500
-
 /**
  * @internal
  *

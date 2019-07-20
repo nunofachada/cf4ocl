@@ -95,6 +95,7 @@ static void sub_devices_test() {
     CCLErr * err = NULL;
     CCLWrapperInfo * info = NULL;
     cl_device_partition_property * dpp;
+    ccl_devquery_format format_func;
     cl_uint i;
     cl_bool supported;
     CCLDevice * const * subdevs;
@@ -103,6 +104,8 @@ static void sub_devices_test() {
     cl_uint cu;
     cl_uint subcu;
     cl_device_id parent_device;
+    const int aux_len = 10;
+    gchar out[CCL_TEST_DEVQUERY_MAXINFOLEN], aux[aux_len];
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(120, &err);
@@ -190,6 +193,17 @@ static void sub_devices_test() {
                     CL_DEVICE_PARTITION_EQUALLY);
             g_assert_cmpuint( /* Check number of CUs in each device */
                     ((cl_device_partition_property *) info->value)[1], ==, cu);
+
+            /* Test device query function for formatting partition
+             * properties. */
+
+            format_func = /* Get formatting function. */
+                ccl_devquery_info_map[
+                    ccl_devquery_get_index("PARTITION_TYPE")].format;
+            format_func(info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+            g_assert(g_strrstr(out, "EQUALLY") != NULL);
+            g_snprintf(aux, aux_len, "%d", cu);
+            g_assert(g_strrstr(out, aux) != NULL); /* Check number of CUs */
         }
 
         /* Check that the last position is NULL. */
@@ -266,6 +280,23 @@ static void sub_devices_test() {
                     ((cl_device_partition_property *) info->value)[j],
                     ==,
                     ctprop[j]);
+            }
+
+            /* Test device query function for formatting partition
+             * properties. */
+
+            format_func = /* Get formatting function. */
+                ccl_devquery_info_map[
+                    ccl_devquery_get_index("PARTITION_TYPE")].format;
+            format_func(info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+            g_assert(g_strrstr(out, "BY_COUNTS") != NULL);
+            for (guint j = 1;
+                 ctprop[j] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+                 j++) {
+                /* Check if sub-device with the specified number of CUs appears
+                 * in the string returned by the query. */
+                g_snprintf(aux, aux_len, " %ld", ctprop[j]);
+                g_assert(g_strrstr(out, aux) != NULL);
             }
         }
 

@@ -34,6 +34,9 @@
 /* The default device to use in tests is set in the CMake configuration. */
 #define CCL_TEST_DEFAULT_DEVICE_IDX @TESTS_DEVICE_INDEX@
 
+/* Maximum length of info query strings. */
+#define CCL_TEST_DEVQUERY_MAXINFOLEN 500
+
 /* Print handler which redirects output to debug stream. */
 void ccl_print_to_debug(const gchar * string);
 
