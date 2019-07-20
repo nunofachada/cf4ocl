@@ -212,19 +212,139 @@ static void rare_test() {
 
     /* Variables. */
     CCLWrapperInfo info;
+    ccl_devquery_format format_func;
     char out[CCL_TEST_DEVQUERY_MAXINFOLEN];
 
-    /* Formatting functions to test. */
-    ccl_devquery_format format_hex =
+    /* 1. Test format hex function with units. */
+
+    /* Get function, which is used for formatting CL_DEVICE_VENDOR_ID info. */
+    format_func =
         ccl_devquery_info_map[ccl_devquery_get_index("VENDOR_ID")].format;
 
-    /* Test format hex with units. */
+    /* Perform test. */
     cl_ushort hexval = 0xAB;
     info.size = sizeof(cl_ushort);
     info.value = (void *) &hexval;
-    format_hex(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "mockUnits");
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "mockUnits");
     g_assert_cmpstr(out, ==, "0xab mockUnits");
 
+    /* 2. Test format local memory type with option NONE, which will
+     * probably never happen in a real situation. */
+
+    /* Get function, which is used for formatting CL_DEVICE_LOCAL_MEM_TYPE
+     * info. */
+    format_func =
+        ccl_devquery_info_map[ccl_devquery_get_index("LOCAL_MEM_TYPE")].format;
+
+    /* Perform test. */
+    cl_device_local_mem_type lmt = CL_NONE;
+    info.size = sizeof(cl_device_local_mem_type);
+    info.value = &lmt;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert_cmpstr(out, ==, "NONE");
+
+    /* 3. Test format of rarely implemented device partition properties. */
+
+    /* Get function, used for formatting CL_DEVICE_PARTITION_PROPERTIES info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("PARTITION_PROPERTIES")].format;
+
+    /* Perform test. */
+    cl_device_partition_property part_props[] = {
+        CL_DEVICE_PARTITION_EQUALLY,
+        CL_DEVICE_PARTITION_BY_COUNTS,
+        CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN,
+        CL_DEVICE_PARTITION_EQUALLY_EXT,
+        CL_DEVICE_PARTITION_BY_COUNTS_EXT,
+        CL_DEVICE_PARTITION_BY_NAMES_EXT,
+        CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT,
+        -2, /* Unknown */
+        0 };
+    info.size = sizeof(part_props);
+    info.value = part_props;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert(g_strrstr(out, "EQUALLY") != NULL);
+    g_assert(g_strrstr(out, "BY_COUNTS") != NULL);
+    g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN") != NULL);
+    g_assert(g_strrstr(out, "EQUALLY_EXT") != NULL);
+    g_assert(g_strrstr(out, "BY_COUNTS_EXT") != NULL);
+    g_assert(g_strrstr(out, "BY_NAMES_EXT") != NULL);
+    g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
+    g_assert(g_strrstr(out, "UNKNOWN") != NULL);
+
+    /* 4. Test format of device partition properties in their optional
+     * extension form. */
+
+    /* Get function, used for formatting CL_DEVICE_PARTITION_TYPES_EXT info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("PARTITION_TYPES_EXT")].format;
+
+    /* Perform test. */
+    cl_device_partition_property_ext part_props_ext[] = {
+        CL_DEVICE_PARTITION_EQUALLY_EXT,
+        CL_DEVICE_PARTITION_BY_COUNTS_EXT,
+        CL_DEVICE_PARTITION_BY_NAMES_EXT,
+        CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN_EXT,
+        -2, /* Unknown */
+        0 };
+    info.size = sizeof(part_props_ext);
+    info.value = part_props_ext;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert(g_strrstr(out, "EQUALLY_EXT") != NULL);
+    g_assert(g_strrstr(out, "BY_COUNTS_EXT") != NULL);
+    g_assert(g_strrstr(out, "BY_NAMES_EXT") != NULL);
+    g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
+    g_assert(g_strrstr(out, "UNKNOWN") != NULL);
+
+    /* 5. Test format of affinity domains when partitioning device by
+     * affinity. */
+
+    /* Get function, used for formatting CL_DEVICE_PARTITION_AFFINITY_DOMAIN
+     * info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("PARTITION_AFFINITY_DOMAIN")].format;
+
+    /* Perform test. */
+    cl_device_affinity_domain ad =
+        CL_DEVICE_AFFINITY_DOMAIN_NUMA | CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE;
+    info.size = sizeof(cl_device_affinity_domain);
+    info.value = &ad;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert(g_strrstr(out, "NUMA") != NULL);
+    g_assert(g_strrstr(out, "L1_CACHE") != NULL);
+    g_assert_null(g_strrstr(out, "L2_CACHE"));
+    g_assert_null(g_strrstr(out, "L3_CACHE"));
+    g_assert_null(g_strrstr(out, "L4_CACHE"));
+
+    /* 6. Test format of affinity domains when partitioning device by
+     * affinity using the optional extension form. */
+
+    /* Get function, used for formatting CL_DEVICE_AFFINITY_DOMAINS_EXT info. */
+    format_func =
+        ccl_devquery_info_map[
+            ccl_devquery_get_index("AFFINITY_DOMAINS_EXT")].format;
+
+    /* Perform test. */
+    cl_device_partition_property_ext ppe[] = {
+        CL_AFFINITY_DOMAIN_L1_CACHE_EXT,
+        CL_AFFINITY_DOMAIN_L2_CACHE_EXT,
+        CL_AFFINITY_DOMAIN_L3_CACHE_EXT,
+        CL_AFFINITY_DOMAIN_L4_CACHE_EXT,
+        CL_AFFINITY_DOMAIN_NUMA_EXT,
+        -2, /* Unknown */
+        CL_PROPERTIES_LIST_END_EXT };
+    info.size = sizeof(ppe);
+    info.value = ppe;
+    format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
+    g_assert(g_strrstr(out, "NUMA_EXT") != NULL);
+    g_assert(g_strrstr(out, "L1_CACHE_EXT") != NULL);
+    g_assert(g_strrstr(out, "L2_CACHE_EXT") != NULL);
+    g_assert(g_strrstr(out, "L3_CACHE_EXT") != NULL);
+    g_assert(g_strrstr(out, "L4_CACHE_EXT") != NULL);
+    g_assert(g_strrstr(out, "UNKNOWN") != NULL);
 }
 
 /**
