@@ -57,7 +57,7 @@ static char * ccl_devquery_format_hex(
 
     GString * str = g_string_new("0x");
     gboolean start = FALSE;
-    gchar val;
+    guchar val;
 
     for (gint i = (gint) info->size - 1; i >= 0 ; i--) {
         val = ((cl_char *) info->value)[i];
@@ -1205,19 +1205,18 @@ const CCLDevQueryMap ccl_devquery_info_map[] = {
  */
 
 /**
- * @internal
- *
  * @brief Return the index of the device information map object of the
  * given parameter name.
  *
- * @private @memberof ccl_devquery_map
+ * @public @memberof ccl_devquery_map
  *
  * @param[in] name A parameter name, in the format stored in the
  * ::ccl_devquery_info_map array.
  * @return Index of the device information map object of the given
  * parameter name, or -1 if device information map is not found.
  * */
-static int ccl_devquery_get_index(const char * name) {
+CCL_EXPORT
+int ccl_devquery_get_index(const char * name) {
 
     /* Make sure name is not NULL. */
     g_return_val_if_fail(name != NULL, -1);
@@ -1254,7 +1253,7 @@ static int ccl_devquery_get_index(const char * name) {
 }
 
 /**
- * Get a final device info prefix in the same format as
+ * @brief Get a final device info prefix in the same format as
  * kept in the ::ccl_devquery_info_map.
  *
  * @public @memberof ccl_devquery_map
@@ -1301,7 +1300,7 @@ gchar * ccl_devquery_get_prefix_final(const char * prefix) {
 }
 
 /**
- * Return a `cl_device_info` object given its name.
+ * @brief Return a `cl_device_info` object given its name.
  *
  * @public @memberof ccl_devquery_map
  *
@@ -1342,7 +1341,7 @@ cl_device_info ccl_devquery_name(const char * name) {
 }
 
 /**
- * Get a pointer to the first device information parameter which
+ * @brief Get a pointer to the first device information parameter which
  * has the given prefix.
  *
  * @public @memberof ccl_devquery_map
@@ -1432,7 +1431,7 @@ const CCLDevQueryMap * ccl_devquery_prefix(
 }
 
 /**
- * Search for a device information parameter by matching part
+ * @brief Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop.
  *
  * @public @memberof ccl_devquery_map

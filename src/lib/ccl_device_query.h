@@ -47,7 +47,7 @@
 /**
  * Output formatting function.
  *
- * @param[in] info CL device information bitfield.
+ * @param[in] info Information wrapper object.
  * @param[out] out Character buffer (pre-allocated) where to write formatted
  * output.
  * @param[in] size Maximum output length.
@@ -103,6 +103,11 @@ extern const int ccl_devquery_info_map_size;
  * units suffix. */
 CCL_EXPORT
 extern const CCLDevQueryMap ccl_devquery_info_map[];
+
+/* Return the index of the device information map object of the
+ * given parameter name. */
+CCL_EXPORT
+int ccl_devquery_get_index(const char * name);
 
 /* Get a final device info prefix in the same format as
  * kept in the ccl_devquery_info_map. */
