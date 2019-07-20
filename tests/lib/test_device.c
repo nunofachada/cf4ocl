@@ -93,6 +93,7 @@ static void sub_devices_test() {
     CCLContext * ctx = NULL;
     CCLDevice * pdev = NULL;
     CCLErr * err = NULL;
+    CCLWrapperInfo * info = NULL;
     cl_device_partition_property * dpp;
     cl_uint i;
     cl_bool supported;
@@ -175,6 +176,20 @@ static void sub_devices_test() {
             g_assert_no_error(err);
             g_assert_cmphex(GPOINTER_TO_SIZE(parent_device), ==,
                 GPOINTER_TO_SIZE(ccl_device_unwrap(pdev)));
+
+            /* Check the partitioning style. */
+            info = ccl_device_get_info(
+                subdevs[i], CL_DEVICE_PARTITION_TYPE, &err);
+            g_assert_no_error(err);
+            g_assert(info->value != NULL);
+            g_assert_cmpuint( /* Array must have at least two items */
+                info->size, >=, 2 * sizeof(cl_device_partition_property));
+            g_assert_cmpuint( /* Check partitioning type */
+                    ((cl_device_partition_property *) info->value)[0],
+                    ==,
+                    CL_DEVICE_PARTITION_EQUALLY);
+            g_assert_cmpuint( /* Check number of CUs in each device */
+                    ((cl_device_partition_property *) info->value)[1], ==, cu);
         }
 
         /* Check that the last position is NULL. */
@@ -236,6 +251,22 @@ static void sub_devices_test() {
                 GPOINTER_TO_SIZE(parent_device),
                 ==,
                 GPOINTER_TO_SIZE(ccl_device_unwrap(pdev)));
+
+            /* Check the partitioning style. */
+            info = ccl_device_get_info(
+                subdevs[i], CL_DEVICE_PARTITION_TYPE, &err);
+            g_assert_no_error(err);
+            g_assert(info->value != NULL);
+            g_assert_cmpuint( /* Array must have at least three items */
+                info->size, >=, 3 * sizeof(cl_device_partition_property));
+            for (cl_uint j = 0;
+                 ctprop[j] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
+                 j++) {
+                g_assert_cmpuint(
+                    ((cl_device_partition_property *) info->value)[j],
+                    ==,
+                    ctprop[j]);
+            }
         }
 
         /* Check that the total number of compute units is as
