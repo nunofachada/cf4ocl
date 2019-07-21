@@ -174,15 +174,15 @@ static GOptionEntry entries[] = {
 
 /* Information queried for basic CLI option. */
 static gchar * basic_info[] = {
-    "type",
-    "vendor",
-    "opencl_c_version",
-    "max_compute_units",
-    "global_mem_size",
-    "max_mem_alloc_size",
-    "local_mem_size",
-    "local_mem_type",
-    "max_work_group_size",
+    "TYPE",
+    "VENDOR",
+    "OPENCL_C_VERSION",
+    "MAX_COMPUTE_UNITS",
+    "GLOBAL_MEM_SIZE",
+    "MAX_MEM_ALLOC_SIZE",
+    "LOCAL_MEM_SIZE",
+    "LOCAL_MEM_TYPE",
+    "MAX_WORK_GROUP_SIZE",
     NULL
 };
 
@@ -388,8 +388,7 @@ void ccl_devinfo_show_device_info_custom(CCLDevice * d) {
         /* Get next row (the first one). */
         info_row = ccl_devquery_match(custom_param_name, &idx);
 
-        /* Keep getting rows until we reach the end of the device
-         * info_map. */
+        /* Keep getting rows until we reach the end of the device info_map. */
         while (info_row != NULL) {
 
             /* Get parameter value for current info_map row. */
@@ -428,7 +427,6 @@ void ccl_devinfo_show_device_info_custom(CCLDevice * d) {
 
         /* Free the proper format custom parameter name. */
         g_free(custom_param_name);
-
     }
 }
 
@@ -438,6 +436,9 @@ void ccl_devinfo_show_device_info_custom(CCLDevice * d) {
  * @param[in] d Device wrapper object.
  * */
 void ccl_devinfo_show_device_info_basic(CCLDevice * d) {
+
+    /* Index of info map row. */
+    int info_row_index;
 
     /* A row of the device info_map. */
     const CCLDevQueryMap * info_row;
@@ -454,12 +455,16 @@ void ccl_devinfo_show_device_info_basic(CCLDevice * d) {
     /* Cycle through the pre-defined basic information array. */
     for (guint i = 0; basic_info[i] != NULL; i++) {
 
-        /* Get next row. */
-        info_row = ccl_devquery_prefix(basic_info[i], NULL);
+        /* Get index of info map row. */
+        info_row_index = ccl_devquery_get_index(basic_info[i]);
 
-        /* Check that its a valid parameter, otherwise we have a
+        /* Check that its a valid index, otherwise we have a
          * programming error, so it is better to abort. */
-        g_assert(info_row != NULL);
+        g_assert_cmpint(info_row_index, >=, 0);
+        g_assert_cmpint(info_row_index, <, ccl_devquery_info_map_size);
+
+        /* Get next row. */
+        info_row = &ccl_devquery_info_map[info_row_index];
 
         /* Get parameter value for current info_map row. */
         param_value = ccl_device_get_info(d, info_row->device_info, &err);

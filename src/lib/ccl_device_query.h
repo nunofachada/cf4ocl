@@ -118,10 +118,6 @@ gchar * ccl_devquery_get_prefix_final(const char * prefix);
 CCL_EXPORT
 cl_device_info ccl_devquery_name(const char * name);
 
-/* Get a list of device information parameters which have the given prefix. */
-CCL_EXPORT
-const CCLDevQueryMap * ccl_devquery_prefix(const char * prefix, int * size);
-
 /* Search for a device information parameter by matching part
  * of its name. This function is supposed to be used in a loop. */
 CCL_EXPORT

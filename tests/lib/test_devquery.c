@@ -79,16 +79,6 @@ static void name_test() {
 /**
  * @internal
  *
- * @brief Test the ccl_devquery_prefix function.
- * */
-static void prefix_test() {
-
-    /* TO DO */
-}
-
-/**
- * @internal
- *
  * @brief Tests if the ccl_devquery_info_map array is well built,
  * namely (i) if the param_name fields are alphabetically ordered, and
  * (ii) if the size of the array corresponds to the
@@ -539,8 +529,6 @@ int main(int argc, char ** argv) {
     g_test_init(&argc, &argv, NULL);
 
     g_test_add_func("/devquery/name", name_test);
-
-    g_test_add_func("/devquery/prefix", prefix_test);
 
     g_test_add_func("/devquery/infomap", infomap_test);
 
