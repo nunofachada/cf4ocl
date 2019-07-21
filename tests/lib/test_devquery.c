@@ -32,9 +32,100 @@
 /**
  * @internal
  *
- * @brief Tests devquery module helper functions.
+ * @brief Test the ccl_devquery_name function.
  * */
-static void helpers_test() {
+static void name_test() {
+
+    /* Device information. */
+    cl_device_info info;
+
+    /* Test exact parameter name. */
+    info = ccl_devquery_name("CL_DEVICE_ENDIAN_LITTLE");
+    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+    info = ccl_devquery_name("CL_DEVICE_EXTENSIONS");
+    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+    info = ccl_devquery_name("CL_DRIVER_VERSION");
+    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+    /* Test mixed parameter name. */
+    info = ccl_devquery_name("cl_Device_Endian_Little");
+    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+    info = ccl_devquery_name("CL_device_Extensions");
+    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+    info = ccl_devquery_name("cl_DRIVer_version");
+    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+    /* Test lowercase parameter name without cl_device_ or cl_ prefix. */
+    info = ccl_devquery_name("endian_little");
+    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+    info = ccl_devquery_name("extensions");
+    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+    info = ccl_devquery_name("driver_version");
+    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+    /* Test parameter name without CL_DEVICE_ or CL_ prefix. */
+    info = ccl_devquery_name("ENDIAN_LITTLE");
+    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
+    info = ccl_devquery_name("EXTENSIONS");
+    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
+    info = ccl_devquery_name("DRIVER_VERSION");
+    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
+
+    /* Test not found parameter name. */
+    info = ccl_devquery_name("MOCK_PARAM_THAT_DOES_NOT_EXIST");
+    g_assert_cmphex(info, ==, 0);
+}
+
+/**
+ * @internal
+ *
+ * @brief Test the ccl_devquery_prefix function.
+ * */
+static void prefix_test() {
+
+    /* TO DO */
+}
+
+/**
+ * @internal
+ *
+ * @brief Tests if the ccl_devquery_info_map array is well built,
+ * namely (i) if the param_name fields are alphabetically ordered, and
+ * (ii) if the size of the array corresponds to the
+ * ccl_devquery_info_map_size variable.
+ * */
+static void infomap_test() {
+
+    /* Determined size of info map. */
+    gint imsize;
+
+    /* Cycle through info map. */
+    for (imsize = 0;
+        ccl_devquery_info_map[imsize].param_name != NULL;
+        imsize++) {
+
+        if ((imsize > 0)
+            &&
+            (ccl_devquery_info_map[imsize].param_name != NULL)) {
+
+            /* Test if parameter names are alphabetically ordered. */
+            g_assert_cmpstr(
+                ccl_devquery_info_map[imsize - 1].param_name,
+                <,
+                ccl_devquery_info_map[imsize].param_name);
+        }
+    }
+
+    /* Test if size corresponds. */
+    g_assert_cmpint(imsize, ==, ccl_devquery_info_map_size);
+}
+
+/**
+ * @internal
+ *
+ * @brief Tests devquery module formatting functions.
+ * */
+static void format_test() {
 
     CCLPlatforms * platfs = NULL;
     CCLPlatform * p = NULL;
@@ -121,92 +212,10 @@ static void helpers_test() {
 /**
  * @internal
  *
- * @brief Test the ccl_devquery_name function.
- * */
-static void name_test() {
-
-    /* Device information. */
-    cl_device_info info;
-
-    /* Test exact parameter name. */
-    info = ccl_devquery_name("CL_DEVICE_ENDIAN_LITTLE");
-    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-    info = ccl_devquery_name("CL_DEVICE_EXTENSIONS");
-    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-    info = ccl_devquery_name("CL_DRIVER_VERSION");
-    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
-
-    /* Test mixed parameter name. */
-    info = ccl_devquery_name("cl_Device_Endian_Little");
-    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-    info = ccl_devquery_name("CL_device_Extensions");
-    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-    info = ccl_devquery_name("cl_DRIVer_version");
-    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
-
-    /* Test lowercase parameter name without cl_device_ or cl_ prefix. */
-    info = ccl_devquery_name("endian_little");
-    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-    info = ccl_devquery_name("extensions");
-    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-    info = ccl_devquery_name("driver_version");
-    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
-
-    /* Test parameter name without CL_DEVICE_ or CL_ prefix. */
-    info = ccl_devquery_name("ENDIAN_LITTLE");
-    g_assert_cmphex(info, ==, CL_DEVICE_ENDIAN_LITTLE);
-    info = ccl_devquery_name("EXTENSIONS");
-    g_assert_cmphex(info, ==, CL_DEVICE_EXTENSIONS);
-    info = ccl_devquery_name("DRIVER_VERSION");
-    g_assert_cmphex(info, ==, CL_DRIVER_VERSION);
-
-    /* Test not found parameter name. */
-    info = ccl_devquery_name("MOCK_PARAM_THAT_DOES_NOT_EXIST");
-    g_assert_cmphex(info, ==, 0);
-
-}
-
-/**
- * @internal
- *
- * @brief Tests if the ccl_devquery_info_map array is well built,
- * namely (i) if the param_name fields are alphabetically ordered, and
- * (ii) if the size of the array corresponds to the
- * ccl_devquery_info_map_size variable.
- * */
-static void infomap_test() {
-
-    /* Determined size of info map. */
-    gint imsize;
-
-    /* Cycle through info map. */
-    for (imsize = 0;
-        ccl_devquery_info_map[imsize].param_name != NULL;
-        imsize++) {
-
-        if ((imsize > 0)
-            &&
-            (ccl_devquery_info_map[imsize].param_name != NULL)) {
-
-            /* Test if parameter names are alphabetically ordered. */
-            g_assert_cmpstr(
-                ccl_devquery_info_map[imsize - 1].param_name,
-                <,
-                ccl_devquery_info_map[imsize].param_name);
-        }
-    }
-
-    /* Test if size corresponds. */
-    g_assert_cmpint(imsize, ==, ccl_devquery_info_map_size);
-}
-
-/**
- * @internal
- *
  * @brief Tests rarely used formatting functions or formatting functions used
  * in a rare way.
  * */
-static void rare_test() {
+static void format_rare_test() {
 
     /* Variables. */
     CCLWrapperInfo info;
@@ -529,13 +538,15 @@ int main(int argc, char ** argv) {
 
     g_test_init(&argc, &argv, NULL);
 
-    g_test_add_func("/devquery/helpers", helpers_test);
-
     g_test_add_func("/devquery/name", name_test);
+
+    g_test_add_func("/devquery/prefix", prefix_test);
 
     g_test_add_func("/devquery/infomap", infomap_test);
 
-    g_test_add_func("/devquery/rare", rare_test);
+    g_test_add_func("/devquery/format", format_test);
+
+    g_test_add_func("/devquery/format_rare", format_rare_test);
 
     return g_test_run();
 }
