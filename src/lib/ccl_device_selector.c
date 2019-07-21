@@ -699,9 +699,9 @@ cl_bool ccl_devsel_indep_type(CCLDevice * dev, void * data, CCLErr ** err) {
     CCLErr * err_internal = NULL;
 
     /* Device type. */
-    cl_device_type type = CL_DEVICE_TYPE_DEFAULT;
+    cl_device_type type = 0;
     /* Device type to check for. */
-    cl_device_type type_to_check = CL_DEVICE_TYPE_DEFAULT;
+    cl_device_type type_to_check = 0;
 
     /* Make sure data is not NULL. */
     g_if_err_create_goto(*err, CCL_ERROR, data == NULL,
