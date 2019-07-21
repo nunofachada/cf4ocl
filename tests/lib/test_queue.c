@@ -138,13 +138,13 @@ static void create_info_destroy_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy context. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -185,14 +185,14 @@ static void ref_unref_test() {
     g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) cq));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_queue_unref(cq);
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -257,7 +257,7 @@ static void barrier_marker_test() {
      * as the specific implementation). */
     ct = ccl_event_get_command_type(evt_barrier, &err);
     g_assert_no_error(err);
-    g_assert((ct == CL_COMMAND_BARRIER) || (ct == CL_COMMAND_MARKER));
+    g_assert_true((ct == CL_COMMAND_BARRIER) || (ct == CL_COMMAND_MARKER));
 
     /* Unmap buffer, get resulting event. */
     evt_unmap = ccl_buffer_enqueue_unmap(buf, cq, host_buf, NULL, &err);
@@ -313,16 +313,16 @@ static void barrier_marker_test() {
                 break;
             }
         }
-        g_assert(evt_in_cq);
+        g_assert_true(evt_in_cq);
     }
 
     /* Clear events in queue and check that they were really destroyed. */
     ccl_queue_gc(cq);
     ccl_queue_iter_event_init(cq);
-    g_assert(ccl_queue_iter_event_next(cq) == NULL);
+    g_assert_true(ccl_queue_iter_event_next(cq) == NULL);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -330,7 +330,7 @@ static void barrier_marker_test() {
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**

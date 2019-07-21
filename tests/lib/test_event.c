@@ -140,7 +140,7 @@ static void create_info_destroy_test() {
     g_assert_cmpuint(*((cl_ulong *) info->value), <=, time_end);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_event_destroy(evt);
@@ -150,7 +150,7 @@ static void create_info_destroy_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -248,7 +248,7 @@ static void name_test() {
     g_assert_cmpstr("UNMAP_MEM_OBJECT", ==, evt_name);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -257,7 +257,7 @@ static void name_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -337,14 +337,14 @@ static void event_wait_lists_test() {
     num_evts = ccl_event_wait_list_get_num_events(ewl_test_aux(&ewl));
     g_assert_cmpuint(num_evts, ==, 1);
     clevent_ptr = ccl_event_wait_list_get_clevents(ewl_test_aux(&ewl));
-    g_assert(*clevent_ptr == ccl_event_unwrap(evt));
+    g_assert_true(*clevent_ptr == ccl_event_unwrap(evt));
 
     /* Wait on last event. */
     ccl_event_wait(&ewl, &err);
     g_assert_no_error(err);
 
     /* Check that ewl is NULL. */
-    g_assert(ewl == NULL);
+    g_assert_true(ewl == NULL);
 
     /* Check if host buffers contain the same information. */
     for (cl_uint i = 0; i < 8; ++i)
@@ -352,16 +352,16 @@ static void event_wait_lists_test() {
 
     /* Re-add completed event to wait list, clear list explicitly. */
     ccl_event_wait_list_add(&ewl, evt, NULL);
-    g_assert(ewl != NULL);
+    g_assert_true(ewl != NULL);
     ccl_event_wait_list_clear(&ewl);
-    g_assert(ewl == NULL);
+    g_assert_true(ewl == NULL);
 
     /* Clear it again, should throw no error. */
     ccl_event_wait_list_clear(&ewl);
-    g_assert(ewl == NULL);
+    g_assert_true(ewl == NULL);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -371,7 +371,7 @@ static void event_wait_lists_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -455,7 +455,7 @@ static void user_event_test() {
     g_assert_cmpint(exec_status, ==, CL_COMPLETE);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_event_destroy(uevt);
@@ -463,7 +463,7 @@ static void user_event_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
 #endif
 
@@ -554,7 +554,7 @@ static void callback_test() {
     g_assert_no_error(err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -563,7 +563,7 @@ static void callback_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
     /* Wait some more... */
     timer = g_timer_new();

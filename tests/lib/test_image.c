@@ -112,7 +112,7 @@ static void create_info_destroy_test() {
         void * host_ptr;
         host_ptr = ccl_memobj_get_info_scalar(
             img, CL_MEM_HOST_PTR, void *, &err);
-        g_assert(
+        g_assert_true(
             (err == NULL) || (err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL));
         g_assert_cmphex(GPOINTER_TO_SIZE(host_ptr), ==,
             GPOINTER_TO_SIZE(NULL));

@@ -122,13 +122,13 @@ CCLContext * ccl_test_context_new(cl_uint min_ocl_ver, CCLErr ** err) {
     }
 
     /* If we got here, everything is OK. */
-    g_assert(err == NULL || *err == NULL);
+    g_assert_true(err == NULL || *err == NULL);
     goto finish;
 
 error_handler:
 
     /* If we got here there was an error, verify that it is so. */
-    g_assert(err == NULL || *err != NULL);
+    g_assert_true(err == NULL || *err != NULL);
 
 set_context_to_null:
 
@@ -192,13 +192,13 @@ CCLContext * ccl_test_context_new_with_image_support(
     }
 
     /* If we got here, everything is OK. */
-    g_assert(err == NULL || *err == NULL);
+    g_assert_true(err == NULL || *err == NULL);
     goto finish;
 
 error_handler:
 
     /* If we got here there was an error, verify that it is so. */
-    g_assert(err == NULL || *err != NULL);
+    g_assert_true(err == NULL || *err != NULL);
 
 finish:
 

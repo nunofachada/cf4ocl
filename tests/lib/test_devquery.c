@@ -196,7 +196,7 @@ static void format_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -261,14 +261,14 @@ static void format_rare_test() {
     info.size = sizeof(part_props);
     info.value = part_props;
     format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
-    g_assert(g_strrstr(out, "EQUALLY") != NULL);
-    g_assert(g_strrstr(out, "BY_COUNTS") != NULL);
-    g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN") != NULL);
-    g_assert(g_strrstr(out, "EQUALLY_EXT") != NULL);
-    g_assert(g_strrstr(out, "BY_COUNTS_EXT") != NULL);
-    g_assert(g_strrstr(out, "BY_NAMES_EXT") != NULL);
-    g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
-    g_assert(g_strrstr(out, "UNKNOWN") != NULL);
+    g_assert_true(g_strrstr(out, "EQUALLY") != NULL);
+    g_assert_true(g_strrstr(out, "BY_COUNTS") != NULL);
+    g_assert_true(g_strrstr(out, "BY_AFFINITY_DOMAIN") != NULL);
+    g_assert_true(g_strrstr(out, "EQUALLY_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "BY_COUNTS_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "BY_NAMES_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "UNKNOWN") != NULL);
 
     /* 4. Test format of device partition properties in their optional
      * extension form. */
@@ -289,11 +289,11 @@ static void format_rare_test() {
     info.size = sizeof(part_props_ext);
     info.value = part_props_ext;
     format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
-    g_assert(g_strrstr(out, "EQUALLY_EXT") != NULL);
-    g_assert(g_strrstr(out, "BY_COUNTS_EXT") != NULL);
-    g_assert(g_strrstr(out, "BY_NAMES_EXT") != NULL);
-    g_assert(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
-    g_assert(g_strrstr(out, "UNKNOWN") != NULL);
+    g_assert_true(g_strrstr(out, "EQUALLY_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "BY_COUNTS_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "BY_NAMES_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "BY_AFFINITY_DOMAIN_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "UNKNOWN") != NULL);
 
     /* 5. Test format of available affinity domains for partitioning device by
      * affinity. */
@@ -310,8 +310,8 @@ static void format_rare_test() {
     info.size = sizeof(cl_device_affinity_domain);
     info.value = &ad;
     format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
-    g_assert(g_strrstr(out, "NUMA") != NULL);
-    g_assert(g_strrstr(out, "L1_CACHE") != NULL);
+    g_assert_true(g_strrstr(out, "NUMA") != NULL);
+    g_assert_true(g_strrstr(out, "L1_CACHE") != NULL);
     g_assert_null(g_strrstr(out, "L2_CACHE"));
     g_assert_null(g_strrstr(out, "L3_CACHE"));
     g_assert_null(g_strrstr(out, "L4_CACHE"));
@@ -336,12 +336,12 @@ static void format_rare_test() {
     info.size = sizeof(appe);
     info.value = appe;
     format_func(&info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
-    g_assert(g_strrstr(out, "NUMA_EXT") != NULL);
-    g_assert(g_strrstr(out, "L1_CACHE_EXT") != NULL);
-    g_assert(g_strrstr(out, "L2_CACHE_EXT") != NULL);
-    g_assert(g_strrstr(out, "L3_CACHE_EXT") != NULL);
-    g_assert(g_strrstr(out, "L4_CACHE_EXT") != NULL);
-    g_assert(g_strrstr(out, "UNKNOWN") != NULL);
+    g_assert_true(g_strrstr(out, "NUMA_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "L1_CACHE_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "L2_CACHE_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "L3_CACHE_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "L4_CACHE_EXT") != NULL);
+    g_assert_true(g_strrstr(out, "UNKNOWN") != NULL);
 
     /* 7. Test format of partition properties of a sub-device when it is
      * partitioned by affinity or with incorrect parameters. */

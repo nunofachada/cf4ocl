@@ -128,7 +128,7 @@ static void create_add_destroy_test() {
     g_debug("Profiling eff. duration: %d", (cl_int) eff_duration);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy buffers. */
     ccl_buffer_destroy(buf1);
@@ -149,7 +149,7 @@ static void create_add_destroy_test() {
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -261,22 +261,22 @@ static void features_test() {
     const CCLProfAgg * agg;
 
     agg = ccl_prof_get_agg(prof, "Event1");
-    g_assert(agg != NULL);
+    g_assert_true(agg != NULL);
     g_assert_cmpuint(agg->absolute_time, >=, 0);
     g_assert_cmpfloat(agg->relative_time, >=, 0);
 
     agg = ccl_prof_get_agg(prof, "Event2");
-    g_assert(agg != NULL);
+    g_assert_true(agg != NULL);
     g_assert_cmpuint(agg->absolute_time, >=, 0);
     g_assert_cmpfloat(agg->relative_time, >=, 0);
 
     agg = ccl_prof_get_agg(prof, "Event3");
-    g_assert(agg != NULL);
+    g_assert_true(agg != NULL);
     g_assert_cmpuint(agg->absolute_time, >=, 0);
     g_assert_cmpfloat(agg->relative_time, >=, 0);
 
     agg = ccl_prof_get_agg(prof, "Event4");
-    g_assert(agg != NULL);
+    g_assert_true(agg != NULL);
     g_assert_cmpuint(agg->absolute_time, >=, 0);
     g_assert_cmpfloat(agg->relative_time, >=, 0);
 
@@ -337,10 +337,10 @@ static void features_test() {
     while ((o = ccl_prof_iter_overlap_next(prof)) != NULL) {
 
         /* Check for impossible overlaps. */
-        g_assert(!ccl_test_prof_is_overlap("Event1", "Event3"));
-        g_assert(!ccl_test_prof_is_overlap("Event1", "Event4"));
-        g_assert(!ccl_test_prof_is_overlap("Event2", "Event3"));
-        g_assert(!ccl_test_prof_is_overlap("Event2", "Event4"));
+        g_assert_true(!ccl_test_prof_is_overlap("Event1", "Event3"));
+        g_assert_true(!ccl_test_prof_is_overlap("Event1", "Event4"));
+        g_assert_true(!ccl_test_prof_is_overlap("Event2", "Event3"));
+        g_assert_true(!ccl_test_prof_is_overlap("Event2", "Event4"));
 
         /* Check for possible overlaps. */
         if (ccl_test_prof_is_overlap("Event1", "Event2")) {
@@ -374,17 +374,17 @@ static void features_test() {
     cl_bool export_status = ccl_prof_export_info_file(
         prof, tmp_file_name, &err);
     g_assert_no_error(err);
-    g_assert(export_status);
+    g_assert_true(export_status);
 
     /* Test if output file was correctly written. */
     gchar * file_contents;
     gboolean read_flag = g_file_get_contents(
         tmp_file_name, &file_contents, NULL, NULL);
-    g_assert(read_flag);
-    g_assert(g_strrstr(file_contents, "Event1"));
-    g_assert(g_strrstr(file_contents, "Event2"));
-    g_assert(g_strrstr(file_contents, "Event3"));
-    g_assert(g_strrstr(file_contents, "Event4"));
+    g_assert_true(read_flag);
+    g_assert_true(g_strrstr(file_contents, "Event1"));
+    g_assert_true(g_strrstr(file_contents, "Event2"));
+    g_assert_true(g_strrstr(file_contents, "Event3"));
+    g_assert_true(g_strrstr(file_contents, "Event4"));
     g_free(file_contents);
     g_free(tmp_dir_name);
     g_free(tmp_file_name);
@@ -412,13 +412,13 @@ static void features_test() {
     ccl_queue_destroy(q1);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Free context. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**

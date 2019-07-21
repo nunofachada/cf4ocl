@@ -163,7 +163,7 @@ static void create_info_destroy_test() {
      * was created. */
     info = ccl_context_get_info(ctx, CL_CONTEXT_DEVICES, &err);
     g_assert_no_error(err);
-    g_assert(((cl_device_id *) info->value)[0] == d_id);
+    g_assert_true(((cl_device_id *) info->value)[0] == d_id);
 
     /* Check again that the number of devices is 1, this time not using
      * CL_CONTEXT_NUM_DEVICES, which is not available in OpenCL 1.0. */
@@ -197,7 +197,7 @@ static void create_info_destroy_test() {
     d_ids = ccl_context_get_info_array(
         ctx, CL_CONTEXT_DEVICES, cl_device_id, &err);
     g_assert_no_error(err);
-    g_assert(d_ids[0] == d_id);
+    g_assert_true(d_ids[0] == d_id);
 
     /* Free context. */
     ccl_context_destroy(ctx);
@@ -216,14 +216,14 @@ static void create_info_destroy_test() {
      * unwrapped cl_context corresponds to the cl_context with which
      * the context wrapper was created.*/
     ctx = ccl_context_new_wrap(context);
-    g_assert(ccl_context_unwrap(ctx) == context);
+    g_assert_true(ccl_context_unwrap(ctx) == context);
 
     /* Get the first device wrapper from the context wrapper, check that
      * the unwrapped cl_device_id corresponds to the cl_device_id with
      * which the cl_context was created. */
     d = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
-    g_assert(ccl_device_unwrap(d) == d_id);
+    g_assert_true(ccl_device_unwrap(d) == d_id);
 
     /* Check that the context number of devices taken using context
      * info is 1. */
@@ -256,7 +256,7 @@ static void create_info_destroy_test() {
 
     /* Check that either there was no error or that no GPU was found. */
     ctx = ccl_context_new_gpu(&err);
-    g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
+    g_assert_true((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
     any_device |= (ctx != NULL);
 
     /* Free context if no error and set filters to NULL. */
@@ -271,7 +271,7 @@ static void create_info_destroy_test() {
 
     /* Check that either there was no error or that no CPU was found. */
     ctx = ccl_context_new_cpu(&err);
-    g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
+    g_assert_true((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
     any_device |= (ctx != NULL);
 
     /* Free context if no error and set filters to NULL. */
@@ -287,7 +287,7 @@ static void create_info_destroy_test() {
     /* Check that either there was no error or that no accelerator was
      * found. */
     ctx = ccl_context_new_accel(&err);
-    g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
+    g_assert_true((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
     any_device |= (ctx != NULL);
 
     /* Free context if no error and set filters to NULL. */
@@ -299,7 +299,7 @@ static void create_info_destroy_test() {
     }
 
     /* Check that at least one device type context was created. */
-    g_assert(any_device);
+    g_assert_true(any_device);
 
     /* 3.4. Specific platform filter. */
 
@@ -317,7 +317,7 @@ static void create_info_destroy_test() {
     platf_ref = ccl_device_get_info_scalar(
         d, CL_DEVICE_PLATFORM, cl_platform_id, &err);
     g_assert_no_error(err);
-    g_assert(platf_ref == platform);
+    g_assert_true(platf_ref == platform);
 
     /* Free context and set filters to NULL. */
     ccl_context_destroy(ctx);
@@ -360,7 +360,7 @@ static void create_info_destroy_test() {
             d, CL_DEVICE_PLATFORM, cl_platform_id, &err);
         g_assert_no_error(err);
 
-        g_assert(platf_ref == platform);
+        g_assert_true(platf_ref == platform);
     }
 
     /* Free context and set filters to NULL. */
@@ -400,7 +400,7 @@ static void create_info_destroy_test() {
             cl_platform_id, &err);
         g_assert_no_error(err);
 
-        g_assert(platf_ref == platform);
+        g_assert_true(platf_ref == platform);
     }
 
     /* Free context and set filters to NULL. */
@@ -461,7 +461,7 @@ static void create_info_destroy_test() {
     g_free(ctx_props);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -506,7 +506,7 @@ static void ref_unref_test() {
 
         /* Get current platform. */
         p = ccl_platforms_get(ps, i);
-        g_assert(p != NULL);
+        g_assert_true(p != NULL);
 
         /* Cycle through devices available in platform. */
         num_devs = ccl_platform_get_num_devices(p, &err);
@@ -688,7 +688,7 @@ static void ref_unref_test() {
 
     /* Create context from filter. */
     ctx = ccl_context_new_from_filters(&filters, &err);
-    g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
+    g_assert_true((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 
     /* If an error occurred and where here its because a GPU wasn't
      * found. */
@@ -723,7 +723,7 @@ static void ref_unref_test() {
 
     /* Create context from filter. */
     ctx = ccl_context_new_from_filters(&filters, &err);
-    g_assert((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
+    g_assert_true((err == NULL) || (err->code == CCL_ERROR_DEVICE_NOT_FOUND));
 
     /* If an error occurred and where here its because a CPU wasn't found. */
     if (err != NULL) {
@@ -790,13 +790,13 @@ static void ref_unref_test() {
     g_assert_cmpuint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 1);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Unref device. */
     ccl_device_unref(d);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -839,7 +839,7 @@ static void get_supported_image_formats_test() {
         }
 
         /* Confirm that memory allocated by wrappers has not yet been freed. */
-        g_assert(!ccl_wrapper_memcheck());
+        g_assert_true(!ccl_wrapper_memcheck());
 
         /* Destroy context. */
         ccl_context_destroy(c);
@@ -847,7 +847,7 @@ static void get_supported_image_formats_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -882,14 +882,14 @@ static void device_container_test() {
     g_assert_no_error(err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy context. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**

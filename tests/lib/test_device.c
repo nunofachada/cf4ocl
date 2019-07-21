@@ -66,13 +66,13 @@ static void info_test() {
     g_assert_cmpuint(array[2], >=, 1);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
 }
 
@@ -184,7 +184,7 @@ static void sub_devices_test() {
             info = ccl_device_get_info(
                 subdevs[i], CL_DEVICE_PARTITION_TYPE, &err);
             g_assert_no_error(err);
-            g_assert(info->value != NULL);
+            g_assert_true(info->value != NULL);
             g_assert_cmpuint( /* Array must have at least two items */
                 info->size, >=, 2 * sizeof(cl_device_partition_property));
             g_assert_cmpuint( /* Check partitioning type */
@@ -201,9 +201,9 @@ static void sub_devices_test() {
                 ccl_devquery_info_map[
                     ccl_devquery_get_index("PARTITION_TYPE")].format;
             format_func(info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
-            g_assert(g_strrstr(out, "EQUALLY") != NULL);
+            g_assert_true(g_strrstr(out, "EQUALLY") != NULL);
             g_snprintf(aux, aux_len, "%d", cu);
-            g_assert(g_strrstr(out, aux) != NULL); /* Check number of CUs */
+            g_assert_true(g_strrstr(out, aux) != NULL); /* Check number of CUs */
         }
 
         /* Check that the last position is NULL. */
@@ -270,7 +270,7 @@ static void sub_devices_test() {
             info = ccl_device_get_info(
                 subdevs[i], CL_DEVICE_PARTITION_TYPE, &err);
             g_assert_no_error(err);
-            g_assert(info->value != NULL);
+            g_assert_true(info->value != NULL);
             g_assert_cmpuint( /* Array must have at least three items */
                 info->size, >=, 3 * sizeof(cl_device_partition_property));
             for (cl_uint j = 0;
@@ -289,14 +289,14 @@ static void sub_devices_test() {
                 ccl_devquery_info_map[
                     ccl_devquery_get_index("PARTITION_TYPE")].format;
             format_func(info, out, CCL_TEST_DEVQUERY_MAXINFOLEN, "");
-            g_assert(g_strrstr(out, "BY_COUNTS") != NULL);
+            g_assert_true(g_strrstr(out, "BY_COUNTS") != NULL);
             for (guint j = 1;
                  ctprop[j] != CL_DEVICE_PARTITION_BY_COUNTS_LIST_END;
                  j++) {
                 /* Check if sub-device with the specified number of CUs appears
                  * in the string returned by the query. */
                 g_snprintf(aux, aux_len, " %ld", ctprop[j]);
-                g_assert(g_strrstr(out, aux) != NULL);
+                g_assert_true(g_strrstr(out, aux) != NULL);
             }
         }
 
@@ -315,13 +315,13 @@ static void sub_devices_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
 #endif
 

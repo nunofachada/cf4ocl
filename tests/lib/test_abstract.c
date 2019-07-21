@@ -62,7 +62,7 @@ static void device_container_errors_test() {
         &mock_devcon, mock_get_devices, 0, &err);
 
     /* Check that dev is NULL */
-    g_assert(dev == NULL);
+    g_assert_true(dev == NULL);
 
     /* Check the error domain and code, and clear the error. */
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
@@ -73,14 +73,14 @@ static void device_container_errors_test() {
         &mock_devcon, mock_get_devices, &err);
 
     /* Check that dev is NULL */
-    g_assert(dev_lst == NULL);
+    g_assert_true(dev_lst == NULL);
 
     /* Check the error domain and code, and clear the error. */
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
     ccl_err_clear(&err);
 
     /* Confirm that no memory was allocated for wrappers. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -118,7 +118,7 @@ static void errors_test() {
     ccl_err_clear(&err);
 
     /* Confirm that no memory was allocated for wrappers. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -142,7 +142,7 @@ static void info_zero_size_test() {
     ccl_wrapper_info_destroy(info);
 
     /* Confirm that no memory was allocated for wrappers. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**

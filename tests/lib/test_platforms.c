@@ -63,7 +63,7 @@ static void ccl_test_platforms_check_error(CCLErr ** err) {
         g_debug("%s (Value=%d,Domain='%s')",
             (*err)->message, (*err)->code, g_quark_to_string((*err)->domain));
     }
-    g_assert(status);
+    g_assert_true(status);
 }
 
 /**
@@ -168,7 +168,7 @@ static void create_info_destroy_test() {
         /* Make an invalid info request. */
         platf_info = ccl_platform_get_info_string(
             p, 0x0 /* Invalid */, &err);
-        g_assert(err != NULL);
+        g_assert_true(err != NULL);
         ccl_err_clear(&err);
 
         /* Get platform vendor. */
@@ -638,20 +638,20 @@ static void create_info_destroy_test() {
             g_assert_no_error(err);
             d = ccl_platform_get_device(p, j, &err);
             g_assert_no_error(err);
-            g_assert(d == ds[j]);
+            g_assert_true(d == ds[j]);
         }
         g_assert_no_error(err);
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy list of platforms. */
     ccl_platforms_destroy(platfs);
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
@@ -695,7 +695,7 @@ static void ref_unref_test() {
     g_assert_cmpint(ccl_wrapper_ref_count((CCLWrapper *) d), ==, 2);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     ccl_platform_destroy(p);
 
@@ -704,7 +704,7 @@ static void ref_unref_test() {
     ccl_device_destroy(d);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**

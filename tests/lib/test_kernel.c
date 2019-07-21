@@ -135,12 +135,12 @@ static void create_info_destroy_test() {
         context = ccl_kernel_get_info_scalar(
             krnl, CL_KERNEL_CONTEXT, cl_context, &err);
         g_assert_no_error(err);
-        g_assert(context == ccl_context_unwrap(ctx));
+        g_assert_true(context == ccl_context_unwrap(ctx));
 
         program = ccl_kernel_get_info_scalar(
             krnl, CL_KERNEL_PROGRAM, cl_program, &err);
         g_assert_no_error(err);
-        g_assert(program == ccl_program_unwrap(prg));
+        g_assert_true(program == ccl_program_unwrap(prg));
 
         /* Get OpenCL version of kernel's underlying platform. */
         ocl_ver = ccl_kernel_get_opencl_version(krnl, &err);
@@ -191,7 +191,7 @@ static void create_info_destroy_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
@@ -202,7 +202,7 @@ static void create_info_destroy_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
 }
 
@@ -266,7 +266,7 @@ static void info_workgroup_test() {
     CCL_UNUSED(kcwgs);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
@@ -276,7 +276,7 @@ static void info_workgroup_test() {
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
 #endif
 
@@ -331,7 +331,7 @@ static void info_args_test() {
     kaaq = ccl_kernel_get_arg_info_scalar(
         krnl, 0, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
         cl_kernel_arg_address_qualifier, &err);
-    g_assert((err == NULL)
+    g_assert_true((err == NULL)
         || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
             && (err->domain == CCL_ERROR))
         || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -344,7 +344,7 @@ static void info_args_test() {
 
     kernel_arg_type_name = ccl_kernel_get_arg_info_array(
         krnl, 0, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-    g_assert((err == NULL)
+    g_assert_true((err == NULL)
         || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
             && (err->domain == CCL_ERROR))
         || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -357,7 +357,7 @@ static void info_args_test() {
 
     kernel_arg_name = ccl_kernel_get_arg_info_array(
         krnl, 0, CL_KERNEL_ARG_NAME, char, &err);
-    g_assert((err == NULL)
+    g_assert_true((err == NULL)
         || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
             && (err->domain == CCL_ERROR))
         || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -369,7 +369,7 @@ static void info_args_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
@@ -380,7 +380,7 @@ static void info_args_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 
 #endif
 
@@ -450,14 +450,14 @@ static void ref_unref_test() {
         GPOINTER_TO_SIZE(krnl1), ==, GPOINTER_TO_SIZE(krnl2));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy remaining stuff. */
     ccl_program_destroy(prg);
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 #define WS_INIT(ws, a, b, c) \
@@ -735,13 +735,13 @@ static void suggest_worksizes_test() {
     ccl_program_destroy(prg);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 
@@ -881,7 +881,7 @@ static void args_test() {
         kaaq = ccl_kernel_get_arg_info_scalar(krnl, 0,
                 CL_KERNEL_ARG_ADDRESS_QUALIFIER,
                 cl_kernel_arg_address_qualifier, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -894,7 +894,7 @@ static void args_test() {
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
             krnl, 0, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -907,7 +907,7 @@ static void args_test() {
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
             krnl, 0, CL_KERNEL_ARG_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -922,7 +922,7 @@ static void args_test() {
         kaaq = ccl_kernel_get_arg_info_scalar(krnl, 1,
                 CL_KERNEL_ARG_ADDRESS_QUALIFIER,
                 cl_kernel_arg_address_qualifier, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -935,7 +935,7 @@ static void args_test() {
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
             krnl, 1, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -948,7 +948,7 @@ static void args_test() {
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
             krnl, 1, CL_KERNEL_ARG_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -963,7 +963,7 @@ static void args_test() {
         kaaq = ccl_kernel_get_arg_info_scalar(
             krnl, 2, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
             cl_kernel_arg_address_qualifier, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -976,7 +976,7 @@ static void args_test() {
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
             krnl, 2, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -989,7 +989,7 @@ static void args_test() {
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
             krnl, 2, CL_KERNEL_ARG_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1004,7 +1004,7 @@ static void args_test() {
         kaaq = ccl_kernel_get_arg_info_scalar(
             krnl, 3, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
             cl_kernel_arg_address_qualifier, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1017,7 +1017,7 @@ static void args_test() {
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
             krnl, 3, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1030,7 +1030,7 @@ static void args_test() {
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
             krnl, 3, CL_KERNEL_ARG_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1045,7 +1045,7 @@ static void args_test() {
         kaaq = ccl_kernel_get_arg_info_scalar(
             krnl, 4, CL_KERNEL_ARG_ADDRESS_QUALIFIER,
             cl_kernel_arg_address_qualifier, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1058,7 +1058,7 @@ static void args_test() {
 
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
             krnl, 4, CL_KERNEL_ARG_TYPE_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1071,7 +1071,7 @@ static void args_test() {
 
         kernel_arg_name = ccl_kernel_get_arg_info_array(
             krnl, 4, CL_KERNEL_ARG_NAME, char, &err);
-        g_assert((err == NULL)
+        g_assert_true((err == NULL)
             || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)
                 && (err->domain == CCL_ERROR))
             || ((err->code == CL_KERNEL_ARG_INFO_NOT_AVAILABLE)
@@ -1085,7 +1085,7 @@ static void args_test() {
         /* Bogus request, should return NULL and should raise an error. */
         kernel_arg_type_name = ccl_kernel_get_arg_info_array(
             krnl, 0, 0 /* invalid value */, char, &err);
-        g_assert(kernel_arg_type_name == NULL);
+        g_assert_true(kernel_arg_type_name == NULL);
         g_assert (err != NULL);
         ccl_err_clear(&err);
     }
@@ -1141,20 +1141,20 @@ static void args_test() {
     CCLArg * arg_test = NULL;
 
     arg_test = ccl_arg_new(&pi, sizeof(cl_float));
-    g_assert(arg_test != NULL);
+    g_assert_true(arg_test != NULL);
     g_assert_cmpuint(ccl_arg_size(arg_test), ==, sizeof(cl_float));
     g_assert_cmpfloat(pi, ==, *((cl_float *) ccl_arg_value(arg_test)));
     ccl_arg_destroy(arg_test);
 
     arg_test = NULL;
     arg_test = ccl_arg_full(&c, sizeof(cl_char));
-    g_assert(arg_test != NULL);
+    g_assert_true(arg_test != NULL);
     g_assert_cmpuint(ccl_arg_size(arg_test), ==, sizeof(cl_char));
     g_assert_cmpfloat(c, ==, *((cl_char *) ccl_arg_value(arg_test)));
     ccl_arg_destroy(arg_test);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /* ******************************************** */
@@ -1265,7 +1265,7 @@ static void native_test() {
         g_assert_cmpint(hbuf[i] + 1, ==, hbuf_out[i]);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert(!ccl_wrapper_memcheck());
+    g_assert_true(!ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);
@@ -1276,7 +1276,7 @@ skip:
     ccl_context_destroy(ctx);
 
     /* Confirm that memory allocated by wrappers has been properly freed. */
-    g_assert(ccl_wrapper_memcheck());
+    g_assert_true(ccl_wrapper_memcheck());
 }
 
 /**
