@@ -557,7 +557,7 @@ static void create_info_destroy_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy the memory objects. */
     ccl_buffer_destroy(a_w);
@@ -639,7 +639,7 @@ static void ref_unref_test() {
     ccl_program_unref(prg);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy remaining stuff. */
     ccl_program_destroy(prg);
@@ -753,7 +753,7 @@ static void compile_link_test() {
         g_assert_cmpint(hbuf_out[i], ==, hbuf_in[i] + i);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free stuff. */
     ccl_buffer_destroy(buf);

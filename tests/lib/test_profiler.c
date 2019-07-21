@@ -128,7 +128,7 @@ static void create_add_destroy_test() {
     g_debug("Profiling eff. duration: %d", (cl_int) eff_duration);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy buffers. */
     ccl_buffer_destroy(buf1);
@@ -337,10 +337,10 @@ static void features_test() {
     while ((o = ccl_prof_iter_overlap_next(prof)) != NULL) {
 
         /* Check for impossible overlaps. */
-        g_assert_true(!ccl_test_prof_is_overlap("Event1", "Event3"));
-        g_assert_true(!ccl_test_prof_is_overlap("Event1", "Event4"));
-        g_assert_true(!ccl_test_prof_is_overlap("Event2", "Event3"));
-        g_assert_true(!ccl_test_prof_is_overlap("Event2", "Event4"));
+        g_assert_false(ccl_test_prof_is_overlap("Event1", "Event3"));
+        g_assert_false(ccl_test_prof_is_overlap("Event1", "Event4"));
+        g_assert_false(ccl_test_prof_is_overlap("Event2", "Event3"));
+        g_assert_false(ccl_test_prof_is_overlap("Event2", "Event4"));
 
         /* Check for possible overlaps. */
         if (ccl_test_prof_is_overlap("Event1", "Event2")) {
@@ -412,7 +412,7 @@ static void features_test() {
     ccl_queue_destroy(q1);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free context. */
     ccl_context_destroy(ctx);

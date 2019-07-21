@@ -191,7 +191,7 @@ static void create_info_destroy_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
@@ -266,7 +266,7 @@ static void info_workgroup_test() {
     CCL_UNUSED(kcwgs);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
@@ -369,7 +369,7 @@ static void info_args_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy the command queue. */
     ccl_queue_destroy(cq);
@@ -450,7 +450,7 @@ static void ref_unref_test() {
         GPOINTER_TO_SIZE(krnl1), ==, GPOINTER_TO_SIZE(krnl2));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy remaining stuff. */
     ccl_program_destroy(prg);
@@ -735,7 +735,7 @@ static void suggest_worksizes_test() {
     ccl_program_destroy(prg);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_context_destroy(ctx);
@@ -1265,7 +1265,7 @@ static void native_test() {
         g_assert_cmpint(hbuf[i] + 1, ==, hbuf_out[i]);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);

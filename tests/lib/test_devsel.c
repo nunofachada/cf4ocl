@@ -57,7 +57,7 @@ static void dependent_filters_test() {
     g_assert_cmphex(GPOINTER_TO_SIZE(devs), !=, GPOINTER_TO_SIZE(NULL));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* TO DO: Test dependent filters. */
 

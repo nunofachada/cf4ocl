@@ -96,7 +96,7 @@ static void create_info_destroy_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy context. */
     ccl_context_destroy(ctx);
@@ -148,7 +148,7 @@ static void ref_unref_test() {
     g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_buffer_unref(b);
@@ -207,7 +207,7 @@ static void wrap_unwrap_test() {
     g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) b));
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_buffer_destroy(b);
@@ -307,7 +307,7 @@ static void read_write_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     ccl_event_destroy(evt);
 
@@ -386,7 +386,7 @@ static void copy_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free stuff. */
     ccl_buffer_destroy(b1);
@@ -475,7 +475,7 @@ static void map_unmap_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free stuff. */
     ccl_event_destroy(ue);
@@ -547,7 +547,7 @@ static void destructor_callback_test() {
     g_assert_no_error(err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy buffer. */
     ccl_buffer_destroy(b);
@@ -686,7 +686,7 @@ static void rect_read_write_copy_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free stuff. */
     ccl_event_destroy(ue);
@@ -799,7 +799,7 @@ static void create_from_region_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_buffer_destroy(buf);
@@ -888,7 +888,7 @@ static void fill_test() {
     ccl_err_clear(&err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free stuff. */
     ccl_event_destroy(ue);
@@ -959,7 +959,7 @@ static void migrate_test() {
     g_assert_no_error(err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Free stuff. */
     ccl_buffer_destroy(b);

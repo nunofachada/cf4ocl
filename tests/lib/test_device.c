@@ -66,7 +66,7 @@ static void info_test() {
     g_assert_cmpuint(array[2], >=, 1);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_context_destroy(ctx);
@@ -315,7 +315,7 @@ static void sub_devices_test() {
     }
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_context_destroy(ctx);

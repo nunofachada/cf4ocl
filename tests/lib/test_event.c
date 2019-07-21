@@ -140,7 +140,7 @@ static void create_info_destroy_test() {
     g_assert_cmpuint(*((cl_ulong *) info->value), <=, time_end);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_event_destroy(evt);
@@ -248,7 +248,7 @@ static void name_test() {
     g_assert_cmpstr("UNMAP_MEM_OBJECT", ==, evt_name);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -361,7 +361,7 @@ static void event_wait_lists_test() {
     g_assert_true(ewl == NULL);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
@@ -455,7 +455,7 @@ static void user_event_test() {
     g_assert_cmpint(exec_status, ==, CL_COMPLETE);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Destroy stuff. */
     ccl_event_destroy(uevt);
@@ -554,7 +554,7 @@ static void callback_test() {
     g_assert_no_error(err);
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
-    g_assert_true(!ccl_wrapper_memcheck());
+    g_assert_false(ccl_wrapper_memcheck());
 
     /* Release wrappers. */
     ccl_buffer_destroy(buf);
