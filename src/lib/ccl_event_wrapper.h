@@ -28,7 +28,6 @@
 #ifndef _CCL_EVENT_WRAPPER_H_
 #define _CCL_EVENT_WRAPPER_H_
 
-#include <glib.h>
 #include "ccl_oclversions.h"
 #include "ccl_abstract_wrapper.h"
 #include "ccl_context_wrapper.h"

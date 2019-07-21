@@ -29,7 +29,6 @@
 #ifndef _CCL_DEVICE_SELECTOR_H_
 #define _CCL_DEVICE_SELECTOR_H_
 
-#include <glib.h>
 #include "ccl_oclversions.h"
 #include "ccl_device_wrapper.h"
 #include "ccl_platforms.h"

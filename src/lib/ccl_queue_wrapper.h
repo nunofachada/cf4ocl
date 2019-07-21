@@ -28,7 +28,6 @@
 #ifndef _CCL_QUEUE_WRAPPER_H_
 #define _CCL_QUEUE_WRAPPER_H_
 
-#include <glib.h>
 #include "ccl_oclversions.h"
 #include "ccl_abstract_wrapper.h"
 #include "ccl_device_wrapper.h"
