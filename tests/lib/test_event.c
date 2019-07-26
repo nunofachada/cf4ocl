@@ -406,6 +406,9 @@ static void user_event_test() {
     uevt = ccl_user_event_new(ctx, &err);
     g_assert_no_error(err);
 
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(uevt), ==, "USER");
+
     /* Check that event ref count is 1. */
     g_assert_cmpuint(1, ==, ccl_wrapper_ref_count((CCLWrapper *) uevt));
 

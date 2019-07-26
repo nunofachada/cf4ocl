@@ -1191,6 +1191,7 @@ static void native_test() {
     CCLDevice * dev = NULL;
     CCLBuffer * buf = NULL;
     CCLQueue * cq = NULL;
+    CCLEvent * evt = NULL;
     CCLErr * err = NULL;
     cl_int hbuf[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
     cl_int hbuf_out[CCL_TEST_KERNEL_NATIVE_BUF_SIZE];
@@ -1245,11 +1246,14 @@ static void native_test() {
     args_mem_loc = (const void *) &args.buf;
 
     /* Test the ccl_kernel_enqueue_native() function. */
-    ccl_kernel_enqueue_native(
+    evt = ccl_kernel_enqueue_native(
         cq, native_kernel, &args,
         sizeof(struct nk_args), 1, (CCLMemObj * const *) &buf,
         &args_mem_loc, NULL, &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(evt), ==, "NATIVE_KERNEL");
 
     /* Read device buffer, modified by native kernel. */
     ccl_buffer_enqueue_read(

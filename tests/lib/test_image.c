@@ -308,6 +308,7 @@ static void copy_test() {
     CCLImage * img1 = NULL;
     CCLImage * img2 = NULL;
     CCLQueue * q;
+    CCLEvent * e;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     gint32 himg_in[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
@@ -363,9 +364,12 @@ static void copy_test() {
 
     /* Copy data from first image to second image, using an offset on
      * the second image. */
-    ccl_image_enqueue_copy(
+    e = ccl_image_enqueue_copy(
         img1, img2, q, src_origin, dst_origin, region, NULL, &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "COPY_IMAGE");
 
     /* Read image data back to host. */
     ccl_image_enqueue_read(
@@ -448,6 +452,9 @@ static void map_unmap_test() {
         img, q, CL_FALSE, CL_MAP_READ, origin, region,
         &image_row_pitch, NULL, NULL, &evt, &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(evt), ==, "MAP_IMAGE");
 
     /* Wait before mapping is complete. */
     ccl_event_wait(ccl_ewl(&ewl, evt, NULL), &err);
@@ -549,14 +556,20 @@ static void copy_buffer_test() {
     g_assert_no_error(err);
 
     /* Copy image to buffer. */
-    ccl_image_enqueue_copy_to_buffer(
+    evt = ccl_image_enqueue_copy_to_buffer(
         img1, buf, cq, origin, region, 0, NULL, &err);
     g_assert_no_error(err);
 
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(evt), ==, "COPY_IMAGE_TO_BUFFER");
+
     /* Copy buffer to new image. */
-    ccl_buffer_enqueue_copy_to_image(
+    evt = ccl_buffer_enqueue_copy_to_image(
         buf, img2, cq, 0, origin, region, NULL, &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(evt), ==, "COPY_BUFFER_TO_IMAGE");
 
     /* Read image to host. */
     evt = ccl_image_enqueue_read(
@@ -611,7 +624,8 @@ static void fill_test() {
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLImage * img = NULL;
-    CCLQueue * q;
+    CCLQueue * q = NULL;
+    CCLEvent * e = NULL;
     cl_image_format image_format = { CL_RGBA, CL_UNSIGNED_INT8 };
     gint32 himg_out[CCL_TEST_IMAGE_WIDTH * CCL_TEST_IMAGE_HEIGHT];
     const size_t origin[3] = {0, 0, 0};
@@ -650,9 +664,12 @@ static void fill_test() {
     g_assert_no_error(err);
 
     /* Fill image with color. */
-    ccl_image_enqueue_fill(
+    e = ccl_image_enqueue_fill(
         img, q, &color, origin, region, NULL, &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "FILL_IMAGE");
 
     /* Read image data back to host. */
     ccl_image_enqueue_read(

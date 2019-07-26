@@ -834,7 +834,7 @@ static void fill_test() {
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
     CCLQueue * q = NULL;
-    CCLEvent * ue = NULL;
+    CCLEvent * ue = NULL, * e = NULL;
     CCLEventWaitList ewl = NULL;
     cl_char8 h[CCL_TEST_BUFFER_SIZE];
     cl_char8 pattern = {{ 1, -1, 5, 4, -12, 3, 7, -20 }};
@@ -862,11 +862,17 @@ static void fill_test() {
     ue = ccl_user_event_new(ctx, &err);
     g_assert_no_error(err);
 
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(ue), ==, "USER");
+
     /* Fill buffer with pattern. */
-    ccl_buffer_enqueue_fill(
+    e = ccl_buffer_enqueue_fill(
         b, q, &pattern, sizeof(cl_char8), 0, buf_size,
         ccl_ewl(&ewl, ue, NULL), &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "FILL_BUFFER");
 
     /* Set user event as complete, allowing the buffer fill to take place. */
     ccl_user_event_set_status(ue, CL_COMPLETE, &err);
@@ -922,7 +928,8 @@ static void migrate_test() {
     CCLContext * ctx = NULL;
     CCLDevice * d = NULL;
     CCLBuffer * b = NULL;
-    CCLQueue * q;
+    CCLQueue * q = NULL;
+    CCLEvent * e = NULL;
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
     CCLErr * err = NULL;
 
@@ -946,13 +953,19 @@ static void migrate_test() {
 
     /* Assign buffer to first device in context (via the command
      * queue). */
-    ccl_memobj_enqueue_migrate((CCLMemObj **) &b, 1, q, 0, NULL, &err);
+    e = ccl_memobj_enqueue_migrate((CCLMemObj **) &b, 1, q, 0, NULL, &err);
     g_assert_no_error(err);
 
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "MIGRATE_MEM_OBJECTS");
+
     /* Migrate buffer to host. */
-    ccl_memobj_enqueue_migrate(
+    e = ccl_memobj_enqueue_migrate(
         (CCLMemObj **) &b, 1, q, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &err);
     g_assert_no_error(err);
+
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "MIGRATE_MEM_OBJECTS");
 
     /* Wait for queue to finish... */
     ccl_queue_finish(q, &err);
