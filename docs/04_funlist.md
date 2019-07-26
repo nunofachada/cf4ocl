@@ -69,10 +69,10 @@ Function/macro | Description
 ::ccl_device_ref() | @copybrief ccl_device_ref
 ::ccl_device_unref() | @copybrief ccl_device_unref
 ::ccl_device_unwrap() | @copybrief ccl_device_unwrap
+::ccl_devquery_get_index() | @copybrief ccl_devquery_get_index
 ::ccl_devquery_get_prefix_final() | @copybrief ccl_devquery_get_prefix_final
 ::ccl_devquery_match() | @copybrief ccl_devquery_match
 ::ccl_devquery_name() | @copybrief ccl_devquery_name
-::ccl_devquery_prefix() | @copybrief ccl_devquery_prefix
 ::ccl_devquery_type2str() | @copybrief ccl_devquery_type2str
 ::ccl_devsel_add_dep_filter() | @copybrief ccl_devsel_add_dep_filter
 ::ccl_devsel_add_indep_filter() | @copybrief ccl_devsel_add_indep_filter
@@ -130,6 +130,7 @@ Function/macro | Description
 ::ccl_image_get_info() | @copybrief ccl_image_get_info
 ::ccl_image_get_info_array() | @copybrief ccl_image_get_info_array
 ::ccl_image_get_info_scalar() | @copybrief ccl_image_get_info_scalar
+::ccl_image_get_supported_formats() | @copybrief ccl_image_get_supported_formats
 ::ccl_image_new() | @copybrief ccl_image_new
 ::ccl_image_new_v() | @copybrief ccl_image_new_v
 ::ccl_image_new_wrap() | @copybrief ccl_image_new_wrap
