@@ -16,8 +16,7 @@ ccl_functions=$(LC_ALL=C ctags -I $macros_to_ignore -x --c-kinds=pd \
 FUNLIST_MD="../docs/04_funlist.md"
 
 # Remove previous page with function list, if any
-echo "Function list {#funlist}" > ${FUNLIST_MD}
-echo "=============" >> ${FUNLIST_MD}
+echo "# Function list {#funlist}" > ${FUNLIST_MD}
 echo "" >> ${FUNLIST_MD}
 echo "@brief List of _cf4ocl_ functions and function-like macros." >> \
     ${FUNLIST_MD}

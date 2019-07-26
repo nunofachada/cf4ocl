@@ -1,7 +1,6 @@
-@brief _cf4ocl_, a C Framework for OpenCL
+# Introduction {#intro}
 
-Introduction {#intro}
-============
+@brief _cf4ocl_, a C Framework for OpenCL
 
 ## Overview {#intro_overview}
 

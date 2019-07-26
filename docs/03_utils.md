@@ -1,5 +1,4 @@
-Utilities {#utils}
-=========
+# Utilities {#utils}
 
 @brief Utilities included with _cf4ocl_.
 

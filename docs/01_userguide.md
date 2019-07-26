@@ -1,5 +1,4 @@
-User guide {#ug}
-==========
+# User guide {#ug}
 
 @brief _cf4ocl_ user guide.
 
@@ -18,11 +17,11 @@ utilities provided with _cf4ocl_ are presented in section
 @ref ug_architecture "wrapper architecure", are discussed in section
 @ref ug_advanced "Advanced".
 
-# Using the library {#ug_library}
+## Using the library {#ug_library}
 
-## Basics {#ug_basics}
+### Basics {#ug_basics}
 
-### Library organization {#ug_forg}
+#### Library organization {#ug_forg}
 
 The _cf4ocl_ library offers an object-oriented interface to the OpenCL
 API using wrapper classes and methods (or structs and functions, in C
@@ -59,7 +58,7 @@ Additional modules are also available:
 | @ref CCL_PLATFORMS "Platforms module"              | Management of the OpencL platforms available in the system.                                        |
 | @ref CCL_PROFILER "Profiler module"                | Simple, convenient and thorough profiling of OpenCL events.                                        |
 
-### The new/destroy rule {#ug_new_destroy}
+#### The new/destroy rule {#ug_new_destroy}
 
 The _cf4ocl_ constructors and destructors have `new` and `destroy` in
 their name, respectively. In _cf4ocl_, the new/destroy rule states
@@ -97,7 +96,7 @@ suffice:
 ccl_program_destroy(prg);
 ```
 
-### Getting info about OpenCL objects {#ug_getinfo}
+#### Getting info about OpenCL objects {#ug_getinfo}
 
 The `ccl_<class>_get_info_<scalar|array>()` macros can be used to get
 information about OpenCL objects. Use the `array` version when the
@@ -136,7 +135,7 @@ The values and objects returned by these macros are automatically
 released when the respective wrapper object is destroyed and should
 never be directly freed by client code.
 
-### Error handling {#ug_errorhandle}
+#### Error handling {#ug_errorhandle}
 
 Error-reporting _cf4ocl_ functions provide two methods for client-side
 error handling:
@@ -255,7 +254,7 @@ reported by tools such as [Valgrind](http://valgrind.org/).
 The internals of ::CCLErr-based error handling are discussed in further detail
 in section @ref ug_deps "The GLib and OpenCL dependencies".
 
-## Wrapper modules {#ug_wrappers}
+### Wrapper modules {#ug_wrappers}
 
 Each [OpenCL class](http://www.khronos.org/registry/cl/sdk/2.1/docs/man/xhtml/classDiagram.html)
 is associated with a _cf4ocl_ [module](modules.html). At the most basic level,
@@ -291,81 +290,81 @@ methods. For example, the ::CCLContext* class provides the
 ::ccl_context_get_all_devices(), ::ccl_context_get_device() and
 ::ccl_context_get_num_devices() methods for this purpose.
 
-### Platform module {#ug_platform}
+#### Platform module {#ug_platform}
 
 @copydoc CCL_PLATFORM_WRAPPER
 
-### Device module {#ug_device}
+#### Device module {#ug_device}
 
 @copydoc CCL_DEVICE_WRAPPER
 
-### Context module {#ug_context}
+#### Context module {#ug_context}
 
 @copydoc CCL_CONTEXT_WRAPPER
 
-### Command queue module {#ug_queue}
+#### Command queue module {#ug_queue}
 
 @copydoc CCL_QUEUE_WRAPPER
 
-### Memory object module {#ug_memobj}
+#### Memory object module {#ug_memobj}
 
 @copydoc CCL_MEMOBJ_WRAPPER
 
-### Buffer module {#ug_buffer}
+#### Buffer module {#ug_buffer}
 
 @copydoc CCL_BUFFER_WRAPPER
 
-### Image module {#ug_image}
+#### Image module {#ug_image}
 
 @copydoc CCL_IMAGE_WRAPPER
 
-### Sampler module {#ug_sampler}
+#### Sampler module {#ug_sampler}
 
 @copydoc CCL_SAMPLER_WRAPPER
 
-### Program module {#ug_program}
+#### Program module {#ug_program}
 
 @copydoc CCL_PROGRAM_WRAPPER
 
-### Kernel module {#ug_kernel}
+#### Kernel module {#ug_kernel}
 
 @copydoc CCL_KERNEL_WRAPPER
 
-#### Kernel arguments module {#ug_kernel_args}
+##### Kernel arguments module {#ug_kernel_args}
 
 @copydoc CCL_KERNEL_ARG
 
-### Event module {#ug_event}
+#### Event module {#ug_event}
 
 @copydoc CCL_EVENT_WRAPPER
 
-#### Event wait lists module {#ug_event_wait_lists}
+##### Event wait lists module {#ug_event_wait_lists}
 
 @copydoc CCL_EVENT_WAIT_LIST
 
-## Other modules {#ug_othermodules}
+### Other modules {#ug_othermodules}
 
-### Device selector module {#ug_devsel}
+#### Device selector module {#ug_devsel}
 
 @copydoc CCL_DEVICE_SELECTOR
 
-### Device query module {#ug_devquery}
+#### Device query module {#ug_devquery}
 
 @copydoc CCL_DEVICE_QUERY
 
-### Errors module {#ug_errors}
+#### Errors module {#ug_errors}
 
 @copydoc CCL_ERRORS
 
-### Platforms module {#ug_platforms}
+#### Platforms module {#ug_platforms}
 
 @copydoc CCL_PLATFORMS
 
-### Profiler module {#ug_profiling}
+#### Profiler module {#ug_profiling}
 
 @copydoc CCL_PROFILER
 
-# Bundled utilities {#ug_utils}
+## Bundled utilities {#ug_utils}
 
 _cf4ocl_ is bundled with the following utilities:
 
@@ -373,9 +372,9 @@ _cf4ocl_ is bundled with the following utilities:
 * @ref ccl_c "ccl_c" - @copybrief ccl_c
 * @ref ccl_plot_events "ccl_plot_events" - @copybrief ccl_plot_events.py
 
-# Advanced {#ug_advanced}
+## Advanced {#ug_advanced}
 
-## Wrapper architecture {#ug_architecture}
+### Wrapper architecture {#ug_architecture}
 
 The wrapper classes, which wrap OpenCL types, are implemented using an
 object-oriented (OO) approach in C. While C does not directly provide
@@ -490,7 +489,7 @@ digraph cf4ocl {
 }
 @enddot
 
-### The CCLWrapper base class {#ug_cclwrapper}
+#### The CCLWrapper base class {#ug_cclwrapper}
 
 The ::CCLWrapper* base class is responsible for common functionality of wrapper
 objects, namely:
@@ -592,7 +591,7 @@ automatically casting objects and values to the appropriate type,
 selecting the correct `clGet*Info()` function for the object being
 queried. The cache is never used by the  @ref ug_getinfo "info macros".
 
-### The CCLDevContainer class {#ug_ccldevcontainer}
+#### The CCLDevContainer class {#ug_ccldevcontainer}
 
 The intermediate ::CCLDevContainer* class provides functionality for
 managing a set of ::CCLDevice* wrapper instances, abstracting code
@@ -613,7 +612,7 @@ client code via specific methods, e.g. in the case of ::CCLProgram* objects,
 these are ::ccl_program_get_all_devices(), ::ccl_program_get_device() and
 ::ccl_program_get_num_devices(), respectively.
 
-### The CCLMemObj class {#ug_cclmemobj}
+#### The CCLMemObj class {#ug_cclmemobj}
 
 The relationship between the ::CCLMemObj* class and the ::CCLBuffer* and
 ::CCLImage* classes follows that of the respective
@@ -622,7 +621,7 @@ In other words, both OpenCL images and buffers are memory objects with
 common functionality, and _cf4ocl_ directly maps this relationship with
 the respective wrappers.
 
-## The GLib and OpenCL dependencies {#ug_deps}
+### The GLib and OpenCL dependencies {#ug_deps}
 
 _cf4ocl_ relies heavily on its two dependencies:
 [GLib](https://developer.gnome.org/glib/stable/) and
@@ -670,7 +669,7 @@ GLib function. From version 2.1.0 onwards,  _cf4ocl_ provides the
 for [g_strfreev()](https://developer.gnome.org/glib/stable/glib-String-Utility-Functions.html#g-strfreev).
 Thus, this change does not break compatibility with existing client code.
 
-## Log messages {#ug_log}
+### Log messages {#ug_log}
 
 _cf4ocl_ internally uses the
 [GLib message logging framework](https://developer.gnome.org/glib/stable/glib-Message-Logging.html)

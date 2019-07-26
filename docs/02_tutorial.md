@@ -1,9 +1,8 @@
-Tutorial {#tut}
-========
+# Tutorial {#tut}
 
 @brief Developing an application with _cf4ocl_.
 
-### Introduction
+## Introduction
 
 This tutorial is based on the `canon` example available in the
 examples folder. The goal is to add two vectors, `a` and `b`, as well as
@@ -27,7 +26,7 @@ __kernel void sum(__global const uint * a, __global const uint * b,
 For the purpose of this tutorial, we'll assume the kernel code is in a
 file called `mysum.cl`, and the host code in `mysum.c`.
 
-### Getting started
+## Getting started
 
 The _cf4ocl_ header should be included at the beginning of the `mysum.c`
 file:
@@ -104,7 +103,7 @@ $ ./mysum
 
 With Clang the command is the same, just replace `gcc` with `clang`.
 
-### Host and device buffers
+## Host and device buffers
 
 The goal of the program is to sum two vectors and a constant. As such, we need
 to declare three host vectors, two of which will be initialized with some values
@@ -212,7 +211,7 @@ int main() {
 }
 ```
 
-### Creating the command queue
+## Creating the command queue
 
 The ::ccl_queue_new() constructor provides the simplest way to create a command
 queue. However, command queue creation requires a device. The context contains a
@@ -315,7 +314,7 @@ int main() {
 
 Compile and run the code. As expected, nothing special happens yet.
 
-### Creating and building the program
+## Creating and building the program
 
 _cf4ocl_ provides several constructors for creating
 @ref CCL_PROGRAM_WRAPPER "program objects". When a single OpenCL C kernel source
@@ -424,7 +423,7 @@ Compile and run the code. Don't forget to put the `mysum.cl` file containing the
 kernel source code in the same folder, otherwise the program object will not be
 successfully created.
 
-### Setting kernel arguments and running the program
+## Setting kernel arguments and running the program
 
 _cf4ocl_ greatly simplifies the execution of OpenCL programs. Instead of
 creating a kernel with clCreateKernel(), setting kernel arguments one-by-one
@@ -465,7 +464,7 @@ While the ::ccl_program_enqueue_kernel() simplifies executing a kernel
 (including setting its arguments), _cf4ocl_ provides additional functions which
 allow client code to have finer control over this process.
 
-### Checking results
+## Checking results
 
 To check the results of the kernel execution, it's necessary to read the
 contents of device buffer `c` into host buffer `vec_c`:
@@ -591,7 +590,7 @@ int main() {
 }
 ```
 
-### A better way to check for errors
+## A better way to check for errors
 
 Our code may be correctly implemented, but a number of OpenCL errors can still
 occur. Checking the return values of _cf4ocl_ functions allows us to determine
@@ -737,7 +736,7 @@ The error checking strategy in our code is just an example. Client code can
 implement any strategy. More information about this topic is available in the
 @ref ug_errorhandle "user guide".
 
-### Profiling your program the easy way
+## Profiling your program the easy way
 
 Profiling OpenCL code by hand, i.e. by gathering and processing information
 about all `cl_event` objects, is an extremely verbose and error-prone process.

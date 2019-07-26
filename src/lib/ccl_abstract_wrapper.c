@@ -576,7 +576,7 @@ finish:
  *
  * This function should not be directly invoked in most circumstances. Use the
  * `ccl_*_get_info_*()` macros instead.
- *  *
+ *
  * @public @memberof ccl_wrapper
  *
  * @param[in] wrapper1 The wrapper object to query.
