@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8.12)
 project(cf4ocl2)
 
 # Set modules directory
@@ -64,7 +64,7 @@ endif()
 
 # Search for glib with pkg-config
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLIB REQUIRED glib-2.0>=2.38.1)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.40.0)
 
 # Find OpenCL
 find_package(OpenCL REQUIRED)

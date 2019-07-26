@@ -31,6 +31,11 @@
 #ifndef _CCL_DEFS_H_
 #define _CCL_DEFS_H_
 
+/* GLib must be included before this file. */
+#ifndef __G_LIB_H__
+    #error "GLib must be included before this file"
+#endif
+
 /* These deprecation macros are copied from GLib latest version in
  * order to support Clang. */
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
@@ -54,17 +59,6 @@
 #else
 #define CCL_BEGIN_IGNORE_DEPRECATIONS
 #define CCL_END_IGNORE_DEPRECATIONS
-#endif
-
-/**
- * @internal
- *
- * @brief A `g_info()` macro for older GLib versions which do not provide it.
- *
- * @def g_info()
- * */
-#ifndef g_info
-#define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
 #endif
 
 /* The CCL_STRD macro determines which debug information appear in error

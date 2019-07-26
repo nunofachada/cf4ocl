@@ -28,6 +28,13 @@
 #ifndef _CCL_COMMON_H_
 #define _CCL_COMMON_H_
 
+/* GLib must be not included before this file. */
+#ifdef __G_LIB_H__
+    #error "GLib must not be included before this file"
+#endif
+
+#define GLIB_VERSION_MIN_REQUIRED GLIB_VERSION_2_40
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
