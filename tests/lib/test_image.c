@@ -156,6 +156,31 @@ static void create_info_destroy_test() {
         /* Destroy image. */
         ccl_image_destroy(img);
     }
+
+    /* Erroneous image creation (invalid key in image description). */
+    img = ccl_image_new(
+        ctx, CL_MEM_READ_WRITE, &image_format, NULL, &err,
+        "image_type", (cl_mem_object_type) CL_MEM_OBJECT_IMAGE2D,
+        "image_width", (size_t) CCL_TEST_IMAGE_WIDTH,
+        "image_height", (size_t) CCL_TEST_IMAGE_HEIGHT,
+        "image_depth", (size_t) 0,
+        "image_array_size", (size_t) 0,
+        "image_row_pitch", (size_t) 0,
+        "image_slice_pitch", (size_t) 0,
+        "num_mip_levels", (cl_uint) 0,
+        "num_samples", (cl_uint) 0,
+        "memobj", (CCLMemObj *) NULL,
+        "invalid option", -1,
+        NULL);
+    g_assert_error(err, CCL_ERROR, CCL_ERROR_ARGS);
+    g_clear_error(&err);
+
+    /* Erroneous image creation (NULL image format). */
+    img = ccl_image_new(
+        ctx, CL_MEM_READ_WRITE, NULL, NULL, &err,
+        NULL);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
+    g_clear_error(&err);
 }
 
 /**

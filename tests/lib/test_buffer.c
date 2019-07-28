@@ -394,8 +394,7 @@ static void copy_test() {
     ccl_queue_destroy(q);
     ccl_context_destroy(ctx);
 
-    /* Confirm that memory allocated by wrappers has been properly
-     * freed. */
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert_true(ccl_wrapper_memcheck());
 }
 
