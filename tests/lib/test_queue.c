@@ -283,6 +283,9 @@ static void barrier_marker_test() {
     }
 #endif
 
+    /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(evt_marker), ==, "MARKER");
+
     /* Wait for marker event to complete (which means all previous
      * enqueued events have also completed). */
     ccl_event_wait(ccl_ewl(&ewl, evt_marker, NULL), &err);

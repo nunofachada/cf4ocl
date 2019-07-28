@@ -592,7 +592,7 @@ static void rect_read_write_copy_test() {
     CCLBuffer * b1 = NULL;
     CCLBuffer * b2 = NULL;
     CCLQueue * cq = NULL;
-    CCLEvent * ue = NULL;
+    CCLEvent * ue = NULL, * e = NULL;
     CCLEventWaitList ewl = NULL;
     cl_uchar h1[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
     cl_uchar h2[CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE];
@@ -635,20 +635,29 @@ static void rect_read_write_copy_test() {
     g_assert_no_error(err);
 
     /* Write "rect" data to first buffer in device. */
-    ccl_buffer_enqueue_write_rect(
+    e = ccl_buffer_enqueue_write_rect(
         b1, cq, CL_TRUE, origin, origin, region, 0, 0, 0, 0, h1, NULL, &err);
     g_assert_no_error(err);
     ccl_err_clear(&err);
 
+   /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "WRITE_BUFFER_RECT");
+
     /* Copy "rect" data from first buffer to second buffer. */
-    ccl_buffer_enqueue_copy_rect(
+    e = ccl_buffer_enqueue_copy_rect(
         b1, b2, cq, origin, origin, region, 0, 0, 0, 0, NULL, &err);
     g_assert_no_error(err);
 
+   /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "COPY_BUFFER_RECT");
+
     /* Read data "rect" back to host from the second buffer. */
-    ccl_buffer_enqueue_read_rect(
+    e = ccl_buffer_enqueue_read_rect(
         b2, cq, CL_TRUE, origin, origin, region, 0, 0, 0, 0, h2, NULL, &err);
     g_assert_no_error(err);
+
+   /* Check event name (set by cf4ocl). */
+    g_assert_cmpstr(ccl_event_get_final_name(e), ==, "READ_BUFFER_RECT");
 
     /* Check data is OK doing a flat comparison. */
     for (cl_uint i = 0; i < CCL_TEST_BUFFER_SIZE * CCL_TEST_BUFFER_SIZE; ++i)
