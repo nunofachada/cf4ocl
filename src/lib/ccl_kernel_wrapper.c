@@ -649,8 +649,9 @@ CCLEvent * ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel * krnl,
 
     CCLEvent * evt = NULL;
 
-    /* Set kernel arguments. */
-    ccl_kernel_set_args_v(krnl, args);
+    /* Set kernel arguments, if any arguments were given. */
+    if (args != NULL)
+        ccl_kernel_set_args_v(krnl, args);
 
     /* Enqueue kernel. */
     evt = ccl_kernel_enqueue_ndrange(krnl, cq, work_dim, global_work_offset,
