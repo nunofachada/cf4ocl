@@ -163,14 +163,31 @@ static void create_info_destroy_test() {
 
         /* Set args and execute kernel. */
         if (i == 0) {
+
             /* For i==0 use the array version (_v) of ccl_kernel_set_args */
             args[0] = buf;
             ccl_kernel_set_args_v(krnl, args);
+
+            /* Execute kernel using the function which also accepts arguments,
+             * but passing it none (note the NULL given as the last parameter).
+             * The kernel should use the arguments given in the previous line
+             * of code, ignoring what was given here. */
+            ccl_kernel_set_args_and_enqueue_ndrange(
+                krnl, cq, 1, NULL, &gws, &lws, NULL, &err, NULL);
+
         } else {
+
             /* For i>0 use the direct of ccl_kernel_set_args */
             ccl_kernel_set_args(krnl, buf, NULL);
+
+            /* There should be no problem when trying to use this function
+             * without args. Nothing should happen. */
+            ccl_kernel_set_args(krnl, NULL);
+
+            /* Execute kernel. */
+            ccl_kernel_enqueue_ndrange(
+                krnl, cq, 1, NULL, &gws, &lws, NULL, &err);
         }
-        ccl_kernel_enqueue_ndrange(krnl, cq, 1, NULL, &gws, &lws, NULL, &err);
         g_assert_no_error(err);
 
         /* Read back results to host. */
