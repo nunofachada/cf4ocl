@@ -162,8 +162,14 @@ static void create_info_destroy_test() {
         g_assert_no_error(err);
 
         /* Set args and execute kernel. */
-        args[0] = buf;
-        ccl_kernel_set_args_v(krnl, args);
+        if (i == 0) {
+            /* For i==0 use the array version (_v) of ccl_kernel_set_args */
+            args[0] = buf;
+            ccl_kernel_set_args_v(krnl, args);
+        } else {
+            /* For i>0 use the direct of ccl_kernel_set_args */
+            ccl_kernel_set_args(krnl, buf, NULL);
+        }
         ccl_kernel_enqueue_ndrange(krnl, cq, 1, NULL, &gws, &lws, NULL, &err);
         g_assert_no_error(err);
 
