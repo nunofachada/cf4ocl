@@ -30,26 +30,6 @@
  * */
 
 /**
- * @internal
- *
- * @brief Implementation of ccl_wrapper_release_fields() function for
- * ::CCLMemObj wrapper objects.
- *
- * @protected @memberof ccl_memobj
- *
- * @param[in] mo A ::CCLMemObj wrapper object.
- * */
-void ccl_memobj_release_fields(CCLMemObj * mo) {
-
-    /* Make sure mo wrapper object is not NULL. */
-    g_return_if_fail(mo != NULL);
-
-    /* Reduce reference count of memory object context wrapper. */
-    if (mo->ctx != NULL)
-        ccl_context_unref(mo->ctx);
-}
-
-/**
  * @addtogroup CCL_MEMOBJ_WRAPPER
  * @{
  */

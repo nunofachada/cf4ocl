@@ -171,8 +171,7 @@ CCLImage * ccl_image_new_wrap(cl_mem mem_object) {
 CCL_EXPORT
 void ccl_image_destroy(CCLImage * img) {
 
-    ccl_wrapper_unref((CCLWrapper *) img, sizeof(CCLImage),
-        (ccl_wrapper_release_fields) ccl_memobj_release_fields,
+    ccl_wrapper_unref((CCLWrapper *) img, sizeof(CCLImage), NULL,
         (ccl_wrapper_release_cl_object) clReleaseMemObject, NULL);
 }
 

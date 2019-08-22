@@ -84,8 +84,7 @@ CCLBuffer * ccl_buffer_new_wrap(cl_mem mem_object) {
 CCL_EXPORT
 void ccl_buffer_destroy(CCLBuffer * buf) {
 
-    ccl_wrapper_unref((CCLWrapper *) buf, sizeof(CCLBuffer),
-        (ccl_wrapper_release_fields) ccl_memobj_release_fields,
+    ccl_wrapper_unref((CCLWrapper *) buf, sizeof(CCLBuffer), NULL,
         (ccl_wrapper_release_cl_object) clReleaseMemObject, NULL);
 }
 
