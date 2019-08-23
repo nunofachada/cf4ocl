@@ -51,9 +51,11 @@ static void create_info_destroy_test() {
     CCLContext * ctx = NULL;
     CCLProgram * prg = NULL;
     CCLProgram * prg2 = NULL;
+    CCLProgramBinary * prg_bin = NULL;
     CCLKernel * krnl = NULL;
     CCLWrapperInfo * info = NULL;
     CCLDevice * d = NULL;
+    CCLDevice * d2 = NULL;
     CCLQueue * cq = NULL;
     size_t gws;
     size_t lws;
@@ -73,6 +75,9 @@ static void create_info_destroy_test() {
     gchar * tmp_dir_name;
     gchar * tmp_file_prefix;
     const char * build_log;
+    cl_device_id * devices = NULL;
+    cl_context context = NULL;
+
 
     /* Get a temp. dir. */
     tmp_dir_name = g_dir_make_tmp("test_program_XXXXXX", &err);
@@ -399,32 +404,45 @@ static void create_info_destroy_test() {
     ccl_program_destroy(prg2);
 
     /* Get binary in variable. */
-    CCLProgramBinary * prg_bin = ccl_program_get_binary(prg, d, &err);
+    prg_bin = ccl_program_get_binary(prg, d, &err);
     g_assert_no_error(err);
 
-    /* Create program using that binary. */
-    prg2 = ccl_program_new_from_binaries(ctx, 1, &d, &prg_bin, NULL, &err);
-    g_assert_no_error(err);
+    /* Test program creation with binary. */
+    for (guint i = 0; i < 2; i++) {
 
-    /* Check that device is the correct one. */
-    CCLDevice * d2 = ccl_program_get_device(prg2, 0, &err);
-    g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_SIZE(d), ==, GPOINTER_TO_SIZE(d2));
+        if (i == 0) {
+            /* Create program using the ccl_program_new_from_binaries()
+             * function. */
+            prg2 = ccl_program_new_from_binaries(
+                ctx, 1, &d, &prg_bin, NULL, &err);
+        } else if (i == 1) {
+            /* Create program using ccl_program_new_from_binary() helper
+             * funcion. */
+            prg2 = ccl_program_new_from_binary(ctx, d, prg_bin, NULL, &err);
+        }
+        g_assert_no_error(err);
 
-    cl_device_id * devices = ccl_program_get_info_array(
-        prg2, CL_PROGRAM_DEVICES, cl_device_id, &err);
-    g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_SIZE(devices[0]),
-        ==, GPOINTER_TO_SIZE(ccl_device_unwrap(d)));
+        /* Check that device is the correct one. */
+        d2 = ccl_program_get_device(prg2, 0, &err);
+        g_assert_no_error(err);
+        g_assert_cmphex(GPOINTER_TO_SIZE(d), ==, GPOINTER_TO_SIZE(d2));
 
-    cl_context context = ccl_program_get_info_scalar(
-        prg2, CL_PROGRAM_CONTEXT, cl_context, &err);
-    g_assert_no_error(err);
-    g_assert_cmphex(GPOINTER_TO_SIZE(context),
-        ==, GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
+        devices = ccl_program_get_info_array(
+            prg2, CL_PROGRAM_DEVICES, cl_device_id, &err);
+        g_assert_no_error(err);
+        g_assert_cmphex(GPOINTER_TO_SIZE(devices[0]),
+            ==, GPOINTER_TO_SIZE(ccl_device_unwrap(d)));
 
-    /* Destroy program created with binary. */
-    ccl_program_destroy(prg2);
+        context = ccl_program_get_info_scalar(
+            prg2, CL_PROGRAM_CONTEXT, cl_context, &err);
+        g_assert_no_error(err);
+        g_assert_cmphex(GPOINTER_TO_SIZE(context),
+            ==, GPOINTER_TO_SIZE(ccl_context_unwrap(ctx)));
+
+        /* Destroy program created with binary. */
+        ccl_program_destroy(prg2);
+
+    }
 
     /* Create program using the wrap constructor. */
     prg2 = ccl_program_new_wrap(ccl_program_unwrap(prg));
