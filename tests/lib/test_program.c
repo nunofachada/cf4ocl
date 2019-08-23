@@ -773,6 +773,37 @@ static void compile_link_test() {
 /**
  * @internal
  *
+ * @brief Test error conditions.
+ * */
+static void errors_test() {
+
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLProgram * prg = NULL;
+    CCLErr * err = NULL;
+    const char * bad_src[] = { NULL, "text", "more text" };
+    const size_t bad_src_len[] = { 4, 5, 5 };
+
+    /* Get the test context with the pre-defined device. */
+    ctx = ccl_test_context_new(0, &err);
+    g_assert_no_error(err);
+
+    /* Check error when creating program with invalid source. */
+    prg = ccl_program_new_from_sources(ctx, 3, bad_src, bad_src_len, &err);
+    g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
+    g_clear_error(&err);
+    g_assert_null(prg);
+
+    /* Free stuff. */
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly freed. */
+    g_assert_true(ccl_wrapper_memcheck());
+}
+
+/**
+ * @internal
+ *
  * @brief Main function.
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
@@ -793,6 +824,10 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/program/compile-link",
         compile_link_test);
+
+    g_test_add_func(
+        "/wrappers/program/errors",
+        errors_test);
 
     return g_test_run();
 }
