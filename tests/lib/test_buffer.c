@@ -940,6 +940,7 @@ static void migrate_test() {
     CCLEvent * e = NULL;
     size_t buf_size = sizeof(cl_char8) * CCL_TEST_BUFFER_SIZE;
     CCLErr * err = NULL;
+    CCLEventWaitList ewl = NULL;
 
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(120, &err);
@@ -969,7 +970,8 @@ static void migrate_test() {
 
     /* Migrate buffer to host. */
     e = ccl_memobj_enqueue_migrate(
-        (CCLMemObj **) &b, 1, q, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &err);
+        (CCLMemObj **) &b, 1, q, CL_MIGRATE_MEM_OBJECT_HOST,
+        ccl_ewl(&ewl, e, NULL), &err);
     g_assert_no_error(err);
 
     /* Check event name (set by cf4ocl). */
