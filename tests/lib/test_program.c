@@ -797,6 +797,7 @@ static void errors_test() {
 
     /* Test variables. */
     CCLContext * ctx = NULL;
+    CCLDevice * dev = NULL;
     CCLProgram * prg = NULL;
     CCLErr * err = NULL;
     const char * bad_src[] = { NULL, "text", "more text" };
@@ -805,12 +806,26 @@ static void errors_test() {
     /* Get the test context with the pre-defined device. */
     ctx = ccl_test_context_new(0, &err);
     g_assert_no_error(err);
+    dev = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
 
-    /* Check error when creating program with invalid source. */
+    /* 1. Check error when creating program with invalid source. */
     prg = ccl_program_new_from_sources(ctx, 3, bad_src, bad_src_len, &err);
+    g_assert_null(prg);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
     g_clear_error(&err);
+
+#ifdef CL_VERSION_1_2
+
+    /* 2. Check error when trying to create a program with built-in kernels. */
+    prg = ccl_program_new_from_built_in_kernels(
+        ctx, 1, &dev, "badkernel1;badkernel2", &err);
     g_assert_null(prg);
+    g_assert_nonnull(err);
+    g_assert(err->domain == CCL_OCL_ERROR);
+    g_clear_error(&err);
+
+#endif
 
     /* Free stuff. */
     ccl_context_destroy(ctx);
