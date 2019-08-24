@@ -470,26 +470,39 @@ static void create_info_destroy_test() {
     ccl_program_build_full(prg, 1, &d, NULL, NULL, NULL, &err);
     g_assert_no_error(err);
 
+    /* ************************************************************* */
     /* Get some program build info, compare it with expected values. */
+    /* ************************************************************* */
+
+    /* Get build status. */
     info = ccl_program_get_build_info(
         prg, d, CL_PROGRAM_BUILD_STATUS, &err);
     g_assert_no_error(err);
     g_assert_true(*((cl_build_status *) info->value) == CL_BUILD_SUCCESS);
 
+    /* Get build log via program build info. */
     info = ccl_program_get_build_info(
         prg, d, CL_PROGRAM_BUILD_LOG, &err);
     g_assert_true((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
         (err->domain == CCL_ERROR)));
     ccl_err_clear(&err);
 
-    build_log = ccl_program_get_build_log(prg, &err);
-    g_assert_true((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
-        (err->domain == CCL_ERROR)));
-    if (info) {
-        g_assert_true(g_strrstr(build_log, (char *) info->value));
-    }
-    ccl_err_clear(&err);
+    /* Get concatenated build log (ie build logs for all devices associated
+     * with the program). */
+    for (int i = 0; i < 2; i++) {
 
+        /* We get the build log two times at the program level to test for
+         * clearing concatenated build log cache . */
+        build_log = ccl_program_get_build_log(prg, &err);
+        g_assert_true((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
+            (err->domain == CCL_ERROR)));
+        if (info) {
+            g_assert_true(g_strrstr(build_log, (char *) info->value));
+        }
+        ccl_err_clear(&err);
+    }
+
+    /* Get build log via program build info array. */
     build_log = ccl_program_get_build_info_array(
         prg, d, CL_PROGRAM_BUILD_LOG, char, &err);
     g_assert_true((err == NULL) || ((err->code == CCL_ERROR_INFO_UNAVAILABLE_OCL) &&
