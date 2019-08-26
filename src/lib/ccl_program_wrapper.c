@@ -1957,7 +1957,6 @@ cl_bool ccl_program_save_all_binaries(CCLProgram * prg,
     if (filenames != NULL)
         *filenames = g_malloc((num_devices + 1) * sizeof(char *));
 
-    /* Allocate space for*/
     /* Cycle through each device. */
     for (guint i = 0; i < num_devices; ++i) {
 

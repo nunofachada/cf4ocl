@@ -392,6 +392,11 @@ static void create_info_destroy_test() {
     ccl_program_save_binary(prg, d, tmp_file_prefix, &err);
     g_assert_no_error(err);
 
+    /* Save all binaries without keeping the filenames and an empty suffix
+     * (these will not be used). */
+    ccl_program_save_all_binaries(prg, tmp_file_prefix, "", NULL, &err);
+    g_assert_no_error(err);
+
     /* Create a new program using the saved binaries. */
     prg2 = ccl_program_new_from_binary_files(
         ctx, num_devs, devs, (const char **) filenames, NULL, &err);
@@ -822,7 +827,9 @@ static void errors_test() {
     dev = ccl_context_get_device(ctx, 0, &err);
     g_assert_no_error(err);
 
+    /* ********************************************************* */
     /* 1. Check error when creating program with invalid source. */
+    /* ********************************************************* */
     prg = ccl_program_new_from_sources(ctx, 3, bad_src, bad_src_len, &err);
     g_assert_null(prg);
     g_assert_error(err, CCL_OCL_ERROR, CL_INVALID_VALUE);
@@ -830,7 +837,9 @@ static void errors_test() {
 
 #ifdef CL_VERSION_1_2
 
+    /* ********************************************************************* */
     /* 2. Check error when trying to create a program with built-in kernels. */
+    /* ********************************************************************* */
     prg = ccl_program_new_from_built_in_kernels(
         ctx, 1, &dev, "badkernel1;badkernel2", &err);
     g_assert_null(prg);
