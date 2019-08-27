@@ -252,7 +252,7 @@ CCLQueue * ccl_queue_new_full(CCLContext * ctx, CCLDevice * dev,
 
 #else
 
-    /* Where any OpenCL >= 2.0 property names or values specified? */
+    /* Were any OpenCL >= 2.0 property names or values specified? */
     if (prop_other) {
 
         /* If so, log warning and ignore them. */
