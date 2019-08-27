@@ -36,7 +36,6 @@
 
 #define CCL_TEST_PROGRAM_BUF_SIZE 16
 #define CCL_TEST_PROGRAM_LWS 8 /* Must be a divisor of CCL_TEST_PROGRAM_BUF_SIZE */
-#define CCL_TEST_PROGRAM_CONST 4
 G_STATIC_ASSERT(CCL_TEST_PROGRAM_BUF_SIZE % CCL_TEST_PROGRAM_LWS == 0);
 
 /**
@@ -56,21 +55,6 @@ static void create_info_destroy_test() {
     CCLWrapperInfo * info = NULL;
     CCLDevice * d = NULL;
     CCLDevice * d2 = NULL;
-    CCLQueue * cq = NULL;
-    size_t gws;
-    size_t lws;
-    cl_uint a_h[CCL_TEST_PROGRAM_BUF_SIZE];
-    cl_uint b_h[CCL_TEST_PROGRAM_BUF_SIZE];
-    cl_uint c_h[CCL_TEST_PROGRAM_BUF_SIZE];
-    cl_uint d_h ;
-    CCLBuffer * a_w;
-    CCLBuffer * b_w;
-    CCLBuffer * c_w;
-    CCLEvent * evt_w1;
-    CCLEvent * evt_w2;
-    CCLEvent * evt_kr;
-    CCLEvent * evt_r1;
-    CCLEventWaitList ewl = NULL;
     CCLErr * err = NULL;
     gchar * tmp_dir_name;
     gchar * tmp_file_prefix;
@@ -78,6 +62,17 @@ static void create_info_destroy_test() {
     cl_device_id * devices = NULL;
     cl_context context = NULL;
 
+    /* Create a context with devices from first available platform. */
+    ctx = ccl_test_context_new(0, &err);
+    g_assert_no_error(err);
+
+    /* Get first device in context (and in program). */
+    d = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    /* ************************************************** */
+    /* 1. Create program from source file and destroy it. */
+    /* ************************************************** */
 
     /* Get a temp. dir. */
     tmp_dir_name = g_dir_make_tmp("test_program_XXXXXX", &err);
@@ -92,22 +87,27 @@ static void create_info_destroy_test() {
         tmp_file_prefix, CCL_TEST_PROGRAM_SUM_CONTENT, -1, &err);
     g_assert_no_error(err);
 
-    /* Create a context with devices from first available platform. */
-    ctx = ccl_test_context_new(0, &err);
-    g_assert_no_error(err);
-
     /* Create a new program from kernel file. */
     prg = ccl_program_new_from_source_file(
         ctx, tmp_file_prefix, &err);
     g_assert_no_error(err);
 
+    /* Destroy program. */
     ccl_program_destroy(prg);
+
+    /* ****************************************************** */
+    /* 2. Create program from source files (only one though). */
+    /* ****************************************************** */
 
     const char * file_pref = (const char *) tmp_file_prefix;
     prg = ccl_program_new_from_source_files(ctx, 1, &file_pref, &err);
     g_assert_no_error(err);
 
     g_free(tmp_file_prefix);
+
+    /* *********************************************** */
+    /* 3. Check program info/build info, before build. */
+    /* *********************************************** */
 
     /* Get some program info, compare it with expected info. */
     info = ccl_program_get_info(prg, CL_PROGRAM_CONTEXT, &err);
@@ -128,14 +128,14 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
     g_assert_cmpstr((char *) info->value, ==, CCL_TEST_PROGRAM_SUM_CONTENT);
 
-    /* Get first device in context (and in program). */
-    d = ccl_context_get_device(ctx, 0, &err);
-    g_assert_no_error(err);
-
     /* Check that no build was performed yet. */
     info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_STATUS, &err);
     g_assert_no_error(err);
     g_assert_cmpint(*((cl_build_status *) info->value), ==, CL_BUILD_NONE);
+
+    /* *********************************************** */
+    /* 4. Build program, check build info after build. */
+    /* *********************************************** */
 
     /* **** BUILD PROGRAM **** */
     ccl_program_build(prg, NULL, &err);
@@ -150,6 +150,10 @@ static void create_info_destroy_test() {
     /* Get the build log, check that no error occurs. */
     info = ccl_program_get_build_info(prg, d, CL_PROGRAM_BUILD_LOG, &err);
     g_assert_no_error(err);
+
+    /* ************************************ */
+    /* 5. Get kernel and check kernel info. */
+    /* ************************************ */
 
     /* Get kernel wrapper object. */
     krnl = ccl_program_get_kernel(prg, CCL_TEST_PROGRAM_SUM, &err);
@@ -169,11 +173,17 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
     g_assert_true(*((cl_context *) info->value) == ccl_context_unwrap(ctx));
 
+    /* Check that program in kernel is the same program where kernel came
+     * from. */
     info = ccl_kernel_get_info(krnl, CL_KERNEL_PROGRAM, &err);
     g_assert_no_error(err);
     g_assert_true(*((cl_program *) info->value) == ccl_program_unwrap(prg));
 
 #ifdef CL_VERSION_1_2
+
+    /* ****************************** */
+    /* 6. Check kernel argument info. */
+    /* ****************************** */
 
     cl_kernel_arg_address_qualifier kaaq;
     char * kernel_arg_type_name;
@@ -362,6 +372,10 @@ static void create_info_destroy_test() {
 
 #endif
 
+    /* ************************************* */
+    /* 7. Test binary-related functionality. */
+    /* ************************************* */
+
     /* Save binaries for all available devices (which we will load into
      * a new program later). */
     char ** filenames;
@@ -393,7 +407,7 @@ static void create_info_destroy_test() {
     g_assert_no_error(err);
 
     /* Save all binaries without keeping the filenames and an empty suffix
-     * (these will not be used). */
+     * (these will be discarded, just test the function). */
     ccl_program_save_all_binaries(prg, tmp_file_prefix, "", NULL, &err);
     g_assert_no_error(err);
 
@@ -449,6 +463,10 @@ static void create_info_destroy_test() {
 
     }
 
+    /* ********************************************** */
+    /* 8. Test program created with wrap constructor. */
+    /* ********************************************** */
+
     /* Create program using the wrap constructor. */
     prg2 = ccl_program_new_wrap(ccl_program_unwrap(prg));
 
@@ -460,6 +478,10 @@ static void create_info_destroy_test() {
 
     /* Destroy original program. */
     ccl_program_destroy(prg);
+
+    /* ******************************** */
+    /* 9. Create a program from binary. */
+    /* ******************************** */
 
     /* Create a new program using the specifically saved binary. */
     prg = ccl_program_new_from_binary_file(
@@ -475,9 +497,9 @@ static void create_info_destroy_test() {
     ccl_program_build_full(prg, 1, &d, NULL, NULL, NULL, &err);
     g_assert_no_error(err);
 
-    /* ************************************************************* */
-    /* Get some program build info, compare it with expected values. */
-    /* ************************************************************* */
+    /* ***************************************************************** */
+    /* 10. Get some program build info, compare it with expected values. */
+    /* ***************************************************************** */
 
     /* Get build status. */
     info = ccl_program_get_build_info(
@@ -517,91 +539,12 @@ static void create_info_destroy_test() {
     }
     ccl_err_clear(&err);
 
-    /* Create a command queue. */
-    cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
-    g_assert_no_error(err);
-
-    /* Set kernel enqueue properties and initialize host data. */
-    gws = CCL_TEST_PROGRAM_BUF_SIZE;
-    lws = CCL_TEST_PROGRAM_LWS;
-
-    for (cl_uint i = 0; i < CCL_TEST_PROGRAM_BUF_SIZE; ++i) {
-        a_h[i] = i + 1;
-        b_h[i] = i + 1;
-    }
-    d_h = CCL_TEST_PROGRAM_CONST;
-
-    /* Create device buffers. */
-    a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
-        CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
-    g_assert_no_error(err);
-    b_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
-        CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
-    g_assert_no_error(err);
-    c_w = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
-        CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
-    g_assert_no_error(err);
-
-    /* Copy host data to device buffers without waiting for transfer
-     * to terminate before continuing host program. */
-    evt_w1 = ccl_buffer_enqueue_write(
-        a_w, cq, CL_FALSE, 0,
-        CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
-    g_assert_no_error(err);
-    evt_w2 = ccl_buffer_enqueue_write(
-        b_w, cq, CL_FALSE, 0,
-        CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
-    g_assert_no_error(err);
-
-    /* Initialize event wait list and add the two transfer events. */
-    ccl_event_wait_list_add(&ewl, evt_w1, evt_w2, NULL);
-
-    /* Set args and execute kernel, waiting for the two transfer events
-     * to terminate (this will empty the event wait list). */
-    void * args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
-    evt_kr =  ccl_program_enqueue_kernel_v(
-        prg, CCL_TEST_PROGRAM_SUM, cq, 1, NULL, &gws, &lws, &ewl, args, &err);
-    g_assert_no_error(err);
-
-    /* Add the kernel termination event to the wait list. */
-    ccl_event_wait_list_add(&ewl, evt_kr, NULL);
-
-    /* Sync. queue for events in wait list (just the kernel event in
-     * this case) to terminate before going forward... */
-    ccl_enqueue_barrier(cq, &ewl, &err);
-    g_assert_no_error(err);
-
-    /* Read back results from host without waiting for
-     * transfer to terminate before continuing host program.. */
-    evt_r1 = ccl_buffer_enqueue_read(
-        c_w, cq, CL_FALSE, 0,
-        CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, NULL, &err);
-    g_assert_no_error(err);
-
-    /* Add read back results event to wait list. */
-    ccl_event_wait_list_add(&ewl, evt_r1, NULL);
-
-    /* Wait for all events in wait list to terminate (this will empty
-     * the wait list). */
-    ccl_event_wait(&ewl, &err);
-    g_assert_no_error(err);
-
-    /* Check results are as expected. */
-    for (guint i = 0; i < CCL_TEST_PROGRAM_BUF_SIZE; i++) {
-        g_assert_cmpuint(c_h[i], ==, a_h[i] + b_h[i] + d_h);
-        g_debug("c_h[%d] = %d\n", i, c_h[i]);
-    }
+    /* ***** */
+    /* Done! */
+    /* ***** */
 
     /* Confirm that memory allocated by wrappers has not yet been freed. */
     g_assert_false(ccl_wrapper_memcheck());
-
-    /* Destroy the memory objects. */
-    ccl_buffer_destroy(a_w);
-    ccl_buffer_destroy(b_w);
-    ccl_buffer_destroy(c_w);
-
-    /* Destroy the command queue. */
-    ccl_queue_destroy(cq);
 
     /* Destroy stuff. */
     ccl_program_destroy(prg);
@@ -612,6 +555,187 @@ static void create_info_destroy_test() {
 
     /* Confirm that memory allocated by wrappers has been properly
      * freed. */
+    g_assert_true(ccl_wrapper_memcheck());
+}
+
+/**
+ * @internal
+ *
+ * @brief Test running kernels via the program class.
+ * */
+static void execute_test() {
+
+    /* Test variables. */
+    CCLContext * ctx = NULL;
+    CCLProgram * prg = NULL;
+    CCLKernel * krnl = NULL;
+    CCLDevice * d = NULL;
+    CCLQueue * cq = NULL;
+    size_t gws;
+    size_t lws;
+    cl_uint a_h[CCL_TEST_PROGRAM_BUF_SIZE];
+    cl_uint b_h[CCL_TEST_PROGRAM_BUF_SIZE];
+    cl_uint c_h[CCL_TEST_PROGRAM_BUF_SIZE];
+    cl_uint d_h ;
+    CCLBuffer * a_w;
+    CCLBuffer * b_w;
+    CCLBuffer * c_w;
+    CCLEvent * evt_w1;
+    CCLEvent * evt_w2;
+    CCLEvent * evt_kr;
+    CCLEvent * evt_r1;
+    CCLEventWaitList ewl = NULL;
+    CCLErr * err = NULL;
+
+    /* Create a context with devices from first available platform. */
+    ctx = ccl_test_context_new(0, &err);
+    g_assert_no_error(err);
+
+    /* Get first device in context (and in program). */
+    d = ccl_context_get_device(ctx, 0, &err);
+    g_assert_no_error(err);
+
+    /* Create a command queue. */
+    cq = ccl_queue_new(ctx, d, CL_QUEUE_PROFILING_ENABLE, &err);
+    g_assert_no_error(err);
+
+    /* Set kernel enqueue properties and initialize host data. */
+    gws = CCL_TEST_PROGRAM_BUF_SIZE;
+    lws = CCL_TEST_PROGRAM_LWS;
+
+    /* Test 3 ways of running kernels via the program class. */
+    for (cl_uint i = 0; i < 3; i++) {
+
+        /* Create a program. */
+        prg = ccl_program_new_from_source(ctx, CCL_TEST_PROGRAM_SUM_CONTENT, &err);
+        g_assert_no_error(err);
+
+        /* Build program. */
+        ccl_program_build(prg, NULL, &err);
+        g_assert_no_error(err);
+
+        /* Populate host buffers. */
+        for (cl_uint j = 0; j < CCL_TEST_PROGRAM_BUF_SIZE; ++j) {
+            a_h[j] = (cl_uint) g_test_rand_int();
+            b_h[j] = (cl_uint) g_test_rand_int();
+        }
+        d_h = (cl_uint) g_test_rand_int();
+
+        /* Create device buffers. */
+        a_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+            CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
+        g_assert_no_error(err);
+        b_w = ccl_buffer_new(ctx, CL_MEM_READ_ONLY,
+            CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
+        g_assert_no_error(err);
+        c_w = ccl_buffer_new(ctx, CL_MEM_WRITE_ONLY,
+            CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), NULL, &err);
+        g_assert_no_error(err);
+
+        /* Copy host data to device buffers without waiting for transfer
+        * to terminate before continuing host program. */
+        evt_w1 = ccl_buffer_enqueue_write(
+            a_w, cq, CL_FALSE, 0,
+            CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), a_h, NULL, &err);
+        g_assert_no_error(err);
+        evt_w2 = ccl_buffer_enqueue_write(
+            b_w, cq, CL_FALSE, 0,
+            CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), b_h, NULL, &err);
+        g_assert_no_error(err);
+
+        /* Initialize event wait list and add the two transfer events. */
+        ccl_event_wait_list_add(&ewl, evt_w1, evt_w2, NULL);
+
+        /* Execute kernel via program class in three different ways: */
+        if (i == 0) {
+            /* Use ccl_program_enqueue_kernel_v() with args */
+
+            void * args[] = {a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL};
+            evt_kr =  ccl_program_enqueue_kernel_v(
+                prg, CCL_TEST_PROGRAM_SUM, cq,
+                1, NULL ,&gws, &lws, &ewl, args, &err);
+            /* Waiting for the two transfer events to terminate will empty
+             * the event wait list). */
+            g_assert_no_error(err);
+
+        } else if (i == 1) {
+            /* Use ccl_program_enqueue_kernel() with args */
+
+            evt_kr =  ccl_program_enqueue_kernel(
+                prg, CCL_TEST_PROGRAM_SUM, cq,
+                1, NULL ,&gws, &lws, &ewl, &err,
+                a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
+            /* Waiting for the two transfer events to terminate will empty
+             * the event wait list). */
+            g_assert_no_error(err);
+
+        } else if (i == 2) {
+            /* Use ccl_program_enqueue_kernel() without args, setting
+             * them previously and separately.*/
+
+            /* Kernel kernel and set arguments to it directly. */
+            krnl = ccl_program_get_kernel(prg, CCL_TEST_PROGRAM_SUM, &err);
+            g_assert_no_error(err);
+
+            ccl_kernel_set_args(
+                krnl, a_w, b_w, c_w, ccl_arg_priv(d_h, cl_uint), NULL);
+
+            /* Run kernel via program class without setting arguments. */
+            evt_kr =  ccl_program_enqueue_kernel(
+                prg, CCL_TEST_PROGRAM_SUM, cq,
+                1, NULL ,&gws, &lws, &ewl, &err, NULL);
+
+            /* Waiting for the two transfer events to terminate will empty
+             * the event wait list). */
+            g_assert_no_error(err);
+        }
+
+        /* Add the kernel termination event to the wait list. */
+        ccl_event_wait_list_add(&ewl, evt_kr, NULL);
+
+        /* Sync. queue for events in wait list (just the kernel event in
+        * this case) to terminate before going forward... */
+        ccl_enqueue_barrier(cq, &ewl, &err);
+        g_assert_no_error(err);
+
+        /* Read back results from host without waiting for
+        * transfer to terminate before continuing host program.. */
+        evt_r1 = ccl_buffer_enqueue_read(
+            c_w, cq, CL_FALSE, 0,
+            CCL_TEST_PROGRAM_BUF_SIZE * sizeof(cl_uint), c_h, NULL, &err);
+        g_assert_no_error(err);
+
+        /* Add read back results event to wait list. */
+        ccl_event_wait_list_add(&ewl, evt_r1, NULL);
+
+        /* Wait for all events in wait list to terminate (this will empty
+        * the wait list). */
+        ccl_event_wait(&ewl, &err);
+        g_assert_no_error(err);
+
+        /* Check results are as expected. */
+        for (cl_uint j = 0; j < CCL_TEST_PROGRAM_BUF_SIZE; j++) {
+            g_assert_cmpuint(c_h[j], ==, a_h[j] + b_h[j] + d_h);
+            g_debug("c_h[%d] = %d\n", i, c_h[j]);
+        }
+
+        /* Destroy the memory objects. */
+        ccl_buffer_destroy(a_w);
+        ccl_buffer_destroy(b_w);
+        ccl_buffer_destroy(c_w);
+
+        /* Destroy the program. */
+        ccl_program_destroy(prg);
+
+        /* Confirm that memory allocated by wrappers has not yet been freed. */
+        g_assert_false(ccl_wrapper_memcheck());
+    }
+
+    /* Destroy stuff. */
+    ccl_queue_destroy(cq);
+    ccl_context_destroy(ctx);
+
+    /* Confirm that memory allocated by wrappers has been properly freed. */
     g_assert_true(ccl_wrapper_memcheck());
 }
 
@@ -871,6 +995,10 @@ int main(int argc, char ** argv) {
     g_test_add_func(
         "/wrappers/program/create-info-destroy",
         create_info_destroy_test);
+
+    g_test_add_func(
+        "/wrappers/program/execute",
+        execute_test);
 
     g_test_add_func(
         "/wrappers/program/ref-unref",
