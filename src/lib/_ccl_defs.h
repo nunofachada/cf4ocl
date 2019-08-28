@@ -80,7 +80,54 @@
  * by CCL_STRD. */
 #define G_ERR_DEBUG_STR CCL_STRD
 
-/* Include error handling macros. */
-#include "_g_err_macros.h"
+/**
+ * If error is detected (`error_code != no_error_code`),
+ * create an error object (GError) and go to the specified label.
+ *
+ * @param[out] err GError* object.
+ * @param[in] quark Quark indicating the error domain.
+ * @param[in] error_condition Must result to true in order to create
+ * error.
+ * @param[in] error_code Error code to set.
+ * @param[in] label Label to goto if error is detected.
+ * @param[in] msg Error message in case of error.
+ * @param[in] ... Extra parameters for error message.
+ * */
+#define g_if_err_create_goto( \
+    err, quark, error_condition, error_code, label, msg, ...) \
+    if (error_condition) { \
+        g_set_error(&(err), (quark), (error_code), (msg), ##__VA_ARGS__); \
+        g_debug(G_ERR_DEBUG_STR); \
+        goto label; \
+    }
+
+/**
+ * If error is detected in `err` object (`err != NULL`), go to the specified
+ * label.
+ *
+ * @param[in] err GError* object.
+ * @param[in] label Label to goto if error is detected.
+ * */
+#define g_if_err_goto(err, label) \
+    if ((err) != NULL) { \
+        g_debug(G_ERR_DEBUG_STR); \
+        goto label; \
+    }
+
+/**
+ * Same as g_if_err_goto(), but rethrows error in a source GError object to
+ * a new destination GError object.
+ *
+ * @param[out] err_dest Destination GError** object.
+ * @param[in] err_src Source GError* object.
+ * @param[in] label Label to goto if error is detected.
+ * */
+#define g_if_err_propagate_goto(err_dest, err_src, label) \
+    if ((err_src) != NULL) { \
+        g_debug(G_ERR_DEBUG_STR); \
+        g_propagate_error((err_dest), (err_src)); \
+        err_src = NULL; \
+        goto label; \
+    }
 
 #endif /* _CCL_DEFS_H_ */
