@@ -134,7 +134,7 @@ static cl_context_properties * ccl_context_properties_default(
         /* Get context platform using first device. */
         ocl_status = clGetDeviceInfo(device, CL_DEVICE_PLATFORM,
             sizeof(cl_platform_id), &platform, NULL);
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: unable to get platform from device (OpenCL error %d: %s).",
             CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -259,10 +259,10 @@ CCLContext * ccl_context_new_from_filters_full(
 
     /* Get selected/filtered devices. */
     devices = ccl_devsel_select(filters, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Check if any device was found. */
-    g_if_err_create_goto(*err, CCL_ERROR, devices->len == 0,
+    ccl_if_err_create_goto(*err, CCL_ERROR, devices->len == 0,
         CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
         "%s: no device found for selected filters.",
         CCL_STRD);
@@ -271,7 +271,7 @@ CCLContext * ccl_context_new_from_filters_full(
     ctx = ccl_context_new_from_devices_full(properties, devices->len,
         (CCLDevice **) devices->pdata, pfn_notify, user_data,
         &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -354,7 +354,7 @@ CCLContext * ccl_context_new_from_devices_full(
         (const cl_context_properties *) ctx_props, num_devices,
         (const cl_device_id *) cl_devices, pfn_notify, user_data,
         &ocl_status);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to create cl_context (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -429,7 +429,7 @@ CCLContext * ccl_context_new_from_filter(CCLDevSelFilterType ftype,
                 &filters, (ccl_devsel_indep) filter, data);
         } else {
             /* Unknown filter type. */
-            g_if_err_create_goto(*err, CCL_ERROR, TRUE, CCL_ERROR_ARGS,
+            ccl_if_err_create_goto(*err, CCL_ERROR, TRUE, CCL_ERROR_ARGS,
                 error_handler, "%s: Unknown filter type.", CCL_STRD);
         }
 
@@ -440,7 +440,7 @@ CCLContext * ccl_context_new_from_filter(CCLDevSelFilterType ftype,
 
     /* Create a context with selected device. */
     ctx = ccl_context_new_from_filters(&filters, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -505,10 +505,10 @@ cl_uint ccl_context_get_opencl_version(CCLContext * ctx, CCLErr ** err) {
     cl_uint ver = 0;
 
     platf = ccl_context_get_platform(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     ver = ccl_platform_get_opencl_version(platf, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -554,9 +554,9 @@ CCLPlatform * ccl_context_get_platform(CCLContext * ctx, CCLErr ** err) {
     } else {
         /* Get platform using device. */
         dev = ccl_context_get_device(ctx, 0, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         platf = ccl_platform_new_from_device(dev, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         /* Keep platform. */
         ctx->platf = platf;
     }
@@ -620,11 +620,11 @@ const cl_image_format * ccl_context_get_supported_image_formats(
     /* Get number of image formats. */
     ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
         flags, image_type, 0, NULL, num_image_formats);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: get number of supported image formats (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
-    g_if_err_create_goto(*err, CCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_ERROR,
         *num_image_formats == 0, CCL_ERROR_OTHER, error_handler,
         "%s: number of returned supported image formats is 0.",
         CCL_STRD);
@@ -637,7 +637,7 @@ const cl_image_format * ccl_context_get_supported_image_formats(
     ocl_status = clGetSupportedImageFormats(ccl_context_unwrap(ctx),
         flags, image_type, *num_image_formats,
         (cl_image_format *) info->value, NULL);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: get supported image formats (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));

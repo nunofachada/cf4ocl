@@ -138,7 +138,7 @@ CCLKernel * ccl_kernel_new(
     /* Create kernel. */
     kernel = clCreateKernel(ccl_program_unwrap(prg),
         kernel_name, &ocl_status);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to create kernel (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -420,7 +420,7 @@ CCLEvent * ccl_kernel_enqueue_ndrange(CCLKernel * krnl, CCLQueue * cq,
             CCLArg * arg = (CCLArg *) arg_ptr;
             ocl_status = clSetKernelArg(ccl_kernel_unwrap(krnl), arg_index,
                 ccl_arg_size(arg), ccl_arg_value(arg));
-            g_if_err_create_goto(*err, CCL_OCL_ERROR,
+            ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
                 CL_SUCCESS != ocl_status, ocl_status, error_handler,
                 "%s: unable to set kernel arg %d (OpenCL error %d: %s).",
                 CCL_STRD, arg_index, ocl_status, ccl_err(ocl_status));
@@ -434,7 +434,7 @@ CCLEvent * ccl_kernel_enqueue_ndrange(CCLKernel * krnl, CCLQueue * cq,
         global_work_size, local_work_size,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to enqueue kernel (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -656,7 +656,7 @@ CCLEvent * ccl_kernel_set_args_and_enqueue_ndrange_v(CCLKernel * krnl,
     /* Enqueue kernel. */
     evt = ccl_kernel_enqueue_ndrange(krnl, cq, work_dim, global_work_offset,
         global_work_size, local_work_size, evt_wait_lst, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);
@@ -743,7 +743,7 @@ CCLEvent * ccl_kernel_enqueue_native(CCLQueue * cq,
         args, cb_args, num_mos, (const cl_mem *) mem_list, args_mem_loc,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to enqueue native kernel (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -810,14 +810,14 @@ cl_uint ccl_kernel_get_opencl_version(CCLKernel * krnl, CCLErr ** err) {
     /* Get cl_context object for this kernel. */
     context = ccl_kernel_get_info_scalar(
         krnl, CL_KERNEL_CONTEXT, cl_context, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get context wrapper. */
     ctx = ccl_context_new_wrap(context);
 
     /* Get OpenCL version. */
     ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Unref. the context wrapper. */
     ccl_context_unref(ctx);
@@ -844,21 +844,21 @@ finish:
  * @brief Helper macro which tests if the error is a
  * `CCL_ERROR_INFO_UNAVAILABLE_OCL` error, and if so, generates a warning and
  * clears the error. Otherwise it tests the error in the same way as
- * g_if_err_propagate_goto().
+ * ccl_if_err_propagate_goto().
  *
  * @param[out] err Destination CCLErr** object.
  * @param[in] err_internal Source CCLErr* object.
  * @param[in] error_handler Label to goto if an error other than
  * `CCL_ERROR_INFO_UNAVAILABLE_OCL` is detected.
  * */
-#define g_if_err_not_info_unavailable_propagate_goto( \
+#define ccl_if_err_not_info_unavailable_propagate_goto( \
             err, err_internal, error_handler) \
     if (((err_internal) != NULL) && ((err_internal)->domain == CCL_ERROR) && \
             ((err_internal)->code == CCL_ERROR_INFO_UNAVAILABLE_OCL)) { \
         g_warning("In %s: %s", CCL_STRD, (err_internal)->message); \
         ccl_err_clear(&(err_internal)); \
     } else { \
-        g_if_err_propagate_goto(err, err_internal, error_handler); \
+        ccl_if_err_propagate_goto(err, err_internal, error_handler); \
     }
 
 /**
@@ -928,8 +928,8 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
     /* Check if device supports the requested dims. */
     dev_dims = ccl_device_get_info_scalar(
         dev, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, cl_uint, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
-    g_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_create_goto(*err, CCL_ERROR, dims > dev_dims,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: device only supports a maximum of %d dimension(s), "
         "but %d were requested.",
@@ -938,7 +938,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
     /* Get max. work item sizes for device. */
     max_wi_sizes = ccl_device_get_info_array(
         dev, CL_DEVICE_MAX_WORK_ITEM_SIZES, size_t, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* For each dimension, if the user specified a maximum local work
      * size, the effective maximum local work size will be the minimum
@@ -955,7 +955,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
         /* Determine maximum workgroup size. */
         wg_size_max = ccl_kernel_get_workgroup_info_scalar(krnl, dev,
             CL_KERNEL_WORK_GROUP_SIZE, size_t, &err_internal);
-        g_if_err_not_info_unavailable_propagate_goto(
+        ccl_if_err_not_info_unavailable_propagate_goto(
             err, err_internal, error_handler);
 
 #ifdef CL_VERSION_1_1
@@ -964,7 +964,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
 
         /* Get OpenCL version of the underlying platform. */
         cl_uint ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
         /* If OpenCL version of the underlying platform is >= 1.1 ... */
         if (ocl_ver >= 110) {
@@ -973,7 +973,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
             wg_size_mult = ccl_kernel_get_workgroup_info_scalar(
                 krnl, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
                 size_t, &err_internal);
-            g_if_err_not_info_unavailable_propagate_goto(
+            ccl_if_err_not_info_unavailable_propagate_goto(
                 err, err_internal, error_handler);
 
         } else {
@@ -997,7 +997,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
     if ((wg_size_max == 0) && (wg_size_mult == 0)) {
         wg_size_max = ccl_device_get_info_scalar(
             dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, size_t, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         wg_size_mult = wg_size_max;
     }
 
@@ -1040,7 +1040,7 @@ cl_bool ccl_kernel_suggest_worksizes(CCLKernel * krnl, CCLDevice * dev,
         }
         /* Avoid infinite loops and throw error if wg_size didn't
          * change. */
-        g_if_err_create_goto(*err, CCL_ERROR, wg_size == wg_size_aux,
+        ccl_if_err_create_goto(*err, CCL_ERROR, wg_size == wg_size_aux,
             CCL_ERROR_OTHER, error_handler,
             "%s: Unable to determine a work size within the device limit (%d).",
             CCL_STRD, (int) wg_size_max);
@@ -1201,7 +1201,7 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(
 
     /* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
      * error. */
-    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+    ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: Obtaining kernel argument information requires cf4ocl to be "
         "deployed with support for OpenCL version 1.2 or newer.",
@@ -1211,10 +1211,10 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(
 
     /* Check that context platform is >= OpenCL 1.2 */
     ocl_ver = ccl_kernel_get_opencl_version(krnl, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If OpenCL version is not >= 1.2, throw error. */
-    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+    ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: information about kernel arguments requires OpenCL" \
         " version 1.2 or newer.", CCL_STRD);
@@ -1226,7 +1226,7 @@ CCLWrapperInfo * ccl_kernel_get_arg_info(
     info = ccl_wrapper_get_info(
         (CCLWrapper *) krnl, &fake_wrapper, param_name, 0,
         CCL_INFO_KERNEL_ARG, CL_FALSE, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 

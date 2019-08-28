@@ -243,7 +243,7 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
 
     /* Get context platform version. */
     ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Create the OpenCL sampler object. */
     if (ocl_ver >= 200) {
@@ -273,7 +273,7 @@ CCLSampler * ccl_sampler_new_full(CCLContext * ctx,
 #endif
 
     /* Check for errors. */
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to create sampler (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));

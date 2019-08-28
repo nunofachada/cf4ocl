@@ -201,7 +201,7 @@ void ccl_c_args_parse(int argc, char * argv[], CCLErr ** err) {
 
     /* Use context to parse command line options. */
     g_option_context_parse(context, &argc, &argv, err);
-    g_if_err_goto(*err, error_handler);
+    ccl_if_err_goto(*err, error_handler);
 
     /* If we get here, no need for error treatment, jump to cleanup. */
     g_assert(*err == NULL);
@@ -250,11 +250,11 @@ void ccl_c_kernel_info_show(
 
     /* Get OpenCL version. */
     ocl_ver = ccl_program_get_opencl_version(prg, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get kernel. */
     krnl = ccl_program_get_kernel(prg, kernel, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     g_printf("\n");
 
@@ -265,7 +265,7 @@ void ccl_c_kernel_info_show(
         ccl_err_clear(&err_internal);
         g_printf("   - Maximum workgroup size                  : N/A\n");
     } else {
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         g_printf("   - Maximum workgroup size                  : %lu\n",
             (unsigned long) k_wg_size);
     }
@@ -280,7 +280,7 @@ void ccl_c_kernel_info_show(
             ccl_err_clear(&err_internal);
             g_printf("   - Preferred multiple of workgroup size    : N/A\n");
         } else {
-            g_if_err_propagate_goto(err, err_internal, error_handler);
+            ccl_if_err_propagate_goto(err, err_internal, error_handler);
             g_printf("   - Preferred multiple of workgroup size    : %lu\n",
                 (unsigned long) k_pref_wg_size_mult);
         }
@@ -293,7 +293,7 @@ void ccl_c_kernel_info_show(
         ccl_err_clear(&err_internal);
         g_printf("   - WG size in __attribute__ qualifier      : N/A\n");
     } else {
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         g_printf("   - WG size in __attribute__ qualifier      : "
             "(%lu, %lu, %lu)\n",
             (unsigned long) k_compile_wg_size[0],
@@ -308,7 +308,7 @@ void ccl_c_kernel_info_show(
         ccl_err_clear(&err_internal);
         g_printf("   - Local memory used by kernel             : N/A\n");
     } else {
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         g_printf("   - Local memory used by kernel             : %lu bytes\n",
             (unsigned long) k_loc_mem_size);
     }
@@ -320,7 +320,7 @@ void ccl_c_kernel_info_show(
         ccl_err_clear(&err_internal);
         g_printf("   - Min. private mem. used by each workitem : N/A\n");
     } else {
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         g_printf("   - Min. private mem. used by each workitem : %lu bytes\n",
             (unsigned long) k_priv_mem_size);
     }
@@ -394,7 +394,7 @@ int main(int argc, char * argv[]) {
 
     /* Parse command line options. */
     ccl_c_args_parse(argc, argv, &err);
-    g_if_err_goto(err, error_handler);
+    ccl_if_err_goto(err, error_handler);
 
     g_printf("\n");
 
@@ -408,7 +408,7 @@ int main(int argc, char * argv[]) {
 
         /* If user requested a list of available devices, present the list. */
         ccl_devsel_print_device_strings(&err);
-        g_if_err_goto(err, error_handler);
+        ccl_if_err_goto(err, error_handler);
 
     } else {
 
@@ -416,7 +416,7 @@ int main(int argc, char * argv[]) {
          * file and the specification of a device. */
 
         /* Check for input files. */
-        g_if_err_create_goto(err, CCL_ERROR, (src_files == NULL) &&
+        ccl_if_err_create_goto(err, CCL_ERROR, (src_files == NULL) &&
             (src_h_files == NULL) && (bin_files == NULL),
             CCL_ERROR_ARGS, error_handler,
             "No source or binary input files have been specified.");
@@ -434,11 +434,11 @@ int main(int argc, char * argv[]) {
         } else {
             ctx = ccl_context_new_from_device_index(&dev_idx, &err);
         }
-        g_if_err_goto(err, error_handler);
+        ccl_if_err_goto(err, error_handler);
 
         /* Get device. */
         dev = ccl_context_get_device(ctx, 0, &err);
-        g_if_err_goto(err, error_handler);
+        ccl_if_err_goto(err, error_handler);
 
          /* Perform task. */
         switch (task) {
@@ -446,17 +446,17 @@ int main(int argc, char * argv[]) {
 
                 /* For direct builds we can only have either one binary
                  * or one or more source files (but not both). */
-                g_if_err_create_goto(err, CCL_ERROR,
+                ccl_if_err_create_goto(err, CCL_ERROR,
                     (n_src_files > 0) && (n_bin_files > 0),
                     CCL_ERROR_ARGS, error_handler,
                     "The 'build' task requires either: 1) one or more "
                     "source files; or, 2) one binary file.");
-                g_if_err_create_goto(err, CCL_ERROR, n_bin_files > 1,
+                ccl_if_err_create_goto(err, CCL_ERROR, n_bin_files > 1,
                     CCL_ERROR_ARGS, error_handler,
                     "The 'build' task accepts at most one binary file.");
 
                 /* Input headers are not accepted by the compile task. */
-                g_if_err_create_goto(err, CCL_ERROR,
+                ccl_if_err_create_goto(err, CCL_ERROR,
                     (n_src_h_files > 0) || (n_src_h_names > 0),
                     CCL_ERROR_ARGS, error_handler,
                     "Input headers can only be specified for the 'compile' "
@@ -476,7 +476,7 @@ int main(int argc, char * argv[]) {
                         ctx, n_src_files, (const char **) src_files, &err);
 
                 }
-                g_if_err_goto(err, error_handler);
+                ccl_if_err_goto(err, error_handler);
 
                 /* Build program. */
                 ccl_program_build(prg, options, &err_build);
@@ -484,7 +484,7 @@ int main(int argc, char * argv[]) {
                 /* Only check for errors that are not build/compile/link
                  * failures. */
                 if (!ccl_c_is_build_error(err_build)) {
-                    g_if_err_propagate_goto(&err, err_build, error_handler);
+                    ccl_if_err_propagate_goto(&err, err_build, error_handler);
                 }
 
                 break;
@@ -492,18 +492,18 @@ int main(int argc, char * argv[]) {
             case CCL_C_COMPILE:
 
                 /* Compilation requires at least one source file. */
-                g_if_err_create_goto(err, CCL_ERROR, n_src_files == 0,
+                ccl_if_err_create_goto(err, CCL_ERROR, n_src_files == 0,
                     CCL_ERROR_ARGS, error_handler,
                     "The 'compile' task requires at least one source file.");
 
                 /* Compilation does not support binaries. */
-                g_if_err_create_goto(err, CCL_ERROR, n_bin_files > 0,
+                ccl_if_err_create_goto(err, CCL_ERROR, n_bin_files > 0,
                     CCL_ERROR_ARGS, error_handler,
                     "The 'compile' task does not support binaries.");
 
                 /* Number of header include names must be zero OR be the same as
                  * the number of input headers. */
-                g_if_err_create_goto(err, CCL_ERROR,
+                ccl_if_err_create_goto(err, CCL_ERROR,
                     (n_src_h_files != n_src_h_names) && (n_src_h_names > 0),
                     CCL_ERROR_ARGS, error_handler,
                     "Number of header include names must be the same as the "
@@ -522,7 +522,7 @@ int main(int argc, char * argv[]) {
                         /* Create current header program from source. */
                         prg_aux = ccl_program_new_from_source_files(
                             ctx, 1, (const char **) &(src_h_files[i]), &err);
-                        g_if_err_goto(err, error_handler);
+                        ccl_if_err_goto(err, error_handler);
 
                         /* Add header program to array. */
                         g_ptr_array_add(prgs, (gpointer) prg_aux);
@@ -532,7 +532,7 @@ int main(int argc, char * argv[]) {
                 /* Create main program from source. */
                 prg = ccl_program_new_from_source_files(
                     ctx, n_src_files, (const char **) src_files, &err);
-                g_if_err_goto(err, error_handler);
+                ccl_if_err_goto(err, error_handler);
 
                 /* Compile program. */
                 ccl_program_compile(prg, 1, &dev, options, n_src_h_files,
@@ -543,7 +543,7 @@ int main(int argc, char * argv[]) {
                 /* Only check for errors that are not build/compile/link
                  * failures. */
                 if (!ccl_c_is_build_error(err_build)) {
-                    g_if_err_propagate_goto(&err, err_build, error_handler);
+                    ccl_if_err_propagate_goto(&err, err_build, error_handler);
                 }
 
                 break;
@@ -552,7 +552,7 @@ int main(int argc, char * argv[]) {
 
                 /* Linking requires at least one binary file and does
                  * not support source files. */
-                g_if_err_create_goto(err, CCL_ERROR, (n_bin_files == 0) ||
+                ccl_if_err_create_goto(err, CCL_ERROR, (n_bin_files == 0) ||
                     (n_src_files > 0) || (n_src_h_files > 0),
                     CCL_ERROR_ARGS, error_handler,
                     "The 'link' task requires at least one binary file "
@@ -568,7 +568,7 @@ int main(int argc, char * argv[]) {
                     /* Create program from current binary file. */
                     prg_aux = ccl_program_new_from_binary_file(ctx, dev,
                         bin_files[i], NULL, &err);
-                    g_if_err_goto(err, error_handler);
+                    ccl_if_err_goto(err, error_handler);
 
                     /* Add binary program to array. */
                     g_ptr_array_add(prgs, (gpointer) prg_aux);
@@ -581,20 +581,20 @@ int main(int argc, char * argv[]) {
                 /* Only check for errors that are not build/compile/link
                  * failures. */
                 if (!ccl_c_is_build_error(err_build)) {
-                    g_if_err_propagate_goto(&err, err_build, error_handler);
+                    ccl_if_err_propagate_goto(&err, err_build, error_handler);
                 }
 
                 break;
 
             default:
-                g_if_err_create_goto(err, CCL_ERROR, TRUE,
+                ccl_if_err_create_goto(err, CCL_ERROR, TRUE,
                     CCL_ERROR_ARGS, error_handler, "Unknown task: %d",
                     task);
         }
 
         /* Get and show device name. */
         dname = ccl_device_get_info_array(dev, CL_DEVICE_NAME, char, &err);
-        g_if_err_goto(err, error_handler);
+        ccl_if_err_goto(err, error_handler);
         g_printf("* Device                 : %s\n", dname);
 
         /* Ir program object exists... */
@@ -603,7 +603,7 @@ int main(int argc, char * argv[]) {
             /* ...get build status and build status string. */
             build_status = ccl_program_get_build_info_scalar(prg, dev,
                 CL_PROGRAM_BUILD_STATUS, cl_build_status, &err);
-            g_if_err_goto(err, error_handler);
+            ccl_if_err_goto(err, error_handler);
             build_status_str = ccl_c_get_build_status_str(build_status);
 
         } else {
@@ -621,7 +621,7 @@ int main(int argc, char * argv[]) {
         if (output && prg && (build_status == CL_BUILD_SUCCESS)) {
 
             ccl_program_save_binary(prg, dev, output, &err);
-            g_if_err_goto(err, error_handler);
+            ccl_if_err_goto(err, error_handler);
             g_printf("* Binary output file     : %s\n", output);
         }
 
@@ -639,7 +639,7 @@ int main(int argc, char * argv[]) {
                 /* Show information for current kernel name. */
                 g_printf("* Kernel information     : %s\n", kernel_names[i]);
                 ccl_c_kernel_info_show(prg, dev, kernel_names[i], &err);
-                g_if_err_goto(err, error_handler);
+                ccl_if_err_goto(err, error_handler);
 
             }
         }
@@ -673,7 +673,7 @@ int main(int argc, char * argv[]) {
                     /* Output to file. */
                     g_printf(" Saved to %s.\n", bld_log_out);
                     g_file_set_contents(bld_log_out, build_log, -1, &err);
-                    g_if_err_goto(err, error_handler);
+                    ccl_if_err_goto(err, error_handler);
 
                 } else {
 

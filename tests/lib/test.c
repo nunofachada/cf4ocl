@@ -85,7 +85,7 @@ CCLContext * ccl_test_context_new(cl_uint min_ocl_ver, CCLErr ** err) {
 
     /* Create context. */
     ctx = ccl_context_new_from_device_index(&ccl_tests_devidx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Does the test require a minimum OpenCL version? */
     if (min_ocl_ver > 0) {
@@ -97,7 +97,7 @@ CCLContext * ccl_test_context_new(cl_uint min_ocl_ver, CCLErr ** err) {
 
         /* Get OpenCL version of platform associated with context. */
         ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
         /* Does the platform support the required OpenCL version? */
         if (ocl_ver < min_ocl_ver) {
@@ -108,11 +108,11 @@ CCLContext * ccl_test_context_new(cl_uint min_ocl_ver, CCLErr ** err) {
 
         /* Get selected device. */
         dev = ccl_context_get_device(ctx, 0, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
         /* Does the device support the required minimum OpenCL version? */
         ocl_ver = ccl_device_get_opencl_version(dev, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         if (ocl_ver < min_ocl_ver)
         {
             g_test_skip(
@@ -169,19 +169,19 @@ CCLContext * ccl_test_context_new_with_image_support(
 
     /* Create a context with the devices specified in CCL_TEST_DEVICE_INDEX. */
     ctx = ccl_test_context_new(min_ocl_ver, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Was the context created successfully? */
     if (ctx) {
 
         /* Get the first device associated with the context. */
         dev = ccl_context_get_device(ctx, 0, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
         /* Get device image support. */
         image_support = ccl_device_get_info_scalar(
             dev, CL_DEVICE_IMAGE_SUPPORT, cl_bool, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
         /* Does the device support images? */
         if (!image_support) {

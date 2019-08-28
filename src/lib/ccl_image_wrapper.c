@@ -91,7 +91,7 @@ static cl_mem ccl_image_new_deprecated(CCLContext * ctx, cl_mem_flags flags,
             image_format, img_dsc->image_width, img_dsc->image_height,
             img_dsc->image_row_pitch, host_ptr, &ocl_status);
 
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: unable to create image with clCreateImage2D() " \
             "(OpenCL error %d: %s).",
@@ -105,7 +105,7 @@ static cl_mem ccl_image_new_deprecated(CCLContext * ctx, cl_mem_flags flags,
             img_dsc->image_depth, img_dsc->image_row_pitch,
             img_dsc->image_slice_pitch, host_ptr, &ocl_status);
 
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: unable to create image with clCreateImage3D() " \
             "(OpenCL error %d: %s).",
@@ -114,7 +114,7 @@ static cl_mem ccl_image_new_deprecated(CCLContext * ctx, cl_mem_flags flags,
     } else {
 
         /* Unknown or unsupported image type. */
-        g_if_err_create_goto(*err, CCL_ERROR, CL_TRUE,
+        ccl_if_err_create_goto(*err, CCL_ERROR, CL_TRUE,
             CCL_ERROR_UNSUPPORTED_OCL, error_handler,
             "%s: unknown or unsuported image type (%x)", CCL_STRD,
             img_dsc->image_type);
@@ -242,7 +242,7 @@ CCLImage * ccl_image_new_v(CCLContext * ctx, cl_mem_flags flags,
 
     /* Get OpenCL platform version. */
     ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Create image depending on OpenCL platform version.*/
     if (ocl_ver >= 120) {
@@ -273,7 +273,7 @@ CCLImage * ccl_image_new_v(CCLContext * ctx, cl_mem_flags flags,
         /* Create image. */
         image = clCreateImage(ccl_context_unwrap(ctx), flags,
             image_format, &image_desc, host_ptr, &ocl_status);
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: unable to create image with clCreateImage() " \
             "(OpenCL error %d: %s).",
@@ -283,7 +283,7 @@ CCLImage * ccl_image_new_v(CCLContext * ctx, cl_mem_flags flags,
 
         image = ccl_image_new_deprecated(ctx, flags, image_format,
             img_dsc, host_ptr, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
     }
 
 #else
@@ -291,7 +291,7 @@ CCLImage * ccl_image_new_v(CCLContext * ctx, cl_mem_flags flags,
     /* Create image. */
     image = ccl_image_new_deprecated(ctx, flags, image_format,
         img_dsc, host_ptr, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 
@@ -496,7 +496,7 @@ CCLEvent * ccl_image_enqueue_read(CCLImage * img, CCLQueue * cq,
         row_pitch, slice_pitch, ptr,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to enqueue an image read (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -585,7 +585,7 @@ CCLEvent * ccl_image_enqueue_write(CCLImage * img, CCLQueue * cq,
         input_row_pitch, input_slice_pitch, ptr,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to enqueue an image write (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -673,7 +673,7 @@ CCLEvent * ccl_image_enqueue_copy(CCLImage * src_img, CCLImage * dst_img,
         src_origin, dst_origin, region,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to enqueue an image copy (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -760,7 +760,7 @@ CCLEvent * ccl_image_enqueue_copy_to_buffer(CCLImage * src_img,
         src_origin, region, dst_offset,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to copy image to buffer (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -855,7 +855,7 @@ void * ccl_image_enqueue_map(CCLImage * img, CCLQueue * cq,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst),
         &event, &ocl_status);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to map image (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -950,7 +950,7 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
 
     /* If cf4ocl was not compiled with support for OpenCL >= 1.2, always throw
      * error. */
-    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+    ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: Image fill requires cf4ocl to be deployed with "
         "support for OpenCL version 1.2 or newer.",
@@ -961,10 +961,10 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
     /* Check that context platform is >= OpenCL 1.2 */
     ocl_ver = ccl_memobj_get_opencl_version(
         (CCLMemObj *) img, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If OpenCL version is not >= 1.2, throw error. */
-    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
+    ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 120,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: Image fill requires OpenCL version 1.2 or newer.",
         CCL_STRD);
@@ -974,7 +974,7 @@ CCLEvent * ccl_image_enqueue_fill(CCLImage * img, CCLQueue * cq,
         ccl_memobj_unwrap(img), fill_color, origin, region,
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to enqueue a fill image command (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));

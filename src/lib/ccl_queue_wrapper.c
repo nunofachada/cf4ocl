@@ -206,7 +206,7 @@ CCLQueue * ccl_queue_new_full(CCLContext * ctx, CCLDevice * dev,
     /* If dev is NULL, get first device in context. */
     if (dev == NULL) {
         dev = ccl_context_get_device(ctx, 0, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
     }
 
 #ifdef CL_VERSION_2_0
@@ -216,7 +216,7 @@ CCLQueue * ccl_queue_new_full(CCLContext * ctx, CCLDevice * dev,
 
     /* Get context platform version. */
     platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Create and keep the OpenCL command queue object. */
     if (platf_ver >= 200) {
@@ -270,7 +270,7 @@ CCLQueue * ccl_queue_new_full(CCLContext * ctx, CCLDevice * dev,
 #endif
 
     /* Check for errors in queue creation. */
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to create queue (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -380,7 +380,7 @@ CCLContext * ccl_queue_get_context(CCLQueue * cq, CCLErr ** err) {
         /* Otherwise, get it using a query. */
         CCLWrapperInfo * info = NULL;
         info = ccl_queue_get_info(cq, CL_QUEUE_CONTEXT, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         ctx = ccl_context_new_wrap(*((cl_context *) info->value));
         cq->ctx = ctx;
     }
@@ -432,7 +432,7 @@ CCLDevice * ccl_queue_get_device(CCLQueue * cq, CCLErr ** err) {
         /* Otherwise, get it using a query. */
         CCLWrapperInfo * info = NULL;
         info = ccl_queue_get_info(cq, CL_QUEUE_DEVICE, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
         dev = ccl_device_new_wrap(*((cl_device_id *) info->value));
         cq->dev = dev;
     }
@@ -676,7 +676,7 @@ static cl_event ccl_enqueue_barrier_deprecated(
 
         /* If so, use clEnqueueBarrier() */
         ocl_status = clEnqueueBarrier(ccl_queue_unwrap(cq));
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: error in clEnqueueBarrier() (OpenCL error %d: %s).",
             CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -687,7 +687,7 @@ static cl_event ccl_enqueue_barrier_deprecated(
         ocl_status = clEnqueueWaitForEvents(ccl_queue_unwrap(cq),
             ccl_event_wait_list_get_num_events(evt_wait_lst),
             ccl_event_wait_list_get_clevents(evt_wait_lst));
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: error in clEnqueueWaitForEvents() (OpenCL error %d: %s).",
             CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -695,7 +695,7 @@ static cl_event ccl_enqueue_barrier_deprecated(
 
     /* Enqueue a marker so we get an OpenCL event object. */
     ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -769,9 +769,9 @@ CCLEvent * ccl_enqueue_barrier(
 
     /* Get platform version. */
     ctx = ccl_queue_get_context(cq, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
     platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Proceed depending on platform version. */
     if (platf_ver >= 120) {
@@ -780,7 +780,7 @@ CCLEvent * ccl_enqueue_barrier(
         ocl_status = clEnqueueBarrierWithWaitList(ccl_queue_unwrap(cq),
             ccl_event_wait_list_get_num_events(evt_wait_lst),
             ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: error in clEnqueueBarrierWithWaitList() "
             "(OpenCL error %d: %s).",
@@ -791,7 +791,7 @@ CCLEvent * ccl_enqueue_barrier(
         /* Use "old" functions. */
         event = ccl_enqueue_barrier_deprecated(
             cq, evt_wait_lst,  &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
     }
 
 #else
@@ -800,7 +800,7 @@ CCLEvent * ccl_enqueue_barrier(
      * then use those functions by default. */
     event = ccl_enqueue_barrier_deprecated(
         cq, evt_wait_lst,  &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 
@@ -871,7 +871,7 @@ static cl_event ccl_enqueue_marker_deprecated(
 
     /* Call clEnqueueMarker() once. */
     ocl_status = clEnqueueMarker(ccl_queue_unwrap(cq), &event);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: error in clEnqueueMarker() (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -944,9 +944,9 @@ CCLEvent * ccl_enqueue_marker(
 
     /* Get platform version. */
     ctx = ccl_queue_get_context(cq, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
     platf_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Proceed depending on platform version. */
     if (platf_ver >= 120) {
@@ -955,7 +955,7 @@ CCLEvent * ccl_enqueue_marker(
         ocl_status = clEnqueueMarkerWithWaitList(ccl_queue_unwrap(cq),
             ccl_event_wait_list_get_num_events(evt_wait_lst),
             ccl_event_wait_list_get_clevents(evt_wait_lst), &event);
-        g_if_err_create_goto(*err, CCL_OCL_ERROR,
+        ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
             CL_SUCCESS != ocl_status, ocl_status, error_handler,
             "%s: error in clEnqueueMarkerWithWaitList() (OpenCL error %d: %s).",
             CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -964,7 +964,7 @@ CCLEvent * ccl_enqueue_marker(
 
         /* Use "old" functions. */
         event = ccl_enqueue_marker_deprecated(cq, evt_wait_lst, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
     }
 
 #else
@@ -972,7 +972,7 @@ CCLEvent * ccl_enqueue_marker(
     /* If library is compiled with support for OpenCL 1.0 and 1.1,
      * then use those functions by default. */
     event = ccl_enqueue_marker_deprecated(cq, evt_wait_lst, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
 #endif
 

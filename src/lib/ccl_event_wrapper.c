@@ -394,14 +394,14 @@ cl_uint ccl_event_get_opencl_version(CCLEvent * evt, CCLErr ** err) {
 
     context = ccl_event_get_info_scalar(
         evt, CL_EVENT_CONTEXT, cl_context, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get context wrapper. */
     ctx = ccl_context_new_wrap(context);
 
     /* Get OpenCL version. */
     ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Unref. the context wrapper. */
     ccl_context_unref(ctx);
@@ -477,7 +477,7 @@ cl_bool ccl_event_set_callback(CCLEvent * evt,
 
     /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
      * error. */
-    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+    ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: Event callbacks require cf4ocl to be deployed with "
         "support for OpenCL version 1.1 or newer.",
@@ -487,10 +487,10 @@ cl_bool ccl_event_set_callback(CCLEvent * evt,
 
     /* Check that context platform is >= OpenCL 1.1 */
     ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If OpenCL version is not >= 1.1, throw error. */
-    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+    ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: set event callback requires OpenCL version 1.1 or newer.",
         CCL_STRD);
@@ -498,7 +498,7 @@ cl_bool ccl_event_set_callback(CCLEvent * evt,
     /* Set event callback.*/
     ocl_status = clSetEventCallback(ccl_event_unwrap(evt),
         command_exec_callback_type, pfn_notify, user_data);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: unable to set event callback (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -565,7 +565,7 @@ CCLEvent * ccl_user_event_new(CCLContext * ctx, CCLErr ** err) {
 
     /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
      * error. */
-    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+    ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: User events require cf4ocl to be deployed with "
         "support for OpenCL version 1.1 or newer.",
@@ -575,17 +575,17 @@ CCLEvent * ccl_user_event_new(CCLContext * ctx, CCLErr ** err) {
 
     /* Check that context platform is >= OpenCL 1.1 */
     ocl_ver = ccl_context_get_opencl_version(ctx, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If OpenCL version is not >= 1.1, throw error. */
-    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+    ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: User events require OpenCL version 1.1 or newer.",
         CCL_STRD);
 
     /* Create user event. */
     event = clCreateUserEvent(ccl_context_unwrap(ctx), &ocl_status);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: error creating user event (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -652,7 +652,7 @@ cl_bool ccl_user_event_set_status(
 
     /* If cf4ocl was not compiled with support for OpenCL >= 1.1, always throw
      * error. */
-    g_if_err_create_goto(*err, CCL_ERROR, TRUE,
+    ccl_if_err_create_goto(*err, CCL_ERROR, TRUE,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: User events require cf4ocl to be deployed with "
         "support for OpenCL version 1.1 or newer.",
@@ -662,10 +662,10 @@ cl_bool ccl_user_event_set_status(
 
     /* Check that context platform is >= OpenCL 1.1 */
     ocl_ver = ccl_event_get_opencl_version(evt, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If OpenCL version is not >= 1.1, throw error. */
-    g_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
+    ccl_if_err_create_goto(*err, CCL_ERROR, ocl_ver < 110,
         CCL_ERROR_UNSUPPORTED_OCL, error_handler,
         "%s: User events require OpenCL version 1.1 or newer.",
         CCL_STRD);
@@ -673,7 +673,7 @@ cl_bool ccl_user_event_set_status(
     /* Set status. */
     ocl_status = clSetUserEventStatus(
         ccl_event_unwrap(evt), execution_status);
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: error setting user event status (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));
@@ -824,7 +824,7 @@ cl_bool ccl_event_wait(CCLEventWaitList * evt_wait_lst, CCLErr ** err) {
     ocl_status = clWaitForEvents(
         ccl_event_wait_list_get_num_events(evt_wait_lst),
         ccl_event_wait_list_get_clevents(evt_wait_lst));
-    g_if_err_create_goto(*err, CCL_OCL_ERROR,
+    ccl_if_err_create_goto(*err, CCL_OCL_ERROR,
         CL_SUCCESS != ocl_status, ocl_status, error_handler,
         "%s: error while waiting for events (OpenCL error %d: %s).",
         CCL_STRD, ocl_status, ccl_err(ocl_status));

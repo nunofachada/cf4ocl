@@ -630,27 +630,27 @@ static void ccl_prof_add_event(
     /* Get event queued instant. */
     instant_queued = ccl_event_get_profiling_info_scalar(
         evt, CL_PROFILING_COMMAND_QUEUED, cl_ulong, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get event submit instant. */
     instant_submit = ccl_event_get_profiling_info_scalar(
         evt, CL_PROFILING_COMMAND_SUBMIT, cl_ulong, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get event start instant. */
     instant_start = ccl_event_get_profiling_info_scalar(
         evt, CL_PROFILING_COMMAND_START, cl_ulong, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get event end instant. */
     instant_end = ccl_event_get_profiling_info_scalar(
         evt, CL_PROFILING_COMMAND_END, cl_ulong, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Get command type. */
     command_type = ccl_event_get_info_scalar(
         evt, CL_EVENT_COMMAND_TYPE, cl_command_type, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we get here, update number of profilable events, and get an ID
      * for the given event. */
@@ -750,8 +750,8 @@ static void ccl_prof_process_queues(CCLProf * prof, CCLErr ** err) {
         /* Check that queue has profiling enabled. */
         qprop = ccl_queue_get_info_scalar(cq, CL_QUEUE_PROPERTIES,
             cl_command_queue_properties, &err_internal);
-        g_if_err_propagate_goto(err, err_internal, error_handler);
-        g_if_err_create_goto(*err, CCL_ERROR,
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_create_goto(*err, CCL_ERROR,
             (qprop & CL_QUEUE_PROFILING_ENABLE) == 0, CCL_ERROR_OTHER,
             error_handler,
             "%s: the '%s' queue does not have profiling enabled.",
@@ -781,7 +781,7 @@ static void ccl_prof_process_queues(CCLProf * prof, CCLErr ** err) {
                 ccl_err_clear(&err_internal);
                 continue;
             }
-            g_if_err_propagate_goto(err, err_internal, error_handler);
+            ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
         }
 
@@ -1314,7 +1314,7 @@ cl_bool ccl_prof_calc(CCLProf * prof, CCLErr ** err) {
 
     /* Process queues and respective events. */
     ccl_prof_process_queues(prof, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Obtain the event_ids table (by reversing the event_names table) */
     prof->event_name_ids = g_hash_table_new(g_direct_hash, g_direct_equal);
@@ -1889,7 +1889,7 @@ cl_bool ccl_prof_export_info(CCLProf * prof, FILE * stream, CCLErr ** err) {
             export_options.evname_delim,
             export_options.newline);
 
-        g_if_err_create_goto(*err, CCL_ERROR, write_status < 0,
+        ccl_if_err_create_goto(*err, CCL_ERROR, write_status < 0,
             CCL_ERROR_STREAM_WRITE, error_handler,
             "Error while exporting profiling information" \
             "(writing to stream).");
@@ -1945,13 +1945,13 @@ cl_bool ccl_prof_export_info_file(
 
     /* Open file. */
     FILE * fp = fopen(filename, "w");
-    g_if_err_create_goto(*err, CCL_ERROR, fp == NULL,
+    ccl_if_err_create_goto(*err, CCL_ERROR, fp == NULL,
         CCL_ERROR_OPENFILE, error_handler,
         "Unable to open file '%s' for exporting.", filename);
 
     /* Export data. */
     status = ccl_prof_export_info(prof, fp, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* If we got here, everything is OK. */
     g_assert(err == NULL || *err == NULL);

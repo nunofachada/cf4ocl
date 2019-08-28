@@ -59,7 +59,7 @@ static void ccl_dev_container_init_devices(CCLDevContainer * devcon,
 
     /* Get device IDs. */
     info_devs = get_devices(devcon, &err_internal);
-    g_if_err_propagate_goto(err, err_internal, error_handler);
+    ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     /* Determine number of devices. */
     devcon->num_devices = (cl_uint) (info_devs->size / sizeof(cl_device_id));
@@ -198,12 +198,12 @@ CCLDevice * ccl_dev_container_get_device(
             devcon, get_devices, &err_internal);
 
         /* Check for errors. */
-        g_if_err_propagate_goto(err, err_internal, error_handler);
+        ccl_if_err_propagate_goto(err, err_internal, error_handler);
 
     }
 
     /* Make sure device index is less than the number of devices. */
-    g_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices,
+    ccl_if_err_create_goto(*err, CCL_ERROR, index >= devcon->num_devices,
         CCL_ERROR_DEVICE_NOT_FOUND, error_handler,
         "%s: device index (%d) out of bounds (%d devices in list).",
          CCL_STRD, index, devcon->num_devices);
