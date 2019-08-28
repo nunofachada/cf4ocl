@@ -27,7 +27,7 @@
  * */
 
 #include "test.h"
-#include "_g_err_macros.h"
+#include "_ccl_defs.h"
 
 /**
  * @internal
