@@ -276,6 +276,7 @@ const char * ccl_event_get_final_name(CCLEvent * evt) {
             case CL_COMMAND_GL_FENCE_SYNC_OBJECT_KHR:
                 final_name = "GL_FENCE_SYNC_OBJECT_KHR";
                 break;
+            #if defined(__MSC_VER)
             case CL_COMMAND_ACQUIRE_D3D10_OBJECTS_KHR:
                 final_name = "ACQUIRE_D3D10_OBJECTS_KHR";
                 break;
@@ -294,6 +295,7 @@ const char * ccl_event_get_final_name(CCLEvent * evt) {
             case CL_COMMAND_RELEASE_D3D11_OBJECTS_KHR:
                 final_name = "RELEASE_D3D11_OBJECTS_KHR";
                 break;
+            #endif
             case CL_COMMAND_ACQUIRE_EGL_OBJECTS_KHR:
                 final_name = "ACQUIRE_EGL_OBJECTS_KHR";
                 break;

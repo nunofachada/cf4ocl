@@ -32,7 +32,7 @@
     #include <OpenCL/opencl.h>
 #else
     #include <CL/opencl.h>
-    #ifdef CL_VERSION_1_2
+    #if defined(CL_VERSION_1_2) && defined(__MSC_VER)
         #include <CL/cl_dx9_media_sharing.h>
     #endif
 #endif
