@@ -5,7 +5,7 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: cf4ocl2
 Description: C Framework for OpenCL
-URL: http://fakenmc.github.io/cf4ocl/
+URL: http://nunofachada.github.io/cf4ocl/
 Version: @cf4ocl2_VERSION@
 Requires.private: glib-2.0 >= 2.32.1
 Libs: -L${libdir} -lcf4ocl2

@@ -101,9 +101,9 @@
  * REPORTING BUGS
  * ==============
  *
- * * Report ccl_devinfo bugs at https://github.com/fakenmc/cf4ocl/issues
- * * cf4ocl home page: http://fakenmc.github.io/cf4ocl/
- * * cf4ocl wiki: https://github.com/fakenmc/cf4ocl/wiki
+ * * Report ccl_devinfo bugs at https://github.com/nunofachada/cf4ocl/issues
+ * * cf4ocl home page: http://nunofachada.github.io/cf4ocl/
+ * * cf4ocl wiki: https://github.com/nunofachada/cf4ocl/wiki
  *
  * COPYRIGHT
  * =========

@@ -402,7 +402,7 @@ if(WIN32)
     # Windows packaging settings
     set(CPACK_GENERATOR "NSIS" "ZIP")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
-    set(CPACK_NSIS_URL_INFO_ABOUT "http://fakenmc.github.io/cf4ocl/" )
+    set(CPACK_NSIS_URL_INFO_ABOUT "http://nunofachada.github.io/cf4ocl/" )
 elseif(APPLE)
     # OSX packaging settings
     # Use defaults

@@ -1,7 +1,7 @@
 [![ci](https://github.com/nunofachada/cf4ocl/actions/workflows/main.yml/badge.svg)](https://github.com/nunofachada/cf4ocl/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/fakenmc/cf4ocl/branch/master/graph/badge.svg)](https://codecov.io/gh/fakenmc/cf4ocl)
+[![codecov](https://codecov.io/gh/nunofachada/cf4ocl/branch/master/graph/badge.svg)](https://codecov.io/gh/nunofachada/cf4ocl)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11475/badge.svg)](https://scan.coverity.com/projects/fakenmc-cf4ocl)
-[![Latest release](https://img.shields.io/github/release/fakenmc/cf4ocl.svg)](https://github.com/fakenmc/cf4ocl/releases)
+[![Latest release](https://img.shields.io/github/release/nunofachada/cf4ocl.svg)](https://github.com/nunofachada/cf4ocl/releases)
 [![LGPL Licence](https://img.shields.io/badge/license-LGPLv3-yellowgreen.svg)](https://opensource.org/licenses/LGPL-3.0/)
 [![Supported platforms](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux%20%7C%20bsd-orange.svg)](https://en.wikipedia.org/wiki/Cross-platform)
 
@@ -45,7 +45,7 @@ Documentation
 
 * [User guide and API](http://www.fakenmc.com/cf4ocl/docs/latest/)
 * [Tutorial](http://www.fakenmc.com/cf4ocl/docs/latest/tut.html)
-* [Wiki](https://github.com/fakenmc/cf4ocl/wiki)
+* [Wiki](https://github.com/nunofachada/cf4ocl/wiki)
 * [Utilities](http://www.fakenmc.com/cf4ocl/docs/latest/utils.html)
 * [Function list](http://www.fakenmc.com/cf4ocl/docs/latest/funlist.html)
 * [Library modules](http://www.fakenmc.com/cf4ocl/docs/latest/modules.html)
@@ -55,8 +55,8 @@ Feedback and collaboration
 ==========================
 
 Download or clone _cf4ocl_,
-[build and install it](https://github.com/fakenmc/cf4ocl/wiki/Build-and-install-from-source),
-and [code](https://github.com/fakenmc/cf4ocl/wiki/Using-cf4ocl-in-a-new-project)
+[build and install it](https://github.com/nunofachada/cf4ocl/wiki/Build-and-install-from-source),
+and [code](https://github.com/nunofachada/cf4ocl/wiki/Using-cf4ocl-in-a-new-project)
 a small example, such as the one below, which shows a clean and fast way to
 create an OpenCL context with a user-selected device:
 
@@ -119,14 +119,14 @@ projects:
 * [hiCL][]
 * [ocl-ke][]
 
-[releases]: https://github.com/fakenmc/cf4ocl/releases
+[releases]: https://github.com/nunofachada/cf4ocl/releases
 [OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
 [LGPLv3]: http://www.gnu.org/licenses/lgpl.html "LGPLv3"
 [GPLv3]: http://www.gnu.org/licenses/gpl.html "GPLv3"
-[Wiki]: https://github.com/fakenmc/cf4ocl/wiki
-[enhancements]: https://github.com/fakenmc/cf4ocl/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
-[issues]: https://github.com/fakenmc/cf4ocl/issues "issues"
-[binary packaging]: https://github.com/fakenmc/cf4ocl/wiki/Install-the-binaries
+[Wiki]: https://github.com/nunofachada/cf4ocl/wiki
+[enhancements]: https://github.com/nunofachada/cf4ocl/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
+[issues]: https://github.com/nunofachada/cf4ocl/issues "issues"
+[binary packaging]: https://github.com/nunofachada/cf4ocl/wiki/Install-the-binaries
 [Simple OpenCL]: https://github.com/morousg/simple-opencl "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
 [OCL-MLA]: http://tuxfan.github.io/ocl-mla/ "OCL-MLA"

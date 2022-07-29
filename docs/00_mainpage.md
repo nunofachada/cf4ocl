@@ -86,8 +86,8 @@ projects:
 [OpenCL]: http://www.khronos.org/opencl/ "OpenCL"
 [LGPLv3]: http://www.gnu.org/licenses/lgpl.html "LGPLv3"
 [GPLv3]: http://www.gnu.org/licenses/gpl.html "GPLv3"
-[Wiki]: https://github.com/fakenmc/cf4ocl/wiki
-[enhancements]: https://github.com/fakenmc/cf4ocl/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
+[Wiki]: https://github.com/nunofachada/cf4ocl/wiki
+[enhancements]: https://github.com/nunofachada/cf4ocl/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
 [Simple OpenCL]: https://github.com/morousg/simple-opencl "Simple OpenCL"
 [The OpenCL utility library]: https://github.com/Oblomov/CLU "The OpenCL utility library"
 [OCL-MLA]: http://tuxfan.github.io/ocl-mla/ "OCL-MLA"
