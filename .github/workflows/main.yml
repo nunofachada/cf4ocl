@@ -13,14 +13,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    steps:        
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Install dependencies
         run: |
-          sudo apt update && sudo apt install -y bats build-essential cmake libpocl-dev libglib2.0-dev
-        
+          sudo apt update && sudo apt install -y bats build-essential cmake libpocl-dev libglib2.0-dev ocl-icd-opencl-dev
+
       - name: Build
         run: |
           mkdir build
