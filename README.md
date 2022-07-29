@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/fakenmc/cf4ocl.svg?branch=master)](https://travis-ci.org/fakenmc/cf4ocl)
+[![ci](https://github.com/nunofachada/cf4ocl/actions/workflows/main.yml/badge.svg)](https://github.com/nunofachada/cf4ocl/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/fakenmc/cf4ocl/branch/master/graph/badge.svg)](https://codecov.io/gh/fakenmc/cf4ocl)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11475/badge.svg)](https://scan.coverity.com/projects/fakenmc-cf4ocl)
 [![Latest release](https://img.shields.io/github/release/fakenmc/cf4ocl.svg)](https://github.com/fakenmc/cf4ocl/releases)
