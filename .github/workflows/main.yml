@@ -23,36 +23,57 @@ jobs:
             libclang-cpp{11,14}-dev libclang-cpp{11,14} llvm-{11,14}-dev \
             libglib2.0-dev valgrind
 
+      - name: Cache POCL and Oclgrind builds
+        id: cache-poclgrind
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${GITHUB_WORKSPACE}/pocl
+            ${GITHUB_WORKSPACE}/Oclgrind
+          key: ${{ runner.os }}-poclgrind
+
       - name: Clone POCL
+        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: pocl/pocl
           ref: release_3_0
           path: pocl
 
-      - name: Build and install POCL
+      - name: Build POCL
+        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
         run: |
           cd ${GITHUB_WORKSPACE}/pocl
           mkdir build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_LLVM_CONFIG=/usr/bin/llvm-config-14
           make
+
+      - name: Install POCL
+        run: |
+          cd ${GITHUB_WORKSPACE}/pocl/build
           sudo make install
           sudo mkdir -p /etc/OpenCL/vendors
           sudo cp pocl.icd /etc/OpenCL/vendors/pocl.icd
 
       - name: Clone Oclgrind
+        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: jrprice/Oclgrind
           ref: v21.10
           path: Oclgrind
 
-      - name: Build and install Oclgrind
+      - name: Build Oclgrind
+        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
         run: |
           cd ${GITHUB_WORKSPACE}/Oclgrind
           mkdir build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_DIR=/usr/lib/llvm-11/share/llvm/cmake
           make
+
+      - name: Install Oclgrind
+        run: |
+          cd ${GITHUB_WORKSPACE}/Oclgrind/build
           sudo make install
 
       - name: Update registry of installed libraries
@@ -72,10 +93,16 @@ jobs:
           make
 
       - name: List available OpenCL devices (should only register POCL)
-        run: ./src/utils/ccl_devinfo
+        run: |
+          cd ${GITHUB_WORKSPACE}/cf4ocl/build
+          ./src/utils/ccl_devinfo
 
       - name: Test cf4ocl against POCL
-        run: ctest
+        run: |
+          cd ${GITHUB_WORKSPACE}/cf4ocl/build
+          ctest
 
       - name: Test cf4ocl against Oclgrind and check for memory leaks
-        run: oclgrind valgrind --tool=memcheck --leak-check=full ctest
+        run:  |
+          cd ${GITHUB_WORKSPACE}/cf4ocl/build
+          oclgrind valgrind --tool=memcheck --leak-check=full ctest
