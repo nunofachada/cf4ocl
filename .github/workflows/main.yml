@@ -11,21 +11,71 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Install dependencies
         run: |
-          sudo apt update && sudo apt install -y bats build-essential cmake libpocl-dev libglib2.0-dev ocl-icd-opencl-dev
+          sudo apt install -y bats build-essential ocl-icd-libopencl1 cmake git \
+            pkg-config libclang-{11,14}-dev clang-{11,14} llvm-{11,14} make \
+            ninja-build ocl-icd-libopencl1 ocl-icd-dev ocl-icd-opencl-dev \
+            libhwloc-dev zlib1g zlib1g-dev clinfo dialog apt-utils libxml2-dev \
+            libclang-cpp{11,14}-dev libclang-cpp{11,14} llvm-{11,14}-dev \
+            libglib2.0-dev valgrind
 
-      - name: Build
+      - name: Clone POCL
+        uses: actions/checkout@v3
+        with:
+          repository: pocl/pocl
+          ref: release_3_0
+          path: pocl
+
+      - name: Build and install POCL
         run: |
+          cd ${GITHUB_WORKSPACE}/pocl
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_LLVM_CONFIG=/usr/bin/llvm-config-14
+          make
+          sudo make install
+          sudo mkdir -p /etc/OpenCL/vendors
+          sudo cp pocl.icd /etc/OpenCL/vendors/pocl.icd
+
+      - name: Clone Oclgrind
+        uses: actions/checkout@v3
+        with:
+          repository: jrprice/Oclgrind
+          ref: v21.10
+          path: Oclgrind
+
+      - name: Build and install Oclgrind
+        run: |
+          cd ${GITHUB_WORKSPACE}/Oclgrind
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_DIR=/usr/lib/llvm-11/share/llvm/cmake
+          make
+          sudo make install
+
+      - name: Update registry of installed libraries
+        run: sudo ldconfig
+
+      - name: Clone cf4ocl
+        uses: actions/checkout@v3
+        with:
+          path: cf4ocl
+
+      - name: Build cf4ocl
+        run: |
+          cd ${GITHUB_WORKSPACE}/cf4ocl
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so
           make
-          make test
 
+      - name: List available OpenCL devices (should only register POCL)
+        run: ./src/utils/ccl_devinfo
+
+      - name: Test cf4ocl against POCL
+        run: ctest
+
+      - name: Test cf4ocl against Oclgrind and check for memory leaks
+        run: oclgrind valgrind --tool=memcheck --leak-check=full ctest
