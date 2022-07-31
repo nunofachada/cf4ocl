@@ -71,7 +71,7 @@ jobs:
         with:
           path: cf4ocl
 
-      - name: Build cf4ocl
+      - name: Build cf4ocl, test against POCL and generate coverage report
         run: |
           cmake -S cf4ocl -B builds/cf4ocl \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -87,11 +87,6 @@ jobs:
 
       - name: List available OpenCL devices (should only register POCL)
         run: ./builds/cf4ocl/src/utils/ccl_devinfo
-
-      - name: Test cf4ocl against POCL
-        run: |
-          cd builds/cf4ocl
-          ctest
 
       - name: Test cf4ocl against Oclgrind and check for memory leaks
         run:  |
