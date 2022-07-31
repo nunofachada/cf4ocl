@@ -23,15 +23,6 @@ jobs:
             libclang-cpp{11,14}-dev libclang-cpp{11,14} llvm-{11,14}-dev \
             libglib2.0-dev lcov valgrind
 
-      - name: Cache POCL and Oclgrind builds
-        id: cache-builds
-        uses: actions/cache@v3
-        with:
-          path: |
-            builds/pocl
-            builds/oclgrind
-          key: ${{ runner.os }}-builds
-
       - name: Clone POCL
         uses: actions/checkout@v3
         with:
@@ -40,7 +31,6 @@ jobs:
           path: pocl
 
       - name: Build POCL
-        if: steps.cache-builds.outputs.cache-hit != 'true'
         run: |
           cmake -S pocl -B builds/pocl \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -62,7 +52,6 @@ jobs:
           path: oclgrind
 
       - name: Build Oclgrind
-        if: steps.cache-builds.outputs.cache-hit != 'true'
         run: |
           cmake -S oclgrind -B builds/oclgrind \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -86,11 +75,12 @@ jobs:
         run: |
           cmake -S cf4ocl -B builds/cf4ocl \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so
+            -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so \
             -DTESTS_GENERATE_COVERAGE=1
           cmake --build builds/cf4ocl --target codecov
 
-      - uses: codecov/codecov-action@v3
+      - name: Upload coverage report to CodeCov
+        uses: codecov/codecov-action@v3
         with:
           directory: builds/cf4ocl
           verbose: true
