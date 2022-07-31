@@ -13,11 +13,6 @@ jobs:
   test:
     runs-on: ubuntu-22.04
 
-    env:
-      LIBS_BUILD_PATH: ~/builds
-      POCL_BUILD_PATH: ~/builds/pocl
-      OCLGRIND_BUILD_PATH: ~/builds/oclgrind
-
     steps:
       - name: Install dependencies
         run: |
@@ -32,7 +27,9 @@ jobs:
         id: cache-builds
         uses: actions/cache@v3
         with:
-          path: $LIBS_BUILD_PATH
+          path: |
+            builds/pocl
+            builds/oclgrind
           key: ${{ runner.os }}-builds
 
       - name: Clone POCL
@@ -45,14 +42,14 @@ jobs:
       - name: Build POCL
         if: steps.cache-builds.outputs.cache-hit != 'true'
         run: |
-          mkdir -p $POCL_BUILD_PATH && cd $POCL_BUILD_PATH
-          cmake ${GITHUB_WORKSPACE}/pocl -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          cmake -S pocl -B builds/pocl \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DWITH_LLVM_CONFIG=/usr/bin/llvm-config-14
-          make
+          cmake --build builds/pocl
 
       - name: Install POCL
         run: |
-          cd $POCL_BUILD_PATH
+          cd builds/pocl
           sudo make install
           sudo mkdir -p /etc/OpenCL/vendors
           sudo cp pocl.icd /etc/OpenCL/vendors/pocl.icd
@@ -67,14 +64,14 @@ jobs:
       - name: Build Oclgrind
         if: steps.cache-builds.outputs.cache-hit != 'true'
         run: |
-          mkdir -p $OCLGRIND_BUILD_PATH && cd $OCLGRIND_BUILD_PATH
-          cmake ${GITHUB_WORKSPACE}/oclgrind -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          cmake -S oclgrind -B builds/oclgrind \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DLLVM_DIR=/usr/lib/llvm-11/share/llvm/cmake
-          make
+          cmake --build builds/oclgrind
 
       - name: Install Oclgrind
         run: |
-          cd $OCLGRIND_BUILD_PATH
+          cd builds/oclgrind
           sudo make install
 
       - name: Update registry of installed libraries
@@ -87,24 +84,20 @@ jobs:
 
       - name: Build cf4ocl
         run: |
-          cd ${GITHUB_WORKSPACE}/cf4ocl
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          cmake -S cf4ocl -B builds/cf4ocl \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so
-          make
+          cmake --build builds/cf4ocl
 
       - name: List available OpenCL devices (should only register POCL)
-        run: |
-          cd ${GITHUB_WORKSPACE}/cf4ocl/build
-          ./src/utils/ccl_devinfo
+        run: ./builds/cf4ocl/src/utils/ccl_devinfo
 
       - name: Test cf4ocl against POCL
         run: |
-          cd ${GITHUB_WORKSPACE}/cf4ocl/build
+          cd builds/cf4ocl
           ctest
 
       - name: Test cf4ocl against Oclgrind and check for memory leaks
         run:  |
-          cd ${GITHUB_WORKSPACE}/cf4ocl/build
+          cd builds/cf4ocl
           oclgrind valgrind --tool=memcheck --leak-check=full ctest
