@@ -21,7 +21,7 @@ jobs:
             ninja-build ocl-icd-libopencl1 ocl-icd-dev ocl-icd-opencl-dev \
             libhwloc-dev zlib1g zlib1g-dev clinfo dialog apt-utils libxml2-dev \
             libclang-cpp{11,14}-dev libclang-cpp{11,14} llvm-{11,14}-dev \
-            libglib2.0-dev valgrind
+            libglib2.0-dev lcov valgrind
 
       - name: Cache POCL and Oclgrind builds
         id: cache-builds
@@ -85,9 +85,15 @@ jobs:
       - name: Build cf4ocl
         run: |
           cmake -S cf4ocl -B builds/cf4ocl \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_BUILD_TYPE=Debug \
             -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so
-          cmake --build builds/cf4ocl
+            -DTESTS_GENERATE_COVERAGE=1
+          cmake --build builds/cf4ocl --target codecov
+
+      - uses: codecov/codecov-action@v3
+        with:
+          directory: builds/cf4ocl
+          verbose: true
 
       - name: List available OpenCL devices (should only register POCL)
         run: ./builds/cf4ocl/src/utils/ccl_devinfo
