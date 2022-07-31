@@ -13,6 +13,11 @@ jobs:
   test:
     runs-on: ubuntu-22.04
 
+    env:
+      LIBS_BUILD_PATH: ~/builds
+      POCL_BUILD_PATH: ~/builds/pocl
+      OCLGRIND_BUILD_PATH: ~/builds/oclgrind
+
     steps:
       - name: Install dependencies
         run: |
@@ -24,16 +29,13 @@ jobs:
             libglib2.0-dev valgrind
 
       - name: Cache POCL and Oclgrind builds
-        id: cache-poclgrind
+        id: cache-builds
         uses: actions/cache@v3
         with:
-          path: |
-            ${GITHUB_WORKSPACE}/pocl
-            ${GITHUB_WORKSPACE}/Oclgrind
-          key: ${{ runner.os }}-poclgrind
+          path: $LIBS_BUILD_PATH
+          key: ${{ runner.os }}-builds
 
       - name: Clone POCL
-        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: pocl/pocl
@@ -41,39 +43,38 @@ jobs:
           path: pocl
 
       - name: Build POCL
-        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
+        if: steps.cache-builds.outputs.cache-hit != 'true'
         run: |
-          cd ${GITHUB_WORKSPACE}/pocl
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_LLVM_CONFIG=/usr/bin/llvm-config-14
+          mkdir -p $POCL_BUILD_PATH && cd $POCL_BUILD_PATH
+          cmake ${GITHUB_WORKSPACE}/pocl -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DWITH_LLVM_CONFIG=/usr/bin/llvm-config-14
           make
 
       - name: Install POCL
         run: |
-          cd ${GITHUB_WORKSPACE}/pocl/build
+          cd $POCL_BUILD_PATH
           sudo make install
           sudo mkdir -p /etc/OpenCL/vendors
           sudo cp pocl.icd /etc/OpenCL/vendors/pocl.icd
 
       - name: Clone Oclgrind
-        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: jrprice/Oclgrind
           ref: v21.10
-          path: Oclgrind
+          path: oclgrind
 
       - name: Build Oclgrind
-        if: steps.cache-poclgrind.outputs.cache-hit != 'true'
+        if: steps.cache-builds.outputs.cache-hit != 'true'
         run: |
-          cd ${GITHUB_WORKSPACE}/Oclgrind
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_DIR=/usr/lib/llvm-11/share/llvm/cmake
+          mkdir -p $OCLGRIND_BUILD_PATH && cd $OCLGRIND_BUILD_PATH
+          cmake ${GITHUB_WORKSPACE}/oclgrind -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DLLVM_DIR=/usr/lib/llvm-11/share/llvm/cmake
           make
 
       - name: Install Oclgrind
         run: |
-          cd ${GITHUB_WORKSPACE}/Oclgrind/build
+          cd $OCLGRIND_BUILD_PATH
           sudo make install
 
       - name: Update registry of installed libraries
@@ -89,7 +90,8 @@ jobs:
           cd ${GITHUB_WORKSPACE}/cf4ocl
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so
+          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so
           make
 
       - name: List available OpenCL devices (should only register POCL)
