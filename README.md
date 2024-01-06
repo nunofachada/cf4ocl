@@ -8,9 +8,13 @@
 News
 ====
 
+*6 Jan. 2024*
+
+- This repository is now archived and will not be further developed by the original author. It's hard to make a case for using OpenCL in pure C nowadays, given the existence of excellent wrappers for other programming languages. If someone wants to pick up where I left off, let me know.
+
 *4 July 2016*
 
-Version 2.1.0 is available for download in the [releases][] page.
+- Version 2.1.0 is available for download in the [releases][] page.
 
 Summary
 =======
@@ -20,10 +24,10 @@ framework for developing and benchmarking [OpenCL][] projects. It aims to:
 
 1. Promote the rapid development of OpenCL host programs in C (with support for
 C++) and avoid the tedious and error-prone boilerplate code usually required.
-2. Assist in the benchmarking of OpenCL events, such as kernel execution and
+1. Assist in the benchmarking of OpenCL events, such as kernel execution and
 data transfers. Profiling comes for **free** with _cf4ocl_.
-3. Simplify the analysis of the OpenCL environment and of kernel requirements.
-4. Allow for all levels of integration with existing OpenCL code: use as much or
+1. Simplify the analysis of the OpenCL environment and of kernel requirements.
+2. Allow for all levels of integration with existing OpenCL code: use as much or
 as few of _cf4ocl_ required for your project, with full access to the underlying
 OpenCL objects and functions at all times.
 
